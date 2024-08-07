@@ -536,6 +536,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
+#if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                            Access::Privilege aNeededPrivilege)
 {
@@ -546,6 +547,7 @@ static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor,
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
 }
+#endif
 
 static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
