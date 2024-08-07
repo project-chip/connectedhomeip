@@ -52,6 +52,33 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
     case BasicInformation::Attributes::FeatureMap::Id:
         encoder.Encode(kBridgedDeviceBasicInformationFeatureMap);
         break;
+    case BasicInformation::Attributes::UniqueID::Id:
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().uniqueId.c_str()));
+        break;
+    case BasicInformation::Attributes::VendorName::Id:
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().vendorName.c_str()));
+        break;
+    case BasicInformation::Attributes::VendorID::Id:
+        encoder.Encode(dev->GetBridgedAttributes().vendorId);
+        break;
+    case BasicInformation::Attributes::ProductName::Id:
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().productName.c_str()));
+        break;
+    case BasicInformation::Attributes::ProductID::Id:
+        encoder.Encode(dev->GetBridgedAttributes().productId);
+        break;
+    case BasicInformation::Attributes::HardwareVersion::Id:
+        encoder.Encode(dev->GetBridgedAttributes().hardwareVersion);
+        break;
+    case BasicInformation::Attributes::HardwareVersionString::Id:
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().hardwareVersionString.c_str()));
+        break;
+    case BasicInformation::Attributes::SoftwareVersion::Id:
+        encoder.Encode(dev->GetBridgedAttributes().softwareVersion);
+        break;
+    case BasicInformation::Attributes::SoftwareVersionString::Id:
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().softwareVersionString.c_str()));
+        break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
