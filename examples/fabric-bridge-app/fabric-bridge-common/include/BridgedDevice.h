@@ -61,11 +61,9 @@ public:
 
 protected:
     bool mReachable;
-    std::string mLocation;
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;
-    std::string mZone;
 
     BridgedAttributes mAttributes;
 };
