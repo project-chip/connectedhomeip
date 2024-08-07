@@ -100,7 +100,28 @@ public:
     /**
      * @brief Get the CastingPlayer object targeted currently (may not be connected)
      */
-    static CastingPlayer * GetTargetCastingPlayer() { return mTargetCastingPlayer; }
+    static CastingPlayer * GetTargetCastingPlayer()
+    {
+        ChipLogProgress(AppServer, "CastingPlayer::GetTargetCastingPlayer() called");
+        std::shared_ptr<CastingPlayer> sharedPtr = mTargetCastingPlayer.lock();
+        CastingPlayer * rawPtr                   = nullptr;
+        if (sharedPtr)
+        {
+            rawPtr = sharedPtr.get();
+            ChipLogProgress(
+                AppServer,
+                "CastingPlayer::GetTargetCastingPlayer() Got rawPtr from mTargetCastingPlayer, sharedPtr reference count: %lu",
+                sharedPtr.use_count());
+            sharedPtr.reset();
+        }
+        else
+        {
+            ChipLogError(AppServer,
+                         "CastingPlayer::GetTargetCastingPlayer() The shared pointer observed by mTargetCastingPlayer has expired "
+                         "(become nullptr)");
+        }
+        return rawPtr;
+    }
 
     /**
      * @brief Compares based on the Id
@@ -257,12 +278,21 @@ public:
 
     void SetFabricIndex(chip::FabricIndex fabricIndex) { mAttributes.fabricIndex = fabricIndex; }
 
+    /**
+     * @brief Return the current state of the CastingPlayer
+     */
+    ConnectionState GetConnectionState() const { return mConnectionState; }
+
 private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
     IdentificationDeclarationOptions mIdOptions;
-    static CastingPlayer * mTargetCastingPlayer;
+    // This is a std::weak_ptr. A std::weak_ptr is a non-owning reference to an object managed by one
+    // or more std::shared_ptr instances. When the last std::shared_ptr instance that owns the managed
+    // object is destroyed or reset, the object itself is automatically destroyed, and all
+    // std::weak_ptr instances that reference that object become expired.
+    static memory::Weak<CastingPlayer> mTargetCastingPlayer;
     uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted            = {};
 

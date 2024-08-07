@@ -151,6 +151,24 @@ public:
     static EcosystemInformationServer & Instance();
 
     /**
+     * @brief Add EcosystemInformation Cluster to endpoint so we respond appropriately on endpoint
+     *
+     * EcosystemInformation cluster is only ever on dynamic bridge endpoint. If cluster is added
+     * to a new endpoint, but does not contain any ecosystem information presently,
+     * this is called to let ECOINFO cluster code know it is supposed to provide blank attribute
+     * information on this endpoint.
+     *
+     * This approach was intentionally taken instead of relying on emberAfDeviceTypeListFromEndpoint
+     * to keep this cluster more unit testable. This does add burden to application but is worth
+     * the trade-off.
+     *
+     * @param[in] aEndpoint Which endpoint is the device being added to the device directory.
+     * @return #CHIP_NO_ERROR on success.
+     * @return Other CHIP_ERROR associated with issue.
+     */
+    CHIP_ERROR AddEcosystemInformationClusterToEndpoint(EndpointId aEndpoint);
+
+    /**
      * @brief Adds device as entry to DeviceDirectory list Attribute.
      *
      * @param[in] aEndpoint Which endpoint is the device being added to the device directory.
@@ -187,7 +205,7 @@ public:
 private:
     struct DeviceInfo
     {
-        Optional<uint64_t> mRemovedOn;
+        Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
         // Map key is using the UniqueLocationId
         std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;

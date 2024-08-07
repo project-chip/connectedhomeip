@@ -35,7 +35,7 @@ bool ChipDeviceEventHandler::sUdcInProgress = false;
 
 void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle called");
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() called");
 
     bool runPostCommissioning           = false;
     chip::NodeId targetNodeId           = 0;
@@ -65,16 +65,17 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
         CastingPlayer::GetTargetCastingPlayer()->FindOrEstablishSession(
             nullptr,
             [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle: Connection to CastingPlayer successful");
+                ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() Connection to CastingPlayer successful");
                 CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
 
                 // this async call will Load all the endpoints with their respective attributes into the TargetCastingPlayer
                 // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                 EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
+                ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling EndpointListLoader::GetInstance()->Load()");
                 EndpointListLoader::GetInstance()->Load();
             },
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                ChipLogError(AppServer, "ChipDeviceEventHandler::Handle: Connection to CastingPlayer failed");
+                ChipLogError(AppServer, "ChipDeviceEventHandler::Handle(): Connection to CastingPlayer failed");
                 CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
                 CHIP_ERROR err = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
                 if (err != CHIP_NO_ERROR)
@@ -84,7 +85,7 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
 
                 VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
                 CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
-                CastingPlayer::mTargetCastingPlayer = nullptr;
+                CastingPlayer::mTargetCastingPlayer.reset();
             });
     }
 }
@@ -99,8 +100,8 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
         sUdcInProgress                                            = false;
         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted         = nullptr;
-        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer = nullptr;
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted = nullptr;
+        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer.reset();
         return;
     }
 
