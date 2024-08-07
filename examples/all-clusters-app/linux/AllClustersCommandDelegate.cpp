@@ -410,12 +410,12 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetOccupancy")
     {
-        uint8_t occupancy = static_cast<uint8_t>(self->mJsonValue["Occupancy"].asUInt());
+        uint8_t occupancy     = static_cast<uint8_t>(self->mJsonValue["Occupancy"].asUInt());
         EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
 
         if (1 == occupancy || 0 == occupancy)
         {
-            self->HandleSetOccupancyChange(endpointId,occupancy);
+            self->HandleSetOccupancyChange(endpointId, occupancy);
         }
         else
         {
@@ -800,7 +800,8 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
         uint16_t * holdTime = chip::app::Clusters::OccupancySensing::GetHoldTimeForEndpoint(endpointId);
         if (holdTime != nullptr)
         {
-            CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler, nullptr);
+            CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler, nullptr);
             ChipLogDetail(NotSpecified, "Start HoldTime timer");
             if (CHIP_NO_ERROR != err)
             {
@@ -812,7 +813,7 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
 
 void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    uint8_t clearValue = 0;
+    uint8_t clearValue                         = 0;
     Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Set(1, clearValue);
     ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
 
