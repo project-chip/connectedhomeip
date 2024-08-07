@@ -119,7 +119,11 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 void DeviceSynchronizer::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
+#if defined(PW_RPC_ENABLED)
     AddSynchronizedDevice(mCurrentDeviceData);
+#else
+    ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+#endif
 }
 
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
