@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <wifipaf/WiFiPAFLayer.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 #include <utility>
+#include <wifipaf/WiFiPAFLayer.h>
 
 namespace chip {
 namespace Transport {
