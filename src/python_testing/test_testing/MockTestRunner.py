@@ -38,7 +38,7 @@ class AsyncMock(MagicMock):
 
 class MockTestRunner():
 
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path=None):
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = None, pics: dict[str, bool] = None, paa_trust_store_path=None):
         self.test = test
         self.endpoint = endpoint
         self.pics = pics
