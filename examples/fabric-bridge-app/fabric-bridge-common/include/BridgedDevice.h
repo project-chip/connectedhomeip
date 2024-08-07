@@ -57,7 +57,7 @@ public:
 
     /// Convenience method to set just the unique id of a bridged device as it
     /// is one of the few attributes that is not always bulk-set
-    void SetUniqueId(const std::string &value) { mAttributes.uniqueId = value; }
+    void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
     bool mReachable;
