@@ -106,7 +106,7 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice &data)
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
