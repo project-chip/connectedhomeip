@@ -403,8 +403,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
-
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(CurrentCommissioner(), mNodeId);
     }
     else
     {
