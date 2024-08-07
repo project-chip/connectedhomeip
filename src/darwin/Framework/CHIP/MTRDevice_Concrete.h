@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +15,13 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Foundation/Foundation.h>
+#import <Matter/MTRDevice.h>
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
+NS_ASSUME_NONNULL_BEGIN
 
-// Inherit defaults from config/standalone/CHIPProjectConfig.h
-#include <CHIPProjectConfig.h>
+@interface MTRDevice_Concrete : MTRDevice
+
+@end
+
+NS_ASSUME_NONNULL_END

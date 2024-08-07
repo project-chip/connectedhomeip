@@ -36,6 +36,7 @@ source_set("fabric-bridge-lib") {
     "src/BridgedDevice.cpp",
     "src/BridgedDeviceBasicInformationImpl.cpp",
     "src/BridgedDeviceManager.cpp",
+    "src/ZCLCallbacks.cpp",
   ]
 
   deps = [
