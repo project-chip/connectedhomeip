@@ -720,9 +720,6 @@ public:
      */
     void CloseBleConnection();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    void ConnectWiFiPAFTransportToSelf();
-#endif
 
     /**
      * @brief
