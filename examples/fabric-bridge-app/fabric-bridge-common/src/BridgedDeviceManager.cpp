@@ -52,8 +52,8 @@ constexpr int kNodeLabelSize       = 32;
 constexpr int kUniqueIdSize        = 32;
 constexpr int kVendorNameSize      = 32;
 constexpr int kProductNameSize     = 32;
-constexpr int kHardwareVersionSize = 32;
-constexpr int kSoftwareVersionSize = 32;
+constexpr int kHardwareVersionSize = 64;
+constexpr int kSoftwareVersionSize = 64;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
