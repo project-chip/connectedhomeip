@@ -21,8 +21,6 @@
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <string>
-
 using namespace chip::app::Clusters::Actions;
 
 BridgedDevice::BridgedDevice(chip::NodeId nodeId)
@@ -30,11 +28,6 @@ BridgedDevice::BridgedDevice(chip::NodeId nodeId)
     mReachable  = false;
     mNodeId     = nodeId;
     mEndpointId = chip::kInvalidEndpointId;
-}
-
-bool BridgedDevice::IsReachable()
-{
-    return mReachable;
 }
 
 void BridgedDevice::SetReachable(bool reachable)

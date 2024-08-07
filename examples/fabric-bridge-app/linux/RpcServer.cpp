@@ -107,6 +107,7 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     }
 
     device->SetBridgedAttributes(attributes);
+    device->SetIcd(request.has_is_icd && request.is_icd);
 
     auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
     if (!result.has_value())

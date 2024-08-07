@@ -24,7 +24,6 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 
 static constexpr unsigned kBridgedDeviceBasicInformationClusterRevision = 4;
-static constexpr unsigned kBridgedDeviceBasicInformationFeatureMap      = 0;
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -49,9 +48,12 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
     case BasicInformation::Attributes::ClusterRevision::Id:
         encoder.Encode(kBridgedDeviceBasicInformationClusterRevision);
         break;
-    case BasicInformation::Attributes::FeatureMap::Id:
-        encoder.Encode(kBridgedDeviceBasicInformationFeatureMap);
-        break;
+    case BasicInformation::Attributes::FeatureMap::Id: {
+        BitMask<Clusters::BridgedDeviceBasicInformation::Feature> features;
+        features.Set(Clusters::BridgedDeviceBasicInformation::Feature::kBridgedICDSupport, dev->IsIcd());
+        encoder.Encode(features);
+    }
+    break;
     case BasicInformation::Attributes::UniqueID::Id:
         encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().uniqueId.c_str()));
         break;
