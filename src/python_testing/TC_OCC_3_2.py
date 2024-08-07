@@ -31,10 +31,10 @@
 #  [TC-OCC-3.1] test procedure step 3, 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
+import time
 import logging
 
 import chip.clusters as Clusters
-import sleep
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
                                     await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
@@ -87,7 +87,7 @@ class TC_OCC_3_2(MatterBaseTest):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
         # Delay for pipe command to be processed (otherwise tests are flaky)
-        sleep(0.001)
+        time.sleep(0.001)
 
     @async_test_body
     async def test_TC_OCC_3_2(self):
