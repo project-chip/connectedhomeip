@@ -32,6 +32,7 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
+
 import chip.clusters as Clusters
 import sleep
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
