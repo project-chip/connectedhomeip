@@ -68,44 +68,17 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     {
         areaID = aOther.areaID;
         mapID  = aOther.mapID;
-
-        if (aOther.areaDesc.locationInfo.IsNull())
-        {
-            areaDesc.locationInfo.SetNull();
-        }
-        else
-        {
-            areaDesc.locationInfo.SetNonNull();
-
-            // deep copy the name.
-            auto sizeToCopy = std::min(sizeof(mAreaNameBuffer), aOther.areaDesc.locationInfo.Value().locationName.size());
-            memcpy(mAreaNameBuffer, aOther.areaDesc.locationInfo.Value().locationName.data(), sizeToCopy);
-            areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
-
-            areaDesc.locationInfo.Value().floorNumber = aOther.areaDesc.locationInfo.Value().floorNumber;
-            areaDesc.locationInfo.Value().areaType    = aOther.areaDesc.locationInfo.Value().areaType;
-        }
-
-        if (aOther.areaDesc.landmarkInfo.IsNull())
-        {
-            areaDesc.landmarkInfo.SetNull();
-        }
-        else
-        {
-            areaDesc.landmarkInfo.SetNonNull();
-            areaDesc.landmarkInfo.Value().landmarkTag = aOther.areaDesc.landmarkInfo.Value().landmarkTag;
-            if (aOther.areaDesc.landmarkInfo.Value().positionTag.IsNull())
-            {
-                areaDesc.landmarkInfo.Value().positionTag.SetNull();
-            }
-            else
-            {
-                areaDesc.landmarkInfo.Value().positionTag.SetNonNull();
-                areaDesc.landmarkInfo.Value().positionTag.Value() = aOther.areaDesc.landmarkInfo.Value().positionTag.Value();
-            }
-        }
+        SetLocationInfo(aOther.areaDesc.locationInfo);
+        SetLandmarkInfo(aOther.areaDesc.landmarkInfo);
 
         return *this;
+    }
+
+    bool operator==(const AreaStructureWrapper & aOther) const
+    {
+        BitMask<IsEqualConfig> config = 0; // Do not ignore the AreaID or the MapID.
+
+        return IsEqual(aOther, config);
     }
 
     AreaStructureWrapper & SetAreaId(uint32_t aAreaID) {
