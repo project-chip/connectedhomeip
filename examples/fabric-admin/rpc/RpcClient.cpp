@@ -124,25 +124,25 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
     strcpy(device.vendor_name, "Test Vendor");
     device.has_vendor_name = true;
 
-    device.vendor_id = 123;
+    device.vendor_id     = 123;
     device.has_vendor_id = true;
 
     strcpy(device.product_name, "Test Product");
     device.has_product_name = true;
 
-    device.product_id = 234;
+    device.product_id     = 234;
     device.has_product_id = true;
 
     strcpy(device.node_label, "Device Label");
     device.has_node_label = true;
 
-    device.hardware_version = 11;
+    device.hardware_version     = 11;
     device.has_hardware_version = true;
 
     strcpy(device.hardware_version_string, "Hardware");
     device.has_hardware_version_string = true;
 
-    device.software_version = 22;
+    device.software_version     = 22;
     device.has_software_version = true;
 
     strcpy(device.software_version_string, "Test 1.4.22");
