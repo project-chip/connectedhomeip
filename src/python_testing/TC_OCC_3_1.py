@@ -24,11 +24,12 @@
 # === END CI TEST ARGUMENTS ===
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
-#  [TC-OCC-3.1] test procedure step 4
-#  [TC-OCC-3.2] test precedure step 3c
+#  [TC-OCC-3.1] test procedure step 3, 4
+#  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
 import time
+import sleep
 from typing import Any, Optional
 
 import chip.clusters as Clusters
@@ -71,10 +72,26 @@ class TC_OCC_3_1(MatterBaseTest):
         ]
         return pics
 
+    # Sends and out-of-band command to the rvc-app
+    def write_to_app_pipe(self, command):
+        with open(self.app_pipe, "w") as app_pipe:
+            app_pipe.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests are flaky)
+        sleep(0.001)
+    
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10  # 10 seconds for occupancy state hold time
 
+        # CI app pipe id creation
+        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid == 0:
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+            self.app_pipe = self.app_pipe + str(app_pid)
+        
         self.step(1)  # commissioning and getting cluster attribute list
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
@@ -99,16 +116,24 @@ class TC_OCC_3_1(MatterBaseTest):
             if has_hold_time:
                 time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
             else:  # a user wait until a sensor specific time to change occupancy attribute to 0.  This is the case where the sensor doesn't support HoldTime.
-                self.wait_for_user_input(
-                    prompt_msg="Type any letter and press ENTER after the sensor occupancy is detection ready state (occupancy attribute = 0)")
+                # CI call to trigger off
+                if self.is_ci:
+                    self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+                else:
+                    self.wait_for_user_input(
+                        prompt_msg="Type any letter and press ENTER after the sensor occupancy is detection ready state (occupancy attribute = 0)")
 
         # check sensor occupancy state is 0 for the next test step
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is still 1.")
 
         self.step(4)
-        # Trigger occupancy sensor to change Occupancy attribute value to 1 => TESTER ACTION on DUT
-        self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
+        # CI call to trigger on
+        if self.is_ci:
+            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
+        else:
+            # Trigger occupancy sensor to change Occupancy attribute value to 1 => TESTER ACTION on DUT
+            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
 
         # And then check if Occupancy attribute has changed.
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
