@@ -65,6 +65,7 @@ declare_args() {
   #   'external' - Externally LogV implementation (src/platform/logging/LogV.h)
   #   'none'     - Discard all log output
   #   'stdio'    - Print to stdout
+  #   'syslog'   - POSIX syslog()
   if (chip_use_external_logging) {
     chip_logging_backend = "external"
   } else {
@@ -134,8 +135,9 @@ if (chip_target_style == "") {
 
 assert(
     chip_logging_backend == "platform" || chip_logging_backend == "external" ||
-        chip_logging_backend == "none" || chip_logging_backend == "stdio",
-    "Please select a valid logging backend: platform, external, none, stdio")
+        chip_logging_backend == "none" || chip_logging_backend == "stdio" ||
+        chip_logging_backend == "syslog",
+    "Please select a valid logging backend: platform, external, none, stdio, syslog")
 assert(
     !chip_use_external_logging || chip_logging_backend == "external",
     "Setting chip_use_external_logging = true conflicts with selected chip_logging_backend")

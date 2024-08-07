@@ -83,7 +83,8 @@ group("default") {
              chip_device_platform == "external" || chip_device_platform == "none")
     }
   } else if (chip_logging_backend == "none" ||
-             chip_logging_backend == "stdio ") {
+             chip_logging_backend == "stdio " ||
+             chip_logging_backend == "syslog") {
     deps = [ ":${chip_logging_backend}" ]
   } else {
     assert(chip_logging_backend == "external")
@@ -108,6 +109,14 @@ source_set("none") {
 
 source_set("stdio") {
   sources = [ "impl/Stdio.cpp" ]
+  deps = [
+    ":headers",
+    "${chip_root}/src/platform:platform_base",
+  ]
+}
+
+source_set("syslog") {
+  sources = [ "impl/Syslog.cpp" ]
   deps = [
     ":headers",
     "${chip_root}/src/platform:platform_base",
