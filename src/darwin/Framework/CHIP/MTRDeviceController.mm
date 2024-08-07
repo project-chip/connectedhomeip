@@ -75,6 +75,7 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <optional>
 #include <string>
 
 #import <os/lock.h>
@@ -107,8 +108,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // Atomic because it can be touched from multiple threads.
+    // Atomic because they can be touched from multiple threads.
     std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
 
     // queue used to serialize all work performed by the MTRDeviceController
     dispatch_queue_t _chipWorkQueue;
@@ -278,6 +280,7 @@ using namespace chip::Tracing::DarwinFramework;
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
@@ -351,6 +354,7 @@ using namespace chip::Tracing::DarwinFramework;
         // shutdown completes, in case it wants to write to storage as it
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
@@ -590,6 +594,7 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         self->_storedFabricIndex = fabricIdx;
+        self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
         commissionerInitialized = YES;
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
@@ -1440,20 +1445,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (nullable NSNumber *)compressedFabricID
 {
-    assertChipStackLockedByCurrentThread();
-
-    if (!_cppCommissioner) {
-        return nil;
-    }
-
-    return @(_cppCommissioner->GetCompressedFabricId());
-}
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID
-{
-    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
-        return [self compressedFabricID];
-    } error:nil];
+    auto storedValue = _storedCompressedFabricID.load();
+    return storedValue.has_value() ? @(storedValue.value()) : nil;
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable

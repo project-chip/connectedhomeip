@@ -79,8 +79,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Will return the compressed fabric id of the fabric if the controller is
  * running, else nil.
- *
- * This property MUST be gotten from the Matter work queue.
  */
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 
@@ -265,8 +263,6 @@ NS_ASSUME_NONNULL_BEGIN
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID;
 
 /**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
