@@ -25,6 +25,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -35,8 +36,15 @@
 #include <sys/ioctl.h>
 #include <thread>
 
-using namespace chip;
+// This is declared here and not in a header because zap/embr assumes all clusters
+// are defined in a static endpoint in the .zap file. From there, the codegen will
+// automatically use PluginApplicationCallbacksHeader.jinja to declare and call
+// the respective Init callbacks. However, because EcosystemInformation cluster is only
+// ever on a dynamic endpoint, this doesn't get declared and called for us, so we
+// need to declare and call it ourselves where the application is initialized.
+void MatterEcosystemInformationPluginServerInitCallback();
 
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
@@ -177,6 +185,7 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
+    MatterEcosystemInformationPluginServerInitCallback();
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
     registerAttributeAccessOverride(&gBridgedDeviceBasicInformationAttributes);
 

@@ -71,9 +71,6 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
-    ChipLogProgress(NotSpecified, "Attribute data");
-    path.LogPath();
-
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
@@ -115,7 +112,6 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
             "SoftwareVersionString");
         break;
     default:
-        ChipLogProgress(NotSpecified, "Attribute data not processed");
         break;
     }
 }
@@ -123,7 +119,11 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 void DeviceSynchronizer::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
+#if defined(PW_RPC_ENABLED)
     AddSynchronizedDevice(mCurrentDeviceData);
+#else
+    ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+#endif
 }
 
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)

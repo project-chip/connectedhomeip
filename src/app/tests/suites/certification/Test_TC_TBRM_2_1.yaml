@@ -74,10 +74,10 @@ tests:
       response:
           constraints:
               type: int64u
-    # TODO: Attribute missing from cluster XML
-    # - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
-    #   command: readAttribute
-    #   attribute: PendingDatasetTimestamp
-    #   response:
-    #       constraints:
-    #           type: int64u
+
+    - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: PendingDatasetTimestamp
+      response:
+          constraints:
+              type: int64u
