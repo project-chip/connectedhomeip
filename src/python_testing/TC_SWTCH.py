@@ -39,7 +39,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
 from chip.tlv import uint
 from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                    await_sequence_of_reports, default_matter_test_main, has_feature, run_for_each_matching_endpoint)
+                                    await_sequence_of_reports, default_matter_test_main, has_feature,
+                                    run_for_each_matching_endpoint)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
