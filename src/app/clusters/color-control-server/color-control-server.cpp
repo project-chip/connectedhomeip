@@ -3120,8 +3120,8 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
  * @param quietReporter: The QuieterReportingAttribute<TYPE> object for the attribute to update.
  * @param newValue: Value to update the attribute with
  * @param isStartOrEndOfTransition: Boolean that indicatse whether the update is occurring at the start or end of a level transition
- * @return MarkAttributeDirty::kYes when the attribute must be marked dirty and be reported. MarkAttributeDirty::kNo when it
- * when it no report is needed.
+ * @return MarkAttributeDirty::kYes when the attribute must be marked dirty and be reported. MarkAttributeDirty::kNo when
+ * no report is needed.
  */
 template <typename Q, typename V>
 MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingAttribute<Q> & quietReporter, V newValue,
@@ -3133,8 +3133,8 @@ MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingA
     if (isStartOrEndOfTransition)
     {
         // At the start or end of the movement/transition we must report if the value changed
-        auto predicate = [](const typename QuieterReportingAttribute<Q>::SufficientChangePredicateCandidate & candidate) -> bool {
-            return (candidate.lastDirtyValue != candidate.newValue);
+        auto predicate = [](const typename QuieterReportingAttribute<Q>::SufficientChangePredicateCandidate &) -> bool {
+            return true;
         };
         dirtyState = quietReporter.SetValue(newValue, now, predicate);
     }

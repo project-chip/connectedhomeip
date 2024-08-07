@@ -391,8 +391,8 @@ static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelContro
     if (isStartOrEndOfTransition)
     {
         // At the start or end of the movement/transition we must report
-        auto predicate = [](const decltype(state->quietCurrentLevel)::SufficientChangePredicateCandidate & candidate) -> bool {
-            return (candidate.lastDirtyValue != candidate.newValue);
+        auto predicate = [](const decltype(state->quietCurrentLevel)::SufficientChangePredicateCandidate &) -> bool {
+            return true;
         };
         dirtyState = state->quietCurrentLevel.SetValue(newValue, now, predicate);
     }
