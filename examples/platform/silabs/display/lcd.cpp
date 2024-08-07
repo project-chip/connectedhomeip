@@ -274,7 +274,9 @@ CHIP_ERROR SilabsLCD::TurnOn(void)
 {
     sl_status_t status = SL_STATUS_OK;
 #if (SLI_SI91X_MCU_INTERFACE)
-    status = sl_memlcd_power_on(sl_memlcd_get(), true);
+    sl_memlcd_display_enable();
+    sl_memlcd_power_on(sl_memlcd_get(), true);
+    sl_memlcd_clear(sl_memlcd_get());
 #else
     status = sl_board_enable_display();
 #endif // SLI_SI91X_MCU_INTERFACE
@@ -296,7 +298,8 @@ CHIP_ERROR SilabsLCD::TurnOff(void)
         return CHIP_ERROR_INTERNAL;
     }
 #if (SLI_SI91X_MCU_INTERFACE)
-    status = sl_memlcd_power_on(sl_memlcd_get(), false);
+    sl_memlcd_power_on(sl_memlcd_get(), false);
+    sl_memlcd_display_disable();
 #else
     status = sl_board_disable_display();
 #endif // SLI_SI91X_MCU_INTERFACE
