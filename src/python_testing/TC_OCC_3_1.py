@@ -32,7 +32,6 @@ import time
 from typing import Any, Optional
 
 import chip.clusters as Clusters
-import sleep
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -77,7 +76,7 @@ class TC_OCC_3_1(MatterBaseTest):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
         # Delay for pipe command to be processed (otherwise tests are flaky)
-        sleep(0.001)
+        time.sleep(0.001)
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
