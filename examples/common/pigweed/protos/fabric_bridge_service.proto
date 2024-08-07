@@ -7,6 +7,17 @@ package chip.rpc;
 // Define the message for a synchronized end device with necessary fields
 message SynchronizedDevice {
   uint64 node_id = 1;
+
+  string unique_id = 2;
+  string vendor_name = 3;
+  uint32 vendor_id = 4;
+  string product_name = 5;
+  uint32 product_id = 6;
+  string node_label = 7;
+  uint32 hardware_version = 8;
+  string hardware_version_string = 9;
+  uint32 software_version = 10;
+  string software_version_string = 11;
 }
 
 service FabricBridge {
