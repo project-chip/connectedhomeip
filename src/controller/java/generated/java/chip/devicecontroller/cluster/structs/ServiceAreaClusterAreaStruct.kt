@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ServiceAreaClusterAreaStruct(
   val areaID: ULong,
-  val mapID: UInt?,
+  val mapID: ULong?,
   val areaDesc: ServiceAreaClusterAreaInfoStruct,
 ) {
   override fun toString(): String = buildString {
@@ -59,7 +59,7 @@ class ServiceAreaClusterAreaStruct(
       val areaID = tlvReader.getULong(ContextSpecificTag(TAG_AREA_I_D))
       val mapID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_MAP_I_D))
+          tlvReader.getULong(ContextSpecificTag(TAG_MAP_I_D))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_MAP_I_D))
           null

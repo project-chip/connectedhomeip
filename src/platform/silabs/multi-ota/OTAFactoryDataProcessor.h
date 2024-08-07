@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include <ProvisionManager.h>
+#include <ProvisionStorage.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#include <provision/ProvisionStorage.h>        // nogncheck
-#include <provision/ProvisionStorageGeneric.h> // nogncheck
 
 namespace chip {
 

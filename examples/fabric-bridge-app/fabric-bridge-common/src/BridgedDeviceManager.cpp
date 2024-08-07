@@ -52,8 +52,8 @@ constexpr int kNodeLabelSize       = 32;
 constexpr int kUniqueIdSize        = 32;
 constexpr int kVendorNameSize      = 32;
 constexpr int kProductNameSize     = 32;
-constexpr int kHardwareVersionSize = 32;
-constexpr int kSoftwareVersionSize = 32;
+constexpr int kHardwareVersionSize = 64;
+constexpr int kSoftwareVersionSize = 64;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
@@ -114,6 +114,13 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
                             kSoftwareVersionSize, 0),
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
+// Declare Ecosystem Information cluster attributes
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(ecosystemInformationBasicAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::RemovedOn::Id, EPOCH_US, kNodeLabelSize, ATTRIBUTE_MASK_NULLABLE),
+    DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::DeviceDirectory::Id, ARRAY, kDescriptorAttributeArraySize, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::LocationDirectory::Id, ARRAY, kDescriptorAttributeArraySize, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
 // Declare Administrator Commissioning cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),
@@ -133,6 +140,7 @@ constexpr CommandId administratorCommissioningCommands[] = {
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedNodeClusters)
 DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(EcosystemInformation::Id, ecosystemInformationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(AdministratorCommissioning::Id, AdministratorCommissioningAttrs, ZAP_CLUSTER_MASK(SERVER),
                             administratorCommissioningCommands, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
