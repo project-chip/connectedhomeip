@@ -3113,15 +3113,15 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
  * - When it changes from null to any other value and vice versa. (Implicit to the QuieterReportingAttribute class)
  *
  * The QuietReportAttribute class is updated with the new value and when the report conditions are met,
- * this function will return MarkAttributeDirty::kIfChanged.
+ * this function will return MarkAttributeDirty::kYes.
  * It is expected that the user will use this return value to trigger a reporting mechanism for the attribute with the new value
  * (Which was updated in the quietReporter)
  *
  * @param quietReporter: The QuieterReportingAttribute<TYPE> object for the attribute to update.
  * @param newValue: Value to update the attribute with
  * @param isStartOrEndOfTransition: Boolean that indicatse whether the update is occurring at the start or end of a level transition
- * @return MarkAttributeDirty::kIfChanged when the attribute must be maredk dirty and be reported. MarkAttributeDirty::kNo when it
- * when it no report is needed.
+ * @return MarkAttributeDirty::kYes when the attribute must be marked dirty and be reported. MarkAttributeDirty::kNo when
+ * no report is needed.
  */
 template <typename Q, typename V>
 MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingAttribute<Q> & quietReporter, V newValue,
@@ -3132,7 +3132,7 @@ MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingA
 
     if (isStartOrEndOfTransition)
     {
-        // At the start or end of the movement/transition we must report
+        // At the start or end of the movement/transition we must report if the value changed
         auto predicate = [](const typename QuieterReportingAttribute<Q>::SufficientChangePredicateCandidate &) -> bool {
             return true;
         };
@@ -3155,7 +3155,7 @@ MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingA
         dirtyState                                   = quietReporter.SetValue(newValue, now, predicate);
     }
 
-    return (dirtyState == AttributeDirtyState::kMustReport) ? MarkAttributeDirty::kIfChanged : MarkAttributeDirty::kNo;
+    return (dirtyState == AttributeDirtyState::kMustReport) ? MarkAttributeDirty::kYes : MarkAttributeDirty::kNo;
 }
 
 /*
@@ -3180,7 +3180,7 @@ Status ColorControlServer::SetQuietReportRemainingTime(EndpointId endpoint, uint
     // - kMarkDirtyOnIncrement : When the value increases.
     if (quietRemainingTime[epIndex].SetValue(newRemainingTime, now) == AttributeDirtyState::kMustReport)
     {
-        markDirty = MarkAttributeDirty::kIfChanged;
+        markDirty = MarkAttributeDirty::kYes;
     }
 
     return Attributes::RemainingTime::Set(endpoint, quietRemainingTime[epIndex].value().Value(), markDirty);
