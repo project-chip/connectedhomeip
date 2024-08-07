@@ -37,6 +37,11 @@ bool BridgedDevice::IsReachable()
     return mReachable;
 }
 
+bool BridgedDevice::IsIcd()
+{
+    return mIsIcd;
+}
+
 void BridgedDevice::SetReachable(bool reachable)
 {
     mReachable = reachable;

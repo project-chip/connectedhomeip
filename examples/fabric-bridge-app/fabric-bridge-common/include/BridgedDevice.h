@@ -36,6 +36,7 @@ public:
     virtual ~BridgedDevice() {}
 
     bool IsReachable();
+    bool IsIcd();
     void SetReachable(bool reachable);
     void SetName(const char * name);
     void SetLocation(std::string location) { mLocation = location; };
@@ -51,6 +52,7 @@ public:
 
 protected:
     bool mReachable;
+    bool mIsIcd = false;
     char mName[kDeviceNameSize];
     std::string mLocation;
     chip::NodeId mNodeId;

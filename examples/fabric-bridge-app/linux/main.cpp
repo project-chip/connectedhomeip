@@ -181,19 +181,43 @@ public:
 void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
     using Protocols::InteractionModel::Status;
+    VerifyOrReturn(handlerContext.mRequestPath.mCommandId != BridgedDeviceBasicInformation::Commands::KeepActive::Id);
 
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
 
-    if (handlerContext.mRequestPath.mCommandId != BridgedDeviceBasicInformation::Commands::KeepActive::Id)
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+
+    if (device == nullptr || !device->IsIcd())
     {
-        // Proceed with default handling in BridgedDeviceBasicInformation Server
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
         return;
     }
 
-    ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
+    BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType commandData;
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
 
-    handlerContext.SetCommandHandled();
-    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Success);
+    Status status = Status::Failure;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "KeepActive successfully processed");
+        status = Status::Success;
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "KeepActive failed to process");
+    }
+#else
+    ChipLogProgress(NotSpecified, "Unable to properly call KeepActive: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;

@@ -61,3 +61,15 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
+
+/**
+ * @brief Received StayActiveResponse on behalf of client that previously called KeepActive
+ *
+ * @param nodeId The Node ID of the device we recieved a StayActiveResponse.
+ * @param promisedActiveDuration the computed duration (in milliseconds) that the ICD intends to stay active for.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDuration);

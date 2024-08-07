@@ -44,6 +44,7 @@ class FabricBridge final : public chip::rpc::FabricBridge
 public:
     pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
+    pw::Status ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response) override;
 };
 
 pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
@@ -77,6 +78,23 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
         return pw::Status::NotFound();
     }
 
+    return pw::OkStatus();
+}
+
+pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response)
+{
+    NodeId nodeId = request.node_id;
+    ChipLogProgress(NotSpecified, "Received ActiveChanged: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    auto* device = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
+    if (device == nullptr)
+    {
+        ChipLogError(NotSpecified, "Could not find bridged device associated with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return pw::Status::NotFound();
+    }
+
+    // TODO: DNS without making this change, we need to send the event for the coresponding bridged device endpoint.
+    // device->TriggerActiveChangeEventOnDevice(request.promised_active_duration)
     return pw::OkStatus();
 }
 

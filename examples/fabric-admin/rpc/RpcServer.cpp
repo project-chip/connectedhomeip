@@ -65,6 +65,18 @@ public:
 
         return pw::OkStatus();
     }
+
+    pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, chip_rpc_OperationStatus & response) override
+    {
+        // TODO(#33221): When we get this command hopefully we are already registers with an ICD device to be
+        // notified when it wakes up. We will need to add in hooks there to make sure we send the StayActiveRequest
+        // Important thing to note:
+        //  * If we get this call multiple times before we get a wakeup from ICD, we only send out one StayActiveRequest command
+        //  * After 60 mins from last exipry we no longer will send out a StayActiveRequest.
+
+        response.success = true;
+        return pw::OkStatus();
+    }
 };
 
 FabricAdmin fabric_admin_service;
