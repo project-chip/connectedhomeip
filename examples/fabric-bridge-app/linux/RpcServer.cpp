@@ -93,8 +93,7 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
         return pw::Status::NotFound();
     }
 
-    // TODO: DNS without making this change, we need to send the event for the coresponding bridged device endpoint.
-    // device->TriggerActiveChangeEventOnDevice(request.promised_active_duration)
+    device->LogActiveChangeEvent(request.promised_active_duration);
     return pw::OkStatus();
 }
 

@@ -35,6 +35,8 @@ public:
     BridgedDevice(chip::NodeId nodeId);
     virtual ~BridgedDevice() {}
 
+    void LogActiveChangeEvent(uint32_t promisedActiveDuration);
+
     bool IsReachable();
     bool IsIcd();
     void SetReachable(bool reachable);

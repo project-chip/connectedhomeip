@@ -184,12 +184,14 @@ public:
 void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
     using Protocols::InteractionModel::Status;
-    VerifyOrReturn(handlerContext.mRequestPath.mCommandId != BridgedDeviceBasicInformation::Commands::KeepActive::Id);
+    VerifyOrReturn(handlerContext.mRequestPath.mCommandId == BridgedDeviceBasicInformation::Commands::KeepActive::Id);
 
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
     ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
 
     BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+
+    handlerContext.SetCommandHandled();
 
     if (device == nullptr || !device->IsIcd())
     {
