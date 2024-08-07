@@ -18,6 +18,7 @@ message SynchronizedDevice {
   optional string hardware_version_string = 9;
   optional uint32 software_version = 10;
   optional string software_version_string = 11;
+  optional bool is_icd = 12;
 }
 
 service FabricBridge {

@@ -22,16 +22,9 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
-#include <string>
-#include <thread>
 
+#include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
-#include "pw_assert/check.h"
-#include "pw_hdlc/decoder.h"
-#include "pw_hdlc/default_addresses.h"
-#include "pw_hdlc/rpc_channel.h"
-#include "pw_rpc/client.h"
-#include "pw_stream/socket_stream.h"
 
 using namespace chip;
 
@@ -113,44 +106,13 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice &data)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
-    device.node_id                     = nodeId;
-
-    // TODO: fill this with real data. For now we just add things for testing
-    strcpy(device.vendor_name, "Test Vendor");
-    device.has_vendor_name = true;
-
-    device.vendor_id = 123;
-    device.has_vendor_id = true;
-
-    strcpy(device.product_name, "Test Product");
-    device.has_product_name = true;
-
-    device.product_id = 234;
-    device.has_product_id = true;
-
-    strcpy(device.node_label, "Device Label");
-    device.has_node_label = true;
-
-    device.hardware_version = 11;
-    device.has_hardware_version = true;
-
-    strcpy(device.hardware_version_string, "Hardware");
-    device.has_hardware_version_string = true;
-
-    device.software_version = 22;
-    device.has_software_version = true;
-
-    strcpy(device.software_version_string, "Test 1.4.22");
-    device.has_software_version_string = true;
-
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
+    auto call = fabricBridgeClient.AddSynchronizedDevice(data, OnAddDeviceResponseCompleted);
 
     if (!call.active())
     {
