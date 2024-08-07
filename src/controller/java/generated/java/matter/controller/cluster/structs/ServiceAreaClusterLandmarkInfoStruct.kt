@@ -22,35 +22,45 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterMapStruct(val mapID: UInt, val name: String) {
+class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UByte, val positionTag: UByte?) {
   override fun toString(): String = buildString {
-    append("ServiceAreaClusterMapStruct {\n")
-    append("\tmapID : $mapID\n")
-    append("\tname : $name\n")
+    append("ServiceAreaClusterLandmarkInfoStruct {\n")
+    append("\tlandmarkTag : $landmarkTag\n")
+    append("\tpositionTag : $positionTag\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MAP_I_D), mapID)
-      put(ContextSpecificTag(TAG_NAME), name)
+      put(ContextSpecificTag(TAG_LANDMARK_TAG), landmarkTag)
+      if (positionTag != null) {
+        put(ContextSpecificTag(TAG_POSITION_TAG), positionTag)
+      } else {
+        putNull(ContextSpecificTag(TAG_POSITION_TAG))
+      }
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_MAP_I_D = 0
-    private const val TAG_NAME = 1
+    private const val TAG_LANDMARK_TAG = 0
+    private const val TAG_POSITION_TAG = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterMapStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLandmarkInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val mapID = tlvReader.getUInt(ContextSpecificTag(TAG_MAP_I_D))
-      val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val landmarkTag = tlvReader.getUByte(ContextSpecificTag(TAG_LANDMARK_TAG))
+      val positionTag =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_POSITION_TAG))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
+          null
+        }
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterMapStruct(mapID, name)
+      return ServiceAreaClusterLandmarkInfoStruct(landmarkTag, positionTag)
     }
   }
 }

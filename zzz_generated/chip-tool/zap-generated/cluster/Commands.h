@@ -9429,6 +9429,7 @@ class ServiceAreaSkipArea : public ClusterCommand
 public:
     ServiceAreaSkipArea(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-area", credsIssuerConfig)
     {
+        AddArgument("SkippedArea", 0, UINT32_MAX, &mRequest.skippedArea);
         ClusterCommand::AddArguments();
     }
 

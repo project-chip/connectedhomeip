@@ -39092,7 +39092,7 @@ public class ChipClusters {
           final long statusFieldID = 0L;
           Integer status = null;
           final long statusTextFieldID = 1L;
-          Optional<String> statusText = Optional.empty();
+          String statusText = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -39102,7 +39102,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == statusTextFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.String) {
                 StringType castingValue = element.value(StringType.class);
-                statusText = Optional.of(castingValue.value(String.class));
+                statusText = castingValue.value(String.class);
               }
             }
           }
@@ -39110,14 +39110,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback) {
-      skipArea(callback, 0);
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea) {
+      skipArea(callback, skippedArea, 0);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long skippedAreaFieldID = 0L;
+      BaseTLVType skippedAreatlvValue = new UIntType(skippedArea);
+      elements.add(new StructElement(skippedAreaFieldID, skippedAreatlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -39125,7 +39129,7 @@ public class ChipClusters {
           final long statusFieldID = 0L;
           Integer status = null;
           final long statusTextFieldID = 1L;
-          Optional<String> statusText = Optional.empty();
+          String statusText = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -39135,7 +39139,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == statusTextFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.String) {
                 StringType castingValue = element.value(StringType.class);
-                statusText = Optional.of(castingValue.value(String.class));
+                statusText = castingValue.value(String.class);
               }
             }
           }
@@ -39144,11 +39148,11 @@ public class ChipClusters {
     }
 
     public interface SelectAreasResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Optional<String> statusText);
+      void onSuccess(Integer status, String statusText);
     }
 
     public interface SkipAreaResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Optional<String> statusText);
+      void onSuccess(Integer status, String statusText);
     }
 
     public interface SupportedAreasAttributeCallback extends BaseAttributeCallback {

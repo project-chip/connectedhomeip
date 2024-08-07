@@ -3848,21 +3848,23 @@ enum class SelectAreasStatus : uint8_t
 // Enum for SkipAreaStatus
 enum class SkipAreaStatus : uint8_t
 {
-    kSuccess         = 0x00,
-    kInvalidAreaList = 0x01,
-    kInvalidInMode   = 0x02,
+    kSuccess            = 0x00,
+    kInvalidAreaList    = 0x01,
+    kInvalidInMode      = 0x02,
+    kInvalidSkippedArea = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 4,
 };
 
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kListOrder          = 0x1,
-    kSelectWhileRunning = 0x2,
+    kSelectWhileRunning = 0x1,
+    kProgressReporting  = 0x2,
+    kMaps               = 0x4,
 };
 } // namespace ServiceArea
 
