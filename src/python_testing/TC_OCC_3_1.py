@@ -29,10 +29,11 @@
 
 import logging
 import time
-import sleep
+
 from typing import Any, Optional
 
 import chip.clusters as Clusters
+import sleep
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -78,7 +79,7 @@ class TC_OCC_3_1(MatterBaseTest):
             app_pipe.write(command + "\n")
         # Delay for pipe command to be processed (otherwise tests are flaky)
         sleep(0.001)
-    
+
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10  # 10 seconds for occupancy state hold time
@@ -91,7 +92,7 @@ class TC_OCC_3_1(MatterBaseTest):
             if app_pid == 0:
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
             self.app_pipe = self.app_pipe + str(app_pid)
-        
+
         self.step(1)  # commissioning and getting cluster attribute list
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
