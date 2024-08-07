@@ -42067,6 +42067,7 @@ class ThreadBorderRouterManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="threadVersion", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000003, Type=bool),
                 ClusterObjectFieldDescriptor(Label="activeDatasetTimestamp", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="pendingDatasetTimestamp", Tag=0x00000005, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -42080,6 +42081,7 @@ class ThreadBorderRouterManagement(Cluster):
     threadVersion: 'uint' = None
     interfaceEnabled: 'bool' = None
     activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
+    pendingDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -42242,6 +42244,22 @@ class ThreadBorderRouterManagement(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class PendingDatasetTimestamp(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000452
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

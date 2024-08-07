@@ -24398,6 +24398,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, interfaceEnabled);
     case Attributes::ActiveDatasetTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeDatasetTimestamp);
+    case Attributes::PendingDatasetTimestamp::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, pendingDatasetTimestamp);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

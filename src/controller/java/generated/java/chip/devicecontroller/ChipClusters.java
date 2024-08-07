@@ -54619,6 +54619,7 @@ public class ChipClusters {
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
     private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 4L;
+    private static final long PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -54737,6 +54738,10 @@ public class ChipClusters {
     }
 
     public interface ActiveDatasetTimestampAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface PendingDatasetTimestampAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
     }
 
@@ -54884,6 +54889,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

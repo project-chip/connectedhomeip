@@ -17232,6 +17232,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
         }
+        case ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PendingDatasetTimestamp", 1, value);
+        }
         case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
