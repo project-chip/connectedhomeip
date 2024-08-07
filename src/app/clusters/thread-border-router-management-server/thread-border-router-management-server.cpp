@@ -291,16 +291,7 @@ CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, Attribu
     default:
         break;
     }
-    if (status == CHIP_ERROR_NO_MEMORY)
-    {
-        // If the status returned by Encode function is CHIP_ERROR_NO_MEMORY, map it to IM status ResourceExhausted
-        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
-    }
-    if (status != CHIP_NO_ERROR)
-    {
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
-    return CHIP_NO_ERROR;
+    return status;
 }
 
 void ServerInstance::CommitSavedBreadcrumb()
