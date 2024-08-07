@@ -138,12 +138,12 @@ chip-tool will require installing the
 on MacOS or iOS/iPadOS.
 
 -   Download the Bluetooth Central Matter Client Developer Mode profile and
-    install it on a supported system. system.
+    install it on a supported system.
 
     -   For _macOS_, Profile can be installed via Settings->Privacy &
         Security->Profiles
     -   For _iOS/iPadOS_, If necessary, email the profile or use AirDrop to
-        transfer the profile to the _iOS/iPadOS 16 beta 3_ device.
+        transfer the profile to the _iOS/iPadOS_ device.
 
 -   Restart your system
     -   For _iOS/iPadOS_, enable Developer Mode. Refer to
@@ -208,21 +208,22 @@ Example:
 
 -   Supported device types are (not exhaustive):
 
-| Type               | Decimal | HEX  |
-| ------------------ | ------- | ---- |
-| Lightbulb          | 256     | 0100 |
-| Lightbulb + Dimmer | 257     | 0101 |
-| Switch             | 259     | 0103 |
-| Contact Sensor     | 21      | 0015 |
-| Door Lock          | 10      | 000A |
-| Light Sensor       | 262     | 0106 |
-| Occupancy Sensor   | 263     | 0107 |
-| Outlet             | 266     | 010A |
-| Color Bulb         | 268     | 010C |
-| Window Covering    | 514     | 0202 |
-| Thermostat         | 769     | 0301 |
-| Temperature Sensor | 770     | 0302 |
-| Flow Sensor        | 774     | 0306 |
+| Type               | Decimal | HEX  | Notes                                            |
+| ------------------ | ------- | ---- | ------------------------------------------------ |
+| Lightbulb          | 256     | 0100 |                                                  |
+| Lightbulb + Dimmer | 257     | 0101 |                                                  |
+| Generic Switch     | 15      | 000F | Supports momentary switch only, and not latching |
+| Switch             | 259     | 0103 | Requires both On/Off Client and Server           |
+| Contact Sensor     | 21      | 0015 |                                                  |
+| Door Lock          | 10      | 000A |                                                  |
+| Light Sensor       | 262     | 0106 |                                                  |
+| Occupancy Sensor   | 263     | 0107 |                                                  |
+| Outlet             | 266     | 010A |                                                  |
+| Color Bulb         | 268     | 010C |                                                  |
+| Window Covering    | 514     | 0202 |                                                  |
+| Thermostat         | 769     | 0301 |                                                  |
+| Temperature Sensor | 770     | 0302 |                                                  |
+| Flow Sensor        | 774     | 0306 |                                                  |
 
 ### Examples of how to setup devices
 
@@ -302,6 +303,8 @@ Example:
         -   [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit)
         -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=network)
         -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns)
+    -   Any Thread device:
+        [Thread Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?name=HomeThread)
 
 ### Release to SHA Mappings
 
