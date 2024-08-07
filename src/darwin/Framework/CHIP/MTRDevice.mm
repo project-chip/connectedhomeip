@@ -354,9 +354,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
-// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset
-@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
@@ -497,7 +494,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
@@ -632,7 +628,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_updateDeviceTimeAndScheduleNextUpdate
 {
-    os_unfair_lock_assert_owner(&self->_timeSyncLock);
+    os_unfair_lock_assert_owner(&_lock);
     if (self.timeUpdateScheduled) {
         MTR_LOG_DEBUG("%@ Device Time Update already scheduled", self);
         return;
@@ -644,7 +640,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
-    std::lock_guard lock(_timeSyncLock);
+    std::lock_guard lock(_lock);
     // Device needs to still be reachable
     if (self.state != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
@@ -888,11 +884,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [_asyncWorkQueue invalidate];
 
-    os_unfair_lock_lock(&self->_timeSyncLock);
-    _timeUpdateScheduled = NO;
-    os_unfair_lock_unlock(&self->_timeSyncLock);
+    std::lock_guard lock(_lock);
 
-    os_unfair_lock_lock(&self->_lock);
+    _timeUpdateScheduled = NO;
 
     _state = MTRDeviceStateUnknown;
 
@@ -921,8 +915,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                      errorHandler:nil];
 
     [self _stopConnectivityMonitoring];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)nodeMayBeAdvertisingOperational
@@ -1186,7 +1178,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     // If subscription had reset since this handler was scheduled, do not execute "established" logic below
     if (!HaveSubscriptionEstablishedRightNow(_internalDeviceState)) {
@@ -1220,15 +1212,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _storePersistedDeviceData];
     }
 
-    os_unfair_lock_unlock(&self->_lock);
-
-    os_unfair_lock_lock(&self->_timeSyncLock);
-
     if (!self.timeUpdateScheduled) {
         [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC];
     }
-
-    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (void)_handleSubscriptionError:(NSError *)error
