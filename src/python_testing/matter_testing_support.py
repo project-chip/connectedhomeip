@@ -49,11 +49,11 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
-from chip.clusters import Attribute
 import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
