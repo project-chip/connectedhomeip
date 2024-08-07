@@ -142,16 +142,6 @@ MTR_DIRECT_MEMBERS
 #endif
 @end
 
-NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
-{
-    if ([aNumber compare:min] == NSOrderedAscending) {
-        return min;
-    } else if ([aNumber compare:max] == NSOrderedDescending) {
-        return max;
-    }
-    return aNumber;
-}
-
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 
 @interface NSObject (MatterPrivateForInternalDragonsDoNotFeed)
@@ -251,10 +241,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @implementation MTRDeviceClusterData {
     NSMutableDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _attributes;
 }
-
-static NSString * const sDataVersionKey = @"dataVersion";
-static NSString * const sAttributesKey = @"attributes";
-static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
 {
@@ -496,6 +482,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     id _systemTimeChangeObserverToken;
 
     NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+}
+
+- (instancetype)initForSubclasses
+{
+    if (self = [super init]) {
+        // nothing, as superclass of MTRDevice is NSObject
+    }
+
+    return self;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -1193,22 +1188,20 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_lock(&self->_lock);
 
+    // If subscription had reset since this handler was scheduled, do not execute "established" logic below
+    if (!HaveSubscriptionEstablishedRightNow(_internalDeviceState)) {
+        MTR_LOG("%@ _handleSubscriptionEstablished run with internal state %lu - skipping subscription establishment logic", self, static_cast<unsigned long>(_internalDeviceState));
+        return;
+    }
+
     // We have completed the subscription work - remove from the subscription pool.
     [self _clearSubscriptionPoolWork];
 
-    // reset subscription attempt wait time when subscription succeeds
-    _lastSubscriptionAttemptWait = 0;
-    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
-        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
-    } else {
-        MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
-        [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
-    }
-
-    [self _changeState:MTRDeviceStateReachable];
-
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
+
+    // reset subscription attempt wait time when subscription succeeds
+    _lastSubscriptionAttemptWait = 0;
 
     auto initialSubscribeStart = _initialSubscribeStart;
     // We no longer need to track subscribe latency for this device.
@@ -2476,6 +2469,19 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                },
                                ^(void) {
                                    MTR_LOG("%@ got subscription established", self);
+                                   std::lock_guard lock(self->_lock);
+
+                                   // First synchronously change state
+                                   if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
+                                       [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
+                                   } else {
+                                       MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
+                                       [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
+                                   }
+
+                                   [self _changeState:MTRDeviceStateReachable];
+
+                                   // Then async work that shouldn't be performed on the matter queue
                                    dispatch_async(self.queue, ^{
                                        // OnSubscriptionEstablished
                                        [self _handleSubscriptionEstablished];

@@ -189,7 +189,7 @@ template("tizen_qemu_mkisofs") {
       "mkisofs",
       "-input-charset=default",
       "-VCHIP",  # Volume ID = CHIP
-      "-JRU",  # Joliet + Rock Ridge with untranslated filenames
+      "-JrU",  # Joliet + Rock Ridge with untranslated filenames
     ]
 
     # Exclude files from the ISO image which might otherwise be included
