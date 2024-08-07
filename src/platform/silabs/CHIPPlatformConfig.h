@@ -26,6 +26,12 @@
 
 #include <stdint.h>
 
+#if (SL_MATTER_GN_BUILD == 0)
+#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#include "sl_matter_icd_config.h"
+#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#endif // SL_MATTER_GN_BUILD
+
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_ABORT() abort()
@@ -45,7 +51,8 @@
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
-#if (CHIP_CRYPTO_PLATFORM == 1)
+
+#if (CHIP_CRYPTO_PLATFORM == 1) && !defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "psa/crypto.h"
 
 #if !defined(CHIP_CONFIG_SHA256_CONTEXT_SIZE)
@@ -56,7 +63,7 @@
 #define CHIP_CONFIG_SHA256_CONTEXT_ALIGN psa_hash_operation_t
 #endif
 
-#endif // CHIP_CRYPTO_PLATFORM
+#endif // (CHIP_CRYPTO_PLATFORM == 1) && !defined(SL_MBEDTLS_USE_TINYCRYPT)
 
 // ==================== General Configuration Overrides ====================
 
