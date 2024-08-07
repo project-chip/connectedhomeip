@@ -625,14 +625,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     NSString * reportAge;
     if (mostRecentReportTime) {
-        reportAge = [NSString stringWithFormat:@" (%.0fs ago)", -[mostRecentReportTime timeIntervalSinceNow]];
+        reportAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[mostRecentReportTime timeIntervalSinceNow]];
     } else {
         reportAge = @"";
     }
 
     NSString * subscriptionFailureAge;
     if (lastSubscriptionFailureTime) {
-        subscriptionFailureAge = [NSString stringWithFormat:@" (%.0fs ago)", -[lastSubscriptionFailureTime timeIntervalSinceNow]];
+        subscriptionFailureAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[lastSubscriptionFailureTime timeIntervalSinceNow]];
     } else {
         subscriptionFailureAge = @"";
     }
