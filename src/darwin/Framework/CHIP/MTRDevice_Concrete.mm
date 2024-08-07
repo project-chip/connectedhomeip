@@ -126,6 +126,14 @@ MTR_DIRECT_MEMBERS
 
 - (NSString *)description
 {
+    std::lock_guard lock(_lock);
+    return [self _descriptionWhileLocked];
+}
+
+- (NSString *)_descriptionWhileLocked
+{
+    os_unfair_lock_assert_owner(&_lock);
+
     return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
 }
 
@@ -465,23 +473,24 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_setTimeOnDevice
 {
+    os_unfair_lock_assert_owner(&_lock);
     NSDate * now = [NSDate date];
     // If no date available, error
     if (!now) {
-        MTR_LOG_ERROR("%@ Could not retrieve current date. Unable to setUTCTime on endpoints.", self);
+        MTR_LOG_ERROR("%@ Could not retrieve current date. Unable to setUTCTime on endpoints.", [self _descriptionWhileLocked]);
         return;
     }
 
     uint64_t matterEpochTimeMicroseconds = 0;
     if (!DateToMatterEpochMicroseconds(now, matterEpochTimeMicroseconds)) {
-        MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", self, now);
+        MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", [self _descriptionWhileLocked], now);
         return;
     }
 
     // Set Time on each Endpoint with a Time Synchronization Cluster Server
     NSArray<NSNumber *> * endpointsToSync = [self _endpointsWithTimeSyncClusterServer];
     for (NSNumber * endpoint in endpointsToSync) {
-        MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", self, endpoint);
+        MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", [self _descriptionWhileLocked], endpoint);
         [self _setUTCTime:matterEpochTimeMicroseconds withGranularity:MTRTimeSynchronizationGranularityMicrosecondsGranularity forEndpoint:endpoint];
 
         // Check how many DST offsets this endpoint supports.
@@ -489,7 +498,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         auto dstOffsetsMaxSize = [self readAttributeWithEndpointID:dstOffsetsMaxSizePath.endpoint clusterID:dstOffsetsMaxSizePath.cluster attributeID:dstOffsetsMaxSizePath.attribute params:nil];
         if (dstOffsetsMaxSize == nil) {
             // This endpoint does not support TZ, so won't support SetDSTOffset.
-            MTR_LOG("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
+            MTR_LOG("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", [self _descriptionWhileLocked], endpoint);
             continue;
         }
         auto attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
@@ -499,19 +508,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                                                       error:nil];
         uint8_t maxOffsetCount;
         if (attrReport == nil) {
-            MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is invalid. Defaulting to 1.", self, endpoint);
+            MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is invalid. Defaulting to 1.", [self _descriptionWhileLocked], endpoint);
             maxOffsetCount = 1;
         } else {
             NSNumber * maxOffsetCountAsNumber = attrReport.value;
             maxOffsetCount = maxOffsetCountAsNumber.unsignedCharValue;
             if (maxOffsetCount == 0) {
-                MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is 0, which is not allowed. Defaulting to 1.", self, endpoint);
+                MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is 0, which is not allowed. Defaulting to 1.", [self _descriptionWhileLocked], endpoint);
                 maxOffsetCount = 1;
             }
         }
         auto * dstOffsets = MTRComputeDSTOffsets(maxOffsetCount);
         if (dstOffsets == nil) {
-            MTR_LOG_ERROR("%@ Could not retrieve DST offset information. Unable to setDSTOffset on endpoint %@.", self, endpoint);
+            MTR_LOG_ERROR("%@ Could not retrieve DST offset information. Unable to setDSTOffset on endpoint %@.", [self _descriptionWhileLocked], endpoint);
             continue;
         }
 
@@ -521,6 +530,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
         MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
@@ -528,12 +539,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if (self) {
             [self _performScheduledTimeUpdate];
         } else {
-            MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer Scheduled will be scheduled for a Device Time Update.", self);
+            MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer will be scheduled for a Device Time Update.", self);
             return;
         }
     });
     self.timeUpdateScheduled = YES;
-    MTR_LOG_DEBUG("%@ Timer Scheduled for next Device Time Update, in %llu seconds", self, nextUpdateInSeconds);
+    MTR_LOG_DEBUG("%@ Timer Scheduled for next Device Time Update, in %llu seconds", [self _descriptionWhileLocked], nextUpdateInSeconds);
 }
 
 // Time Updates are a day apart (this can be changed in the future)
@@ -543,7 +554,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&_lock);
     if (self.timeUpdateScheduled) {
-        MTR_LOG_DEBUG("%@ Device Time Update already scheduled", self);
+        MTR_LOG_DEBUG("%@ Device Time Update already scheduled", [self _descriptionWhileLocked]);
         return;
     }
 
@@ -556,12 +567,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(_lock);
     // Device needs to still be reachable
     if (self.state != MTRDeviceStateReachable) {
-        MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
+        MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", [self _descriptionWhileLocked]);
         return;
     }
     // Device must not be invalidated
     if (!self.timeUpdateScheduled) {
-        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
+        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", [self _descriptionWhileLocked]);
         return;
     }
     self.timeUpdateScheduled = NO;
@@ -570,6 +581,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     auto partsList = [self readAttributeWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID) params:nil];
     NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
     if (!endpointsOnDevice) {
@@ -588,20 +601,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [endpointsWithTimeSyncCluster addObject:endpoint];
         }
     }
-    MTR_LOG_DEBUG("%@ Device has following endpoints with Time Sync Cluster Server: %@", self, endpointsWithTimeSyncCluster);
+    MTR_LOG_DEBUG("%@ Device has following endpoints with Time Sync Cluster Server: %@", [self _descriptionWhileLocked], endpointsWithTimeSyncCluster);
     return endpointsWithTimeSyncCluster;
 }
 
 - (void)_setUTCTime:(UInt64)matterEpochTime withGranularity:(uint8_t)granularity forEndpoint:(NSNumber *)endpoint
 {
-    MTR_LOG_DEBUG(" %@ _setUTCTime with matterEpochTime: %llu, endpoint %@", self, matterEpochTime, endpoint);
+    os_unfair_lock_assert_owner(&_lock);
+
+    MTR_LOG_DEBUG(" %@ _setUTCTime with matterEpochTime: %llu, endpoint %@", [self _descriptionWhileLocked], matterEpochTime, endpoint);
     MTRTimeSynchronizationClusterSetUTCTimeParams * params = [[MTRTimeSynchronizationClusterSetUTCTimeParams
         alloc] init];
     params.utcTime = @(matterEpochTime);
     params.granularity = @(granularity);
     auto setUTCTimeResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
         if (error) {
-            MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
+            MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", [self _descriptionWhileLocked], endpoint, params, error);
         }
     };
 
@@ -620,8 +635,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_setDSTOffsets:(NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> *)dstOffsets forEndpoint:(NSNumber *)endpoint
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     MTR_LOG_DEBUG("%@ _setDSTOffsets with offsets: %@, endpoint %@",
-        self, dstOffsets, endpoint);
+        [self _descriptionWhileLocked], dstOffsets, endpoint);
 
     MTRTimeSynchronizationClusterSetDSTOffsetParams * params = [[MTRTimeSynchronizationClusterSetDSTOffsetParams
         alloc] init];
@@ -724,21 +741,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (!strongDelegate) {
             [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
+            MTR_LOG("%@ removing delegate info for nil delegate %p", [self _descriptionWhileLocked], delegateInfo.delegatePointerValue);
         } else if (strongDelegate == delegate) {
             [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
+            MTR_LOG("%@ replacing delegate info for %p", [self _descriptionWhileLocked], delegate);
         }
     }
     if (delegatesToRemove.count) {
         NSUInteger oldDelegatesCount = _delegates.count;
         [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
+        MTR_LOG("%@ addDelegate: removed %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
 
     MTRDeviceDelegateInfo_ConcreteCopy * newDelegateInfo = [[MTRDeviceDelegateInfo_ConcreteCopy alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
     [_delegates addObject:newDelegateInfo];
-    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+    MTR_LOG("%@ added delegate info %@", [self _descriptionWhileLocked], newDelegateInfo);
 
     __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
 
@@ -753,13 +770,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 
     if (shouldSetUpSubscription) {
-        MTR_LOG("%@ - starting subscription setup", self);
+        MTR_LOG("%@ - starting subscription setup", [self _descriptionWhileLocked]);
         // Record the time of first addDelegate call that triggers initial subscribe, and do not reset this value on subsequent addDelegate calls
         if (!_initialSubscribeStart) {
             _initialSubscribeStart = [NSDate now];
         }
         if ([self _deviceUsesThread]) {
-            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
+            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", [self _descriptionWhileLocked]);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
                 [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
@@ -781,13 +798,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (strongDelegate == delegate) {
             [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
+            MTR_LOG("%@ removing delegate info %@ for %p", [self _descriptionWhileLocked], delegateInfo, delegate);
         }
     }];
     if (delegatesToRemove.count) {
         NSUInteger oldDelegatesCount = _delegates.count;
         [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
+        MTR_LOG("%@ removeDelegate: removed %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
 }
 
@@ -810,7 +827,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _reattemptingSubscription = NO;
 
     [_deviceController asyncDispatchToMatterQueue:^{
-        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
+        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", [self _descriptionWhileLocked]);
 
         // Destroy the read client and callback (has to happen on the Matter
         // queue, to avoid deleting objects that are being referenced), to
@@ -939,7 +956,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // TODO: Do we need to worry about this being too spammy in the log if
         // we keep getting reads while not subscribed?  We could add another
         // backoff timer or counter for the log line...
-        MTR_LOG_DEBUG("%@ skipping resubscribe from skipped read-through: not enough time has passed since %@", self, _lastSubscriptionFailureTime);
+        MTR_LOG_DEBUG("%@ skipping resubscribe from skipped read-through: not enough time has passed since %@", [self _descriptionWhileLocked], _lastSubscriptionFailureTime);
         return;
     }
 
@@ -964,7 +981,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (!_delegates.count) {
-        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
+        MTR_LOG_DEBUG("%@ no delegates to iterate", [self _descriptionWhileLocked]);
         return NO;
     }
 
@@ -989,7 +1006,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (delegatesToRemove.count) {
         [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
+        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
     }
 
     return (_delegates.count > 0);
@@ -1018,7 +1035,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
         if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
-            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
+            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", [self _descriptionWhileLocked], delegateInfo);
             return;
         }
     }
@@ -1043,20 +1060,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
+            MTR_LOG("%@ reachability state change %lu => %lu, set estimated start time to nil", [self _descriptionWhileLocked], static_cast<unsigned long>(lastState),
                 static_cast<unsigned long>(state));
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
             MTR_LOG(
-                "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+                "%@ reachability state change %lu => %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
         [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
             [delegate device:self stateChanged:state];
         }];
     } else {
         MTR_LOG(
-            "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+            "%@ Not reporting reachability state change, since no change in state %lu => %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
 
@@ -1066,7 +1083,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRInternalDeviceState lastState = _internalDeviceState;
     _internalDeviceState = state;
     if (lastState != state) {
-        MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+        MTR_LOG("%@ internal state change %lu => %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
         // TODO: This should only be called for thread devices
@@ -1182,7 +1199,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (networkCommissioningClusterFeatureMapValueNumber == nil)
         return NO;
     if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
-        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
+        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", [self _descriptionWhileLocked], networkCommissioningClusterFeatureMapValueNumber);
         return NO;
     }
 
@@ -1214,7 +1231,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Sanity check we are not scheduling for this device multiple times in the pool
     if (_subscriptionPoolWorkCompletionBlock) {
-        MTR_LOG("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
+        MTR_LOG("%@ already scheduled in subscription pool for this device - ignoring: %@", [self _descriptionWhileLocked], description);
         return;
     }
 
@@ -1234,7 +1251,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
             if (self->_subscriptionPoolWorkCompletionBlock) {
                 // This means a resubscription triggering event happened and is now in-progress
-                MTR_LOG("%@ timer fired but already running in subscription pool - ignoring: %@", self, description);
+                MTR_LOG("%@ timer fired but already running in subscription pool - ignoring: %@", [self _descriptionWhileLocked], description);
                 os_unfair_lock_unlock(&self->_lock);
 
                 // call completion as complete to remove from queue
@@ -1345,7 +1362,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _lastSubscriptionAttemptWait = 0;
         secondsToWait = retryDelay.doubleValue;
         MTR_LOG("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
-            self, secondsToWait);
+            [self _descriptionWhileLocked], secondsToWait);
     } else {
         _lastSubscriptionAttemptWait *= 2;
         if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
@@ -1354,7 +1371,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         secondsToWait = _lastSubscriptionAttemptWait;
     }
 
-    MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
+    MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", [self _descriptionWhileLocked], secondsToWait);
 
     // If we started subscription or session establishment but failed, remove item from the subscription pool so we can re-queue.
     [self _clearSubscriptionPoolWork];
@@ -1383,7 +1400,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
+    MTR_LOG("%@ reattempting subscription with reason %@", [self _descriptionWhileLocked], reason);
     self.reattemptingSubscription = NO;
     [self _setupSubscriptionWithReason:reason];
 }
@@ -1416,7 +1433,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    MTR_LOG("%@ still not subscribed, marking the device as unreachable", self);
+    MTR_LOG("%@ still not subscribed, marking the device as unreachable", [self _descriptionWhileLocked]);
     [self _changeState:MTRDeviceStateUnreachable];
 }
 
@@ -1467,7 +1484,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Sanity check
     if (![self _dataStoreExists]) {
-        MTR_LOG_ERROR("%@ storage behavior: no data store in _persistClusterData!", self);
+        MTR_LOG_ERROR("%@ storage behavior: no data store in _persistClusterData!", [self _descriptionWhileLocked]);
         return;
     }
 
@@ -1476,7 +1493,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
+    MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(_clusterDataToPersist.count));
     // We're going to hand out these MTRDeviceClusterData objects to our
     // storage implementation, which will try to read them later.  Make sure
     // we snapshot the state here instead of handing out live copies.
@@ -1518,7 +1535,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSTimeInterval intervalSinceDeviceReportingExcessively = -[_deviceReportingExcessivelyStartTime timeIntervalSinceNow];
     BOOL deviceIsReportingExcessively = intervalSinceDeviceReportingExcessively > _storageBehaviorConfiguration.deviceReportingExcessivelyIntervalThreshold;
     if (deviceIsReportingExcessively) {
-        MTR_LOG("%@ storage behavior: device has been reporting excessively for %.3lf seconds", self, intervalSinceDeviceReportingExcessively);
+        MTR_LOG("%@ storage behavior: device has been reporting excessively for %.3lf seconds", [self _descriptionWhileLocked], intervalSinceDeviceReportingExcessively);
     }
     return deviceIsReportingExcessively;
 }
@@ -1543,13 +1560,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // A report came in after this call was scheduled
 
         if (!_clusterDataPersistenceFirstScheduledTime) {
-            MTR_LOG_ERROR("%@ storage behavior: expects _clusterDataPersistenceFirstScheduledTime if _clusterDataToPersist exists", self);
+            MTR_LOG_ERROR("%@ storage behavior: expects _clusterDataPersistenceFirstScheduledTime if _clusterDataToPersist exists", [self _descriptionWhileLocked]);
             return;
         }
 
         NSTimeInterval intervalSinceFirstScheduledPersistence = -[_clusterDataPersistenceFirstScheduledTime timeIntervalSinceNow];
         if (intervalSinceFirstScheduledPersistence < [self _reportToPersistenceDelayTimeMaxAfterMutiplier]) {
-            MTR_LOG("%@ storage behavior: not persisting: intervalSinceLastReport %lf intervalSinceFirstScheduledPersistence %lf", self, intervalSinceLastReport, intervalSinceFirstScheduledPersistence);
+            MTR_LOG("%@ storage behavior: not persisting: intervalSinceLastReport %lf intervalSinceFirstScheduledPersistence %lf", [self _descriptionWhileLocked], intervalSinceLastReport, intervalSinceFirstScheduledPersistence);
             // The max delay is also not reached - do not persist yet
             return;
         }
@@ -1575,13 +1592,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // No persisted data / lack of controller data store
     if (![self _dataStoreExists]) {
-        MTR_LOG_DEBUG("%@ storage behavior: no data store", self);
+        MTR_LOG_DEBUG("%@ storage behavior: no data store", [self _descriptionWhileLocked]);
         return;
     }
 
     // Nothing to persist
     if (!_clusterDataToPersist.count) {
-        MTR_LOG_DEBUG("%@ storage behavior: nothing to persist", self);
+        MTR_LOG_DEBUG("%@ storage behavior: nothing to persist", [self _descriptionWhileLocked]);
         return;
     }
 
@@ -1649,7 +1666,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
             // Set current multiplier to [1, MaxMultiplier]
             _reportToPersistenceDelayCurrentMultiplier = 1 + (proportionTowardMinThreshold * (_storageBehaviorConfiguration.reportToPersistenceDelayMaxMultiplier - 1));
-            MTR_LOG("%@ storage behavior: device reporting frequently - setting delay multiplier to %lf", self, _reportToPersistenceDelayCurrentMultiplier);
+            MTR_LOG("%@ storage behavior: device reporting frequently - setting delay multiplier to %lf", [self _descriptionWhileLocked], _reportToPersistenceDelayCurrentMultiplier);
         } else {
             _reportToPersistenceDelayCurrentMultiplier = 1;
         }
@@ -1658,7 +1675,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if (averageTimeBetweenReports < _storageBehaviorConfiguration.timeBetweenReportsTooShortMinThreshold) {
             if (!_deviceReportingExcessivelyStartTime) {
                 _deviceReportingExcessivelyStartTime = [NSDate now];
-                MTR_LOG_DEBUG("%@ storage behavior: device is reporting excessively @%@", self, _deviceReportingExcessivelyStartTime);
+                MTR_LOG_DEBUG("%@ storage behavior: device is reporting excessively @%@", [self _descriptionWhileLocked], _deviceReportingExcessivelyStartTime);
             }
         } else {
             _deviceReportingExcessivelyStartTime = nil;
@@ -1775,6 +1792,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Returns nil if no attribute report has a path that matches the paths in the interestedPaths array.
 - (NSArray<NSDictionary<NSString *, id> *> *)_filteredAttributes:(NSArray<NSDictionary<NSString *, id> *> *)attributes forInterestedPaths:(NSArray * _Nullable)interestedPaths
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     if (!interestedPaths) {
         return attributes;
     }
@@ -1795,7 +1814,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     if (filteredAttributes.count && (filteredAttributes.count != attributes.count)) {
-        MTR_LOG("%@ filtered attribute report %lu => %lu", self, static_cast<unsigned long>(attributes.count), static_cast<unsigned long>(filteredAttributes.count));
+        MTR_LOG("%@ filtered attribute report %lu => %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(attributes.count), static_cast<unsigned long>(filteredAttributes.count));
     }
 
     return filteredAttributes;
@@ -1872,6 +1891,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Returns nil if no event report has a path that matches the paths in the interestedPaths array.
 - (NSArray<NSDictionary<NSString *, id> *> *)_filteredEvents:(NSArray<NSDictionary<NSString *, id> *> *)events forInterestedPaths:(NSArray * _Nullable)interestedPaths
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     if (!interestedPaths) {
         return events;
     }
@@ -1892,7 +1913,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     if (filteredEvents.count && (filteredEvents.count != events.count)) {
-        MTR_LOG("%@ filtered event report %lu => %lu", self, static_cast<unsigned long>(events.count), static_cast<unsigned long>(filteredEvents.count));
+        MTR_LOG("%@ filtered event report %lu => %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(events.count), static_cast<unsigned long>(filteredEvents.count));
     }
 
     return filteredEvents;
@@ -1941,12 +1962,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         if (isStartUpEvent) {
             if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
                 // If UpTime was received, make use of it as mark of system start time
-                MTR_LOG("%@ StartUp event: set estimated start time forward to %@", self,
+                MTR_LOG("%@ StartUp event: set estimated start time forward to %@", [self _descriptionWhileLocked],
                     _estimatedStartTimeFromGeneralDiagnosticsUpTime);
                 _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
             } else {
                 // If UpTime was not received, reset estimated start time in case of reboot
-                MTR_LOG("%@ StartUp event: set estimated start time to nil", self);
+                MTR_LOG("%@ StartUp event: set estimated start time to nil", [self _descriptionWhileLocked]);
                 _estimatedStartTime = nil;
             }
         }
@@ -1954,14 +1975,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
         NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
         if (!eventTimeTypeNumber) {
-            MTR_LOG_ERROR("%@ Event %@ missing event time type", self, eventDict);
+            MTR_LOG_ERROR("%@ Event %@ missing event time type", [self _descriptionWhileLocked], eventDict);
             continue;
         }
         MTREventTimeType eventTimeType = (MTREventTimeType) eventTimeTypeNumber.unsignedIntegerValue;
         if (eventTimeType == MTREventTimeTypeSystemUpTime) {
             NSNumber * eventTimeValueNumber = eventDict[MTREventSystemUpTimeKey];
             if (!eventTimeValueNumber) {
-                MTR_LOG_ERROR("%@ Event %@ missing event time value", self, eventDict);
+                MTR_LOG_ERROR("%@ Event %@ missing event time value", [self _descriptionWhileLocked], eventDict);
                 continue;
             }
             NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
@@ -1981,7 +2002,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [reportToReturn addObject:eventToReturn];
     }
     if (oldEstimatedStartTime != _estimatedStartTime) {
-        MTR_LOG("%@ updated estimated start time to %@", self, _estimatedStartTime);
+        MTR_LOG("%@ updated estimated start time to %@", [self _descriptionWhileLocked], _estimatedStartTime);
     }
 
     __block BOOL delegatesCalled = NO;
@@ -2024,7 +2045,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
 
-    MTR_LOG_ERROR("%@ Storage missing %lu / %lu clusters - reconciling in-memory records", self, static_cast<unsigned long>(clusterPathsToRemove.count), static_cast<unsigned long>(_persistedClusters.count));
+    MTR_LOG_ERROR("%@ Storage missing %lu / %lu clusters - reconciling in-memory records", [self _descriptionWhileLocked], static_cast<unsigned long>(clusterPathsToRemove.count), static_cast<unsigned long>(_persistedClusters.count));
     [_persistedClusters minusSet:clusterPathsToRemove];
 }
 
@@ -2060,7 +2081,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
-    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", [self _descriptionWhileLocked], clusterPath, YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
@@ -2098,7 +2119,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         dataVersions[path] = [self _clusterDataForPath:path].dataVersion;
     }
 
-    MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
+    MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", [self _descriptionWhileLocked], static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
 }
@@ -2236,7 +2257,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_resetSubscriptionWithReasonString:(NSString *)reasonString
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
+    MTR_LOG_ERROR("%@ %@ - resetting subscription", [self _descriptionWhileLocked], reasonString);
 
     [_deviceController asyncDispatchToMatterQueue:^{
         MTR_LOG("%@ subscription reset disconnecting ReadClient and SubscriptionCallback", self);
@@ -2269,7 +2290,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
-        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
+        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", [self _descriptionWhileLocked], reason);
         return;
     }
 
@@ -2288,13 +2309,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
-        MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
+        MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", [self _descriptionWhileLocked], static_cast<unsigned long>(_internalDeviceState), reason);
         return;
     }
 
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
-    MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
+    MTR_LOG("%@ setting up subscription with reason: %@", [self _descriptionWhileLocked], reason);
 
     __block bool markUnreachableAfterWait = true;
 #ifdef DEBUG
@@ -2328,8 +2349,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error,
                            NSNumber * _Nullable retryDelay) {
                            if (error != nil) {
-                               MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
+                               // We might be getting called sync or async, so
+                               // we don't know whether we might be holding our
+                               // lock here.  Don't do anything that would
+                               // assume one way or the other.
                                dispatch_async(self.queue, ^{
+                                   MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
                                    [self _handleSubscriptionError:error];
                                    [self _handleSubscriptionReset:retryDelay];
                                });
@@ -3200,7 +3225,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     // log attribute paths
-    MTR_LOG("%@ report from expired expected values %@", self, attributePathsToReport);
+    MTR_LOG("%@ report from expired expected values %@", [self _descriptionWhileLocked], attributePathsToReport);
     [self _reportAttributes:attributesToReport];
 
 // Have a reasonable minimum wait time for expiration timers
@@ -3251,7 +3276,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return cachedAttributeValue;
     } else {
         // TODO: when not found in cache, generated default values should be used
-        MTR_LOG("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
+        MTR_LOG("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", [self _descriptionWhileLocked],
             attributePath);
     }
 
@@ -3260,9 +3285,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     // Sanity check for nil cases
     if (!one && !theOther) {
-        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
+        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", [self _descriptionWhileLocked]);
         return YES;
     }
     if (!one || !theOther) {
@@ -3455,7 +3482,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _dataStoreExists] && !_clusterDataToPersist.count) {
-        MTR_LOG_DEBUG("%@ No data store to prune from", self);
+        MTR_LOG_DEBUG("%@ No data store to prune from", [self _descriptionWhileLocked]);
         return;
     }
 
@@ -3493,7 +3520,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
-            MTR_LOG("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
+            MTR_LOG("%@ report %@ no data value or error: %@", [self _descriptionWhileLocked], attributePath, attributeResponseValue);
             continue;
         }
 
@@ -3509,7 +3536,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (attributeError) {
             shouldReportAttribute = YES;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
-            MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
+            MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", [self _descriptionWhileLocked], attributePath, attributeError,
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
@@ -3571,9 +3598,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // When the expected value interval expires, the correct value will be reported,
                 // if needed.
                 if (expectedValue) {
-                    MTR_LOG("%@ report %@ value filtered - expected value still present", self, attributePath);
+                    MTR_LOG("%@ report %@ value filtered - expected value still present", [self _descriptionWhileLocked], attributePath);
                 } else {
-                    MTR_LOG("%@ report %@ value filtered - same as read cache", self, attributePath);
+                    MTR_LOG("%@ report %@ value filtered - same as read cache", [self _descriptionWhileLocked], attributePath);
                 }
             }
 
@@ -3587,7 +3614,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     NSDate * oldSystemStartTime = _estimatedStartTime;
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
-                        MTR_LOG("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
+                        MTR_LOG("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", [self _descriptionWhileLocked], upTime,
                             oldSystemStartTime, potentialSystemStartTime);
                         _estimatedStartTime = potentialSystemStartTime;
                     }
@@ -3611,7 +3638,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     if (attributePathsToReport.count > 0) {
-        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+        MTR_LOG("%@ report from reported values %@", [self _descriptionWhileLocked], attributePathsToReport);
     }
 
     return attributesToReport;
@@ -3824,7 +3851,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *expectedValueID = expectedValueIDToReturn;
     }
 
-    MTR_LOG("%@ report from new expected values %@", self, attributePathsToReport);
+    MTR_LOG("%@ report from new expected values %@", [self _descriptionWhileLocked], attributePathsToReport);
 
     return attributesToReport;
 }
@@ -3887,7 +3914,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueID:expectedValueID
                  previousValue:&previousValue];
 
-    MTR_LOG("%@ remove expected value for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
+    MTR_LOG("%@ remove expected value for path %@ should report %@", [self _descriptionWhileLocked], attributePath, shouldReportValue ? @"YES" : @"NO");
 
     if (shouldReportValue) {
         NSMutableDictionary * attribute = [NSMutableDictionary dictionaryWithObject:attributePath forKey:MTRAttributePathKey];
