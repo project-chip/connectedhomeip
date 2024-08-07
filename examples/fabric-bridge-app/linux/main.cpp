@@ -35,6 +35,12 @@
 #include <sys/ioctl.h>
 #include <thread>
 
+// This is declared here and not in a header because zap/embr assumes all clusters
+// are defined in a static endpoint in the .zap file. From there, the codegen will
+// automatically use PluginApplicationCallbacksHeader.jinja to declare and call
+// the respective Init callbacks. However, because EcosystemInformation cluster is only
+// ever on a dynamic endpoint, this doesn't get declared and called for us, so we
+// need to declare and call it ourselves where the application is initialized.
 void MatterEcosystemInformationPluginServerInitCallback();
 
 using namespace chip;
