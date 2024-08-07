@@ -74,6 +74,8 @@ def main(search_directory, env_file):
         "TC_MCORE_FS_1_1.py",
         "TC_MCORE_FS_1_2.py",
         "TC_MCORE_FS_1_3.py",
+        "TC_OCC_3_1.py",
+        "TC_OCC_3_2.py",
         "TC_BRBINFO_4_1.py",
         "TC_SEAR_1_2.py",
         "TC_SEAR_1_3.py",
