@@ -12864,11 +12864,7 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)skipAreaWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    [self skipAreaWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRServiceAreaClusterSkipAreaParams
@@ -17338,6 +17334,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveDatasetTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterManagementID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePendingDatasetTimestampWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterManagementID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributePendingDatasetTimestampID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
