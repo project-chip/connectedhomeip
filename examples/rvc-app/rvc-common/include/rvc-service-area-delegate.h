@@ -49,7 +49,7 @@ public:
     bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
                                ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan statusText) override;
 
-    bool HandleSkipCurrentArea(MutableCharSpan skipStatusText) override;
+    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText) override;
 
     //*************************************************************************
     // Supported Locations accessors
@@ -78,7 +78,7 @@ public:
 
     bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
-    bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
+    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
     bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
 
