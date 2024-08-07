@@ -117,7 +117,7 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device;
+    chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
     device.node_id = nodeId;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
@@ -137,7 +137,7 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device;
+    chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
     device.node_id = nodeId;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
