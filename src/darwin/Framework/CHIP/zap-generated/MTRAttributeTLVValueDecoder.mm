@@ -11252,33 +11252,29 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = cppValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRServiceAreaClusterMapStruct * newElement_1;
-                    newElement_1 = [MTRServiceAreaClusterMapStruct new];
-                    newElement_1.mapID = [NSNumber numberWithUnsignedChar:entry_1.mapID];
-                    newElement_1.name = AsString(entry_1.name);
-                    if (newElement_1.name == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRServiceAreaClusterMapStruct * newElement_0;
+                newElement_0 = [MTRServiceAreaClusterMapStruct new];
+                newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID];
+                newElement_0.name = AsString(entry_0.name);
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
-                value = array_1;
+                [array_0 addObject:newElement_0];
             }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
         }
         return value;
     }
@@ -11289,26 +11285,22 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = cppValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedInt:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_1;
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
         }
         return value;
     }
@@ -11349,46 +11341,42 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = cppValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRServiceAreaClusterProgressStruct * newElement_1;
-                    newElement_1 = [MTRServiceAreaClusterProgressStruct new];
-                    newElement_1.areaID = [NSNumber numberWithUnsignedInt:entry_1.areaID];
-                    newElement_1.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.status)];
-                    if (entry_1.totalOperationalTime.HasValue()) {
-                        if (entry_1.totalOperationalTime.Value().IsNull()) {
-                            newElement_1.totalOperationalTime = nil;
-                        } else {
-                            newElement_1.totalOperationalTime = [NSNumber numberWithUnsignedInt:entry_1.totalOperationalTime.Value().Value()];
-                        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRServiceAreaClusterProgressStruct * newElement_0;
+                newElement_0 = [MTRServiceAreaClusterProgressStruct new];
+                newElement_0.areaID = [NSNumber numberWithUnsignedInt:entry_0.areaID];
+                newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+                if (entry_0.totalOperationalTime.HasValue()) {
+                    if (entry_0.totalOperationalTime.Value().IsNull()) {
+                        newElement_0.totalOperationalTime = nil;
                     } else {
-                        newElement_1.totalOperationalTime = nil;
+                        newElement_0.totalOperationalTime = [NSNumber numberWithUnsignedInt:entry_0.totalOperationalTime.Value().Value()];
                     }
-                    if (entry_1.estimatedTime.HasValue()) {
-                        if (entry_1.estimatedTime.Value().IsNull()) {
-                            newElement_1.estimatedTime = nil;
-                        } else {
-                            newElement_1.estimatedTime = [NSNumber numberWithUnsignedInt:entry_1.estimatedTime.Value().Value()];
-                        }
+                } else {
+                    newElement_0.totalOperationalTime = nil;
+                }
+                if (entry_0.estimatedTime.HasValue()) {
+                    if (entry_0.estimatedTime.Value().IsNull()) {
+                        newElement_0.estimatedTime = nil;
                     } else {
-                        newElement_1.estimatedTime = nil;
+                        newElement_0.estimatedTime = [NSNumber numberWithUnsignedInt:entry_0.estimatedTime.Value().Value()];
                     }
-                    [array_1 addObject:newElement_1];
+                } else {
+                    newElement_0.estimatedTime = nil;
                 }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_1;
+                [array_0 addObject:newElement_0];
             }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
         }
         return value;
     }
