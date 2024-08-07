@@ -83,7 +83,7 @@ group("default") {
              chip_device_platform == "external" || chip_device_platform == "none")
     }
   } else if (chip_logging_backend == "none" ||
-             chip_logging_backend == "stdio " ||
+             chip_logging_backend == "stdio" ||
              chip_logging_backend == "syslog") {
     deps = [ ":${chip_logging_backend}" ]
   } else {
