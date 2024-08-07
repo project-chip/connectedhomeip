@@ -45,8 +45,13 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-constexpr uint8_t kMaxRetries = 10;
-constexpr int kNodeLabelSize  = 32;
+constexpr uint8_t kMaxRetries      = 10;
+constexpr int kNodeLabelSize       = 32;
+constexpr int kUniqueIdSize        = 32;
+constexpr int kVendorNameSize      = 32;
+constexpr int kProductNameSize     = 32;
+constexpr int kHardwareVersionSize = 32;
+constexpr int kSoftwareVersionSize = 32;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
@@ -76,27 +81,44 @@ constexpr int kDescriptorAttributeArraySize = 254;
 //   - Bridged Device Basic Information
 //   - Administrator Commissioning
 
+// clang-format off
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* device list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+  DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* device list */
+  DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
+  DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
+  DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+  // The attributes below are MANDATORY in the Bridged Device Information Cluster
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0),
+
+  // The attributes below are OPTIONAL in the bridged device, however they are MANDATORY in the BasicInformation cluster
+  // so they can always be provided if desired
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::VendorName::Id, CHAR_STRING, kVendorNameSize, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::VendorID::Id, INT16U, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ProductName::Id, CHAR_STRING, kProductNameSize, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ProductID::Id, INT16U, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::HardwareVersion::Id, INT16U, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::HardwareVersionString::Id, CHAR_STRING,
+                            kHardwareVersionSize, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::SoftwareVersion::Id, INT32U, 4, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::SoftwareVersionString::Id, CHAR_STRING,
+                            kSoftwareVersionSize, 0),
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Administrator Commissioning cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),              /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminFabricIndex::Id, FABRIC_IDX, 1, 0), /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminVendorId::Id, VENDOR_ID, 2, 0),     /* Reachable */
-    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminFabricIndex::Id, FABRIC_IDX, 1, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminVendorId::Id, VENDOR_ID, 2, 0),
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+// clang-format on
 
 constexpr CommandId administratorCommissioningCommands[] = {
     app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
