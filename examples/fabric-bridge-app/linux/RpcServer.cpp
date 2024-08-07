@@ -51,13 +51,12 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    BridgedDevice * device = new BridgedDevice(nodeId);
+    auto device = std::make_unique<BridgedDevice>(nodeId);
     device->SetReachable(true);
 
-    int result = BridgeDeviceMgr().AddDeviceEndpoint(device, 1);
-    if (result == -1)
+    auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
+    if (!result.has_value())
     {
-        delete device;
         ChipLogError(NotSpecified, "Failed to add device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::Unknown();
     }

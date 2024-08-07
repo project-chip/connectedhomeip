@@ -33,6 +33,7 @@
 #include <lib/support/ZclString.h>
 
 #include <cstdio>
+#include <optional>
 #include <string>
 
 using namespace chip;
@@ -147,60 +148,55 @@ BridgedDeviceManager BridgedDeviceManager::sInstance;
 
 void BridgedDeviceManager::Init()
 {
-    memset(mDevices, 0, sizeof(mDevices));
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     mCurrentEndpointId = mFirstDynamicEndpointId;
 }
 
-int BridgedDeviceManager::AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId)
+std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+                                                                chip::EndpointId parentEndpointId)
 {
-    uint8_t index                                              = 0;
     EmberAfEndpointType * ep                                   = &sBridgedNodeEndpoint;
     const chip::Span<const EmberAfDeviceType> & deviceTypeList = Span<const EmberAfDeviceType>(sBridgedDeviceTypes);
     const chip::Span<chip::DataVersion> & dataVersionStorage   = Span<DataVersion>(sBridgedNodeDataVersions);
 
-    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
     {
-        if (nullptr == mDevices[index])
+        if (mDevices[index])
         {
-            mDevices[index] = dev;
-            CHIP_ERROR err;
-            int retryCount = 0;
-            while (retryCount < kMaxRetries)
-            {
-                DeviceLayer::StackLock lock;
-                dev->SetEndpointId(mCurrentEndpointId);
-                dev->SetParentEndpointId(parentEndpointId);
-                err =
-                    emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-                if (err == CHIP_NO_ERROR)
-                {
-                    ChipLogProgress(NotSpecified,
-                                    "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
-                                    ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
-                    return index;
-                }
-                if (err != CHIP_ERROR_ENDPOINT_EXISTS)
-                {
-                    mDevices[index] = nullptr;
-                    return -1; // Return error as endpoint addition failed due to an error other than endpoint already exists
-                }
-                // Increment the endpoint ID and handle wrap condition
-                if (++mCurrentEndpointId < mFirstDynamicEndpointId)
-                {
-                    mCurrentEndpointId = mFirstDynamicEndpointId;
-                }
-                retryCount++;
-            }
-            ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
-            mDevices[index] = nullptr;
-            return -1; // Return error as all retries are exhausted
+            continue;
         }
-        index++;
+
+        for (int retryCount = 0; retryCount < kMaxRetries; retryCount++)
+        {
+            DeviceLayer::StackLock lock;
+            dev->SetEndpointId(mCurrentEndpointId);
+            dev->SetParentEndpointId(parentEndpointId);
+            CHIP_ERROR err =
+                emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(NotSpecified, "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
+                                ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
+                mDevices[index] = std::move(dev);
+                return index;
+            }
+            if (err != CHIP_ERROR_ENDPOINT_EXISTS)
+            {
+                return std::nullopt; // Return error as endpoint addition failed due to an error other than endpoint already exists
+            }
+            // Increment the endpoint ID and handle wrap condition
+            if (++mCurrentEndpointId < mFirstDynamicEndpointId)
+            {
+                mCurrentEndpointId = mFirstDynamicEndpointId;
+            }
+        }
+        ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
+        return std::nullopt; // Return error as all retries are exhausted
     }
+
     ChipLogProgress(NotSpecified, "Failed to add dynamic endpoint: No endpoints available!");
-    return -1;
+    return std::nullopt;
 }
 
 int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
@@ -208,7 +204,7 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (mDevices[index] == dev)
+        if (mDevices[index].get() == dev)
         {
             DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
@@ -229,7 +225,7 @@ BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) con
     {
         if (mDevices[index] && mDevices[index]->GetEndpointId() == endpointId)
         {
-            return mDevices[index];
+            return mDevices[index].get();
         }
     }
     return nullptr;
@@ -241,7 +237,7 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) con
     {
         if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
         {
-            return mDevices[index];
+            return mDevices[index].get();
         }
     }
     return nullptr;

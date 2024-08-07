@@ -22,6 +22,8 @@
 
 #include "BridgedDevice.h"
 
+#include <memory>
+
 class BridgedDeviceManager
 {
 public:
@@ -45,9 +47,10 @@ public:
      *
      * @param dev A pointer to the device to be added.
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
-     * @return int The index of the dynamic endpoint if successful, -1 otherwise.
+     * @return int The index of the dynamic endpoint if successful, nullopt otherwise
      */
-    int AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+    std::optional<unsigned> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+                                              chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
      * @brief Removes a device from a dynamic endpoint.
@@ -104,7 +107,7 @@ private:
 
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
-    BridgedDevice * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
+    std::unique_ptr<BridgedDevice> mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
 /**
