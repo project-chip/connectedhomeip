@@ -462,7 +462,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Temporarily commented to avoid linter errors -- will revert once output value is known so that assertion can be used correctly
         # read_request_24 = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.FeatureMap)])
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.FeatureMap(value=123456))])
-        
+
         # data_version = read_request_24[0][Clusters.Descriptor][Clusters.Attribute.DataVersion]
         # data_version_filter = [(0, Clusters.Descriptor, data_version)]
         # read_request_24_1 = await self.default_controller.ReadAttribute(
