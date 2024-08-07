@@ -243,6 +243,17 @@ EcosystemInformationServer & EcosystemInformationServer::Instance()
     return mInstance;
 }
 
+CHIP_ERROR EcosystemInformationServer::AddEcosystemInformationClusterToEndpoint(EndpointId aEndpoint)
+{
+    VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    auto it = mDevicesMap.find(aEndpoint);
+    // We expect that the device has not been previously added.
+    VerifyOrReturnError((it == mDevicesMap.end()), CHIP_ERROR_INCORRECT_STATE);
+    // This create an empty DeviceInfo in mDevicesMap.
+    mDevicesMap[aEndpoint] = DeviceInfo();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice)
 {
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);
@@ -282,11 +293,11 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
     switch (aPath.mAttributeId)
     {
     case Attributes::RemovedOn::Id:
-        return EcosystemInformationServer::Instance().EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::DeviceDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::LocationDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::ClusterRevision::Id: {
         uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
         return aEncoder.Encode(rev);
