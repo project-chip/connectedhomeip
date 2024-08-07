@@ -98,7 +98,7 @@ public:
      * @param nodeId The NodeId of the device to be removed.
      * @return int The index of the removed dynamic endpoint if successful, -1 otherwise.
      */
-    int RemoveDeviceByNodeId(chip::NodeId nodeId);
+    std::optional<unsigned> RemoveDeviceByNodeId(chip::NodeId nodeId);
 
 private:
     friend BridgedDeviceManager & BridgeDeviceMgr();

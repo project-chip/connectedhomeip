@@ -243,9 +243,9 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) con
     return nullptr;
 }
 
-int BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
+std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
 {
-    for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
+    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
         {
@@ -257,5 +257,5 @@ int BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
             return index;
         }
     }
-    return -1;
+    return std::nullopt;
 }
