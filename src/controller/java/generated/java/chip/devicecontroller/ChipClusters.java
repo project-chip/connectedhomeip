@@ -39073,16 +39073,16 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas) {
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas) {
       selectAreas(callback, newAreas, 0);
     }
 
-    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long newAreasFieldID = 0L;
-      BaseTLVType newAreastlvValue = newAreas != null ? ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas)) : new NullType();
+      BaseTLVType newAreastlvValue = ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas));
       elements.add(new StructElement(newAreasFieldID, newAreastlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -39156,11 +39156,11 @@ public class ChipClusters {
     }
 
     public interface SupportedMapsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value);
+      void onSuccess(List<ChipStructs.ServiceAreaClusterMapStruct> value);
     }
 
     public interface SelectedAreasAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<Long> value);
+      void onSuccess(List<Long> value);
     }
 
     public interface CurrentAreaAttributeCallback extends BaseAttributeCallback {
@@ -39172,7 +39172,7 @@ public class ChipClusters {
     }
 
     public interface ProgressAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value);
+      void onSuccess(List<ChipStructs.ServiceAreaClusterProgressStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -39224,7 +39224,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_MAPS_ATTRIBUTE_ID, true);
@@ -39237,7 +39237,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_MAPS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -39250,7 +39250,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SELECTED_AREAS_ATTRIBUTE_ID, true);
@@ -39263,7 +39263,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SELECTED_AREAS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -39328,7 +39328,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PROGRESS_ATTRIBUTE_ID, true);
@@ -39341,7 +39341,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PROGRESS_ATTRIBUTE_ID, minInterval, maxInterval);

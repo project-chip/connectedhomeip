@@ -18,7 +18,7 @@
 
 #pragma once
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0xFFF10010 // TODO: ID-TBD
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
 
 // Inherit defaults from config/standalone/CHIPProjectConfig.h

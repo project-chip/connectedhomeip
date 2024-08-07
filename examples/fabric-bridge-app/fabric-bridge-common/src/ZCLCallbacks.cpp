@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DeviceManager.h"
+#include "BridgedDeviceManager.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,6 +26,7 @@ using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 
@@ -36,10 +37,15 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 {
     AttributeId attributeId = attributeMetadata->attributeId;
 
-    Device * dev = DeviceMgr().GetDevice(endpoint);
-    if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
+    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpoint);
+    if (dev == nullptr)
     {
-        using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    if (clusterId == BridgedDeviceBasicInformation::Id)
+    {
+        using namespace BridgedDeviceBasicInformation::Attributes;
         ChipLogProgress(NotSpecified, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId,
                         maxReadLength);
 
@@ -69,6 +75,21 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
         return Protocols::InteractionModel::Status::Success;
     }
 
+    if (clusterId == AdministratorCommissioning::Id)
+    {
+        // TODO(#34791) This is a workaround to prevent crash. CADMIN is still reading incorrect
+        // Attribute values on dynamic endpoint as it only reads the root node and not the actual bridge
+        // device we are representing here, when addressing the issue over there we can more easily
+        // resolve this workaround.
+        if ((attributeId == AdministratorCommissioning::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
+        {
+            uint16_t rev = ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION;
+            memcpy(buffer, &rev, sizeof(rev));
+            return Protocols::InteractionModel::Status::Success;
+        }
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     return Protocols::InteractionModel::Status::Failure;
 }
 
@@ -80,7 +101,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
 
-    Device * dev = DeviceMgr().GetDevice(endpointIndex);
+    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpointIndex);
     if (dev != nullptr && dev->IsReachable())
     {
         ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);
