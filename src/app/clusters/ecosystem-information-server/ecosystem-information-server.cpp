@@ -282,11 +282,11 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
     switch (aPath.mAttributeId)
     {
     case Attributes::RemovedOn::Id:
-        return EcosystemInformationServer::Instance().EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::DeviceDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::LocationDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::ClusterRevision::Id: {
         uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
         return aEncoder.Encode(rev);
