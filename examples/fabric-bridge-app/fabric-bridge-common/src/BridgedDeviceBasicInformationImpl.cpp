@@ -23,7 +23,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 
-static constexpr unsigned kBridgedDeviceBasicInformationClusterRevision = 2;
+static constexpr unsigned kBridgedDeviceBasicInformationClusterRevision = 4;
 static constexpr unsigned kBridgedDeviceBasicInformationFeatureMap      = 0;
 
 using namespace ::chip;
