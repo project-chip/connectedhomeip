@@ -121,7 +121,7 @@ declare_args() {
   # Include wifi-paf to commission the device or not
   # This is a feature of Wi-Fi spec that it can be enabled if wifi is enabled
   # and the supplicant can support.
-  chip_device_config_enable_wifipaf = chip_enable_wifi && (current_os == "linux")
+  chip_device_config_enable_wifipaf = chip_enable_wifi && current_os == "linux"
 }
 
 declare_args() {
