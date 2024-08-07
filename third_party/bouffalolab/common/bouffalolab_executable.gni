@@ -49,13 +49,9 @@ template("bouffalolab_executable") {
 
   objcopy_image_name = output_base_name + ".bin"
   if (invoker.bl_plat_name == "bl602") {
-    flashing_config_inputs = [ 
-      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" 
-    ]
+    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
   } else {
-    flashing_config_inputs = [ 
-      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" 
-    ]
+    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
   }
 
   copy(flashing_config_target) {
@@ -70,7 +66,6 @@ template("bouffalolab_executable") {
   flashing_options += [ "--chipname" ]
   flashing_options += [ "${invoker.bl_plat_name}" ]
 
-
   flashing_options += [ "--xtal" ]
   if (invoker.bl_plat_name == "bl602") {
     flashing_options += [ "40M" ]
@@ -83,17 +78,16 @@ template("bouffalolab_executable") {
   flashing_options += [ "--pt" ]
   if (invoker.bl_plat_name == "bl602") {
     flashing_options +=
-      [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
   } else if (defined(invoker.enable_openthread_border_router) &&
              invoker.enable_openthread_border_router) {
-  flashing_options += [ rebase_path("partition_cfg_2M_noOTA.toml",
-                                        root_out_dir,
-                                        root_out_dir) ]
+    flashing_options += [ rebase_path("partition_cfg_2M_noOTA.toml",
+                                      root_out_dir,
+                                      root_out_dir) ]
   } else {
     flashing_options +=
-          [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   }
-
 
   # set 2000000 baudrate for image download by default
   flashing_options += [ "--baudrate" ]
@@ -101,6 +95,9 @@ template("bouffalolab_executable") {
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
-    data_deps = [ ":${flashing_runtime_target}", ":${flashing_config_target}" ]
+    data_deps = [
+      ":${flashing_config_target}",
+      ":${flashing_runtime_target}",
+    ]
   }
 }

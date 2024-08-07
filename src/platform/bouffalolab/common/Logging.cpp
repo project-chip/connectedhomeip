@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <stdio.h>
-#include <string.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/logging/LogV.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <CHIPDevicePlatformConfig.h>
 #include <lib/core/CHIPConfig.h>

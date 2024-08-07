@@ -24,6 +24,7 @@ pw_assert_BACKEND = "$dir_pw_assert_log"
 pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
 chip_detail_logging = false
+
 # use -Os instead of -Og
 is_debug = false
 

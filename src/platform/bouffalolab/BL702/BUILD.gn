@@ -65,9 +65,9 @@ static_library("BL702") {
       "../common/FactoryDataProvider.h",
     ]
   }
-  
+
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp"]
+    sources += [ "../common/BLConfig.cpp" ]
   }
 
   if (chip_enable_wifi) {

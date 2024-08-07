@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <lwip/tcpip.h>
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"
 #include "lwip/netif.h"
@@ -9,6 +8,7 @@
 #include "lwip/prot/ip6.h"
 #include "lwip/prot/nd6.h"
 #include "lwip/raw.h"
+#include <lwip/tcpip.h>
 
 #include "bl_route_hook.h"
 #include "bl_route_table.h"

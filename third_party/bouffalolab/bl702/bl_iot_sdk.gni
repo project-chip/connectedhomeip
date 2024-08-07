@@ -150,13 +150,11 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_xip_sflash_ext.c",
     ]
 
-    configs += [ 
+    configs += [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_freertos"
+      ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_BSP_Driver",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
     cflags_c = [
       "-Wno-sign-compare",
       "-Wno-unused-variable",
@@ -327,7 +325,7 @@ template("bl_iot_sdk") {
       "-Wno-format-truncation",
       "-Wno-shadow",
       "-Wno-incompatible-pointer-types",
-      "-Wno-array-bounds"
+      "-Wno-array-bounds",
     ]
 
     configs += [
@@ -404,8 +402,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/cli/cli/include",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-      include_dirs += [ "${bl_iot_sdk_root}/components/stage/easyflash4/inc"]
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      include_dirs += [ "${bl_iot_sdk_root}/components/stage/easyflash4/inc" ]
     }
 
     if (defined(invoker.enable_cdc_module) && invoker.enable_cdc_module) {
@@ -429,7 +428,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_sw.c",
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_wip.c",
       "${bl_iot_sdk_root}/components/stage/blog/blog.c",
-
       "${bl_iot_sdk_root}/components/stage/yloop/src/aos_freertos.c",
       "${bl_iot_sdk_root}/components/stage/yloop/src/device.c",
       "${bl_iot_sdk_root}/components/stage/yloop/src/local_event.c",
@@ -447,8 +445,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-      sources += [ 
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      sources += [
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/easyflash.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_env.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_port.c",
@@ -456,9 +455,7 @@ template("bl_iot_sdk") {
       ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config_stage",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_stage" ]
   }
 
   config("${sdk_target_name}_config_sys") {
@@ -742,8 +739,7 @@ template("bl_iot_sdk") {
 
     if (invoker.chip_openthread_ftd) {
       defines = [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
-    }
-    else {
+    } else {
       defines = [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
     }
 
@@ -761,8 +757,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_sys.c",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-        sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_easyflash.c" ]
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_easyflash.c" ]
     }
 
     libs = [
@@ -770,9 +767,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702/lib/libopenthread_utils_bl702.a",
     ]
 
-    cflags_c = [
-      "-Wno-sign-compare"
-    ]
+    cflags_c = [ "-Wno-sign-compare" ]
 
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -965,11 +960,11 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_factory_data") {
-    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/mfd/include" ]
+    include_dirs =
+        [ "${bl_iot_sdk_root}/components/network/matter/mfd/include" ]
   }
 
   source_set("${sdk_target_name}_factory_data") {
-
     defines = [ "BL_MFD_PLAT_H=\"bl_mfd_bl702.h\"" ]
     sources = [
       "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd.c",

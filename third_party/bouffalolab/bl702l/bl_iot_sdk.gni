@@ -143,16 +143,12 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_spi.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/BSP_Driver/std_drv/src/bl702l_tzc_sec.c",
     ]
-    sources += [
-      "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/MCU_Common/ring_buffer/ring_buffer.c",
-    ]
-    configs += [ 
+    sources += [ "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std/MCU_Common/ring_buffer/ring_buffer.c" ]
+    configs += [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_freertos"
+      ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_BSP_Driver",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_BSP_Driver" ]
     cflags_c = [
       "-Wno-sign-compare",
       "-Wno-unused-variable",
@@ -213,7 +209,6 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_freertos",
     ]
   }
-
 
   config("${sdk_target_name}_config_hosal") {
     include_dirs = [
@@ -357,9 +352,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/libc/newlibc/syscalls.c",
     ]
     cflags_c = [ "-Wno-builtin-declaration-mismatch" ]
-    configs += [
-      ":${sdk_target_name}_config_freertos",
-    ]
+    configs += [ ":${sdk_target_name}_config_freertos" ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
@@ -372,8 +365,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/cli/cli/include",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-      include_dirs += [ "${bl_iot_sdk_root}/components/stage/easyflash4/inc"]
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      include_dirs += [ "${bl_iot_sdk_root}/components/stage/easyflash4/inc" ]
     }
   }
 
@@ -410,8 +404,9 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_freertos",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-      sources += [ 
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      sources += [
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/easyflash.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_env.c",
         "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_port.c",
@@ -419,9 +414,7 @@ template("bl_iot_sdk") {
       ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config_stage",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_stage" ]
   }
 
   config("${sdk_target_name}_config_sys") {
@@ -619,7 +612,6 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_ble") {
-
     libs = [ "${bl_iot_sdk_root}/components/network/ble/btblecontroller_702l_m0s1p/lib/libbtblecontroller_702l_m0s1p.a" ]
 
     include_dirs = [
@@ -657,9 +649,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_ble",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_ble" ]
 
     cflags_c = [
       "-Wno-sign-compare",
@@ -695,8 +685,7 @@ template("bl_iot_sdk") {
 
     if (invoker.chip_openthread_ftd) {
       defines = [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
-    }
-    else {
+    } else {
       defines = [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
     }
 
@@ -714,8 +703,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_sys.c",
     ]
 
-    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) && invoker.bouffalo_sdk_component_easyflash_enabled) {
-        sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_easyflash.c" ]
+    if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
+        invoker.bouffalo_sdk_component_easyflash_enabled) {
+      sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_easyflash.c" ]
     }
 
     libs = [
@@ -723,9 +713,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702l/lib/libopenthread_utils_bl702l.a",
     ]
 
-    cflags_c = [
-      "-Wno-sign-compare"
-    ]
+    cflags_c = [ "-Wno-sign-compare" ]
 
     configs += [
       ":${sdk_target_name}_config",
@@ -735,9 +723,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_stage",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_openthread_port",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_openthread_port" ]
 
     public_deps = [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -746,11 +732,11 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_factory_data") {
-    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/mfd/include" ]
+    include_dirs =
+        [ "${bl_iot_sdk_root}/components/network/matter/mfd/include" ]
   }
 
   source_set("${sdk_target_name}_factory_data") {
-
     defines = [ "BL_MFD_PLAT_H=\"bl_mfd_bl702l.h\"" ]
     sources = [
       "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd.c",

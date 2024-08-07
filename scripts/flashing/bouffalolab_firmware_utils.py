@@ -13,30 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import binascii
+import configparser
 import importlib.metadata
 import logging
 import os
 import pathlib
+import platform
 import re
 import shutil
-import sys
 import subprocess
-import platform
-import shutil
-import toml
-import binascii
-import configparser
-import coloredlogs
+import sys
 import time
-import firmware_utils
 
+import coloredlogs
+import firmware_utils
+import toml
 from Crypto.Cipher import AES
 
 coloredlogs.install(level='DEBUG')
 
 # Additional options that can be use to configure an `Flasher`
 # object (as dictionary keys) and/or passed as command line options.
+
+
 def any_base_int(s): return int(s, 0)
+
 
 BOUFFALO_OPTIONS = {
     # Configuration options define properties used in flashing operations.
@@ -202,6 +204,7 @@ BOUFFALO_OPTIONS = {
 
 MATTER_ROOT = os.getcwd()
 
+
 class DictObject:
     def __init__(self, data_dict):
         for key, value in data_dict.items():
@@ -218,6 +221,7 @@ class DictObject:
 
     def __repr__(self):
         return str(self.__dict__)
+
 
 class Flasher(firmware_utils.Flasher):
 
@@ -242,7 +246,7 @@ class Flasher(firmware_utils.Flasher):
     def parse_mfd(self):
 
         def decrypt_data(data_bytearray, key_bytearray, iv_bytearray):
-            data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16) ))
+            data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
             cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
             plaintext = cryptor.decrypt(data_bytearray)
             return plaintext
@@ -373,7 +377,7 @@ class Flasher(firmware_utils.Flasher):
             if dts:
                 return dts
             else:
-                return os.path.join(flashtool_path, "chips", self.args["chipname"], 
+                return os.path.join(flashtool_path, "chips", self.args["chipname"],
                                     "device_tree", "bl_factory_params_IoTKitA_{}.dts".format(self.args["xtal"]))
 
         def get_boot_image(flashtool_path, boot2_image):
@@ -381,7 +385,7 @@ class Flasher(firmware_utils.Flasher):
             if boot2_image:
                 return boot2_image
 
-            if self.args["chipname"] in [ "bl702l" ]:
+            if self.args["chipname"] in ["bl702l"]:
                 return None
 
             builtin_imgs_path = os.path.join(flashtool_path, "chips", self.args["chipname"], "builtin_imgs")
@@ -423,8 +427,8 @@ class Flasher(firmware_utils.Flasher):
             ]
 
             if self.args["sk"]:
-                gen_ota_img_cmd += [ "--sk", self.args["sk"] ]
-            
+                gen_ota_img_cmd += ["--sk", self.args["sk"]]
+
             logging.info("ota image generating: {}".format(" ".join(gen_ota_img_cmd)))
             process = subprocess.Popen(gen_ota_img_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             while process.poll() is None:
@@ -442,7 +446,6 @@ class Flasher(firmware_utils.Flasher):
                 ota_img_name = os.path.basename(img)
                 new_name = os.path.join(self.work_dir, "ota_images", fw_name + ota_img_name[len("FW_OTA"):])
                 os.system("mv {} {}".format(img, new_name))
-
 
         def exe_prog_cmd(flashtool_exe, mfd_addr):
 
@@ -463,22 +466,22 @@ class Flasher(firmware_utils.Flasher):
             ]
 
             if self.args["boot2"]:
-                prog_cmd += [ "--boot2", self.args["boot2"] ]
+                prog_cmd += ["--boot2", self.args["boot2"]]
 
             if self.args["sk"]:
-                prog_cmd += [ "--sk", self.args["sk"] ]
+                prog_cmd += ["--sk", self.args["sk"]]
 
             if mfd_addr and self.args["mfd_str"]:
                 if self.args["key"] and not self.args["iv"]:
                     logging.warning("mfd file has no iv, do NOT program mfd key.")
                 else:
-                    prog_cmd += [ "--dac_key", self.args["key"] ]
-                    prog_cmd += [ "--dac_iv", self.args["iv"] ]
-                    prog_cmd += [ "--dac_addr", hex(mfd_addr) ]
-                    prog_cmd += [ "--dac_value", self.args["mfd_str"] ]
+                    prog_cmd += ["--dac_key", self.args["key"]]
+                    prog_cmd += ["--dac_iv", self.args["iv"]]
+                    prog_cmd += ["--dac_addr", hex(mfd_addr)]
+                    prog_cmd += ["--dac_value", self.args["mfd_str"]]
 
             if self.option.erase:
-                prog_cmd += [ "--erase" ]
+                prog_cmd += ["--erase"]
 
             logging.info("firmware programming: {}".format(" ".join(prog_cmd)))
             process = subprocess.Popen(prog_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -494,12 +497,11 @@ class Flasher(firmware_utils.Flasher):
         self.parse_mfd()
         self.args["dts"] = get_dts_file(flashtool_path, self.args["dts"])
         self.args["boot2"] = get_boot_image(flashtool_path, self.args["boot2"])
-            
+
         os.chdir(self.work_dir)
 
         exe_gen_ota_image_cmd(flashtool_exe)
         exe_prog_cmd(flashtool_exe, mfd_addr)
-
 
     def gen_ota_image(self):
         sys.path.insert(0, os.path.join(MATTER_ROOT, 'src', 'app'))
@@ -589,6 +591,7 @@ class Flasher(firmware_utils.Flasher):
             self.gen_ota_image()
 
         return self
+
 
 if __name__ == '__main__':
 

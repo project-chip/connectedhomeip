@@ -110,7 +110,7 @@ class BouffalolabBuilder(GnBuilder):
         self.chip_name = bouffalo_chip
         self.app = app
         self.board = board
-        
+
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/bouffalolab/toolchain')
         toolchain = f'custom_toolchain="{toolchain}:riscv_gcc"'
         if toolchain:
@@ -161,7 +161,7 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt.append(f'chip_mdns="{chip_mdns}"')
         self.argsOpt.append(f'chip_inet_config_enable_ipv4={str(enable_ethernet or enable_wifi).lower()}')
-        
+
         self.argsOpt.append(f'bouffalo_sdk_component_easyflash_enabled=true')
 
         if enable_thread:
@@ -255,10 +255,10 @@ class BouffalolabBuilder(GnBuilder):
             logging.info("Firmware is built out at: {}".format(path_fw))
             logging.info("Command to generate ota image: ")
             logging.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                            '--version <version> --version-str <version string> '
-                            '--digest-algorithm <digest algorithm>'.format(path_flash_script))
+                         '--version <version> --version-str <version string> '
+                         '--digest-algorithm <digest algorithm>'.format(path_flash_script))
             logging.info("Command to generate and sign ota image: ")
             logging.info('./{} --build-ota --vendor-id <vendor id> --product-id <product id> '
-                            '--version <version> --version-str <version string> '
-                            '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
+                         '--version <version> --version-str <version string> '
+                         '--digest-algorithm <digest algorithm> --sk <private key>'.format(path_flash_script))
             logging.info('*' * 80)

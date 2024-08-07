@@ -61,9 +61,9 @@ static_library("BL602") {
       "../common/FactoryDataProvider.h",
     ]
   }
-  
+
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp"]
+    sources += [ "../common/BLConfig.cpp" ]
   }
 
   deps = [

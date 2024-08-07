@@ -19,8 +19,8 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
-#include <bl_mfd.h>
 #include "FactoryDataProvider.h"
+#include <bl_mfd.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -114,7 +114,6 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-
 
     uint32_t dacCertSize = 0, dacPrivateKeySize = 0;
     uint8_t * pDacCertPtr       = mfd_getDacCertPtr(&dacCertSize);
