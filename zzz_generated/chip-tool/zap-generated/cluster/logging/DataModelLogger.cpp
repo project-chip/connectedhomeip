@@ -14739,14 +14739,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SupportedAreas", 1, value);
         }
         case ServiceArea::Attributes::SupportedMaps::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedMaps", 1, value);
         }
         case ServiceArea::Attributes::SelectedAreas::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
+            chip::app::DataModel::DecodableList<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SelectedAreas", 1, value);
         }
@@ -14761,9 +14759,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EstimatedEndTime", 1, value);
         }
         case ServiceArea::Attributes::Progress::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Progress", 1, value);
         }
