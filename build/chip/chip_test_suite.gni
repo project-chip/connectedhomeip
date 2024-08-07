@@ -53,17 +53,13 @@ declare_args() {
 template("chip_test_suite") {
   _suite_name = target_name
 
-  if (!defined(invoker.test_sources)) {
-    invoker.test_sources = []
-  }
-
   if (chip_build_test_static_libraries) {
     _target_type = "static_library"
   } else {
     _target_type = "source_set"
   }
   target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests", "test_sources", ])
+    forward_variables_from(invoker, "*", [ "tests", "test_sources" ])
 
     output_dir = "${root_out_dir}/lib"
 
@@ -84,40 +80,42 @@ template("chip_test_suite") {
 
   tests = []
 
-  foreach(_test, invoker.test_sources) {
-    _test_name = string_replace(_test, ".cpp", "")
+  if (defined(invoker.test_sources)) {
+    foreach(_test, invoker.test_sources) {
+      _test_name = string_replace(_test, ".cpp", "")
 
-    _test_output_dir = "${root_out_dir}/tests"
-    if (defined(invoker.output_dir)) {
-      _test_output_dir = invoker.output_dir
-    }
-
-    pw_test(_test_name) {
-      # Forward certain variables from the invoker.
-      forward_variables_from(invoker,
-                             [
-                               "deps",
-                               "public_deps",
-                               "cflags",
-                               "configs",
-                             ])
-
-      # Link to the common lib for this suite so we get its `sources`.
-      public_deps += [ ":${_suite_name}.lib" ]
-
-      # Set variables that the platform executable may need.
-      if (test_executable_output_name != "") {
-        output_name = test_executable_output_name + _test_name +
-                      test_executable_output_name_suffix
+      _test_output_dir = "${root_out_dir}/tests"
+      if (defined(invoker.output_dir)) {
+        _test_output_dir = invoker.output_dir
       }
-      ldflags = test_executable_ldflags
 
-      # Add the individual test source file (e.g. "TestSomething.cpp").
-      sources = [ _test ]
+      pw_test(_test_name) {
+        # Forward certain variables from the invoker.
+        forward_variables_from(invoker,
+                              [
+                                "deps",
+                                "public_deps",
+                                "cflags",
+                                "configs",
+                              ])
 
-      output_dir = _test_output_dir
+        # Link to the common lib for this suite so we get its `sources`.
+        public_deps += [ ":${_suite_name}.lib" ]
+
+        # Set variables that the platform executable may need.
+        if (test_executable_output_name != "") {
+          output_name = test_executable_output_name + _test_name +
+                        test_executable_output_name_suffix
+        }
+        ldflags = test_executable_ldflags
+
+        # Add the individual test source file (e.g. "TestSomething.cpp").
+        sources = [ _test ]
+
+        output_dir = _test_output_dir
+      }
+      tests += [ _test_name ]
     }
-    tests += [ _test_name ]
   }
 
   group(_suite_name) {
@@ -127,6 +125,9 @@ template("chip_test_suite") {
     foreach(_test, tests) {
       deps += [ ":${_test}" ]
     }
+
+    # Add the common library.
+    deps += [ ":${_suite_name}.lib" ]
   }
 
   if (chip_pw_run_tests) {
