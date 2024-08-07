@@ -14,8 +14,6 @@
 # limitations under the License.
 
 import binascii
-import configparser
-import importlib.metadata
 import logging
 import os
 import pathlib
@@ -24,7 +22,6 @@ import re
 import shutil
 import subprocess
 import sys
-import time
 
 import coloredlogs
 import firmware_utils
@@ -259,7 +256,7 @@ class Flasher(firmware_utils.Flasher):
         if self.args['mfd_str']:
             try:
                 iv = self.args['mfd_str'].split(":")[1].split(',')[0]
-            except Exception as e:
+            except Exception:
                 raise Exception("Invalid mfd-str format.")
 
             self.args["iv"] = iv
@@ -356,7 +353,7 @@ class Flasher(firmware_utils.Flasher):
 
             try:
                 flashtool_exe = flashtool_path + "/" + bflb_tools_dict[sys.platform]["flash_tool"]
-            except Exception as e:
+            except Exception:
                 raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
 
             if not os.path.exists(flashtool_exe):
@@ -368,7 +365,7 @@ class Flasher(firmware_utils.Flasher):
                 logging.fatal('\tPlease make sure BOUFFALOLAB_SDK_ROOT exports before building as below:')
                 logging.fatal('\t\texport BOUFFALOLAB_SDK_ROOT="your install path"')
                 logging.fatal('*' * 80)
-                raise Exception(e)
+                raise Exception("Flash tool is not installed.")
 
             return flashtool_path, flashtool_exe
 
@@ -549,13 +546,6 @@ class Flasher(firmware_utils.Flasher):
     def actions(self):
         """Perform actions on the device according to self.option."""
         self.log(3, 'Options:', self.option)
-
-        is_for_ota_image_building = None
-        is_for_programming = False
-        has_private_key = False
-        has_public_key = False
-        ota_output_folder = None
-        options_keys = BOUFFALO_OPTIONS["configuration"].keys()
 
         if platform.machine() not in ["x86_64"]:
             raise Exception("Only support x86_64 CPU machine to program firmware.")

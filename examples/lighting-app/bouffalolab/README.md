@@ -59,7 +59,8 @@ and Thread Border Router.
         Router application and Matter ZigBee bridge
         -   Openthread Border Router application, please refer to Openthread
             Border Router application
-        -   Matter ZigBee application, please contact `Bouffalo Lab` for support.
+        -   Matter ZigBee application, please contact `Bouffalo Lab` for
+            support.
 
 ## Initial setup
 
