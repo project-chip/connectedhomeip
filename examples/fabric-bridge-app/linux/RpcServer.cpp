@@ -86,10 +86,11 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received ActiveChanged: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    auto* device = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
+    auto * device = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
     if (device == nullptr)
     {
-        ChipLogError(NotSpecified, "Could not find bridged device associated with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        ChipLogError(NotSpecified, "Could not find bridged device associated with nodeId=0x" ChipLogFormatX64,
+                     ChipLogValueX64(nodeId));
         return pw::Status::NotFound();
     }
 

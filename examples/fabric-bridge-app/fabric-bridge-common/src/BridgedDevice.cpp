@@ -26,14 +26,15 @@
 
 namespace {
 
-struct ActiveChangeEventWorkData {
+struct ActiveChangeEventWorkData
+{
     chip::EndpointId mEndpointId;
     uint32_t mPromisedActiveDuration;
 };
 
 static void ActiveChangeEventWork(intptr_t arg)
 {
-    ActiveChangeEventWorkData* data = reinterpret_cast<ActiveChangeEventWorkData *>(arg);
+    ActiveChangeEventWorkData * data = reinterpret_cast<ActiveChangeEventWorkData *>(arg);
 
     chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
     event.promisedActiveDuration  = data->mPromisedActiveDuration;
@@ -61,9 +62,9 @@ BridgedDevice::BridgedDevice(chip::NodeId nodeId)
 
 void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDuration)
 {
-    ActiveChangeEventWorkData* workdata = chip::Platform::New<ActiveChangeEventWorkData>();
-    workdata->mEndpointId = mEndpointId;
-    workdata->mPromisedActiveDuration = promisedActiveDuration;
+    ActiveChangeEventWorkData * workdata = chip::Platform::New<ActiveChangeEventWorkData>();
+    workdata->mEndpointId                = mEndpointId;
+    workdata->mPromisedActiveDuration    = promisedActiveDuration;
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(ActiveChangeEventWork, reinterpret_cast<intptr_t>(workdata));
 }

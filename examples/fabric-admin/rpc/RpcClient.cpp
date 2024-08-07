@@ -175,7 +175,7 @@ CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDuration)
     ChipLogProgress(NotSpecified, "ActiveChanged");
 
     chip_rpc_KeepActiveChanged parameters;
-    parameters.node_id = nodeId;
+    parameters.node_id                  = nodeId;
     parameters.promised_active_duration = promisedActiveDuration;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
