@@ -43,17 +43,11 @@ void BridgedDevice::SetReachable(bool reachable)
 
     if (reachable)
     {
-        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: ONLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: ONLINE", mAttributes.uniqueId.c_str());
     }
     else
     {
-        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mAttributes.uniqueId.c_str());
     }
 }
 
-void BridgedDevice::SetName(const char * name)
-{
-    ChipLogProgress(NotSpecified, "BridgedDevice[%s]: New Name=\"%s\"", mName, name);
-
-    chip::Platform::CopyString(mName, name);
-}

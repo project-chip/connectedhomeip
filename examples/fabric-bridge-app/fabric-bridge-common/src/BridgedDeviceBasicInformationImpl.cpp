@@ -44,7 +44,7 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
         encoder.Encode(dev->IsReachable());
         break;
     case BasicInformation::Attributes::NodeLabel::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetName()));
+        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().nodeLabel.c_str()));
         break;
     case BasicInformation::Attributes::ClusterRevision::Id:
         encoder.Encode(kBridgedDeviceBasicInformationClusterRevision);

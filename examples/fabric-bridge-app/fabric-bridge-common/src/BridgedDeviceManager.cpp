@@ -211,7 +211,8 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
             mDevices[index]                = nullptr;
-            ChipLogProgress(NotSpecified, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
+            ChipLogProgress(NotSpecified, "Removed device %s from dynamic endpoint %d (index=%d)",
+                            dev->GetBridgedAttributes().uniqueId.c_str(), ep, index);
             return index;
         }
         index++;

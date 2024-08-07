@@ -54,6 +54,21 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     auto device = std::make_unique<BridgedDevice>(nodeId);
     device->SetReachable(true);
 
+    BridgedDevice::BridgedAttributes attributes;
+
+    attributes.uniqueId              = request.unique_id;
+    attributes.vendorName            = request.vendor_name;
+    attributes.vendorId              = request.vendor_id;
+    attributes.productName           = request.product_name;
+    attributes.productId             = request.product_id;
+    attributes.nodeLabel             = request.node_label;
+    attributes.hardwareVersion       = request.hardware_version;
+    attributes.hardwareVersionString = request.hardware_version_string;
+    attributes.softwareVersion       = request.software_version;
+    attributes.softwareVersionString = request.software_version_string;
+
+    device->SetBridgedAttributes(attributes);
+
     auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
     if (!result.has_value())
     {
