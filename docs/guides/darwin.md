@@ -178,13 +178,14 @@ on MacOS or iOS/iPadOS.
 | Temperature Color Light | 268     | 010C |                                                  |
 | Enhanced Color Light    | 269     | 010D |                                                  |
 | Bridges                 | 14      | 000E |                                                  |
+| Robot Vacuum Cleaner    | 116     | 0074 | Announced, not yet supported                     |
 
 ## Additional Device Type Support on Apple's Platforms
 
-As a Developer, you can use Matter.framework on _all_ of Apple's platforms to
-setup and control all device types available in the Matter SDK. You're able to
-develop your own Applications that can work with devices added to Apple Home, or
-create your own Fabric to manage your and other devices as well.
+Apple's platforms support all device types available in the Matter SDK, so
+developers can use Matter.framework to develop their own applications that can
+work with devices added to Apple Home, or you create your own Fabric to manage
+your and other devices as well.
 
 Please see documentation about `-[HMAccessory matterNodeID]`
 [here](https://developer.apple.com/documentation/homekit/hmaccessory/matternodeid-5zfqo)
