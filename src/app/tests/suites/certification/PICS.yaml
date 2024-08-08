@@ -6567,6 +6567,9 @@ PICS:
     - label: "Supports a local temperature not exposed"
       id: TSTAT.S.F06
 
+    - label: "Supports enhanced schedules"
+      id: TSTAT.S.F07
+
     - label: "Supports setpoint presets"
       id: TSTAT.S.F08
 
