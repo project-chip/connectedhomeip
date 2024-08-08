@@ -358,7 +358,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                            (result == CHIP_NO_ERROR)                  ? "allowed"
+                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
+                                                                       : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
