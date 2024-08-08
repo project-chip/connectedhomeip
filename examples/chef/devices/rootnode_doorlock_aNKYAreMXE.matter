@@ -2726,7 +2726,7 @@ endpoint 1 {
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
-    ram      attribute autoRelockTime default = 5;
+    ram      attribute autoRelockTime default = 0;
     ram      attribute soundVolume default = 0;
     ram      attribute operatingMode default = 0;
     ram      attribute supportedOperatingModes default = 0xFFFF;

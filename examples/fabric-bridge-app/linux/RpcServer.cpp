@@ -20,6 +20,7 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 #include <lib/core/CHIPError.h>
 
 #include <string>
@@ -51,16 +52,73 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    BridgedDevice * device = new BridgedDevice(nodeId);
+    auto device = std::make_unique<BridgedDevice>(nodeId);
     device->SetReachable(true);
 
-    int result = BridgeDeviceMgr().AddDeviceEndpoint(device, 1);
-    if (result == -1)
+    BridgedDevice::BridgedAttributes attributes;
+
+    if (request.has_unique_id)
     {
-        delete device;
+        attributes.uniqueId = request.unique_id;
+    }
+
+    if (request.has_vendor_name)
+    {
+        attributes.vendorName = request.vendor_name;
+    }
+
+    if (request.has_vendor_id)
+    {
+        attributes.vendorId = request.vendor_id;
+    }
+
+    if (request.has_product_name)
+    {
+        attributes.productName = request.product_name;
+    }
+
+    if (request.has_product_id)
+    {
+        attributes.productId = request.product_id;
+    }
+
+    if (request.has_node_label)
+    {
+        attributes.nodeLabel = request.node_label;
+    }
+
+    if (request.has_hardware_version)
+    {
+        attributes.hardwareVersion = request.hardware_version;
+    }
+
+    if (request.has_hardware_version_string)
+    {
+        attributes.hardwareVersionString = request.hardware_version_string;
+    }
+
+    if (request.has_software_version)
+    {
+        attributes.softwareVersion = request.software_version;
+    }
+
+    if (request.has_software_version_string)
+    {
+        attributes.softwareVersionString = request.software_version_string;
+    }
+
+    device->SetBridgedAttributes(attributes);
+
+    auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
+    if (!result.has_value())
+    {
         ChipLogError(NotSpecified, "Failed to add device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::Unknown();
     }
+
+    CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
+        device->GetEndpointId());
+    VerifyOrDie(err == CHIP_NO_ERROR);
 
     return pw::OkStatus();
 }
@@ -70,8 +128,8 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    int removed_idx = BridgeDeviceMgr().RemoveDeviceByNodeId(nodeId);
-    if (removed_idx < 0)
+    auto removed_idx = BridgeDeviceMgr().RemoveDeviceByNodeId(nodeId);
+    if (!removed_idx.has_value())
     {
         ChipLogError(NotSpecified, "Failed to remove device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::NotFound();
