@@ -22,7 +22,6 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/KeyValueStoreManager.h>
 
 CHIP_ERROR chip::app::DefaultEnhancedSetupFlowProvider::Init(TermsAndConditionsProvider * const inTermsAndConditionsProvider)
 {

@@ -107,7 +107,7 @@ static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
 app::DefaultEnhancedSetupFlowProvider sDefaultEnhancedSetupFlowProviderInstance;
 app::EnhancedSetupFlowProvider * CommonCaseDeviceServerInitParams::sDefaultEnhancedSetupFlowProvider =
     &sDefaultEnhancedSetupFlowProviderInstance;
@@ -155,7 +155,7 @@ CHIP_ERROR CommonCaseDeviceServerInitParams::InitializeStaticResourcesBeforeServ
         reportScheduler = &sReportScheduler;
     }
 
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     if (this->termsAndConditionsProvider == nullptr)
     {
         ReturnErrorOnFailure(sDefaultTermsAndConditionsProviderInstance.Init(this->persistentStorageDelegate,
@@ -202,10 +202,10 @@ CHIP_ERROR CommonCaseDeviceServerInitParams::InitializeStaticResourcesBeforeServ
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-        if (this->icdCheckInBackOffStrategy == nullptr)
-        {
-            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
-        }
+    if (this->icdCheckInBackOffStrategy == nullptr)
+    {
+        this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
+    }
 #endif
 
     return CHIP_NO_ERROR;
@@ -235,7 +235,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     VerifyOrExit(initParams.enhancedSetupFlowProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.termsAndConditionsProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 #endif
@@ -295,7 +295,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mReportScheduler = initParams.reportScheduler;
 
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     mTermsAndConditionsProvider = initParams.termsAndConditionsProvider;
     mEnhancedSetupFlowProvider  = initParams.enhancedSetupFlowProvider;
 #endif

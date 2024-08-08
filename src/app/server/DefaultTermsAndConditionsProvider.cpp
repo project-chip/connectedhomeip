@@ -23,12 +23,13 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/KeyValueStoreManager.h>
 
 namespace {
-static constexpr chip::TLV::Tag kAcceptedAcknowledgementsTag        = chip::TLV::ContextTag(1);
-static constexpr chip::TLV::Tag kAcceptedAcknowledgementsVersionTag = chip::TLV::ContextTag(2);
-static constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t));
+constexpr chip::TLV::Tag kSerializationVersionTag            = chip::TLV::ContextTag(1);
+constexpr chip::TLV::Tag kAcceptedAcknowledgementsTag        = chip::TLV::ContextTag(2);
+constexpr chip::TLV::Tag kAcceptedAcknowledgementsVersionTag = chip::TLV::ContextTag(3);
+constexpr uint8_t kSerializationVersion                      = 1;
+constexpr size_t kEstimatedTlvBufferSize = chip::TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t));
 }; // namespace
 
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::Init(chip::PersistentStorageDelegate * const inPersistentStorageDelegate,
@@ -83,11 +84,9 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(uint16_t 
     tlvReader.Init(buffer);
     ReturnErrorOnFailure(tlvReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(tlvContainer));
-    ReturnErrorOnFailure(tlvReader.Next());
-    ReturnErrorOnFailure(tlvReader.Expect(kAcceptedAcknowledgementsTag));
+    ReturnErrorOnFailure(tlvReader.Next(kAcceptedAcknowledgementsTag));
     ReturnErrorOnFailure(tlvReader.Get(acknowledgements));
-    ReturnErrorOnFailure(tlvReader.Next());
-    ReturnErrorOnFailure(tlvReader.Expect(kAcceptedAcknowledgementsVersionTag));
+    ReturnErrorOnFailure(tlvReader.Next(kAcceptedAcknowledgementsVersionTag));
     ReturnErrorOnFailure(tlvReader.Get(acknowledgementsVersion));
     ReturnErrorOnFailure(tlvReader.ExitContainer(tlvContainer));
 
@@ -117,6 +116,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::SetAcceptance(uint16_t 
 
     tlvWriter.Init(buffer, sizeof(buffer));
     ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, tlvContainer));
+    ReturnErrorOnFailure(tlvWriter.Put(kSerializationVersionTag, kSerializationVersion));
     ReturnErrorOnFailure(tlvWriter.Put(kAcceptedAcknowledgementsTag, inAcceptedAcknowledgementsValue));
     ReturnErrorOnFailure(tlvWriter.Put(kAcceptedAcknowledgementsVersionTag, inAcceptedAcknowledgementsVersionValue));
     ReturnErrorOnFailure(tlvWriter.EndContainer(tlvContainer));

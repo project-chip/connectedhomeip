@@ -40,7 +40,7 @@ public:
      * @param[in] inRequiredAcknowledgementsVersionValue The version of the required acknowledgements.
      * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
-    CHIP_ERROR Init(chip::PersistentStorageDelegate * const inPersistentStorageDelegate, uint16_t inRequiredAcknowledgementsValue,
+    CHIP_ERROR Init(PersistentStorageDelegate * const inPersistentStorageDelegate, uint16_t inRequiredAcknowledgementsValue,
                     uint16_t inRequiredAcknowledgementsVersionValue);
 
     /**
@@ -64,7 +64,7 @@ public:
     CHIP_ERROR SetAcceptance(uint16_t inAcknowledgementsValue, uint16_t inAcknowledgementsVersionValue) override;
 
 private:
-    chip::PersistentStorageDelegate * mPersistentStorageDelegate;
+    PersistentStorageDelegate * mPersistentStorageDelegate;
     uint16_t mRequiredAcknowledgementsValue;
     uint16_t mRequiredAcknowledgementsVersionValue;
 };

@@ -181,7 +181,7 @@ struct ServerInitParams
     // Optional. Support for the ICD Check-In BackOff strategy. Must be initialized before being provided.
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     // Optional. Enhanced setup flow provider to support terms and conditions acceptance check.
     app::EnhancedSetupFlowProvider * enhancedSetupFlowProvider = nullptr;
     // Optional. Terms and conditions provider to support enhanced setup flow feature.
@@ -254,7 +254,7 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     static app::DefaultICDCheckInBackOffStrategy sDefaultICDCheckInBackOffStrategy;
 #endif
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     static app::EnhancedSetupFlowProvider * sDefaultEnhancedSetupFlowProvider;
     static app::TermsAndConditionsProvider * sDefaultTermsAndConditionsProvider;
 #endif
@@ -338,7 +338,7 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     app::EnhancedSetupFlowProvider * GetEnhancedSetupFlowProvider() { return mEnhancedSetupFlowProvider; }
 #endif
 
@@ -615,7 +615,7 @@ private:
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
     app::reporting::ReportScheduler * mReportScheduler;
-#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+#if defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined(CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
     app::EnhancedSetupFlowProvider * mEnhancedSetupFlowProvider;
     app::TermsAndConditionsProvider * mTermsAndConditionsProvider;
 #endif

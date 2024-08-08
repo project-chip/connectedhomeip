@@ -74,7 +74,7 @@ public:
     /**
      * @copydoc EnhancedSetupFlowProvider::SetTermsAndConditionsAcceptance
      */
-    CHIP_ERROR SetTermsAndConditionsAcceptance(uint16_t aTCAcknowledgements, uint16_t aTCAcknowledgementsVersion) override;
+    CHIP_ERROR SetTermsAndConditionsAcceptance(uint16_t aTCAcknowledgements, uint16_t inTCAcknowledgementsVersionValue) override;
 
     /**
      * @copydoc EnhancedSetupFlowProvider::ClearTermsAndConditionsAcceptance

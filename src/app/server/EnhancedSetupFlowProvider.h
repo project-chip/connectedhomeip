@@ -92,11 +92,11 @@ public:
      * @brief Sets the acceptance status of the terms and conditions.
      *
      * @param[in] inTCAcknowledgements The acknowledgements to accept.
-     * @param[in] inTCAcknowledgementsoutValue The version of the acknowledgements to accept.
+     * @param[in] inTCAcknowledgementsVersionValue The version of the acknowledgements to accept.
      * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR SetTermsAndConditionsAcceptance(uint16_t inTCAcknowledgementsValue,
-                                                       uint16_t inTCAcknowledgementsoutValue) = 0;
+                                                       uint16_t inTCAcknowledgementsVersionValue) = 0;
 
     /**
      * @brief Clears the acceptance status of the terms and conditions.
