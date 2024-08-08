@@ -22,6 +22,8 @@
 
 #include "BridgedDevice.h"
 
+#include <memory>
+
 class BridgedDeviceManager
 {
 public:
@@ -41,13 +43,19 @@ public:
      * This function attempts to add a device to a dynamic endpoint. It tries to find an available
      * endpoint slot and retries the addition process up to a specified maximum number of times if
      * the endpoint already exists. If the addition is successful, it returns the index of the
-     * dynamic endpoint; otherwise, it returns -1.
+     * dynamic endpoint;
+     *
+     * Ensures that the device has a unique id:
+     *   - device MUST set its unique id if any BEFORE calling this method
+     *   - if no unique id (i.e. empty string), a new unique id will be generated
+     *   - Add will fail if the unique id is not unique
      *
      * @param dev A pointer to the device to be added.
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
-     * @return int The index of the dynamic endpoint if successful, -1 otherwise.
+     * @return int The index of the dynamic endpoint if successful, nullopt otherwise
      */
-    int AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+    std::optional<unsigned> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+                                              chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
      * @brief Removes a device from a dynamic endpoint.
@@ -95,16 +103,26 @@ public:
      * @param nodeId The NodeId of the device to be removed.
      * @return int The index of the removed dynamic endpoint if successful, -1 otherwise.
      */
-    int RemoveDeviceByNodeId(chip::NodeId nodeId);
+    std::optional<unsigned> RemoveDeviceByNodeId(chip::NodeId nodeId);
+
+    /**
+     * Finds the device with the given unique id (if any)
+     */
+    BridgedDevice * GetDeviceByUniqueId(const std::string & id);
 
 private:
     friend BridgedDeviceManager & BridgeDeviceMgr();
+
+    /**
+     * Creates a new unique ID that is not used by any other mDevice
+     */
+    std::string GenerateUniqueId();
 
     static BridgedDeviceManager sInstance;
 
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
-    BridgedDevice * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
+    std::unique_ptr<BridgedDevice> mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
 /**

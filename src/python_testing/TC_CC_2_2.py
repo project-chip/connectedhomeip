@@ -160,8 +160,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
             count = sub_handler.attribute_report_counts[attr]
-            # TODO: should be 12 - see issue #34646
-            # asserts.assert_less_equal(count, 12, "More than 12 reports received")
+            asserts.assert_less_equal(count, 12, "More than 12 reports received")
             asserts.assert_less_equal(count, gather_time, f"More than {gather_time} reports received")
 
         self.step(9)
@@ -270,17 +269,16 @@ class TC_CC_2_3(MatterBaseTest):
         time.sleep(20)
 
         self.step(34)
-        # TODO: Re-enable checks 34, 36 when #34643 is addressed
         logging.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
-        # count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
-        # asserts.assert_equal(count, 3, "Unexpected number of reports received")
+        count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
+        asserts.assert_equal(count, 3, "Unexpected number of reports received")
 
         self.step(35)
         asserts.assert_equal(sub_handler.attribute_reports[cc.Attributes.RemainingTime][0].value, 100, "Unexpected first report")
 
         self.step(36)
-        # asserts.assert_almost_equal(
-        #    sub_handler.attribute_reports[cc.Attributes.RemainingTime][1].value, 0, delta=10, msg="Unexpected second report")
+        asserts.assert_almost_equal(
+            sub_handler.attribute_reports[cc.Attributes.RemainingTime][1].value, 150, delta=10, msg="Unexpected second report")
 
         self.step(37)
         asserts.assert_equal(sub_handler.attribute_reports[cc.Attributes.RemainingTime][-1].value, 0, "Unexpected last report")

@@ -19,29 +19,42 @@
 
 namespace chip {
 namespace app {
-namespace CommandHandlerInterfaceRegistry {
 
-/// Remove the entire linked list of handlers
-void UnregisterAllHandlers();
-
-/// Add a new handler to the list of registered command handlers
+/// Keeps track of a list of registered command handler interfaces
 ///
-/// At most one command handler can exist for a given endpoint/cluster combination. Trying
-/// to register conflicting handlers will result in a `CHIP_ERROR_INCORRECT_STATE` error.
-CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
+/// NOTE: command handler interface objects are IntrusiveList elements (i.e.
+///       their pointers are contained within). As a result, a command handler
+///       may only ever be part of a single registry.
+class CommandHandlerInterfaceRegistry
+{
+public:
+    /// Remove the entire linked list of handlers
+    void UnregisterAllHandlers();
 
-/// Unregister all commandHandlers that `MatchesEndpoint` for the given endpointId.
-void UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId);
+    /// Add a new handler to the list of registered command handlers
+    ///
+    /// At most one command handler can exist for a given endpoint/cluster combination. Trying
+    /// to register conflicting handlers will result in a `CHIP_ERROR_INCORRECT_STATE` error.
+    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
 
-/// Unregister a single handler.
-///
-/// If the handler is not registered, a `CHIP_ERROR_KEY_NOT_FOUND` is returned.
-CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
+    /// Unregister all commandHandlers that `MatchesEndpoint` for the given endpointId.
+    void UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId);
 
-/// Find the command handler for the given endpoint/cluster combination or return
-/// nullptr if no such command handler exists.
-CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clusterId);
+    /// Unregister a single handler.
+    ///
+    /// If the handler is not registered, a `CHIP_ERROR_KEY_NOT_FOUND` is returned.
+    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
 
-} // namespace CommandHandlerInterfaceRegistry
+    /// Find the command handler for the given endpoint/cluster combination or return
+    /// nullptr if no such command handler exists.
+    CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clusterId);
+
+    /// A global instance of a command handler registry
+    static CommandHandlerInterfaceRegistry & Instance();
+
+private:
+    CommandHandlerInterface * mCommandHandlerList = nullptr;
+};
+
 } // namespace app
 } // namespace chip

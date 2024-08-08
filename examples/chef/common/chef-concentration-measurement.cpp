@@ -91,7 +91,7 @@ Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
         CHIP_ERROR err = clusterInstance->SetMeasuredValue(MakeNullable(newValue));
         if (CHIP_NO_ERROR == err)
         {
-            ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x to MeasuredValue: %f", endpoint, clusterId, newValue);
+            ChipLogDetail(DeviceLayer, "Updated EP:%d, Cluster: 0x%04x MeasuredValue", endpoint, clusterId);
         }
         else
         {

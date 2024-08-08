@@ -302,6 +302,8 @@
 		99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 99AECC7F2798A57E00B6355B /* MTRCommissioningParameters.mm */; };
 		99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 99C65E0F267282F1003402F6 /* MTRControllerTests.m */; };
 		99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 99D466E02798936D0089A18F /* MTRCommissioningParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9BDA2A062C5D9AF800A32BDD /* MTRDevice_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */; };
+		9BDA2A082C5D9AFB00A32BDD /* MTRDevice_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */; };
 		AF1CB86E2874B03B00865A96 /* MTROTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AF1CB8702874B04C00865A96 /* MTROTAProviderDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86F2874B04C00865A96 /* MTROTAProviderDelegateBridge.h */; };
 		AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF5F90FE2878D351005503FA /* MTROTAProviderDelegateBridge.mm */; };
@@ -729,6 +731,8 @@
 		99AECC7F2798A57E00B6355B /* MTRCommissioningParameters.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommissioningParameters.mm; sourceTree = "<group>"; };
 		99C65E0F267282F1003402F6 /* MTRControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRControllerTests.m; sourceTree = "<group>"; };
 		99D466E02798936D0089A18F /* MTRCommissioningParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningParameters.h; sourceTree = "<group>"; };
+		9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice_Concrete.mm; sourceTree = "<group>"; };
+		9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_Concrete.h; sourceTree = "<group>"; };
 		AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROTAProviderDelegate.h; sourceTree = "<group>"; };
 		AF1CB86F2874B04C00865A96 /* MTROTAProviderDelegateBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROTAProviderDelegateBridge.h; sourceTree = "<group>"; };
 		AF5F90FE2878D351005503FA /* MTROTAProviderDelegateBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAProviderDelegateBridge.mm; sourceTree = "<group>"; };
@@ -1301,6 +1305,8 @@
 				7596A84A287636C1004DAE0E /* MTRDevice_Internal.h */,
 				7596A84228762729004DAE0E /* MTRDevice.h */,
 				7596A84328762729004DAE0E /* MTRDevice.mm */,
+				9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */,
+				9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */,
 				88EBF8CB27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h */,
 				7534F12728BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h */,
 				7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */,
@@ -1600,6 +1606,7 @@
 				5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.h in Headers */,
 				5173A47529C0E2ED00F67F48 /* MTRFabricInfo_Internal.h in Headers */,
+				9BDA2A082C5D9AFB00A32BDD /* MTRDevice_Concrete.h in Headers */,
 				3D843717294979230070D20A /* MTRClusters_Internal.h in Headers */,
 				7596A85728788557004DAE0E /* MTRClusters.h in Headers */,
 				99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */,
@@ -2001,6 +2008,7 @@
 				7596A85528788557004DAE0E /* MTRClusters.mm in Sources */,
 				88EBF8CF27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm in Sources */,
 				5A6FEC9827B5C6AF00F25F42 /* MTRDeviceOverXPC.mm in Sources */,
+				9BDA2A062C5D9AF800A32BDD /* MTRDevice_Concrete.mm in Sources */,
 				514654492A72F9DF00904E61 /* MTRDemuxingStorage.mm in Sources */,
 				1E4D655229C30A8700BC3478 /* MTRCommissionableBrowser.mm in Sources */,
 				88FA798E2B7B257100CD4B6F /* MTRMetricsCollector.mm in Sources */,

@@ -293,5 +293,5 @@ exit:
 
 void MatterMessagesPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gMessagesAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gMessagesAttrAccess);
 }
