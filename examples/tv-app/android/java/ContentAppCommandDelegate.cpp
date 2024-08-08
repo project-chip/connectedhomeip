@@ -129,7 +129,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
                 // return dummy value in case JSON is invalid
                 FormatResponseData(handlerContext, "{\"value\":{}}");
             }
-            
+
         }
         env->DeleteLocalRef(resp);
     }
