@@ -1,5 +1,6 @@
 name: "Process Stale Issues and PRs"
 on:
+    workflow_dispatch:
     schedule:
         - cron: "30 1 * * *"
 
