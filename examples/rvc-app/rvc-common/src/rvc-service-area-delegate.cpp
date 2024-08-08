@@ -108,18 +108,18 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 //*************************************************************************
 // command support
 
-bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan & statusText)
 {
     return (mIsSetSelectedAreasAllowedDeviceInstance->*mIsSetSelectedAreasAllowedCallback)(statusText);
 };
 
 bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & areaStatus,
-                                                   MutableCharSpan statusText)
+                                                   MutableCharSpan & statusText)
 {
     return (mIsValidSelectAreasSetDeviceInstance->*mIsValidSelectAreasSetCallback)(req, areaStatus, statusText);
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
     return (mHandleSkipCurrentAreaDeviceInstance->*mHandleSkipCurrentAreaCallback)(skippedArea, skipStatusText);
 };
