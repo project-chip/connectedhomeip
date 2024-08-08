@@ -161,7 +161,7 @@ psoc6_executable("clusters_app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include"
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
   ]
 
   defines = []
