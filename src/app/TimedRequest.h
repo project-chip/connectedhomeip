@@ -38,8 +38,8 @@ public:
     // but came in after we sent a timed request).
     //
     // If the response is a failure StatusResponse, its status will be
-    // encapsulated in the CHIP_ERROR this returns.  In that case,
-    // StatusIB::InitFromChipError can be used to extract the status.
+    // encapsulated in the CHIP_ERROR this returns.  In that case, constructing
+    // a StatusIB from the error can be used to extract the status.
     static CHIP_ERROR HandleResponse(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 };
 
