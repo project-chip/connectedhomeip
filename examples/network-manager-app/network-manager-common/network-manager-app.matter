@@ -1892,6 +1892,7 @@ endpoint 1 {
     handle command GetPendingDatasetRequest;
     handle command DatasetResponse;
     handle command SetActiveDatasetRequest;
+    handle command SetPendingDatasetRequest;
   }
 
   server cluster ThreadNetworkDirectory {

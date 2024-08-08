@@ -295,6 +295,23 @@ public:
     CHIP_ERROR SetSecurityPolicy(uint32_t aSecurityPolicy);
 
     /**
+     * Retrieves the delay timer from the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetDelayTimer(uint32_t & aDelayMillis) const;
+
+    /**
+     * This method sets the delay timer within the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetDelayTimer(uint32_t aDelayMillis);
+
+    /**
      * This method clears all data stored in the dataset.
      */
     void Clear(void) { mLength = 0; }
