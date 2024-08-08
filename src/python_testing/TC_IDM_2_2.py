@@ -79,7 +79,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             attribute_list.extend(cluster_attributes)
         return attribute_list
 
-    async def get_cluster_from_type(self, cluster_type: type) -> None:
+    async def get_cluster_from_type(self, desired_attribute_type: type) -> None:
         for cluster in self.all_supported_clusters:
             all_types = self.all_type_attributes_for_cluster(cluster, cluster_type)
             if all_types:
