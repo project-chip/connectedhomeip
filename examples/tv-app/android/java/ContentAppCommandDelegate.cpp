@@ -222,25 +222,6 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
 {
     handlerContext.SetCommandHandled();
     Json::Value value;
-    std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
-
-    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
-    {
-        ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
-        return;
-    }
-
-    // Validate and access JSON data safely
-    if (!value.isObject())
-    {
-        ChipLogError(Zcl, "Invalid JSON structure: not an object");
-        return;
-    }
-
-    if (!reader.parse(response, value))
-    {
-        return;
-    }
 
     // handle errors from platform-app
     if (!value[FAILURE_KEY].empty())
