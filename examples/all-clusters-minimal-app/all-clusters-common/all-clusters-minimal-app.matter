@@ -5583,6 +5583,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
+    kPendingUserApproval = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -6922,7 +6925,7 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -7275,7 +7278,7 @@ endpoint 2 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
 }

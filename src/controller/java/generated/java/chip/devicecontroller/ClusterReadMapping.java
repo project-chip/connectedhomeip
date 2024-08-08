@@ -17129,6 +17129,17 @@ public class ClusterReadMapping {
           readThreadBorderRouterManagementActiveDatasetTimestampCommandParams
         );
         result.put("readActiveDatasetTimestampAttribute", readThreadBorderRouterManagementActiveDatasetTimestampAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementPendingDatasetTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementPendingDatasetTimestampAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readPendingDatasetTimestampAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.PendingDatasetTimestampAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterPendingDatasetTimestampAttributeCallback(),
+          readThreadBorderRouterManagementPendingDatasetTimestampCommandParams
+        );
+        result.put("readPendingDatasetTimestampAttribute", readThreadBorderRouterManagementPendingDatasetTimestampAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThreadBorderRouterManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadBorderRouterManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
