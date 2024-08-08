@@ -127,7 +127,6 @@ psoc6_executable("clusters_app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
