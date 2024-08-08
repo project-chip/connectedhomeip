@@ -90,8 +90,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 // MTRDeviceController ivar internal access
 
-//@property (nonatomic, readonly) std::atomic<chip::FabricIndex> storedFabricIndex;
-
+@property (nonatomic, readonly) std::atomic<chip::FabricIndex> storedFabricIndex;
 @property (nonatomic, readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (nonatomic, readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
 @property (nonatomic, readonly) chip::Credentials::DefaultDACVerifier * defaultDACVerifier;
@@ -156,7 +155,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
-
+@synthesize storedFabricIndex = _storedFabricIndex;
 
 //@synthesize uniqueIdentifier = _uniqueIdentifier;
 
