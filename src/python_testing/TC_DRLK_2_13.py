@@ -217,7 +217,7 @@ class TC_DRLK_2_13(MatterBaseTest):
         if step is not None:
             self.step(step)
         try:
-            # TODO ask suma if this is right DRLK.S.F0d(ALIRO) & DRLK.S.C24.Rsp(GetCredentialStatus) & DRLK.S.C25.Tx(GetCredentialStatusResponse)
+
             if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics(
                     "DRLK.S.C25.Tx")):
                 credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
@@ -578,7 +578,6 @@ class TC_DRLK_2_13(MatterBaseTest):
                 while 1:
                     if start_credential_index <= (self.max_aliro_keys_supported - 2):
                         if start_credential_index != 1:
-                            # TODO we need to build a fucntion that will generate keys like  self.alirononevictableendpointkey
                             credentials_data = self.generate_unique_octstr()
 
                         await self.set_credential_cmd(credentialData=credentials_data,
