@@ -612,7 +612,8 @@ if (chip_device_platform != "none") {
     public_deps = [ ":platform_buildconfig" ]
   }
 
-  source_set("platform_base") {}
+  source_set("platform_base") {
+  }
 }
 
 source_set("syscalls_stub") {
