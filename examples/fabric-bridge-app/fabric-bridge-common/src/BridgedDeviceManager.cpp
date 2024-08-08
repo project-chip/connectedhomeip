@@ -141,7 +141,6 @@ constexpr CommandId administratorCommissioningCommands[] = {
     kInvalidCommandId,
 };
 
-
 // clang-format off
 // Declare Cluster List for Bridged Node endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedNodeClusters)
