@@ -188,7 +188,8 @@ create your own Fabric to manage your and other devices as well.
 
 Please see documentation about `-[HMAccessory matterNodeID]`
 [here](https://developer.apple.com/documentation/homekit/hmaccessory/matternodeid-5zfqo)
-in order to use Matter.framework to interact with Matter Devices in Apple Home.
+which allows you to use Matter.framework to interact with Matter Devices
+directly that are paired into Apple Home.
 
 ## Apple Home Development Guide
 
