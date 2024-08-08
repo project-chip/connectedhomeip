@@ -129,6 +129,7 @@ void DeviceSynchronizer::OnReportEnd()
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 {
     // Nothing to do: error reported on OnError or report ended called.
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnError(CHIP_ERROR error)
@@ -156,21 +157,31 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue read for BasicInformation data");
+        mDeviceSyncInProcess = false;
     }
 }
 
 void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
                                                     bool deviceIsIcd)
 {
+    if (mDeviceSyncInProcess)
+    {
+        ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
+        return;
+    }
+
     mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
     mCurrentDeviceData.node_id    = nodeId;
     mCurrentDeviceData.has_is_icd = true;
     mCurrentDeviceData.is_icd     = deviceIsIcd;
+
+    mDeviceSyncInProcess = true;
 
     controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
