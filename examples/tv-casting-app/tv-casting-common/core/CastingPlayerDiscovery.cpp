@@ -63,7 +63,7 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %lu, mCastingPlayersInternal: %lu",
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %zu, mCastingPlayersInternal: %zu",
                     mCastingPlayers.size(), mCastingPlayersInternal.size());
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
@@ -80,7 +80,7 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 
 void CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %lu",
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %zu",
                     mCastingPlayersInternal.size());
     // Only clear the CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
     for (auto it = mCastingPlayersInternal.begin(); it != mCastingPlayersInternal.end();)
