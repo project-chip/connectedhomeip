@@ -43,12 +43,11 @@ class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
-        // TODO We should be using the scoped node ID, but we do not have anything that manages
-        // all the existing device we are managing. DeviceManager today only managers device
-        // for a bridged device.
         chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
         auto it             = mPendingKeepActive.find(nodeId);
         VerifyOrReturn(it != mPendingKeepActive.end());
+        // TODO(#33221): We also need a mechanism here to drop KeepActive
+        // request if they were recieved over 60 mins ago.
         uint32_t stayActiveDurationMs = it->second;
         mPendingKeepActive.erase(nodeId);
 
