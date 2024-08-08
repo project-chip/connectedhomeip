@@ -37,8 +37,8 @@ limitations under the License.
     <item fieldId="1" name="OneShot" type="boolean" optional="true" default="0"/>
     <item fieldId="2" name="EmergencyBoost" type="boolean" optional="true" default="0"/>
     <item fieldId="3" name="TemporarySetpoint" type="temperature" optional="true"/>
-    <item fieldId="4" name="TargetPercentage" type="percent" optional="true" min="0" max="100"/>
-    <item fieldId="5" name="TargetReheat" type="percent" optional="true" min="0" max="100"/>
+    <item fieldId="4" name="TargetPercentage" type="percent" optional="true"/>
+    <item fieldId="5" name="TargetReheat" type="percent" optional="true"/>
   </struct>
 
   <cluster code="0x0094" apiMaturity="provisional">
@@ -52,7 +52,7 @@ limitations under the License.
       <feature bit="0" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
         <optionalConform/>
       </feature>
-      <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of the water in the tank which is hot">
+      <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of hot water in the tank">
         <optionalConform/>
       </feature>
     </features>
@@ -83,6 +83,6 @@ limitations under the License.
     <event code="0x0001" name="BoostEnded" priority="info" side="server">
       <description>BoostEnded</description>
     </event>
-        
+
   </cluster>
 </configurator>
