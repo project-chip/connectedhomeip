@@ -150,7 +150,57 @@ on MacOS or iOS/iPadOS.
         [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 -   Compile chip-tool for macOS or CHIP Tool for iOS
 
-#### General Matter Platform Development Guide
+## Supported Device Types in Apple Home
+
+##### Note: Not exhaustive, and may be out of date, see [below](#apple-home-development-guide) for more information
+
+| Type                    | Decimal | HEX  | Notes                                            |
+| ----------------------- | ------- | ---- | ------------------------------------------------ |
+| On/Off Light            | 256     | 0100 |                                                  |
+| Dimming Light           | 257     | 0101 |                                                  |
+| On/Off Plug-In Unit     | 266     | 010A |                                                  |
+| Dimmable Plug-In Unit   | 267     | 010B |                                                  |
+| On/Off Light Switch     | 259     | 0103 | Requires both On/Off Client and Server           |
+| Dimmer Switch           | 260     | 0104 | Requires both On/Off Client and Server           |
+| Generic Switch (button) | 15      | 000F | Supports momentary switch only, and not latching |
+| Contact Sensor          | 21      | 0015 |                                                  |
+| Light Sensor            | 262     | 0106 |                                                  |
+| Occupancy Sensor        | 263     | 0107 |                                                  |
+| Temperature Sensor      | 770     | 0302 |                                                  |
+| Humidity Sensor         | 775     | 0307 |                                                  |
+| Air Quality Sensor      | 44      | 002C |                                                  |
+| Door Lock               | 10      | 000A |                                                  |
+| Window Covering         | 514     | 0202 |                                                  |
+| Heating/Cooling Unit    | 768     | 0300 |                                                  |
+| Thermostat              | 769     | 0301 |                                                  |
+| Fan                     | 43      | 002B |                                                  |
+| Air Purifier            | 45      | 002D |                                                  |
+| Temperature Color Light | 268     | 010C |                                                  |
+| Enhanced Color Light    | 269     | 010D |                                                  |
+| Bridges                 | 14      | 000E |                                                  |
+
+## Additional Device Type Support on Apple's Platforms
+
+As a Developer, you can use Matter.framework on _all_ of Apple's platforms to
+setup and control all device types available in the Matter SDK. You're able to
+develop your own Applications that can work with devices added to Apple Home, or
+create your own Fabric to manage your and other devices as well.
+
+Please see documentation about `-[HMAccessory matterNodeID]`
+[here](https://developer.apple.com/documentation/homekit/hmaccessory/matternodeid-5zfqo)
+in order to use Matter.framework to interact with Matter Devices in Apple Home.
+
+## Apple Home Development Guide
+
+Please see [here](https://developer.apple.com/apple-home/) for more general
+information about developing an Application or a Device for Apple Home. This
+includes information about
+[best practices](https://developer.apple.com/apple-home/downloads/Matter-Accessory-Best-Practices-for-Apple-Home.pdf),
+[platform developer API](https://developer.apple.com/apple-home/matter/),
+[OTA Updates](https://developer.apple.com/accessories/Apple-Matter-OTA-User-Guide.pdf),
+general adoption Q&A, and the "Works with Apple Home" badge.
+
+## General Matter Platform Development Guide
 
 ##### Getting the SDK Ready
 
@@ -206,30 +256,11 @@ Example:
     }
 ```
 
--   Supported device types are (not exhaustive):
-
-| Type               | Decimal | HEX  | Notes                                            |
-| ------------------ | ------- | ---- | ------------------------------------------------ |
-| Lightbulb          | 256     | 0100 |                                                  |
-| Lightbulb + Dimmer | 257     | 0101 |                                                  |
-| Generic Switch     | 15      | 000F | Supports momentary switch only, and not latching |
-| Switch             | 259     | 0103 | Requires both On/Off Client and Server           |
-| Contact Sensor     | 21      | 0015 |                                                  |
-| Door Lock          | 10      | 000A |                                                  |
-| Light Sensor       | 262     | 0106 |                                                  |
-| Occupancy Sensor   | 263     | 0107 |                                                  |
-| Outlet             | 266     | 010A |                                                  |
-| Color Bulb         | 268     | 010C |                                                  |
-| Window Covering    | 514     | 0202 |                                                  |
-| Thermostat         | 769     | 0301 |                                                  |
-| Temperature Sensor | 770     | 0302 |                                                  |
-| Flow Sensor        | 774     | 0306 |                                                  |
-
 ### Examples of how to setup devices
 
 ##### Case study 1: Configuring a development M5Stack, as a multi-device to work with iOS/iPadOS/tvOS
 
-##### Note: These instructions are specific to getting started with the (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be generalised to work on most platforms ([more listed below](#guides))
+##### Note: These instructions are specific to getting started with the (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be generalised to work on most platforms ([more listed below](#platform-guides))
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
