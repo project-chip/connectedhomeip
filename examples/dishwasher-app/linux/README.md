@@ -117,6 +117,20 @@ details.
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
 
+
+## Control
+
+Control the operational mode:
+    
+    $ chip-tool operationalstate start <node_id> <endpoint>
+    $ chip-tool operationalstate stop <node_id> <endpoint>
+    $ chip-tool operationalstate pause <node_id> <endpoint>
+    
+    $ chip-tool operationalstate start 1 1
+    $ chip-tool operationalstate stop 1 1
+    $ chip-tool operationalstate pause 1 1
+    
+
 ## Running RPC Console
 
 -   As part of building the example with RPCs enabled the chip_rpc python
