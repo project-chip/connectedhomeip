@@ -53,6 +53,7 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
@@ -329,7 +330,7 @@ class AttributeChangeCallback:
             logging.info(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
-            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
@@ -1875,7 +1876,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
               """
         asserts.fail(msg)
 
-    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
     forced_endpoint = self.user_params.get('force_endpoint', None)
     if forced_endpoint is None:

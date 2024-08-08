@@ -39073,16 +39073,16 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas) {
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas) {
       selectAreas(callback, newAreas, 0);
     }
 
-    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
+    public void selectAreas(SelectAreasResponseCallback callback, ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long newAreasFieldID = 0L;
-      BaseTLVType newAreastlvValue = newAreas != null ? ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas)) : new NullType();
+      BaseTLVType newAreastlvValue = ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas));
       elements.add(new StructElement(newAreasFieldID, newAreastlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -39092,7 +39092,7 @@ public class ChipClusters {
           final long statusFieldID = 0L;
           Integer status = null;
           final long statusTextFieldID = 1L;
-          Optional<String> statusText = Optional.empty();
+          String statusText = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -39102,7 +39102,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == statusTextFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.String) {
                 StringType castingValue = element.value(StringType.class);
-                statusText = Optional.of(castingValue.value(String.class));
+                statusText = castingValue.value(String.class);
               }
             }
           }
@@ -39110,14 +39110,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback) {
-      skipArea(callback, 0);
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea) {
+      skipArea(callback, skippedArea, 0);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long skippedAreaFieldID = 0L;
+      BaseTLVType skippedAreatlvValue = new UIntType(skippedArea);
+      elements.add(new StructElement(skippedAreaFieldID, skippedAreatlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -39125,7 +39129,7 @@ public class ChipClusters {
           final long statusFieldID = 0L;
           Integer status = null;
           final long statusTextFieldID = 1L;
-          Optional<String> statusText = Optional.empty();
+          String statusText = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -39135,7 +39139,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == statusTextFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.String) {
                 StringType castingValue = element.value(StringType.class);
-                statusText = Optional.of(castingValue.value(String.class));
+                statusText = castingValue.value(String.class);
               }
             }
           }
@@ -39144,11 +39148,11 @@ public class ChipClusters {
     }
 
     public interface SelectAreasResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Optional<String> statusText);
+      void onSuccess(Integer status, String statusText);
     }
 
     public interface SkipAreaResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Optional<String> statusText);
+      void onSuccess(Integer status, String statusText);
     }
 
     public interface SupportedAreasAttributeCallback extends BaseAttributeCallback {
@@ -39156,11 +39160,11 @@ public class ChipClusters {
     }
 
     public interface SupportedMapsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value);
+      void onSuccess(List<ChipStructs.ServiceAreaClusterMapStruct> value);
     }
 
     public interface SelectedAreasAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<Long> value);
+      void onSuccess(List<Long> value);
     }
 
     public interface CurrentAreaAttributeCallback extends BaseAttributeCallback {
@@ -39172,7 +39176,7 @@ public class ChipClusters {
     }
 
     public interface ProgressAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value);
+      void onSuccess(List<ChipStructs.ServiceAreaClusterProgressStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -39224,7 +39228,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_MAPS_ATTRIBUTE_ID, true);
@@ -39237,7 +39241,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterMapStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_MAPS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -39250,7 +39254,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SELECTED_AREAS_ATTRIBUTE_ID, true);
@@ -39263,7 +39267,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SELECTED_AREAS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -39328,7 +39332,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PROGRESS_ATTRIBUTE_ID, true);
@@ -39341,7 +39345,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterProgressStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PROGRESS_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -54619,6 +54623,7 @@ public class ChipClusters {
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
     private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 4L;
+    private static final long PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -54737,6 +54742,10 @@ public class ChipClusters {
     }
 
     public interface ActiveDatasetTimestampAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface PendingDatasetTimestampAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
     }
 
@@ -54884,6 +54893,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePendingDatasetTimestampAttribute(
+        PendingDatasetTimestampAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PENDING_DATASET_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
