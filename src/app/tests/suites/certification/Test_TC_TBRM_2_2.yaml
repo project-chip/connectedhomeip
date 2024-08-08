@@ -72,7 +72,7 @@ tests:
       arguments:
           values:
               - name: ExpiryLengthSeconds
-                value: 900
+                value: 60
               - name: Breadcrumb
                 value: 1
 
