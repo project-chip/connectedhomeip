@@ -194,13 +194,16 @@ enum PositionTag : enum8 {
   kMiddle = 4;
   kRow = 5;
   kColumn = 6;
-  kUnder = 7;
-  kNextTo = 8;
-  kAround = 9;
-  kOn = 10;
-  kAbove = 11;
-  kFrontOf = 12;
-  kBehind = 13;
+}
+
+enum RelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -9249,10 +9252,10 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap default = 1;
-    ram      attribute holdTime default = 10;
+    callback attribute holdTime;
     callback attribute holdTimeLimits;
     ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
-    ram      attribute featureMap default = 0x02;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -9727,10 +9730,10 @@ endpoint 2 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap default = 1;
-    ram      attribute holdTime default = 20;
+    callback attribute holdTime;
     callback attribute holdTimeLimits;
     ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
-    ram      attribute featureMap default = 0x02;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
 }

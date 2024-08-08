@@ -56,8 +56,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -68,9 +68,9 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(emberAfContainsServer(mEndpointId, Id), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.", long(Id)));
 
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return mDelegate->Init();
 }
@@ -123,7 +123,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
     case Commands::SkipArea::Id:
         return CommandHandlerInterface::HandleCommand<Commands::SkipArea::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentAreaCmd(ctx); });
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentAreaCmd(ctx, req); });
     }
 }
 
@@ -134,7 +134,7 @@ CHIP_ERROR Instance::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedAreas() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -153,7 +153,7 @@ CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedMaps() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -172,7 +172,7 @@ CHIP_ERROR Instance::ReadSelectedAreas(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSelectedAreas() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -191,7 +191,7 @@ CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfProgressElements() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -217,16 +217,15 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     auto exitResponse = [ctx](SelectAreasStatus status, CharSpan statusText) {
         Commands::SelectAreasResponse::Type response{
             .status     = status,
-            .statusText = Optional(statusText),
+            .statusText = statusText,
         };
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
 
     size_t numberOfLocations = 0;
     // Get the number of Selected Locations in the command parameter and check that it is valid.
-    if (!req.newAreas.IsNull())
     {
-        if (CHIP_NO_ERROR != req.newAreas.Value().ComputeSize(&numberOfLocations))
+        if (CHIP_NO_ERROR != req.newAreas.ComputeSize(&numberOfLocations))
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
@@ -244,14 +243,14 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
     bool matchesCurrentSelectedAreas = (numberOfLocations == mDelegate->GetNumberOfSelectedAreas());
 
-    if (!req.newAreas.IsNull())
+    if (numberOfLocations != 0)
     {
         // do as much parameter validation as we can
         {
             uint32_t ignoredIndex = 0;
             uint32_t oldSelectedLocation;
             uint32_t i         = 0;
-            auto iLocationIter = req.newAreas.Value().begin();
+            auto iLocationIter = req.newAreas.begin();
             while (iLocationIter.Next())
             {
                 uint32_t aSelectedLocation = iLocationIter.GetValue();
@@ -266,7 +265,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
                 // Checking for duplicate locations.
                 uint32_t j         = 0;
-                auto jLocationIter = req.newAreas.Value().begin();
+                auto jLocationIter = req.newAreas.begin();
                 while (j < i)
                 {
                     jLocationIter
@@ -343,9 +342,9 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         // and the SelectedAreas attribute SHALL be set to the value of the newAreas field.
         mDelegate->ClearSelectedAreas();
 
-        if (!req.newAreas.IsNull())
+        if (numberOfLocations != 0)
         {
-            auto locationIter = req.newAreas.Value().begin();
+            auto locationIter = req.newAreas.begin();
             uint32_t ignored;
             while (locationIter.Next())
             {
@@ -359,7 +358,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     exitResponse(SelectAreasStatus::kSuccess, ""_span);
 }
 
-void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx)
+void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req)
 {
     ChipLogDetail(Zcl, "Service Area: HandleSkipCurrentArea");
 
@@ -367,7 +366,7 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx)
     auto exitResponse = [ctx](SkipAreaStatus status, CharSpan statusText) {
         Commands::SkipAreaResponse::Type response{
             .status     = status,
-            .statusText = Optional(statusText),
+            .statusText = statusText,
         };
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
@@ -397,7 +396,7 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx)
     char skipStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan skipStatusText(skipStatusBuffer);
 
-    if (!mDelegate->HandleSkipCurrentArea(skipStatusText))
+    if (!mDelegate->HandleSkipCurrentArea(req.skippedArea, skipStatusText))
     {
         exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;
@@ -450,39 +449,45 @@ bool Instance::IsSupportedLocation(uint32_t aAreaId)
 
 bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
 {
-    // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
-    // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
-    if (aLocation.areaDesc.locationInfo.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
+    // If the LocationInfo field is null, the LandmarkInfo field SHALL NOT be null.
+    // If the LandmarkInfo field is null, the LocationInfo field SHALL NOT be null.
+    if (aLocation.areaDesc.locationInfo.IsNull() && aLocation.areaDesc.landmarkInfo.IsNull())
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkTag", aLocation.areaID);
+        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkInfo", aLocation.areaID);
         return false;
     }
 
-    // If HomeLocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
-    // be null: HomeLocationInfo's FloorNumber field, HomeLocationInfo's AreaType field, the LandmarkTag field
+    // If LocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
+    // be null: LocationInfo's FloorNumber field, LocationInfo's AreaType field, the LandmarkInfo
     if (!aLocation.areaDesc.locationInfo.IsNull())
     {
         if (aLocation.areaDesc.locationInfo.Value().locationName.empty() &&
             aLocation.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
-            aLocation.areaDesc.locationInfo.Value().areaType.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
+            aLocation.areaDesc.locationInfo.Value().areaType.IsNull() && aLocation.areaDesc.landmarkInfo.IsNull())
         {
             ChipLogDetail(
-                Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkTag are null",
+                Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
                 aLocation.areaID);
             return false;
         }
     }
 
-    // If the LandmarkTag field is null, the PositionTag field SHALL be null.
-    if (aLocation.areaDesc.landmarkTag.IsNull() && !aLocation.areaDesc.positionTag.IsNull())
+    // The mapID field SHALL be null if SupportedMaps is not supported or SupportedMaps is an empty list.
+    bool shouldMapsBeNull = false;
+    if (mFeature.Has(Feature::kMaps))
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.areaID);
-        return false;
+        if (mDelegate->GetNumberOfSupportedMaps() == 0)
+        {
+            shouldMapsBeNull = true;
+        }
+    }
+    else
+    {
+        shouldMapsBeNull = true;
     }
 
-    if (mDelegate->GetNumberOfSupportedMaps() == 0)
+    if (shouldMapsBeNull)
     {
-        // If the SupportedMaps attribute is null, mapid SHALL be null.
         if (!aLocation.mapID.IsNull())
         {
             ChipLogDetail(Zcl, "IsValidSupportedLocation %u - map Id %u is not in empty supported map list", aLocation.areaID,
@@ -571,15 +576,14 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
-bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
                                     const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                     const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                    const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                                    const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                                    const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
 {
     // Create location object for validation.
-    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag, aSurfaceTag);
+    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aRelativePositionTag);
 
     // Does device mode allow this attribute to be updated?
     if (!mDelegate->IsSupportedAreasChangeAllowed())
@@ -622,12 +626,11 @@ bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<
     return true;
 }
 
-bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId,
+bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId,
                                        const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                        const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                        const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                       const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                                       const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                                       const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
 {
     bool mapIDChanged = false;
     uint32_t listIndex;
@@ -654,8 +657,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
         }
 
         // create new location object for validation
-        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
-                                      aSurfaceTag);
+        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aRelativePositionTag);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewArea))
@@ -709,7 +711,7 @@ bool Instance::ClearSupportedAreas()
 //*************************************************************************
 // Supported Maps manipulators
 
-bool Instance::IsSupportedMap(uint8_t aMapId)
+bool Instance::IsSupportedMap(uint32_t aMapId)
 {
     uint32_t ignoredIndex;
     MapStructureWrapper ignoredMap;
@@ -717,7 +719,7 @@ bool Instance::IsSupportedMap(uint8_t aMapId)
     return mDelegate->GetSupportedMapById(aMapId, ignoredIndex, ignoredMap);
 }
 
-bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
+bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
 {
     // check max# of list entries
     if (mDelegate->GetNumberOfSupportedMaps() >= kMaxNumSupportedMaps)
@@ -770,7 +772,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     return true;
 }
 
-bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
+bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 {
     uint32_t modifiedIndex;
     MapStructureWrapper modifiedMap;

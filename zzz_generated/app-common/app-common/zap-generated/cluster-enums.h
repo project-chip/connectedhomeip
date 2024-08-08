@@ -390,25 +390,35 @@ enum class LandmarkTag : uint8_t
 // Enum for PositionTag
 enum class PositionTag : uint8_t
 {
-    kLeft    = 0x00,
-    kRight   = 0x01,
-    kTop     = 0x02,
-    kBottom  = 0x03,
-    kMiddle  = 0x04,
-    kRow     = 0x05,
-    kColumn  = 0x06,
-    kUnder   = 0x07,
-    kNextTo  = 0x08,
-    kAround  = 0x09,
-    kOn      = 0x0A,
-    kAbove   = 0x0B,
-    kFrontOf = 0x0C,
-    kBehind  = 0x0D,
+    kLeft   = 0x00,
+    kRight  = 0x01,
+    kTop    = 0x02,
+    kBottom = 0x03,
+    kMiddle = 0x04,
+    kRow    = 0x05,
+    kColumn = 0x06,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 14,
+    kUnknownEnumValue = 7,
+};
+
+// Enum for RelativePositionTag
+enum class RelativePositionTag : uint8_t
+{
+    kUnder   = 0x00,
+    kNextTo  = 0x01,
+    kAround  = 0x02,
+    kOn      = 0x03,
+    kAbove   = 0x04,
+    kFrontOf = 0x05,
+    kBehind  = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
 };
 
 // Enum for TestGlobalEnum
@@ -3838,21 +3848,23 @@ enum class SelectAreasStatus : uint8_t
 // Enum for SkipAreaStatus
 enum class SkipAreaStatus : uint8_t
 {
-    kSuccess         = 0x00,
-    kInvalidAreaList = 0x01,
-    kInvalidInMode   = 0x02,
+    kSuccess            = 0x00,
+    kInvalidAreaList    = 0x01,
+    kInvalidInMode      = 0x02,
+    kInvalidSkippedArea = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 4,
 };
 
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kListOrder          = 0x1,
-    kSelectWhileRunning = 0x2,
+    kSelectWhileRunning = 0x1,
+    kProgressReporting  = 0x2,
+    kMaps               = 0x4,
 };
 } // namespace ServiceArea
 
@@ -5208,14 +5220,17 @@ namespace ApplicationLauncher {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess             = 0x00,
+    kAppNotAvailable     = 0x01,
+    kSystemBusy          = 0x02,
+    kPendingUserApproval = 0x03,
+    kDownloading         = 0x04,
+    kInstalling          = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature

@@ -26,6 +26,9 @@ namespace Clusters {
 namespace EcosystemInformation {
 namespace {
 
+#define ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION (1u)
+#define ZCL_ECOSYSTEM_INFORMATION_FEATURE_MAP (0u)
+
 constexpr size_t kDeviceNameMaxSize             = 64;
 constexpr size_t kUniqueLocationIdMaxSize       = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize  = 64;
@@ -46,18 +49,7 @@ public:
 CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::EcosystemInformation::Id);
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::RemovedOn::Id:
-        return EcosystemInformationServer::Instance().EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
-    case Attributes::DeviceDirectory ::Id:
-        return EcosystemInformationServer::Instance().EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
-    case Attributes::LocationDirectory ::Id:
-        return EcosystemInformationServer::Instance().EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
+    return EcosystemInformationServer::Instance().ReadAttribute(aPath, aEncoder);
 }
 
 // WARNING: caller is expected to use the returned LocationDescriptorStruct::Type immediately. Caller must
@@ -251,6 +243,17 @@ EcosystemInformationServer & EcosystemInformationServer::Instance()
     return mInstance;
 }
 
+CHIP_ERROR EcosystemInformationServer::AddEcosystemInformationClusterToEndpoint(EndpointId aEndpoint)
+{
+    VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    auto it = mDevicesMap.find(aEndpoint);
+    // We expect that the device has not been previously added.
+    VerifyOrReturnError((it == mDevicesMap.end()), CHIP_ERROR_INCORRECT_STATE);
+    // This create an empty DeviceInfo in mDevicesMap.
+    mDevicesMap[aEndpoint] = DeviceInfo();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice)
 {
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);
@@ -282,6 +285,30 @@ CHIP_ERROR EcosystemInformationServer::RemoveDevice(EndpointId aEndpoint, uint64
     VerifyOrReturnError((it != mDevicesMap.end()), CHIP_ERROR_INVALID_ARGUMENT);
     auto & deviceInfo = it->second;
     deviceInfo.mRemovedOn.SetValue(aEpochUs);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::RemovedOn::Id:
+        return EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
+    case Attributes::DeviceDirectory::Id:
+        return EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
+    case Attributes::LocationDirectory::Id:
+        return EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
+    case Attributes::ClusterRevision::Id: {
+        uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
+        return aEncoder.Encode(rev);
+    }
+    case Attributes::FeatureMap::Id: {
+        uint32_t featureMap = ZCL_ECOSYSTEM_INFORMATION_FEATURE_MAP;
+        return aEncoder.Encode(featureMap);
+    }
+    default:
+        break;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -375,5 +402,5 @@ chip::app::Clusters::EcosystemInformation::AttrAccess gAttrAccess;
 
 void MatterEcosystemInformationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
