@@ -48,7 +48,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex save the attribute",
                      "TH Reads Attribute Successfully"),
             TestStep("1b", "TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users",
-                     "Verify that the DUT sends SUCCESS response"),
+                     "DUT responds with Success response"),
             TestStep("1c", "TH sends ClearCredential Command to DUT to clear all the credentials",
                      "Verify that the DUT sends SUCCESS response"),
             TestStep("2a",
