@@ -125,7 +125,7 @@ For Context: This is a mapping of platform to OS
 
 ### Enable Developer Mode on your Apple Device
 
-##### Note: Developer mode is a great way to get logs from your device as well as enables other useful developer tools
+##### Note: Developer mode is a great way to get logs from your device as well as enable other useful developer tools
 
 To enable developer mode, please follow the instructions
 [here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
