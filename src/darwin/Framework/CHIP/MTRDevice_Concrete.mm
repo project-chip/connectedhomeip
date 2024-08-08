@@ -2917,7 +2917,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }];
 
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         // Make sure to use writeRequests here, because that's what our batching
         // handler will modify as needed.
