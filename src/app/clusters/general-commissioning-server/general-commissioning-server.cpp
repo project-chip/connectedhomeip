@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/CommissioningWindowManager.h>
+#if CHIP_CONFIG_TC_REQUIRED
+#include <app/server/EnhancedSetupFlowProvider.h>
+#endif
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
@@ -45,104 +48,194 @@ using namespace chip::DeviceLayer;
 using Transport::SecureSession;
 using Transport::Session;
 
-#define CheckSuccess(expr, code)                                                                                                   \
+// Function that calls the given callable if it is a function pointer and not nullptr
+template <typename T>
+void CallIfFunction(T callable)
+{
+    if constexpr (std::is_pointer<T>::value && std::is_function<typename std::remove_pointer<T>::type>::value)
+    {
+        if (nullptr != callable)
+        {
+            callable();
+        }
+    }
+}
+
+#define CheckSuccess(expr, code, onSuccess, onFailure)                                                                             \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
             commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code, #expr);                                  \
+            CallIfFunction(onFailure);                                                                                             \
             return true;                                                                                                           \
         }                                                                                                                          \
+        CallIfFunction(onSuccess);                                                                                                 \
     } while (false)
 
 namespace {
 
-class GeneralCommissioningAttrAccess : public AttributeAccessInterface
+template <typename Provider, typename T>
+CHIP_ERROR ReadIfSupported(Provider * const provider, CHIP_ERROR (Provider::*const nonConstGetter)(T &),
+                           AttributeValueEncoder & aEncoder)
 {
-public:
-    // Register for the GeneralCommissioning cluster on all endpoints.
-    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder);
-};
-
-GeneralCommissioningAttrAccess gAttrAccess;
-
-CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    if (aPath.mClusterId != GeneralCommissioning::Id)
+    if (nullptr == provider)
     {
-        // We shouldn't have been called at all.
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    switch (aPath.mAttributeId)
-    {
-    case RegulatoryConfig::Id: {
-        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, aEncoder);
-    }
-    case LocationCapability::Id: {
-        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);
-    }
-    case BasicCommissioningInfo::Id: {
-        return ReadBasicCommissioningInfo(aEncoder);
-    }
-    case SupportsConcurrentConnection::Id: {
-        return ReadSupportsConcurrentConnection(aEncoder);
-    }
-    default: {
-        break;
-    }
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
-                                                           AttributeValueEncoder & aEncoder)
-{
-    uint8_t data;
-    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        data = 0;
-    }
-    else if (err != CHIP_NO_ERROR)
+    T value;
+    CHIP_ERROR err = (provider->*nonConstGetter)(value);
+    if (err != CHIP_NO_ERROR)
     {
         return err;
     }
 
-    return aEncoder.Encode(data);
+    return aEncoder.Encode(value);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
+template <typename Provider, typename T>
+CHIP_ERROR ReadIfSupported(Provider * const provider, CHIP_ERROR (Provider::*const getter)(T &) const,
+                           AttributeValueEncoder & aEncoder)
 {
-    BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
-
-    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
-    // the CommissioningParameters at the beginning of commissioning flow.
-    basicCommissioningInfo.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
-    basicCommissioningInfo.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
-    static_assert(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC >= CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC,
-                  "Max cumulative failsafe seconds must be larger than failsafe expiry length seconds");
-
-    return aEncoder.Encode(basicCommissioningInfo);
+    // Removing the const qualifier from the getter function pointer because there are a handful of getter functions that are not
+    // correctly marked as const.
+    using NonConstGetter          = CHIP_ERROR (Provider::*)(T &);
+    NonConstGetter nonConstGetter = reinterpret_cast<NonConstGetter>(getter);
+    return ReadIfSupported(provider, nonConstGetter, aEncoder);
 }
 
-CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(AttributeValueEncoder & aEncoder)
+class GeneralCommissioningAttrAccess : public AttributeAccessInterface
 {
-    SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+public:
+    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
 
-    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
-    // the CommissioningParameters at the beginning of commissioning flow.
-    supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION) != 0;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+    {
+        if (aPath.mClusterId != GeneralCommissioning::Id)
+        {
+            // We shouldn't have been called at all.
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
-    return aEncoder.Encode(supportsConcurrentConnection);
+        switch (aPath.mAttributeId)
+        {
+        case RegulatoryConfig::Id: {
+            return ReadIfSupported(&DeviceLayer::ConfigurationMgr(), &ConfigurationManager::GetRegulatoryLocation, aEncoder);
+        }
+        case LocationCapability::Id: {
+            return ReadIfSupported(&DeviceLayer::ConfigurationMgr(), &ConfigurationManager::GetLocationCapability, aEncoder);
+        }
+        case BasicCommissioningInfo::Id: {
+            BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
+
+            // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+            // the CommissioningParameters at the beginning of commissioning flow.
+            basicCommissioningInfo.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+            basicCommissioningInfo.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
+            static_assert(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC >= CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC,
+                          "Max cumulative failsafe seconds must be larger than failsafe expiry length seconds");
+
+            return aEncoder.Encode(basicCommissioningInfo);
+        }
+        case SupportsConcurrentConnection::Id: {
+            SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+
+            // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+            // the CommissioningParameters at the beginning of commissioning flow.
+            supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION) != 0;
+
+            return aEncoder.Encode(supportsConcurrentConnection);
+        }
+#if CHIP_CONFIG_TC_REQUIRED
+        case TCAcceptedVersion::Id: {
+            auto provider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+            auto getter   = &EnhancedSetupFlowProvider::GetTermsAndConditionsAcceptedAcknowledgementsVersion;
+            return ReadIfSupported(provider, getter, aEncoder);
+        }
+        case TCMinRequiredVersion::Id: {
+            auto provider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+            auto getter   = &EnhancedSetupFlowProvider::GetTermsAndConditionsRequiredAcknowledgementsVersion;
+            return ReadIfSupported(provider, getter, aEncoder);
+        }
+        case TCAcknowledgements::Id: {
+            auto provider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+            auto getter   = &EnhancedSetupFlowProvider::GetTermsAndConditionsAcceptedAcknowledgements;
+            return ReadIfSupported(provider, getter, aEncoder);
+        }
+        case TCAcknowledgementsRequired::Id: {
+            auto provider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+            auto getter   = &EnhancedSetupFlowProvider::GetTermsAndConditionsRequiredAcknowledgements;
+            return ReadIfSupported(provider, getter, aEncoder);
+        }
+#endif
+        default:
+            break;
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+GeneralCommissioningAttrAccess gAttributeAccessInstance;
+
+#if CHIP_CONFIG_TC_REQUIRED
+CHIP_ERROR checkTermsAndConditionsAcknowledgementsState(CommissioningErrorEnum & errorCode)
+{
+    EnhancedSetupFlowProvider * enhancedSetupFlowProvider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+
+    CHIP_ERROR err;
+
+    uint16_t termsAndConditionsAcceptedAcknowledgements;
+    bool hasRequiredTermAccepted;
+    bool hasRequiredTermVersionAccepted;
+
+    err = enhancedSetupFlowProvider->GetTermsAndConditionsAcceptedAcknowledgements(termsAndConditionsAcceptedAcknowledgements);
+    if (!::chip::ChipError::IsSuccess(err))
+    {
+        ChipLogError(AppServer, "Failed to GetTermsAndConditionsAcceptedAcknowledgements");
+        return err;
+    }
+
+    err = enhancedSetupFlowProvider->HasTermsAndConditionsRequiredAcknowledgementsBeenAccepted(hasRequiredTermAccepted);
+    if (!::chip::ChipError::IsSuccess(err))
+    {
+        ChipLogError(AppServer, "Failed to HasTermsAndConditionsRequiredAcknowledgementsBeenAccepted");
+        return err;
+    }
+
+    err =
+        enhancedSetupFlowProvider->HasTermsAndConditionsRequiredAcknowledgementsVersionBeenAccepted(hasRequiredTermVersionAccepted);
+    if (!::chip::ChipError::IsSuccess(err))
+    {
+        ChipLogError(AppServer, "Failed to HasTermsAndConditionsRequiredAcknowledgementsVersionBeenAccepted");
+        return err;
+    }
+
+    if (!hasRequiredTermAccepted)
+    {
+        uint16_t requiredAcknowledgements = 0;
+        (void) enhancedSetupFlowProvider->GetTermsAndConditionsRequiredAcknowledgements(requiredAcknowledgements);
+
+        ChipLogProgress(AppServer, "Required terms and conditions, 0x%04x,have not been accepted", requiredAcknowledgements);
+        errorCode = (0 == termsAndConditionsAcceptedAcknowledgements) ? CommissioningErrorEnum::kTCAcknowledgementsNotReceived
+                                                                      : CommissioningErrorEnum::kRequiredTCNotAccepted;
+        return CHIP_NO_ERROR;
+    }
+
+    if (!hasRequiredTermVersionAccepted)
+    {
+        uint16_t requiredAcknowledgementsVersion = 0;
+        (void) enhancedSetupFlowProvider->GetTermsAndConditionsRequiredAcknowledgementsVersion(requiredAcknowledgementsVersion);
+        ChipLogProgress(AppServer, "Minimum terms and conditions version, 0x%04x, has not been accepted",
+                        requiredAcknowledgementsVersion);
+        errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+        return CHIP_NO_ERROR;
+    }
+
+    errorCode = CommissioningErrorEnum::kOk;
+    return CHIP_NO_ERROR;
 }
+#endif
 
 } // anonymous namespace
 
@@ -193,7 +286,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         {
             CheckSuccess(
                 failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                Failure);
+                Failure, nullptr, nullptr);
             Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
             commandObj->AddResponse(commandPath, response);
@@ -214,9 +307,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
-    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    DeviceControlServer * const devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    auto & failSafe                     = Server::GetInstance().GetFailSafeContext();
+    auto & fabricTable                  = Server::GetInstance().GetFabricTable();
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -239,20 +332,19 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
         }
         else
         {
+            CHIP_ERROR err;
+
+#if CHIP_CONFIG_TC_REQUIRED
+            CheckSuccess(checkTermsAndConditionsAcknowledgementsState(response.errorCode), Failure, nullptr, nullptr);
+#endif
+
             if (failSafe.NocCommandHasBeenInvoked())
             {
-                CHIP_ERROR err = fabricTable.CommitPendingFabricData();
-                if (err != CHIP_NO_ERROR)
-                {
-                    // No need to revert on error: CommitPendingFabricData always reverts if not fully successful.
-                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
-                                 err.Format());
-                }
-                else
-                {
-                    ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully commited pending fabric data");
-                }
-                CheckSuccess(err, Failure);
+                err = fabricTable.CommitPendingFabricData();
+                CheckSuccess(
+                    err, Failure,
+                    []() { ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully commited pending fabric data"); },
+                    []() { ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data"); });
             }
 
             /*
@@ -261,9 +353,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
              * Once bindings are implemented, this may no longer be needed.
              */
             failSafe.DisarmFailSafe();
-            CheckSuccess(
-                devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
-                Failure);
+            err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
+            CheckSuccess(err, Failure, nullptr, nullptr);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningErrorEnum::kOk;
@@ -304,7 +395,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
         uint8_t locationCapability;
         uint8_t location = to_underlying(commandData.newRegulatoryConfig);
 
-        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
+        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure, nullptr, nullptr);
 
         // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
         // either the Indoor or Outdoor fixed value in LocationCapability.
@@ -317,7 +408,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
         }
         else
         {
-            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+            CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure, nullptr, nullptr);
             Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningErrorEnum::kOk;
         }
@@ -328,6 +419,28 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     return true;
 }
 
+bool emberAfGeneralCommissioningClusterSetTCAcknowledgementsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData)
+{
+#if !CHIP_CONFIG_TC_REQUIRED
+    return false;
+
+#else
+    MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
+    Commands::SetTCAcknowledgementsResponse::Type response;
+    EnhancedSetupFlowProvider * const enhancedSetupFlowProvider = Server::GetInstance().GetEnhancedSetupFlowProvider();
+    uint16_t acknowledgements                                   = commandData.TCUserResponse;
+    uint16_t acknowledgementsVersion                            = commandData.TCVersion;
+    CheckSuccess(enhancedSetupFlowProvider->SetTermsAndConditionsAcceptance(acknowledgements, acknowledgementsVersion), Failure,
+                 nullptr, nullptr);
+    CheckSuccess(checkTermsAndConditionsAcknowledgementsState(response.errorCode), Failure, nullptr, nullptr);
+    commandObj->AddResponse(commandPath, response);
+    return true;
+
+#endif
+}
+
 namespace {
 void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -335,6 +448,11 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
     {
         // Spec says to reset Breadcrumb attribute to 0.
         Breadcrumb::Set(0, 0);
+
+#if CHIP_CONFIG_TC_REQUIRED
+        // Clear terms and conditions acceptance on failsafe timer expiration
+        Server::GetInstance().GetEnhancedSetupFlowProvider()->ClearTermsAndConditionsAcceptance();
+#endif
     }
 }
 
@@ -343,7 +461,7 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    registerAttributeAccessOverride(&gAttributeAccessInstance);
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 

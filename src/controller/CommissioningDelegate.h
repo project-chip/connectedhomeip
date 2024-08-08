@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,6 +104,12 @@ struct WiFiCredentials
     WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
 
+struct TermsAndConditionsAcknowledgement
+{
+    uint16_t acceptedTermsAndConditions;
+    uint16_t acceptedTermsAndConditionsVersion;
+};
+
 struct NOCChainGenerationParameters
 {
     ByteSpan nocsrElements;
@@ -167,6 +173,11 @@ public:
 
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
+
+    Optional<TermsAndConditionsAcknowledgement> GetTermsAndConditionsAcknowledgement() const
+    {
+        return mTermsAndConditionsAcknowledgement;
+    }
 
     // Time zone to set for the node
     // If required, this will be truncated to fit the max size allowable on the node
@@ -337,6 +348,13 @@ public:
     CommissioningParameters & SetCountryCode(CharSpan countryCode)
     {
         mCountryCode.SetValue(countryCode);
+        return *this;
+    }
+
+    CommissioningParameters &
+    SetTermsAndConditionsAcknowledgement(TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement)
+    {
+        mTermsAndConditionsAcknowledgement.SetValue(termsAndConditionsAcknowledgement);
         return *this;
     }
 
@@ -611,6 +629,7 @@ private:
     Optional<ByteSpan> mAttestationNonce;
     Optional<WiFiCredentials> mWiFiCreds;
     Optional<CharSpan> mCountryCode;
+    Optional<TermsAndConditionsAcknowledgement> mTermsAndConditionsAcknowledgement;
     Optional<ByteSpan> mThreadOperationalDataset;
     Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
     Optional<ByteSpan> mRootCert;
