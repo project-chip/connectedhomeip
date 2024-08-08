@@ -118,7 +118,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -206,7 +206,7 @@ void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -605,16 +605,16 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress)
+void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        mAtomicWriteStates[ep].inProgress = inProgress;
-        mAtomicWriteStates[ep].endpointId = endpoint;
-        mAtomicWriteStates[ep].nodeId     = originatorNodeId;
+        mAtomicWriteSessions[ep].state      = state;
+        mAtomicWriteSessions[ep].endpointId = endpoint;
+        mAtomicWriteSessions[ep].nodeId     = originatorNodeId;
     }
 }
 
@@ -624,9 +624,9 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteStates[ep].inProgress;
+        inAtomicWrite = (mAtomicWriteSessions[ep].state == kAtomicWriteState_Open);
     }
     return inAtomicWrite;
 }
@@ -657,9 +657,9 @@ ScopedNodeId ThermostatAttrAccess::GetAtomicWriteScopedNodeId(EndpointId endpoin
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        originatorNodeId = mAtomicWriteStates[ep].nodeId;
+        originatorNodeId = mAtomicWriteSessions[ep].nodeId;
     }
     return originatorNodeId;
 }
@@ -944,10 +944,10 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
 
 void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(mAtomicWriteStates); ++i)
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
-        auto atomicWriteState = mAtomicWriteStates[i];
-        if (atomicWriteState.inProgress && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             auto delegate = GetDelegate(atomicWriteState.endpointId);
             if (delegate == nullptr)
@@ -1689,13 +1689,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == imcode::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {
