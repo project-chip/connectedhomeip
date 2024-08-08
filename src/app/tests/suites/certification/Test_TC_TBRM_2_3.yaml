@@ -41,7 +41,8 @@ tests:
               - name: nodeId
                 value: nodeId
 
-    - label: "TH subscribes to the ActiveDatasetTimestamp attribute from the DUT"
+    - label:
+          "TH subscribes to the ActiveDatasetTimestamp attribute from the DUT"
       command: subscribeAttribute
       attribute: ActiveDatasetTimestamp
       minInterval: 1

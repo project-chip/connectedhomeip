@@ -54,7 +54,9 @@ tests:
       response:
           value: null
 
-    - label: "TH sends a valid ActiveDatasetRequest command to the DUT without having armed the fail-safe"
+    - label:
+          "TH sends a valid ActiveDatasetRequest command to the DUT without
+          having armed the fail-safe"
       command: SetActiveDatasetRequest
       arguments:
           values:
