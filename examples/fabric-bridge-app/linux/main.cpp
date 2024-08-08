@@ -32,7 +32,6 @@
 #include "RpcServer.h"
 #endif
 
-#include <string>
 #include <sys/ioctl.h>
 #include <thread>
 
@@ -48,6 +47,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -133,7 +133,8 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
     ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoint: %d", endpointId);
 
-    if (handlerContext.mRequestPath.mCommandId != Commands::OpenCommissioningWindow::Id || endpointId == kRootEndpointId)
+    if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
+        endpointId == kRootEndpointId)
     {
         // Proceed with default handling in Administrator Commissioning Server
         return;
@@ -141,7 +142,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     handlerContext.SetCommandHandled();
 
-    Commands::OpenCommissioningWindow::DecodableType commandData;
+    AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType commandData;
     if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
@@ -177,7 +178,63 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the BridgedDeviceBasicInformation cluster on all endpoints.
+    BridgedDeviceInformationCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), BridgedDeviceBasicInformation::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+    VerifyOrReturn(handlerContext.mRequestPath.mCommandId == BridgedDeviceBasicInformation::Commands::KeepActive::Id);
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
+
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+
+    handlerContext.SetCommandHandled();
+
+    if (device == nullptr || !device->IsIcd())
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
+        return;
+    }
+
+    BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType commandData;
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    Status status = Status::Failure;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "KeepActive successfully processed");
+        status = Status::Success;
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "KeepActive failed to process");
+    }
+#else
+    ChipLogProgress(NotSpecified, "Unable to properly call KeepActive: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
+BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
 } // namespace
 
@@ -186,8 +243,9 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
-    registerAttributeAccessOverride(&gBridgedDeviceBasicInformationAttributes);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);

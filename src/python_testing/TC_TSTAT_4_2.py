@@ -31,6 +31,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -90,7 +91,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                 expected_overall_status: Status = Status.Success,
                                                 expected_preset_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=0,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
                                                                                      attributeRequests=[
                                                                                          cluster.Attributes.Presets.attribute_id],
                                                                                      timeout=1800),
@@ -108,7 +109,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                  expected_overall_status: Status = Status.Success,
                                                  expected_preset_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=1,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
@@ -123,7 +124,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                    expected_overall_status: Status = Status.Success,
                                                    expected_preset_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=2,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
