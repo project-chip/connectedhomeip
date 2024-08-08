@@ -174,6 +174,23 @@ public:
         mIsSupportedMapChangeAllowedCallback       = callback;
         mIsSupportedMapChangeAllowedDeviceInstance = instance;
     }
+
+    //*************************************************************************
+    // Helper methods for setting service area attributes.
+
+    /**
+     * Sets the service area attributes at the start of a clean.
+     * This includes the current area an progress attributes.
+     */
+    void SetAttributesAtCleanStart();
+
+    /**
+     *
+     * @param finished true if there are no more areas to clean an we should end the clean.
+     * // todo Call this method from an out of band message.
+     */
+    void GoToNextArea(bool & finished);
+
 };
 
 } // namespace ServiceArea

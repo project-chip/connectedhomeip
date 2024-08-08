@@ -1000,7 +1000,7 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
     // TotalOperationalTime SHALL be null if the Status field is not set to Completed or Skipped.
     if ((opStatus != OperationalStatusEnum::kCompleted) && (opStatus != OperationalStatusEnum::kSkipped))
     {
-        progressElement.totalOperationalTime.Value().SetNull();
+        progressElement.totalOperationalTime.Emplace(DataModel::NullNullable);
     }
 
     // add the updated element to the progress attribute
@@ -1011,6 +1011,7 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
 
     NotifyProgressChanged();
     return true;
+
 }
 
 bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)

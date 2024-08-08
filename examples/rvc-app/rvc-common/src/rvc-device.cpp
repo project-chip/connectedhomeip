@@ -52,6 +52,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         mDocked   = false;
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        mServiceAreaDelegate.SetAttributesAtCleanStart();
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
     }

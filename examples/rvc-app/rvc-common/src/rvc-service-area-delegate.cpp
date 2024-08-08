@@ -505,3 +505,117 @@ bool RvcServiceAreaDelegate::ClearProgress()
 
     return false;
 }
+
+void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
+{
+    if (GetNumberOfSupportedAreas() == 0)
+    {
+        return;
+    }
+
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        AreaStructureWrapper firstArea;
+        GetSupportedAreaByIndex(0, firstArea);
+
+        GetInstance()->SetCurrentArea(firstArea.areaID);
+
+        if (GetInstance()->HasFeature(Feature::kProgressReporting))
+        {
+            GetInstance()->AddPendingProgressElement(firstArea.areaID);
+            GetInstance()->SetProgressStatus(firstArea.areaID, OperationalStatusEnum::kOperating);
+        }
+    }
+    else
+    {
+        uint32_t areaId;
+        GetSelectedAreaByIndex(0, areaId);
+
+        GetInstance()->SetCurrentArea(areaId);
+
+        if (GetInstance()->HasFeature(Feature::kProgressReporting))
+        {
+            GetInstance()->AddPendingProgressElement(areaId);
+            GetInstance()->SetProgressStatus(areaId, OperationalStatusEnum::kOperating);
+
+            uint32_t i = 1;
+            while (GetSelectedAreaByIndex(i, areaId))
+            {
+                GetInstance()->AddPendingProgressElement(areaId);
+                i ++;
+            }
+        }
+    }
+}
+
+void RvcServiceAreaDelegate::GoToNextArea(bool & finished)
+{
+    AreaStructureWrapper currentArea;
+    auto currentAreaIdN = GetInstance()->GetCurrentArea();
+
+    if (currentAreaIdN.IsNull())
+    {
+        return;
+    }
+
+    auto currentAreaId = currentAreaIdN.Value();
+    uint32_t currentAreaIndex;
+    GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
+    auto currentAreaMapId = currentArea.mapID;
+
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        AreaStructureWrapper nextArea;
+        uint32_t nextIndex = currentAreaIndex + 1;
+        finished = true;
+        while (GetSupportedAreaByIndex(nextIndex, nextArea))
+        {
+            if (!currentAreaMapId.IsNull() && nextArea.mapID == currentAreaMapId.Value())
+            {
+                GetInstance()->SetCurrentArea(nextArea.areaID);
+
+                if (GetInstance()->HasFeature(Feature::kProgressReporting))
+                {
+                    GetInstance()->SetProgressStatus(currentAreaIndex, OperationalStatusEnum::kCompleted);
+                    GetInstance()->SetProgressStatus(nextArea.areaID, OperationalStatusEnum::kOperating);
+                }
+
+                finished = false;
+                return;
+            }
+
+            ++nextIndex;
+        }
+    }
+    else
+    {
+        uint32_t selectedAreaId;
+        uint32_t selectedAreaIndex = 0;
+        while (GetSelectedAreaByIndex(selectedAreaIndex, selectedAreaId))
+        {
+            if (selectedAreaId == currentAreaId)
+            {
+                break;
+            }
+            ++selectedAreaIndex;
+        }
+
+        uint32_t nextSelectedAreaId;
+        uint32_t nextSelectedAreaIndex = selectedAreaIndex + 1;
+        if (!GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
+        {
+            finished = true;
+            return;
+        }
+
+        GetInstance()->SetCurrentArea(nextSelectedAreaId);
+
+        if (GetInstance()->HasFeature(Feature::kProgressReporting))
+        {
+            GetInstance()->SetProgressStatus(currentAreaIndex, OperationalStatusEnum::kCompleted);
+            GetInstance()->SetProgressStatus(nextSelectedAreaId, OperationalStatusEnum::kOperating);
+        }
+
+        finished = false;
+    }
+}
