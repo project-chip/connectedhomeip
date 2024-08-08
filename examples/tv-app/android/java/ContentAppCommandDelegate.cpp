@@ -59,13 +59,15 @@ bool isValidJson(const char * response)
     Json::Value value;
     std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
 
-    if (!testReader->parse(response, response + std::strlen(response), &value, &errors)) {
+    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
+    {
         ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
         return false;
     }
 
     // Validate and access JSON data safely
-    if (!value.isObject()) {
+    if (!value.isObject())
+    {
         ChipLogError(Zcl, "Invalid JSON structure: not an object");
         return false;
     }
@@ -123,13 +125,15 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         {
             JniUtfString respStr(env, resp);
             ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
-            if (isValidJson(respStr.c_str())) {
+            if (isValidJson(respStr.c_str()))
+            {
                 FormatResponseData(handlerContext, respStr.c_str());
-            } else {
+            }
+            else
+            {
                 // return dummy value in case JSON is invalid
                 FormatResponseData(handlerContext, "{\"value\":{}}");
             }
-
         }
         env->DeleteLocalRef(resp);
     }
