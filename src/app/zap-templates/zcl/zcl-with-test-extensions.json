@@ -63,6 +63,8 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-bitmaps.xml",
+        "global-enums.xml",
         "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
@@ -291,7 +293,7 @@
             "ClientsSupportedPerFabric",
             "MaximumCheckInBackOff"
         ],
-        "Occupancy Sensing": ["HoldTimeLimits"],
+        "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -318,6 +320,7 @@
             "ThreadVersion",
             "InterfaceEnabled",
             "ActiveDatasetTimestamp",
+            "PendingDatasetTimestamp",
             "FeatureMap"
         ],
         "Thread Network Diagnostics": [
@@ -681,7 +684,7 @@
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentLocation", "EstimatedEndTime", "FeatureMap"]
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

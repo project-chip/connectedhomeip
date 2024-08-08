@@ -116,18 +116,19 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
-    gThermostatAttrAccess.SetPresetsEditable(endpoint, false);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
+    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
 }
 
 /**
- * @brief Schedules a timer for the given timeout in seconds.
+ * @brief Schedules a timer for the given timeout in milliseconds.
  *
  * @param[in] endpoint The endpoint to use.
- * @param[in] timeoutSeconds The timeout in seconds.
+ * @param[in] timeoutMilliseconds The timeout in milliseconds.
  */
-void ScheduleTimer(EndpointId endpoint, uint16_t timeoutSeconds)
+void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout)
 {
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), TimerExpiredCallback,
+    DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
@@ -139,18 +140,6 @@ void ScheduleTimer(EndpointId endpoint, uint16_t timeoutSeconds)
 void ClearTimer(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
-}
-
-/**
- * @brief Extends the currently scheduled timer to a new timeout value in seconds
- *
- * @param[in] endpoint The endpoint to use.
- * @param[in] timeoutSeconds The timeout in seconds to extend the timer to.
- */
-void ExtendTimer(EndpointId endpoint, uint16_t timeoutSeconds)
-{
-    DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), TimerExpiredCallback,
-                                             reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 /**
@@ -203,40 +192,21 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 }
 
 /**
- * @brief Utility to clean up state by clearing the pending presets list, canceling the timer
- *        and setting PresetsEditable to false and clear the originator scoped node id.
+ * @brief Discards pending atomic writes and atomic state.
  *
  * @param[in] delegate The delegate to use.
  * @param[in] endpoint The endpoint to use.
+ *
  */
-void CleanUp(Delegate * delegate, EndpointId endpoint)
+void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate != nullptr)
     {
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    gThermostatAttrAccess.SetPresetsEditable(endpoint, false);
-    gThermostatAttrAccess.SetOriginatorScopedNodeId(endpoint, ScopedNodeId());
-}
-
-/**
- * @brief Sends a response for the command and cleans up state by calling CleanUp()
- *
- * @param[in] delegate The delegate to use.
- * @param[in] endpoint The endpoint to use.
- * @param[in] commandObj The command handler to use to add the status response.
- * @param[in] commandPath The command path.
- * @param[in] status The status code to send as the response.
- *
- * @return true to indicate the response has been sent and command has been handled.
- */
-bool SendResponseAndCleanUp(Delegate * delegate, EndpointId endpoint, CommandHandler * commandObj,
-                            const ConcreteCommandPath & commandPath, imcode status)
-{
-    commandObj->AddStatus(commandPath, status);
-    CleanUp(delegate, endpoint);
-    return true;
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
+    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
 }
 
 /**
@@ -277,8 +247,8 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 }
 
 /**
- * @brief Finds and returns an entry in the Presets attribute list that matches a preset.
- *        The presetHandle of the two presets must match.
+ * @brief Finds and returns an entry in the Presets attribute list that matches
+ *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
  *
  * @param[in] delegate The delegate to use.
  * @param[in] presetToMatch The preset to match with.
@@ -286,7 +256,7 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
  *
  * @return true if a matching entry was found in the  presets attribute list, false otherwise.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch,
+bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & presetToMatch,
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -305,7 +275,8 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStructWithOwned
             return false;
         }
 
-        if (PresetHandlesExistAndMatch(matchingPreset, presetToMatch))
+        // Note: presets coming from our delegate always have a handle.
+        if (presetToMatch.presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
         }
@@ -350,45 +321,20 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
 }
 
 /**
- * @brief Returns the length of the list of presets if the pending presets were to be applied. The calculation is done by
- *        adding the number of presets in Presets attribute list to the number of pending presets in the pending
- *        presets list and subtracting the number of duplicate presets. This is called before changes are actually applied.
+ * @brief Returns the length of the list of presets if the pending presets were to be applied. The size of the pending presets list
+ *        calculated, after all the constraint checks are done, is the new size of the updated Presets attribute since the pending
+ *        preset list is expected to have all existing presets with or without edits plus new presets.
+ *        This is called before changes are actually applied.
  *
  * @param[in] delegate The delegate to use.
  *
  * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
  */
-uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
+uint8_t CountNumberOfPendingPresets(Delegate * delegate)
 {
-    uint8_t numberOfPresets        = 0;
-    uint8_t numberOfMatches        = 0;
     uint8_t numberOfPendingPresets = 0;
 
     VerifyOrReturnValue(delegate != nullptr, 0);
-
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers preset;
-        CHIP_ERROR err = delegate->GetPresetAtIndex(i, preset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return 0;
-        }
-        numberOfPresets++;
-
-        bool found = MatchingPendingPresetExists(delegate, preset);
-
-        if (found)
-        {
-            numberOfMatches++;
-        }
-    }
 
     for (uint8_t i = 0; true; i++)
     {
@@ -401,16 +347,14 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
             return 0;
         }
         numberOfPendingPresets++;
     }
 
-    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
-    // This API needs to modify its logic for the deletion case.
-    return static_cast<uint8_t>(numberOfPresets + numberOfPendingPresets - numberOfMatches);
+    return numberOfPendingPresets;
 }
 
 /**
@@ -661,50 +605,70 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-void ThermostatAttrAccess::SetPresetsEditable(EndpointId endpoint, bool presetEditable)
+void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, bool inProgress)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mPresetsEditables))
+    if (ep < ArraySize(mAtomicWriteState))
     {
-        mPresetsEditables[ep] = presetEditable;
+        mAtomicWriteState[ep] = inProgress;
     }
 }
 
-bool ThermostatAttrAccess::GetPresetsEditable(EndpointId endpoint)
+bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
 {
-    bool presetEditable = false;
+    bool inAtomicWrite = false;
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mPresetsEditables))
+    if (ep < ArraySize(mAtomicWriteState))
     {
-        presetEditable = mPresetsEditables[ep];
+        inAtomicWrite = mAtomicWriteState[ep];
     }
-    return presetEditable;
+    return inAtomicWrite;
 }
 
-void ThermostatAttrAccess::SetOriginatorScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
+bool ThermostatAttrAccess::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint)
+{
+    if (!InAtomicWrite(endpoint))
+    {
+        return false;
+    }
+    return subjectDescriptor.authMode == Access::AuthMode::kCase &&
+        GetAtomicWriteScopedNodeId(endpoint) == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint)
+{
+    if (!InAtomicWrite(endpoint))
+    {
+        return false;
+    }
+    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
+    return GetAtomicWriteScopedNodeId(endpoint) == sourceNodeId;
+}
+
+void ThermostatAttrAccess::SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mPresetEditRequestOriginatorNodeIds))
+    if (ep < ArraySize(mAtomicWriteNodeIds))
     {
-        mPresetEditRequestOriginatorNodeIds[ep] = originatorNodeId;
+        mAtomicWriteNodeIds[ep] = originatorNodeId;
     }
 }
 
-ScopedNodeId ThermostatAttrAccess::GetOriginatorScopedNodeId(EndpointId endpoint)
+ScopedNodeId ThermostatAttrAccess::GetAtomicWriteScopedNodeId(EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mPresetEditRequestOriginatorNodeIds))
+    if (ep < ArraySize(mAtomicWriteNodeIds))
     {
-        originatorNodeId = mPresetEditRequestOriginatorNodeIds[ep];
+        originatorNodeId = mAtomicWriteNodeIds[ep];
     }
     return originatorNodeId;
 }
@@ -769,6 +733,23 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         Delegate * delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
+        auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
+        if (InAtomicWrite(subjectDescriptor, aPath.mEndpointId))
+        {
+            return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    PresetStructWithOwnedMembers preset;
+                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(encoder.Encode(preset));
+                }
+            });
+        }
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
@@ -782,10 +763,6 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                 ReturnErrorOnFailure(encoder.Encode(preset));
             }
         });
-    }
-    break;
-    case PresetsSchedulesEditable::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(GetPresetsEditable(aPath.mEndpointId)));
     }
     break;
     case ActivePresetHandle::Id: {
@@ -827,48 +804,24 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 {
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
 
-    uint32_t ourFeatureMap;
-    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
-        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+    EndpointId endpoint      = aPath.mEndpointId;
+    auto & subjectDescriptor = aDecoder.GetSubjectDescriptor();
 
+    // Check atomic attributes first
     switch (aPath.mAttributeId)
     {
-    case RemoteSensing::Id:
-        if (localTemperatureNotExposedSupported)
-        {
-            uint8_t valueRemoteSensing;
-            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
-            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
-            imcode status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
-            StatusIB statusIB(status);
-            return statusIB.ToChipError();
-        }
-        break;
     case Presets::Id: {
 
-        EndpointId endpoint = aPath.mEndpointId;
         Delegate * delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(GetPresetsEditable(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+        VerifyOrReturnError(InAtomicWrite(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
-        // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
+        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
         // otherwise return BUSY.
-        const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
-        ScopedNodeId scopedNodeId                         = ScopedNodeId();
-
-        // Get the node id if the authentication mode is CASE.
-        if (subjectDescriptor.authMode == Access::AuthMode::kCase)
-        {
-            scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
-        }
-
-        if (GetOriginatorScopedNodeId(endpoint) != scopedNodeId)
+        if (!InAtomicWrite(subjectDescriptor, endpoint))
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
             return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -889,14 +842,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             while (iter.Next())
             {
                 const PresetStruct::Type & preset = iter.GetValue();
-                if (IsValidPresetEntry(preset))
-                {
-                    ReturnErrorOnFailure(delegate->AppendToPendingPresetList(preset));
-                }
-                else
-                {
-                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-                }
+                ReturnErrorOnFailure(AppendPendingPreset(delegate, preset));
             }
             return iter.GetStatus();
         }
@@ -906,11 +852,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         {
             PresetStruct::Type preset;
             ReturnErrorOnFailure(aDecoder.Decode(preset));
-            if (IsValidPresetEntry(preset))
-            {
-                return delegate->AppendToPendingPresetList(preset);
-            }
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            return AppendPendingPreset(delegate, preset);
         }
     }
     break;
@@ -918,11 +860,95 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
+    }
+
+    // This is not an atomic attribute, so check to make sure we don't have an atomic write going for this client
+    if (InAtomicWrite(subjectDescriptor, endpoint))
+    {
+        ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
+    uint32_t ourFeatureMap;
+    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+
+    switch (aPath.mAttributeId)
+    {
+    case RemoteSensing::Id:
+        if (localTemperatureNotExposedSupported)
+        {
+            uint8_t valueRemoteSensing;
+            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
+            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+            imcode status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
+            StatusIB statusIB(status);
+            return statusIB.ToChipError();
+        }
+        break;
+
     default: // return CHIP_NO_ERROR and just write to the attribute store in default
         break;
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Delegate * delegate, const PresetStruct::Type & preset)
+{
+    if (!IsValidPresetEntry(preset))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    if (preset.presetHandle.IsNull())
+    {
+        if (IsBuiltIn(preset))
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+    else
+    {
+        auto & presetHandle = preset.presetHandle.Value();
+
+        // Per spec we need to check that:
+        // (a) There is an existing non-pending preset with this handle.
+        PresetStructWithOwnedMembers matchingPreset;
+        if (!GetMatchingPresetInPresets(delegate, preset, matchingPreset))
+        {
+            return CHIP_IM_GLOBAL_STATUS(NotFound);
+        }
+
+        // (b) There is no existing pending preset with this handle.
+        if (CountPresetsInPendingListWithPresetHandle(delegate, presetHandle) > 0)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // (c)/(d) The built-in fields do not have a mismatch.
+        // TODO: What's the story with nullability on the BuiltIn field?
+        if (!preset.builtIn.IsNull() && !matchingPreset.GetBuiltIn().IsNull() &&
+            preset.builtIn.Value() != matchingPreset.GetBuiltIn().Value())
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
+    if (!PresetScenarioExistsInPresetTypes(delegate, preset.presetScenario))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    if (preset.name.HasValue() && !PresetTypeSupportsNames(delegate, preset.presetScenario))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    return delegate->AppendToPendingPresetList(preset);
 }
 
 } // namespace Thermostat
@@ -1244,16 +1270,16 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * com
 }
 
 bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
 bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
@@ -1287,112 +1313,123 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     return true;
 }
 
-bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData)
+bool validAtomicAttributes(const Commands::AtomicRequest::DecodableType & commandData, bool requireBoth)
 {
-    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    // If the presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
-    // is not the same as the one that previously originated a StartPresetsSchedulesEditRequest command, return BUSY.
-    if (gThermostatAttrAccess.GetPresetsEditable(endpoint) &&
-        (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId))
+    auto attributeIdsIter = commandData.attributeRequests.begin();
+    bool requestedPresets = false, requestedSchedules = false;
+    while (attributeIdsIter.Next())
     {
-        commandObj->AddStatus(commandPath, imcode::Busy);
-        return true;
-    }
+        auto & attributeId = attributeIdsIter.GetValue();
 
-    // If presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
-    // is the same as the one that previously originated a StartPresetsSchedulesEditRequest command, extend the timer.
-    if (gThermostatAttrAccess.GetPresetsEditable(endpoint))
+        switch (attributeId)
+        {
+        case Presets::Id:
+            if (requestedPresets) // Double-requesting an attribute is invalid
+            {
+                return false;
+            }
+            requestedPresets = true;
+            break;
+        case Schedules::Id:
+            if (requestedSchedules) // Double-requesting an attribute is invalid
+            {
+                return false;
+            }
+            requestedSchedules = true;
+            break;
+        default:
+            return false;
+        }
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
     {
-        ExtendTimer(endpoint, commandData.timeoutSeconds);
-        commandObj->AddStatus(commandPath, imcode::Success);
-        return true;
+        return false;
     }
-
-    // Set presets editable to true and the scoped originator node id to the source scoped node id, and start a timer with the
-    // timeout in seconds passed in the command args. Return success.
-    gThermostatAttrAccess.SetPresetsEditable(endpoint, true);
-    gThermostatAttrAccess.SetOriginatorScopedNodeId(endpoint, sourceNodeId);
-    ScheduleTimer(endpoint, commandData.timeoutSeconds);
-    commandObj->AddStatus(commandPath, imcode::Success);
-    return true;
+    if (requireBoth)
+    {
+        return (requestedPresets && requestedSchedules);
+    }
+    // If the atomic request doesn't contain at least one of these attributes, it's invalid
+    return (requestedPresets || requestedSchedules);
 }
 
-bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData)
+void sendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, imcode status, imcode presetsStatus,
+                        imcode schedulesStatus, Optional<uint16_t> timeout = NullOptional)
+{
+    Commands::AtomicResponse::Type response;
+    Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
+        { .attributeID = Presets::Id, .statusCode = to_underlying(presetsStatus) },
+        { .attributeID = Schedules::Id, .statusCode = to_underlying(schedulesStatus) }
+    };
+    response.statusCode      = to_underlying(status);
+    response.attributeStatus = attributeStatus;
+    response.timeout         = timeout;
+    commandObj->AddResponse(commandPath, response);
+}
+
+void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                       const Commands::AtomicRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    // If presets are not editable, return INVALID_IN_STATE.
-    if (!gThermostatAttrAccess.GetPresetsEditable(endpoint))
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (delegate == nullptr)
     {
+        ChipLogError(Zcl, "Delegate is null");
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
+        return;
     }
 
-    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
-
-    // If the node id sending the CancelPresetsSchedulesRequest command is not the same as the one which send the
-    // previous StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
-    if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
+    if (gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint))
     {
-        commandObj->AddStatus(commandPath, imcode::UnsupportedAccess);
-        return true;
+        // This client already has an open atomic write
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
     }
 
-    Delegate * delegate = GetDelegate(endpoint);
-
-    if (delegate == nullptr)
+    if (!commandData.timeout.HasValue())
     {
-        ChipLogError(Zcl, "Delegate is null");
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
     }
 
-    // Clear the timer, discard the changes and set PresetsEditable to false.
-    return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
+    auto timeout = commandData.timeout.Value();
+
+    if (!validAtomicAttributes(commandData, false))
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+
+    if (gThermostatAttrAccess.InAtomicWrite(endpoint))
+    {
+        sendAtomicResponse(commandObj, commandPath, imcode::Failure, imcode::Busy, imcode::Busy);
+        return;
+    }
+
+    // This is a valid request to open an atomic write. Tell the delegate it
+    // needs to keep track of a pending preset list now.
+    delegate->InitializePendingPresets();
+
+    uint16_t maxTimeout = 5000;
+    timeout             = std::min(timeout, maxTimeout);
+
+    ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
+    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
 }
 
-bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
+imcode commitPresets(Delegate * delegate, EndpointId endpoint)
 {
-    EndpointId endpoint = commandPath.mEndpointId;
-    Delegate * delegate = GetDelegate(endpoint);
-
-    if (delegate == nullptr)
-    {
-        ChipLogError(Zcl, "Delegate is null");
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
-    }
-
-    // If presets are not editable, return INVALID_IN_STATE.
-    if (!gThermostatAttrAccess.GetPresetsEditable(endpoint))
-    {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
-    }
-
-    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
-
-    // If the node id sending the CommitPresetsSchedulesRequest command is not the same as the one which send the
-    // StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
-    if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
-    {
-        commandObj->AddStatus(commandPath, imcode::UnsupportedAccess);
-        return true;
-    }
-
-    PresetStructWithOwnedMembers preset;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // For each preset in the presets attribute, check that the matching preset in the pending presets list does not
     // violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
+        PresetStructWithOwnedMembers preset;
         err = delegate->GetPresetAtIndex(i, preset);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -1405,7 +1442,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
                          "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+            return imcode::InvalidInState;
         }
 
         bool found = MatchingPendingPresetExists(delegate, preset);
@@ -1414,7 +1451,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::ConstraintError;
         }
     }
 
@@ -1428,7 +1465,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
     if (err != CHIP_NO_ERROR)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
 
     if (!activePresetHandle.empty())
@@ -1436,7 +1473,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle);
         if (count == 0)
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+            return imcode::InvalidInState;
         }
     }
 
@@ -1456,67 +1493,11 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
                          "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
-        }
-
-        bool isPendingPresetWithNullPresetHandle = pendingPreset.GetPresetHandle().IsNull();
-
-        // If the preset handle is null and the built in field is set to true, return CONSTRAINT_ERROR.
-        if (isPendingPresetWithNullPresetHandle && IsBuiltIn(pendingPreset))
-        {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
-        }
-
-        bool foundMatchingPresetInPresets = false;
-        PresetStructWithOwnedMembers matchingPreset;
-        if (!isPendingPresetWithNullPresetHandle)
-        {
-            foundMatchingPresetInPresets = GetMatchingPresetInPresets(delegate, pendingPreset, matchingPreset);
-
-            // If the presetHandle for the pending preset is not null and a matching preset is not found in the
-            // presets attribute list, return NOT_FOUND.
-            if (!foundMatchingPresetInPresets)
-            {
-                return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::NotFound);
-            }
-
-            // Find the number of presets in the pending preset list that match the preset handle. If there are duplicate
-            // entries, return CONSTRAINT_ERROR.
-            uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, pendingPreset.GetPresetHandle().Value());
-            if (count > 1)
-            {
-                return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
-            }
-        }
-
-        // If the preset is found in the  presets attribute list and the preset is builtIn in the pending presets list
-        //  but not in the presets attribute list, return UNSUPPORTED_ACCESS.
-        if (foundMatchingPresetInPresets && (IsBuiltIn(pendingPreset) && !IsBuiltIn(matchingPreset)))
-        {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
-        }
-
-        // If the preset is found in the  presets attribute list and the preset is builtIn in the presets attribute
-        //  but not in the pending presets list, return UNSUPPORTED_ACCESS.
-        if (foundMatchingPresetInPresets && (!IsBuiltIn(pendingPreset) && IsBuiltIn(matchingPreset)))
-        {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
-        }
-
-        // If the presetScenario is not found in the preset types, return CONSTRAINT_ERROR.
-        PresetScenarioEnum presetScenario = pendingPreset.GetPresetScenario();
-        if (!PresetScenarioExistsInPresetTypes(delegate, presetScenario))
-        {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
-        }
-
-        // If the preset type for the preset scenario does not support names and a name is specified, return CONSTRAINT_ERROR.
-        if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
-        {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::InvalidInState;
         }
 
         // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
+        // TODO: This code does not work, because it's modifying our temporary copy.
         Optional<int16_t> coolingSetpointValue = pendingPreset.GetCoolingSetpoint();
         if (coolingSetpointValue.HasValue())
         {
@@ -1530,21 +1511,21 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         }
     }
 
-    uint8_t totalCount = CountUpdatedPresetsAfterApplyingPendingPresets(delegate);
+    uint8_t totalCount = CountNumberOfPendingPresets(delegate);
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 
     if (numberOfPresetsSupported == 0)
     {
         ChipLogError(Zcl, "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: Failed to get NumberOfPresets");
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
 
     // If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
     // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
     if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ResourceExhausted);
+        return imcode::ResourceExhausted;
     }
 
     // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
@@ -1555,10 +1536,98 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
     if (err != CHIP_NO_ERROR)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
 
-    return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
+    return imcode::Success;
+}
+
+void handleAtomicCommit(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                        const Commands::AtomicRequest::DecodableType & commandData)
+{
+    if (!validAtomicAttributes(commandData, true))
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    EndpointId endpoint = commandPath.mEndpointId;
+    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
+    if (!inAtomicWrite)
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null");
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+
+    auto presetsStatus = commitPresets(delegate, endpoint);
+    // TODO: copy over schedules code
+    auto schedulesStatus = imcode::Success;
+    resetAtomicWrite(delegate, endpoint);
+    imcode status = (presetsStatus == imcode::Success && schedulesStatus == imcode::Success) ? imcode::Success : imcode::Failure;
+    sendAtomicResponse(commandObj, commandPath, status, presetsStatus, schedulesStatus);
+}
+
+void handleAtomicRollback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                          const Commands::AtomicRequest::DecodableType & commandData)
+{
+    if (!validAtomicAttributes(commandData, true))
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    EndpointId endpoint = commandPath.mEndpointId;
+    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
+    if (!inAtomicWrite)
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null");
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+    resetAtomicWrite(delegate, endpoint);
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success);
+}
+
+bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+{
+    auto & requestType = commandData.requestType;
+
+    // If we've gotten this far, then the client has manage permission to call AtomicRequest, which is also the
+    // privilege necessary to write to the atomic attributes, so no need to check
+
+    switch (requestType)
+    {
+    case Globals::AtomicRequestTypeEnum::kBeginWrite:
+        handleAtomicBegin(commandObj, commandPath, commandData);
+        return true;
+    case Globals::AtomicRequestTypeEnum::kCommitWrite:
+        handleAtomicCommit(commandObj, commandPath, commandData);
+        return true;
+    case Globals::AtomicRequestTypeEnum::kRollbackWrite:
+        handleAtomicRollback(commandObj, commandPath, commandData);
+        return true;
+    case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return true;
+    }
+
+    return false;
 }
 
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
@@ -1799,5 +1868,5 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gThermostatAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
 }

@@ -130,6 +130,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestTypeEnum val)
+{
+    using EnumType = Globals::AtomicRequestTypeEnum;
+    switch (val)
+    {
+    case EnumType::kBeginWrite:
+    case EnumType::kCommitWrite:
+    case EnumType::kRollbackWrite:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
     using EnumType = detail::ChangeIndicationEnum;
@@ -363,13 +377,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     case EnumType::kMiddle:
     case EnumType::kRow:
     case EnumType::kColumn:
-    case EnumType::kUnder:
-    case EnumType::kNextTo:
-    case EnumType::kAround:
-    case EnumType::kOn:
-    case EnumType::kAbove:
-    case EnumType::kFrontOf:
-    case EnumType::kBehind:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -391,6 +398,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
+{
+    using EnumType = Globals::RelativePositionTag;
+    switch (val)
+    {
+    case EnumType::kUnder:
+    case EnumType::kNextTo:
+    case EnumType::kAround:
+    case EnumType::kOn:
+    case EnumType::kAbove:
+    case EnumType::kFrontOf:
+    case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
 {
     using EnumType = Globals::TestGlobalEnum;
@@ -2566,14 +2591,14 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::Operationa
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectLocationsStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectAreasStatus val)
 {
-    using EnumType = ServiceArea::SelectLocationsStatus;
+    using EnumType = ServiceArea::SelectAreasStatus;
     switch (val)
     {
     case EnumType::kSuccess:
-    case EnumType::kUnsupportedLocation:
-    case EnumType::kDuplicatedLocations:
+    case EnumType::kUnsupportedArea:
+    case EnumType::kDuplicatedAreas:
     case EnumType::kInvalidInMode:
     case EnumType::kInvalidSet:
         return val;
@@ -2581,14 +2606,15 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectLoca
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipCurrentLocationStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipAreaStatus val)
 {
-    using EnumType = ServiceArea::SkipCurrentLocationStatus;
+    using EnumType = ServiceArea::SkipAreaStatus;
     switch (val)
     {
     case EnumType::kSuccess:
-    case EnumType::kInvalidLocationList:
+    case EnumType::kInvalidAreaList:
     case EnumType::kInvalidInMode:
+    case EnumType::kInvalidSkippedArea:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2716,7 +2742,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     using EnumType = Thermostat::PresetScenarioEnum;
     switch (val)
     {
-    case EnumType::kUnspecified:
     case EnumType::kOccupied:
     case EnumType::kUnoccupied:
     case EnumType::kSleep:
@@ -3401,6 +3426,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::St
     case EnumType::kSuccess:
     case EnumType::kAppNotAvailable:
     case EnumType::kSystemBusy:
+    case EnumType::kPendingUserApproval:
+    case EnumType::kDownloading:
+    case EnumType::kInstalling:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

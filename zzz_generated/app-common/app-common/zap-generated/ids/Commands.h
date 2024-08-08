@@ -1298,21 +1298,21 @@ static constexpr CommandId Id = 0x00000001;
 namespace ServiceArea {
 namespace Commands {
 
-namespace SelectLocations {
+namespace SelectAreas {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectLocations
+} // namespace SelectAreas
 
-namespace SelectLocationsResponse {
+namespace SelectAreasResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace SelectLocationsResponse
+} // namespace SelectAreasResponse
 
-namespace SkipCurrentLocation {
+namespace SkipArea {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipCurrentLocation
+} // namespace SkipArea
 
-namespace SkipCurrentLocationResponse {
+namespace SkipAreaResponse {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipCurrentLocationResponse
+} // namespace SkipAreaResponse
 
 } // namespace Commands
 } // namespace ServiceArea
@@ -1348,17 +1348,13 @@ namespace SetActivePresetRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace SetActivePresetRequest
 
-namespace StartPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000007;
-} // namespace StartPresetsSchedulesEditRequest
+namespace AtomicResponse {
+static constexpr CommandId Id = 0x000000FD;
+} // namespace AtomicResponse
 
-namespace CancelPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000008;
-} // namespace CancelPresetsSchedulesEditRequest
-
-namespace CommitPresetsSchedulesRequest {
-static constexpr CommandId Id = 0x00000009;
-} // namespace CommitPresetsSchedulesRequest
+namespace AtomicRequest {
+static constexpr CommandId Id = 0x000000FE;
+} // namespace AtomicRequest
 
 } // namespace Commands
 } // namespace Thermostat
