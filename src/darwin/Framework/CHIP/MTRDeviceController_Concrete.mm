@@ -186,7 +186,7 @@ using namespace chip::Tracing::DarwinFramework;
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
       storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
 {
-    if (self = [super init]) {
+    if (self = [super initForSubclasses]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
         _uniqueIdentifier = uniqueIdentifier;

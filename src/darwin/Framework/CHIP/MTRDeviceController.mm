@@ -133,6 +133,16 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
 }
 
+
+- (instancetype)initForSubclasses
+{
+    if (self = [super init]) {
+        // nothing, as superclass of MTRDeviceController is NSObject
+    }
+
+    return self;
+}
+
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {

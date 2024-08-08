@@ -57,6 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
 
+- (instancetype)initForSubclasses;
+
 #pragma mark - MTRDeviceControllerFactory methods
 
 /**
