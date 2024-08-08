@@ -57,7 +57,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
