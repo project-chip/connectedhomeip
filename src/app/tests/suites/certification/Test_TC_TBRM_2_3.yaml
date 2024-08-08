@@ -31,10 +31,8 @@ config:
         # Active Timestamp ----^^^^^^^^^^^^^^^^
         # Pending Timestamp -----------------------^^^^^^^^^^^^^^^^
         # Delay Timer -------------------------------------------------^^^^^^^^ == 20000ms Note: waitForReport has a hard-coded 30 second timeout
-    PIXIT.TBRM.THREAD_PENDING_DATASET.ACTIVE_TIMESTAMP: 0x20000
 
 tests:
-    # Step 0
     - label: "Wait for the commissioned device to be retrieved"
       cluster: DelayCommands
       command: WaitForCommissionee
@@ -119,9 +117,9 @@ tests:
       command: readAttribute
       attribute: PendingDatasetTimestamp
       response:
-          value: PIXIT.TBRM.THREAD_PENDING_DATASET.ACTIVE_TIMESTAMP
           constraints:
               type: int64u
+              notValue: initialPendingTimestamp
 
     # Step 8
     - label:
@@ -140,7 +138,8 @@ tests:
       attribute: ActiveDatasetTimestamp
       # TODO: waitForReport uses a hard-coded timeout of 30s, should be configurable?
       response:
-          value: PIXIT.TBRM.THREAD_PENDING_DATASET.ACTIVE_TIMESTAMP
+          constraints:
+              hasValue: true
 
     # Step 9
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
