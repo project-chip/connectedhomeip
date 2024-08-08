@@ -86,16 +86,24 @@ class TC_CADMIN_1_11(MatterBaseTest):
             TestStep(4, "TH_CR2 fully commissions the DUT", "DUT should fully commission"),
             TestStep(
                 5, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "New commissioning window should open and be set to timeout"),
-            TestStep(6, "TH_CR1 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
-            TestStep(7, "TH_CR2 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep(6, "TH_CR1 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window",
+                     "Commissioning window should fail to be opened due to being busy"),
+            TestStep(7, "TH_CR2 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window",
+                     "Commissioning window should fail to be opened due to being busy"),
             TestStep(8, "TH_CR1 sends an RevokeCommissioning command to the DUT", "Commissioning window should be closed"),
-            TestStep(9, "TH_CR1 reads the FeatureMap from the Administrator Commissioning Cluster to check to see if BC is supported on DUT", "FeatureMap should be checked to see if BC enum is available feature, if not then test steps 9a-9d will be skipped"),
-            TestStep("9a", "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "Opens basic commissioning window on the DUT for timeout set to value of MaxCumulativeFailsafeSeconds"),
-            TestStep("9b", "TH_CR1 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
-            TestStep("9c", "TH_CR2 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep(9, "TH_CR1 reads the FeatureMap from the Administrator Commissioning Cluster to check to see if BC is supported on DUT",
+                     "FeatureMap should be checked to see if BC enum is available feature, if not then test steps 9a-9d will be skipped"),
+            TestStep("9a", "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo",
+                     "Opens basic commissioning window on the DUT for timeout set to value of MaxCumulativeFailsafeSeconds"),
+            TestStep("9b", "TH_CR1 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window",
+                     "Commissioning window should fail to be opened due to being busy"),
+            TestStep("9c", "TH_CR2 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window",
+                     "Commissioning window should fail to be opened due to being busy"),
             TestStep("9d", "TH_CR1 sends a RevokeCommissioning command to the DUT", "Commissioning window should be closed"),
-            TestStep(10, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx", "th2_idx set to value for CurrentFabricIndex attribute from TH_CR2"),
-            TestStep(11, "TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx", "TH_CR1 removes TH_CR2 fabric using th2_idx"),
+            TestStep(10, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx",
+                     "th2_idx set to value for CurrentFabricIndex attribute from TH_CR2"),
+            TestStep(11, "TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+                     "TH_CR1 removes TH_CR2 fabric using th2_idx"),
         ]
 
     def generate_unique_random_value(self, value):
@@ -163,7 +171,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
             fm_attribute = Clusters.AdministratorCommissioning.Attributes
             features = await self.read_single_attribute_check_success(cluster=AC_cluster, attribute=fm_attribute.FeatureMap)
         else:
-            features = AC_cluster.Attributes.FeatureMap.value            
+            features = AC_cluster.Attributes.FeatureMap.value
 
         self.supports_bc = bool(features & AC_cluster.Bitmaps.Feature.kBasic) != 0
 
