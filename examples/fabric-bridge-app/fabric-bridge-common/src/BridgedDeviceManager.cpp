@@ -29,10 +29,12 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
 
 #include <cstdio>
+#include <optional>
 #include <string>
 
 using namespace chip;
@@ -50,8 +52,8 @@ constexpr int kNodeLabelSize       = 32;
 constexpr int kUniqueIdSize        = 32;
 constexpr int kVendorNameSize      = 32;
 constexpr int kProductNameSize     = 32;
-constexpr int kHardwareVersionSize = 32;
-constexpr int kSoftwareVersionSize = 32;
+constexpr int kHardwareVersionSize = 64;
+constexpr int kSoftwareVersionSize = 64;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
@@ -161,60 +163,65 @@ BridgedDeviceManager BridgedDeviceManager::sInstance;
 
 void BridgedDeviceManager::Init()
 {
-    memset(mDevices, 0, sizeof(mDevices));
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     mCurrentEndpointId = mFirstDynamicEndpointId;
 }
 
-int BridgedDeviceManager::AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId)
+std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+                                                                chip::EndpointId parentEndpointId)
 {
-    uint8_t index                                              = 0;
     EmberAfEndpointType * ep                                   = &sBridgedNodeEndpoint;
     const chip::Span<const EmberAfDeviceType> & deviceTypeList = Span<const EmberAfDeviceType>(sBridgedDeviceTypes);
     const chip::Span<chip::DataVersion> & dataVersionStorage   = Span<DataVersion>(sBridgedNodeDataVersions);
 
-    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    if (dev->GetBridgedAttributes().uniqueId.empty())
     {
-        if (nullptr == mDevices[index])
-        {
-            mDevices[index] = dev;
-            CHIP_ERROR err;
-            int retryCount = 0;
-            while (retryCount < kMaxRetries)
-            {
-                DeviceLayer::StackLock lock;
-                dev->SetEndpointId(mCurrentEndpointId);
-                dev->SetParentEndpointId(parentEndpointId);
-                err =
-                    emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-                if (err == CHIP_NO_ERROR)
-                {
-                    ChipLogProgress(NotSpecified,
-                                    "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
-                                    ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
-                    return index;
-                }
-                if (err != CHIP_ERROR_ENDPOINT_EXISTS)
-                {
-                    mDevices[index] = nullptr;
-                    return -1; // Return error as endpoint addition failed due to an error other than endpoint already exists
-                }
-                // Increment the endpoint ID and handle wrap condition
-                if (++mCurrentEndpointId < mFirstDynamicEndpointId)
-                {
-                    mCurrentEndpointId = mFirstDynamicEndpointId;
-                }
-                retryCount++;
-            }
-            ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
-            mDevices[index] = nullptr;
-            return -1; // Return error as all retries are exhausted
-        }
-        index++;
+        dev->SetUniqueId(GenerateUniqueId());
     }
+    else if (GetDeviceByUniqueId(dev->GetBridgedAttributes().uniqueId) != nullptr)
+    {
+        ChipLogProgress(NotSpecified, "A device with unique id '%s' already exists", dev->GetBridgedAttributes().uniqueId.c_str());
+        return std::nullopt;
+    }
+
+    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
+    {
+        if (mDevices[index])
+        {
+            continue;
+        }
+
+        for (int retryCount = 0; retryCount < kMaxRetries; retryCount++)
+        {
+            DeviceLayer::StackLock lock;
+            dev->SetEndpointId(mCurrentEndpointId);
+            dev->SetParentEndpointId(parentEndpointId);
+            CHIP_ERROR err =
+                emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(NotSpecified, "Added device with nodeId=0x" ChipLogFormatX64 " to dynamic endpoint %d (index=%d)",
+                                ChipLogValueX64(dev->GetNodeId()), mCurrentEndpointId, index);
+                mDevices[index] = std::move(dev);
+                return index;
+            }
+            if (err != CHIP_ERROR_ENDPOINT_EXISTS)
+            {
+                return std::nullopt; // Return error as endpoint addition failed due to an error other than endpoint already exists
+            }
+            // Increment the endpoint ID and handle wrap condition
+            if (++mCurrentEndpointId < mFirstDynamicEndpointId)
+            {
+                mCurrentEndpointId = mFirstDynamicEndpointId;
+            }
+        }
+        ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
+        return std::nullopt; // Return error as all retries are exhausted
+    }
+
     ChipLogProgress(NotSpecified, "Failed to add dynamic endpoint: No endpoints available!");
-    return -1;
+    return std::nullopt;
 }
 
 int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
@@ -222,14 +229,15 @@ int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (mDevices[index] == dev)
+        if (mDevices[index].get() == dev)
         {
             DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
             mDevices[index]                = nullptr;
-            ChipLogProgress(NotSpecified, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
+            ChipLogProgress(NotSpecified, "Removed device %s from dynamic endpoint %d (index=%d)",
+                            dev->GetBridgedAttributes().uniqueId.c_str(), ep, index);
             return index;
         }
         index++;
@@ -243,7 +251,45 @@ BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) con
     {
         if (mDevices[index] && mDevices[index]->GetEndpointId() == endpointId)
         {
-            return mDevices[index];
+            return mDevices[index].get();
+        }
+    }
+    return nullptr;
+}
+
+std::string BridgedDeviceManager::GenerateUniqueId()
+{
+    char rand_buffer[kUniqueIdSize + 1];
+    memset(rand_buffer, 0, sizeof(rand_buffer));
+
+    static const char kRandCharChoices[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    while (true)
+    {
+        /// for nice viewing, prefix the generated value
+        memcpy(rand_buffer, "GEN-", 4);
+        for (unsigned idx = 4; idx < kUniqueIdSize; idx++)
+        {
+            rand_buffer[idx] = kRandCharChoices[Crypto::GetRandU8() % (sizeof(kRandCharChoices) - 1)];
+        }
+
+        // we know zero-terminated due to the memset
+        std::string uniqueIdChoice = rand_buffer;
+
+        if (!GetDeviceByUniqueId(uniqueIdChoice))
+        {
+            return uniqueIdChoice;
+        }
+    }
+}
+
+BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id)
+{
+    for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
+    {
+        if (mDevices[index] && mDevices[index]->GetBridgedAttributes().uniqueId == id)
+        {
+            return mDevices[index].get();
         }
     }
     return nullptr;
@@ -255,15 +301,15 @@ BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) con
     {
         if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
         {
-            return mDevices[index];
+            return mDevices[index].get();
         }
     }
     return nullptr;
 }
 
-int BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
+std::optional<unsigned> BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
 {
-    for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
+    for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetNodeId() == nodeId)
         {
@@ -275,5 +321,5 @@ int BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
             return index;
         }
     }
-    return -1;
+    return std::nullopt;
 }

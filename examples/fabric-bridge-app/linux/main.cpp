@@ -32,7 +32,6 @@
 #include "RpcServer.h"
 #endif
 
-#include <string>
 #include <sys/ioctl.h>
 #include <thread>
 
@@ -244,9 +243,9 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
-    registerAttributeAccessOverride(&gBridgedDeviceBasicInformationAttributes);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);

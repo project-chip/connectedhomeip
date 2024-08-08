@@ -91,7 +91,7 @@ PowerSourceClusterInfo * sPowerSourceClusterInfo = nullptr;
 
 void MatterPowerSourcePluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
 
 namespace chip {

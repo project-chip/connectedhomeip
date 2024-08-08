@@ -8236,6 +8236,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
+    kPendingUserApproval = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -8295,6 +8298,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
+    kPendingUserApproval = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -9589,7 +9595,7 @@ endpoint 1 {
     ram      attribute physicalContactOccupiedToUnoccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision default = 5;
   }
 }

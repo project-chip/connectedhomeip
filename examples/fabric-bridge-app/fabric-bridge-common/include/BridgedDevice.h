@@ -20,45 +20,54 @@
 
 #include <app/util/attribute-storage.h>
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <functional>
 #include <string>
-#include <vector>
 
 class BridgedDevice
 {
 public:
-    static const int kDeviceNameSize = 32;
+    /// Defines all attributes that we keep track of for a bridged device
+    struct BridgedAttributes
+    {
+        std::string uniqueId;
+        std::string vendorName;
+        uint16_t vendorId = 0;
+        std::string productName;
+        uint16_t productId = 0;
+        std::string nodeLabel;
+        uint16_t hardwareVersion = 0;
+        std::string hardwareVersionString;
+        uint32_t softwareVersion = 0;
+        std::string softwareVersionString;
+    };
 
     BridgedDevice(chip::NodeId nodeId);
-    virtual ~BridgedDevice() {}
+    virtual ~BridgedDevice() = default;
 
     void LogActiveChangeEvent(uint32_t promisedActiveDuration);
 
     bool IsReachable();
     bool IsIcd();
     void SetReachable(bool reachable);
-    void SetName(const char * name);
-    void SetLocation(std::string location) { mLocation = location; };
+
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline chip::NodeId GetNodeId() { return mNodeId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
-    inline char * GetName() { return mName; };
-    inline std::string GetLocation() { return mLocation; };
-    inline std::string GetZone() { return mZone; };
-    inline void SetZone(std::string zone) { mZone = zone; };
+
+    [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
+    void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+
+    /// Convenience method to set just the unique id of a bridged device as it
+    /// is one of the few attributes that is not always bulk-set
+    void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
     bool mReachable;
     bool mIsIcd = false;
-    char mName[kDeviceNameSize];
-    std::string mLocation;
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;
-    std::string mZone;
+
+    BridgedAttributes mAttributes;
 };

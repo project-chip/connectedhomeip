@@ -131,6 +131,9 @@ ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len
 #ifdef CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     return usb_serial_jtag_write_bytes(buf, len, 0);
 #endif
+#if CONFIG_ESP_CONSOLE_NONE
+    return len;
+#endif
 }
 
 static streamer_t streamer_stdio = {
