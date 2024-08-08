@@ -62,14 +62,12 @@ tests:
       response:
           saveAs: PresetsValue
 
-    - label:
-          "Saving value for comparision in step 6 read PresetsSchedulesEditable
-          attribute"
-      PICS: TSTAT.S.A0052
+    - label: "Saving value for comparision in step 6 read Schedules attribute"
+      PICS: TSTAT.S.A0051
       command: "readAttribute"
-      attribute: "PresetsSchedulesEditable"
+      attribute: "Schedules"
       response:
-          saveAs: PresetsSchedulesEditableValue
+          saveAs: SchedulesValue
 
     - label: "Step 2: TH reads the PresetTypes attribute from the DUT"
       PICS: TSTAT.S.F08 & TSTAT.S.A0048
@@ -103,11 +101,10 @@ tests:
           constraints:
               type: list
 
-    - label:
-          "Step 6: TH reads the PresetsSchedulesEditable attribute from the DUT"
-      PICS: TSTAT.S.F08 & TSTAT.S.A0052
+    - label: "Step 6: TH reads the Schedules attribute from the DUT"
+      PICS: TSTAT.S.F07 & TSTAT.S.A0051
       command: "readAttribute"
-      attribute: "PresetsSchedulesEditable"
+      attribute: "Schedules"
       response:
           constraints:
-              type: boolean
+              type: list

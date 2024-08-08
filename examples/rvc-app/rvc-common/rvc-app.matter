@@ -99,6 +99,12 @@ enum AreaTypeTag : enum8 {
   kWorkshop = 94;
 }
 
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
 enum FloorSurfaceTag : enum8 {
   kCarpet = 0;
   kCeramic = 1;
@@ -188,13 +194,16 @@ enum PositionTag : enum8 {
   kMiddle = 4;
   kRow = 5;
   kColumn = 6;
-  kUnder = 7;
-  kNextTo = 8;
-  kAround = 9;
-  kOn = 10;
-  kAbove = 11;
-  kFrontOf = 12;
-  kBehind = 13;
+}
+
+enum RelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -218,6 +227,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1410,9 +1424,9 @@ cluster RvcOperationalState = 97 {
   command GoHome(): OperationalCommandResponse = 128;
 }
 
-/** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
+/** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OperationalStatusEnum : enum8 {
     kPending = 0;
@@ -1421,56 +1435,61 @@ provisional cluster ServiceArea = 336 {
     kCompleted = 3;
   }
 
-  enum SelectLocationsStatus : enum8 {
+  enum SelectAreasStatus : enum8 {
     kSuccess = 0;
-    kUnsupportedLocation = 1;
-    kDuplicatedLocations = 2;
+    kUnsupportedArea = 1;
+    kDuplicatedAreas = 2;
     kInvalidInMode = 3;
     kInvalidSet = 4;
   }
 
-  enum SkipCurrentLocationStatus : enum8 {
+  enum SkipAreaStatus : enum8 {
     kSuccess = 0;
-    kInvalidLocationList = 1;
+    kInvalidAreaList = 1;
     kInvalidInMode = 2;
+    kInvalidSkippedArea = 3;
   }
 
   bitmap Feature : bitmap32 {
-    kListOrder = 0x1;
-    kSelectWhileRunning = 0x2;
+    kSelectWhileRunning = 0x1;
+    kProgressReporting = 0x2;
+    kMaps = 0x4;
   }
 
-  struct LocationInfoStruct {
+  struct LandmarkInfoStruct {
+    LandmarkTag landmarkTag = 0;
+    nullable RelativePositionTag positionTag = 1;
+  }
+
+  struct AreaInfoStruct {
     nullable LocationDescriptorStruct locationInfo = 0;
-    nullable LandmarkTag landmarkTag = 1;
-    nullable PositionTag positionTag = 2;
-    nullable FloorSurfaceTag surfaceTag = 3;
+    nullable LandmarkInfoStruct landmarkInfo = 1;
   }
 
-  struct LocationStruct {
-    int32u locationID = 0;
-    nullable int8u mapID = 1;
-    LocationInfoStruct locationInfo = 2;
+  struct AreaStruct {
+    int32u areaID = 0;
+    nullable int32u mapID = 1;
+    AreaInfoStruct areaDesc = 2;
   }
 
   struct MapStruct {
-    int8u mapID = 0;
+    int32u mapID = 0;
     char_string<64> name = 1;
   }
 
   struct ProgressStruct {
-    int32u locationID = 0;
+    int32u areaID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
     optional nullable elapsed_s estimatedTime = 3;
   }
 
-  readonly attribute LocationStruct supportedLocations[] = 0;
-  readonly attribute nullable MapStruct supportedMaps[] = 1;
-  readonly attribute nullable int32u selectedLocations[] = 2;
-  readonly attribute optional nullable int32u currentLocation = 3;
+  readonly attribute AreaStruct supportedAreas[] = 0;
+  readonly attribute optional MapStruct supportedMaps[] = 1;
+  readonly attribute int32u selectedAreas[] = 2;
+  readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
-  readonly attribute optional nullable ProgressStruct progress[] = 5;
+  readonly attribute optional ProgressStruct progress[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1478,24 +1497,28 @@ provisional cluster ServiceArea = 336 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SelectLocationsRequest {
-    nullable int32u newLocations[] = 0;
+  request struct SelectAreasRequest {
+    int32u newAreas[] = 0;
   }
 
-  response struct SelectLocationsResponse = 1 {
-    SelectLocationsStatus status = 0;
-    optional char_string<256> statusText = 1;
+  response struct SelectAreasResponse = 1 {
+    SelectAreasStatus status = 0;
+    char_string<256> statusText = 1;
   }
 
-  response struct SkipCurrentLocationResponse = 3 {
-    SkipCurrentLocationStatus status = 0;
-    optional char_string<256> statusText = 1;
+  request struct SkipAreaRequest {
+    int32u skippedArea = 0;
   }
 
-  /** Command used to select a set of device locations, where the device is to operate */
-  command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
-  /** This command is used to skip the current location where the device operates. */
-  command SkipCurrentLocation(): SkipCurrentLocationResponse = 2;
+  response struct SkipAreaResponse = 3 {
+    SkipAreaStatus status = 0;
+    char_string<256> statusText = 1;
+  }
+
+  /** Command used to select a set of device areas, where the device is to operate. */
+  command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
+  /** This command is used to skip an area where the device operates. */
+  command SkipArea(SkipAreaRequest): SkipAreaResponse = 2;
 }
 
 endpoint 0 {
@@ -1755,10 +1778,10 @@ endpoint 1 {
   }
 
   server cluster ServiceArea {
-    callback attribute supportedLocations;
+    callback attribute supportedAreas;
     callback attribute supportedMaps;
-    callback attribute selectedLocations;
-    callback attribute currentLocation;
+    callback attribute selectedAreas;
+    callback attribute currentArea;
     callback attribute estimatedEndTime;
     callback attribute progress;
     callback attribute generatedCommandList;
@@ -1768,10 +1791,10 @@ endpoint 1 {
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
-    handle command SelectLocations;
-    handle command SelectLocationsResponse;
-    handle command SkipCurrentLocation;
-    handle command SkipCurrentLocationResponse;
+    handle command SelectAreas;
+    handle command SelectAreasResponse;
+    handle command SkipArea;
+    handle command SkipAreaResponse;
   }
 }
 

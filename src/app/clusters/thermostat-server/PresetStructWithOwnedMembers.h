@@ -42,7 +42,8 @@ struct PresetStructWithOwnedMembers : protected Structs::PresetStruct::Type
 public:
     PresetStructWithOwnedMembers() = default;
     PresetStructWithOwnedMembers(const Structs::PresetStruct::Type & other);
-    void operator=(const Structs::PresetStruct::Type & other);
+    PresetStructWithOwnedMembers & operator=(const Structs::PresetStruct::Type & other);
+    PresetStructWithOwnedMembers & operator=(const PresetStructWithOwnedMembers & other);
 
     void SetPresetScenario(PresetScenarioEnum enumValue);
     CHIP_ERROR SetPresetHandle(const DataModel::Nullable<ByteSpan> & newPresetHandle);

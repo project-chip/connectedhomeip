@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -521,7 +521,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-lighting')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-freertos-lighting')
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
@@ -662,17 +662,19 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1',
+        TargetPart('BL602DK',
                    board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
-        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
+        TargetPart('BL602-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+        TargetPart('BL706-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL602-IoT-Matter-V1',
+                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
+                   module_type="BL706C-22"),
     ])
 
     # Apps
@@ -680,20 +682,20 @@ def BuildBouffalolabTarget():
         TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
-    target.AppendModifier('shell', enable_shell=True)
-    target.AppendModifier('115200', baudrate=115200)
-    target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('cdc', enable_cdc=True)
-    target.AppendModifier('resetCnt', enable_resetCnt=True)
-    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('mfd', function_mfd=BouffalolabMfd.MFD_RELEASE)
-    target.AppendModifier('mfdtest', function_mfd=BouffalolabMfd.MFD_TEST)
     target.AppendModifier('ethernet', enable_ethernet=True)
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
-    target.AppendModifier('fp', enable_frame_ptr=True)
-    target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('easyflash', enable_easyflash=True)
+    target.AppendModifier('shell', enable_shell=True)
+    target.AppendModifier('mfd', enable_mfd=True)
+    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
+    target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('cdc', enable_cdc=True)
     target.AppendModifier('mot', use_matter_openthread=True)
+    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('115200', baudrate=115200)
+    target.AppendModifier('fp', enable_frame_ptr=True)
 
     return target
 

@@ -30,6 +30,7 @@ import copy
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -61,32 +62,47 @@ class TC_TSTAT_4_2(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, cluster.Attributes.Presets(presets))])
         return result[0].Status
 
-    async def send_edit_preset_request_command(self,
-                                               endpoint: int = None,
-                                               expected_status: Status = Status.Success):
+    async def send_edit_atomic_request_begin_command(self,
+                                                     endpoint: int = None,
+                                                     expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.StartPresetsSchedulesEditRequest(timeoutSeconds=180),
+            await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
+                                                                          attributeRequests=[
+                                                                              cluster.Attributes.Presets.attribute_id],
+                                                                          timeout=1800),
                                        endpoint=endpoint)
             asserts.assert_equal(expected_status, Status.Success)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_commit_preset_request_command(self,
-                                                 endpoint: int = None,
-                                                 expected_status: Status = Status.Success):
+    async def send_edit_atomic_request_commit_command(self,
+                                                      endpoint: int = None,
+                                                      expected_status: Status = Status.Success,
+                                                      expected_overall_status: Status = Status.Success,
+                                                      expected_preset_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.CommitPresetsSchedulesRequest(),
-                                       endpoint=endpoint)
-            asserts.assert_equal(expected_status, Status.Success)
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
+                                                                                     attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
+                                                  endpoint=endpoint)
+            asserts.assert_equal(expected_status, Status.Success, "We expected we had a valid commit command")
+            asserts.assert_equal(response.statusCode, expected_overall_status, "Commit should have the right overall status")
+            found_preset_status = False
+            for attrStatus in response.attributeStatus:
+                if attrStatus.attributeID == cluster.Attributes.Presets.attribute_id:
+                    asserts.assert_equal(attrStatus.statusCode, expected_preset_status,
+                                         "Preset attribute commit should have the right status")
+                    found_preset_status = True
+            asserts.assert_true(found_preset_status, "Preset attribute commit should have a status")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_cancel_preset_request_command(self,
-                                                 endpoint: int = None,
-                                                 expected_status: Status = Status.Success):
+    async def send_edit_atomic_request_rollback_command(self,
+                                                        endpoint: int = None,
+                                                        expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=cluster.Commands.CancelPresetsSchedulesEditRequest(),
+            await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
+                                                                          attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                        endpoint=endpoint)
             asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
@@ -116,11 +132,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
         steps = [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
-            TestStep("2", "TH writes to the Presets attribute without calling the StartPresetsSchedulesEditRequest command",
-                     " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command."),
-            TestStep("3", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command but doesn't call CommitPresetsSchedulesRequest to commit",
+            TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
+                     " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling AtomicRequest command."),
+            TestStep("3", "TH writes to the Presets attribute after calling the AtomicRequest command but doesn't call CommitPresetsSchedulesRequest to commit",
                      "Verify that the Presets attribute was not updated since CommitPresetsSchedulesRequest command was not called."),
-            TestStep("4", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command and calls CommitPresetsSchedulesRequest to commit",
+            TestStep("4", "TH writes to the Presets attribute after calling the AtomicRequest command and calls CommitPresetsSchedulesRequest to commit",
                      "Verify that the Presets attribute was updated with new presets."),
             TestStep("5", "TH writes to the Presets attribute with a built-in preset removed",
                      "Verify that the CommitPresetsSchedulesRequest returned UNSUPPORTED_ACCESS (0x7e)."),
@@ -157,49 +173,55 @@ class TC_TSTAT_4_2(MatterBaseTest):
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, initial_presets, "Presets do not match initial value")
 
-            # Write to the presets attribute without calling StartPresetsSchedulesEditRequest command
+            # Write to the presets attribute without calling AtomicRequest command
             status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.InvalidInState)
             asserts.assert_true(status_ok, "Presets write did not return InvalidInState as expected")
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp")):
-            await self.send_edit_preset_request_command()
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+            await self.send_edit_atomic_request_begin_command()
 
-            # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
+            # Write to the presets attribute after calling AtomicRequest command
             status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
-            # Read the presets attribute and verify it was not updated since CommitPresetsSchedulesRequest was not called after writing presets
+            # Read the presets attribute and verify it was updated by the write
             presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
+            asserts.assert_equal(presets, new_presets_with_handle, "Presets were updated, as expected")
+
+            await self.send_edit_atomic_request_rollback_command()
+
+            # Read the presets attribute and verify it has been properly rolled back
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
             asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
 
         self.step("4")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
-            # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
+            # Write to the presets attribute after calling AtomicRequest command
             status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
-            # Send the CommitPresetsSchedulesRequest command
-            await self.send_commit_preset_request_command()
+            # Send the AtomicRequest commit command
+            await self.send_edit_atomic_request_commit_command()
 
-            # Read the presets attribute and verify it was updated since CommitPresetsSchedulesRequest was called after writing presets
+            # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
             presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = new_presets_with_handle.copy()
@@ -208,11 +230,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
-            # Send the CommitPresetsSchedulesRequest command and expect UnsupportedAccess
-            await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
+            # Send the AtomicRequest commit command and expect ConstraintError for presets.
+            await self.send_edit_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
 
         self.step("6")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
             # Send the SetActivePresetRequest command
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
@@ -222,8 +244,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
             asserts.assert_equal(activePresetHandle, b'\x03', "Active preset handle was not updated as expected")
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after removing the preset that was set as the active preset handle. Remove the last entry with preset handle (b'\x03')
             test_presets = new_presets_with_handle.copy()
@@ -232,31 +254,31 @@ class TC_TSTAT_4_2(MatterBaseTest):
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
-            # Send the CommitPresetsSchedulesRequest command and expect InvalidInState
-            await self.send_commit_preset_request_command(expected_status=Status.InvalidInState)
+            # Send the AtomicRequest commit command and expect InvalidInState for presets.
+            await self.send_edit_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
 
         self.step("7")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after setting the builtIn flag to False for preset with handle (b'\x01')
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[0].builtIn = False
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 "Presets write should return ConstraintError, because BuiltIn values do not match")
 
-            # Send the CommitPresetsSchedulesRequest command and expect UnsupportedAccess
-            await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("8")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after adding a preset with builtIn set to True
             test_presets = copy.deepcopy(new_presets_with_handle)
@@ -265,16 +287,17 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 "Presets write should return ConstraintError, since we are trying to add a new built-in preset")
 
-            # Send the CommitPresetsSchedulesRequest command and expect ConstraintError
-            await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("9")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
             test_presets = copy.deepcopy(new_presets_with_handle)
@@ -282,17 +305,17 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                 name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.NotFound,
+                                 "Presets write should return NotFound, since we are trying to modify non-existent preset")
 
-            # Send the CommitPresetsSchedulesRequest command and expect NotFound
-            await self.send_commit_preset_request_command(expected_status=Status.NotFound)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after adding a duplicate preset with handle (b'\x03')
             test_presets = copy.deepcopy(new_presets_with_handle)
@@ -300,66 +323,66 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 "Presets write should return ConstraintError, since we have duplicated presets")
 
-            # Send the CommitPresetsSchedulesRequest command and expect ConstraintError
-            await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[2].builtIn = True
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 "Presets write should return ConstraintError, since we are trying to change whether a preset is BuiltIn")
 
-            # Send the CommitPresetsSchedulesRequest command and expect UnsupportedAccess
-            await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("12")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute after setting a name for preset with handle (b'\x01') that doesn't support names
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[0].name = "Occupied"
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.ConstraintError,
+                                 "Presets write should return ConstraintError, since we are trying to set a name for a preset that does not support that")
 
-            # Send the CommitPresetsSchedulesRequest command and expect ConstraintError
-            await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
+            # Clear state for next test.
+            await self.send_edit_atomic_request_rollback_command()
 
         self.step("13")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
-            # Send the StartPresetsSchedulesEditRequest command
-            await self.send_edit_preset_request_command()
+            # Send the AtomicRequest begin command
+            await self.send_edit_atomic_request_begin_command()
 
             # Write to the presets attribute with a new valid preset added
             test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x04', presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
                                 name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            asserts.assert_equal(status, Status.Success, "Presets write did not return Success as expected")
 
-            # Send the CancelPresetsSchedulesRequest command
-            await self.send_cancel_preset_request_command()
+            # Roll back
+            await self.send_edit_atomic_request_rollback_command()
 
-            # Send the CommitPresetsSchedulesRequest command and expect InvalidInState as the previous edit request was cancelled
-            await self.send_commit_preset_request_command(expected_status=Status.InvalidInState)
+            # Send the AtomicRequest commit command and expect InvalidInState as the previous edit request was cancelled
+            await self.send_edit_atomic_request_commit_command(expected_status=Status.InvalidInState)
 
         # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
 

@@ -1432,27 +1432,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRServiceAreaClusterSelectLocationsParams (InternalMethods)
+@interface MTRServiceAreaClusterSelectAreasParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRServiceAreaClusterSelectLocationsResponseParams (InternalMethods)
+@interface MTRServiceAreaClusterSelectAreasResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRServiceAreaClusterSkipCurrentLocationParams (InternalMethods)
+@interface MTRServiceAreaClusterSkipAreaParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRServiceAreaClusterSkipCurrentLocationResponseParams (InternalMethods)
+@interface MTRServiceAreaClusterSkipAreaResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1498,19 +1498,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+@interface MTRThermostatClusterAtomicResponseParams (InternalMethods)
 
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AtomicResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+@interface MTRThermostatClusterAtomicRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
