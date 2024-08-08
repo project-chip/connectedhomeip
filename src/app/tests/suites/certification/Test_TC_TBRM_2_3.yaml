@@ -22,6 +22,9 @@ config:
     nodeId: 0x12344321
     cluster: Thread Border Router Management
     endpoint: 1
+    PIXIT.TBRM.THREAD_ACTIVE_DATASET:
+        type: octet_string
+        defaultValue: "hex:0e080000000000010000000300001235060004001fffe002082ad51c02fe8f64f20708fddb8af85255f93a051083e2b9b2cc609b00125adbf823ea2ab20102c4d904100a133626c411d7de02a570ca3c3d80470c0402a0f7f8031054687265616441637469766554657374"
     PIXIT.TBRM.THREAD_PENDING_DATASET:
         type: octet_string
         defaultValue: "hex:0e080000000000020000340400004e2035060004001fffe002082ad51c02fe8f64f20708fddb8af85255f93a051083e2b9b2cc609b00125adbf823ea2ab20102c4d904100a133626c411d7de02a570ca3c3d80470c0402a0f7f8030d54687265616450656e64696e67000300000c33080000000000010000"
@@ -30,7 +33,7 @@ config:
     PIXIT.TBRM.THREAD_PENDING_DATASET.ACTIVE_TIMESTAMP: 0x20000
 
 # Precondition:
-# The DUT has an Active Dataset that differs from PIXIT.TBRM.THREAD_PENDING_DATASET
+# The DUT does not have an Active Dataset
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -41,6 +44,33 @@ tests:
               - name: nodeId
                 value: nodeId
 
+    - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: ActiveDatasetTimestamp
+      response:
+          saveAs: initialActiveTimestamp
+          value: null
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      cluster: General Commissioning
+      command: ArmFailSafe
+      endpoint: 0
+      arguments:
+          values:
+              - name: ExpiryLengthSeconds
+                value: 60
+              - name: Breadcrumb
+                value: 1
+
+      # TODO: runIf: initialActiveTimestamp == null
+    - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
+      command: SetActiveDatasetRequest
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
+
+      # TODO: runIf: initialActiveTimestamp == null
     - label:
           "TH subscribes to the ActiveDatasetTimestamp attribute from the DUT"
       command: subscribeAttribute
