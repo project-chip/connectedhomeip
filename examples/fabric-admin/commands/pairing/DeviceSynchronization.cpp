@@ -124,18 +124,17 @@ void DeviceSynchronizer::OnReportEnd()
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
 #endif
-    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 {
     // Nothing to do: error reported on OnError or report ended called.
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error fetching device data: %" CHIP_ERROR_FORMAT, error.Format());
-    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & exchangeMgr,
@@ -158,12 +157,14 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue read for BasicInformation data");
+        mDeviceSyncInProcess = false;
     }
 }
 
 void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
