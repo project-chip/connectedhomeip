@@ -27,6 +27,7 @@
 #include "thermostat-delegate.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
 
 namespace chip {
 namespace app {
@@ -48,45 +49,66 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
     /**
-     * @brief Sets the scoped node id of the originator that send the last successful
-     *        StartPresetsSchedulesEditRequest for the given endpoint.
+     * @brief Sets the scoped node id of the originator that sent the last successful
+     *        AtomicRequest of type BeginWrite for the given endpoint.
      *
      * @param[in] endpoint The endpoint.
      * @param[in] originatorNodeId The originator scoped node id.
      */
-    void SetOriginatorScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId);
+    void SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId);
 
     /**
-     * @brief Gets the scoped node id of the originator that send the last successful
-     *        StartPresetsSchedulesEditRequest for the given endpoint.
+     * @brief Gets the scoped node id of the originator that sent the last successful
+     *        AtomicRequest of type BeginWrite for the given endpoint.
      *
      * @param[in] endpoint The endpoint.
      *
      * @return the scoped node id for the given endpoint if set. Otherwise returns ScopedNodeId().
      */
-    ScopedNodeId GetOriginatorScopedNodeId(EndpointId endpoint);
+    ScopedNodeId GetAtomicWriteScopedNodeId(EndpointId endpoint);
 
     /**
-     * @brief Sets the presets editable flag for the given endpoint
+     * @brief Sets whether an atomic write is in progress for the given endpoint
      *
      * @param[in] endpoint The endpoint.
-     * @param[in] presetEditable The value of the presets editable.
+     * @param[in] inProgress Whether or not an atomic write is in progress.
      */
-    void SetPresetsEditable(EndpointId endpoint, bool presetEditable);
+    void SetAtomicWrite(EndpointId endpoint, bool inProgress);
 
     /**
-     * @brief Gets the prests editable flag value for the given endpoint
+     * @brief Gets whether an atomic write is in progress for the given endpoint
      *
      * @param[in] endpoint The endpoint.
      *
-     * @return the presets editable flag value for the given endpoint if set. Otherwise returns false.
+     * @return Whether an atomic write is in progress for the given endpoint
      */
-    bool GetPresetsEditable(EndpointId endpoint);
+    bool InAtomicWrite(EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] subjectDescriptor The subject descriptor.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] commandObj The command handler.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
-    ScopedNodeId mPresetEditRequestOriginatorNodeIds[kThermostatEndpointCount];
+    CHIP_ERROR AppendPendingPreset(Delegate * delegate, const Structs::PresetStruct::Type & preset);
 
-    bool mPresetsEditables[kThermostatEndpointCount];
+    ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];
+    bool mAtomicWriteState[kThermostatEndpointCount];
 };
 
 /**

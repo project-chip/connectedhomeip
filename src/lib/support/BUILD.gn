@@ -301,11 +301,9 @@ static_library("support") {
     "${chip_root}/src/inet:inet_config_header",
   ]
 
-  # Android has no 'platform' that provides logging
-  if (current_os == "android") {
-    public_deps += [ "${chip_root}/src/platform/android:logging" ]
-  }
-
+  # Platforms that utilize CHIP_SYSTEM_CONFIG_PLATFORM_LOG need to
+  # be pulled in here as public_deps since they hook into logging at
+  # the macro level rather than just providing a LogV implementation.
   if (current_os == "mac" || current_os == "ios") {
     public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }

@@ -5450,20 +5450,20 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ServiceArea attributes
-        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedLocationsID:
-            result = @"SupportedLocations";
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedAreasID:
+            result = @"SupportedAreas";
             break;
 
         case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedMapsID:
             result = @"SupportedMaps";
             break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedLocationsID:
-            result = @"SelectedLocations";
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedAreasID:
+            result = @"SelectedAreas";
             break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentLocationID:
-            result = @"CurrentLocation";
+        case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentAreaID:
+            result = @"CurrentArea";
             break;
 
         case MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID:
@@ -5870,10 +5870,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeSchedulesID:
             result = @"Schedules";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
-            result = @"PresetsSchedulesEditable";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
@@ -7600,6 +7596,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
             result = @"ActiveDatasetTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributePendingDatasetTimestampID:
+            result = @"PendingDatasetTimestamp";
             break;
 
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:

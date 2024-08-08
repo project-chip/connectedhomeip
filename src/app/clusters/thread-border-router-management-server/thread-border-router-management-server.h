@@ -17,17 +17,13 @@
 
 #pragma once
 
-#include "thread-br-delegate.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/FailSafeContext.h>
+#include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
 #include <app/reporting/reporting.h>
-#include <inet/UDPEndPoint.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 
@@ -68,25 +64,30 @@ private:
     // TODO: Split the business logic from the unit test class
     friend class TestThreadBorderRouterManagementCluster;
     // Command Handlers
-    Status HandleGetActiveDatasetRequest(bool isOverCASESession, Thread::OperationalDataset & dataset)
+    Status HandleGetActiveDatasetRequest(HandlerContext & ctx, Thread::OperationalDataset & dataset)
     {
-        return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kActive, dataset);
+        return HandleGetDatasetRequest(ctx, Delegate::DatasetType::kActive, dataset);
     }
-    Status HandleGetPendingDatasetRequest(bool isOverCASESession, Thread::OperationalDataset & dataset)
+    Status HandleGetPendingDatasetRequest(HandlerContext & ctx, Thread::OperationalDataset & dataset)
     {
-        return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kPending, dataset);
+        return HandleGetDatasetRequest(ctx, Delegate::DatasetType::kPending, dataset);
     }
-    Status HandleSetActiveDatasetRequest(CommandHandler * commandHandler,
-                                         const Commands::SetActiveDatasetRequest::DecodableType & req);
-    Status HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req);
-    Status HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
+    Status HandleSetActiveDatasetRequest(HandlerContext & ctx, const Commands::SetActiveDatasetRequest::DecodableType & req);
+    Status HandleSetPendingDatasetRequest(HandlerContext & ctx, const Commands::SetPendingDatasetRequest::DecodableType & req);
+    Status HandleGetDatasetRequest(HandlerContext & ctx, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
 
     // Attribute Read handlers
     void ReadFeatureMap(BitFlags<Feature> & feature);
-    Optional<uint64_t> ReadActiveDatasetTimestamp();
+    std::optional<uint64_t> ReadActiveDatasetTimestamp();
+    std::optional<uint64_t> ReadPendingDatasetTimestamp();
     CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
     CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetSkipCASESessionCheck(bool skipCheck) { mSkipCASESessionCheck = skipCheck; }
+    bool mSkipCASESessionCheck;
+#endif
+    bool IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx);
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnFailSafeTimerExpired();
     void CommitSavedBreadcrumb();

@@ -334,7 +334,11 @@ config("warnings_third_party") {
 }
 
 config("symbols_default") {
-  cflags = [ "-g${symbol_level}" ]
+  if (strip_symbols) {
+    cflags = [ "-s" ]
+  } else {
+    cflags = [ "-g${symbol_level}" ]
+  }
 }
 
 config("std_default") {
@@ -489,6 +493,7 @@ config("libfuzzer_fuzzing") {
 
 config("oss_fuzz") {
   cflags = string_split(getenv("CFLAGS"))
+  cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
   ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
 }

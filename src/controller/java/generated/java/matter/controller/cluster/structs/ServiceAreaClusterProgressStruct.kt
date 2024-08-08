@@ -24,14 +24,14 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ServiceAreaClusterProgressStruct(
-  val locationID: UInt,
+  val areaID: UInt,
   val status: UByte,
   val totalOperationalTime: Optional<UInt>?,
   val estimatedTime: Optional<UInt>?,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterProgressStruct {\n")
-    append("\tlocationID : $locationID\n")
+    append("\tareaID : $areaID\n")
     append("\tstatus : $status\n")
     append("\ttotalOperationalTime : $totalOperationalTime\n")
     append("\testimatedTime : $estimatedTime\n")
@@ -41,7 +41,7 @@ class ServiceAreaClusterProgressStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_LOCATION_I_D), locationID)
+      put(ContextSpecificTag(TAG_AREA_I_D), areaID)
       put(ContextSpecificTag(TAG_STATUS), status)
       if (totalOperationalTime != null) {
         if (totalOperationalTime.isPresent) {
@@ -64,14 +64,14 @@ class ServiceAreaClusterProgressStruct(
   }
 
   companion object {
-    private const val TAG_LOCATION_I_D = 0
+    private const val TAG_AREA_I_D = 0
     private const val TAG_STATUS = 1
     private const val TAG_TOTAL_OPERATIONAL_TIME = 2
     private const val TAG_ESTIMATED_TIME = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterProgressStruct {
       tlvReader.enterStructure(tlvTag)
-      val locationID = tlvReader.getUInt(ContextSpecificTag(TAG_LOCATION_I_D))
+      val areaID = tlvReader.getUInt(ContextSpecificTag(TAG_AREA_I_D))
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {
@@ -98,12 +98,7 @@ class ServiceAreaClusterProgressStruct(
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterProgressStruct(
-        locationID,
-        status,
-        totalOperationalTime,
-        estimatedTime,
-      )
+      return ServiceAreaClusterProgressStruct(areaID, status, totalOperationalTime, estimatedTime)
     }
   }
 }

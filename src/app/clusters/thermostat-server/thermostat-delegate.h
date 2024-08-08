@@ -81,6 +81,11 @@ public:
     virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) = 0;
 
     /**
+     * @brief Copies existing presets to the pending preset list
+     */
+    virtual void InitializePendingPresets() = 0;
+
+    /**
      * @brief Appends a preset to the pending presets list maintained by the delegate.
      *        The delegate must ensure it makes a copy of the provided preset and the data
      *        of its preset handle, if any.  For example, it could create a PresetStructWithOwnedMembers
