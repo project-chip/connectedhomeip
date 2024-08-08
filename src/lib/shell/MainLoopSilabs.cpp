@@ -206,10 +206,6 @@ void ProcessShellLine(intptr_t args)
         }
     }
     MemoryFree(line);
-#ifdef BRD4325A
-    // small delay for uart print
-    vTaskDelay(1);
-#endif
     streamer_printf(streamer_get(), kShellPrompt);
 }
 
