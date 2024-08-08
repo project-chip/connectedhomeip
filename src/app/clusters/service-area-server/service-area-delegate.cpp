@@ -28,7 +28,7 @@ void Delegate::HandleSupportedAreasUpdated()
     mInstance->ClearProgress();
 }
 
-bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+bool Delegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
     listIndex = 0;
 
@@ -88,3 +88,6 @@ bool Delegate::IsProgressElement(uint32_t aAreaId)
 
     return GetProgressElementById(aAreaId, index, progressElement);
 }
+
+// todo: Should we add default implementations for the accessor methods of the non-mandatory attributes?
+//  This is so that devices that do not support these attributes are not forced to provide an implementation.

@@ -8571,6 +8571,7 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "SkipArea",
                 "args": {
+                    "skippedArea": "int",
                 },
             },
         },

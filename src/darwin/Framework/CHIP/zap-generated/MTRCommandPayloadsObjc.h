@@ -7671,7 +7671,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRServiceAreaClusterSelectAreasResponseParams with a response-value dictionary
@@ -7689,6 +7689,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterSkipAreaParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull skippedArea MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7720,7 +7722,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRServiceAreaClusterSkipAreaResponseParams with a response-value dictionary

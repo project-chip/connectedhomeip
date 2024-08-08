@@ -311,7 +311,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     else
     {
         aai_result = TryReadViaAccessInterface(
-            request.path, GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId), encoder);
+            request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
+            encoder);
     }
     ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
 

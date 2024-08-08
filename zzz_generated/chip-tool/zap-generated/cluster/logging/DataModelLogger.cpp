@@ -3516,17 +3516,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
-            return err;
-        }
-    }
     {
         CHIP_ERROR err = LogValue("LandmarkTag", indent + 1, value.landmarkTag);
         if (err != CHIP_NO_ERROR)
@@ -3543,11 +3535,28 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("SurfaceTag", indent + 1, value.surfaceTag);
+        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SurfaceTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LandmarkInfo", indent + 1, value.landmarkInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkInfo'");
             return err;
         }
     }

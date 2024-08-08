@@ -11722,6 +11722,23 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
+                }public enum SkipAreaCommandField {SkippedArea(0),;
+                    private final int id;
+                    SkipAreaCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SkipAreaCommandField value(int id) throws NoSuchFieldError {
+                        for (SkipAreaCommandField field : SkipAreaCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();

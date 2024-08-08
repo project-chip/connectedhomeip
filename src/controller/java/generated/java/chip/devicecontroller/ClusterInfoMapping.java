@@ -13125,12 +13125,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> statusText) {
+    public void onSuccess(Integer status, String statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }
@@ -13149,12 +13149,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> statusText) {
+    public void onSuccess(Integer status, String statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }
@@ -26985,10 +26985,16 @@ public class ClusterInfoMapping {
     serviceAreaClusterInteractionInfoMap.put("selectAreas", serviceAreaselectAreasInteractionInfo);
 
     Map<String, CommandParameterInfo> serviceAreaskipAreaCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo serviceAreaskipAreaskippedAreaCommandParameterInfo = new CommandParameterInfo("skippedArea", Long.class, Long.class);
+    serviceAreaskipAreaCommandParams.put("skippedArea",serviceAreaskipAreaskippedAreaCommandParameterInfo);
     InteractionInfo serviceAreaskipAreaInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ServiceAreaCluster) cluster)
           .skipArea((ChipClusters.ServiceAreaCluster.SkipAreaResponseCallback) callback
+           , (Long)
+             commandArguments.get("skippedArea")
+
             );
         },
         () -> new DelegatedServiceAreaClusterSkipAreaResponseCallback(),
