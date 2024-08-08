@@ -1,4 +1,4 @@
-# CHIP Linux Energy Management Example
+# Matter Linux Energy Management Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Linux Energy Management Example on Raspberry Pi. This doc
@@ -12,7 +12,7 @@ details.
 
 <hr>
 
--   [CHIP Linux Energy Management Example](#chip-linux-energy-management-example)
+-   [Matter Linux Energy Management Example](#matter-linux-energy-management-example)
     -   [Building](#building)
     -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)

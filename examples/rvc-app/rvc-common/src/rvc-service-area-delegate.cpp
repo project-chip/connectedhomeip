@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-service-area-delegate.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -25,8 +26,8 @@ using namespace chip::app::Clusters::ServiceArea;
 CHIP_ERROR RvcServiceAreaDelegate::Init()
 {
     // hardcoded fill of SUPPORTED MAPS for prototyping
-    uint8_t supportedMapId_XX = 3;
-    uint8_t supportedMapId_YY = 245;
+    uint32_t supportedMapId_XX = 3;
+    uint32_t supportedMapId_YY = 245;
 
     GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
     GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
@@ -38,32 +39,29 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint32_t supportedAreaID_D = 0x88888888;
 
     // Location A has name, floor number, uses map XX
-    GetInstance()->AddSupportedLocation(
-        supportedAreaID_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
-        DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
-        DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
+    GetInstance()->AddSupportedLocation(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location A"_span,
+                                        DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(),
+                                        DataModel::Nullable<Globals::LandmarkTag>(),
+                                        DataModel::Nullable<Globals::RelativePositionTag>());
 
     // Location B has name, uses map XX
-    GetInstance()->AddSupportedLocation(
-        supportedAreaID_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location B"_span,
-        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
-        DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
+    GetInstance()->AddSupportedLocation(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location B"_span,
+                                        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
+                                        DataModel::Nullable<Globals::LandmarkTag>(),
+                                        DataModel::Nullable<Globals::RelativePositionTag>());
 
     // Location C has full SemData, no name, Map YY
-    GetInstance()->AddSupportedLocation(supportedAreaID_C, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY), CharSpan(),
+    GetInstance()->AddSupportedLocation(supportedAreaID_C, DataModel::Nullable<uint32_t>(supportedMapId_YY), CharSpan(),
                                         DataModel::Nullable<int16_t>(-1),
                                         DataModel::Nullable<Globals::AreaTypeTag>(Globals::AreaTypeTag::kPlayRoom),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kBackDoor),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kLeft),
-                                        DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kConcrete));
+                                        DataModel::Nullable<Globals::RelativePositionTag>(Globals::RelativePositionTag::kNextTo));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
-    GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
-                                        "My Location D"_span, DataModel::Nullable<int16_t>(),
-                                        DataModel::Nullable<Globals::AreaTypeTag>(),
+    GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint32_t>(supportedMapId_YY), "My Location D"_span,
+                                        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kLeft),
-                                        DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kHardwood));
+                                        DataModel::Nullable<Globals::RelativePositionTag>(Globals::RelativePositionTag::kNextTo));
 
     GetInstance()->SetCurrentArea(supportedAreaID_C);
 
@@ -86,7 +84,7 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::
     return true;
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentArea(MutableCharSpan skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
 {
     // TODO IMPLEMENT
     return true;
@@ -213,7 +211,7 @@ bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStruc
     return false;
 };
 
-bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+bool RvcServiceAreaDelegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation

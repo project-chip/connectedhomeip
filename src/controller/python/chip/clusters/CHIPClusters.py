@@ -8571,6 +8571,7 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "SkipArea",
                 "args": {
+                    "skippedArea": "int",
                 },
             },
         },
@@ -11967,6 +11968,12 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
                 "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "PendingDatasetTimestamp",
+                "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },

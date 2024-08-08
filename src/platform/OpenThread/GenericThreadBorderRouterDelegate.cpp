@@ -167,6 +167,12 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::ActiveDatasetTimestamp::Id);
             });
         }
+        if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_PENDING_DATASET)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::PendingDatasetTimestamp::Id);
+            });
+        }
     }
 }
 

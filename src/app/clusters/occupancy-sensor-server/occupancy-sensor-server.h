@@ -30,19 +30,21 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-class OccupancySensingAttrAccess : public AttributeAccessInterface
+class Instance : public AttributeAccessInterface
 {
 public:
-    OccupancySensingAttrAccess(BitMask<Feature> aFeature) :
+    Instance(BitMask<Feature> aFeature) :
         app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
     {}
 
-    ~OccupancySensingAttrAccess() { Shutdown(); }
+    ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     bool HasFeature(Feature aFeature) const;
 

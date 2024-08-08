@@ -22,7 +22,7 @@
 
 namespace chip {
 
-using FactoryProvider = DeviceLayer::Silabs::Provision::Storage;
+using namespace ::chip::DeviceLayer::Silabs;
 
 CHIP_ERROR OTAFactoryDataProcessor::Init()
 {
@@ -146,21 +146,20 @@ CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan> & opt
 
 CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue)
 {
-    FactoryProvider factoryProvider;
     switch (tag)
     {
     case (int) FactoryTags::kDacKey:
         ChipLogProgress(SoftwareUpdate, "Set Device Attestation Key");
-        return factoryProvider.FactoryProvider::SetDeviceAttestationKey(newValue);
+        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationKey(newValue);
     case (int) FactoryTags::kDacCert:
         ChipLogProgress(SoftwareUpdate, "Set Device Attestation Cert");
-        return factoryProvider.FactoryProvider::SetDeviceAttestationCert(newValue);
+        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationCert(newValue);
     case (int) FactoryTags::kPaiCert:
         ChipLogProgress(SoftwareUpdate, "Set Product Attestionation Intermediate Cert");
-        return factoryProvider.FactoryProvider::SetProductAttestationIntermediateCert(newValue);
+        return Provision::Manager::GetInstance().GetStorage().SetProductAttestationIntermediateCert(newValue);
     case (int) FactoryTags::kCdCert:
         ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
-        return factoryProvider.FactoryProvider::SetCertificationDeclaration(newValue);
+        return Provision::Manager::GetInstance().GetStorage().SetCertificationDeclaration(newValue);
     }
 
     ChipLogError(DeviceLayer, "Failed to find tag %d.", tag);

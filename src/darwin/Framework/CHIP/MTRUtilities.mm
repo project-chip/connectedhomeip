@@ -32,3 +32,13 @@ BOOL MTREqualObjects(id<NSObject> _Nullable a, id<NSObject> _Nullable b)
     // Otherwise work on equality, given that we're both non nil
     return [a isEqual:b];
 }
+
+NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
+{
+    if ([aNumber compare:min] == NSOrderedAscending) {
+        return min;
+    } else if ([aNumber compare:max] == NSOrderedDescending) {
+        return max;
+    }
+    return aNumber;
+}

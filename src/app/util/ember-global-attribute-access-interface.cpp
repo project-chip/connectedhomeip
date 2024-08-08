@@ -97,7 +97,7 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 {
     return aEncoder.EncodeList([&](const auto & encoder) {
         auto * commandHandler =
-            CommandHandlerInterfaceRegistry::GetCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
+            CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
         if (commandHandler)
         {
             struct Context

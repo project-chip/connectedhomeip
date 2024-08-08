@@ -82,12 +82,13 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
 
     if (statusEmber != statusDm)
     {
-        StringBuilder<128> buffer;
+        ActionReturnStatus::StringStorage buffer;
+
         // Note log + chipDie instead of VerifyOrDie so that breakpoints (and usage of rr)
         // is easier to debug.
         ChipLogError(Test, "Different return codes between ember and DM");
-        ChipLogError(Test, "  Ember status: %s", statusEmber.c_str());
-        ChipLogError(Test, "  DM status:    %s", statusDm.c_str());
+        ChipLogError(Test, "  Ember status: %s", statusEmber.c_str(buffer));
+        ChipLogError(Test, "  DM status:    %s", statusDm.c_str(buffer));
 
         // For time-dependent data, we may have size differences here: one data fitting in buffer
         // while another not, resulting in different errors (success vs out of space).

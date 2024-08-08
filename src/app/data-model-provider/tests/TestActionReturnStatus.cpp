@@ -111,3 +111,45 @@ TEST(TestActionReturnStatus, TestStatusCode)
     ASSERT_EQ(ActionReturnStatus(CHIP_IM_CLUSTER_STATUS(0x12)).GetStatusCode(), ClusterStatusCode::ClusterSpecificFailure(0x12));
     ASSERT_EQ(ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(Timeout)).GetStatusCode(), ClusterStatusCode(Status::Timeout));
 }
+
+TEST(TestActionReturnStatus, TestCString)
+{
+    /// only tests the strings that we build and NOT the CHIP_ERROR ones which
+    /// are tested separately. for chip_error we just say it should not be empty.
+    ActionReturnStatus::StringStorage buffer;
+    ActionReturnStatus status(Status::Success);
+
+    // chip-error returns something non-empty
+    status = CHIP_ERROR_NOT_FOUND;
+    ASSERT_STRNE(status.c_str(buffer), "");
+
+    status = CHIP_NO_ERROR;
+    ASSERT_STRNE(status.c_str(buffer), "");
+
+    // the items below we control
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+    status = Status::Success;
+    ASSERT_STREQ(status.c_str(buffer), "SUCCESS(0)");
+
+    status = Status::UnsupportedCommand;
+    ASSERT_STREQ(status.c_str(buffer), "UNSUPPORTED_COMMAND(129)");
+
+    status = ClusterStatusCode::ClusterSpecificSuccess(31);
+    ASSERT_STREQ(status.c_str(buffer), "SUCCESS(0), Code 31");
+
+    status = ClusterStatusCode::ClusterSpecificFailure(32);
+    ASSERT_STREQ(status.c_str(buffer), "FAILURE(1), Code 32");
+#else
+    status = Status::Success;
+    ASSERT_STREQ(status.c_str(buffer), "Success");
+
+    status = Status::UnsupportedCommand;
+    ASSERT_STREQ(status.c_str(buffer), "Status<129>");
+
+    status = ClusterStatusCode::ClusterSpecificSuccess(31);
+    ASSERT_STREQ(status.c_str(buffer), "Success, Code 31");
+
+    status = ClusterStatusCode::ClusterSpecificFailure(32);
+    ASSERT_STREQ(status.c_str(buffer), "Status<1>, Code 32");
+#endif
+}

@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterMapStruct(val mapID: UInt, val name: String) {
+class ServiceAreaClusterMapStruct(val mapID: ULong, val name: String) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterMapStruct {\n")
     append("\tmapID : $mapID\n")
@@ -45,7 +45,7 @@ class ServiceAreaClusterMapStruct(val mapID: UInt, val name: String) {
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterMapStruct {
       tlvReader.enterStructure(tlvTag)
-      val mapID = tlvReader.getUInt(ContextSpecificTag(TAG_MAP_I_D))
+      val mapID = tlvReader.getULong(ContextSpecificTag(TAG_MAP_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()

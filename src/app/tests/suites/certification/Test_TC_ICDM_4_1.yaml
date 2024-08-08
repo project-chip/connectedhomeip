@@ -17,58 +17,57 @@ name: "[TC-ICDM-4.1] Stay Active Request with DUT as Server"
 
 PICS:
     - ICDM.S
-    - ICDM.S.C00.Rsp
-    - ICDM.S.C02.Rsp
-    - ICDM.S.C03.Rsp
+    - ICDM.S.F02
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "ICD Management"
     endpoint: 0
 
 tests:
-    - label: "Preconditions"
-      verification: |
-          1.Commission DUT to TH (can be skipped if done in a preceding test).
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
-          "Step 1: TH sends StayActiveRequest command with StayActiveDuration."
-      PICS: ICDM.S.C03.Rsp
-      verification: |
-          ./chip-tool icdmanagement stay-active-request 1 0
+          "TH sends StayActiveRequest command with StayActiveDuration greater
+          than or equal 30000 milliseconds."
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 30000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                saveAs: ActiveDuration
+                constraints:
+                    type: int32u
+                    minValue: 29995
 
-          Via the TH (chip-tool), verify the SUCCESS response for StayActiveRequest command.
+    - label: "Wait for the PromisedActiveDuration to end"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ActiveDuration
 
-          [1702414315.312084][3787:3789] CHIP:DMG: InvokeResponseMessage =
-          [1702414315.312130][3787:3789] CHIP:DMG: {
-          [1702414315.312244][3787:3789] CHIP:DMG:         suppressResponse = false,
-          [1702414315.312295][3787:3789] CHIP:DMG:         InvokeResponseIBs =
-          [1702414315.312360][3787:3789] CHIP:DMG:         [
-          [1702414315.312497][3787:3789] CHIP:DMG:                 InvokeResponseIB =
-          [1702414315.312572][3787:3789] CHIP:DMG:                 {
-          [1702414315.312626][3787:3789] CHIP:DMG:                         CommandStatusIB =
-          [1702414315.312709][3787:3789] CHIP:DMG:                         {
-          [1702414315.312774][3787:3789] CHIP:DMG:                                 CommandPathIB =
-          [1702414315.312857][3787:3789] CHIP:DMG:                                 {
-          [1702414315.312921][3787:3789] CHIP:DMG:                                         EndpointId = 0x0,
-          [1702414315.312994][3787:3789] CHIP:DMG:                                         ClusterId = 0x46,
-          [1702414315.313060][3787:3789] CHIP:DMG:                                         CommandId = 0x3,
-          [1702414315.313155][3787:3789] CHIP:DMG:                                 },
-          [1702414315.313234][3787:3789] CHIP:DMG:
-          [1702414315.313293][3787:3789] CHIP:DMG:                                 StatusIB =
-          [1702414315.313382][3787:3789] CHIP:DMG:                                 {
-          [1702414315.313450][3787:3789] CHIP:DMG:                                         status = 0x81 (UNSUPPORTED_COMMAND),
-          [1702414315.313536][3787:3789] CHIP:DMG:                                 },
-          [1702414315.313603][3787:3789] CHIP:DMG:
-          [1702414315.313679][3787:3789] CHIP:DMG:                         },
-          [1702414315.313747][3787:3789] CHIP:DMG:
-          [1702414315.313799][3787:3789] CHIP:DMG:                 },
-          [1702414315.313878][3787:3789] CHIP:DMG:
-          [1702414315.313928][3787:3789] CHIP:DMG:         ],
-          [1702414315.313989][3787:3789] CHIP:DMG:
-          [1702414315.314057][3787:3789] CHIP:DMG:         InteractionModelRevision = 11
-          [1702414315.314106][3787:3789] CHIP:DMG: },
-          [1702414315.314254][3787:3789] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0003 Status=0x81
-          [1702414315.314359][3787:3789] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
-      disabled: true
+    - label:
+          "TH sends StayActiveRequest command with StayActiveDuration less than
+          30000 milliseconds."
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 20000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 19995

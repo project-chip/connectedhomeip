@@ -115,15 +115,16 @@ private:
     /**
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
-     * @param[in] req the command parameters
+     * @param[in] req the command parameters.
      */
     void HandleSelectAreasCmd(HandlerContext & ctx, const Commands::SelectAreas::DecodableType & req);
 
     /**
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
+     * @param[in] req the command parameters.
      */
-    void HandleSkipCurrentAreaCmd(HandlerContext & ctx);
+    void HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
 
     //*************************************************************************
     // attribute notifications
@@ -176,18 +177,17 @@ public:
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
      * home.
      * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect
+     * to the landmark.
      * @return true if the new location passed validation checks and was successfully added to the list.
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      */
-    bool AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    bool AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
                               const DataModel::Nullable<int16_t> & aFloorNumber,
                               const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                               const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                              const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                              const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
+                              const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
 
     /**
      * @brief Modify/replace an existing location in the supported locations list.
@@ -198,20 +198,19 @@ public:
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
      * home.
      * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect
+     * to the landmark.
      * @return true if the location is a member of supported locations, the modifications pass all validation checks and the
      * location was modified.
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note if mapID is changed, the delegate's HandleSupportedAreasUpdated method is called.
      */
-    bool ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    bool ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
                                  const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                  const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                 const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                                 const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
+                                 const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
 
     /**
      * @return true if the SupportedAreas attribute was not already null.
@@ -226,7 +225,7 @@ public:
     /**
      * @return true if a map with the aMapId ID exists in the supported maps attribute. False otherwise.
      */
-    bool IsSupportedMap(uint8_t aMapId);
+    bool IsSupportedMap(uint32_t aMapId);
 
     /**
      * @brief Add a new map to the supported maps list.
@@ -234,7 +233,7 @@ public:
      * @param[in] aMapName The name of the map to be added. This cannot be an empty string.
      * @return true if the new map passed validation checks and was successfully added to the list.
      */
-    bool AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName);
+    bool AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName);
 
     /**
      * @brief Rename an existing map in the supported maps list.
@@ -244,7 +243,7 @@ public:
      *
      * @note if the specified map is not a member of the supported maps list, returns false with no action taken.
      */
-    bool RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName);
+    bool RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName);
 
     /**
      * @return true if the SupportedMaps attribute was not already null.

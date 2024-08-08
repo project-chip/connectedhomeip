@@ -43,6 +43,8 @@ limitations under the License.
 
     <attribute side="server" code="0x0004" apiMaturity="provisional" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">ActiveDatasetTimestamp</attribute>
 
+    <attribute side="server" code="0x0005" apiMaturity="provisional" define="PENDING_DATASET_TIMESTAMP" type="int64u" isNullable="true">PendingDatasetTimestamp</attribute>
+
     <command source="client" code="0x00" apiMaturity="provisional" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
       <description>Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session</description>
       <access op="invoke" privilege="manage"/>

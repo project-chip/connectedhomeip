@@ -370,3 +370,12 @@ network-manager-app/README
 
 lit-icd-app/**/README
 ```
+
+## Thread Border Router example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+thread-br-app/**/README
+```

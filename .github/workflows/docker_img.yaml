@@ -102,7 +102,6 @@ jobs:
                     # - "-imx"
                     - "-java"
                     - "-k32w"
-                    - "-mbed-os"
                     - "-nrf-platform"
                     - "-telink"
                     - "-ti"

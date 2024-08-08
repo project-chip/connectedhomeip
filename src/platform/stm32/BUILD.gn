@@ -39,7 +39,6 @@ static_library("stm32") {
     sources = [
       "../FreeRTOS/SystemTimeSupport.cpp",
       "../SingletonConfigurationManager.cpp",
-      "../logging/impl/stdio/Logging.cpp",
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
       "BlePlatformConfig.h",
@@ -69,7 +68,7 @@ static_library("stm32") {
       "SystemPlatformConfig.h",
     ]
 
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
+    deps += [ "${chip_root}/src/platform/logging:stdio" ]
   }
 
   public = [

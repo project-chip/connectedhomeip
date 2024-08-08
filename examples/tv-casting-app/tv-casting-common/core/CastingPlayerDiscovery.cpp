@@ -63,14 +63,49 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() called");
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() mCastingPlayers: %u, mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayers.size()), static_cast<unsigned int>(mCastingPlayersInternal.size()));
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
+    // Copy mCastingPlayers to mCastingPlayersInternal
+    mCastingPlayersInternal = std::vector<memory::Strong<CastingPlayer>>(mCastingPlayers);
+
+    // Clear mCastingPlayers of all CastingPlayers
     mCastingPlayers.clear();
     mState = DISCOVERY_READY;
 
     return CHIP_NO_ERROR;
+}
+
+void CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal()
+{
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %u",
+                    static_cast<unsigned int>(mCastingPlayersInternal.size()));
+    // Only clear the CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
+    for (auto it = mCastingPlayersInternal.begin(); it != mCastingPlayersInternal.end();)
+    {
+        auto & player = *it;
+        if (player->GetConnectionState() == CASTING_PLAYER_NOT_CONNECTED)
+        {
+            ChipLogProgress(
+                Discovery,
+                "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() Removing disconnected CastingPlayer: %s "
+                "with reference count: %lu",
+                player->GetDeviceName(), player.use_count());
+            it = mCastingPlayersInternal.erase(it);
+        }
+        else
+        {
+            ++it; // Move to the next element if the current one is not removed
+        }
+    }
+}
+
+void CastingPlayerDiscovery::ClearCastingPlayersInternal()
+{
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearCastingPlayersInternal()");
+    mCastingPlayersInternal.clear();
 }
 
 void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)

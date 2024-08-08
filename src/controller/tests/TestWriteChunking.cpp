@@ -217,7 +217,7 @@ TEST_F(TestWriteChunking, TestListChunking)
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     //
@@ -290,7 +290,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
@@ -369,7 +369,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
@@ -443,7 +443,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
@@ -591,7 +591,7 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     // Test 1: we should receive transaction notifications
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");

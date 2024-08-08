@@ -110,7 +110,7 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&GetLogProvider());
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&GetLogProvider());
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

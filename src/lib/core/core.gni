@@ -54,7 +54,23 @@ declare_args() {
   # Configure chip logging to output through external logging implementation.
   # External code will need to provide implementation for CHIP log output
   # function (LogV), which is defined in "src/platform/logging/LogV.h".
+  # Same as setting chip_logging_backend = "external"
   chip_use_external_logging = false
+}
+
+declare_args() {
+  # Logging backend to use for targets that don't link a specific log
+  # backend (e.g. command line utilites usually use 'stdio'). Options:
+  #   'platform' - The default log backend of the device platform
+  #   'external' - External LogV implementation (src/platform/logging/LogV.h)
+  #   'none'     - Discard all log output
+  #   'stdio'    - Print to stdout
+  #   'syslog'   - POSIX syslog()
+  if (chip_use_external_logging) {
+    chip_logging_backend = "external"
+  } else {
+    chip_logging_backend = "platform"
+  }
 
   # Enable short error strings.
   chip_config_short_error_str = false
@@ -116,6 +132,15 @@ if (chip_target_style == "") {
     chip_target_style = "embedded"
   }
 }
+
+assert(
+    chip_logging_backend == "platform" || chip_logging_backend == "external" ||
+        chip_logging_backend == "none" || chip_logging_backend == "stdio" ||
+        chip_logging_backend == "syslog",
+    "Please select a valid logging backend: platform, external, none, stdio, syslog")
+assert(
+    !chip_use_external_logging || chip_logging_backend == "external",
+    "Setting chip_use_external_logging = true conflicts with selected chip_logging_backend")
 
 assert(chip_target_style == "unix" || chip_target_style == "embedded",
        "Please select a valid target style: unix, embedded")

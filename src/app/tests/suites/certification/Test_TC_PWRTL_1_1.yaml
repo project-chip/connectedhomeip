@@ -88,7 +88,7 @@ tests:
               hasMasksSet: [0x4, 0x8]
 
     - label: "Step 4a: TH reads AttributeList from DUT"
-      PICS: "!PICS_SF_SET && !PICS_SF_DYPF"
+      PICS: "!PWRTL.S.F02 && !PWRTL.S.F03"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -99,7 +99,7 @@ tests:
     - label:
           "Step 4b: TH reads feature dependent attribute(AvailableEndpoints)
           AttributeList from DUT"
-      PICS: "PICS_SF_SET && !PICS_SF_DYPF"
+      PICS: "PWRTL.S.F02 && !PWRTL.S.F03"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -110,7 +110,7 @@ tests:
     - label:
           "Step 4c: TH reads feature dependent attribute(ActiveEndpoints)
           AttributeList from DUT"
-      PICS: "PICS_SF_SET && PICS_SF_DYPF"
+      PICS: "PWRTL.S.F02 && PWRTL.S.F03"
       command: "readAttribute"
       attribute: "AttributeList"
       response:

@@ -227,7 +227,6 @@ public:
         {
             ChipLogDetail(AppServer, "\tpairing hint: %d", mPairingHint);
         }
-
         if (mNoPasscode)
         {
             ChipLogDetail(AppServer, "\tno passcode: true");
@@ -349,6 +348,9 @@ public:
     void SetQRCodeDisplayed(bool newValue) { mQRCodeDisplayed = newValue; };
     bool GetQRCodeDisplayed() const { return mQRCodeDisplayed; };
 
+    void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
+    bool GetCancelPasscode() const { return mCancelPasscode; };
+
     /**
      *  Writes the CommissionerDeclaration message to the given buffer.
      *
@@ -390,6 +392,10 @@ public:
         {
             ChipLogDetail(AppServer, "\tQR code displayed: true");
         }
+        if (mCancelPasscode)
+        {
+            ChipLogDetail(AppServer, "\tPasscode cancelled: true");
+        }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
 
@@ -403,6 +409,7 @@ private:
         kPasscodeDialogDisplayedTag,
         kCommissionerPasscodeTag,
         kQRCodeDisplayedTag,
+        kCancelPasscodeTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -413,6 +420,7 @@ private:
     bool mPasscodeDialogDisplayed = false;
     bool mCommissionerPasscode    = false;
     bool mQRCodeDisplayed         = false;
+    bool mCancelPasscode          = false;
 };
 
 class DLL_EXPORT InstanceNameResolver

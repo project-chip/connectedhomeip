@@ -549,7 +549,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 11b: TH writes NumberOfWeekDaySchedules SupportedPerUser
@@ -582,7 +582,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 12b: TH writes NumberOfYearDay SchedulesSupportedPerUser
@@ -615,7 +615,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 13b: TH writes NumberOfHoliday SchedulesSupported attribute as

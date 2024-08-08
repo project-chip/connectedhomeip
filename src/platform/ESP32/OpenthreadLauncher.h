@@ -19,9 +19,13 @@
 
 #include <esp_err.h>
 #include <esp_openthread_types.h>
+#include <esp_rcp_update.h>
 #include <lib/core/CHIPError.h>
 #include <memory>
 
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config);
+#endif
 esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config);
 esp_err_t openthread_init_stack(void);
 esp_err_t openthread_launch_task(void);

@@ -107,9 +107,9 @@ ending in the cluster initialization code.
 EmberAfInitializeAttributes - ember attribute storage - for all attributes
 marked as “RAM” in the zap, sets defaults in the storage
 Matter<Cluster>PluginServerCallback - .h is a generated file, .cpp impl is done
-in the server cluster code. Use this to setup the cluster and do attribute
-overrides registerAttributeAccessOverride - use this if you want to handle
-attribute reads and writes externally
+in the server cluster code. Use this to setup the cluster and setup overrides in
+chip::app::AttributeAccessInterfaceRegistry::Instance().Register - use this if
+you want to handle attribute reads and writes externally
 
 Blue sections can be overridden.
 

@@ -558,7 +558,9 @@ struct LwIPEvent;
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_LOG
  *
  *  @brief
- *      Defines whether (1) or not (0) the system uses a platform-specific logging implementation.
+ *      Defines whether (1) or not (0) the system uses a platform-specific implementation of
+ *      ChipLog* macros. Most platforms do not use this option and simply provide a logging
+ *      backend that implements LogV.
  *
  *  See CHIPLogging.h for details.
  */

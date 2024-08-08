@@ -408,5 +408,5 @@ exit:
 
 void MatterChannelPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gChannelAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gChannelAttrAccess);
 }

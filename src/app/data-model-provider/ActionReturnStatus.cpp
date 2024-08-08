@@ -149,45 +149,42 @@ bool ActionReturnStatus::IsOutOfSpaceEncodingResponse() const
     return false;
 }
 
-const char * ActionReturnStatus::c_str() const
+const char * ActionReturnStatus::c_str(ActionReturnStatus::StringStorage & storage) const
 {
-
-    // Generally size should be sufficient.
-    // len("Status<123>, Code 255") == 21 (and then 22 for null terminator. We have slack.)
-    static chip::StringBuilder<32> sFormatBuffer;
-
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
         return err->Format(); // any length
 #else
-        sFormatBuffer.Reset().AddFormat("%" CHIP_ERROR_FORMAT, err->Format());
-        return sFormatBuffer.c_str();
+        storage.formatBuffer.Reset().AddFormat("%" CHIP_ERROR_FORMAT, err->Format());
+        return storage.formatBuffer.c_str();
 #endif
     }
 
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
+        storage.formatBuffer.Reset();
+
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
-        sFormatBuffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
-                                static_cast<int>(status->GetStatus()));
+        storage.formatBuffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
+                                       static_cast<int>(status->GetStatus()));
 #else
         if (status->IsSuccess())
         {
-            sFormatBuffer.Add("Success");
+            storage.formatBuffer.Add("Success");
         }
         else
         {
-            sFormatBuffer.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
+            storage.formatBuffer.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
         }
 #endif
 
         chip::Optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
         if (clusterCode.HasValue())
         {
-            sFormatBuffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
+            storage.formatBuffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
         }
-        return sFormatBuffer.c_str();
+        return storage.formatBuffer.c_str();
     }
 
     // all std::variant cases exhausted

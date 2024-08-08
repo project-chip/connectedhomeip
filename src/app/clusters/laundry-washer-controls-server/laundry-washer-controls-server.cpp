@@ -187,7 +187,7 @@ CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAt
 void MatterLaundryWasherControlsPluginServerInitCallback()
 {
     LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
-    registerAttributeAccessOverride(&laundryWasherControlsServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&laundryWasherControlsServer);
 }
 
 Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,

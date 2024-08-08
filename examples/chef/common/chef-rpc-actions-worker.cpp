@@ -147,7 +147,9 @@ void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, Actio
 
 ChefRpcActionsWorker::ChefRpcActionsWorker()
 {
+#if CONFIG_ENABLE_PW_RPC
     chip::rpc::SubscribeActions(ChefRpcActionsCallback);
+#endif
 }
 
 static ChefRpcActionsWorker instance;

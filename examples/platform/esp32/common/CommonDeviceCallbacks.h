@@ -41,6 +41,7 @@ public:
     virtual void OnIPv4ConnectivityEstablished() {}
     virtual void OnIPv4ConnectivityLost() {}
     virtual void OnDnssdInitialized() {}
+    virtual void OnIPv6ConnectivityEstablished() {}
     DeviceCallbacksDelegate * mDelegate = nullptr;
     void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
     DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
