@@ -101,11 +101,10 @@ class TC_DRLK_2_13(MatterBaseTest):
                             "TH sends ClearUser Command with UserIndex as 1 to DUT to clear alirouser"
                             "Executing steps 29 to 35 only when 'max_aliro_keys_supported <= numberofcredentialsupportedperuser' else exit script",
                      "Verify that Read operation is successful"),
-            TestStep("29a","TH sends SetUser Command to DUT to create an Aliro user",
+            TestStep("29a", "TH sends SetUser Command to DUT to create an Aliro user",
                      "DUT sends SUCCESS response"),
             TestStep("29b",
-                     "TH performs repeated number of SetCredential commands with credentials as 8 'startcredentialindex' until 'max_aliro_keys_supported - 1', startcredentialindex initially has value 1 ."
-                     , "Verify that the DUT responds with SetCredentialResponse command and Status success."),
+                     "TH performs repeated number of SetCredential commands with credentials as 8 'startcredentialindex' until 'max_aliro_keys_supported - 1', startcredentialindex initially has value 1 .", "Verify that the DUT responds with SetCredentialResponse command and Status success."),
             TestStep("30",
                      "TH sends SetCredential Command to DUT with CredentialType as AliroEvictableEndpointKey for the 'alirouser' ",
                      "Verify that the DUT responds with SetCredentialResponse command and Status success. This step will fill the last slot with credentialType as AliroEvictableEndpointKey"),
@@ -142,16 +141,16 @@ class TC_DRLK_2_13(MatterBaseTest):
             if step is not None:
                 self.step(step)
             if self.pics_guard(
-                    self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0080")) and aliro_attribute_step.get(
-                "condition") == 1:
+                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0080")) and aliro_attribute_step.get(
+                    "condition") == 1:
                 pass
             elif self.pics_guard(
-                    self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0081")) and aliro_attribute_step.get(
-                "condition") == 2:
+                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0081")) and aliro_attribute_step.get(
+                    "condition") == 2:
                 pass
             elif self.pics_guard(
-                    self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0084")) and aliro_attribute_step.get(
-                "condition") == 3:
+                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0084")) and aliro_attribute_step.get(
+                    "condition") == 3:
                 pass
             else:
                 continue
