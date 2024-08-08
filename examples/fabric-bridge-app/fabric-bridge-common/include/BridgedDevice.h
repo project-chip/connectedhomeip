@@ -46,6 +46,8 @@ public:
     [[nodiscard]] bool IsReachable() const { return mReachable; }
     void SetReachable(bool reachable);
 
+    void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
+
     [[nodiscard]] bool IsIcd() const { return mIsIcd; }
     void SetIcd(bool icd) { mIsIcd = icd; }
 
@@ -63,12 +65,25 @@ public:
     void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
+<<<<<<< HEAD
     bool mReachable = false;
     bool mIsIcd     = false;
 
     chip::NodeId mNodeId               = 0;
     chip::EndpointId mEndpointId       = 0;
     chip::EndpointId mParentEndpointId = 0;
+||||||| a315c91a2d
+    bool mReachable;
+    chip::NodeId mNodeId;
+    chip::EndpointId mEndpointId;
+    chip::EndpointId mParentEndpointId;
+=======
+    bool mReachable;
+    bool mIsIcd = false;
+    chip::NodeId mNodeId;
+    chip::EndpointId mEndpointId;
+    chip::EndpointId mParentEndpointId;
+>>>>>>> master
 
     BridgedAttributes mAttributes;
 };
