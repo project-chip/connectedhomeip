@@ -45606,11 +45606,14 @@ class ApplicationLauncher(Cluster):
             kSuccess = 0x00
             kAppNotAvailable = 0x01
             kSystemBusy = 0x02
+            kPendingUserApproval = 0x03
+            kDownloading = 0x04
+            kInstalling = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 6,
 
     class Bitmaps:
         class Feature(IntFlag):
