@@ -25,3 +25,8 @@ dependencies:
         rules:
             - if: "idf_version >=5.0"
             - if: "target != esp32h2"
+
+    espressif/esp_rcp_update:
+        version: "1.0.3"
+        rules:
+            - if: "idf_version >=5.0"
