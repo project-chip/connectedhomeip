@@ -39,7 +39,7 @@ void RvcServiceAreaDelegate::SetMapTopology()
 
     // Area B has name, uses map XX
     auto areaB = AreaStructureWrapper{}
-                     .SetMapId(supportedAreaID_B)
+                     .SetAreaId(supportedAreaID_B)
                      .SetMapId(supportedMapId_XX)
                      .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
@@ -75,7 +75,7 @@ void RvcServiceAreaDelegate::SetNoMapTopology()
 
     // Area B has name.
     auto areaB = AreaStructureWrapper{}
-                     .SetMapId(supportedAreaID_B)
+                     .SetAreaId(supportedAreaID_B)
                      .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
     // Area C has full SemData, no name.
