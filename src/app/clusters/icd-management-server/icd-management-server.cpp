@@ -242,7 +242,7 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 {
     RequestPath requestPath{ .cluster  = commandPath.mClusterId,
                              .endpoint = commandPath.mEndpointId,
-                             .requestType == RequestType::kCommandInvokeRequest,
+                             .requestType = RequestType::kCommandInvokeRequest,
                              .entityId = commandPath.mCommandId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
     if (CHIP_NO_ERROR == err)
