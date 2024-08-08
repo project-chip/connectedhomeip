@@ -365,6 +365,7 @@ jobs:
                 platform: darwin
                 bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
+
             - name: Build Apps
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -713,4 +714,3 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-                  
