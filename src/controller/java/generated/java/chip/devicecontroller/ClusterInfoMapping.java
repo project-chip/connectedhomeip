@@ -18094,6 +18094,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThreadBorderRouterManagementClusterPendingDatasetTimestampAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.PendingDatasetTimestampAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedThreadBorderRouterManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
