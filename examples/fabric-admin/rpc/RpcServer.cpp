@@ -20,10 +20,14 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
+#include <map>
+#include <thread>
+
+#include "RpcClient.h"
+#include <commands/common/IcdManager.h>
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <system/SystemClock.h>
-#include <thread>
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
 #include "pigweed/rpc_services/FabricAdmin.h"
@@ -34,9 +38,25 @@ using namespace ::chip;
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
-class FabricAdmin final : public rpc::FabricAdmin
+class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 {
 public:
+    void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
+    {
+        // TODO We should be using the scoped node ID, but we do not have anything that manages
+        // all the existing device we are managing. DeviceManager today only managers device
+        // for a bridged device.
+        chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
+        auto it = mPendingKeepActive.find(nodeId);
+        VerifyOrReturn(it != mPendingKeepActive.end());
+        uint32_t stayActiveDurationMs = it->second;
+        mPendingKeepActive.erase(nodeId);
+
+        // TODO(#33221): Send the StayActiveRequest command for realy to the device. Right now we
+        // pretending that we got a StayActiveResponse.
+        ActiveChanged(nodeId, stayActiveDurationMs);
+    }
+
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
                                        chip_rpc_OperationStatus & response) override
     {
@@ -69,14 +89,18 @@ public:
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
-        // TODO(#33221): When we get this command hopefully we are already registered with an ICD device to be
-        // notified when it wakes up. We will need to add in hooks there to make sure we send the StayActiveRequest
-        // Important thing to note:
-        //  * If we get this call multiple times before we get a wakeup from ICD, we only send out one StayActiveRequest command
-        //  * After 60 mins from last exipry we no longer will send out a StayActiveRequest.
+        // TODO(#33221): 
+        //   1. Is there an imporvement to check if the device is already active?
+        //   2. We should really be using ScopedNode, but that requires larger fixes
 
+        // We are okay with overriding an existing entry
+        // TODO we should likely make sure we are called from the Matter event loop.
+        mPendingKeepActive[request.node_id] = request.stay_active_duration_ms;
         return pw::OkStatus();
     }
+
+private:
+    std::map<chip::NodeId, uint32_t> mPendingKeepActive;
 };
 
 FabricAdmin fabric_admin_service;
@@ -86,6 +110,7 @@ void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
     server.RegisterService(fabric_admin_service);
+    IcdManager::Instance().SetDelegate(&fabric_admin_service);
 #endif
 }
 
