@@ -25,88 +25,26 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 
 // External attribute read callback function
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
 {
-    AttributeId attributeId = attributeMetadata->attributeId;
-
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpoint);
-    if (dev == nullptr)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    if (clusterId == BridgedDeviceBasicInformation::Id)
-    {
-        using namespace BridgedDeviceBasicInformation::Attributes;
-        ChipLogProgress(NotSpecified, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId,
-                        maxReadLength);
-
-        if ((attributeId == Reachable::Id) && (maxReadLength == 1))
-        {
-            *buffer = dev->IsReachable() ? 1 : 0;
-        }
-        else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
-        {
-            MutableByteSpan zclNameSpan(buffer, maxReadLength);
-            MakeZclCharString(zclNameSpan, dev->GetName());
-        }
-        else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-        {
-            uint16_t rev = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
-            memcpy(buffer, &rev, sizeof(rev));
-        }
-        else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-        {
-            uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
-            memcpy(buffer, &featureMap, sizeof(featureMap));
-        }
-        else
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-
     if (clusterId == AdministratorCommissioning::Id)
     {
         // TODO(#34791) This is a workaround to prevent crash. CADMIN is still reading incorrect
         // Attribute values on dynamic endpoint as it only reads the root node and not the actual bridge
         // device we are representing here, when addressing the issue over there we can more easily
         // resolve this workaround.
-        if ((attributeId == AdministratorCommissioning::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
+        if ((attributeMetadata->attributeId == AdministratorCommissioning::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
         {
             uint16_t rev = ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION;
             memcpy(buffer, &rev, sizeof(rev));
             return Protocols::InteractionModel::Status::Success;
         }
-        return Protocols::InteractionModel::Status::Failure;
     }
 
     return Protocols::InteractionModel::Status::Failure;
-}
-
-// External attribute write callback function
-Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                          const EmberAfAttributeMetadata * attributeMetadata,
-                                                                          uint8_t * buffer)
-{
-    uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
-
-    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpointIndex);
-    if (dev != nullptr && dev->IsReachable())
-    {
-        ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);
-        ret = Protocols::InteractionModel::Status::Success;
-    }
-
-    return ret;
 }
