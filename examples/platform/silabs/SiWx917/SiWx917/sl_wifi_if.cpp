@@ -687,7 +687,7 @@ static sl_status_t wfx_rsi_do_join(void)
     case WFX_SEC_WPA3:
         ap.security = SL_WIFI_WPA3_TRANSITION;
 #else
-        ap.security = SL_WIFI_WPA_WPA2_MIXED;
+        ap.security          = SL_WIFI_WPA_WPA2_MIXED;
 #endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         break;
     case WFX_SEC_NONE:

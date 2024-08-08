@@ -18,9 +18,9 @@
 #include "AppConfig.h"
 #include "matter_shell.h"
 #include <cmsis_os2.h>
+#include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
-#include <lib/shell/Engine.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,11 +35,11 @@ extern "C" {
 #define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE / 2)
 
 #if SLI_SI91X_MCU_INTERFACE
+#include "USART.h"
 #include "rsi_board.h"
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
 #include "sl_si91x_usart.h"
-#include "USART.h"
 #else // For EFR32
 #include "em_core.h"
 #include "em_usart.h"
@@ -96,10 +96,10 @@ extern "C" {
 namespace {
 // In order to reduce the probability of data loss during the dmaFull callback handler we use
 // two duplicate receive buffers so we can always have one "active" receive queue.
-uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE] = { 0 };
+uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE]  = { 0 };
 uint8_t sRxDmaBuffer2[MAX_DMA_BUFFER_SIZE] = { 0 };
-uint16_t lastCount = 0; // Nb of bytes already processed from the active dmaBuffer
-}
+uint16_t lastCount                         = 0; // Nb of bytes already processed from the active dmaBuffer
+} // namespace
 
 #endif // SLI_SI91X_MCU_INTERFACE
 
@@ -282,7 +282,7 @@ void uartConsoleInit(void)
 
     sUartTxQueue    = osMessageQueueNew(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), &kUartTxQueueAttr);
     sUartTaskHandle = osThreadNew(uartMainLoop, nullptr, &kUartTaskAttr);
-    
+
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
@@ -297,7 +297,6 @@ void uartConsoleInit(void)
     // Activate 2 dma queues to always have one active
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
-
 
     // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
@@ -319,10 +318,11 @@ void uartConsoleInit(void)
 }
 
 #if SLI_SI91X_MCU_INTERFACE
-void cache_uart_rx_data(char character) {
+void cache_uart_rx_data(char character)
+{
     if (RemainingSpace(&sReceiveFifo) >= 1)
     {
-        WriteToFifo(&sReceiveFifo,(uint8_t *) &character, 1);
+        WriteToFifo(&sReceiveFifo, (uint8_t *) &character, 1);
     }
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
@@ -464,7 +464,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 #if SLI_SI91X_MCU_INTERFACE == 0
     if (NbBytesToRead > AvailableDataCount(&sReceiveFifo))
     {
-    	UARTDRV_Count_t count, remaining;
+        UARTDRV_Count_t count, remaining;
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
         CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(vcom_handle, &data, &count, &remaining); if (count > lastCount) {
@@ -503,7 +503,7 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 {
 #if SLI_SI91X_MCU_INTERFACE
     // ensuring null termination of buffer
-    if( nbOfBytes != CHIP_SHELL_MAX_LINE_SIZE && buffer[nbOfBytes - 1] != '\0')
+    if (nbOfBytes != CHIP_SHELL_MAX_LINE_SIZE && buffer[nbOfBytes - 1] != '\0')
     {
         buffer[nbOfBytes] = '\0';
     }
