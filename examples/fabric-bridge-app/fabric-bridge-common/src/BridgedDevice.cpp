@@ -59,11 +59,11 @@ BridgedDevice::BridgedDevice(chip::NodeId nodeId)
     mEndpointId = chip::kInvalidEndpointId;
 }
 
-void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDuration)
+void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
 {
     ActiveChangeEventWorkData * workdata = chip::Platform::New<ActiveChangeEventWorkData>();
     workdata->mEndpointId                = mEndpointId;
-    workdata->mPromisedActiveDuration    = promisedActiveDuration;
+    workdata->mPromisedActiveDuration    = promisedActiveDurationMs;
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(ActiveChangeEventWork, reinterpret_cast<intptr_t>(workdata));
 }

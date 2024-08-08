@@ -22,7 +22,7 @@ message SynchronizedDevice {
 
 message KeepActiveChanged {
   uint64 node_id = 1;
-  uint32 promised_active_duration = 2;
+  uint32 promised_active_duration_ms = 2;
 }
 
 service FabricBridge {

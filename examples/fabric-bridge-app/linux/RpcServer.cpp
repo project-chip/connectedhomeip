@@ -152,7 +152,7 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
         return pw::Status::NotFound();
     }
 
-    device->LogActiveChangeEvent(request.promised_active_duration);
+    device->LogActiveChangeEvent(request.promised_active_duration_ms);
     return pw::OkStatus();
 }
 

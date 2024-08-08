@@ -68,8 +68,8 @@ public:
 
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
-        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration);
-        // TODO(#33221): When we get this command hopefully we are already registers with an ICD device to be
+        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
+        // TODO(#33221): When we get this command hopefully we are already registered with an ICD device to be
         // notified when it wakes up. We will need to add in hooks there to make sure we send the StayActiveRequest
         // Important thing to note:
         //  * If we get this call multiple times before we get a wakeup from ICD, we only send out one StayActiveRequest command

@@ -162,11 +162,11 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
     return OpenCommissioningWindow(device);
 }
 
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDuration)
+CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
 {
     chip_rpc_KeepActiveParameters params;
     params.node_id              = nodeId;
-    params.stay_active_duration = stayActiveDuration;
+    params.stay_active_duration_ms = stayActiveDurationMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
