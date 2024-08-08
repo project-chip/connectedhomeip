@@ -184,8 +184,7 @@ on MacOS or iOS/iPadOS.
 
 Apple's platforms support all device types available in the Matter SDK, so
 developers can use Matter.framework to develop their own applications that can
-work with devices added to Apple Home, or you create your own Fabric to manage
-your and other devices as well.
+add devices to Apple Home, or create their own Fabric to manage devices as well.
 
 Please see documentation about `-[HMAccessory matterNodeID]`
 [here](https://developer.apple.com/documentation/homekit/hmaccessory/matternodeid-5zfqo)
