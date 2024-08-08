@@ -192,8 +192,8 @@ class TC_DRLK_2_13(MatterBaseTest):
     async def send_clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=user_index),
-                                                  endpoint=1,
-                                                  timedRequestTimeoutMs=1000)
+                                       endpoint=1,
+                                       timedRequestTimeoutMs=1000)
             asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
