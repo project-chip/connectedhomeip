@@ -45,8 +45,9 @@ public:
      * @param[out] timeoutRequest The timeout proposed by the client.
      * @return The maximum allowed timeout; zero if the request is invalid.
      */
-    virtual System::Clock::Milliseconds16 GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
-                                                                System::Clock::Milliseconds16 timeoutRequest) = 0;
+    virtual std::optional<System::Clock::Milliseconds16>
+    GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                          System::Clock::Milliseconds16 timeoutRequest) = 0;
 
     /**
      * @brief Get the preset type at a given index in the PresetTypes attribute

@@ -1418,17 +1418,18 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     // needs to keep track of a pending preset list now.
     delegate->InitializePendingPresets();
 
-    System::Clock::Milliseconds16 timeout =
+    auto timeout =
         delegate->GetAtomicWriteTimeout(commandData.attributeRequests, System::Clock::Milliseconds16(commandData.timeout.Value()));
 
-    if (timeout == System::Clock::Milliseconds16(0))
+    if (!timeout.has_value())
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
         return;
     }
-    ScheduleTimer(endpoint, timeout);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), true);
-    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout.count()));
+    ScheduleTimer(endpoint, timeout.value());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success,
+                       MakeOptional(timeout.value().count()));
 }
 
 imcode commitPresets(Delegate * delegate, EndpointId endpoint)

@@ -148,8 +148,9 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Milliseconds16 ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
-                                                                        System::Clock::Milliseconds16 timeoutRequest)
+std::optional<System::Clock::Milliseconds16>
+ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                                          System::Clock::Milliseconds16 timeoutRequest)
 {
     auto attributeIdsIter = attributeRequests.begin();
     bool requestedPresets = false, requestedSchedules = false;
