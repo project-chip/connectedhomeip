@@ -53,6 +53,7 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
@@ -1863,7 +1864,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
 
