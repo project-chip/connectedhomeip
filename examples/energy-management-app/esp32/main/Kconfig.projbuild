@@ -185,3 +185,20 @@ depends on ENABLE_PW_RPC
             about available pin numbers for UART.
 
 endmenu
+
+
+menu "Energy Management Example App Configuration"
+
+    config ENABLE_EXAMPLE_EVSE_DEVICE
+        bool "Enable EVSE device on EP1"
+        default "y"
+        help
+            To use Energy Management App as EVSE device and compile dependent files.
+
+    config ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+        bool "Enable Water Heater device on EP2"
+        default "n"
+        help
+            To use Energy Management App as Water Heater device and compile dependent files.
+
+endmenu            
