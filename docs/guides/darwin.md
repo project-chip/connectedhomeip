@@ -11,8 +11,8 @@
 ### Filing Issues
 
 -   An issues related to Apple Home, or Development on Apple's Platforms should
-    be reported using this [feedback tool](#providing-feedback-to-apple) as
-    described in this section
+    be reported using Feedback Assistant as
+    described [below](#providing-feedback-to-apple)
 
 -   Any issues related to the Matter SDK should be reported to the project
     [here](https://github.com/project-chip/connectedhomeip/issues)
