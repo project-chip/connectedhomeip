@@ -43,7 +43,10 @@ public:
     BridgedDevice(chip::NodeId nodeId);
     virtual ~BridgedDevice() = default;
 
+    void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
+
     bool IsReachable();
+    bool IsIcd();
     void SetReachable(bool reachable);
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
@@ -61,6 +64,7 @@ public:
 
 protected:
     bool mReachable;
+    bool mIsIcd = false;
     chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;

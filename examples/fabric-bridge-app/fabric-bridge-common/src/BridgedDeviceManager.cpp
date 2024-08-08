@@ -129,6 +129,11 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 // clang-format on
 
+constexpr CommandId bridgedDeviceBasicInformationCommands[] = {
+    app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::Id,
+    kInvalidCommandId,
+};
+
 constexpr CommandId administratorCommissioningCommands[] = {
     app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
     app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
@@ -139,7 +144,8 @@ constexpr CommandId administratorCommissioningCommands[] = {
 // Declare Cluster List for Bridged Node endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedNodeClusters)
 DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            bridgedDeviceBasicInformationCommands, nullptr),
     DECLARE_DYNAMIC_CLUSTER(EcosystemInformation::Id, ecosystemInformationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(AdministratorCommissioning::Id, AdministratorCommissioningAttrs, ZAP_CLUSTER_MASK(SERVER),
                             administratorCommissioningCommands, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
