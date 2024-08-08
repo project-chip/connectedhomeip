@@ -173,7 +173,24 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan statusText)
 
 bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
 {
-    // todo implement
+    if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
+    {
+        // This device only supports skipping the current location.
+        CopyCharSpanToMutableCharSpan("the skipped area does not match the current area"_span, skipStatusText);
+        return false;
+    }
+
+    // Call the device's skip command.
+    // if successful
+
+    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting) || mServiceAreaDelegate.GetNumberOfProgressElements() == 0)
+    {
+        // notting else to do since there is no progress data.
+        return true;
+    }
+
+    mServiceAreaInstance.SetProgressStatus(skippedArea, ServiceArea::OperationalStatusEnum::kSkipped);
+
     return true;
 }
 
