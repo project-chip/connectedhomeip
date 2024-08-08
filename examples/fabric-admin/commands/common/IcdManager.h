@@ -28,7 +28,7 @@ public:
     class Delegate
     {
     public:
-        virtual ~Delegate() = default;
+        virtual ~Delegate()                                                          = default;
         virtual void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) = 0;
     };
 
@@ -41,5 +41,5 @@ public:
 
 private:
     static IcdManager sInstance;
-    Delegate* mDelegate = nullptr;
+    Delegate * mDelegate = nullptr;
 };

@@ -47,7 +47,7 @@ public:
         // all the existing device we are managing. DeviceManager today only managers device
         // for a bridged device.
         chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it = mPendingKeepActive.find(nodeId);
+        auto it             = mPendingKeepActive.find(nodeId);
         VerifyOrReturn(it != mPendingKeepActive.end());
         uint32_t stayActiveDurationMs = it->second;
         mPendingKeepActive.erase(nodeId);
