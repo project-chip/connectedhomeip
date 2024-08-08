@@ -124,6 +124,7 @@ void DeviceSynchronizer::OnReportEnd()
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
 #endif
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
@@ -134,6 +135,7 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 void DeviceSynchronizer::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error fetching device data: %" CHIP_ERROR_FORMAT, error.Format());
+    mDeviceSyncInProcess = false;
 }
 
 void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & exchangeMgr,
@@ -167,10 +169,18 @@ void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & pe
 void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
                                                     bool deviceIsIcd)
 {
+    if (mDeviceSyncInProcess)
+    {
+        ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
+        return;
+    }
+
     mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
     mCurrentDeviceData.node_id    = nodeId;
     mCurrentDeviceData.has_is_icd = true;
     mCurrentDeviceData.is_icd     = deviceIsIcd;
+
+    mDeviceSyncInProcess = true;
 
     controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
