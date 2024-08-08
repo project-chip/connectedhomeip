@@ -89,7 +89,7 @@ public:
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
-        // TODO(#33221): 
+        // TODO(#33221):
         //   1. Is there an imporvement to check if the device is already active?
         //   2. We should really be using ScopedNode, but that requires larger fixes
 
