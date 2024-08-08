@@ -60,16 +60,27 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
-                              expected_preset_status: Status = Status.Success):
+                              expected_preset_status: Status = Status.Success,
+                              expected_schedules_status: Status = Status.Success,
+                              expected_timeout: int = None):
         asserts.assert_equal(expected_status, Status.Success, "We expected we had a valid response")
         asserts.assert_equal(response.statusCode, expected_overall_status, "Response should have the right overall status")
         found_preset_status = False
+        found_schedules_status = False
         for attrStatus in response.attributeStatus:
             if attrStatus.attributeID == cluster.Attributes.Presets.attribute_id:
                 asserts.assert_equal(attrStatus.statusCode, expected_preset_status,
                                      "Preset attribute should have the right status")
                 found_preset_status = True
+            if attrStatus.attributeID == cluster.Attributes.Schedules.attribute_id:
+                asserts.assert_equal(attrStatus.statusCode, expected_schedules_status,
+                                     "Schedules attribute should have the right status")
+                found_schedules_status = True
+        if expected_timeout is not None:
+            asserts.assert_equal(response.timeout, expected_timeout,
+                                 "Timeout should have the right value")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
+        asserts.assert_true(found_schedules_status, "Schedules attribute should have a status")
 
     async def write_presets(self,
                             endpoint,
@@ -86,17 +97,21 @@ class TC_TSTAT_4_2(MatterBaseTest):
     async def send_atomic_request_begin_command(self,
                                                 dev_ctrl: ChipDeviceCtrl = None,
                                                 endpoint: int = None,
+                                                timeout: int = 1800,
                                                 expected_status: Status = Status.Success,
                                                 expected_overall_status: Status = Status.Success,
-                                                expected_preset_status: Status = Status.Success):
+                                                expected_preset_status: Status = Status.Success,
+                                                expected_schedules_status: Status = Status.Success,
+                                                expected_timeout: int = None):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=0,
                                                                                      attributeRequests=[
                                                                                          cluster.Attributes.Presets.attribute_id],
-                                                                                     timeout=1800),
+                                                                                     timeout=timeout),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
-            self.check_atomic_response(response, expected_status, expected_overall_status, expected_preset_status)
+            self.check_atomic_response(response, expected_status, expected_overall_status,
+                                       expected_preset_status, expected_schedules_status, expected_timeout)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -106,13 +121,15 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                  endpoint: int = None,
                                                  expected_status: Status = Status.Success,
                                                  expected_overall_status: Status = Status.Success,
-                                                 expected_preset_status: Status = Status.Success):
+                                                 expected_preset_status: Status = Status.Success,
+                                                 expected_schedules_status: Status = Status.Success):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=1,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
-            self.check_atomic_response(response, expected_status, expected_overall_status, expected_preset_status)
+            self.check_atomic_response(response, expected_status, expected_overall_status,
+                                       expected_preset_status, expected_schedules_status)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
@@ -121,13 +138,15 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                    endpoint: int = None,
                                                    expected_status: Status = Status.Success,
                                                    expected_overall_status: Status = Status.Success,
-                                                   expected_preset_status: Status = Status.Success):
+                                                   expected_preset_status: Status = Status.Success,
+                                                   expected_schedules_status: Status = Status.Success):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=2,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
-            self.check_atomic_response(response, expected_status, expected_overall_status, expected_preset_status)
+            self.check_atomic_response(response, expected_status, expected_overall_status,
+                                       expected_preset_status, expected_schedules_status)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
@@ -258,7 +277,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
 
             # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
 
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = new_presets_with_handle.copy()
@@ -409,7 +428,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command()
 
             # Send the AtomicRequest begin command from separate controller, which should receive busy
-            status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy)
+            status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy, expected_schedules_status=Status.Busy)
 
             # Roll back
             await self.send_atomic_request_rollback_command()

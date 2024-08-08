@@ -19,13 +19,23 @@
 #include <thermostat-manager.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
 
 ThermostatManager ThermostatManager::sInstance;
 
@@ -35,32 +45,10 @@ ThermostatManager::ThermostatManager()
     mNextFreeIndexInPresetsList        = 0;
     mNextFreeIndexInPendingPresetsList = 0;
 
-    InitializePresetTypes();
     InitializePresets();
 
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
-}
-
-void ThermostatManager::InitializePresetTypes()
-{
-    PresetScenarioEnum presetScenarioEnumArray[kMaxNumberOfPresetTypes] = {
-        PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied, PresetScenarioEnum::kSleep,
-        PresetScenarioEnum::kWake,     PresetScenarioEnum::kVacation,   PresetScenarioEnum::kGoingToSleep
-    };
-    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresetTypes));
-
-    uint8_t index = 0;
-    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
-    {
-        mPresetTypes[index].presetScenario  = presetScenario;
-        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetsOfEachType;
-        mPresetTypes[index].presetTypeFeatures =
-            (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied)
-            ? PresetTypeFeaturesBitmap::kAutomatic
-            : PresetTypeFeaturesBitmap::kSupportsNames;
-        index++;
-    }
 }
 
 void ThermostatManager::InitializePresets()
@@ -93,9 +81,26 @@ void ThermostatManager::InitializePresets()
 
 CHIP_ERROR ThermostatManager::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
 {
-    if (index < ArraySize(mPresetTypes))
+    static PresetTypeStruct::Type presetTypes[] = {
+        { .presetScenario     = PresetScenarioEnum::kOccupied,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
+        { .presetScenario     = PresetScenarioEnum::kUnoccupied,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
+        { .presetScenario     = PresetScenarioEnum::kSleep,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kWake,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kVacation,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+    };
+    if (index < ArraySize(presetTypes))
     {
-        presetType = mPresetTypes[index];
+        presetType = presetTypes[index];
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -108,6 +113,7 @@ uint8_t ThermostatManager::GetNumberOfPresets()
 
 CHIP_ERROR ThermostatManager::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
+
     if (index < mNextFreeIndexInPresetsList)
     {
         preset = mPresets[index];
@@ -147,44 +153,6 @@ CHIP_ERROR ThermostatManager::SetActivePresetHandle(const DataModel::Nullable<By
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Milliseconds16
-ThermostatManager::GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                                         System::Clock::Milliseconds16 timeoutRequest)
-{
-    auto attributeIdsIter = attributeRequests.begin();
-    bool requestedPresets = false, requestedSchedules = false;
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
-
-        switch (attributeId)
-        {
-        case Attributes::Presets::Id:
-            requestedPresets = true;
-            break;
-        case Attributes::Schedules::Id:
-            requestedSchedules = true;
-            break;
-        default:
-            return System::Clock::Milliseconds16(0);
-        }
-    }
-    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return System::Clock::Milliseconds16(0);
-    }
-    auto timeout = System::Clock::Milliseconds16(0);
-    if (requestedPresets)
-    {
-        timeout += std::chrono::milliseconds(1000);
-    }
-    if (requestedSchedules)
-    {
-        timeout += std::chrono::milliseconds(3000);
-    }
-    return std::min(timeoutRequest, timeout);
-}
-
 void ThermostatManager::InitializePendingPresets()
 {
     mNextFreeIndexInPendingPresetsList = 0;
@@ -203,8 +171,8 @@ CHIP_ERROR ThermostatManager::AppendToPendingPresetList(const PresetStruct::Type
         if (preset.presetHandle.IsNull())
         {
             // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
-            // each type are supported.
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets
+            // of each type are supported.
             const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
             mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
@@ -240,3 +208,21 @@ void ThermostatManager::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
 }
+
+std::optional<System::Clock::Milliseconds16> ThermostatManager::GetWriteTimeout(AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case Presets::Id:
+        return std::chrono::milliseconds(3000);
+    case Schedules::Id:
+        return std::chrono::milliseconds(5000);
+    default:
+        return std::nullopt;
+    }
+}
+
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

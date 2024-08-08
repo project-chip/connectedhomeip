@@ -19,6 +19,10 @@
 
 #include "PresetStructWithOwnedMembers.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/data-model/DecodableList.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -37,16 +41,6 @@ public:
     Delegate() = default;
 
     virtual ~Delegate() = default;
-
-    /**
-     * @brief Get the maximum timeout for atomically writing to a set of attributes
-     *
-     * @param[in] attributeRequests The list of attributes to write to.
-     * @param[out] timeoutRequest The timeout proposed by the client.
-     * @return The maximum allowed timeout; zero if the request is invalid.
-     */
-    virtual System::Clock::Milliseconds16 GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                                                                System::Clock::Milliseconds16 timeoutRequest) = 0;
 
     /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
@@ -136,6 +130,8 @@ public:
      *
      */
     virtual void ClearPendingPresetList() = 0;
+
+    virtual std::optional<System::Clock::Milliseconds16> GetWriteTimeout(AttributeId attributeId) = 0;
 };
 
 } // namespace Thermostat

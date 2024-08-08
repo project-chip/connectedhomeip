@@ -428,6 +428,10 @@ template("chip_data_model") {
         ]
       } else if (cluster == "thermostat-server") {
         sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}-atomic.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}-presets.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}-setpoints.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}-setpoints.h",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/PresetStructWithOwnedMembers.cpp",

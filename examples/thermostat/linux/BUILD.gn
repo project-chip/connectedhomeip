@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 executable("thermostat-app") {
   sources = [
+    "${chip_root}/examples/thermostat/thermostat-common/src/atomic-write-manager.cpp",
     "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-manager.cpp",
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",

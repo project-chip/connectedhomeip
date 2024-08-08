@@ -21,6 +21,7 @@
 #include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
+#include "atomic-write-manager.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -333,4 +334,8 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     auto & manager = ThermostatManager::GetInstance();
 
     SetDefaultDelegate(endpoint, &manager);
+
+    auto & atomicWriteManager = ThermostatAtomicWriteManager::GetInstance();
+
+    SetDefaultAtomicWriteManager(endpoint, &atomicWriteManager);
 }
