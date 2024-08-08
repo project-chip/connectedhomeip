@@ -50,6 +50,15 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 
 Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
+typedef struct PercentCurrentQTracking {
+    bool initialized;
+    bool moveStarted;
+    DataModel::Nullable<chip::Percent> startPercent;
+    DataModel::Nullable<chip::Percent> endPercent;
+    auto lastUpdateTime;
+} PercentCurrentQTracking;
+
+PercentCurrentQTracking percentCurrentQTracking[kFanControlDelegateTableSize];
 } // anonymous namespace
 
 namespace chip {
@@ -151,6 +160,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     Protocols::InteractionModel::Status res;
+    uint16_t ep = GetEndPoint(attributePath.mEndpointId, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     switch (attributePath.mAttributeId)
     {
@@ -239,6 +249,10 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         }
         else
         {
+            // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other logic???)
+            percentCurrentQTracking[ep].moveStarted = true;
+            percentCurrentQTracking[ep].startPercent = currentValueNeedToGetThisSomehow;
+            percentCurrentQTracking[ep].endPercent = (DataModel::Nullable<chip::Percent>)*value;
             res = Status::Success;
         }
         break;
@@ -295,6 +309,40 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         else
         {
             res = Status::UnsupportedAttribute;
+        }
+        break;
+    }
+    case PercentCurrent::Id: {
+        // Check if the PercentSetting is null.
+        if (NumericAttributeTraits<Percent>::IsNullValue(*value))
+        {
+            // nothing to do?
+            res = Status::Success;
+        }
+        else
+        {
+            // default to suppressing a report
+            res = Status::SuppressReport;
+            if (percentCurrentQTracking[ep].moveStarted)
+            {
+                // need a report at the start of a move.
+                percentCurrentQTracking[ep].moveStarted = false;
+                percentCurrentQTracking[ep].lastUpdateTime = GetTimeNowSomehow();
+                res = Status::ForceReport;
+            }
+            else
+            {
+                SomeTimeType currentTime = GetTimeNowSomehow();
+                if (currentTime - percentCurrentQTracking[ep].lastUpdateTime >= 1) {
+                    // 1 second elapsed, need a report
+                    percentCurrentQTracking[ep].lastUpdateTime = currentTime;
+                    res = Status::ForceReport;
+                }
+                if ((DataModel::Nullable<chip::Percent>)*value == percentCurrentQTracking[ep].endPercent) {
+                    // need a report at the end of a move.
+                    res = Status::ForceReport;
+                }
+            }
         }
         break;
     }
