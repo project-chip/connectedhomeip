@@ -90,7 +90,7 @@ class TC_SEAR_1_2(MatterBaseTest):
                 asserts.assert_is_not(a.mapID, NullValue,
                                       f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
                 asserts.assert_true(a.mapID in self.mapid_list,
-                                  f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
                 k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
                 asserts.assert_true(k not in areadesc_s,
                                     f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
