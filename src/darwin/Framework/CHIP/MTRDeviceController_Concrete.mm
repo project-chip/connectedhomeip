@@ -32,6 +32,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
@@ -1156,7 +1157,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MATTER_LOG_METRIC_SCOPE(kMetricAttestationChallengeForDevice, errorCode);
 
         errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorGetCommissionee error:nil], nil);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);

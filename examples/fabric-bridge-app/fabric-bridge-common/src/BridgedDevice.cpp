@@ -19,9 +19,35 @@
 #include "BridgedDevice.h"
 
 #include <cstdio>
+
+#include <app/EventLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <string>
+namespace {
+
+struct ActiveChangeEventWorkData
+{
+    chip::EndpointId mEndpointId;
+    uint32_t mPromisedActiveDuration;
+};
+
+void ActiveChangeEventWork(intptr_t arg)
+{
+    ActiveChangeEventWorkData * data = reinterpret_cast<ActiveChangeEventWorkData *>(arg);
+
+    chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
+    event.promisedActiveDuration  = data->mPromisedActiveDuration;
+    chip::EventNumber eventNumber = 0;
+
+    CHIP_ERROR err = chip::app::LogEvent(event, data->mEndpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "LogEvent for ActiveChanged failed %s", err.AsString());
+    }
+    chip::Platform::Delete(data);
+}
+
+} // namespace
 
 using namespace chip::app::Clusters::Actions;
 
@@ -32,9 +58,13 @@ BridgedDevice::BridgedDevice(chip::NodeId nodeId)
     mEndpointId = chip::kInvalidEndpointId;
 }
 
-bool BridgedDevice::IsReachable()
+void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
 {
-    return mReachable;
+    ActiveChangeEventWorkData * workdata = chip::Platform::New<ActiveChangeEventWorkData>();
+    workdata->mEndpointId                = mEndpointId;
+    workdata->mPromisedActiveDuration    = promisedActiveDurationMs;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ActiveChangeEventWork, reinterpret_cast<intptr_t>(workdata));
 }
 
 void BridgedDevice::SetReachable(bool reachable)
@@ -43,17 +73,10 @@ void BridgedDevice::SetReachable(bool reachable)
 
     if (reachable)
     {
-        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: ONLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: ONLINE", mAttributes.uniqueId.c_str());
     }
     else
     {
-        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mAttributes.uniqueId.c_str());
     }
-}
-
-void BridgedDevice::SetName(const char * name)
-{
-    ChipLogProgress(NotSpecified, "BridgedDevice[%s]: New Name=\"%s\"", mName, name);
-
-    chip::Platform::CopyString(mName, name);
 }
