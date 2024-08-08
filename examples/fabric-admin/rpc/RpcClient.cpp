@@ -22,16 +22,9 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
-#include <string>
-#include <thread>
 
+#include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
-#include "pw_assert/check.h"
-#include "pw_hdlc/decoder.h"
-#include "pw_hdlc/default_addresses.h"
-#include "pw_hdlc/rpc_channel.h"
-#include "pw_rpc/client.h"
-#include "pw_stream/socket_stream.h"
 
 using namespace chip;
 
@@ -113,16 +106,13 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device;
-    device.node_id = nodeId;
-
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
+    auto call = fabricBridgeClient.AddSynchronizedDevice(data, OnAddDeviceResponseCompleted);
 
     if (!call.active())
     {
@@ -137,8 +127,8 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
-    chip_rpc_SynchronizedDevice device;
-    device.node_id = nodeId;
+    chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
+    device.node_id                     = nodeId;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.

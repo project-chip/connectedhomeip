@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char *, uint8_t, const char *, va_list)
 {
-    // ChipPlatformLog expands to an os_log call directly (see Logging.h), so
-    // we don't need to do anything further here. However his function and the
-    // call to it still exist because of scenarios where a different logging
-    // backend (usually stdio) is swapped in at link time, e.g. for unit tests.
+    // This backend discards all log messages. This is useful when all log output
+    // is routed via `SetLogRedirectCallback()` and/or platform logging
+    // integration at the log macro level (`CHIP_SYSTEM_CONFIG_PLATFORM_LOG`).
 }
 
 } // namespace Platform

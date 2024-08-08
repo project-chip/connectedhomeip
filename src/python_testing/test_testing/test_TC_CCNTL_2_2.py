@@ -17,13 +17,13 @@
 #
 
 import base64
-import click
 import os
 import pathlib
 import sys
 import typing
 
 import chip.clusters as Clusters
+import click
 from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
 from chip.interaction_model import InteractionModelError, Status
@@ -180,7 +180,7 @@ def main(th_server_app: str):
     pics = {"PICS_SDK_CI_ONLY": True}
     test_runner = MyMock('TC_CCTRL_2_2', 'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', 1, paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()
-    config.user_params = {'th_server_app_path': th_server_app}
+    config.global_test_params = {'th_server_app_path': th_server_app}
     test_runner.set_test_config(config)
 
     test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())

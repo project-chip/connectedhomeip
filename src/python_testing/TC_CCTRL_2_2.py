@@ -45,7 +45,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
         # TODO: confirm whether we can open processes like this on the TH
-        app = self.matter_test_config.user_params.get("th_server_app_path", None)
+        app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 

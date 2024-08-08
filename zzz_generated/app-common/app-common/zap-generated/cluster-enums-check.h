@@ -2614,6 +2614,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipAreaSt
     case EnumType::kSuccess:
     case EnumType::kInvalidAreaList:
     case EnumType::kInvalidInMode:
+    case EnumType::kInvalidSkippedArea:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -3425,6 +3426,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::St
     case EnumType::kSuccess:
     case EnumType::kAppNotAvailable:
     case EnumType::kSystemBusy:
+    case EnumType::kPendingUserApproval:
+    case EnumType::kDownloading:
+    case EnumType::kInstalling:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
