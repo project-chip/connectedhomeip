@@ -1,0 +1,25 @@
+{{! Arguments: cluster (might be "Globals", is case-canonicalized already), originalCluster (the name before remapping and whatnot), struct, baseName (might be "" to indicate NSObject), deprecationMessage }}
+{{#if (isSupported cluster struct=struct)}}
+{{availability cluster struct=struct deprecationMessage=deprecationMessage}}
+@interface {{#if (isStrEqual cluster "Globals") ~}}
+  MTRDataType{{struct}}
+{{~else~}}
+  MTR{{cluster}}Cluster{{struct}}
+{{~/if}} : {{#if (isStrEqual baseName "")~}}
+  NSObject<NSCopying>
+{{~else~}}
+  {{baseName}}
+{{~/if}}
+{{#zcl_struct_items}}
+{{#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))}}
+{{> struct_field_decl cluster=../cluster type=type label=label}} {{availability ../cluster struct=../struct structField=(asStructPropertyName label) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase ../originalCluster preserveAcronyms=true) "Cluster" (asUpperCamelCase ../name preserveAcronyms=true))}};
+{{/if}}
+{{#if (hasOldName ../cluster struct=../struct structField=(asStructPropertyName label))}}
+{{#if (isSupported ../cluster struct=../struct structField=(oldName ../cluster struct=../struct structField=(asStructPropertyName label)))}}
+{{> struct_field_decl cluster=../cluster type=type label=(oldName ../cluster struct=../struct structField=(asStructPropertyName label))}} {{availability ../cluster struct=../struct structField=(oldName ../cluster struct=../struct structField=(asStructPropertyName label)) deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/if}}
+{{/if}}
+{{/zcl_struct_items}}
+@end
+
+{{/if}}

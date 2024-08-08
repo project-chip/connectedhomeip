@@ -36,6 +36,14 @@ namespace AccessControlExtensionChanged {
 static constexpr EventId Id = 0x00000001;
 } // namespace AccessControlExtensionChanged
 
+namespace AccessRestrictionEntryChanged {
+static constexpr EventId Id = 0x00000002;
+} // namespace AccessRestrictionEntryChanged
+
+namespace FabricRestrictionReviewUpdate {
+static constexpr EventId Id = 0x00000003;
+} // namespace FabricRestrictionReviewUpdate
+
 } // namespace Events
 } // namespace AccessControl
 
@@ -219,6 +227,10 @@ static constexpr EventId Id = 0x00000002;
 namespace ReachableChanged {
 static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
+
+namespace ActiveChanged {
+static constexpr EventId Id = 0x00000080;
+} // namespace ActiveChanged
 
 } // namespace Events
 } // namespace BridgedDeviceBasicInformation

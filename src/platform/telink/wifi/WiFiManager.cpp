@@ -31,6 +31,7 @@
 #include <zephyr/net/net_event.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_stats.h>
+#include <zephyr/posix/arpa/inet.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -399,21 +400,6 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
     }
 }
 
-void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
-{
-    net_if_start_rs(Instance().mNetIf);
-    Instance().mRouterSolicitationCounter++;
-    if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
-    {
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs), SendRouterSolicitation,
-                                              nullptr);
-    }
-    else
-    {
-        Instance().mRouterSolicitationCounter = 0;
-    }
-}
-
 void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length)
 {
     // Validate that input data size matches the expected one.
@@ -436,10 +422,8 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
         }
         else // The connection has been established successfully.
         {
-            // Workaround needed until sending Router Solicitation after connect will be done by the driver.
-            DeviceLayer::SystemLayer().StartTimer(
-                System::Clock::Milliseconds32(chip::Crypto::GetRandU16() % kMaxInitialRouterSolicitationDelayMs),
-                SendRouterSolicitation, nullptr);
+            // Now we can send/receive data via WiFi
+            net_if_up(InetUtils::GetWiFiInterface());
 
             ChipLogProgress(DeviceLayer, "Connected to WiFi network");
             Instance().mWiFiState = WIFI_STATE_COMPLETED;
@@ -491,6 +475,9 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
 void WiFiManager::IPv6AddressChangeHandler(const void * data)
 {
     const in6_addr * addr = reinterpret_cast<const in6_addr *>(data);
+    char buf[INET6_ADDRSTRLEN];
+
+    ChipLogProgress(DeviceLayer, "IP6 address %s", inet_ntop(AF_INET6, addr, buf, INET6_ADDRSTRLEN));
 
     // Filter out link-local addresses that are not routable outside of a local network.
     if (!net_ipv6_is_ll_addr(addr))
@@ -503,6 +490,10 @@ void WiFiManager::IPv6AddressChangeHandler(const void * data)
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "kDnssdRestartNeeded");
         }
     }
 }

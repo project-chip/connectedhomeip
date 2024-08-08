@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="5">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
     <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
     <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>

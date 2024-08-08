@@ -3,4 +3,4 @@
 nvs,      data, nvs,     ,        0xC000,
 phy_init, data, phy,     ,        0x1000,
 # Factory partition size about 1.9MB
-factory,  app,  factory, ,        1945K,
+factory,  app,  factory, ,        2M,

@@ -325,19 +325,14 @@ void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
     wfx_wifi_provision_t wifiConfig;
-
-    if (!wfx_is_sta_connected() || !wfx_get_wifi_provision(&wifiConfig))
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    uint8_t length = strnlen(wifiConfig.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    if (length > sizeof(network.networkID))
-    {
-        ChipLogError(DeviceLayer, "SSID too long");
-        return CHIP_ERROR_INTERNAL;
-    }
-
+    network.networkIDLen = 0;
+    network.connected    = false;
+    // we are able to fetch the wifi provision data and STA should be connected
+    VerifyOrReturnError(wfx_get_wifi_provision(&wifiConfig), CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(wfx_is_sta_connected(), CHIP_ERROR_NOT_CONNECTED);
+    network.connected = true;
+    uint8_t length    = strnlen(wifiConfig.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+    VerifyOrReturnError(length < sizeof(network.networkID), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(network.networkID, wifiConfig.ssid, length);
     network.networkIDLen = length;
 

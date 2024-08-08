@@ -37,21 +37,43 @@ class AsyncMock(MagicMock):
 
 
 class MockTestRunner():
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int, pics: dict[str, bool] = {}):
-        self.config = MatterTestConfig(
-            tests=[test], endpoint=endpoint, dut_node_ids=[1], pics=pics)
+
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path=None):
+        self.test = test
+        self.endpoint = endpoint
+        self.pics = pics
+        self.kvs_storage = 'kvs_admin.json'
+        self.paa_path = paa_trust_store_path
+        self.set_test(filename, classname, test)
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
             paaTrustStorePath=str(self.config.paa_trust_store_path),
             catTags=self.config.controller_cat_tags
         )
+
+    def set_test(self, filename: str, classname: str, test: str):
+        self.test = test
+        self.set_test_config()
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
         self.test_class = getattr(module, classname)
+
+    def set_test_config(self, test_config: MatterTestConfig = MatterTestConfig()):
+        self.config = test_config
+        self.config.tests = [self.test]
+        self.config.endpoint = self.endpoint
+        self.config.storage_path = self.kvs_storage
+        self.config.paa_trust_store_path = self.paa_path
+        if not self.config.dut_node_ids:
+            self.config.dut_node_ids = [1]
+        if self.pics:
+            self.config.pics = self.pics
 
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse):
+    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
-        return run_tests_no_exit(self.test_class, self.config, None, self.default_controller, self.stack)
+        # This doesn't need to do anything since we are overriding the read anyway
+        self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
+        return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)

@@ -236,6 +236,143 @@ public static class AccessControlClusterAccessControlExtensionChangedEvent {
     return output.toString();
   }
 }
+public static class AccessControlClusterAccessRestrictionEntryChangedEvent {
+  public Integer fabricIndex;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public AccessControlClusterAccessRestrictionEntryChangedEvent(
+    Integer fabricIndex
+  ) {
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterAccessRestrictionEntryChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AccessControlClusterAccessRestrictionEntryChangedEvent(
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessRestrictionEntryChangedEvent {\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
+  public Long token;
+  public @Nullable String instruction;
+  public @Nullable String redirectURL;
+  public Integer fabricIndex;
+  private static final long TOKEN_ID = 0L;
+  private static final long INSTRUCTION_ID = 1L;
+  private static final long REDIRECT_U_R_L_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public AccessControlClusterFabricRestrictionReviewUpdateEvent(
+    Long token,
+    @Nullable String instruction,
+    @Nullable String redirectURL,
+    Integer fabricIndex
+  ) {
+    this.token = token;
+    this.instruction = instruction;
+    this.redirectURL = redirectURL;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TOKEN_ID, new UIntType(token)));
+    values.add(new StructElement(INSTRUCTION_ID, instruction != null ? new StringType(instruction) : new NullType()));
+    values.add(new StructElement(REDIRECT_U_R_L_ID, redirectURL != null ? new StringType(redirectURL) : new NullType()));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterFabricRestrictionReviewUpdateEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long token = null;
+    @Nullable String instruction = null;
+    @Nullable String redirectURL = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TOKEN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          token = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == INSTRUCTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          instruction = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == REDIRECT_U_R_L_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          redirectURL = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AccessControlClusterFabricRestrictionReviewUpdateEvent(
+      token,
+      instruction,
+      redirectURL,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n");
+    output.append("\ttoken: ");
+    output.append(token);
+    output.append("\n");
+    output.append("\tinstruction: ");
+    output.append(instruction);
+    output.append("\n");
+    output.append("\tredirectURL: ");
+    output.append(redirectURL);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ActionsClusterStateChangedEvent {
   public Integer actionID;
   public Long invokeID;
@@ -1894,6 +2031,52 @@ public static class BridgedDeviceBasicInformationClusterReachableChangedEvent {
     output.append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n");
     output.append("\treachableNewValue: ");
     output.append(reachableNewValue);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class BridgedDeviceBasicInformationClusterActiveChangedEvent {
+  public Long promisedActiveDuration;
+  private static final long PROMISED_ACTIVE_DURATION_ID = 0L;
+
+  public BridgedDeviceBasicInformationClusterActiveChangedEvent(
+    Long promisedActiveDuration
+  ) {
+    this.promisedActiveDuration = promisedActiveDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PROMISED_ACTIVE_DURATION_ID, new UIntType(promisedActiveDuration)));
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterActiveChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long promisedActiveDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PROMISED_ACTIVE_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          promisedActiveDuration = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new BridgedDeviceBasicInformationClusterActiveChangedEvent(
+      promisedActiveDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterActiveChangedEvent {\n");
+    output.append("\tpromisedActiveDuration: ");
+    output.append(promisedActiveDuration);
     output.append("\n");
     output.append("}\n");
     return output.toString();

@@ -212,6 +212,9 @@ else
     WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 fi
 
+# Add the matter_testing_infrastructure wheel
+WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)
+
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
 fi

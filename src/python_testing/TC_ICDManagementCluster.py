@@ -46,6 +46,7 @@ class ICDTestEventTriggerOperations(IntEnum):
     kRemoveActiveModeReq = 0x0046000000000002
     kInvalidateHalfCounterValues = 0x0046000000000003
     kInvalidateAllCounterValues = 0x0046000000000004
+    kForceMaximumCheckInBackOffState = 0x0046000000000005
 
 
 class TestICDManagementCluster(MatterBaseTest):
@@ -110,6 +111,15 @@ class TestICDManagementCluster(MatterBaseTest):
                 endpoint=kRootEndpointId,
                 payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kTestEventTriggerKey,
                                                                               eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
+            )
+        )
+
+        asserts.assert_is_none(
+            await dev_ctrl.SendCommand(
+                self.dut_node_id,
+                endpoint=kRootEndpointId,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kTestEventTriggerKey,
+                                                                              eventTrigger=ICDTestEventTriggerOperations.kForceMaximumCheckInBackOffState)
             )
         )
 

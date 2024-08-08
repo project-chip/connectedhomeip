@@ -56,3 +56,5 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams para
  */
 CHIP_ERROR
 OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params);
+
+CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs);

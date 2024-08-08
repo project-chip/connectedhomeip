@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 // Update Name
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Addition of LIT ICD support, UserActiveModeTrigger, ActiveModeDuration, StayActiveResponse; removal of field Key in MonitoringRegistrationStruct"/>
+    <revision revision="3" summary="Addition of the ClientType attribute; addition of the ICD Check-In Backoff support; addition of the DynamicSitLitSupport feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0046" name="ICDManagement"/>
@@ -89,6 +90,14 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <feature name="LITS"/>
+        </optionalConform>
       </otherwiseConform>
     </feature>
   </features>
@@ -216,6 +225,9 @@ Davis, CA 95616, USA
       <field id="3" name="VerificationKey" type="octstr">
         <optionalConform/>
         <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="4" name="ClientType" type="ClientTypeEnum">
+        <mandatoryConform/>
       </field>
     </command>
     <command id="0x01" name="RegisterClientResponse" direction="responseFromServer">
