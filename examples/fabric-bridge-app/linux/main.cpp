@@ -244,7 +244,7 @@ void ApplicationInit()
 
     MatterEcosystemInformationPluginServerInitCallback();
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
     AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
