@@ -19,6 +19,10 @@ config:
     cluster: "Unit Testing"
     endpoint: 1
 
+    AnOctetString:
+        type: octet_string
+        defaultValue: hex:deafbeef
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -51,6 +55,22 @@ tests:
       response:
           constraints:
               excludes: [0, 5]
+
+    - label: "Read attribute LIST With Python constraint"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              python: len(value) == 4 and len(AnOctetString) == 4
+
+    - label: "Read attribute LIST With multi-line Python constraint"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              python: |
+                  print("Hello from Python")
+                  return True
 
     - label: "Write attribute LIST Back to Default Value"
       command: "writeAttribute"
