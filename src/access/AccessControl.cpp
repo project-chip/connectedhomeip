@@ -323,6 +323,11 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
     }
 }
 
+bool AccessControl::IsAccessRestrictionListSupported() const
+{
+    return false; // not yet supported
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
@@ -342,15 +347,18 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
+    if (IsAccessRestrictionListSupported())
+    {
+        VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         if (result != CHIP_ERROR_NOT_IMPLEMENTED)
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR)                  ? "allowed"
-                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
-                                                                       : "error");
+                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
