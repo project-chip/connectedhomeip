@@ -42,7 +42,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
                 nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
-        elif expectedErrCode == 0x02:
+        else:
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
                 await th.OpenCommissioningWindow(
@@ -59,7 +59,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
                 nodeid=self.dut_node_id, timeout=self.timeout)
             return params
 
-        elif expectedErrCode == 0x02:
+        else:
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
                 await th.OpenBasicCommissioningWindow(
@@ -80,22 +80,22 @@ class TC_CADMIN_1_11(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(
-                2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster"),
+                2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster", "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
             TestStep(
-                3, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds"),
-            TestStep(4, "TH_CR2 fully commissions the DUT"),
+                3, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds", "Commissioning window should open with timeout set to MaxCumulativeFailsafeSeconds"),
+            TestStep(4, "TH_CR2 fully commissions the DUT", "DUT should fully commission"),
             TestStep(
-                5, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo"),
-            TestStep(6, "TH_CR1 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window"),
-            TestStep(7, "TH_CR2 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window"),
-            TestStep(8, "TH_CR1 sends an RevokeCommissioning command to the DUT"),
-            TestStep(9, "TH_CR1 reads the FeatureMap from the Administrator Commissioning Cluster to check to see if BC is supported on DUT"),
-            TestStep("9a", "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo"),
-            TestStep("9b", "TH_CR1 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window"),
-            TestStep("9c", "TH_CR2 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window"),
-            TestStep("9d", "TH_CR1 sends a RevokeCommissioning command to the DUT"),
-            TestStep(10, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx"),
-            TestStep(11, "TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx"),
+                5, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "New commissioning window should open and be set to timeout"),
+            TestStep(6, "TH_CR1 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep(7, "TH_CR2 sends an OpenCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep(8, "TH_CR1 sends an RevokeCommissioning command to the DUT", "Commissioning window should be closed"),
+            TestStep(9, "TH_CR1 reads the FeatureMap from the Administrator Commissioning Cluster to check to see if BC is supported on DUT", "FeatureMap should be checked to see if BC enum is available feature, if not then test steps 9a-9d will be skipped"),
+            TestStep("9a", "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "Opens basic commissioning window on the DUT for timeout set to value of MaxCumulativeFailsafeSeconds"),
+            TestStep("9b", "TH_CR1 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep("9c", "TH_CR2 sends an OpenBasicCommissioningWindow command to the DUT and attempts to open another commissioning window", "Commissioning window should fail to be opened due to being busy"),
+            TestStep("9d", "TH_CR1 sends a RevokeCommissioning command to the DUT", "Commissioning window should be closed"),
+            TestStep(10, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx", "th2_idx set to value for CurrentFabricIndex attribute from TH_CR2"),
+            TestStep(11, "TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx", "TH_CR1 removes TH_CR2 fabric using th2_idx"),
         ]
 
     def generate_unique_random_value(self, value):
@@ -133,9 +133,9 @@ class TC_CADMIN_1_11(MatterBaseTest):
         self.timeout = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        self.count = 0
         params = await self.OpenCommissioningWindow(self.th1, 0x00)
         setupPinCode = params.setupPinCode
+        busy_enum = Clusters.AdministratorCommissioning.Enums.StatusCode.kBusy
 
         self.step(4)
         await self.CommissionAttempt(setupPinCode)
@@ -144,10 +144,10 @@ class TC_CADMIN_1_11(MatterBaseTest):
         await self.OpenCommissioningWindow(self.th1, 0x00)
 
         self.step(6)
-        await self.OpenCommissioningWindow(self.th1, 0x02)
+        await self.OpenCommissioningWindow(self.th1, busy_enum)
 
         self.step(7)
-        await self.OpenCommissioningWindow(self.th2, 0x02)
+        await self.OpenCommissioningWindow(self.th2, busy_enum)
 
         self.step(8)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
@@ -156,10 +156,16 @@ class TC_CADMIN_1_11(MatterBaseTest):
         sleep(1)
 
         self.step(9)
+        self.print_step("AC_CLUSTER featureMap", Clusters.Objects.AdministratorCommissioning.featureMap)
+        self.print_step("AC_CLUSTER attributes", Clusters.Objects.AdministratorCommissioning.Attributes.FeatureMap.value)
         AC_cluster = Clusters.AdministratorCommissioning
-        features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
-                                                    endpoint=0, attribute=AC_cluster.Attributes.FeatureMap)
-        self.supports_bc = bool(features & AC_cluster.Bitmaps.Feature.kBasic)
+        if Clusters.Objects.AdministratorCommissioning.featureMap is not None:
+            fm_attribute = Clusters.AdministratorCommissioning.Attributes
+            features = await self.read_single_attribute_check_success(cluster=AC_cluster, attribute=fm_attribute.FeatureMap)
+        else:
+            features = AC_cluster.Attributes.FeatureMap.value            
+
+        self.supports_bc = bool(features & AC_cluster.Bitmaps.Feature.kBasic) != 0
 
         if self.supports_bc:
             self.count = 0
@@ -167,10 +173,10 @@ class TC_CADMIN_1_11(MatterBaseTest):
             await self.OpenBasicCommissioningWindow(self.th1, 0x00)
 
             self.step("9b")
-            await self.OpenBasicCommissioningWindow(self.th1, 0x00)
+            await self.OpenBasicCommissioningWindow(self.th1, busy_enum)
 
             self.step("9c")
-            await self.OpenBasicCommissioningWindow2(self.th2, 0x02)
+            await self.OpenBasicCommissioningWindow2(self.th2, busy_enum)
 
             self.step("9d")
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
