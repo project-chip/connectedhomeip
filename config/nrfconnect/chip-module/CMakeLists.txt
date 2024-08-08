@@ -200,7 +200,6 @@ matter_generate_args_tmp_file()
 # ==============================================================================
 
 matter_build(chip
-    LIB_SHELL   ${CONFIG_CHIP_LIB_SHELL}
     LIB_TESTS   ${CONFIG_CHIP_BUILD_TESTS}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
@@ -222,6 +221,16 @@ if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         -Wl,--wrap=_calloc_r
         -Wl,--wrap=_realloc_r
         -Wl,--wrap=_free_r
+    )
+endif()
+
+if (CONFIG_CHIP_LIB_SHELL)
+    # Force pulling chip::Shell::Engine::RunMainLoop() in the final binary.
+    # Without this workaround, the linker script does not process the shell and
+    # init objects defined in MainLoopZephyr.cpp unless the Matter library or
+    # the Matter shell library is linked using the '--whole-archive' flag.
+    target_link_options(chip INTERFACE
+        -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
     )
 endif()
 

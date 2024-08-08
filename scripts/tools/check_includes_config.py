@@ -128,6 +128,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/application-launcher-server/application-launcher-server.cpp': {'string'},
     'src/app/clusters/application-launcher-server/application-launcher-delegate.h': {'list'},
     'src/app/clusters/audio-output-server/audio-output-delegate.h': {'list'},
+    # EcosystemInformationCluster is for Fabric Sync and is intended to run on device that are capable of handling these types.
+    'src/app/clusters/ecosystem-information-server/ecosystem-information-server.h': {'map', 'string', 'vector'},
     'src/app/clusters/channel-server/channel-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-server.cpp': {'list'},
@@ -137,6 +139,7 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
+    'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
 
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
     'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector', 'string'},

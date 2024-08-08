@@ -22,6 +22,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
 
 #include <algorithm>
 #include <cctype>
@@ -63,14 +64,14 @@ WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    unregisterAttributeAccessOverride(this);
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR WiFiNetworkManagementServer::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -99,10 +100,19 @@ CHIP_ERROR WiFiNetworkManagementServer::SetNetworkCredentials(ByteSpan ssid, Byt
     VerifyOrDie(mPassphrase.SetLength(passphrase.size()) == CHIP_NO_ERROR);
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
-    // Note: The spec currently defines no way to signal a passphrase change
     if (ssidChanged)
     {
         MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
+    }
+    if (passphraseChanged)
+    {
+        mPassphraseSurrogate++;
+        System::Clock::Milliseconds64 realtime;
+        if (System::SystemClock().GetClock_RealTimeMS(realtime) == CHIP_NO_ERROR)
+        {
+            mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
+        }
+        MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -113,6 +123,8 @@ CHIP_ERROR WiFiNetworkManagementServer::Read(const ConcreteReadAttributePath & a
     {
     case Ssid::Id:
         return HaveNetworkCredentials() ? aEncoder.Encode(SsidSpan()) : aEncoder.EncodeNull();
+    case PassphraseSurrogate::Id:
+        return HaveNetworkCredentials() ? aEncoder.Encode(mPassphraseSurrogate) : aEncoder.EncodeNull();
     }
     return CHIP_NO_ERROR;
 }

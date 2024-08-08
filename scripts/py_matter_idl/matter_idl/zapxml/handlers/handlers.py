@@ -225,7 +225,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #   - inside a cluster if a code exists
         #   - inside top level if no codes were associated
         if not self._cluster_codes:
-            LOGGER.error('Struct %s has no cluster codes' % self._struct.name)
+            idl.global_structs.append(self._struct)
             return
 
         for code in self._cluster_codes:
@@ -270,9 +270,9 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
     def FinalizeProcessing(self, idl: Idl):
         if not self._cluster_codes:
-            LOGGER.error("Found enum without a cluster code: %s" %
-                         (self._enum.name))
+            idl.global_enums.append(self._enum)
             return
+
         found = set()
         for c in idl.clusters:
             if c.code in self._cluster_codes:
@@ -313,14 +313,11 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
-        # We have two choices of adding an enum:
+        # We have two choices of adding a bitmap:
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
         if not self._cluster_codes:
-            # Log only instead of critical, as not our XML is well formed.
-            # For example at the time of writing this, SwitchFeature in switch-cluster.xml
-            # did not have a code associated with it.
-            LOGGER.error("Bitmap %r has no cluster codes" % self._bitmap)
+            idl.global_bitmaps.append(self._bitmap)
             return
 
         for code in self._cluster_codes:

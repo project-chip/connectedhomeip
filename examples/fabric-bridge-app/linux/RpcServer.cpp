@@ -20,6 +20,7 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 #include <lib/core/CHIPError.h>
 
 #include <string>
@@ -29,8 +30,8 @@
 #include "pigweed/rpc_services/FabricBridge.h"
 #endif
 
-#include "Device.h"
-#include "DeviceManager.h"
+#include "BridgedDevice.h"
+#include "BridgedDeviceManager.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -44,6 +45,7 @@ class FabricBridge final : public chip::rpc::FabricBridge
 public:
     pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
+    pw::Status ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response) override;
 };
 
 pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
@@ -51,16 +53,74 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    Device * device = new Device(nodeId);
+    auto device = std::make_unique<BridgedDevice>(nodeId);
     device->SetReachable(true);
 
-    int result = DeviceMgr().AddDeviceEndpoint(device, 1);
-    if (result == -1)
+    BridgedDevice::BridgedAttributes attributes;
+
+    if (request.has_unique_id)
     {
-        delete device;
+        attributes.uniqueId = request.unique_id;
+    }
+
+    if (request.has_vendor_name)
+    {
+        attributes.vendorName = request.vendor_name;
+    }
+
+    if (request.has_vendor_id)
+    {
+        attributes.vendorId = request.vendor_id;
+    }
+
+    if (request.has_product_name)
+    {
+        attributes.productName = request.product_name;
+    }
+
+    if (request.has_product_id)
+    {
+        attributes.productId = request.product_id;
+    }
+
+    if (request.has_node_label)
+    {
+        attributes.nodeLabel = request.node_label;
+    }
+
+    if (request.has_hardware_version)
+    {
+        attributes.hardwareVersion = request.hardware_version;
+    }
+
+    if (request.has_hardware_version_string)
+    {
+        attributes.hardwareVersionString = request.hardware_version_string;
+    }
+
+    if (request.has_software_version)
+    {
+        attributes.softwareVersion = request.software_version;
+    }
+
+    if (request.has_software_version_string)
+    {
+        attributes.softwareVersionString = request.software_version_string;
+    }
+
+    device->SetBridgedAttributes(attributes);
+    device->SetIcd(request.has_is_icd && request.is_icd);
+
+    auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
+    if (!result.has_value())
+    {
         ChipLogError(NotSpecified, "Failed to add device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::Unknown();
     }
+
+    CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
+        device->GetEndpointId());
+    VerifyOrDie(err == CHIP_NO_ERROR);
 
     return pw::OkStatus();
 }
@@ -70,13 +130,30 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    int removed_idx = DeviceMgr().RemoveDeviceByNodeId(nodeId);
-    if (removed_idx < 0)
+    auto removed_idx = BridgeDeviceMgr().RemoveDeviceByNodeId(nodeId);
+    if (!removed_idx.has_value())
     {
         ChipLogError(NotSpecified, "Failed to remove device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::NotFound();
     }
 
+    return pw::OkStatus();
+}
+
+pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response)
+{
+    NodeId nodeId = request.node_id;
+    ChipLogProgress(NotSpecified, "Received ActiveChanged: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    auto * device = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
+    if (device == nullptr)
+    {
+        ChipLogError(NotSpecified, "Could not find bridged device associated with nodeId=0x" ChipLogFormatX64,
+                     ChipLogValueX64(nodeId));
+        return pw::Status::NotFound();
+    }
+
+    device->LogActiveChangeEvent(request.promised_active_duration_ms);
     return pw::OkStatus();
 }
 

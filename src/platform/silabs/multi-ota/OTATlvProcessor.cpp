@@ -23,9 +23,12 @@
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #if OTA_ENCRYPTION_ENABLE
-#include "OtaUtils.h"
-#include "rom_aes.h"
+#include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif
+
+using namespace ::chip::DeviceLayer::Internal;
+
 namespace chip {
 
 #if OTA_ENCRYPTION_ENABLE
@@ -105,65 +108,10 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #if OTA_ENCRYPTION_ENABLE
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
-    uint8_t iv[16];
-    uint8_t key[kOTAEncryptionKeyLength];
-    uint8_t dataOut[16] = { 0 };
-    uint32_t u32IVCount;
-    uint32_t Offset = 0;
-    uint8_t data;
-    tsReg128 sKey;
-    aesContext_t Context;
-
-    memcpy(iv, au8Iv, sizeof(au8Iv));
-
-    u32IVCount = (((uint32_t) iv[12]) << 24) | (((uint32_t) iv[13]) << 16) | (((uint32_t) iv[14]) << 8) | (iv[15]);
-    u32IVCount += (mIVOffset >> 4);
-
-    iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
-    iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
-    iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
-    iv[15] = (uint8_t) (u32IVCount & 0xff);
-
-    if (Encoding::HexToBytes(OTA_ENCRYPTION_KEY, strlen(OTA_ENCRYPTION_KEY), key, kOTAEncryptionKeyLength) !=
-        kOTAEncryptionKeyLength)
-    {
-        // Failed to convert the OTAEncryptionKey string to octstr type value
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-
-    ByteSpan KEY = ByteSpan(key);
-    Encoding::LittleEndian::Reader reader_key(KEY.data(), KEY.size());
-    ReturnErrorOnFailure(reader_key.Read32(&sKey.u32register0)
-                             .Read32(&sKey.u32register1)
-                             .Read32(&sKey.u32register2)
-                             .Read32(&sKey.u32register3)
-                             .StatusCode());
-
-    while (Offset + 16 <= block.size())
-    {
-        /*Encrypt the IV*/
-        Context.mode         = AES_MODE_ECB_ENCRYPT;
-        Context.pSoftwareKey = (uint32_t *) &sKey;
-        AES_128_ProcessBlocks(&Context, (uint32_t *) &iv[0], (uint32_t *) &dataOut[0], 1);
-
-        /* Decrypt a block of the buffer */
-        for (uint8_t i = 0; i < 16; i++)
-        {
-            data = block[Offset + i] ^ dataOut[i];
-            memcpy(&block[Offset + i], &data, sizeof(uint8_t));
-        }
-
-        /* increment the IV for the next block  */
-        u32IVCount++;
-
-        iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
-        iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
-        iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
-        iv[15] = (uint8_t) (u32IVCount & 0xff);
-
-        Offset += 16; /* increment the buffer offset */
-        mIVOffset += 16;
-    }
+    uint32_t keyId;
+    SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
+    key.Decrypt(block, mIVOffset);
 
     return CHIP_NO_ERROR;
 }

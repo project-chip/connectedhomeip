@@ -20,6 +20,8 @@ executable("thermostat-app") {
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
     "main.cpp",
+    "thermostat-delegate-impl.cpp",
+    "thermostat-manager.cpp",
   ]
 
   deps = [
@@ -27,6 +29,8 @@ executable("thermostat-app") {
     "${chip_root}/examples/thermostat/thermostat-common",
     "${chip_root}/src/lib",
   ]
+
+  include_dirs = [ "include" ]
 
   cflags = [ "-Wconversion" ]
 

@@ -154,7 +154,7 @@ class ThreadNetworkDirectoryCluster(
 
   suspend fun getOperationalDataset(
     extendedPanID: ByteArray,
-    timedInvokeTimeout: Duration,
+    timedInvokeTimeout: Duration? = null,
   ): OperationalDatasetResponse {
     val commandId: UInt = 2u
 

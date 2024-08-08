@@ -28,6 +28,9 @@
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <silabs_creds.h>
+#ifdef OTA_ENCRYPTION_ENABLE
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif // OTA_ENCRYPTION_ENABLE
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include <sl_si91x_common_flash_intf.h>
 #else
@@ -659,7 +662,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
     ReturnErrorOnFailure(key.Import(value.data(), value.size()));
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
 }
-#endif
+#endif // OTA_ENCRYPTION_ENABLE
 
 /**
  * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.

@@ -43,7 +43,7 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #endif
 
 namespace chip {
@@ -93,6 +93,15 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     StatusIB::RegisterErrorFormatter();
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    ChipLogError(InteractionModel, "WARNING ┌────────────────────────────────────────────────────");
+    ChipLogError(InteractionModel, "WARNING │ Interaction Model Engine running in 'Checked' mode.");
+    ChipLogError(InteractionModel, "WARNING │ This executes BOTH ember and data-model code paths.");
+    ChipLogError(InteractionModel, "WARNING │ which is inefficient and consumes more flash space.");
+    ChipLogError(InteractionModel, "WARNING │ This should be done for testing only.");
+    ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -101,9 +110,11 @@ void InteractionModelEngine::Shutdown()
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
     // TODO: individual object clears the entire command handler interface registry.
-    //       This may not be expected.
-    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
-
+    //       This may not be expected as IME does NOT own the command handler interface registry.
+    //
+    //       This is to be cleaned up once InteractionModelEngine maintains a data model fully and
+    //       the code-generation model can do its clear in its shutdown method.
+    CommandHandlerInterfaceRegistry::Instance().UnregisterAllHandlers();
     mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
@@ -476,7 +487,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
-            AttributePathExpandIterator pathIterator(GetDataModel(), &paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModelProvider(), &paramsList);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
@@ -840,7 +851,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
     ReadHandler * handler =
-        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModel());
+        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModelProvider());
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1673,7 +1684,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
                                              TLV::TLVReader & apPayload)
 {
     CommandHandlerInterface * handler =
-        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1697,13 +1708,23 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
-InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
+DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
+{
+    // Alternting data model should not be done while IM is actively handling requests.
+    VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
+
+    DataModel::Provider * oldModel = GetDataModelProvider();
+    mDataModelProvider             = model;
+    return oldModel;
+}
+
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
 #endif
-    return mDataModel;
+    return mDataModelProvider;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)

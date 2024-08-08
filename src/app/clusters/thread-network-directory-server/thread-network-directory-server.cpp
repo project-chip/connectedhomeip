@@ -47,14 +47,14 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
-    unregisterAttributeAccessOverride(this);
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -274,8 +274,10 @@ void ThreadNetworkDirectoryServer::HandleOperationalDatasetRequest(
 
     uint8_t datasetBuffer[kSizeOperationalDataset];
     MutableByteSpan datasetSpan(datasetBuffer);
+    OperationalDatasetResponse::Type response;
     SuccessOrExit(err = mStorage.GetNetworkDataset(ExtendedPanId(req.extendedPanID), datasetSpan));
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::Success);
+    response.operationalDataset = datasetSpan;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     return;
 exit:
     ChipLogError(Zcl, "GetOperationalDataset: %" CHIP_ERROR_FORMAT, err.Format());
