@@ -24,11 +24,11 @@ from unittest.mock import MagicMock
 from chip.clusters import Attribute
 
 try:
-    from testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
+    from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
+    from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 
 
 class AsyncMock(MagicMock):

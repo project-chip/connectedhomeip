@@ -29,7 +29,7 @@ from random import choice
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

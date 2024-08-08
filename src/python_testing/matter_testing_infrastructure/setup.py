@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""The testing_support package."""
+"""The matter_testing_support package."""
 
 import setuptools  # type: ignore
 

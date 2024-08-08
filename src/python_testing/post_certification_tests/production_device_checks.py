@@ -59,15 +59,15 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from testing_support.basic_composition import BasicCompositionTests
-    from testing_support.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                                run_tests_no_exit)
+    from matter_testing_support.basic_composition import BasicCompositionTests
+    from matter_testing_support.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                                       run_tests_no_exit)
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from testing_support.basic_composition import BasicCompositionTests
-    from testing_support.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                                run_tests_no_exit)
+    from matter_testing_support.basic_composition import BasicCompositionTests
+    from matter_testing_support.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
+                                                       run_tests_no_exit)
 
 try:
     import fetch_paa_certs_from_dcl

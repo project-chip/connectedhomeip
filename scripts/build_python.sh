@@ -213,7 +213,7 @@ else
 fi
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/testing_support._build_wheel/testing_support-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/matter_testing_support._build_wheel/matter_testing_support-*.whl)
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
