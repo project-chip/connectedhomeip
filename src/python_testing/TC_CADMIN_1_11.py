@@ -164,8 +164,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         sleep(1)
 
         self.step(9)
-        self.print_step("AC_CLUSTER featureMap", Clusters.Objects.AdministratorCommissioning.featureMap)
-        self.print_step("AC_CLUSTER attributes", Clusters.Objects.AdministratorCommissioning.Attributes.FeatureMap.value)
+        
         AC_cluster = Clusters.AdministratorCommissioning
         if Clusters.Objects.AdministratorCommissioning.featureMap is not None:
             fm_attribute = Clusters.AdministratorCommissioning.Attributes
