@@ -48,8 +48,6 @@ private:
 
     RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
     IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
-    RvcDevice * mIsValidSelectAreasSetDeviceInstance;
-    IsValidSelectAreasSetCallback mIsValidSelectAreasSetCallback;
     RvcDevice * mHandleSkipCurrentAreaDeviceInstance;
     HandleSkipCurrentAreaCallback mHandleSkipCurrentAreaCallback;
     RvcDevice * mIsSupportedAreasChangeAllowedDeviceInstance;
@@ -157,12 +155,6 @@ public:
     {
         mIsSetSelectedAreasAllowedCallback = callback;
         mIsSetSelectedAreasAllowedDeviceInstance = instance;
-    }
-
-    void SetIsValidSelectAreasSetCallback(IsValidSelectAreasSetCallback callback, RvcDevice * instance)
-    {
-        mIsValidSelectAreasSetCallback = callback;
-        mIsValidSelectAreasSetDeviceInstance = instance;
     }
 
     void SetHandleSkipCurrentAreaCallback(HandleSkipCurrentAreaCallback callback, RvcDevice * instance)

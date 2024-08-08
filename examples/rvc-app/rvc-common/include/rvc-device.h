@@ -61,7 +61,6 @@ public:
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
 
         mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
-        mServiceAreaDelegate.SetIsValidSelectAreasSetCallback(&RvcDevice::SaIsValidSelectAreasSet, this);
         mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
         mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
         mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
@@ -107,8 +106,6 @@ public:
 
 
     bool SaIsSetSelectedAreasAllowed(MutableCharSpan statusText);
-
-    bool SaIsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req, ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
 
     bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText);
 

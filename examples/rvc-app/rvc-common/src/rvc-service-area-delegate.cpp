@@ -116,7 +116,68 @@ bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan & statusT
 bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & areaStatus,
                                                    MutableCharSpan & statusText)
 {
-    return (mIsValidSelectAreasSetDeviceInstance->*mIsValidSelectAreasSetCallback)(req, areaStatus, statusText);
+    // if req is empty list return true.
+    {
+        size_t reqSize;
+        if (req.newAreas.ComputeSize(&reqSize) != CHIP_NO_ERROR)
+        {
+            areaStatus = SelectAreasStatus::kInvalidSet; // todo Not sure this is the correct error to use here
+            CopyCharSpanToMutableCharSpan("error computing number of selected areas"_span, statusText);
+            return false;
+        }
+
+        if (reqSize == 0)
+        {
+            return true;
+        }
+    }
+
+    // If there are less than 2 supported maps, any combination of areas is valid.
+    if (!GetInstance()->HasFeature(Feature::kMaps) || GetNumberOfSupportedMaps() <= 1)
+    {
+        return true;
+    }
+
+    // Check that all the areas are in the same map.
+    auto newAreasIter = req.newAreas.begin();
+    newAreasIter.Next();
+
+    AreaStructureWrapper tempArea;
+    uint32_t ignoredIndex;
+    if (!GetSupportedAreaById(newAreasIter.GetValue(), ignoredIndex, tempArea))
+    {
+        areaStatus = SelectAreasStatus::kUnsupportedArea;
+        CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+        return false;
+    }
+
+    auto mapId = tempArea.mapID.Value(); // It is safe to call `.Value()` as we confirmed that there are at least 2 maps.
+
+    while (newAreasIter.Next())
+    {
+        if (!GetSupportedAreaById(newAreasIter.GetValue(), ignoredIndex, tempArea))
+        {
+            areaStatus = SelectAreasStatus::kUnsupportedArea;
+            CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+            return false;
+        }
+
+        if (tempArea.mapID.Value() != mapId)
+        {
+            areaStatus = SelectAreasStatus::kInvalidSet;
+            CopyCharSpanToMutableCharSpan("all selected areas must be in the same map"_span, statusText);
+            return false;
+        }
+    }
+
+    if (CHIP_NO_ERROR != newAreasIter.GetStatus())
+    {
+        areaStatus = SelectAreasStatus::kInvalidSet;
+        CopyCharSpanToMutableCharSpan("error processing new areas."_span, statusText);
+        return false;
+    }
+
+    return true;
 };
 
 bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)

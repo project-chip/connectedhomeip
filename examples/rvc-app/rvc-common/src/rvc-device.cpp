@@ -171,13 +171,6 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan statusText)
     return true;
 }
 
-
-bool RvcDevice::SaIsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req, ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText)
-{
-    // todo implement
-    return true;
-}
-
 bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
 {
     // todo implement
