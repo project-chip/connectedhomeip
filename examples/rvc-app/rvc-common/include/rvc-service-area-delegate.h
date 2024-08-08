@@ -31,7 +31,7 @@ class RvcDevice;
 
 typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan statusText);
 typedef bool (RvcDevice::*IsValidSelectAreasSetCallback)(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                                                          ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
+                                                         ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
 typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan skipStatusText);
 typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
 
@@ -153,25 +153,25 @@ public:
 
     void SetIsSetSelectedAreasAllowedCallback(IsSetSelectedAreasAllowedCallback callback, RvcDevice * instance)
     {
-        mIsSetSelectedAreasAllowedCallback = callback;
+        mIsSetSelectedAreasAllowedCallback       = callback;
         mIsSetSelectedAreasAllowedDeviceInstance = instance;
     }
 
     void SetHandleSkipCurrentAreaCallback(HandleSkipCurrentAreaCallback callback, RvcDevice * instance)
     {
-        mHandleSkipCurrentAreaCallback = callback;
+        mHandleSkipCurrentAreaCallback       = callback;
         mHandleSkipCurrentAreaDeviceInstance = instance;
     }
 
     void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
     {
-        mIsSupportedAreasChangeAllowedCallback = callback;
+        mIsSupportedAreasChangeAllowedCallback       = callback;
         mIsSupportedAreasChangeAllowedDeviceInstance = instance;
     }
 
     void SetIsSupportedMapChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
     {
-        mIsSupportedMapChangeAllowedCallback = callback;
+        mIsSupportedMapChangeAllowedCallback       = callback;
         mIsSupportedMapChangeAllowedDeviceInstance = instance;
     }
 };

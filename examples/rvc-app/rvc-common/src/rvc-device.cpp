@@ -183,7 +183,8 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan sk
     // Call the device's skip command.
     // if successful
 
-    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting) || mServiceAreaDelegate.GetNumberOfProgressElements() == 0)
+    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting) ||
+        mServiceAreaDelegate.GetNumberOfProgressElements() == 0)
     {
         // notting else to do since there is no progress data.
         return true;
@@ -196,14 +197,15 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan sk
 
 bool RvcDevice::SaIsSupportedAreasChangeAllowed()
 {
-    return mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning);
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
 }
 
 bool RvcDevice::SaIsSupportedMapChangeAllowed()
 {
-    return mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning);
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
 }
-
 
 void RvcDevice::HandleChargedMessage()
 {

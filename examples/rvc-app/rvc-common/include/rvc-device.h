@@ -64,8 +64,6 @@ public:
         mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
         mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
         mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
-
-
     }
 
     /**
@@ -104,7 +102,6 @@ public:
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
-
     bool SaIsSetSelectedAreasAllowed(MutableCharSpan statusText);
 
     bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText);
@@ -112,7 +109,6 @@ public:
     bool SaIsSupportedAreasChangeAllowed();
 
     bool SaIsSupportedMapChangeAllowed();
-
 
     /**
      * Updates the state machine when the device becomes fully-charged.
