@@ -44,12 +44,12 @@ public:
     CHIP_ERROR Init() override;
 
     // command support
-    bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) override;
+    bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
 
     bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                               ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText) override;
+                               ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan & statusText) override;
 
-    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText) override;
+    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
     //*************************************************************************
     // Supported Areas accessors

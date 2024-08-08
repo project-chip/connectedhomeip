@@ -71,7 +71,7 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-
+;
     return mDelegate->Init();
 }
 
@@ -399,6 +399,8 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::Sk
         exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;
     }
+
+    exitResponse(SkipAreaStatus::kSuccess, ""_span);
 }
 
 //*************************************************************************
