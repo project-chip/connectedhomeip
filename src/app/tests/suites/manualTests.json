@@ -117,12 +117,7 @@
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
     "Identify": ["Test_TC_I_3_2"],
-    "IcdManagement": [
-        "Test_TC_ICDM_3_2",
-        "Test_TC_ICDM_3_3",
-        "Test_TC_ICDM_4_1",
-        "Test_TC_ICDM_5_1"
-    ],
+    "IcdManagement": ["Test_TC_ICDM_3_2", "Test_TC_ICDM_5_1"],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",

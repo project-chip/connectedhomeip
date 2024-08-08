@@ -4798,21 +4798,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ServiceArea {
 namespace Attributes {
 
-namespace SupportedLocations {
+namespace SupportedAreas {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedLocations
+} // namespace SupportedAreas
 
 namespace SupportedMaps {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedMaps
 
-namespace SelectedLocations {
+namespace SelectedAreas {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace SelectedLocations
+} // namespace SelectedAreas
 
-namespace CurrentLocation {
+namespace CurrentArea {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentLocation
+} // namespace CurrentArea
 
 namespace EstimatedEndTime {
 static constexpr AttributeId Id = 0x00000004;
@@ -5210,12 +5210,8 @@ namespace Schedules {
 static constexpr AttributeId Id = 0x00000051;
 } // namespace Schedules
 
-namespace PresetsSchedulesEditable {
-static constexpr AttributeId Id = 0x00000052;
-} // namespace PresetsSchedulesEditable
-
 namespace SetpointHoldExpiryTimestamp {
-static constexpr AttributeId Id = 0x00000053;
+static constexpr AttributeId Id = 0x00000052;
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace GeneratedCommandList {
@@ -6829,6 +6825,10 @@ static constexpr AttributeId Id = 0x00000003;
 namespace ActiveDatasetTimestamp {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace ActiveDatasetTimestamp
+
+namespace PendingDatasetTimestamp {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace PendingDatasetTimestamp
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

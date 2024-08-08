@@ -44,6 +44,8 @@ load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-enums.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-structs.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
