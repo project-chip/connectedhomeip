@@ -943,7 +943,7 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 bool Instance::AddPendingProgressElement(uint32_t aAreaId)
 {
     // create progress element
-    Structs::ProgressStruct::Type inactiveProgress = { aAreaId, OperationalStatusEnum::kPending };
+    Structs::ProgressStruct::Type inactiveProgress = { aAreaId, OperationalStatusEnum::kPending};
 
     // check max# of list entries
     if (mDelegate->GetNumberOfProgressElements() >= kMaxNumProgressElements)
