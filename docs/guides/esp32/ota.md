@@ -121,3 +121,66 @@ Please follow the steps below to generate an application image for OTA upgrades:
         ```
 
 3. Use the `lighting-app-encrypted-ota.bin` file with the OTA Provider app.
+
+## Delta OTA
+
+Delta OTA Updates is a feature that enables Over-the-Air (OTA) firmware update
+with compressed delta binaries. Patch files have smaller size than the original
+firmware file, which reduces the time and network usage to download the file
+from the server. Also, no additional storage partition is required for the
+"patch".
+
+### Firmware Changes
+
+-   Enable configuration options for OTA requestor and Delta OTA:
+
+    ```
+    CONFIG_ENABLE_OTA_REQUESTOR=y
+    CONFIG_ENABLE_DELTA_OTA=y
+    ```
+
+Please follow the steps below to generate an application image for OTA upgrades:
+
+1. Delta binary needs to be generated using binary delta encoding in Python
+   3.6+. You can install `detools` using the following command.
+
+    ```
+    pip install detools>=0.49.0
+    ```
+
+2. Generate delta binary.
+
+    ```
+    python managed_components/espressif__esp_delta_ota/examples/https_delta_ota/tools/esp_delta_ota_patch_gen.py --chip <chip> --base_binary <base-binary> --new_binary <new-binary> --patch_file_name <patch-file-name.bin>
+    ```
+
+3. Append the Matter OTA header:
+   `src/app/ota_image_tool.py create --vendor-id 0xFFF1 --product-id 0x8000 --version 2 --version-str "v2.0" -da sha256 <patch-file-name.bin> lighting-app-delta-ota.bin`
+
+4. Use the `lighting-app-delta-ota.bin` file with the OTA Provider app.
+
+## Encrypted Delta OTA
+
+To use encrypted delta OTA, follow the below steps.
+
+### Firmware Changes
+
+-   Enable configuration options for OTA requestor, Delta OTA and Encrypted OTA:
+
+    ```
+    CONFIG_ENABLE_OTA_REQUESTOR=y
+    CONFIG_ENABLE_DELTA_OTA=y
+    CONFIG_ENABLE_ENCRYPTED_OTA=y
+    ```
+
+1. Follow the step of `Generate a new RSA-3072 key pair or use an existing one`
+   of
+   [Encrypted OTA](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/esp32/ota.md#encrypted-ota)
+   to build your binary.
+
+2. Create delta binary as shown in `Generate delta binary` of
+   [Delta OTA](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/esp32/ota.md#delta-ota)
+
+3. Encrypt the application binary.
+
+4. Append the Matter OTA header.

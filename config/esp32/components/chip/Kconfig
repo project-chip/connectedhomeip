@@ -256,6 +256,15 @@ menu "CHIP Core"
             help
                 Enable this option to use the pre encrypted OTA image
 
+        config ENABLE_DELTA_OTA
+            bool "Enable delta OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option for delta OTA image updates. 
+                Delta OTA updates allow for smaller, more efficient updates by only 
+                sending the changes between the current and new firmware versions.
+
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
             depends on ENABLE_OTA_REQUESTOR
