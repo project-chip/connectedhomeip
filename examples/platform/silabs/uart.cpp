@@ -18,7 +18,7 @@
 #include "AppConfig.h"
 #include "matter_shell.h"
 #include <cmsis_os2.h>
-#include <lib/shell/Engine.h>
+// #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
 

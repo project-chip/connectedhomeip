@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <stdint.h>
 
 #if (SL_MATTER_GN_BUILD == 0)
@@ -99,7 +100,7 @@
 #define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
 #endif
 
-#ifdef SL_ICD_ENABLED
+#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC SL_IDLE_MODE_DURATION_S
@@ -117,7 +118,16 @@
 #define CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC
 #endif // CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 
-#endif // SL_ICD_ENABLED
+#endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+
+/**
+ * @brief CHIP_SHELL_MAX_LINE_SIZE
+ *
+ * @brief Platform maximum line for the Matter Shell
+ */
+#ifndef CHIP_SHELL_MAX_LINE_SIZE
+#define CHIP_SHELL_MAX_LINE_SIZE 256
+#endif // CHIP_SHELL_MAX_LINE_SIZE
 
 // ==================== FreeRTOS Configuration Overrides ====================
 #ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
