@@ -38,14 +38,14 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @protocol MTRDeviceControllerDelegate;
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRDeviceController : NSObject
+@interface MTRDeviceController_Concrete : MTRDeviceController
 
 /**
  * Controllers are created via the MTRDeviceControllerFactory object or
  * initialized via initWithParameters:error:.
  */
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+//- (instancetype)init NS_UNAVAILABLE;
+//+ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * Initialize a device controller with the provided parameters.  This will:
@@ -57,7 +57,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
@@ -262,7 +262,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @end
 
-@interface MTRDeviceController (Deprecated)
+@interface MTRDeviceController_Concrete (Deprecated)
 
 @property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_DEPRECATED(
     "Please use controllerNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
