@@ -24,8 +24,36 @@
 #include <lib/core/DataModelTypes.h>
 
 using namespace std;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 using Status = chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+const auto loginTempAccountIdentifierFieldId =
+    to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kTempAccountIdentifier));
+const auto loginSetupPINFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kSetupPIN));
+const auto loginNodeFieldId     = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
+const auto logoutNodeFieldId    = to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
+
+string charSpanToString(const CharSpan & charSpan)
+{
+    return { charSpan.data(), charSpan.size() };
+}
+
+std::string serializeLoginCommand(AccountLogin::Commands::Login::Type cmd)
+{
+    return R"({")" + loginTempAccountIdentifierFieldId + R"(":")" + charSpanToString(cmd.tempAccountIdentifier) + R"(",)" + R"(")" +
+        loginSetupPINFieldId + R"(":")" + charSpanToString(cmd.setupPIN) + R"(",)" + R"(")" + loginNodeFieldId + R"(":")" +
+        to_string(cmd.node.Value()) + R"("})";
+}
+
+std::string serializeLogoutCommand(AccountLogin::Commands::Logout::Type cmd)
+{
+    return R"({")" + logoutNodeFieldId + R"(":")" + to_string(cmd.node.Value()) + R"("})";
+}
+
+} // namespace
 
 AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDelegate, const char * setupPin) :
     mCommandDelegate(commandDelegate)
@@ -33,29 +61,68 @@ AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDele
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPIN,
                                       const chip::Optional<chip::NodeId> & nodeId)
 {
     ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogin called for endpoint %d", mEndpointId);
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    string setupPinString(setupPin.data(), setupPin.size());
 
-    if (strcmp(mSetupPin, setupPinString.c_str()) == 0)
+    if (mCommandDelegate == nullptr)
     {
-        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin success");
-        return true;
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPin);
+        ChipLogError(Zcl, "CommandDelegate not found");
         return false;
     }
+
+    if (tempAccountIdentifier.empty() || setupPIN.empty() || !nodeId.HasValue())
+    {
+        ChipLogError(Zcl, "Invalid parameters");
+        return false;
+    }
+
+    Json::Value response;
+    bool commandHandled                     = true;
+    AccountLogin::Commands::Login::Type cmd = { tempAccountIdentifier, setupPIN, nodeId };
+
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id, AccountLogin::Commands::Login::Id,
+                                                  serializeLoginCommand(cmd), commandHandled, response);
+    if (status == Status::Success)
+    {
+        // Format status response to verify that response is non-failure.
+        status = mCommandDelegate->FormatStatusResponse(response);
+    }
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin command returned with status: %d", chip::to_underlying(status));
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
-    // TODO: Insert your code here to send logout request
-    return true;
+    ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogout called for endpoint %d", mEndpointId);
+
+    if (mCommandDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "CommandDelegate not found");
+        return false;
+    }
+
+    if (!nodeId.HasValue())
+    {
+        ChipLogError(Zcl, "Invalid parameters");
+        return false;
+    }
+
+    Json::Value response;
+    bool commandHandled                      = true;
+    AccountLogin::Commands::Logout::Type cmd = { nodeId };
+
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id, AccountLogin::Commands::Logout::Id,
+                                                  serializeLogoutCommand(cmd), commandHandled, response);
+
+    if (status == Status::Success)
+    {
+        // Format status response to verify that response is non-failure.
+        status = mCommandDelegate->FormatStatusResponse(response);
+    }
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleLogout command returned with status: %d", chip::to_underlying(status));
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
