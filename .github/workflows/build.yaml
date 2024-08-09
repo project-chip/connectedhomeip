@@ -308,7 +308,7 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true enable_pylib=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
@@ -414,7 +414,6 @@ jobs:
                           # "host clang" build, which uses the pigweed
                           # clang.
                           "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
-                          "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
