@@ -542,7 +542,7 @@ void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
             while (GetSelectedAreaByIndex(i, areaId))
             {
                 GetInstance()->AddPendingProgressElement(areaId);
-                i ++;
+                i++;
             }
         }
     }
@@ -569,7 +569,7 @@ void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
     uint32_t currentAreaIndex;
     GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
     auto currentAreaMapId = currentArea.mapID;
-    finished = true;
+    finished              = true;
 
     if (GetInstance()->HasFeature(Feature::kProgressReporting))
     {
