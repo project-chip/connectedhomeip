@@ -1125,7 +1125,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MATTER_LOG_METRIC_SCOPE(kMetricAttestationChallengeForDevice, errorCode);
 
         errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
+        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorGetCommissionee error:nil], nil);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);

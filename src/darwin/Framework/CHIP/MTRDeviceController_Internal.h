@@ -60,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceController () {
 @protected
     std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
 }
