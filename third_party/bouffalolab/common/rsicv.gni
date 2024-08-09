@@ -16,8 +16,6 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/platform/device.gni")
 riscv_arch = "rv32imfc"
 riscv_abi = "ilp32f"
-#  riscv_cpu = ""
-#  riscv_float_abi = "hard"
-#  riscv_fpu = ""
