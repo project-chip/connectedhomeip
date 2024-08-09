@@ -131,7 +131,8 @@ class TC_SEAR_1_6(MatterBaseTest):
             asserts.assert_true(p.status in (Clusters.ServiceArea.Enums.OperationalStatusEnum.kPending,
                                              Clusters.ServiceArea.Enums.OperationalStatusEnum.kOperating),
                                 f"Progress entry with unexpected Status({p.status})")
-            asserts.assert_true(type(p.totalOperationalTime) in [type(None), type(NullValue)], "Progress.TotalOperationalTime has a value")
+            asserts.assert_true(type(p.totalOperationalTime) in [type(None), type(
+                NullValue)], "Progress.TotalOperationalTime has a value")
 
         test_step = "While all entries in Progress show the Pending or Operating status (i.e. \
                     before any area is skipped or completed), manually intervene to put the device \
