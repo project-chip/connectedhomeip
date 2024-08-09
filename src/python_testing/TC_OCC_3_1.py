@@ -40,7 +40,8 @@ from mobly import asserts
 class TC_OCC_3_1(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint = self.matter_test_config.endpoint
+        #endpoint = self.matter_test_config.endpoint
+        endpoint = self.user_params.get("endpoint", 1)
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
@@ -71,7 +72,7 @@ class TC_OCC_3_1(MatterBaseTest):
         ]
         return pics
 
-    # Sends and out-of-band command to the rvc-app
+    # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
