@@ -43,7 +43,8 @@ from mobly import asserts
 class TC_OCC_3_2(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.user_params.get("endpoint", 1)
+        #endpoint_id = self.matter_test_config.endpoint
         return await self.read_single_attribute_check_success(endpoint=endpoint_id, cluster=cluster, attribute=attribute)
 
     def desc_TC_OCC_3_2(self) -> str:
@@ -141,15 +142,23 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("3c")
         # CI call to trigger on
-        if self.is_ci:
+        if self.is_ci:            
             self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
+            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+            time.sleep(2)
+            # will write one more to consier priming report effect of the previous CI writing
+            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+            diff_val = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
+            # enduce occupancy state change one more to consider priming report effect of the previous CI writing  
+            self.wait_for_user_input(
+                prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
 
         self.step("3d")
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-                                  0, 1], timeout_sec=post_prompt_settle_delay_seconds)
+                                  initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
@@ -157,11 +166,12 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_all_remaining_steps("4b")
 
         self.step("4b")
-        initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        initial_dut = 8 # must be different from the initial attribute value!
+        await self.write_single_attribute(attributes.HoldTime(initial_dut)) # write one more time for priming report loss
 
         self.step("4c")
         # write a different a HoldTime attribute value
-        diff_val = 12
+        diff_val = 9
         await self.write_single_attribute(attributes.HoldTime(diff_val))
 
         self.step("4d")
@@ -176,11 +186,12 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("5d")
         else:
             self.step("5b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
+            initial_dut = 11 # must be different from the initial attribute value!
+            await self.write_single_attribute(attributes.PIROccupiedToUnoccupiedDelay(initial_dut)) # write one more time for priming report loss
 
             self.step("5c")
             # write the new attribute value
-            diff_val = 11
+            diff_val = 12
             await self.write_single_attribute(attributes.PIROccupiedToUnoccupiedDelay(diff_val))
 
             self.step("5d")
@@ -195,7 +206,8 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("6d")
         else:
             self.step("6b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+            initial_dut = 13 # must be different from the initial attribute value!
+            await self.write_single_attribute(attributes.UltrasonicOccupiedToUnoccupiedDelay(initial_dut))
 
             self.step("6c")
             # write the new attribute value
@@ -214,11 +226,12 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("7d")
         else:
             self.step("7b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
+            initial_dut = 15 # must be different from the initial attribute value!
+            await self.write_single_attribute(attributes.PhysicalContactOccupiedToUnoccupiedDelay(initial_dut))
 
             self.step("7c")
             # write the new attribute value
-            diff_val = 9
+            diff_val = 16
             await self.write_single_attribute(attributes.PhysicalContactOccupiedToUnoccupiedDelay(diff_val))
 
             self.step("7d")
