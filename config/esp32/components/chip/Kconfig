@@ -163,6 +163,16 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP data model.
 
+        config CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+            bool "Use heap memory to allocate object pools"
+            default n
+            help
+                This option enables the use of heap memory to allocate object pools.
+                When this option is enabled, it does not pre-allocate the object pools.
+                Additionally, there is no limit, (i.e. free heap is the limit) on the
+                maximum number of entries that can be allocated.
+                This option can be usefull if you run into static DRAM overflow.
+
     endmenu # "General Options"
 
     menu "Networking Options"
