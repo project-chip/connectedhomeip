@@ -180,12 +180,13 @@ class Flasher(firmware_utils.Flasher):
             flashbundle_contents = os.path.basename(args.output)
             if args.application is not None:
                 flashbundle_contents += "\n" + os.path.basename(args.application)
+            output_dir = os.path.dirname(args.output) or "."
             if args.platform_firmware_utils is not None:
                 flashbundle_contents += "\n" + os.path.basename(args.platform_firmware_utils)
-                subprocess.run(["cp", args.platform_firmware_utils, os.path.dirname(args.output)])
+                subprocess.run(["cp", args.platform_firmware_utils, output_dir])
             if args.firmware_utils is not None:
                 flashbundle_contents += "\n" + os.path.basename(args.firmware_utils)
-                subprocess.run(["cp", args.firmware_utils, os.path.dirname(args.output)])
+                subprocess.run(["cp", args.firmware_utils, output_dir])
 
             # Create the flashbundle file.
             try:
