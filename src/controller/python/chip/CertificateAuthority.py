@@ -92,7 +92,7 @@ class CertificateAuthority:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
-        self._activeAdmins: list[FabricAdmin.FabricAdmin] = []
+        self._activeAdmins: List[FabricAdmin.FabricAdmin] = []
 
     def LoadFabricAdminsFromStorage(self):
         ''' If FabricAdmins had been setup previously, this re-creates them using information from persistent storage.
