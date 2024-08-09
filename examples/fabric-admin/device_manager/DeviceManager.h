@@ -24,6 +24,8 @@
 
 #include <set>
 
+constexpr uint16_t kResponseTimeoutSeconds = 30;
+
 class Device
 {
 public:
@@ -67,7 +69,13 @@ public:
 
     void RemoveSyncedDevice(chip::NodeId nodeId);
 
-    void HandleAttributeChange(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void StartReverseCommissioning();
+
+    void CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+
+    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+
+    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
 
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
@@ -81,6 +89,7 @@ private:
     std::set<Device> mSyncedDevices;
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
+    uint64_t mRequestId   = 0;
 
     Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
     Device * FindDeviceByNode(chip::NodeId nodeId);

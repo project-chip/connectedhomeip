@@ -19,6 +19,7 @@
 #include "DeviceManager.h"
 
 #include <commands/interactive/InteractiveCommands.h>
+#include <crypto/RandUtils.h>
 
 #include <cstdio>
 #include <string>
@@ -97,8 +98,73 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::HandleAttributeChange(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
+void DeviceManager::StartReverseCommissioning()
 {
+    ChipLogProgress(NotSpecified, "Starting reverse commissioning for bridge device: NodeId: " ChipLogFormatX64,
+                    ChipLogValueX64(mRemoteBridgeNodeId));
+
+    uint64_t requestId = Crypto::GetRandU64();
+    uint16_t vendorId  = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+    uint16_t productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+
+    char command[kMaxCommandSize];
+    int written =
+        snprintf(command, sizeof(command), "commissionercontrol request-commissioning-approval %" PRIu64 " %u %u %" PRIu64 " %d",
+                 requestId, vendorId, productId, mRemoteBridgeNodeId, kRootEndpointId);
+
+    if (written < 0 || static_cast<size_t>(written) >= sizeof(command))
+    {
+        ChipLogError(NotSpecified, "Failed to format command string or command string was truncated.");
+    }
+    else
+    {
+        mRequestId = requestId;
+        PushCommand(command);
+    }
+}
+
+void DeviceManager::CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds)
+{
+    ChipLogProgress(NotSpecified, "Request the Commissioner Control Server to begin commissioning a previously approved request.");
+
+    char command[kMaxCommandSize];
+    int written = snprintf(command, sizeof(command), "commissionercontrol commission-node %" PRIu64 " %u %" PRIu64 " %d", requestId,
+                           responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
+
+    if (written < 0 || static_cast<size_t>(written) >= sizeof(command))
+    {
+        ChipLogError(NotSpecified, "Failed to format command string or command string was truncated.");
+    }
+    else
+    {
+        PushCommand(command);
+    }
+}
+
+void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
+{
+    if (path.mClusterId == CommissionerControl::Id &&
+        path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
+    {
+        ChipLogProgress(NotSpecified, "Attribute SupportedDeviceCategories detected.");
+
+        BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> value;
+        CHIP_ERROR error = app::DataModel::Decode(*data, value);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+            return;
+        }
+
+        if (value.Has(CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization))
+        {
+            ChipLogProgress(NotSpecified, "Remote Fabric-Bridge supports Fabric Synchronization, start reverse commissioning.");
+            StartReverseCommissioning();
+        }
+
+        return;
+    }
+
     if (path.mClusterId != Descriptor::Id || path.mAttributeId != Descriptor::Attributes::PartsList::Id)
     {
         return;
@@ -167,7 +233,7 @@ void DeviceManager::HandleAttributeChange(const app::ConcreteDataAttributePath &
 
         if (mAutoSyncEnabled)
         {
-            char command[64];
+            char command[kMaxCommandSize];
             snprintf(command, sizeof(command), "fabricsync sync-device %d", endpoint);
             PushCommand(command);
         }
@@ -188,7 +254,7 @@ void DeviceManager::HandleAttributeChange(const app::ConcreteDataAttributePath &
 
         if (mAutoSyncEnabled)
         {
-            char command[64];
+            char command[kMaxCommandSize];
             snprintf(command, sizeof(command), "pairing unpair %ld", device->GetNodeId());
 
             PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
@@ -203,6 +269,41 @@ void DeviceManager::HandleAttributeChange(const app::ConcreteDataAttributePath &
             PushCommand(command);
         }
     }
+}
+
+void DeviceManager::HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
+{
+    if (header.mPath.mClusterId != CommissionerControl::Id ||
+        header.mPath.mEventId != CommissionerControl::Events::CommissioningRequestResult::Id)
+    {
+        return;
+    }
+
+    ChipLogProgress(NotSpecified, "CommissioningRequestResult event received.");
+
+    CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
+    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to decode event value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
+
+    if (value.requestId != mRequestId)
+    {
+        ChipLogError(NotSpecified, "The RequestId does not match the RequestId provided to RequestCommissioningApproval");
+        return;
+    }
+
+    if (value.statusCode != static_cast<uint8_t>(Protocols::InteractionModel::Status::Success))
+    {
+        ChipLogError(NotSpecified, "The server is not ready to begin commissioning the requested device");
+        return;
+    }
+
+    // The server is ready to begin commissioning the requested device, request the Commissioner Control Server to begin
+    // commissioning a previously approved request.
+    CommissionApprovedRequest(value.requestId, kResponseTimeoutSeconds);
 }
 
 void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
