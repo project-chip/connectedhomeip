@@ -39,14 +39,40 @@ constexpr uint16_t kSubscribeMinInterval    = 0;
 constexpr uint16_t kSubscribeMaxInterval    = 60;
 constexpr uint16_t kRemoteBridgePort        = 5540;
 
+void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
+{
+    NodeId bridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
+
+    if (bridgeNodeId == kUndefinedNodeId)
+    {
+        // print to console
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet, halting reverse commissioning.\n");
+        return;
+    }
+
+    char command[kMaxCommandSize];
+    snprintf(command, sizeof(command), "commissionercontrol read supported-device-categories %ld %d", bridgeNodeId,
+             kRootEndpointId);
+
+    PushCommand(command);
+}
+
 } // namespace
 
 void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
     {
-        ChipLogProgress(NotSpecified, "Commissioning complete for non-bridge device: NodeId: " ChipLogFormatX64,
-                        ChipLogValueX64(deviceId));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to pair non-bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Commissioning complete for non-bridge device: NodeId: " ChipLogFormatX64,
+                            ChipLogValueX64(deviceId));
+        }
         return;
     }
 
@@ -57,10 +83,25 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, 
                         ChipLogValueX64(mBridgeNodeId));
 
         char command[kMaxCommandSize];
-        snprintf(command, sizeof(command), "descriptor subscribe parts-list %d %d %ld %d", kSubscribeMinInterval,
-                 kSubscribeMaxInterval, mBridgeNodeId, kAggragatorEndpointId);
 
+        // Prepare and push the descriptor subscribe command
+        snprintf(command, sizeof(command), "descriptor subscribe parts-list %d %d %" PRIu64 " %d", kSubscribeMinInterval,
+                 kSubscribeMaxInterval, mBridgeNodeId, kAggragatorEndpointId);
         PushCommand(command);
+
+        // Prepare and push the commissioner control subscribe command
+        snprintf(command, sizeof(command),
+                 "commissionercontrol subscribe-event commissioning-request-result %d %d %" PRIu64 " %d --is-urgent true",
+                 kSubscribeMinInterval, kSubscribeMaxInterval, mBridgeNodeId, kRootEndpointId);
+        PushCommand(command);
+
+        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+        // via the Commissioner Control Cluster. However, we must first verify that the
+        // remote Fabric-Bridge supports Fabric Synchronization.
+        //
+        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+        DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
     }
     else
     {

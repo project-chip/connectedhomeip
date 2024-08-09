@@ -45,9 +45,11 @@ source_set("fabric-bridge-lib") {
     "include/BridgedDeviceBasicInformationImpl.h",
     "include/BridgedDeviceManager.h",
     "include/CHIPProjectAppConfig.h",
+    "include/CommissionerControl.h",
     "src/BridgedDevice.cpp",
     "src/BridgedDeviceBasicInformationImpl.cpp",
     "src/BridgedDeviceManager.cpp",
+    "src/CommissionerControl.cpp",
     "src/ZCLCallbacks.cpp",
   ]
 

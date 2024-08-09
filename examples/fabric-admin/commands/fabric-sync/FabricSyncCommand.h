@@ -23,7 +23,6 @@
 #include <commands/pairing/PairingCommand.h>
 
 constexpr uint32_t kSetupPinCode               = 20202021;
-constexpr uint16_t kMaxCommandSize             = 64;
 constexpr uint16_t kDiscriminator              = 3840;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;

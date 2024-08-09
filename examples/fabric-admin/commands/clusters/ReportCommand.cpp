@@ -46,7 +46,7 @@ void ReportCommand::OnAttributeData(const app::ConcreteDataAttributePath & path,
 
     LogErrorOnFailure(RemoteDataModelLogger::LogAttributeAsJSON(path, data));
 
-    DeviceMgr().HandleAttributeChange(path, data);
+    DeviceMgr().HandleAttributeData(path, data);
 }
 
 void ReportCommand::OnEventData(const app::EventHeader & eventHeader, TLV::TLVReader * data, const app::StatusIB * status)
@@ -73,11 +73,5 @@ void ReportCommand::OnEventData(const app::EventHeader & eventHeader, TLV::TLVRe
 
     LogErrorOnFailure(RemoteDataModelLogger::LogEventAsJSON(eventHeader, data));
 
-    CHIP_ERROR error = DataModelLogger::LogEvent(eventHeader, data);
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(NotSpecified, "Response Failure: Can not decode Data");
-        mError = error;
-        return;
-    }
+    DeviceMgr().HandleEventData(eventHeader, data);
 }
