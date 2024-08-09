@@ -65,9 +65,6 @@
 #include <credentials/CHIPCert.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
-#endif
 #endif
 
 using namespace ::chip;
@@ -145,6 +142,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     {
         ChipLogError(DeviceLayer, "Failed to reset WiFi statistic counts");
     }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    pmWiFiPAF = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 #endif
 
     return CHIP_NO_ERROR;
@@ -878,6 +878,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
                                               MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish: [%s]", args);
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_fi_w1_wpa_supplicant1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %d ! ", publish_id);
 
@@ -896,6 +897,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", mpaf_info.peer_publish_id);
     snprintf(args, sizeof(args), "publish_id=%d", mpaf_info.peer_publish_id);
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
     return CHIP_NO_ERROR;
 }
@@ -906,21 +908,12 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdverti
     {
         return _WiFiPAFPublish(args);
     }
-    else
-    {
-        return _WiFiPAFCancelPublish();
-    }
+    return _WiFiPAFCancelPublish();
 }
 
-Transport::WiFiPAFBase * ConnectivityManagerImpl::_GetWiFiPAF()
+WiFiPAF::WiFiPAFLayer * ConnectivityManagerImpl::_GetWiFiPAF()
 {
     return pmWiFiPAF;
-}
-
-void ConnectivityManagerImpl::_SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF)
-{
-    pmWiFiPAF = pWiFiPAF;
-    return;
 }
 #endif
 
@@ -1385,7 +1378,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
                         mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
                         mpaf_info.peer_addr[5]);
-        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kConnected);
+        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
         // Read the ssi
         GAutoPtr<GVariant> ssiValue(g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING));
@@ -1398,14 +1391,12 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
     }
     else
     {
-        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kInitialized);
+        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kInitialized);
         if (mOnPafSubscribeError != nullptr)
         {
             mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);
         }
     }
-
-    return;
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -1440,8 +1431,6 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     event.Type                           = DeviceEventType::kCHIPoWiFiPAFWriteReceived;
     event.CHIPoWiFiPAFWriteReceived.Data = std::move(buf).UnsafeRelease();
     PlatformMgr().PostEventOrDie(&event);
-
-    return;
 }
 
 void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, gint reason)
@@ -1455,7 +1444,6 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, g
     {
         mpaf_info.subscribe_id = 0;
     }
-    return;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
@@ -1474,7 +1462,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
         CHIP_ERROR_BUFFER_TOO_SMALL);
     mAppState                = appState;
     PafPublish_ssi.DevOpCode = 0;
-    PafPublish_ssi.DevInfo   = connDiscriminator.GetLongValue();
+    PafPublish_ssi.DevInfo =
+        connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
     {
         PafPublish_ssi.ProductId = 0;
@@ -1489,6 +1478,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe: [%s]", args);
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr,
                                                                &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
@@ -1525,7 +1515,17 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelConnect()
     gchar args[MAX_PAF_PUBLISH_SSI_BUFLEN];
 
     snprintf(args, sizeof(args), "subscribe_id=%d", mpresubscribe_id);
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+    mOnPafSubscribeComplete = nullptr;
+    mOnPafSubscribeError    = nullptr;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteConnect()
+{
+    mOnPafSubscribeComplete = nullptr;
+    mOnPafSubscribeError    = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -1563,13 +1563,16 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
              mpaf_info.peer_publish_id, mpaf_info.peer_addr[0], mpaf_info.peer_addr[1], mpaf_info.peer_addr[2],
              mpaf_info.peer_addr[3], mpaf_info.peer_addr[4], mpaf_info.peer_addr[5]);
 
-    ChipLogProgress(Controller, "===> %s(), (%lu, %u)", __FUNCTION__, (strlen(args) + msgBuf->DataLength()), MAX_PAF_TX_SSI_BUFLEN)
-        VerifyOrReturnError((strlen(args) + msgBuf->DataLength() < MAX_PAF_TX_SSI_BUFLEN), CHIP_ERROR_BUFFER_TOO_SMALL);
+    if (strlen(args) + msgBuf->DataLength() >= MAX_PAF_TX_SSI_BUFLEN)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     ret = chip::Encoding::BytesToUppercaseHexString(msgBuf->Start(), msgBuf->DataLength(), &args[strlen(args)],
                                                     MAX_PAF_TX_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi: [%s]", args);
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_fi_w1_wpa_supplicant1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
     ChipLogProgress(Controller, "WiFi-PAF: Outbound message (%lu) done", msgBuf->DataLength());
     return ret;
