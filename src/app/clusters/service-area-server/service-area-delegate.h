@@ -72,7 +72,7 @@ public:
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
      */
-    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) = 0;
+    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) = 0;
 
     /**
      * Given a set of locations to be set to the SelectedAreas attribute, this method should check that
@@ -92,7 +92,7 @@ public:
      * device must stop.
      */
     virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & locationStatus,
-                                       MutableCharSpan statusText) = 0;
+                                       MutableCharSpan & statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedAreas and CurrentArea attributes are not null before
@@ -121,7 +121,7 @@ public:
      * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
      * which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
         // device support of this command is optional
         CopyCharSpanToMutableCharSpan("Skip Current Area command not supported by device"_span, skipStatusText);
