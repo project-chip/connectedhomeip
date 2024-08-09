@@ -25754,39 +25754,12 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> waterHeaterManagementboostCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo waterHeaterManagementboostdurationCommandParameterInfo = new CommandParameterInfo("duration", Long.class, Long.class);
-    waterHeaterManagementboostCommandParams.put("duration",waterHeaterManagementboostdurationCommandParameterInfo);
-
-    CommandParameterInfo waterHeaterManagementboostoneShotCommandParameterInfo = new CommandParameterInfo("oneShot", Optional.class, Boolean.class);
-    waterHeaterManagementboostCommandParams.put("oneShot",waterHeaterManagementboostoneShotCommandParameterInfo);
-
-    CommandParameterInfo waterHeaterManagementboostemergencyBoostCommandParameterInfo = new CommandParameterInfo("emergencyBoost", Optional.class, Boolean.class);
-    waterHeaterManagementboostCommandParams.put("emergencyBoost",waterHeaterManagementboostemergencyBoostCommandParameterInfo);
-
-    CommandParameterInfo waterHeaterManagementboosttemporarySetpointCommandParameterInfo = new CommandParameterInfo("temporarySetpoint", Optional.class, Integer.class);
-    waterHeaterManagementboostCommandParams.put("temporarySetpoint",waterHeaterManagementboosttemporarySetpointCommandParameterInfo);
-
-    CommandParameterInfo waterHeaterManagementboosttargetPercentageCommandParameterInfo = new CommandParameterInfo("targetPercentage", Optional.class, Integer.class);
-    waterHeaterManagementboostCommandParams.put("targetPercentage",waterHeaterManagementboosttargetPercentageCommandParameterInfo);
-
-    CommandParameterInfo waterHeaterManagementboosttargetReheatCommandParameterInfo = new CommandParameterInfo("targetReheat", Optional.class, Integer.class);
-    waterHeaterManagementboostCommandParams.put("targetReheat",waterHeaterManagementboosttargetReheatCommandParameterInfo);
     InteractionInfo waterHeaterManagementboostInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.WaterHeaterManagementCluster) cluster)
         .boost((DefaultClusterCallback) callback
-        , (Long)
-        commandArguments.get("duration")
-        , (Optional<Boolean>)
-        commandArguments.get("oneShot")
-        , (Optional<Boolean>)
-        commandArguments.get("emergencyBoost")
-        , (Optional<Integer>)
-        commandArguments.get("temporarySetpoint")
-        , (Optional<Integer>)
-        commandArguments.get("targetPercentage")
-        , (Optional<Integer>)
-        commandArguments.get("targetReheat")
+        , (ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct)
+        commandArguments.get("boostInfo")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

@@ -156,6 +156,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestGlobalStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestListStructOctet.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UserLabelClusterLabelStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterManagementClusterWaterHeaterBoostInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
 ]
@@ -241,6 +242,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/UnitTestingClusterTestFabricScopedEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ValveConfigurationAndControlClusterValveFaultEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ValveConfigurationAndControlClusterValveStateChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WaterHeaterManagementClusterBoostStartedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterAssociationFailureEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterConnectionStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/WiFiNetworkDiagnosticsClusterDisconnectionEvent.kt",
