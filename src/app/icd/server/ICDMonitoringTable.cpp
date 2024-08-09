@@ -140,7 +140,6 @@ CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    // TODO - Add function to set PSA key lifetime
     ReturnErrorOnFailure(symmetricKeystore->CreateKey(keyMaterial, aesKeyHandle));
     CHIP_ERROR error = symmetricKeystore->CreateKey(keyMaterial, hmacKeyHandle);
 
@@ -269,15 +268,25 @@ CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & en
     VerifyOrReturnError(entry.keyHandleValid, CHIP_ERROR_INVALID_ARGUMENT);
 
     ICDMonitoringEntry e(this->mFabric, index);
-    e.checkInNodeID    = entry.checkInNodeID;
-    e.monitoredSubject = entry.monitoredSubject;
-    e.clientType       = entry.clientType;
-    e.index            = index;
+    e.checkInNodeID     = entry.checkInNodeID;
+    e.monitoredSubject  = entry.monitoredSubject;
+    e.clientType        = entry.clientType;
+    e.index             = index;
+    e.symmetricKeystore = entry.symmetricKeystore;
 
     memcpy(e.aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
            entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
     memcpy(e.hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
            entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
+    ReturnErrorOnFailure(e.symmetricKeystore->PersistICDKey(e.aesKeyHandle));
+    CHIP_ERROR error = e.symmetricKeystore->PersistICDKey(e.hmacKeyHandle);
+    if (error != CHIP_NO_ERROR)
+    {
+        // If setting the persistence of the HmacKeyHandle failed, we need to delete the AesKeyHandle to avoid a key leak
+        e.symmetricKeystore->DestroyKey(e.aesKeyHandle);
+        return error;
+    }
 
     return e.Save(this->mStorage);
 }
