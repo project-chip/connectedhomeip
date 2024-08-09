@@ -59,7 +59,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedMaps attribute")
         supported_maps = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedMaps)
-        logging.info("SupportedMaps: %s" % (supported_maps))
+        logging.info("SupportedMaps: %s" % supported_maps)
         asserts.assert_less_equal(len(supported_maps), 255,
                                   "SupportedMaps should have max 255 entries")
 
@@ -69,14 +69,14 @@ class TC_SEAR_1_2(MatterBaseTest):
         name_list = [m.name for m in supported_maps]
         asserts.assert_true(len(set(name_list)) == len(name_list), "SupportedMaps must have unique Name values!")
 
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.mapid_list = mapid_list
 
     async def read_and_validate_supported_areas(self, step):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        logging.info("SupportedAreas: %s" % (supported_areas))
+        logging.info("SupportedAreas: %s" % supported_areas)
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
@@ -103,15 +103,16 @@ class TC_SEAR_1_2(MatterBaseTest):
                 asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
                 areadesc_s.add(k)
 
-            if a.locationInfo is NullValue and a.landmarkTag is NullValue:
+            if a.areaDesc.locationInfo is NullValue and a.areaDesc.landmarkInfo is NullValue:
                 asserts.assert_true(
-                    f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
-            if a.landmarkTag is not NullValue:
-                asserts.assert_true(a.landmarkTag <= self.MAX_LANDMARK_ID,
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.landmarkTag})")
-                asserts.assert_true(a.positionTag is NullValue or a.positionTag in range(0, self.MAX_RELPOS_ID),
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.positionTag})")
-        # save so other methods can use this if neeeded
+                    f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkInfo")
+            if a.areaDesc.landmarkInfo is not NullValue:
+                asserts.assert_true(a.areaDesc.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaDesc.landmarkInfo.landmarkTag})")
+                asserts.assert_true(a.areaDesc.landmarkInfo.positionTag is NullValue or a
+                                    .areaDesc.landmarkInfo.positionTag in range(0, self.MAX_RELPOS_ID),
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.areaDesc.landmarkInfo.positionTag})")
+        # save so other methods can use this if needed
         self.areaid_list = areaid_list
 
     async def read_and_validate_selected_areas(self, step):
@@ -130,7 +131,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         for a in selected_areas:
             asserts.assert_true(a in self.areaid_list,
                                 f"SelectedAreas entry {a} has invalid value")
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.selareaid_list = selected_areas
 
     async def read_and_validate_current_area(self, step):
@@ -143,7 +144,7 @@ class TC_SEAR_1_2(MatterBaseTest):
                             or
                             current_area in self.selareaid_list,
                             f"CurrentArea {current_area} is invalid. SelectedAreas is {self.selareaid_list}.")
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.current_area = current_area
 
     async def read_and_validate_estimated_end_time(self, step):
