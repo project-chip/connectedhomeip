@@ -124,7 +124,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	# Download Ubuntu image for QEMU
 	&& curl https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img \
 	-o /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img
-	# Prepare ubuntu image
+# Prepare ubuntu image
 RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
 	&& guestfish -a $UBUNTU_QEMU_IMG \
@@ -209,13 +209,14 @@ RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	-append 'console=ttyS0 root=/dev/vda4' \
 	-netdev user,id=network0 \
 	-device e1000,netdev=network0,mac=52:54:00:12:34:56 \
-    -virtfs "local,path=/tmp,mount_tag=host0,security_model=passthrough,id=host0" \
-# tmp folder is mounted only to preserve error during boot
+	-virtfs "local,path=/tmp,mount_tag=host0,security_model=passthrough,id=host0" \
+	# tmp folder is mounted only to preserve error during boot
 	&& mkdir -p /chip \
 	&& rm -rf /opt/ubuntu-qemu/rootfs \
 	&& echo -n \
 	"#!/bin/bash\n" \
 	"grep -q 'rootshell' /proc/cmdline && exit\n" \
+	"[[ -n \$SSH_CONNECTION ]] && exit \n" \
 	"if [[ -x /chip/runner.sh ]]; then\n" \
 	"  echo '### RUNNER START ###'\n" \
 	"  cd /chip\n" \
@@ -227,7 +228,7 @@ RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	"  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \
 	"fi\n" \
 	"echo 'Shutting down emulated system...'\n" \
-	"echo o > /proc/sysrq-trigger\n" \
+	"systemctl poweroff\n" \
 	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
 	&& virt-sparsify --compress ${UBUNTU_QEMU_IMG} ${UBUNTU_QEMU_IMG}.compressed \
 	&& mv ${UBUNTU_QEMU_IMG}.compressed ${UBUNTU_QEMU_IMG} \

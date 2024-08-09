@@ -261,16 +261,32 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
     {
         ret = InterfaceTypeEnum::kWiFi;
     }
-    else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
+    else
     {
-        struct ethtool_cmd ecmd = {};
-        ecmd.cmd                = ETHTOOL_GSET;
-        struct ifreq ifr        = {};
-        ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-        Platform::CopyString(ifr.ifr_name, ifname);
+        // During tests in CI WiFi interfaces are created by mac80211_hwsim driver
+        // Unfortunately, this driver does not support SIOCGIWNAME so we need to check it in a different way.
+        struct ethtool_drvinfo drvinfo = {};
+        struct ifreq ifr_driver        = {};
+        drvinfo.cmd                    = ETHTOOL_GDRVINFO;
+        ifr_driver.ifr_data            = reinterpret_cast<char *>(&drvinfo);
+        Platform::CopyString(ifr_driver.ifr_name, ifname);
+        if (ioctl(sock, SIOCETHTOOL, &ifr_driver) == 0 && strcmp(drvinfo.driver, "mac80211_hwsim") == 0)
+        {
+            ret = InterfaceTypeEnum::kWiFi;
+        }
+        else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
+        {
+            struct ethtool_cmd ecmd = {};
+            ecmd.cmd                = ETHTOOL_GSET;
+            struct ifreq ifr        = {};
+            ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
+            Platform::CopyString(ifr.ifr_name, ifname);
 
-        if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = InterfaceTypeEnum::kEthernet;
+            if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
+            {
+                ret = InterfaceTypeEnum::kEthernet;
+            }
+        }
     }
 
     close(sock);
