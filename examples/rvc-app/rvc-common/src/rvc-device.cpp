@@ -186,7 +186,6 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & 
 
     if (finished)
     {
-        mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
         HandleActivityCompleteEvent();
     }
 
@@ -302,6 +301,9 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.OnOperationCompletionDetected(0, a, b);
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
 }
 
 void RvcDevice::HandleAreaCompletedEvent()
@@ -311,7 +313,6 @@ void RvcDevice::HandleAreaCompletedEvent()
 
     if (finished)
     {
-        mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
         HandleActivityCompleteEvent();
     }
 }
