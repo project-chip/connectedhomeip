@@ -173,7 +173,6 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
         -   `BL602DK`, `BL704LDK` and `BL706DK`.
 
-
             ```shell
             ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
             ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
@@ -301,11 +300,11 @@ ota-provider-app build and usage.
     -   Add boot parameters, signature/encryption if specified
     -   And specify whether image has be compressed.
 -   Add Matter recognition header by
-    [ota_image_tool.py](../../../docs/guides/openthread_border_router_pi.md).
+    [ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md).
 
 Script `*.flash.py` builds `Bouffalo Lab` bootable image and call
-[ota_image_tool.py](../../../docs/guides/openthread_border_router_pi.md) to add
-Matter recognition header. Take `BL602DK` as example.
+[ota_image_tool.py](../../../docs/platforms/openthread/openthread_border_router_pi.md)
+to add Matter recognition header. Take `BL602DK` as example.
 
 ```shell
 ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --build-ota --vendor-id <vendor id> --product-id <product id> --version <version> --version-str <version string> --digest-algorithm <digest algorithm>

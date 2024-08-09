@@ -168,7 +168,7 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 #### Commissioning the Thread device (ESP32H2)
 
 -   For ESP32-H2, firstly start OpenThread Border Router, you can either use
-    [Raspberry Pi OpenThread Border Router](../openthread_border_router_pi.md)
+    [Raspberry Pi OpenThread Border Router](../openthread/openthread_border_router_pi.md)
     OR
     [ESP32 OpenThread Border Router](../../../examples/thread-br-app/esp32/README.md)
 

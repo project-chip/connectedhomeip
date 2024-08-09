@@ -618,7 +618,7 @@ internal flash space can be found in the
 The steps for building the SSBL binary with appropriate configuration and
 writing to the board the binary and other OTA related configurations are
 described in the
-[K32W0x1 OTA guide](../../../../docs/guides/nxp/nxp_k32w0_ota_guide.md).
+[K32W0x1 OTA guide](../../../../docs/platforms/nxp/nxp_k32w0_ota_guide.md).
 
 Note that the application needs to be built using the
 `chip_enable_ota_requestor=true` option. This is enabled in the configuration by
