@@ -46,8 +46,7 @@ cluster = Clusters.DoorLock
 class AliroAttributeVerify:
     th_step: str
     attribute: Clusters.DoorLock.Attributes
-    cluster: Clusters.DoorLock
-    aliro_attribute_value: bytes
+    attribute_value: bytes
 
 
 class TC_DRLK_2_13(MatterBaseTest):
@@ -184,11 +183,11 @@ class TC_DRLK_2_13(MatterBaseTest):
             else:
                 pics_condition = False
 
-            if pics_condition is True:
+            if pics_condition:
                 dut_aliro_key = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                    cluster=aliro_attribute_step.cluster,
+                                                                    cluster=Clusters.Objects.DoorLock,
                                                                     attribute=aliro_attribute_step.attribute)
-                asserts.assert_equal(dut_aliro_key, aliro_attribute_step.aliro_attribute_value,
+                asserts.assert_equal(dut_aliro_key, aliro_attribute_step.attribute_value,
                                      f"Aliro Attribute key verification Failed, readAttributeResponse{dut_aliro_key}")
 
     def pics_TC_DRLK_2_13(self) -> list[str]:
@@ -223,7 +222,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             else:
                 pics_check = self.pics_guard(self.check_pics("DRLK.S.F0e") and self.check_pics("DRLK.S.C28.Rsp"))
 
-            if use_group_resolving_key is False and pics_check is True:
+            if not use_group_resolving_key and pics_check:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=self.signingKey,
                     verificationKey=self.verificationKey,
@@ -231,7 +230,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
-            elif use_group_resolving_key is True and pics_check is True:
+            elif use_group_resolving_key and pics_check:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=self.signingKey,
                     verificationKey=self.verificationKey,
@@ -394,19 +393,14 @@ class TC_DRLK_2_13(MatterBaseTest):
         await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.Success)
         # step 3,4,5
         aliro_attribute_verify_steps = [
-            {"th_step": "3", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey,
-             "aliro_attribute_value": self.verificationKey},
-            {"th_step": "4", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier,
-             "aliro_attribute_value": self.groupIdentifier},
-            {"th_step": "5", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey,
-             "aliro_attribute_value": self.groupResolvingKey}
+            AliroAttributeVerify(th_step="3", attribute=Clusters.Objects.DoorLock.Attributes.AliroReaderVerificationKey,
+                                 attribute_value=self.verificationKey),
+            AliroAttributeVerify(th_step="4", attribute=Clusters.Objects.DoorLock.Attributes.AliroReaderGroupIdentifier,
+                                 attribute_value=self.groupIdentifier),
+            AliroAttributeVerify(th_step="5", attribute=Clusters.Objects.DoorLock.Attributes.AliroGroupResolvingKey,
+                                 attribute_value=self.groupResolvingKey)
         ]
-        list_of_verification_objects = [AliroAttributeVerify(**aliro_object) for aliro_object in
-                                        aliro_attribute_verify_steps]
-        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=list_of_verification_objects)
+        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=aliro_attribute_verify_steps)
 
         #  step 6
         self.step("6a")
@@ -421,16 +415,14 @@ class TC_DRLK_2_13(MatterBaseTest):
 
         # steps 8,9,10
         aliro_attribute_verify_steps = [
-            {"th_step": "8", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey, "aliro_attribute_value": NullValue},
-            {"th_step": "9", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier, "aliro_attribute_value": NullValue},
-            {"th_step": "10", "cluster": Clusters.Objects.DoorLock,
-             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey, "aliro_attribute_value": NullValue}
+            AliroAttributeVerify(th_step="8", attribute=Clusters.Objects.DoorLock.Attributes.AliroReaderVerificationKey,
+                                 attribute_value=NullValue),
+            AliroAttributeVerify(th_step="9", attribute=Clusters.Objects.DoorLock.Attributes.AliroReaderGroupIdentifier,
+                                 attribute_value=NullValue),
+            AliroAttributeVerify(th_step="10", attribute=Clusters.Objects.DoorLock.Attributes.AliroGroupResolvingKey,
+                                 attribute_value=NullValue)
         ]
-        list_of_verification_objects = [AliroAttributeVerify(**aliro_object) for aliro_object in
-                                        aliro_attribute_verify_steps]
-        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=list_of_verification_objects)
+        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=aliro_attribute_verify_steps)
 
         # step 11
         self.step("11a")
