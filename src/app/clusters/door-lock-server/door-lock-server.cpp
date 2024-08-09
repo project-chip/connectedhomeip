@@ -803,6 +803,19 @@ void DoorLockServer::setCredentialCommandHandler(
             return;
         }
 
+        // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+        // CreatorFabricIndex of the credential being modified
+        if (existingCredential.createdBy != fabricIdx)
+        {
+            ChipLogProgress(Zcl,
+                            "[createCredential] Unable to modify credential. Fabric index differs from creator fabric "
+                            "[endpointId=%d,credentialIndex=%d,creatorIdx=%d,modifierIdx=%d]",
+                            commandPath.mEndpointId, credentialIndex, existingCredential.createdBy, fabricIdx);
+
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
@@ -2218,6 +2231,17 @@ DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endp
         return DlStatus::kInvalidField;
     }
 
+    // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+    // CreatorFabricIndex in the user record pointed to by UserIndex
+    if (user.createdBy != modifierFabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[createCredential] Unable to create credential for user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, modifierFabricIdx);
+        return DlStatus::kInvalidField;
+    }
+
     // Add new credential to the user
     auto status = addCredentialToUser(endpointId, modifierFabricIdx, userIndex, credential);
     if (DlStatus::kSuccess != status)
@@ -2336,6 +2360,17 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         ChipLogProgress(Zcl, "[ModifyUserCredential] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId,
                         userIndex);
         return DlStatus::kFailure;
+    }
+
+    // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+    // CreatorFabricIndex in the user record pointed to by UserIndex
+    if (user.createdBy != modifierFabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[createCredential] Unable to modify credential for user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, modifierFabricIdx);
+        return DlStatus::kInvalidField;
     }
 
     for (size_t i = 0; i < user.credentials.size(); ++i)
