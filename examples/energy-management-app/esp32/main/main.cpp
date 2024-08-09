@@ -16,7 +16,14 @@
  */
 
 #include "DeviceCallbacks.h"
+
+#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 #include <EnergyEvseMain.h>
+#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
+
+#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+#include <WaterHeaterMain.h>
+#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
@@ -134,13 +141,26 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 void ApplicationInit()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
+#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
     EvseApplicationInit();
+#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
+
+#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+    WaterHeaterApplicationInit();
+#endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
 void ApplicationShutdown()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
+
+#if CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
     EvseApplicationShutdown();
+#endif // CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
+
+#if CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+    WaterHeaterApplicationShutdown();
+#endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
 static void InitServer(intptr_t context)
