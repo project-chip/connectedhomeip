@@ -344,6 +344,12 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
                         Json::Value & value);
 

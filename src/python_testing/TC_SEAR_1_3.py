@@ -53,6 +53,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
         logging.info("SupportedAreas: %s" % (supported_areas))
 
+        self.supported_areas = supported_areas
+
         return [a.areaID for a in supported_areas]
 
     async def read_selected_areas(self, step):
