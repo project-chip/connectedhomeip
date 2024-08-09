@@ -390,4 +390,9 @@ void RvcDevice::HandleResetMessage()
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
+
+    mServiceAreaInstance.ClearSelectedAreas();
+    mServiceAreaInstance.ClearProgress();
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
 }
