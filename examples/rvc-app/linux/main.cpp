@@ -37,8 +37,7 @@ RvcDevice * gRvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    // todo revert after testing
-    std::string path = kChipEventFifoPathPrefix; // + std::to_string(getpid());
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
     if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
     {
