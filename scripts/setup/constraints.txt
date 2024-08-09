@@ -273,7 +273,7 @@ wcwidth==0.2.6
     # via prompt-toolkit
 websockets==10.4
     # via -r requirements.all.txt
-west==1.0.0
+west==1.2.0
     # via -r requirements.zephyr.txt
 wheel==0.38.4 ; sys_platform == "linux"
     # via
