@@ -1,6 +1,8 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,40 +21,86 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
-
-#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
+#include <EnergyEvseMain.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
-#include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/BitMask.h>
+
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT))
-#define LIGHT_LED 1
+#include <lib/support/CodeUtils.h>
+
+#include <platform/CHIPDeviceLayer.h>
+
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
+#define EVSE_LED 1
 #else
-#define LIGHT_LED 0
+#define EVSE_LED 0
 #endif
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_SELFTESTREQUEST_BUTTON 1
+#define APP_EVSE_SWITCH 1
+
+namespace {
+LEDWidget sEvseLED;
+}
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
+using namespace ::chip::DeviceLayer::Internal;
+using namespace chip::TLV;
 
-namespace {
-LEDWidget sAlarmLED;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
+// Keep track of the parsed featureMap option
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                                          Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
+                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+
+chip::BitMask<Feature> GetFeatureMapFromCmdLine()
+{
+    return sFeatureMap;
 }
 
-using namespace chip::TLV;
-using namespace ::chip::DeviceLayer;
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 AppTask AppTask::sAppTask;
+
+void ApplicationInit()
+{
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    EvseApplicationInit();
+    sEvseLED.Init(EVSE_LED);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+void ApplicationShutdown()
+{
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    EvseApplicationShutdown();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}
 
 CHIP_ERROR AppTask::Init()
 {
@@ -60,7 +108,7 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Smoke-CO-Alarm-App");
+    GetLCD().Init((uint8_t *) "energy-management-App");
 #endif
 
     err = BaseApplication::Init();
@@ -70,30 +118,16 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-    err = AlarmMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("AlarmMgr::Init() failed");
-        appError(err);
-    }
-
-    // Register Smoke & Co Test Event Trigger
-    if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
-    {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
-    }
-
-    sAlarmLED.Init(LIGHT_LED);
-    sAlarmLED.Set(false);
+    ApplicationInit();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(false);
+    GetLCD().WriteDemoUI(LightMgr().IsLightOn());
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
-    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
 #else
-    if (!ConnectivityMgr().IsThreadProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
     {
         GetLCD().ShowQRCode(true);
@@ -121,10 +155,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(err);
     }
 
-#if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sAppTask.StartStatusLEDTimer();
-#endif
-
     SILABS_LOG("App Task started");
 
     while (true)
@@ -138,14 +168,28 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::ButtonActionEventHandler(AppEvent * aEvent)
+void AppTask::EvseActionEventHandler(AppEvent * aEvent)
 {
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    bool success = SmokeCoAlarmServer::Instance().RequestSelfTest(1);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    if (!success)
+    bool initiated = false;
+    int32_t actor;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        SILABS_LOG("Manual self-test failed");
+        actor = AppEvent::kEventType_Button;
+        SILABS_LOG("button event %d ", actor);
+    }
+    else
+    {
+        err = APP_ERROR_UNHANDLED_EVENT;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        if (!initiated)
+        {
+            SILABS_LOG("Action is already in progress or active.");
+        }
     }
 }
 
@@ -155,9 +199,9 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (button == APP_SELFTESTREQUEST_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    if (button == APP_EVSE_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
-        button_event.Handler = ButtonActionEventHandler;
+        button_event.Handler = EvseActionEventHandler;
         AppTask::GetAppTask().PostEvent(&button_event);
     }
     else if (button == APP_FUNCTION_BUTTON)

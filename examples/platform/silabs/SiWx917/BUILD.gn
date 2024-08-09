@@ -210,7 +210,7 @@ source_set("siwx917-common") {
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
-    sources += [ "uart.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
