@@ -43,11 +43,13 @@ public:
     BridgedDevice(chip::NodeId nodeId);
     virtual ~BridgedDevice() = default;
 
+    [[nodiscard]] bool IsReachable() const { return mReachable; }
+    void SetReachable(bool reachable);
+
     void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
 
-    bool IsReachable();
-    bool IsIcd();
-    void SetReachable(bool reachable);
+    [[nodiscard]] bool IsIcd() const { return mIsIcd; }
+    void SetIcd(bool icd) { mIsIcd = icd; }
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
@@ -63,11 +65,12 @@ public:
     void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
-    bool mReachable;
-    bool mIsIcd = false;
-    chip::NodeId mNodeId;
-    chip::EndpointId mEndpointId;
-    chip::EndpointId mParentEndpointId;
+    bool mReachable = false;
+    bool mIsIcd     = false;
+
+    chip::NodeId mNodeId               = 0;
+    chip::EndpointId mEndpointId       = 0;
+    chip::EndpointId mParentEndpointId = 0;
 
     BridgedAttributes mAttributes;
 };

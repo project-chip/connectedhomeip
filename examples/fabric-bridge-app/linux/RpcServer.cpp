@@ -109,6 +109,7 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     }
 
     device->SetBridgedAttributes(attributes);
+    device->SetIcd(request.has_is_icd && request.is_icd);
 
     auto result = BridgeDeviceMgr().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
     if (!result.has_value())
@@ -117,8 +118,11 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
         return pw::Status::Unknown();
     }
 
+    BridgedDevice * addedDevice = BridgeDeviceMgr().GetDeviceByNodeId(nodeId);
+    VerifyOrDie(addedDevice);
+
     CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
-        device->GetEndpointId());
+        addedDevice->GetEndpointId());
     VerifyOrDie(err == CHIP_NO_ERROR);
 
     return pw::OkStatus();

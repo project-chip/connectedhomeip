@@ -26,7 +26,7 @@
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
-/// Ensures that device data is synchronized to the remove fabric bridge.
+/// Ensures that device data is synchronized to the remote fabric bridge.
 ///
 /// Includes a state machine that:
 ///   - initiates a "read basic information data" command to fetch basic information
