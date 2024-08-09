@@ -6525,7 +6525,7 @@ PICS:
     - label:
           "Does the device implement receiving the AtomicRequest command for
           Thermostat?"
-      id: TSTAT.S.CFE.Rsp
+      id: TSTAT.S.Cfe.Rsp
 
     #
     # server / commandsGenerated
@@ -6566,6 +6566,9 @@ PICS:
 
     - label: "Supports a local temperature not exposed"
       id: TSTAT.S.F06
+
+    - label: "Supports enhanced schedules"
+      id: TSTAT.S.F07
 
     - label: "Supports setpoint presets"
       id: TSTAT.S.F08
@@ -6616,7 +6619,7 @@ PICS:
       id: TSTAT.C.C06.Tx
 
     - label: "Does the device implement sending the AtomicRequest command?"
-      id: TSTAT.C.CFE.Tx
+      id: TSTAT.C.Cfe.Tx
 
     #
     # client / manually
