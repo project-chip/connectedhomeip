@@ -86,6 +86,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               public DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -402,7 +403,10 @@ public:
     }
 #endif
 
-    DataModel::Provider * GetDataModelProvider() const;
+    // Temporarly NOT const because the data model provider will be auto-set
+    // to codegen on first usage. This behaviour will be changed once each
+    // application must explicitly set the data model provider.
+    DataModel::Provider * GetDataModelProvider();
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model
@@ -410,6 +414,9 @@ public:
     //
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
 
 private:
     friend class reporting::Engine;
@@ -698,7 +705,23 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class ScopedExchangeContext
+    {
+    public:
+        ScopedExchangeContext(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~ScopedExchangeContext() { mEngine.mCurrentExchange = nullptr; }
+
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

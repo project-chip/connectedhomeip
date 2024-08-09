@@ -317,7 +317,8 @@ class HostBuilder(GnBuilder):
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
-                 chip_casting_simplified: Optional[bool] = None
+                 chip_casting_simplified: Optional[bool] = None,
+                 data_model_interface: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -351,6 +352,9 @@ class HostBuilder(GnBuilder):
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
+
+        if data_model_interface is not None:
+            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -456,10 +460,6 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.SIMULATED_APP2:
             self.extra_gn_options.append('chip_tests_zap_config="app2"')
-
-        if self.app in {HostApp.JAVA_MATTER_CONTROLLER, HostApp.KOTLIN_MATTER_CONTROLLER}:
-            # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
-            self.extra_gn_options.append('chip_use_data_model_interface="disabled"')
 
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'

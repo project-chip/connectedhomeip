@@ -178,6 +178,13 @@ uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
 chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 /**
+ * Increases the cluster version for the specified path.
+ *
+ * Will log errors in case the version storage for the given path does not exist.
+ */
+void emberAfIncreaseClusterDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
+
+/**
  * @brief Returns the number of pre-compiled endpoints.
  */
 uint16_t emberAfFixedEndpointCount();

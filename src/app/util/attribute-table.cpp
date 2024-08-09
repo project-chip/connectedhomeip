@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/af-types.h"
 #include <app/util/attribute-table.h>
 
 #include <app/util/attribute-table-detail.h>
@@ -167,27 +168,34 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
  * - Status::Success: if the attribute was found and successfully written
  */
 Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty);
+                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty,
+                          AttributeChanged * wasDirty);
 } // anonymous namespace
 
 Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                  EmberAfAttributeType dataType)
+                                  EmberAfAttributeType dataType, MarkAttributeDirty markDirty, AttributeChanged * changed)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */,
-                              MarkAttributeDirty::kIfChanged);
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */, markDirty,
+                              changed);
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                              EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */,
-                              MarkAttributeDirty::kIfChanged);
+                              MarkAttributeDirty::kIfChanged, nullptr);
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                              EmberAfAttributeType dataType, MarkAttributeDirty markDirty)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty);
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty, nullptr);
+}
+
+Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+                             EmberAfAttributeType dataType, MarkAttributeDirty markDirty, AttributeChanged * changed)
+{
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty, changed);
 }
 
 //------------------------------------------------------------------------------
@@ -320,8 +328,14 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
 }
 
 Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty)
+                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty,
+                          AttributeChanged * changeState)
 {
+    if (changeState)
+    {
+        *changeState = AttributeChanged::kValueNotChanged;
+    }
+
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
@@ -452,6 +466,12 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     if (status != Status::Success)
     {
         return status;
+    }
+
+    // internal value has changed. Report to the caller.
+    if (changeState != nullptr)
+    {
+        *changeState = AttributeChanged::kValueChanged;
     }
 
     // Save the attribute to persistent storage if needed

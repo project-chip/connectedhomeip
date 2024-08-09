@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/attribute-storage.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -51,7 +52,7 @@ using Protocols::InteractionModel::Status;
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
-std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttributePath & path, AttributeAccessInterface * aai,
                                                      AttributeValueDecoder & decoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
@@ -353,10 +354,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         if (*aai_result == CHIP_NO_ERROR)
         {
-            // TODO: change callbacks should likely be routed through the context `MarkDirty` only
-            //       however for now this is called directly because ember code does this call
-            //       inside emberAfWriteAttribute.
-            MatterReportingAttributeChangeCallback(request.path);
+            emberAfIncreaseClusterDataVersion(request.path);
             CurrentContext().dataModelChangeListener->MarkDirty(request.path);
         }
         return *aai_result;
@@ -373,18 +371,24 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return Status::InvalidValue;
     }
 
+    AttributeChanged attributeChanged = AttributeChanged::kValueNotChanged;
+
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
         // validate attribute types) - see attribute-table.h documentation for details.
         status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                       dataBuffer.data(), (*attributeMetadata)->attributeType);
+                                       dataBuffer.data(), (*attributeMetadata)->attributeType,
+                                       MarkAttributeDirty::kNo, // Model handles its own dirty handling
+                                       &attributeChanged);
     }
     else
     {
         status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            dataBuffer.data(), (*attributeMetadata)->attributeType);
+                                            dataBuffer.data(), (*attributeMetadata)->attributeType,
+                                            MarkAttributeDirty::kNo, // Model handles its own dirty handling
+                                            &attributeChanged);
     }
 
     if (status != Protocols::InteractionModel::Status::Success)
@@ -396,10 +400,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //
     // - Internal writes may need to be able to decide if to mark things dirty or not (see AAI as well)
     // - Changes-ommited paths should not be marked dirty (ember is not aware of that flag)
-    // - This likely maps to `MatterReportingAttributeChangeCallback` HOWEVER current ember write functions
-    //   will selectively call that one depending on old attribute state (i.e. calling every time is a
-    //   change in behavior)
-    CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+    if (attributeChanged == AttributeChanged::kValueChanged)
+    {
+        emberAfIncreaseClusterDataVersion(request.path);
+        CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+    }
     return CHIP_NO_ERROR;
 }
 

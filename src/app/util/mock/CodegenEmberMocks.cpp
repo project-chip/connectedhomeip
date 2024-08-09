@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/af-types.h"
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 
@@ -35,13 +36,15 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 }
 
 Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                  uint8_t * dataPtr, EmberAfAttributeType dataType)
+                                  uint8_t * dataPtr, EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
+                                  chip::app::AttributeChanged * changed)
 {
     return Status::Success;
 }
 
 Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType)
+                             EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
+                             chip::app::AttributeChanged * changed)
 {
-    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType);
+    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType, markDirty, changed);
 }
