@@ -261,7 +261,7 @@ public:
     /**
      * This method is called by the server instance to modify an existing map in the list.
      * The server instance will ensure that the modifiedMap is a valid, unique map.
-     * @param[in] listIndexThe index of the map being modified.
+     * @param[in] listIndex The index of the map being modified.
      * @param[in] modifiedMapA map with the modified contents.
      * @return true if successful, false otherwise.
      *

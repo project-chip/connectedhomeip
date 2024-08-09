@@ -181,6 +181,13 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & 
         return false;
     }
 
+    if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        // This device only accepts the skip are command while in the running state
+        CopyCharSpanToMutableCharSpan("skip area is only accepted when the device is running"_span, skipStatusText);
+        return false;
+    }
+
     bool finished;
     mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, finished);
 
