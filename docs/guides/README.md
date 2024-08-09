@@ -40,10 +40,6 @@
 -   [Open Thread - Hardware suggestions](./openthread_rcp_nrf_dongle.md)
 -   [Open Thread - Setting up a Pi as a border router](./openthread_border_router_pi.md)
 
-## Troubleshooting Guides
-
--   [Avahi - Troubleshooting](./troubleshooting_avahi.md)
-
 ## Tool Guides
 
 -   [chip-tool](./chip_tool_guide.md)
