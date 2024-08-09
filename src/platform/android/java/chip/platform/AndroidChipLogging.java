@@ -19,5 +19,5 @@ package chip.platform;
 
 public class AndroidChipLogging {
   // logging level is in android.util.Log class
-  public native static void setLogFilter(int level);
+  public static native void setLogFilter(int level);
 }
