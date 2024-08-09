@@ -28,6 +28,7 @@
 
 import logging
 import random
+from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.clusters.Attribute import EventPriority
@@ -41,11 +42,19 @@ logger = logging.getLogger(__name__)
 cluster = Clusters.DoorLock
 
 
+@dataclass
+class AliroAttributeVerify:
+    th_step: str
+    attribute: Clusters.DoorLock.Attributes
+    cluster: Clusters.DoorLock
+    aliro_attribute_value: bytes
+
+
 class TC_DRLK_2_13(MatterBaseTest):
 
     def steps_TC_DRLK_2_13(self) -> list[TestStep]:
         steps = [
-            TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex save the attribute",
+            TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex and save the attribute",
                      "TH Reads Attribute Successfully"),
             TestStep("1b", "TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users",
                      "DUT responds with Success response"),
@@ -122,7 +131,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             TestStep("27", "TH reads the LockUserChange event list from DUT",
                      "Verify list has an event LockDataType: 13 as latest event with DataOperationType: 1(DataOperationTypeEnum.Clear) along with other information"),
             TestStep("28a", "Th Reads NumberOfCredentialsSupportedPerUser saves as numberofcredentialsupportedperuser,"
-                     "Read operation is successful"),
+                            "Read operation is successful"),
             TestStep("28b", "TH sends ClearCredential Command to DUT to clear all the credentials of Aliro type "
                             "TH sends ClearUser Command with UserIndex as 1 to DUT to clear alirouser"
                             "Executing steps 29 to 35 only when 'max_aliro_keys_supported <= numberofcredentialsupportedperuser' else exit script",
@@ -130,7 +139,8 @@ class TC_DRLK_2_13(MatterBaseTest):
             TestStep("29a", "TH sends SetUser Command to DUT to create an Aliro user",
                      "DUT sends SUCCESS response"),
             TestStep("29b",
-                     "TH performs repeated number of SetCredential commands with credentials as 8 'startcredentialindex' until 'max_aliro_keys_supported - 1', startcredentialindex initially has value 1 .", "Verify that the DUT responds with SetCredentialResponse command and Status success."),
+                     "TH performs repeated number of SetCredential commands with credentials as 8 'startcredentialindex' until 'max_aliro_keys_supported - 1', startcredentialindex initially has value 1 .",
+                     "Verify that the DUT responds with SetCredentialResponse command and Status success."),
             TestStep("30",
                      "TH sends SetCredential Command to DUT with CredentialType as AliroEvictableEndpointKey for the 'alirouser' ",
                      "Verify that the DUT responds with SetCredentialResponse command and Status success. This step will fill the last slot with credentialType as AliroEvictableEndpointKey"),
@@ -160,31 +170,26 @@ class TC_DRLK_2_13(MatterBaseTest):
             asserts.assert_equal(expected_status, Status.Success,
                                  f"Error reading attributes, response={attribute_value}")
 
-    async def aliro_attribute_verifiers(self, aliro_attribute_verify_steps: list[dict]):
+    async def aliro_attribute_verifiers(self, aliro_attribute_verify_steps: list[AliroAttributeVerify]):
 
         for aliro_attribute_step in aliro_attribute_verify_steps:
-            step = aliro_attribute_step.get("th_step")
-            if step is not None:
-                self.step(step)
-            if self.pics_guard(
-                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0080")) and aliro_attribute_step.get(
-                    "condition") == 1:
-                pass
-            elif self.pics_guard(
-                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0081")) and aliro_attribute_step.get(
-                    "condition") == 2:
-                pass
-            elif self.pics_guard(
-                self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0084")) and aliro_attribute_step.get(
-                    "condition") == 3:
-                pass
+            th_step = aliro_attribute_step.th_step
+            self.step(th_step)
+            if aliro_attribute_step.attribute == Clusters.DoorLock.Attributes.AliroReaderVerificationKey:
+                pics_condition = self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0080"))
+            elif aliro_attribute_step.attribute == Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier:
+                pics_condition = self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0081"))
+            elif aliro_attribute_step.attribute == Clusters.DoorLock.Attributes.AliroGroupResolvingKey:
+                pics_condition = self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.A0084"))
             else:
-                continue
-            dut_aliro_key = await self.read_attributes_from_dut(endpoint=aliro_attribute_step.get("endpoint"),
-                                                                cluster=aliro_attribute_step.get("cluster"),
-                                                                attribute=aliro_attribute_step.get("attribute"))
-            asserts.assert_equal(dut_aliro_key, aliro_attribute_step.get("aliro_attribute_value"),
-                                 f"Aliro Attribute key verification Failed, readAttributeResponse{dut_aliro_key}")
+                pics_condition = False
+
+            if pics_condition is True:
+                dut_aliro_key = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
+                                                                    cluster=aliro_attribute_step.cluster,
+                                                                    attribute=aliro_attribute_step.attribute)
+                asserts.assert_equal(dut_aliro_key, aliro_attribute_step.aliro_attribute_value,
+                                     f"Aliro Attribute key verification Failed, readAttributeResponse{dut_aliro_key}")
 
     def pics_TC_DRLK_2_13(self) -> list[str]:
         return ["DRLK.S.F0d"]
@@ -192,7 +197,7 @@ class TC_DRLK_2_13(MatterBaseTest):
     async def send_clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=user_index),
-                                       endpoint=1,
+                                       endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
             asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
@@ -200,37 +205,39 @@ class TC_DRLK_2_13(MatterBaseTest):
 
     async def send_clear_aliro_reader_config_cmd(self, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearAliroReaderConfig(), endpoint=1,
+            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearAliroReaderConfig(),
+                                       endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
             asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    async def send_set_aliro_reader_config_cmd(self, steps: dict, expected_status: Status = Status.Success, ):
+    async def send_set_aliro_reader_config_cmd(self, use_group_resolving_key: bool,
+                                               expected_status: Status = Status.Success):
         try:
-            if self.pics_guard(self.check_pics("DRLK.S.F0d") and not self.check_pics("DRLK.S.F0e") and self.check_pics(
-                    "DRLK.S.C28.Rsp")) and steps.get("condition") == 1:
-                if steps.get("step") is not None:
-                    self.step(steps.get("step"))
+            # Checks Pics condition
+            if use_group_resolving_key is False:
+                pics_check = self.pics_guard(self.check_pics("DRLK.S.F0d") and not self.check_pics("DRLK.S.F0e") and
+                                             self.check_pics("DRLK.S.C28.Rsp"))
+
+            else:
+                pics_check = self.pics_guard(self.check_pics("DRLK.S.F0e") and self.check_pics("DRLK.S.C28.Rsp"))
+
+            if use_group_resolving_key is False and pics_check is True:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=self.signingKey,
                     verificationKey=self.verificationKey,
                     groupIdentifier=self.groupIdentifier),
-                    endpoint=1,
+                    endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
-                self.skip_step(steps.get("skip_step"))
                 asserts.assert_equal(expected_status, Status.Success)
-            elif (self.pics_guard(self.check_pics("DRLK.S.F0e") and self.check_pics("DRLK.S.C28.Rsp"))
-                  and steps.get("condition") == 2):
-                self.skip_step(steps.get("skip_step"))
-                if steps.get("step") is not None:
-                    self.step(steps.get("step"))
+            elif use_group_resolving_key is True and pics_check is True:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=self.signingKey,
                     verificationKey=self.verificationKey,
                     groupIdentifier=self.groupIdentifier,
                     groupResolvingKey=self.groupResolvingKey),
-                    endpoint=1,
+                    endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
@@ -239,15 +246,14 @@ class TC_DRLK_2_13(MatterBaseTest):
 
     async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
                                      step, userIndex, credential_exists=True):
-        if step is not None:
+        if step:
             self.step(step)
         try:
-
-            if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics(
-                    "DRLK.S.C25.Tx")):
+            flags = ["DRLK.S.F0d", "DRLK.S.C24.Rsp", "DRLK.S.C25.Tx"]
+            if not self.pics_guard(all([self.check_pics(p) for p in flags])):
                 credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                                       credentialType=credentialType)
-                response = await self.send_single_cmd(endpoint=1, timedRequestTimeoutMs=1000,
+                response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
                                                       cmd=cluster.Commands.GetCredentialStatus(
                                                           credential=credentials_struct))
                 asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
@@ -264,7 +270,7 @@ class TC_DRLK_2_13(MatterBaseTest):
 
     async def set_credential_cmd(self, credential_enum: Clusters.DoorLock.Enums.CredentialTypeEnum, credentialIndex,
                                  operationType, userIndex, credentialData, userStatus, userType, step=None):
-        if step is not None:
+        if step:
             self.step(step)
         credentials = cluster.Structs.CredentialStruct(
             credentialType=credential_enum,
@@ -278,7 +284,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     userStatus=userStatus,
                     userType=userType,
                     userIndex=userIndex),
-                    endpoint=1,
+                    endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
                 asserts.assert_true(type_matches(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
@@ -318,7 +324,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 self.step(step)
             if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C26.Rsp")):
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credential),
-                                           endpoint=1,
+                                           endpoint=self.app_cluster_endpoint,
                                            timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
@@ -339,10 +345,8 @@ class TC_DRLK_2_13(MatterBaseTest):
         for creds in all_aliro_cred_list:
             await self.clear_credentials_cmd(credential=creds)
 
-    def generate_unique_octstr(self, length=65):
-        octal_digits = '01234567'
-        octstr = ''.join(random.choice(octal_digits) for _ in range(length))
-        return octstr.encode()
+    def generate_unique_octbytes(self, length=65) -> bytes:
+        return ''.join(random.choices('01234567', k=length)).encode()
 
     @async_test_body
     async def test_TC_DRLK_2_13(self):
@@ -353,7 +357,8 @@ class TC_DRLK_2_13(MatterBaseTest):
             "047a4c992d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
         self.groupIdentifier = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4ad")
         self.groupResolvingKey = bytes.fromhex("89d0859bfcdecdf3c4adfc302ca53e27")
-        self.endpoint = 0
+        self.common_cluster_endpoint = 0
+        self.app_cluster_endpoint = 1
         self.alirouser = "AliroUser"
         self.alirocredentialissuerkey = bytes.fromhex(
             "047a4c882d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
@@ -367,45 +372,48 @@ class TC_DRLK_2_13(MatterBaseTest):
             "047a4c552d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
         #  step 1 TH reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute
         self.step("1a")
-        self.fabric_idx1 = await self.read_attributes_from_dut(endpoint=self.endpoint,
+        self.fabric_idx1 = await self.read_attributes_from_dut(endpoint=self.common_cluster_endpoint,
                                                                cluster=Clusters.Objects.OperationalCredentials,
                                                                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
                                                                )
+        self.step("1b")
         if self.pics_guard(self.check_pics("DRLK.S.C1d.Rsp")):
-            self.step("1b")
             await self.send_clear_user_cmd(user_index=int(0xFFFE))
+
+        self.step("1c")
         if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
-            self.step("1c")
-            clear_all_credentials = Clusters.DoorLock.Structs.CredentialStruct(credentialIndex=int(0xFFFE))
-            await self.clear_credentials_cmd(credential=clear_all_credentials)
+            await self.clear_credentials_cmd(credential=NullValue)
 
         # step 2
-        if self.check_pics("DRLK.S.C26.Rsp"):
-            self.step("2a")
+        self.step("2a")
+        if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
             await self.send_clear_aliro_reader_config_cmd()
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "2b", "condition": 1, "skip_step": "2c"},
-                                                    expected_status=Status.Success)
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "2c", "condition": 2, "skip_step": "2b"},
-                                                    expected_status=Status.Success)
+        self.step("2b")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False, expected_status=Status.Success)
+        self.step("2c")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.Success)
         # step 3,4,5
         aliro_attribute_verify_steps = [
-            {"th_step": "3", "cluster": Clusters.Objects.DoorLock, "condition": 1,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey, "endpoint": 1,
+            {"th_step": "3", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey,
              "aliro_attribute_value": self.verificationKey},
-            {"th_step": "4", "cluster": Clusters.Objects.DoorLock, "condition": 2,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier, "endpoint": 1,
+            {"th_step": "4", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier,
              "aliro_attribute_value": self.groupIdentifier},
-            {"th_step": "5", "cluster": Clusters.Objects.DoorLock, "condition": 3,
-             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey, "endpoint": 1,
+            {"th_step": "5", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey,
              "aliro_attribute_value": self.groupResolvingKey}
         ]
-        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=aliro_attribute_verify_steps)
+        list_of_verification_objects = [AliroAttributeVerify(**aliro_object) for aliro_object in
+                                        aliro_attribute_verify_steps]
+        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=list_of_verification_objects)
 
         #  step 6
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "6a", "condition": 1, "skip_step": "6b"},
+        self.step("6a")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False,
                                                     expected_status=Status.InvalidInState)
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "6b", "condition": 2, "skip_step": "6a"},
-                                                    expected_status=Status.InvalidInState)
+        self.step("6b")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.InvalidInState)
         #  step 7
         self.step("7")
         if self.check_pics("DRLK.S.C26.Rsp"):
@@ -413,28 +421,27 @@ class TC_DRLK_2_13(MatterBaseTest):
 
         # steps 8,9,10
         aliro_attribute_verify_steps = [
-            {"th_step": "8", "cluster": Clusters.Objects.DoorLock, "condition": 1,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey, "endpoint": 1,
-             "aliro_attribute_value": NullValue},
-            {"th_step": "9", "cluster": Clusters.Objects.DoorLock, "condition": 2,
-             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier, "endpoint": 1,
-             "aliro_attribute_value": NullValue},
-            {"th_step": "10", "cluster": Clusters.Objects.DoorLock, "condition": 3,
-             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey, "endpoint": 1,
-             "aliro_attribute_value": NullValue}
+            {"th_step": "8", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroReaderVerificationKey, "aliro_attribute_value": NullValue},
+            {"th_step": "9", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroReaderGroupIdentifier, "aliro_attribute_value": NullValue},
+            {"th_step": "10", "cluster": Clusters.Objects.DoorLock,
+             "attribute": Clusters.DoorLock.Attributes.AliroGroupResolvingKey, "aliro_attribute_value": NullValue}
         ]
-        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=aliro_attribute_verify_steps)
+        list_of_verification_objects = [AliroAttributeVerify(**aliro_object) for aliro_object in
+                                        aliro_attribute_verify_steps]
+        await self.aliro_attribute_verifiers(aliro_attribute_verify_steps=list_of_verification_objects)
 
         # step 11
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "11a", "condition": 1, "skip_step": "11b"},
-                                                    expected_status=Status.Success)
-        await self.send_set_aliro_reader_config_cmd(steps={"step": "11b", "condition": 2, "skip_step": "11a"},
-                                                    expected_status=Status.Success)
+        self.step("11a")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False, expected_status=Status.Success)
+        self.step("11b")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.Success)
 
         #  step 12 Setting User
         self.step("12a")
-        if self.check_pics("DRLK.S.A0088"):
-            self.max_aliro_keys_supported = await self.read_attributes_from_dut(endpoint=1,
+        if self.pics_guard(self.check_pics("DRLK.S.A0088")):
+            self.max_aliro_keys_supported = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                 cluster=Clusters.Objects.DoorLock,
                                                                                 attribute=Clusters.DoorLock.Attributes.NumberOfAliroEndpointKeysSupported)
             if self.max_aliro_keys_supported < 2:
@@ -451,7 +458,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
                     userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
                     credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
-                    endpoint=1,
+                    endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 logging.exception(e)
@@ -566,9 +573,10 @@ class TC_DRLK_2_13(MatterBaseTest):
         # step 28
         self.step("28a")
         if self.check_pics("DRLK.S.A001c"):
-            self.numberofcredentialsupportedperuser = await self.read_attributes_from_dut(endpoint=1,
-                                                                                          cluster=Clusters.Objects.DoorLock,
-                                                                                          attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
+            self.numberofcredentialsupportedperuser = await self.read_attributes_from_dut(
+                endpoint=self.app_cluster_endpoint,
+                cluster=Clusters.Objects.DoorLock,
+                attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)
@@ -590,12 +598,11 @@ class TC_DRLK_2_13(MatterBaseTest):
                             userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
                             userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
                             credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
-                            endpoint=1,
+                            endpoint=self.app_cluster_endpoint,
                             timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         logging.exception(e)
                         asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
-                # step 29
                 self.step("29b")
                 logging.info("setting 'start_credential_index' to value 1 ")
                 start_credential_index = 1
@@ -603,7 +610,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 while 1:
                     if start_credential_index <= (self.max_aliro_keys_supported - 2):
                         if start_credential_index != 1:
-                            credentials_data = self.generate_unique_octstr()
+                            credentials_data = self.generate_unique_octbytes()
 
                         await self.set_credential_cmd(credentialData=credentials_data,
                                                       operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
