@@ -35,7 +35,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                    per_endpoint_test)
+                                    run_for_each_matching_endpoint)
 from mobly import asserts
 
 
@@ -112,7 +112,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         return steps
 
-    @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_2(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 

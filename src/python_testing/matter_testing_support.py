@@ -505,7 +505,7 @@ class MatterTestConfig:
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
     timeout: typing.Union[int, None] = None
-    endpoint: int = 0
+    endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
 
     commissioning_method: Optional[str] = None
@@ -981,7 +981,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = self.matter_test_config.endpoint
+            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
@@ -1013,7 +1013,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = self.matter_test_config.endpoint
+            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
@@ -1042,12 +1042,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
-        endpoint = self.matter_test_config.endpoint if endpoint_id is None else endpoint_id
+        if endpoint_id is None:
+            endpoint_id = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
-        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, attribute_value)])
+        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
         if expect_success:
             asserts.assert_equal(write_result[0].Status, Status.Success,
-                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint}")
+                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
     async def send_single_cmd(
@@ -1060,7 +1061,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
-            endpoint = self.matter_test_config.endpoint
+            endpoint = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                             payloadCapability=payloadCapability)
@@ -1585,7 +1586,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    config.endpoint = 0 if args.endpoint is None else args.endpoint
+    config.endpoint = args.endpoint
     config.app_pid = 0 if args.app_pid is None else args.app_pid
 
     config.controller_node_id = args.controller_node_id
@@ -1638,7 +1639,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
-    basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
@@ -1746,7 +1747,7 @@ def async_test_body(body):
     return async_runner
 
 
-def per_node_test(body):
+def run_once_for_node(body):
     """ Decorator to be used for PICS-free tests that apply to the entire node.
 
     Use this decorator when your script needs to be run once to validate the whole node.
@@ -1754,7 +1755,7 @@ def per_node_test(body):
     """
 
     def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
-        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_node_test.")
+        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for run_once_for_node.")
         return _async_runner(body, self, *args, **kwargs)
 
     return whole_node_runner
@@ -1771,9 +1772,9 @@ def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
 
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified cluster. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1782,7 +1783,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
         EP3, cluster E
 
         And the following test specification:
-        @per_endpoint_test(has_cluster(Clusters.D))
+        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
@@ -1804,9 +1805,9 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
 
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified attribute. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1815,7 +1816,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         EP3, cluster D without attribute d
 
         And the following test specification:
-        @per_endpoint_test(has_attribute(Clusters.D.Attributes.d))
+        @run_for_each_matching_endpoint(has_attribute(Clusters.D.Attributes.d))
         test_mytest(self):
             ...
 
@@ -1836,9 +1837,9 @@ def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescri
 
 
 def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified feature. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1847,7 +1848,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
         EP3, cluster D without feature F0
 
         And the following test specification:
-        @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        @run_for_each_matching_endpoint(has_feature(Clusters.D.Bitmaps.Feature.F0))
         test_mytest(self):
             ...
 
@@ -1860,15 +1861,42 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
 
 
 async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Helper function for the per_endpoint_test decorator.
+    """ Helper function for the run_for_each_matching_endpoint decorator.
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
+
+    if self.matter_test_config.endpoint is not None:
+        msg = """
+              The --endpoint flag is disallowed for tests that run on all matching endpoints.
+              To enable running against a single endpoint for development purposes, use
+              --int-arg force_endpoint:1 (where "1" can be replaced with the desired endpoint)
+              Note that using force_endpoint is disallowed at certification and should be used
+              ONLY FOR DEVELOPMENT.
+              """
+        asserts.fail(msg)
+
     wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
-    return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+    forced_endpoint = self.user_params.get('force_endpoint', None)
+    if forced_endpoint is None:
+        return matching
+
+    asserts.assert_in(forced_endpoint, matching, "Force endpoint does not match test requirements")
+
+    warning = """
+    --------------------------------------------------------------------------------
+    | Warning: Using a forced single endpoint on a test that is intended to be run |
+    |          on each matching endpoint. This is a development-only option.       |
+    |                                                                              |
+    | Use of this option is disallowed at certification                            |
+    --------------------------------------------------------------------------------
+    """
+    logging.warn(warning)
+    return [forced_endpoint]
 
 
-def per_endpoint_test(accept_function: EndpointCheckFunction):
+def run_for_each_matching_endpoint(accept_function: EndpointCheckFunction):
     """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
 
         Place this decorator above the test_ method to have the test framework run this test once per endpoint.
@@ -1883,7 +1911,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
         EP3, cluster E
 
         And the following test specification:
-        @per_endpoint_test(has_cluster(Clusters.D))
+        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
@@ -1899,9 +1927,10 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
         Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
         PICS values internally.
     """
-    def per_endpoint_test_internal(body):
+    def run_for_each_matching_endpoint_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
+            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
+                                 "pics_ method supplied for run_for_each_matching_endpoint.")
             runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
@@ -1915,7 +1944,6 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
             # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hook that
             # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
             # on failure.
-            original_ep = self.matter_test_config.endpoint
             for e in endpoints:
                 logging.info(f'Running test on endpoint {e}')
                 if e != endpoints[0]:
@@ -1926,9 +1954,9 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
                     self.teardown_test()
                     test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
                     self.runner_hook.test_stop(exception=None, duration=test_duration)
-            self.matter_test_config.endpoint = original_ep
+            self.matter_test_config.endpoint = None
         return per_endpoint_runner
-    return per_endpoint_test_internal
+    return run_for_each_matching_endpoint_internal
 
 
 class CommissionDeviceTest(MatterBaseTest):
