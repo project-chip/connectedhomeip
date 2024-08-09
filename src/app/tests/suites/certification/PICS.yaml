@@ -10299,6 +10299,17 @@ PICS:
       id: PWRTL.S.A0001
 
     #
+    # Thread Border Router Management Cluster
+    #
+    - label:
+          "Does the device implement the Thread Border Router Management cluster
+          as a server?"
+      id: TBRM.S
+
+    - label: "Does the device support the PanChange feature?"
+      id: TBRM.S.F00
+
+    #
     # Thread Network Directory Cluster
     #
     - label:

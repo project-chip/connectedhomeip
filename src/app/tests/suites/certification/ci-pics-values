@@ -3017,6 +3017,10 @@ PWRTL.S.F01=0
 PWRTL.S.F02=1
 PWRTL.S.F03=1
 
+# Thread Border Router Management Cluster
+TBRM.S=1
+TBRM.S.F00=1
+
 # Thread Network Directory Cluster
 THNETDIR.S=1
 
