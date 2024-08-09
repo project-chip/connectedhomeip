@@ -69,6 +69,20 @@ static_assert(to_underlying(KeyIdBase::Minimum) >= PSA_KEY_ID_USER_MIN && to_und
               "PSA key ID base out of allowed range");
 
 /**
+ * @brief Finds first free persistent Key slot ID within range.
+ *
+ * @param[out] keyId Key ID handler to which free ID will be set.
+ * @param[in]  start Starting ID in search range.
+ * @param[in]  range Search range.
+ *
+ * @retval CHIP_NO_ERROR               On success.
+ * @retval CHIP_ERROR_INTERNAL         On PSA crypto API error.
+ * @retval CHIP_ERROR_NOT_FOUND        On no free Key ID within range.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT On search arguments out of PSA allowed range.
+ */
+CHIP_ERROR FindFreeKeySlotInRange(psa_key_id_t & keyId, psa_key_id_t start, uint32_t range);
+
+/**
  * @brief Calculates PSA key ID for Node Operational Certificate private key for the given fabric.
  */
 constexpr psa_key_id_t MakeOperationalKeyId(FabricIndex fabricIndex)
