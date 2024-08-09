@@ -87,6 +87,12 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnAreaCompleteHandler();
     }
+    else if (name == "AddMap")
+    {
+        uint32_t  mapId = self->mJsonValue["mapId"].asInt();
+        std::string mapName = self->mJsonValue["mapName"].asString();
+        self->OnAddServiceAreaMap(mapId, mapName);
+    }
     else if (name == "ErrorEvent")
     {
         std::string error = self->mJsonValue["Error"].asString();
@@ -147,6 +153,12 @@ void RvcAppCommandHandler::OnActivityCompleteHandler()
 void RvcAppCommandHandler::OnAreaCompleteHandler()
 {
     mRvcDevice->HandleAreaCompletedEvent();
+}
+
+void RvcAppCommandHandler::OnAddServiceAreaMap(uint32_t mapId, std::string & mapName)
+{
+    // todo fix name type
+    mRvcDevice->HandleAddServiceAreaMap(mapId, mapName);
 }
 
 void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)

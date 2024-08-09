@@ -57,6 +57,8 @@ private:
 
     void OnAreaCompleteHandler();
 
+    void OnAddServiceAreaMap(uint32_t mapId, std::string & mapName);
+
     void OnErrorEventHandler(const std::string & error);
 
     void OnClearErrorHandler();
