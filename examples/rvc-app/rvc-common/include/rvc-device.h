@@ -59,6 +59,11 @@ public:
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
+
+        mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
+        mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
+        mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
+        mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
     }
 
     /**
@@ -97,6 +102,14 @@ public:
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
+    bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
+
+    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+
+    bool SaIsSupportedAreasChangeAllowed();
+
+    bool SaIsSupportedMapChangeAllowed();
+
     /**
      * Updates the state machine when the device becomes fully-charged.
      */
@@ -111,6 +124,8 @@ public:
     void HandleLowChargeMessage();
 
     void HandleActivityCompleteEvent();
+
+    void HandleAreaCompletedEvent();
 
     /**
      * Sets the device to an error state with the error state ID matching the error name given.

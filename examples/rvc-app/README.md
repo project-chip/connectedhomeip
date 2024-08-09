@@ -20,6 +20,11 @@ must have a `"Name"` key that contains the command name. This name is shown in
 the state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
 
+### `AreaComplete` message
+
+This indicates that the area currently being serviced as indicated by the
+service area cluster is now complete.
+
 ### `ErrorEvent` message
 
 The error event message requires the additional key `"Error"` which specifies
@@ -37,10 +42,14 @@ and setting up the testing environment, python tests can be executed with
 `./scripts/tests/run_python_test.py --script src/python_testing/<script_name>.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg <PIXIT_Definitions:1>"`
 
 **Note:** If the testing environment has not been commissioned with the RVC app,
-use chip-tool to switch on the commissioning window
-`chip-tool pairing open-commissioning-window`, and add the following flags to
-the `--script-args` above.
-`--commissioning-method on-network --discriminator XXXX --passcode XXXX`.
+
+1. use chip-tool to switch on the commissioning window
+   `out/debug/chip-tool pairing open-commissioning-window 0x1230 1 180 1000 42`
+2. Get the manual pairing code. This will look something like
+   `Manual pairing code: [01073112097]`.
+3. Run any one of the tests with the `--commission-only` and `--manual-code`
+   flags:
+   `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_1_2.py --script-args "--commissioning-method on-network --manual-code 01073112097 --commission-only"`
 
 Below are the PIXIT definitions required for the different python tests.
 
