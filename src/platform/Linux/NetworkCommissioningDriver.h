@@ -25,9 +25,13 @@
 
 #include <vector>
 
+#define MAX_NETWORKS_MAXIMUM 10
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
+
+static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORKS;
+static_assert(kMaxNetworks <= MAX_NETWORKS_MAXIMUM, "Cannot have more than 10 networks");
 
 template <typename T>
 class LinuxScanResponseIterator : public Iterator<T>
@@ -71,7 +75,8 @@ public:
 
     private:
         LinuxWiFiDriver * driver;
-        bool exhausted = false;
+        bool exhausted               = false;
+        uint8_t networkIteratorIndex = 0;
     };
 
     void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
@@ -82,7 +87,7 @@ public:
     void Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetMaxNetworks() override { return kMaxNetworks; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
 
@@ -120,6 +125,15 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 private:
+    // On receiving ReorderNetwork command, insert the entry requested by the command to the new
+    // index location in mStagingNetworks (0-based index) in a way that they all retain their existing
+    // relative order between each other, with the exception of the newly re-ordered entry.
+    bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
+    // After removing a network from mStagingNetworks the relative order of the entries in the Networks
+    // attribute shall remain unchanged, except for the removal of the requested network configuration.
+    void CompressStagingNetworksList();
+
+private:
     struct WiFiNetwork
     {
         bool Empty() const { return ssidLen == 0; }
@@ -148,8 +162,15 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
-    WiFiNetwork mSavedNetwork;
-    WiFiNetwork mStagingNetwork;
+    // Number of entries in mStagingNetworks
+    uint8_t mStagingNetworkCount = 0;
+    WiFiNetwork mSavedNetworks[kMaxNetworks];
+    WiFiNetwork mStagingNetworks[kMaxNetworks];
+    ConnectCallback * mpConnectCallback;
+    // Index location of the network the device is connected to. Value -1 indicates that the device is not connected to any of the
+    // networks Sets the value to the index location of the network in mStagingNetworks or mSavedNetworks
+    int8_t mStagedConnectedNetworkIndex = -1;
+    int8_t mSavedConnectedNetworkIndex  = -1;
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };
