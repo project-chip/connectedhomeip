@@ -47,6 +47,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 #include <support/CHIPMem.h>
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
@@ -77,6 +78,7 @@ app::Clusters::NetworkCommissioning::Instance
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -181,6 +183,7 @@ static void InitServer(intptr_t context)
     InitManualOperation();
 #endif
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     MatterMicrowaveOvenServerInit();
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;

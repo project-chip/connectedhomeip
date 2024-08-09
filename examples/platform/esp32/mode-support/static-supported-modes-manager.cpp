@@ -33,8 +33,6 @@ using List = app::DataModel::List<T>;
 
 SupportedModesManager::ModeOptionsProvider * StaticSupportedModesManager::epModeOptionsProviderList = nullptr;
 
-const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
-
 int StaticSupportedModesManager::mSize = 0;
 
 CHIP_ERROR StaticSupportedModesManager::InitEndpointArray(int size)
@@ -192,11 +190,6 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
     }
     ChipLogProgress(Zcl, "Cannot find the mode %u", mode);
     return Status::InvalidCommand;
-}
-
-const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
-{
-    return &StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 }
 
 void StaticSupportedModesManager::FreeSupportedModes(EndpointId endpointId) const

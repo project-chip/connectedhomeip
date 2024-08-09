@@ -30,6 +30,7 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -63,6 +64,7 @@ static k_timer sFunctionTimer;
 
 LEDWidget sStatusLED;
 FactoryResetLEDsWrapper<3> sFactoryResetLEDs{ { FACTORY_RESET_SIGNAL_LED, FACTORY_RESET_SIGNAL_LED1, FACTORY_RESET_SIGNAL_LED2 } };
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
@@ -198,6 +200,7 @@ CHIP_ERROR AppTask::Init()
     {
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     return err;
 }
