@@ -10,10 +10,12 @@ PROJECT_FLOW
 VSCODE_DEVELOPMENT
 api/index
 ci-cd/index
+development_controllers/index
 discussion/index
 getting_started/index
 cluster_and_device_type_dev/index
 guides/index
+platforms/index
 style/index
 examples/index
 testing/index
