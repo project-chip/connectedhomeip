@@ -44,7 +44,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
-    enable_pylib = false
 
     # Build the Linux all clusters app example with default group
     chip_build_all_clusters_app = false
@@ -112,9 +111,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/controller/python:chip-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:metadata_parser.wheel",
       ]
-      if (enable_pylib) {
-        deps += [ "${chip_root}/src/pybindings/pycontroller" ]
-      }
     }
   }
 
@@ -214,9 +210,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
-        if (enable_pylib) {
-          data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
-        }
         data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
 

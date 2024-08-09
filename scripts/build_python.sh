@@ -39,7 +39,6 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
 declare chip_detail_logging=false
-declare enable_pybindings=false
 declare chip_mdns
 declare case_retry_delta
 declare install_virtual_env
@@ -49,7 +48,7 @@ declare install_jupyterlab=no
 
 help() {
 
-    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ] [-enable_pybindings EnableValue]"
+    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
 
     echo "General Options:
   -h, --help                Display this information.
@@ -59,8 +58,6 @@ Input Options:
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -p, --enable_pybindings   <true/false>                    Specify whether to enable pybindings as python controller.
-
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
@@ -102,14 +99,6 @@ while (($#)); do
             ;;
         --chip_mdns | -m)
             chip_mdns=$2
-            shift
-            ;;
-        --enable_pybindings | -p)
-            enable_pybindings=$2
-            if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
-                echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
-                exit
-            fi
             shift
             ;;
         --time_between_case_retries | -t)
@@ -157,7 +146,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -184,7 +173,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.
@@ -206,11 +195,7 @@ function wheel_output_dir() {
 ninja -C "$OUTPUT_ROOT" python_wheels
 
 # Add wheels from chip_python_wheel_action templates.
-if [ "$enable_pybindings" == true ]; then
-    WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
-else
-    WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
-fi
+WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 
 # Add the matter_testing_infrastructure wheel
 WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)

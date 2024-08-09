@@ -165,10 +165,6 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/recipe-make-cat1a
 	url = https://github.com/Infineon/recipe-make-cat1a
 	platforms = infineon
-[submodule "third_party/pybind11/repo"]
-	path = third_party/pybind11/repo
-	url = https://github.com/pybind/pybind11
-	branch  = stable
 [submodule "p6/lwip"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip
 	url = https://github.com/lwip-tcpip/lwip.git

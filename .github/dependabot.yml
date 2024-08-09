@@ -54,7 +54,6 @@ updates:
       - dependency-name: "third_party/open-iot-sdk/repo"
       - dependency-name: "third_party/ot-br-posix/repo"
       - dependency-name: "third_party/perfetto/repo"
-      - dependency-name: "third_party/pybind11/repo"
       - dependency-name: "third_party/qpg_sdk/repo"
       - dependency-name: "third_party/silabs/repo"
       - dependency-name: "third_party/simw-top-mini/repo"
