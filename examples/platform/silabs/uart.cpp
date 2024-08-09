@@ -18,14 +18,31 @@
 #include "AppConfig.h"
 #include "matter_shell.h"
 #include <cmsis_os2.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <sl_cmsis_os2_common.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "assert.h"
+
+#include "uart.h"
+#include <stddef.h>
+#include <string.h>
+
+#define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#define MAX_BUFFER_SIZE 256
+#define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE / 2)
+
+#if SLI_SI91X_MCU_INTERFACE
+#include "USART.h"
+#include "rsi_board.h"
+#include "rsi_debug.h"
+#include "rsi_rom_egpio.h"
+#include "sl_si91x_usart.h"
+#else // For EFR32
 #include "em_core.h"
 #include "em_usart.h"
+#include "uartdrv.h"
 #ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
 #endif
@@ -38,11 +55,7 @@ extern "C" {
 #endif
 #ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
-#endif // EFR32MG24
-#include "uart.h"
-#include "uartdrv.h"
-#include <stddef.h>
-#include <string.h>
+#endif // SL_CATALOG_UARTDRV_USART_PRESENT
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
@@ -79,6 +92,16 @@ extern "C" {
 #define vcom_handle sl_uartdrv_usart_vcom_handle
 #endif // EFR32MG24
 
+namespace {
+// In order to reduce the probability of data loss during the dmaFull callback handler we use
+// two duplicate receive buffers so we can always have one "active" receive queue.
+uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE]  = { 0 };
+uint8_t sRxDmaBuffer2[MAX_DMA_BUFFER_SIZE] = { 0 };
+uint16_t lastCount                         = 0; // Nb of bytes already processed from the active dmaBuffer
+} // namespace
+
+#endif // SLI_SI91X_MCU_INTERFACE
+
 typedef struct
 {
     // The data buffer
@@ -90,15 +113,6 @@ typedef struct
     // Maxium size of data that can be hold in buffer before overwriting
     uint16_t MaxSize;
 } Fifo_t;
-
-#define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
-#define MAX_BUFFER_SIZE 256
-#define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE / 2)
-// In order to reduce the probability of data loss during the dmaFull callback handler we use
-// two duplicate receive buffers so we can always have one "active" receive queue.
-static uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE];
-static uint8_t sRxDmaBuffer2[MAX_DMA_BUFFER_SIZE];
-static uint16_t lastCount; // Nb of bytes already processed from the active dmaBuffer
 
 // uart transmit
 #if SILABS_LOG_OUT_UART
@@ -144,7 +158,9 @@ constexpr osMessageQueueAttr_t kUartTxQueueAttr = { .cb_mem  = &sUartTxQueueStru
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
+#if SLI_SI91X_MCU_INTERFACE == 0
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
+#endif // SLI_SI91X_MCU_INTERFACE == 0
 static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
@@ -196,9 +212,9 @@ static uint16_t RemainingSpace(Fifo_t * fifo)
  */
 static void WriteToFifo(Fifo_t * fifo, uint8_t * pDataToWrite, uint16_t SizeToWrite)
 {
-    assert(fifo);
-    assert(pDataToWrite);
-    assert(SizeToWrite <= fifo->MaxSize);
+    VerifyOrDie(fifo != nullptr);
+    VerifyOrDie(pDataToWrite != nullptr);
+    VerifyOrDie(SizeToWrite <= fifo->MaxSize);
 
     // Overwrite is not allowed
     if (RemainingSpace(fifo) >= SizeToWrite)
@@ -227,9 +243,9 @@ static void WriteToFifo(Fifo_t * fifo, uint8_t * pDataToWrite, uint16_t SizeToWr
  */
 static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToRead)
 {
-    assert(fifo);
-    assert(pData);
-    assert(SizeToRead <= fifo->MaxSize);
+    VerifyOrDie(fifo != nullptr);
+    VerifyOrDie(pData != nullptr);
+    VerifyOrDie(SizeToRead <= fifo->MaxSize);
 
     uint16_t ReadSize        = MIN(SizeToRead, AvailableDataCount(fifo));
     uint16_t nBytesBeforWrap = (fifo->MaxSize - fifo->Head);
@@ -263,21 +279,23 @@ void uartConsoleInit(void)
         return;
     }
 
+    sUartTxQueue    = osMessageQueueNew(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), &kUartTxQueueAttr);
+    sUartTaskHandle = osThreadNew(uartMainLoop, nullptr, &kUartTaskAttr);
+
+    // Init a fifo for the data received on the uart
+    InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
+
+    VerifyOrDie(sUartTaskHandle != nullptr);
+    VerifyOrDie(sUartTxQueue != nullptr);
+
+#if SLI_SI91X_MCU_INTERFACE == 0
 #ifdef SL_BOARD_NAME
     sl_board_enable_vcom();
 #endif
-    // Init a fifo for the data received on the uart
-    InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
     // Activate 2 dma queues to always have one active
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
-
-    sUartTxQueue    = osMessageQueueNew(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), &kUartTxQueueAttr);
-    sUartTaskHandle = osThreadNew(uartMainLoop, nullptr, &kUartTaskAttr);
-
-    assert(sUartTaskHandle);
-    assert(sUartTxQueue);
 
     // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
@@ -295,8 +313,24 @@ void uartConsoleInit(void)
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
+#endif // SLI_SI91X_MCU_INTERFACE == 0
 }
 
+#if SLI_SI91X_MCU_INTERFACE
+void cache_uart_rx_data(char character)
+{
+    if (RemainingSpace(&sReceiveFifo) >= 1)
+    {
+        WriteToFifo(&sReceiveFifo, (uint8_t *) &character, 1);
+    }
+#ifdef ENABLE_CHIP_SHELL
+    chip::NotifyShellProcess();
+#endif // ENABLE_CHIP_SHELL
+}
+#endif // SLI_SI91X_MCU_INTERFACE
+
+#if SLI_SI91X_MCU_INTERFACE == 0
+// For EFR32
 void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
@@ -346,6 +380,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     otSysEventSignalPending();
 #endif
 }
+#endif // SLI_SI91X_MCU_INTERFACE == 0
 
 /**
  * @brief Read the data available from the console Uart
@@ -420,15 +455,15 @@ int16_t uartLogWrite(const char * log, uint16_t length)
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
     uint8_t * data;
-    UARTDRV_Count_t count, remaining;
 
     if (Buf == NULL || NbBytesToRead < 1)
     {
         return UART_CONSOLE_ERR;
     }
-
+#if SLI_SI91X_MCU_INTERFACE == 0
     if (NbBytesToRead > AvailableDataCount(&sReceiveFifo))
     {
+        UARTDRV_Count_t count, remaining;
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
         CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(vcom_handle, &data, &count, &remaining); if (count > lastCount) {
@@ -436,6 +471,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
             lastCount = count;
         })
     }
+#endif // SLI_SI91X_MCU_INTERFACE == 0
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
 }
@@ -464,6 +500,14 @@ void uartMainLoop(void * args)
  */
 void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 {
+#if SLI_SI91X_MCU_INTERFACE
+    // ensuring null termination of buffer
+    if (nbOfBytes != CHIP_SHELL_MAX_LINE_SIZE && buffer[nbOfBytes - 1] != '\0')
+    {
+        buffer[nbOfBytes] = '\0';
+    }
+    Board_UARTPutSTR(reinterpret_cast<uint8_t *>(buffer));
+#else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
@@ -489,6 +533,7 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
+#endif // SLI_SI91X_MCU_INTERFACE
 }
 
 #ifdef __cplusplus
