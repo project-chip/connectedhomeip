@@ -162,7 +162,7 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
-bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan statusText)
+bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
     {
@@ -172,7 +172,7 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan statusText)
     return true;
 }
 
-bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
     if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
     {
@@ -181,17 +181,12 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan sk
         return false;
     }
 
-    // Call the device's skip command.
-    // if successful
-
-    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting) ||
-        mServiceAreaDelegate.GetNumberOfProgressElements() == 0)
+    bool ignored;
+    if (!mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, ignored))
     {
-        // notting else to do since there is no progress data.
-        return true;
+        CopyCharSpanToMutableCharSpan("there was a technical error when skipping the area"_span, skipStatusText);
+        return false;
     }
-
-    mServiceAreaInstance.SetProgressStatus(skippedArea, ServiceArea::OperationalStatusEnum::kSkipped);
 
     return true;
 }

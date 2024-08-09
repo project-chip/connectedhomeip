@@ -102,9 +102,9 @@ public:
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
-    bool SaIsSetSelectedAreasAllowed(MutableCharSpan statusText);
+    bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
 
-    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText);
+    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 
     bool SaIsSupportedAreasChangeAllowed();
 
@@ -124,6 +124,8 @@ public:
     void HandleLowChargeMessage();
 
     void HandleActivityCompleteEvent();
+
+    void HandleAreaCompletedEvent();
 
     /**
      * Sets the device to an error state with the error state ID matching the error name given.

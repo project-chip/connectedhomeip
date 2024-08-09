@@ -548,14 +548,19 @@ void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
     }
 }
 
-void RvcServiceAreaDelegate::GoToNextArea(bool & finished)
+bool RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished)
 {
     AreaStructureWrapper currentArea;
     auto currentAreaIdN = GetInstance()->GetCurrentArea();
 
     if (currentAreaIdN.IsNull())
     {
-        return;
+        return false;
+    }
+
+    if (currentAreaOpState != OperationalStatusEnum::kCompleted && currentAreaOpState != OperationalStatusEnum::kSkipped)
+    {
+        return false;
     }
 
     auto currentAreaId = currentAreaIdN.Value();
@@ -581,7 +586,7 @@ void RvcServiceAreaDelegate::GoToNextArea(bool & finished)
                 }
 
                 finished = false;
-                return;
+                return true;
             }
 
             ++nextIndex;
@@ -605,7 +610,7 @@ void RvcServiceAreaDelegate::GoToNextArea(bool & finished)
         if (!GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
         {
             finished = true;
-            return;
+            return true;
         }
 
         GetInstance()->SetCurrentArea(nextSelectedAreaId);
@@ -618,4 +623,5 @@ void RvcServiceAreaDelegate::GoToNextArea(bool & finished)
 
         finished = false;
     }
+    return true;
 }

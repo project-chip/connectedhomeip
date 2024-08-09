@@ -29,10 +29,8 @@ namespace Clusters {
 
 class RvcDevice;
 
-typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan statusText);
-typedef bool (RvcDevice::*IsValidSelectAreasSetCallback)(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                                                         ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
-typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan skipStatusText);
+typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan & statusText);
+typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
 
 namespace ServiceArea {
@@ -185,11 +183,13 @@ public:
     void SetAttributesAtCleanStart();
 
     /**
-     *
+     * Go to the next area in the list of selected areas.
+     * @param currentAreaOpState The operational state to be set in the Status field of the Progress attribute for the current area.
+     * This can only be Completed or Skipped.
      * @param finished true if there are no more areas to clean an we should end the clean.
-     * // todo Call this method from an out of band message.
-     */
-    void GoToNextArea(bool & finished);
+     * @return true if the next area was successfully set. fales if there was an error.
+    */
+    bool GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished);
 
 };
 
