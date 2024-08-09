@@ -521,7 +521,7 @@ void BLEManagerImpl::EventHandler_init(void)
     /* set the stacks in default states */
     DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_IDLE);
 
-    vTaskPrioritySet(xTaskGetCurrentTaskHandle(), 3);
+    vTaskPrioritySet(xTaskGetCurrentTaskHandle(), BLE_MANAGER_TASK_PRIORITY);
 
     // ******************************************************************
     // N0 STACK API CALLS CAN OCCUR BEFORE THIS CALL TO ICall_registerApp
@@ -634,7 +634,7 @@ CHIP_ERROR BLEManagerImpl::CreateEventHandler(void)
                             "ble_hndlr",                         /* Text name for the task. */
                             BLEMANAGER_EVENT_HANDLER_STACK_SIZE, /* Stack size in words, not bytes. */
                             this,                                /* Parameter passed into the task. */
-                            ICALL_TASK_PRIORITIES,               /* Keep priority the same as ICALL until init is complete */
+                            BLE_STACK_TASK_PRIORITY,             /* Keep priority the same as ICALL until init is complete */
                             NULL);                               /* Used to pass out the created task's handle. */
 
     if (xReturned == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
