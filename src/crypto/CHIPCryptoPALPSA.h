@@ -56,16 +56,41 @@ namespace Crypto {
 #endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
 
 /**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+ *
+ * @brief
+ *   End of the PSA key identifier range used by Matter.
+ *
+ * This setting establishes the maximum limit for the key range specific to Matter, in order to
+ * prevent any overlap with other firmware components that also employ the PSA crypto API.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END 0x3FFFF
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+
+static_assert(PSA_KEY_ID_USER_MIN <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE && CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END <= PSA_KEY_ID_USER_MAX,
+              "Matter specific PSA key range doesn't fit within PSA allowed range");
+
+static constexpr uint32_t kMaxICDClientKeys = CHIP_CONFIG_ICD_MAX_CLIENTS;
+
+static_assert(kMaxICDClientKeys >= CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS,
+              "Number of allocated ICD key slots is lower than maximum number of supported ICD clients");
+
+/**
  * @brief Defines subranges of the PSA key identifier space used by Matter.
  */
 enum class KeyIdBase : psa_key_id_t
 {
-    Minimum     = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
-    Operational = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
-    Maximum     = Operational + kMaxValidFabricIndex,
+    Minimum              = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
+    Operational          = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
+    DACPrivKey           = Operational + kMaxValidFabricIndex + 1,
+    ICDHmacKeyRangeStart = DACPrivKey + 1,
+    ICDAesKeyRangeStart  = ICDHmacKeyRangeStart + kMaxICDClientKeys,
+    Maximum              = ICDAesKeyRangeStart + kMaxICDClientKeys,
 };
 
-static_assert(to_underlying(KeyIdBase::Minimum) >= PSA_KEY_ID_USER_MIN && to_underlying(KeyIdBase::Maximum) <= PSA_KEY_ID_USER_MAX,
+static_assert(to_underlying(KeyIdBase::Minimum) >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE &&
+                  to_underlying(KeyIdBase::Maximum) <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END,
               "PSA key ID base out of allowed range");
 
 /**
