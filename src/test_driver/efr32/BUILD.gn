@@ -73,7 +73,7 @@ silabs_executable("efr32_device_tests") {
     "${examples_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
     "${examples_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",
-    "${examples_plat_dir}/uart.cpp",
+    "${examples_common_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
 
