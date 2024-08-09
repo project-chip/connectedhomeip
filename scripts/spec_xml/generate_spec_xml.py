@@ -24,15 +24,13 @@ import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import click
+import paths
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
-DEFAULT_OUTPUT_DIR_1_3 = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', '1.3'))
-DEFAULT_OUTPUT_DIR_TOT = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'master'))
-DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'docs', 'spec_clusters.md'))
+# Calls to paths.py functions
+DEFAULT_CHIP_ROOT = paths.get_chip_root()
+DEFAULT_OUTPUT_DIR_1_3 = paths.get_data_model_path(paths.Branch.V1_3)
+DEFAULT_OUTPUT_DIR_TOT = paths.get_data_model_path(paths.Branch.MASTER)
+DEFAULT_DOCUMENTATION_FILE = os.path.join(DEFAULT_CHIP_ROOT, 'docs', 'spec_clusters.md')
 
 
 def get_xml_path(filename, output_dir):
@@ -91,20 +89,18 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
 
 def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):
     src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
-    sdm_clusters_dir = os.path.abspath(
-        os.path.join(src_dir, 'service_device_management'))
-    app_clusters_dir = os.path.abspath(os.path.join(src_dir, 'app_clusters'))
-    dm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'data_model'))
-    media_clusters_dir = os.path.abspath(
-        os.path.join(app_clusters_dir, 'media'))
-    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
+    sdm_clusters_dir = os.path.join(src_dir, 'service_device_management')
+    app_clusters_dir = os.path.join(src_dir, 'app_clusters')
+    dm_clusters_dir = os.path.join(src_dir, 'data_model')
+    media_clusters_dir = os.path.join(app_clusters_dir, 'media')
+    clusters_output_dir = os.path.join(output_dir, 'clusters')
 
     if not os.path.exists(clusters_output_dir):
         os.makedirs(clusters_output_dir)
 
-    print('Generating main spec to get file include list - this make take a few minutes')
+    print('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    print('Generating cluster spec to get file include list - this make take a few minutes')
+    print('Generating cluster spec to get file include list - this may take a few minutes')
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
 
     def scrape_cluster(filename: str) -> None:
@@ -113,8 +109,7 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress
             print(f'skipping file: {base} as it is not compiled into the asciidoc')
             return
         xml_path = get_xml_path(filename, clusters_output_dir)
-        cmd = [scraper, 'cluster', '-i', filename, '-o',
-               xml_path, '-nd']
+        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd']
         if include_in_progress:
             cmd.extend(['--define', 'in-progress'])
         if dry_run:
@@ -146,16 +141,14 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress
 
 
 def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    device_type_dir = os.path.abspath(
-        os.path.join(spec_root, 'src', 'device_types'))
-    device_types_output_dir = os.path.abspath(
-        os.path.join(output_dir, 'device_types'))
-    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
+    device_type_dir = os.path.join(spec_root, 'src', 'device_types')
+    device_types_output_dir = os.path.join(output_dir, 'device_types')
+    clusters_output_dir = os.path.join(output_dir, 'clusters')
 
     if not os.path.exists(device_types_output_dir):
         os.makedirs(device_types_output_dir)
 
-    print('Generating device type library to get file include list - this make take a few minutes')
+    print('Generating device type library to get file include list - this may take a few minutes')
     device_type_output = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
 
     def scrape_device_type(filename: str) -> None:
@@ -164,8 +157,7 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_prog
             print(f'skipping file: {filename} as it is not compiled into the asciidoc')
             return
         xml_path = get_xml_path(filename, device_types_output_dir)
-        cmd = [scraper, 'devicetype', '-c', '-cls', clusters_output_dir,
-               '-nd', '-i', filename, '-o', xml_path]
+        cmd = [scraper, 'devicetype', '-c', '-cls', clusters_output_dir, '-nd', '-i', filename, '-o', xml_path]
         if dry_run:
             print(cmd)
         else:
@@ -180,29 +172,25 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_prog
 
 
 def dump_versions(scraper, spec_root, output_dir):
-    sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
-    out = subprocess.run(['git', 'rev-parse', 'HEAD'],
-                         capture_output=True, encoding="utf8", cwd=spec_root)
+    sha_file = os.path.join(output_dir, 'spec_sha')
+    out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
 
-    scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
-    out = subprocess.run([scraper, '--version'],
-                         capture_output=True, encoding="utf8")
+    scraper_file = os.path.join(output_dir, 'scraper_version')
+    out = subprocess.run([scraper, '--version'], capture_output=True, encoding="utf8")
     version = out.stdout
     with open(scraper_file, "wt", encoding='utf8') as output:
         output.write(version)
 
 
 def dump_cluster_ids(output_dir):
-    python_testing_path = os.path.abspath(
-        os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing'))
+    python_testing_path = os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')
     sys.path.insert(0, python_testing_path)
-    clusters_output_dir = os.path.abspath(
-        os.path.join(output_dir, 'clusters'))
+    clusters_output_dir = os.path.join(output_dir, 'clusters')
 
-    from matter_testing_support.spec_parsing import build_xml_clusters
+    from spec_parsing_support import build_xml_clusters
 
     header = '# List of currently defined spec clusters\n'
     header += 'This file was **AUTOMATICALLY** generated by `python scripts/generate_spec_xml.py`. DO NOT EDIT BY HAND!\n\n'
