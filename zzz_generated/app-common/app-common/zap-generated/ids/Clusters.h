@@ -394,6 +394,9 @@ static constexpr ClusterId Id = 0x00000751;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
+namespace MeterIdentification {
+static constexpr ClusterId Id = 0x00000B06;
+} // namespace MeterIdentification
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting
