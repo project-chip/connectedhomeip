@@ -17,7 +17,7 @@ name: Check for Unintentional Submodule Updates
 on:
     pull_request:
         branches-ignore:
-            - 'dependabot/**'
+            - "dependabot/**"
         paths:
             - "third_party/**"
             - ".gitmodules"
@@ -26,9 +26,14 @@ jobs:
     check-submodule-update-label:
         name: Check For Submodule Update Label
         runs-on: ubuntu-latest
-        if: "!contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose')"
         steps:
-            - name: Error Message
-              run: echo This pull request attempts to update submodules without the changing-submodules-on-purpose label. Please apply that label if the changes are intentional, or remove those changes.
-            - name: Fail Job
-              run: exit 1
+            - if: ${{ !contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose') }}
+              name: Fail
+              run: |
+                  echo This pull request attempts to update submodules without the changing-submodules-on-purpose label. Please apply that label if the changes are intentional, or remove those changes.
+                  exit 1
+            - if: ${{ contains(github.event.pull_request.labels.*.name, 'changing-submodules-on-purpose') }} 
+              name: Success
+              run: |
+                  echo PR looks good.
+                  exit 0
