@@ -71,7 +71,6 @@
     "IcdManagement": [
         "TestIcdManagementCluster",
         "Test_TC_ICDM_1_1",
-        "Test_TC_ICDM_3_4",
         "Test_TC_ICDM_4_1"
     ],
     "Identify": ["Test_TC_I_2_1", "Test_TC_I_2_2", "Test_TC_I_2_3"],
