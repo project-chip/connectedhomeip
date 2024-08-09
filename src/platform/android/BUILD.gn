@@ -114,6 +114,7 @@ android_library("java") {
 
   sources = [
     "java/chip/platform/AndroidBleManager.java",
+    "java/chip/platform/AndroidChipLogging.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
     "java/chip/platform/BleCallback.java",
