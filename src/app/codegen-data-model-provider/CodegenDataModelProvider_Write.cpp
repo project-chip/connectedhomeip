@@ -278,7 +278,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
-        Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
+                                         .endpoint    = request.path.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForWriteAttribute(request.path));
 

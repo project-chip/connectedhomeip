@@ -171,6 +171,23 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
+char GetRequestTypeStringForLogging(RequestType requestType)
+{
+    switch (requestType)
+    {
+    case RequestType::kAttributeReadRequest:
+        return 'r';
+    case RequestType::kAttributeWriteRequest:
+        return 'w';
+    case RequestType::kCommandInvokeRequest:
+        return 'i';
+    case RequestType::kEventReadOrSubscribeRequest:
+        return 'e';
+    default:
+        return '?';
+    }
+}
+
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
@@ -306,6 +323,11 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
     }
 }
 
+bool AccessControl::IsAccessRestrictionListSupported() const
+{
+    return false; // not yet supported
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
@@ -316,13 +338,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c r=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
-                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege),
+                        GetRequestTypeStringForLogging(requestPath.requestType));
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
+
+    if (IsAccessRestrictionListSupported())
+    {
+        VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);

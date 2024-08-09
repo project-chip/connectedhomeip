@@ -628,6 +628,13 @@ public:
     void RemoveEntryListener(EntryListener & listener);
 
     /**
+     * Check whether or not Access Restriction List is supported.
+     *
+     * @retval true if Access Restriction List is supported.
+     */
+    bool IsAccessRestrictionListSupported() const;
+
+    /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
      *
