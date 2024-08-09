@@ -19,7 +19,6 @@
 #include "BridgedDevice.h"
 
 #include <cstdio>
-#include <string>
 
 #include <app/EventLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -32,7 +31,7 @@ struct ActiveChangeEventWorkData
     uint32_t mPromisedActiveDuration;
 };
 
-static void ActiveChangeEventWork(intptr_t arg)
+void ActiveChangeEventWork(intptr_t arg)
 {
     ActiveChangeEventWorkData * data = reinterpret_cast<ActiveChangeEventWorkData *>(arg);
 
@@ -66,16 +65,6 @@ void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
     workdata->mPromisedActiveDuration    = promisedActiveDurationMs;
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(ActiveChangeEventWork, reinterpret_cast<intptr_t>(workdata));
-}
-
-bool BridgedDevice::IsReachable()
-{
-    return mReachable;
-}
-
-bool BridgedDevice::IsIcd()
-{
-    return mIsIcd;
 }
 
 void BridgedDevice::SetReachable(bool reachable)

@@ -37,6 +37,11 @@ namespace Thermostat {
 static constexpr size_t kThermostatEndpointCount =
     MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+enum AtomicWriteState
+{
+    kAtomicWriteState_Closed = 0,
+    kAtomicWriteState_Open,
+};
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
@@ -59,13 +64,13 @@ public:
     ScopedNodeId GetAtomicWriteScopedNodeId(EndpointId endpoint);
 
     /**
-     * @brief Sets whether an atomic write is in progress for the given endpoint and originatorNodeId
+     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
      *
      * @param[in] endpoint The endpoint.
      * @param[in] originatorNodeId The originator scoped node id.
-     * @param[in] inProgress Whether or not an atomic write is in progress.
+     * @param[in] state Whether or not an atomic write is open or closed.
      */
-    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress);
+    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
 
     /**
      * @brief Gets whether an atomic write is in progress for the given endpoint
@@ -101,14 +106,14 @@ private:
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    struct AtomicWriteState
+    struct AtomicWriteSession
     {
-        bool inProgress;
+        AtomicWriteState state = kAtomicWriteState_Closed;
         ScopedNodeId nodeId;
-        EndpointId endpointId;
+        EndpointId endpointId = kInvalidEndpointId;
     };
 
-    AtomicWriteState mAtomicWriteStates[kThermostatEndpointCount];
+    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 };
 
 /**

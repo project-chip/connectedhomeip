@@ -118,7 +118,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -206,7 +206,7 @@ void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -605,16 +605,16 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress)
+void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        mAtomicWriteStates[ep].inProgress = inProgress;
-        mAtomicWriteStates[ep].endpointId = endpoint;
-        mAtomicWriteStates[ep].nodeId     = originatorNodeId;
+        mAtomicWriteSessions[ep].state      = state;
+        mAtomicWriteSessions[ep].endpointId = endpoint;
+        mAtomicWriteSessions[ep].nodeId     = originatorNodeId;
     }
 }
 
@@ -624,9 +624,9 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteStates[ep].inProgress;
+        inAtomicWrite = (mAtomicWriteSessions[ep].state == kAtomicWriteState_Open);
     }
     return inAtomicWrite;
 }
@@ -657,9 +657,9 @@ ScopedNodeId ThermostatAttrAccess::GetAtomicWriteScopedNodeId(EndpointId endpoin
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        originatorNodeId = mAtomicWriteStates[ep].nodeId;
+        originatorNodeId = mAtomicWriteSessions[ep].nodeId;
     }
     return originatorNodeId;
 }
@@ -944,10 +944,10 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
 
 void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(mAtomicWriteStates); ++i)
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
-        auto atomicWriteState = mAtomicWriteStates[i];
-        if (atomicWriteState.inProgress && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             auto delegate = GetDelegate(atomicWriteState.endpointId);
             if (delegate == nullptr)
@@ -1402,8 +1402,6 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
         return;
     }
 
-    auto timeout = commandData.timeout.Value();
-
     if (!validAtomicAttributes(commandData, false))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
@@ -1420,12 +1418,18 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     // needs to keep track of a pending preset list now.
     delegate->InitializePendingPresets();
 
-    uint16_t maxTimeout = 5000;
-    timeout             = std::min(timeout, maxTimeout);
+    auto timeout =
+        delegate->GetAtomicWriteTimeout(commandData.attributeRequests, System::Clock::Milliseconds16(commandData.timeout.Value()));
 
-    ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), true);
-    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
+    if (!timeout.has_value())
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    ScheduleTimer(endpoint, timeout.value());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success,
+                       MakeOptional(timeout.value().count()));
 }
 
 imcode commitPresets(Delegate * delegate, EndpointId endpoint)
