@@ -43,6 +43,13 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#endif
+
 #if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
 #define EVSE_LED 1
 #else
@@ -65,6 +72,12 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
+
+#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
+static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
+static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
+#endif
 
 namespace chip {
 namespace app {
@@ -119,6 +132,15 @@ CHIP_ERROR AppTask::Init()
     }
 
     ApplicationInit();
+
+#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
+    {
+        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyEvseTestEventTriggerHandler);
+        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyReportingTestEventTriggerHandler);
+        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+    }
+#endif
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
