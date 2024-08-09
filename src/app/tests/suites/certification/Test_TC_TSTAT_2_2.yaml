@@ -1666,7 +1666,7 @@ tests:
           constraints:
               type: int8s
               minValue: 0
-              maxValue: 25
+              maxValue: 127
 
     - label:
           "Step 11a: Test Harness Writes a value back that is different but
@@ -1696,16 +1696,6 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 11b: Test Harness Writes the value above MinSetpointDeadBand "
-      command: "writeAttribute"
-      attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
-      arguments:
-          value: 30
-      response:
-          error: CONSTRAINT_ERROR
-
-    - label:
           "Step 11c: Test Harness Writes the min limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
@@ -1719,7 +1709,7 @@ tests:
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
-          value: 25
+          value: 127
 
     - label:
           "Step 12: Test Harness Reads ControlSequenceOfOperation from Server
