@@ -24,6 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_UDP_CPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_UDP_CPP
 
+#include <lib/core/Global.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -33,8 +34,8 @@ namespace Internal {
 template <class ImplClass>
 chip::Inet::EndPointManager<Inet::UDPEndPoint> & GenericConnectivityManagerImpl_UDP<ImplClass>::_UDPEndPointManager()
 {
-    static chip::Inet::UDPEndPointManagerImpl sUDPEndPointManagerImpl;
-    return sUDPEndPointManagerImpl;
+    static Global<chip::Inet::UDPEndPointManagerImpl> sUDPEndPointManagerImpl;
+    return sUDPEndPointManagerImpl.get();
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
