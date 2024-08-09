@@ -104,22 +104,21 @@ public:
      *
      * @note skipStatusText must be filled out by the function on failure.
      *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 1:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the remaining locations on the SelectedAreas attribute list, starting with
-     * the next entry. If the end of the SelectedAreas attribute list is reached, the server SHALL stop operating.
-     *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 0:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the locations on the SelectedAreas attribute list where operating has not
-     * been completed, using a vendor defined order. If the server has completed operating at all locations on the SelectedAreas
-     * attribute list, the server SHALL stop operating.
+     * @note If the device accepts the request:
+     * - If the device is currently operating at the area identified by SkippedArea, as indicated by either the CurrentArea or
+     *     the Progress attributes, if implemented, the device SHALL stop operating at that area.
+     * - If the Progress attribute is implemented, the entry corresponding to SkippedArea SHALL be updated to indicate that the
+     *     area was skipped.
+     * - The server SHALL attempt to operate only at the areas in the SelectedAreas attribute list where operating has not been
+     *     skipped or completed, using a vendor defined order.
+     * - If the server has either skipped or completed operating at all areas on the SelectedAreas attribute list, the server
+     *     SHALL stop operating.
      *
      * @note If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
      *       If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined
-     * error description which can be used to explain the error to the user. For example, if the Status field is set to
-     * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
-     * which may involve other clusters.
+     *       error description which can be used to explain the error to the user. For example, if the Status field is set to
+     *       InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the
+     *       device, which may involve other clusters.
      */
     virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
@@ -262,7 +261,7 @@ public:
     /**
      * This method is called by the server instance to modify an existing map in the list.
      * The server instance will ensure that the modifiedMap is a valid, unique map.
-     * @param[in] listIndexThe index of the map being modified.
+     * @param[in] listIndex The index of the map being modified.
      * @param[in] modifiedMapA map with the modified contents.
      * @return true if successful, false otherwise.
      *
