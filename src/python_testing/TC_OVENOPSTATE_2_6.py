@@ -33,28 +33,29 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 
-class TC_OPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
+class TC_OVENOPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 
         test_info = TestInfo(
-            pics_code="OPSTATE",
-            cluster=Clusters.OperationalState
+            pics_code="OVENOPSTATE",
+            cluster=Clusters.OvenCavityOperationalState
         )
 
         super().setup_base(test_info=test_info)
 
-    def steps_TC_OPSTATE_2_6(self) -> list[TestStep]:
+    def steps_TC_OVENOPSTATE_2_6(self) -> list[TestStep]:
         return self.steps_TC_OPSTATE_BASE_2_6()
 
-    def pics_TC_OPSTATE_2_6(self) -> list[str]:
-        return ["OPSTATE.S", "OPSTATE.S.A0002"]
+    def pics_TC_OVENOPSTATE_2_6(self) -> list[str]:
+        return ["OVENOPSTATE.S", "OVENOPSTATE.S.A0002"]
 
     @async_test_body
-    async def test_TC_OPSTATE_2_6(self):
-        endpoint = self.matter_test_config.endpoint
+    async def test_TC_OVENOPSTATE_2_6(self):
+        # endpoint = self.matter_test_config.endpoint
 
-        await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=endpoint)
+        # await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=endpoint)
+        await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=1)
 
 
 if __name__ == "__main__":
