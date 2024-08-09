@@ -24,20 +24,29 @@ namespace Crypto {
 
 namespace {
 
-class AesKeyAttributes
+class KeyAttributesBase
 {
 public:
-    AesKeyAttributes()
+    KeyAttributesBase(psa_key_type_t type, psa_algorithm_t algorithm, psa_key_usage_t usageFlags, size_t bits)
     {
-        constexpr psa_algorithm_t kAlgorithm = PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8);
-
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_AES);
-        psa_set_key_algorithm(&mAttrs, kAlgorithm);
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
-        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
+        psa_set_key_type(&mAttrs, type);
+        psa_set_key_algorithm(&mAttrs, algorithm);
+        psa_set_key_usage_flags(&mAttrs, usageFlags);
+        psa_set_key_bits(&mAttrs, bits);
     }
 
-    ~AesKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
+    CHIP_ERROR SetKeyPersistence(psa_key_id_t keyId)
+    {
+        VerifyOrReturnError(to_underlying(KeyIdBase::Maximum) >= keyId && keyId >= to_underlying(KeyIdBase::Minimum),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        psa_set_key_lifetime(&mAttrs, PSA_KEY_LIFETIME_PERSISTENT);
+        psa_set_key_id(&mAttrs, keyId);
+
+        return CHIP_NO_ERROR;
+    }
+
+    ~KeyAttributesBase() { psa_reset_key_attributes(&mAttrs); }
 
     const psa_key_attributes_t & Get() { return mAttrs; }
 
@@ -45,41 +54,29 @@ private:
     psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
 };
 
-class HmacKeyAttributes
+class AesKeyAttributes : public KeyAttributesBase
 {
 public:
-    HmacKeyAttributes()
-    {
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_HMAC);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_SIGN_MESSAGE);
-        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
-    }
-
-    ~HmacKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
-
-    const psa_key_attributes_t & Get() { return mAttrs; }
-
-private:
-    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
+    AesKeyAttributes() :
+        KeyAttributesBase(PSA_KEY_TYPE_AES, PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8),
+                          PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT | PSA_KEY_USAGE_COPY,
+                          CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8)
+    {}
 };
 
-class HkdfKeyAttributes
+class HmacKeyAttributes : public KeyAttributesBase
 {
 public:
-    HkdfKeyAttributes()
-    {
-        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_DERIVE);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HKDF(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_DERIVE);
-    }
+    HmacKeyAttributes() :
+        KeyAttributesBase(PSA_KEY_TYPE_HMAC, PSA_ALG_HMAC(PSA_ALG_SHA_256), PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_COPY,
+                          CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8)
+    {}
+};
 
-    ~HkdfKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
-
-    const psa_key_attributes_t & Get() { return mAttrs; }
-
-private:
-    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
+class HkdfKeyAttributes : public KeyAttributesBase
+{
+public:
+    HkdfKeyAttributes() : KeyAttributesBase(PSA_KEY_TYPE_DERIVE, PSA_ALG_HKDF(PSA_ALG_SHA_256), PSA_KEY_USAGE_DERIVE, 0) {}
 };
 
 } // namespace
