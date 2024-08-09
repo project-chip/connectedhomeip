@@ -86,6 +86,10 @@ template("gen_flashing_script") {
 template("flashable_executable") {
   executable_target = "$target_name.executable"
 
+  if (!defined(invoker.output_dir)) {
+    invoker.output_dir = root_out_dir
+  }
+
   if (defined(invoker.flashing_script_name)) {
     # Generating the flashing script is the final target.
     final_target = "$target_name.flashing"
@@ -110,7 +114,10 @@ template("flashable_executable") {
       data_deps += invoker.data_deps
     }
 
-    write_runtime_deps = "${root_out_dir}/${flashbundle_name}"
+    # Invoker can stop this template from creating the flashbundle.txt by setting flashbundle_name to empty string.
+    if (flashbundle_name != "") {
+      write_runtime_deps = "${invoker.output_dir}/${flashbundle_name}"
+    }
   }
 
   if (defined(invoker.objcopy_image_name)) {
@@ -124,8 +131,8 @@ template("flashable_executable") {
     objcopy = invoker.objcopy
 
     objcopy_convert(image_target) {
-      conversion_input = "${root_out_dir}/${invoker.output_name}"
-      conversion_output = "${root_out_dir}/${image_name}"
+      conversion_input = "${invoker.output_dir}/${invoker.output_name}"
+      conversion_output = "${invoker.output_dir}/${image_name}"
       conversion_target_format = image_format
       deps = [ ":$executable_target" ]
     }
@@ -141,7 +148,8 @@ template("flashable_executable") {
     gen_flashing_script("$target_name.flashing") {
       flashing_script_generator = invoker.flashing_script_generator
       flashing_script_inputs = invoker.flashing_script_inputs
-      flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
+      flashing_script_name =
+          "${invoker.output_dir}/${invoker.flashing_script_name}"
       if (defined(invoker.flashing_options)) {
         flashing_options = invoker.flashing_options
       } else {
@@ -155,7 +163,7 @@ template("flashable_executable") {
 
       flashing_options += [
         "--application",
-        rebase_path(image_name, root_out_dir, root_out_dir),
+        rebase_path(image_name, invoker.output_dir, invoker.output_dir),
       ]
       data_deps = [ ":$image_target" ]
     }
