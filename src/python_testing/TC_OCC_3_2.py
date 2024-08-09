@@ -188,7 +188,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.step("5b")
             initial_dut = 11  # must be different from the initial attribute value!
             # write one more time for priming report loss
-            await self.write_single_attribute(attributes.PIROccupiedToUnoccupiedDelay(initial_dut)) 
+            await self.write_single_attribute(attributes.PIROccupiedToUnoccupiedDelay(initial_dut))
 
             self.step("5c")
             # write the new attribute value
