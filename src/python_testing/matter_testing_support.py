@@ -446,6 +446,39 @@ class ClusterAttributeChangeAccumulator:
         return self._attribute_reports
 
 
+class AttributeChangeCallback:
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+        self._output = queue.Queue()
+        self._expected_attribute = expected_attribute
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute is updated.
+           It checks the passed in attribute is the same as the subscribed to attribute and
+           then posts it into the queue for later processing."""
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        logging.info(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        q = (path, transaction)
+        self._output.put(q)
+
+    def wait_for_report(self):
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            attribute_value = transaction.GetAttribute(path)
+            logging.info(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+        except KeyError:
+            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
+
 class InternalTestRunnerHooks(TestRunnerHooks):
 
     def start(self, count: int):
