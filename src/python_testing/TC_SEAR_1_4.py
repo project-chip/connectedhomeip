@@ -62,10 +62,6 @@ class TC_SEAR_1_4(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
 
-        # Ensure that the device is in the correct state
-        if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
-
         attribute_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
         logging.info("AttributeList: %s" % (attribute_list))

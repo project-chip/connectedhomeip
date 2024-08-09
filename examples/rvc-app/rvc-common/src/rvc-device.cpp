@@ -52,6 +52,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         mDocked   = false;
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        mServiceAreaDelegate.SetAttributesAtCleanStart();
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
     }
@@ -161,6 +162,55 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
+bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
+{
+    if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        CopyCharSpanToMutableCharSpan("cannot set the Selected Areas while the device is running"_span, statusText);
+        return false;
+    }
+    return true;
+}
+
+bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+{
+    if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
+    {
+        // This device only supports skipping the current location.
+        CopyCharSpanToMutableCharSpan("the skipped area does not match the current area"_span, skipStatusText);
+        return false;
+    }
+
+    if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        // This device only accepts the skip are command while in the running state
+        CopyCharSpanToMutableCharSpan("skip area is only accepted when the device is running"_span, skipStatusText);
+        return false;
+    }
+
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, finished);
+
+    if (finished)
+    {
+        HandleActivityCompleteEvent();
+    }
+
+    return true;
+}
+
+bool RvcDevice::SaIsSupportedAreasChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
+bool RvcDevice::SaIsSupportedMapChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
 void RvcDevice::HandleChargedMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=
@@ -258,6 +308,20 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.OnOperationCompletionDetected(0, a, b);
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+}
+
+void RvcDevice::HandleAreaCompletedEvent()
+{
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kCompleted, finished);
+
+    if (finished)
+    {
+        HandleActivityCompleteEvent();
+    }
 }
 
 void RvcDevice::HandleErrorEvent(const std::string & error)
@@ -334,4 +398,9 @@ void RvcDevice::HandleResetMessage()
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
+
+    mServiceAreaInstance.ClearSelectedAreas();
+    mServiceAreaInstance.ClearProgress();
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
 }
