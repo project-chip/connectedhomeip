@@ -2631,18 +2631,8 @@ enum class Feature : uint32_t
     kTankPercent      = 0x2,
 };
 
-// Bitmap for WaterHeaterDemandBitmap
-enum class WaterHeaterDemandBitmap : uint8_t
-{
-    kImmersionElement1 = 0x1,
-    kImmersionElement2 = 0x2,
-    kHeatPump          = 0x4,
-    kBoiler            = 0x8,
-    kOther             = 0x10,
-};
-
-// Bitmap for WaterHeaterTypeBitmap
-enum class WaterHeaterTypeBitmap : uint8_t
+// Bitmap for WaterHeaterHeatSourceBitmap
+enum class WaterHeaterHeatSourceBitmap : uint8_t
 {
     kImmersionElement1 = 0x1,
     kImmersionElement2 = 0x2,

@@ -23,7 +23,7 @@
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x03
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.EWATERHTR.EM:1 PIXIT.EWATERHTR.TP:2
 # === END CI TEST ARGUMENTS ===
 
@@ -53,9 +53,9 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads HeaterTypes attribute.",
-                     "DUT as Server replies with a WaterHeaterTypeBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
+                     "DUT as Server replies with a WaterHeaterHeatSourceBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
             TestStep("3", "TH reads HeatDemand attribute.",
-                     "DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
+                     "DUT as Server replies with a WaterHeaterHeatSourceBitmap (enum8)."),
             TestStep("4", "TH reads TankVolume attribute.",
                      "DUT as Server replies with a uint16 value."),
             TestStep("5", "TH reads EstimatedHeatRequired attribute.",
@@ -81,15 +81,15 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
         asserts.assert_greater(heaterTypes, 0,
                                f"Unexpected HeaterTypes value - expected {heaterTypes} > 0")
-        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
-                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterTypeBitmap.kOther")
+        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterHeatSourceBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterHeatSourceBitmap.kOther")
 
         self.step("3")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0,
                                f"Unexpected HeatDemand value - expected {heatDemand} > 0")
-        asserts.assert_less_equal(heatDemand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
-                                  f"Unexpected HeatDemand value - expected {heatDemand} <= WaterHeaterDemandBitmap.kOther")
+        asserts.assert_less_equal(heatDemand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterHeatSourceBitmap.kOther,
+                                  f"Unexpected HeatDemand value - expected {heatDemand} <= WaterHeaterHeatSourceBitmap.kOther")
 
         self.step("4")
         if em_supported:
