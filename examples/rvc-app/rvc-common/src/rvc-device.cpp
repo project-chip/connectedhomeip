@@ -181,11 +181,13 @@ bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & 
         return false;
     }
 
-    bool ignored;
-    if (!mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, ignored))
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, finished);
+
+    if (finished)
     {
-        CopyCharSpanToMutableCharSpan("there was a technical error when skipping the area"_span, skipStatusText);
-        return false;
+        mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+        HandleActivityCompleteEvent();
     }
 
     return true;
@@ -300,6 +302,18 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.OnOperationCompletionDetected(0, a, b);
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+}
+
+void RvcDevice::HandleAreaCompletedEvent()
+{
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kCompleted, finished);
+
+    if (finished)
+    {
+        mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+        HandleActivityCompleteEvent();
+    }
 }
 
 void RvcDevice::HandleErrorEvent(const std::string & error)

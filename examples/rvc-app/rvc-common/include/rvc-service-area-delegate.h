@@ -187,9 +187,8 @@ public:
      * @param currentAreaOpState The operational state to be set in the Status field of the Progress attribute for the current area.
      * This can only be Completed or Skipped.
      * @param finished true if there are no more areas to clean an we should end the clean.
-     * @return true if the next area was successfully set. fales if there was an error.
     */
-    bool GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished);
+    void GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished);
 
 };
 

@@ -548,31 +548,38 @@ void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
     }
 }
 
-bool RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished)
+void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished)
 {
     AreaStructureWrapper currentArea;
     auto currentAreaIdN = GetInstance()->GetCurrentArea();
 
     if (currentAreaIdN.IsNull())
     {
-        return false;
+        ChipLogError(Zcl, "GoToNextArea: Cannot go to the next area when the current area is null.");
+        return;
     }
 
     if (currentAreaOpState != OperationalStatusEnum::kCompleted && currentAreaOpState != OperationalStatusEnum::kSkipped)
     {
-        return false;
+        ChipLogError(Zcl, "GoToNextArea: currentAreaOpState must be either completed or skipped.");
+        return;
     }
 
     auto currentAreaId = currentAreaIdN.Value();
     uint32_t currentAreaIndex;
     GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
     auto currentAreaMapId = currentArea.mapID;
+    finished = true;
+
+    if (GetInstance()->HasFeature(Feature::kProgressReporting))
+    {
+        GetInstance()->SetProgressStatus(currentAreaId, currentAreaOpState);
+    }
 
     if (GetNumberOfSelectedAreas() == 0)
     {
         AreaStructureWrapper nextArea;
         uint32_t nextIndex = currentAreaIndex + 1;
-        finished = true;
         while (GetSupportedAreaByIndex(nextIndex, nextArea))
         {
             if (!currentAreaMapId.IsNull() && nextArea.mapID == currentAreaMapId.Value())
@@ -581,12 +588,11 @@ bool RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
 
                 if (GetInstance()->HasFeature(Feature::kProgressReporting))
                 {
-                    GetInstance()->SetProgressStatus(currentAreaIndex, OperationalStatusEnum::kCompleted);
                     GetInstance()->SetProgressStatus(nextArea.areaID, OperationalStatusEnum::kOperating);
                 }
 
                 finished = false;
-                return true;
+                return;
             }
 
             ++nextIndex;
@@ -607,21 +613,17 @@ bool RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
 
         uint32_t nextSelectedAreaId;
         uint32_t nextSelectedAreaIndex = selectedAreaIndex + 1;
-        if (!GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
+        if (GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
         {
-            finished = true;
-            return true;
+            GetInstance()->SetCurrentArea(nextSelectedAreaId);
+
+            if (GetInstance()->HasFeature(Feature::kProgressReporting))
+            {
+                GetInstance()->SetProgressStatus(nextSelectedAreaId, OperationalStatusEnum::kOperating);
+            }
+
+            finished = false;
+            return;
         }
-
-        GetInstance()->SetCurrentArea(nextSelectedAreaId);
-
-        if (GetInstance()->HasFeature(Feature::kProgressReporting))
-        {
-            GetInstance()->SetProgressStatus(currentAreaIndex, OperationalStatusEnum::kCompleted);
-            GetInstance()->SetProgressStatus(nextSelectedAreaId, OperationalStatusEnum::kOperating);
-        }
-
-        finished = false;
     }
-    return true;
 }
