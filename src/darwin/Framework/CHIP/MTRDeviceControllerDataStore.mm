@@ -1169,6 +1169,290 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
+#pragma mark - Client Data / Client Endpoint Data Shared
+
+- (NSString *)_indexKeyForPrefix:(NSString *)prefix
+{
+    return [prefix stringByAppendingFormat:@"_index"];
+}
+
+- (NSString *)_dataKeyForPrefix:(NSString *)prefix key:(NSString *)key
+{
+    return [prefix stringByAppendingFormat:@":%@", key];
+}
+
+- (nullable NSArray<NSString *> *)_dataIndexForPrefix:(NSString *)prefix
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    NSArray<NSString *> * index = nil;
+    NSString * key = [self _indexKeyForPrefix:prefix];
+
+    id data;
+
+    MTRDeviceController * controller = self->_controller;
+
+    @autoreleasepool {
+        data = [self->_storageDelegate controller:controller
+                                      valueForKey:key
+                                    securityLevel:MTRStorageSecurityLevelSecure
+                                      sharingType:MTRStorageSharingTypeSameFabric];
+    }
+
+    if (data == nil) {
+        return nil;
+    }
+
+    if (![data isKindOfClass:[NSArray<NSString *> class]]) {
+        MTR_LOG_ERROR("data index for prefix %@ was of unexpected type", prefix);
+        return nil;
+    }
+
+    index = data;
+    return index;
+}
+
+- (void)_storeValue:(id<NSSecureCoding>)value forKey:(NSString *)key inPrefix:(NSString *)prefix
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
+        BOOL storedSuccessfully = [self->_storageDelegate controller:controller
+                                                          storeValue:value
+                                                              forKey:storageKey
+                                                       securityLevel:MTRStorageSecurityLevelSecure
+                                                         sharingType:MTRStorageSharingTypeSameFabric];
+
+        if (!storedSuccessfully) {
+            MTR_LOG_ERROR("unable to store client data with device controller");
+            return;
+        }
+
+        [self _addKey:key toIndexForPrefix:prefix];
+    });
+}
+
+- (void)_addKey:(NSString *)key toIndexForPrefix:(NSString *)prefix
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    MTRDeviceController * controller = self->_controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    NSArray<NSString *> * index = [self _dataIndexForPrefix:prefix];
+    NSMutableArray<NSString *> * modifiedIndex = nil;
+    BOOL indexModified = NO;
+
+    // TODO:  seems like this index logic could be modified for the common case
+    // where the index is present and has the relevant key
+    if (index == nil) {
+        modifiedIndex = [NSMutableArray array];
+    } else {
+        modifiedIndex = [index mutableCopy];
+        indexModified = YES;
+    }
+
+    if (![index containsObject:key]) {
+        // first time storing this key, add to stored keys index
+        [modifiedIndex addObject:key];
+        indexModified = YES;
+    }
+
+    if (!indexModified) {
+        return;
+    }
+
+    [self->_storageDelegate controller:controller
+                            storeValue:modifiedIndex
+                                forKey:[self _indexKeyForPrefix:prefix]
+                         securityLevel:MTRStorageSecurityLevelSecure
+                           sharingType:MTRStorageSharingTypeNotShared];
+}
+
+- (id<NSSecureCoding>)_dataForKey:(NSString *)key inPrefix:(NSString *)prefix
+{
+    __block id clientData = nil;
+
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        id data;
+
+        NSString * dataKey = [self _dataKeyForPrefix:prefix key:key];
+
+        @autoreleasepool {
+            data = [self->_storageDelegate controller:controller
+                                          valueForKey:dataKey
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeSameFabric];
+        }
+        if (data == nil) {
+            return;
+        }
+
+        if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
+            return;
+        }
+
+        // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
+        clientData = data;
+    });
+
+    return clientData;
+}
+
+- (void)_removeDataForKey:(NSString *)key inPrefix:(NSString *)prefix
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // remove the data itself
+        NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
+        [self->_storageDelegate controller:controller
+                         removeValueForKey:storageKey
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeSameFabric];
+
+        // remove the key from the index
+        [self _removeKey:key fromIndexForPrefix:prefix];
+    });
+}
+
+- (void)_removeKey:(NSString *)key fromIndexForPrefix:(NSString *)prefix
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    MTRDeviceController * controller = self->_controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    NSMutableArray<NSString *> * modifiedIndex = [[self _dataIndexForPrefix:prefix] mutableCopy];
+    [modifiedIndex removeObject:key];
+
+    [self->_storageDelegate controller:controller
+                            storeValue:modifiedIndex
+                                forKey:[self _indexKeyForPrefix:prefix]
+                         securityLevel:MTRStorageSecurityLevelSecure
+                           sharingType:MTRStorageSharingTypeNotShared];
+}
+
+- (void)_removeAllDataInPrefix:(NSString *)prefix
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // get index
+        NSArray<NSString *> * index = [self _dataIndexForPrefix:prefix];
+
+        // iterate over index to remove data
+        for (NSString * key in index) {
+            NSString * thisKey = [self _dataKeyForPrefix:prefix key:key];
+            [self->_storageDelegate controller:controller
+                             removeValueForKey:thisKey
+                                 securityLevel:MTRStorageSecurityLevelSecure
+                                   sharingType:MTRStorageSharingTypeNotShared];
+        }
+
+        // remove index itself
+        NSString * indexKey = [self _indexKeyForPrefix:prefix];
+        [self->_storageDelegate controller:controller
+                         removeValueForKey:indexKey
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared];
+    });
+}
+
+#pragma mark - Client Data by Node
+
+static NSString * sClientDataKeyPrefix = @"clientDataByNode";
+
+- (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID
+{
+    return [self _dataIndexForPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (NSString *)_clientDataPrefixForNodeID:(NSNumber *)nodeID
+{
+    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX", nodeID.unsignedLongLongValue];
+}
+
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID
+{
+    return [self _dataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)removeClientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID
+{
+    [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onNodeID:(NSNumber *)nodeID
+{
+    [self _storeValue:value forKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID
+{
+    [self _removeAllDataInPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID
+{
+    __block NSArray<NSString *> * keys = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        keys = [self _clientDataIndexForNodeID:nodeID];
+    });
+    return keys;
+}
+
+#pragma mark - Client Data by Endpoint + Node
+
+static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
+
+- (nullable NSArray<NSString *> *)_clientDataIndexForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [self _dataIndexForPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (NSString *)_clientDataPrefixForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [sClientDataByEndpointKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%016llX",
+                                           nodeID.unsignedLongLongValue, endpointID.unsignedLongLongValue];
+}
+
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [self _dataForKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)removeClientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    [self _storeValue:value forKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)clearStoredClientDataForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    [self _removeAllDataInPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (NSArray<NSString *> *)storedClientDataKeysForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+{
+    __block NSArray<NSString *> * keys = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        keys = [self _clientDataIndexForEndpointID:endpointID onNodeID:nodeID];
+    });
+    return keys;
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo

@@ -4151,84 +4151,62 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
-// Client Metadata Storage
+#pragma mark - Client Metadata Storage
 
 - (NSArray *)supportedClientDataClasses
 {
+    // TODO: KMO: check this list, maybe use list from controller DS
+    // TODO: KMO: or, uplevel this out of MTRDevice to another file for use in both places
     return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
 }
 
-- (NSArray * _Nullable)clientDataKeys
+#pragma mark Client Metadata Storage: By Node ID
+
+- (NSArray<NSString *> * _Nullable)clientDataKeys
 {
-    return [self.temporaryMetaDataCache allKeys];
+    return [self.deviceController.controllerDataStore storedClientDataKeysForNodeID:self.nodeID];
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
-    if (key == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+    NSNumber * selfNodeID = self.nodeID;
+    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key onNodeID:selfNodeID];
+    return data;
 }
 
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
-
-    if (key == nil || value == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
+    [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onNodeID:self.nodeID];
 }
 
 - (void)removeClientDataForKey:(NSString *)key
 {
-    if (key == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+    [self.deviceController.controllerDataStore removeClientDataForKey:key onNodeID:self.nodeID];
 }
 
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
-{
-    if (endpointID == nil)
-        return nil;
-    // TODO: When hooked up to storage, enumerate this better
+#pragma mark Client Metadata Storage: By Endpoint ID + Node ID
 
-    return [self.temporaryMetaDataCache allKeys];
+- (NSArray<NSString *> * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
+{
+    // TODO: (from stub impl) When hooked up to storage, enumerate this better
+    return [self.deviceController.controllerDataStore storedClientDataKeysForEndpointID:endpointID onNodeID:self.nodeID];
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-    if (key == nil || endpointID == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+    return [self.deviceController.controllerDataStore clientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
 }
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
-    if (key == nil || value == nil || endpointID == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+    [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onEndpointID:endpointID onNodeID:self.nodeID];
 }
 
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-    if (key == nil || endpointID == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+    [self.deviceController.controllerDataStore removeClientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
 }
 
 #pragma mark Log Help

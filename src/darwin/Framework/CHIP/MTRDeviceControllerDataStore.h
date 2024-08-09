@@ -91,6 +91,24 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
 
+/**
+ * Storage for client data
+ */
+
+// node ID indexed
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (void)removeClientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID;
+- (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID;
+
+// endpoint ID + node ID indexed
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+- (void)removeClientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClientDataForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+- (NSArray<NSString *> *)storedClientDataKeysForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+
 @end
 
 NS_ASSUME_NONNULL_END

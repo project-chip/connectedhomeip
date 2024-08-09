@@ -36,6 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID;
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+// client data
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (void)removeClientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID;
+- (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID;
 @end
 
 // Declare internal methods for testing
@@ -48,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
+
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
