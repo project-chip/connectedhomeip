@@ -11195,7 +11195,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 if (entry_0.mapID.IsNull()) {
                     newElement_0.mapID = nil;
                 } else {
-                    newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID.Value()];
+                    newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID.Value()];
                 }
                 newElement_0.areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
                 if (entry_0.areaDesc.locationInfo.IsNull()) {
@@ -11219,20 +11219,16 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                         newElement_0.areaDesc.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.locationInfo.Value().areaType.Value())];
                     }
                 }
-                if (entry_0.areaDesc.landmarkTag.IsNull()) {
-                    newElement_0.areaDesc.landmarkTag = nil;
+                if (entry_0.areaDesc.landmarkInfo.IsNull()) {
+                    newElement_0.areaDesc.landmarkInfo = nil;
                 } else {
-                    newElement_0.areaDesc.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkTag.Value())];
-                }
-                if (entry_0.areaDesc.positionTag.IsNull()) {
-                    newElement_0.areaDesc.positionTag = nil;
-                } else {
-                    newElement_0.areaDesc.positionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.positionTag.Value())];
-                }
-                if (entry_0.areaDesc.surfaceTag.IsNull()) {
-                    newElement_0.areaDesc.surfaceTag = nil;
-                } else {
-                    newElement_0.areaDesc.surfaceTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.surfaceTag.Value())];
+                    newElement_0.areaDesc.landmarkInfo = [MTRServiceAreaClusterLandmarkInfoStruct new];
+                    newElement_0.areaDesc.landmarkInfo.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkInfo.Value().landmarkTag)];
+                    if (entry_0.areaDesc.landmarkInfo.Value().positionTag.IsNull()) {
+                        newElement_0.areaDesc.landmarkInfo.positionTag = nil;
+                    } else {
+                        newElement_0.areaDesc.landmarkInfo.positionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkInfo.Value().positionTag.Value())];
+                    }
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -11260,7 +11256,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 auto & entry_0 = iter_0.GetValue();
                 MTRServiceAreaClusterMapStruct * newElement_0;
                 newElement_0 = [MTRServiceAreaClusterMapStruct new];
-                newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID];
+                newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID];
                 newElement_0.name = AsString(entry_0.name);
                 if (newElement_0.name == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -15866,6 +15862,21 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     }
     case Attributes::ActiveDatasetTimestamp::Id: {
         using TypeInfo = Attributes::ActiveDatasetTimestamp::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::PendingDatasetTimestamp::Id: {
+        using TypeInfo = Attributes::PendingDatasetTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

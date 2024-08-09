@@ -47,25 +47,24 @@ public:
     bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) override;
 
     bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                               ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan statusText) override;
+                               ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText) override;
 
-    bool HandleSkipCurrentArea(MutableCharSpan skipStatusText) override;
+    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText) override;
 
     //*************************************************************************
-    // Supported Locations accessors
+    // Supported Areas accessors
 
     bool IsSupportedAreasChangeAllowed() override;
 
     uint32_t GetNumberOfSupportedAreas() override;
 
-    bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::AreaStructureWrapper & supportedLocation) override;
+    bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & supportedArea) override;
 
-    bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
-                                  ServiceArea::AreaStructureWrapper & supportedLocation) override;
+    bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & supportedArea) override;
 
-    bool AddSupportedLocation(const ServiceArea::AreaStructureWrapper & newArea, uint32_t & listIndex) override;
+    bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) override;
 
-    bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::AreaStructureWrapper & modifiedLocation) override;
+    bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) override;
 
     bool ClearSupportedAreas() override;
 
@@ -78,7 +77,7 @@ public:
 
     bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
-    bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
+    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
     bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
 
@@ -87,15 +86,13 @@ public:
     bool ClearSupportedMaps() override;
 
     //*************************************************************************
-    // Selected Locations accessors
+    // Selected Areas accessors
 
     uint32_t GetNumberOfSelectedAreas() override;
 
-    bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) override;
+    bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea) override;
 
-    // IsSelectedLocation() no override
-
-    bool AddSelectedLocation(uint32_t aAreaId, uint32_t & listIndex) override;
+    bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) override;
 
     bool ClearSelectedAreas() override;
 

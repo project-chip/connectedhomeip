@@ -545,7 +545,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
             markDirty = MarkAttributeDirty::kYes;
         }
 
-        Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().ValueOr(0), markDirty);
+        Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().Value(), markDirty);
     }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
 }
