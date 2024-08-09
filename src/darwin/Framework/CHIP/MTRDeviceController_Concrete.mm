@@ -116,32 +116,7 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 
-@implementation MTRDeviceController_Concrete {
-//    // Atomic because it can be touched from multiple threads.
-//    std::atomic<chip::FabricIndex> _storedFabricIndex;
-//
-//    // queue used to serialize all work performed by the MTRDeviceController
-//    dispatch_queue_t _chipWorkQueue;
-//
-//    chip::Controller::DeviceCommissioner * _cppCommissioner;
-//    chip::Credentials::PartialDACVerifier * _partialDACVerifier;
-//    chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
-//    MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
-//    MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
-//    MTRP256KeypairBridge _signingKeypairBridge;
-//    MTRP256KeypairBridge _operationalKeypairBridge;
-//    MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
-//    MTRDeviceControllerFactory * _factory;
-//    NSMapTable * _nodeIDToDeviceMap;
-//    os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
-//    MTRCommissionableBrowser * _commissionableBrowser;
-//    MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
-//
-//    // _serverEndpoints is only touched on the Matter queue.
-//    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
-//
-//    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
-}
+@implementation MTRDeviceController_Concrete
 
 // MTRDeviceController ivar internal access
 @synthesize uniqueIdentifier = _uniqueIdentifier;
@@ -153,10 +128,6 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
-@synthesize storedFabricIndex = _storedFabricIndex;
-
-//@synthesize uniqueIdentifier = _uniqueIdentifier;
-
 
 - (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
