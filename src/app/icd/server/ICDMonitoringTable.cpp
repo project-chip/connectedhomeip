@@ -242,15 +242,21 @@ CHIP_ERROR ICDMonitoringTable::Get(uint16_t index, ICDMonitoringEntry & entry) c
 
 CHIP_ERROR ICDMonitoringTable::Find(NodeId id, ICDMonitoringEntry & entry)
 {
-    uint16_t index = 0;
-    while (index < this->Limit())
+    CHIP_ERROR err;
+    uint16_t index;
+    ICDMonitoringEntry tempEntry(mSymmetricKeystore);
+
+    for (index = 0; index < this->Limit(); index++)
     {
-        ReturnErrorOnFailure(this->Get(index++, entry));
-        if (id == entry.checkInNodeID)
+        SuccessOrExit(err = this->Get(index, tempEntry));
+        if (id == tempEntry.checkInNodeID)
         {
+            entry = tempEntry;
             return CHIP_NO_ERROR;
         }
     }
+
+exit:
     entry.index = index;
     return CHIP_ERROR_NOT_FOUND;
 }
