@@ -91,14 +91,11 @@ using namespace chip::Tracing::DarwinFramework;
 
 // MTRDeviceController ivar internal access
 
-@property (nonatomic, readonly) std::atomic<chip::FabricIndex> storedFabricIndex;
 @property (nonatomic, readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (nonatomic, readonly) chip::Credentials::PartialDACVerifier * partialDACVerifier;
 @property (nonatomic, readonly) chip::Credentials::DefaultDACVerifier * defaultDACVerifier;
 @property (nonatomic, readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (nonatomic, readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
-@property (nonatomic, readonly) MTRP256KeypairBridge signingKeypairBridge;
-@property (nonatomic, readonly) MTRP256KeypairBridge operationalKeypairBridge;
 @property (nonatomic, readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (nonatomic, readwrite) NSUUID * uniqueIdentifier;
 @property (nonatomic, readonly) dispatch_queue_t chipWorkQueue;

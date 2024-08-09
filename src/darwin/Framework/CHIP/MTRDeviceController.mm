@@ -108,10 +108,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // Atomic because they can be touched from multiple threads.
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-
     // queue used to serialize all work performed by the MTRDeviceController
     dispatch_queue_t _chipWorkQueue;
 
@@ -120,8 +116,6 @@ using namespace chip::Tracing::DarwinFramework;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
     NSMapTable * _nodeIDToDeviceMap;

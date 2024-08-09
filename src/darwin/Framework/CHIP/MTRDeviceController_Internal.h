@@ -34,6 +34,8 @@
 #import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
+#import "MTRP256KeypairBridge.h"
+
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
@@ -55,7 +57,12 @@ namespace Controller {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController ()
+@interface MTRDeviceController () {
+@protected
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
+}
 
 - (instancetype)initForSubclasses;
 
