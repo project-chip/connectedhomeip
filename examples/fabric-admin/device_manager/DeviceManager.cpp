@@ -20,12 +20,28 @@
 
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
+#include <lib/support/StringBuilder.h>
 
 #include <cstdio>
 #include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
+
+namespace {
+
+// Constants
+constexpr uint32_t kSetupPinCode               = 20202021;
+constexpr uint16_t kRemoteBridgePort           = 5540;
+constexpr uint16_t kDiscriminator              = 3840;
+constexpr uint16_t kWindowTimeout              = 300;
+constexpr uint16_t kIteration                  = 1000;
+constexpr uint16_t kSubscribeMinInterval       = 0;
+constexpr uint16_t kSubscribeMaxInterval       = 60;
+constexpr uint16_t kAggragatorEndpointId       = 1;
+constexpr uint8_t kEnhancedCommissioningMethod = 1;
+
+} // namespace
 
 // Define the static member
 DeviceManager DeviceManager::sInstance;
@@ -98,6 +114,102 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
                     ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
+void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
+                                                  uint32_t discriminator, const char * saltHex, const char * verifierHex)
+{
+    // Open the commissioning window of a device within its own fabric.
+    StringBuilder<512> commandBuilder;
+
+    commandBuilder.Add("pairing open-commissioning-window ");
+    commandBuilder.AddFormat("%lu %d %d %d %d %d --salt hex:%s --verifier hex:%s", nodeId, kRootEndpointId,
+                             kEnhancedCommissioningMethod, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpointId)
+{
+    // Open the commissioning window of a device from another fabric via its fabric bridge.
+    // This method constructs and sends a command to open the commissioning window for a device
+    // that is part of a different fabric, accessed through a fabric bridge.
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing open-commissioning-window ");
+    commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
+                             kWindowTimeout, kIteration, kDiscriminator);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, const char * deviceRemoteIp)
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing already-discovered ");
+    commandBuilder.AddFormat("%lu %d %s %d", nodeId, kSetupPinCode, deviceRemoteIp, kRemoteBridgePort);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::PairRemoteDevice(chip::NodeId nodeId, const char * payload)
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing code ");
+    commandBuilder.AddFormat("%lu %s", nodeId, payload);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::UnpairRemoteFabricBridge()
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing unpair ");
+    commandBuilder.AddFormat("%lu", mRemoteBridgeNodeId);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::SubscribeRemoteFabricBridge()
+{
+    // Listen to the state changes of the remote fabric bridge.
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    // Prepare and push the descriptor subscribe command
+    commandBuilder.Add("descriptor subscribe parts-list ");
+    commandBuilder.AddFormat("%d %d %lu %d", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
+                             kAggragatorEndpointId);
+    PushCommand(commandBuilder.c_str());
+
+    // Clear the builder for the next command
+    commandBuilder.Reset();
+
+    // Prepare and push the commissioner control subscribe command
+    commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
+    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
+                             kRootEndpointId);
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::ReadSupportedDeviceCategories()
+{
+    if (!IsFabricSyncReady())
+    {
+        // print to console
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet.\n");
+        return;
+    }
+
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("commissionercontrol read supported-device-categories ");
+    commandBuilder.AddFormat("%ld ", mRemoteBridgeNodeId);
+    commandBuilder.AddFormat("%d", kRootEndpointId);
+
+    PushCommand(commandBuilder.c_str());
+}
+
 void DeviceManager::StartReverseCommissioning()
 {
     ChipLogProgress(NotSpecified, "Starting reverse commissioning for bridge device: NodeId: " ChipLogFormatX64,
@@ -107,38 +219,23 @@ void DeviceManager::StartReverseCommissioning()
     uint16_t vendorId  = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     uint16_t productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
 
-    char command[kMaxCommandSize];
-    int written =
-        snprintf(command, sizeof(command), "commissionercontrol request-commissioning-approval %" PRIu64 " %u %u %" PRIu64 " %d",
-                 requestId, vendorId, productId, mRemoteBridgeNodeId, kRootEndpointId);
+    StringBuilder<kMaxCommandSize> commandBuilder;
+    commandBuilder.Add("commissionercontrol request-commissioning-approval ");
+    commandBuilder.AddFormat("%lu %u %u %lu %d", requestId, vendorId, productId, mRemoteBridgeNodeId, kRootEndpointId);
 
-    if (written < 0 || static_cast<size_t>(written) >= sizeof(command))
-    {
-        ChipLogError(NotSpecified, "Failed to format command string or command string was truncated.");
-    }
-    else
-    {
-        mRequestId = requestId;
-        PushCommand(command);
-    }
+    mRequestId = requestId;
+    PushCommand(commandBuilder.c_str());
 }
 
 void DeviceManager::CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds)
 {
     ChipLogProgress(NotSpecified, "Request the Commissioner Control Server to begin commissioning a previously approved request.");
 
-    char command[kMaxCommandSize];
-    int written = snprintf(command, sizeof(command), "commissionercontrol commission-node %" PRIu64 " %u %" PRIu64 " %d", requestId,
-                           responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
+    StringBuilder<kMaxCommandSize> commandBuilder;
+    commandBuilder.Add("commissionercontrol commission-node ");
+    commandBuilder.AddFormat("%lu %u %lu %d", requestId, responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
 
-    if (written < 0 || static_cast<size_t>(written) >= sizeof(command))
-    {
-        ChipLogError(NotSpecified, "Failed to format command string or command string was truncated.");
-    }
-    else
-    {
-        PushCommand(command);
-    }
+    PushCommand(commandBuilder.c_str());
 }
 
 void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
@@ -233,9 +330,10 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
 
         if (mAutoSyncEnabled)
         {
-            char command[kMaxCommandSize];
-            snprintf(command, sizeof(command), "fabricsync sync-device %d", endpoint);
-            PushCommand(command);
+            StringBuilder<kMaxCommandSize> commandBuilder;
+            commandBuilder.Add("fabricsync sync-device ");
+            commandBuilder.AddFormat("%d", endpoint);
+            PushCommand(commandBuilder.c_str());
         }
     }
 
@@ -254,8 +352,9 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
 
         if (mAutoSyncEnabled)
         {
-            char command[kMaxCommandSize];
-            snprintf(command, sizeof(command), "pairing unpair %ld", device->GetNodeId());
+            StringBuilder<kMaxCommandSize> commandBuilder;
+            commandBuilder.Add("pairing unpair ");
+            commandBuilder.AddFormat("%lu", device->GetNodeId());
 
             PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
 
@@ -266,7 +365,7 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
             }
 
             pairingCommand->RegisterPairingDelegate(this);
-            PushCommand(command);
+            PushCommand(commandBuilder.c_str());
         }
     }
 }

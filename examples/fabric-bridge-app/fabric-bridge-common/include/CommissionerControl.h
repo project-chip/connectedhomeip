@@ -40,10 +40,10 @@ public:
 private:
     static constexpr size_t kLabelBufferSize = 64;
 
-    uint64_t mRequestId;
-    NodeId mClientNodeId;
-    VendorId mVendorId;
-    uint16_t mProductId;
+    uint64_t mRequestId  = 0;
+    NodeId mClientNodeId = kUndefinedNodeId;
+    VendorId mVendorId   = VendorId::Unspecified;
+    uint16_t mProductId  = 0;
     char mLabelBuffer[kLabelBufferSize + 1];
     Optional<CharSpan> mLabel;
 };
