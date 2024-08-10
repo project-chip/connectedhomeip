@@ -69,6 +69,8 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+
+        UpdateServiceAreaProgressOnExit();
         return;
     }
     break;
@@ -311,6 +313,7 @@ void RvcDevice::HandleActivityCompleteEvent()
 
     mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
     mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+    UpdateServiceAreaProgressOnExit();
 }
 
 void RvcDevice::HandleAreaCompletedEvent()
@@ -403,4 +406,24 @@ void RvcDevice::HandleResetMessage()
     mServiceAreaInstance.ClearProgress();
     mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
     mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+}
+
+void RvcDevice::UpdateServiceAreaProgressOnExit()
+{
+    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting))
+    {
+        return;
+    }
+
+    uint32_t i = 0;
+    ServiceArea::Structs::ProgressStruct::Type progressElement;
+    while (mServiceAreaDelegate.GetProgressElementByIndex(i, progressElement))
+    {
+        if (progressElement.status == ServiceArea::OperationalStatusEnum::kOperating ||
+            progressElement.status == ServiceArea::OperationalStatusEnum::kPending)
+        {
+            mServiceAreaInstance.SetProgressStatus(progressElement.areaID, ServiceArea::OperationalStatusEnum::kSkipped);
+        }
+        i++;
+    }
 }

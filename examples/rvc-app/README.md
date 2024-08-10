@@ -156,3 +156,13 @@ PICS`SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS=1`. PIXIT: `` Example command:
 
 Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_4.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1`
+
+#### TC 1.5
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_5.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
+
+#### TC 1.6
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_6.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1`
