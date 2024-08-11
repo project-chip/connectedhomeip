@@ -37,25 +37,21 @@ namespace Thermostat {
 static constexpr size_t kThermostatEndpointCount =
     MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+enum AtomicWriteState
+{
+    kAtomicWriteState_Closed = 0,
+    kAtomicWriteState_Open,
+};
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
-class ThermostatAttrAccess : public chip::app::AttributeAccessInterface
+class ThermostatAttrAccess : public chip::app::AttributeAccessInterface, public chip::FabricTable::Delegate
 {
 public:
     ThermostatAttrAccess() : AttributeAccessInterface(Optional<chip::EndpointId>::Missing(), Thermostat::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-    /**
-     * @brief Sets the scoped node id of the originator that sent the last successful
-     *        AtomicRequest of type BeginWrite for the given endpoint.
-     *
-     * @param[in] endpoint The endpoint.
-     * @param[in] originatorNodeId The originator scoped node id.
-     */
-    void SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId);
 
     /**
      * @brief Gets the scoped node id of the originator that sent the last successful
@@ -68,12 +64,13 @@ public:
     ScopedNodeId GetAtomicWriteScopedNodeId(EndpointId endpoint);
 
     /**
-     * @brief Sets whether an atomic write is in progress for the given endpoint
+     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
      *
      * @param[in] endpoint The endpoint.
-     * @param[in] inProgress Whether or not an atomic write is in progress.
+     * @param[in] originatorNodeId The originator scoped node id.
+     * @param[in] state Whether or not an atomic write is open or closed.
      */
-    void SetAtomicWrite(EndpointId endpoint, bool inProgress);
+    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
 
     /**
      * @brief Gets whether an atomic write is in progress for the given endpoint
@@ -105,10 +102,18 @@ public:
     bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
-    CHIP_ERROR AppendPendingPreset(Delegate * delegate, const Structs::PresetStruct::Type & preset);
+    CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
 
-    ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];
-    bool mAtomicWriteState[kThermostatEndpointCount];
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    struct AtomicWriteSession
+    {
+        AtomicWriteState state = kAtomicWriteState_Closed;
+        ScopedNodeId nodeId;
+        EndpointId endpointId = kInvalidEndpointId;
+    };
+
+    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 };
 
 /**

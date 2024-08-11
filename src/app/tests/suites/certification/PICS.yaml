@@ -6525,7 +6525,7 @@ PICS:
     - label:
           "Does the device implement receiving the AtomicRequest command for
           Thermostat?"
-      id: TSTAT.S.CFE.Rsp
+      id: TSTAT.S.Cfe.Rsp
 
     #
     # server / commandsGenerated
@@ -6566,6 +6566,9 @@ PICS:
 
     - label: "Supports a local temperature not exposed"
       id: TSTAT.S.F06
+
+    - label: "Supports enhanced schedules"
+      id: TSTAT.S.F07
 
     - label: "Supports setpoint presets"
       id: TSTAT.S.F08
@@ -6616,7 +6619,7 @@ PICS:
       id: TSTAT.C.C06.Tx
 
     - label: "Does the device implement sending the AtomicRequest command?"
-      id: TSTAT.C.CFE.Tx
+      id: TSTAT.C.Cfe.Tx
 
     #
     # client / manually
@@ -10297,6 +10300,17 @@ PICS:
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    #
+    # Thread Border Router Management Cluster
+    #
+    - label:
+          "Does the device implement the Thread Border Router Management cluster
+          as a server?"
+      id: TBRM.S
+
+    - label: "Does the device support the PanChange feature?"
+      id: TBRM.S.F00
 
     #
     # Thread Network Directory Cluster

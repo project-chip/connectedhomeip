@@ -339,7 +339,10 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
+                                         .endpoint    = current->mValue.mEndpointId,
+                                         .requestType = RequestType::kEventReadOrSubscribeRequest,
+                                         .entityId    = current->mValue.mEventId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);

@@ -72,7 +72,7 @@ public:
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
      */
-    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) = 0;
+    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) = 0;
 
     /**
      * Given a set of locations to be set to the SelectedAreas attribute, this method should check that
@@ -92,7 +92,7 @@ public:
      * device must stop.
      */
     virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & locationStatus,
-                                       MutableCharSpan statusText) = 0;
+                                       MutableCharSpan & statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedAreas and CurrentArea attributes are not null before
@@ -104,27 +104,26 @@ public:
      *
      * @note skipStatusText must be filled out by the function on failure.
      *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 1:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the remaining locations on the SelectedAreas attribute list, starting with
-     * the next entry. If the end of the SelectedAreas attribute list is reached, the server SHALL stop operating.
+     * @note If the device accepts the request:
+     * - If the device is currently operating at the area identified by SkippedArea, as indicated by either the CurrentArea or
+     *     the Progress attributes, if implemented, the device SHALL stop operating at that area.
+     * - If the Progress attribute is implemented, the entry corresponding to SkippedArea SHALL be updated to indicate that the
+     *     area was skipped.
+     * - The server SHALL attempt to operate only at the areas in the SelectedAreas attribute list where operating has not been
+     *     skipped or completed, using a vendor defined order.
+     * - If the server has either skipped or completed operating at all areas on the SelectedAreas attribute list, the server
+     *     SHALL stop operating.
      *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 0:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the locations on the SelectedAreas attribute list where operating has not
-     * been completed, using a vendor defined order. If the server has completed operating at all locations on the SelectedAreas
-     * attribute list, the server SHALL stop operating.
-     *
-     * @note If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
-     *       If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined
-     * error description which can be used to explain the error to the user. For example, if the Status field is set to
-     * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
-     * which may involve other clusters.
+     * @note If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
+     *       If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined
+     *       error description which can be used to explain the error to the user. For example, if the Status field is set to
+     *       InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the
+     *       device, which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
         // device support of this command is optional
-        CopyCharSpanToMutableCharSpan("Skip Current Location command not supported by device"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpan("Skip Current Area command not supported by device"_span, skipStatusText);
         return false;
     }
 
@@ -148,45 +147,45 @@ public:
     virtual uint32_t GetNumberOfSupportedAreas() = 0;
 
     /**
-     * @brief Get a supported location using the position in the list.
+     * @brief Get a supported area using the position in the list.
      * @param[in] listIndex the position in the list.
-     * @param[out] aSupportedLocation  copy of the location contents, if found.
-     * @return true if location found, false otherwise.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
      */
-    virtual bool GetSupportedLocationByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedLocation) = 0;
+    virtual bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea) = 0;
 
     /**
-     * @brief Get a supported location that matches a areaID.
+     * @brief Get a supported area that matches a areaID.
      * @param[in] aAreaId the areaID to search for.
-     * @param[out] listIndex the location's index in the list, if found.
-     * @param[out] aSupportedLocation  copy of the location contents, if found.
-     * @return true if location found, false otherwise.
+     * @param[out] listIndex the area's index in the list, if found.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation);
+    virtual bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea);
 
     /**
-     * This method is called by the server instance to add a new location to the list.
-     * The server instance will ensure that the newArea is a valid, unique location.
-     * @param [in] newArea new location to add.
-     * @param [out] listIndex filled with the list index for the new location, if successful.
+     * This method is called by the server instance to add a new area to the list.
+     * The server instance will ensure that the newArea is a valid, unique area.
+     * @param [in] newArea new area to add.
+     * @param [out] listIndex filled with the list index for the new area, if successful.
      * @return true if successful, false otherwise.
 
-     * @note this function SHOULD double check that the added location won't exceed the maximum list size.
+     * @note this method SHOULD double check that the added area won't exceed the maximum list size.
      */
-    virtual bool AddSupportedLocation(const AreaStructureWrapper & newArea, uint32_t & listIndex) = 0;
+    virtual bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) = 0;
 
     /**
-     * This method is called by the server instance to modify an existing location in the list.
-     * The server instance will ensure that the modifiedLocation is a valid, unique location.
-     * @param[in] listIndex The index of the location being modified.
-     * @param[in] modifiedLocation A location with the modified contents.
+     * This method is called by the server instance to modify an existing area in the list.
+     * The server instance will ensure that the modifiedArea is a valid, unique area.
+     * @param[in] listIndex The index of the area being modified.
+     * @param[in] modifiedArea An area with the modified contents.
      * @return true if successful, false otherwise.
      *
      * @note this function SHOULD double check that newArea's areaID matches the object at listIndex.
      */
-    virtual bool ModifySupportedLocation(uint32_t listIndex, const AreaStructureWrapper & modifiedLocation) = 0;
+    virtual bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) = 0;
 
     /**
      * @return true if supported locations was not already null, false otherwise.
@@ -262,7 +261,7 @@ public:
     /**
      * This method is called by the server instance to modify an existing map in the list.
      * The server instance will ensure that the modifiedMap is a valid, unique map.
-     * @param[in] listIndexThe index of the map being modified.
+     * @param[in] listIndex The index of the map being modified.
      * @param[in] modifiedMapA map with the modified contents.
      * @return true if successful, false otherwise.
      *
@@ -276,36 +275,36 @@ public:
     virtual bool ClearSupportedMaps() = 0;
 
     //*************************************************************************
-    // Selected Locations accessors
+    // Selected Areas accessors
 
     virtual uint32_t GetNumberOfSelectedAreas() = 0;
 
     /**
-     * @brief Get a selected location using the position in the list.
+     * @brief Get a selected area using the position in the list.
      * @param[in] listIndex the position in the list.
-     * @param[out] selectedLocation the selected location value, if found.
-     * @return true if a selected location is found, false otherwise.
+     * @param[out] selectedArea the selected area value, if found.
+     * @return true if a selected area is found, false otherwise.
      */
-    virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
+    virtual bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea) = 0;
 
     /**
      * @return true if the aAreaId areaID is found in the SelectedAreas list, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool IsSelectedLocation(uint32_t aAreaId);
+    virtual bool IsSelectedArea(uint32_t aAreaId);
 
     /**
-     * This method is called by the server instance to add a new selected location to the list.
-     * The server instance will ensure that the aAreaId references a SUPPORTED location, and is unique within selected
-     * locations.
+     * This method is called by the server instance to add a new selected area to the list.
+     * The server instance will ensure that the aAreaId references a SUPPORTED area, and is unique within selected
+     * areas.
      * @param[in] aAreaId The new areaID to add.
-     * @param[out] listIndex filled with the list index of the new location, if successful.
+     * @param[out] listIndex filled with the list index of the new area, if successful.
      * @return true if successful, false otherwise.
      *
-     * @note this function SHOULD double check that the added location won't exceed the maximum list size.
+     * @note this function SHOULD double check that the added area won't exceed the maximum list size.
      */
-    virtual bool AddSelectedLocation(uint32_t aAreaId, uint32_t & listIndex) = 0;
+    virtual bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) = 0;
 
     /**
      * @return true if selected locations was not already null, false otherwise.

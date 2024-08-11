@@ -21449,6 +21449,39 @@ public:
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 namespace WaterHeaterManagement {
+namespace Structs {
+namespace WaterHeaterBoostInfoStruct {
+enum class Fields : uint8_t
+{
+    kDuration          = 0,
+    kOneShot           = 1,
+    kEmergencyBoost    = 2,
+    kTemporarySetpoint = 3,
+    kTargetPercentage  = 4,
+    kTargetReheat      = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace WaterHeaterBoostInfoStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -21469,12 +21502,7 @@ namespace Commands {
 namespace Boost {
 enum class Fields : uint8_t
 {
-    kDuration          = 0,
-    kOneShot           = 1,
-    kEmergencyBoost    = 2,
-    kTemporarySetpoint = 3,
-    kTargetPercentage  = 4,
-    kTargetReheat      = 5,
+    kBoostInfo = 0,
 };
 
 struct Type
@@ -21484,12 +21512,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
 
-    uint32_t duration = static_cast<uint32_t>(0);
-    Optional<bool> oneShot;
-    Optional<bool> emergencyBoost;
-    Optional<int16_t> temporarySetpoint;
-    Optional<chip::Percent> targetPercentage;
-    Optional<chip::Percent> targetReheat;
+    Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21504,12 +21527,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
 
-    uint32_t duration = static_cast<uint32_t>(0);
-    Optional<bool> oneShot;
-    Optional<bool> emergencyBoost;
-    Optional<int16_t> temporarySetpoint;
-    Optional<chip::Percent> targetPercentage;
-    Optional<chip::Percent> targetReheat;
+    Structs::WaterHeaterBoostInfoStruct::DecodableType boostInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Boost
@@ -21548,9 +21566,9 @@ namespace Attributes {
 namespace HeaterTypes {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HeaterTypes::Id; }
@@ -21560,9 +21578,9 @@ struct TypeInfo
 namespace HeatDemand {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HeatDemand::Id; }
@@ -21663,9 +21681,9 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::HeaterTypes::TypeInfo::DecodableType heaterTypes =
-            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>(0);
         Attributes::HeatDemand::TypeInfo::DecodableType heatDemand =
-            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>(0);
         Attributes::TankVolume::TypeInfo::DecodableType tankVolume                       = static_cast<uint16_t>(0);
         Attributes::EstimatedHeatRequired::TypeInfo::DecodableType estimatedHeatRequired = static_cast<int64_t>(0);
         Attributes::TankPercentage::TypeInfo::DecodableType tankPercentage               = static_cast<chip::Percent>(0);
@@ -21680,6 +21698,69 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace BoostStarted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kBoostInfo = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    Structs::WaterHeaterBoostInfoStruct::DecodableType boostInfo;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BoostStarted
+namespace BoostEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BoostEnded
+} // namespace Events
 } // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 namespace Structs {

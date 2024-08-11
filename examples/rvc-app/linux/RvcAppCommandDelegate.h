@@ -55,6 +55,8 @@ private:
 
     void OnActivityCompleteHandler();
 
+    void OnAreaCompleteHandler();
+
     void OnErrorEventHandler(const std::string & error);
 
     void OnClearErrorHandler();
