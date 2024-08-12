@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
-import("${nxp_sdk_matter_support_root}/gn_build/nxp_sdk.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import("${nxp_sdk_matter_support_root}/gn_build/nxp_sdk.gni")
 
 config("support_config") {
   include_dirs = [ "${chip_root}" ]

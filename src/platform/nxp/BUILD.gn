@@ -37,7 +37,8 @@ source_set("logging") {
 # NXP factory data provider. Each platform should define an "nxp_factory_data" source set.
 # Usage: deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
 group("nxp_factory_data") {
-  public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_factory_data" ]
+  public_deps =
+      [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_factory_data" ]
 }
 
 # The application can use this target to integrate the default, platform-specific

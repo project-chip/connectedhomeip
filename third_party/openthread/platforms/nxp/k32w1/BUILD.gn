@@ -91,17 +91,11 @@ source_set("libopenthread-k32w1") {
     }
 
     if (chip_key_storage == "fwk_nvm") {
-      sources += [
-        "${openthread_nxp_root}/src/common/flash_nvm.c"
-      ]
+      sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
     } else if (chip_key_storage == "littlefs") {
-      sources += [
-        "${openthread_nxp_root}/src/common/flash_fsa.c"
-      ]
+      sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
     } else if (chip_key_storage == "nvs") {
-      sources += [
-        "${openthread_nxp_root}/src/common/flash_nvs.c"
-      ]
+      sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
     }
   }
 
@@ -110,9 +104,9 @@ source_set("libopenthread-k32w1") {
   }
 
   public_deps = [
-    nxp_sdk_target,
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "../..:libopenthread-platform",
     "../..:libopenthread-platform-utils",
+    nxp_sdk_target,
   ]
 }

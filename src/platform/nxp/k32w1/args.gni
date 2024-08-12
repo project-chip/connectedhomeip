@@ -28,15 +28,15 @@ declare_args() {
 
   chip_use_plain_dac_key = false
 
-  k32w1_sdk_root =
-      "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
+  k32w1_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
 if (sdk_release) {
   k32w1_sdk_root = getenv("NXP_SDK_ROOT")
 }
 
-openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
+openthread_root =
+    "//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
 nxp_platform = "k32w1"
 nxp_sdk_name = "k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
