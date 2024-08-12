@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
 
-import("${chip_root}/third_party/nxp/nxp_sdk.gni")
+import("${nxp_sdk_matter_support_root}/gn_build/nxp_sdk.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 config("support_config") {

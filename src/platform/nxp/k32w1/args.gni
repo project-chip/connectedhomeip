@@ -29,7 +29,7 @@ declare_args() {
   chip_use_plain_dac_key = false
 
   k32w1_sdk_root =
-      "${chip_root}/third_party/nxp/github_sdk/common_sdk/repo"
+      "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
 if (sdk_release) {
