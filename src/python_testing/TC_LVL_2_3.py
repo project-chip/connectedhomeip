@@ -43,15 +43,18 @@ class TC_LVL_2_3(MatterBaseTest):
         THRead = "TH reads"
         THcommand = "TH sends the command"
         return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
-                TestStep(2, f"{THRead} FeatureMap attribute."),
-                TestStep(3, f"{THRead} MaxLevel attribute and store value as maxLevel", test_plan_support.verify_success()),
-                TestStep(4, f"{THcommand} MoveWithOnOff with MoveMode field set to Down and remaining fields set to 0",
+                TestStep(2, f"{THRead} FeatureMap attribute and the AttributeList value"),
+                TestStep(
+                    "3a", f"If the MaxLevel attribute is in the AttributeList, {THRead} MaxLevel attribute and store value as maxLevel, otherwise set maxLevel to 254", test_plan_support.verify_success()),
+                TestStep(
+                    "3b", f"If the MinLevel attribute is in the AttributeList, {THRead} MinLevel attribute and store value as minLevel, otherwise set minLevel to 1", test_plan_support.verify_success()),
+                TestStep(4, f"{THcommand} MoveWithOnOff with MoveMode field set to Down and rate set to 254 and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(5, f"{THRead} CurrentLevel attribute and store value as startCurrentLevel",
                          test_plan_support.verify_success()),
                 TestStep(6, "Set up a subscription wildcard subscription for the Level Control Cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false",
                          "Subscription successfully established"),
-                TestStep(7, f"{THcommand} MoveToLevel with Level field set to maxLevel, TransitionTime field set to 10 and remaining fields set to 0",
+                TestStep(7, f"{THcommand} MoveToLevelWithOnOff with Level field set to maxLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(8, "TH stores the reported values of CurrentLevel in all incoming reports for CurrentLevel attribute, that contains data in reportedCurrentLevelValuesList, over a period of 30 seconds."),
                 TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 10 entries for CurrentLevel",
@@ -65,18 +68,18 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(13, "If the LT feature is not supported, skip remaining steps and end test case"),
                 # 14 is missing in the test plan
                 TestStep(15, "TH stores the reported values of RemainingTime in all incoming reports for RemainingTime attribute, that contains data in reportedRemainingTimeValuesList."),
-                TestStep(16, f"	{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 10 and remaining fields set to 0",
+                TestStep(16, f"	{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(17, "Wait for 5 seconds"),
-                TestStep(18, f"{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 15 and remaining fields set to 0",
+                TestStep(18, f"{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 150 (15s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(19, "Wait for 20 seconds"),
                 TestStep(20, "TH verifies reportedRemainingTimeValuesList contains three entries",
                          "reportedRemainingTimeValuesList has 3 entries in the list"),
-                TestStep(21, "TH verifies the first entry in reportedRemainingTimeValuesList is 10",
-                         "The first entry in reportedRemainingTimeValuesList is equal to 10"),
-                TestStep(22, "TH verifies the second entry in reportedRemainingTimeValuesList is 15",
-                         "The second entry in reportedRemainingTimeValuesList is equal to 15"),
+                TestStep(21, "TH verifies the first entry in reportedRemainingTimeValuesList is approximately 100 (10s)",
+                         "The first entry in reportedRemainingTimeValuesList is approximately equal to 100"),
+                TestStep(22, "TH verifies the second entry in reportedRemainingTimeValuesList is approximately 150",
+                         "The second entry in reportedRemainingTimeValuesList is approximately equal to 150"),
                 TestStep(23, "TH verifies the third entry in reportedRemainingTimeValuesList is 0",
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
@@ -90,16 +93,28 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(2)
         feature_map = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.FeatureMap)
+        attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
 
-        self.step(3)
-        max_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MaxLevel)
+        self.step("3a")
+        attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
+
+        if lvl.Attributes.MaxLevel.attribute_id in attributes:
+            max_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MaxLevel)
+        else:
+            max_level = 254
+
+        self.step("3b")
+        if lvl.Attributes.MinLevel.attribute_id in attributes:
+            min_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MinLevel)
+        else:
+            min_level = 1
 
         self.step(4)
-        cmd = Clusters.LevelControl.Commands.MoveWithOnOff(moveMode=lvl.Enums.MoveModeEnum.kDown)
+        cmd = Clusters.LevelControl.Commands.MoveToLevelWithOnOff(level=min_level, transitionTime=0)
         await self.send_single_cmd(cmd)
         # NOTE: added this sleep to let the DUT have some time to move
-        logging.info("Test waits for 5 seconds")
-        time.sleep(5)
+        logging.info("Test waits for 1 seconds")
+        time.sleep(1)
 
         self.step(5)
         start_current_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.CurrentLevel)
@@ -109,8 +124,6 @@ class TC_LVL_2_3(MatterBaseTest):
         await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
 
         self.step(7)
-        # NOTE: had to use the WithOnOff version of this command because the dut is off at this point thanks to the above command
-        # TODO: Need to check above and here that the on/off cluster is actually implemented.
         cmd = lvl.Commands.MoveToLevelWithOnOff(level=max_level, transitionTime=100, optionsMask=0, optionsOverride=0)
         await self.send_single_cmd(cmd)
 
@@ -127,12 +140,15 @@ class TC_LVL_2_3(MatterBaseTest):
         if count == 1:
             entry = sub_handler.attribute_reports[lvl.Attributes.CurrentLevel][-1]
             asserts.assert_equal(entry.value, max_level, "Entry is not equal to max level")
+        else:
+            self.mark_current_step_skipped()
 
         if count > 1:
             self.step(11)
             last_value = start_current_level
             for e in sub_handler.attribute_reports[lvl.Attributes.CurrentLevel]:
                 asserts.assert_greater_equal(e.value, last_value, "Values are not increasing")
+                last_value = e.value
 
             self.step(12)
             asserts.assert_equal(e.value, max_level, "Last entry is not max value")
@@ -173,7 +189,7 @@ class TC_LVL_2_3(MatterBaseTest):
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
         logging.info(f'Reamining time reports: {remaining_time}')
-        asserts.assert_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
+        asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 
         self.step(22)
         asserts.assert_almost_equal(remaining_time[1].value, 150, delta=10, msg="Unexpected second RemainingTime report")

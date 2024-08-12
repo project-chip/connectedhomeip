@@ -19,6 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if (SL_MATTER_GN_BUILD == 0)
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 #include "sl_status.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
@@ -52,9 +56,15 @@ extern "C" {
 #include "sl_si91x_m4_ps.h"
 }
 
+namespace {
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
 bool btn0_pressed = false;
+
+#ifdef ENABLE_CHIP_SHELL
+bool ps_requirement_added = false;
+#endif // ENABLE_CHIP_SHELL
+} // namespace
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
 #include "dhcp_client.h"
@@ -288,6 +298,26 @@ void sl_si91x_invoke_btn_press_event()
     {
         btn0_pressed = false;
     }
+
+#ifdef ENABLE_CHIP_SHELL
+    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
+    if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
+    {
+        if (!ps_requirement_added)
+        {
+            sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = true;
+        }
+    }
+    else
+    {
+        if (ps_requirement_added)
+        {
+            sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = false;
+        }
+    }
+#endif // ENABLE_CHIP_SHELL
 }
 
 /******************************************************************
@@ -426,6 +456,16 @@ static sl_status_t wfx_rsi_init(void)
         ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
+#ifdef ENABLE_CHIP_SHELL
+    // While using the matter shell with the ICD server, the GPIO 1 is used to check the UULP PIN 1 status
+    // since UART doesn't act as a wakeup source in the UULP mode
+    /*Configuring the NPS GPIO 1*/
+    RSI_NPSSGPIO_SetPinMux(RTE_UULP_GPIO_1_PIN, 0);
+    /*Configure the NPSS GPIO direction to input */
+    RSI_NPSSGPIO_SetDir(RTE_UULP_GPIO_1_PIN, 1);
+    /*Enable the REN*/
+    RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+#endif // ENABLE_CHIP_SHELL
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SLI_SI91X_MCU_INTERFACE */
 

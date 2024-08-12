@@ -27,7 +27,7 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -70,7 +70,7 @@ namespace app {
 class AttributePathExpandIteratorEmber
 {
 public:
-    AttributePathExpandIteratorEmber(InteractionModel::DataModel *, // datamodel is NOT used by this class
+    AttributePathExpandIteratorEmber(DataModel::Provider *, // datamodel is NOT used by this class
                                      SingleLinkedListNode<AttributePathParams> * aAttributePath);
 
     /**

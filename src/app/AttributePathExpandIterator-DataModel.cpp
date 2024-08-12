@@ -18,14 +18,14 @@
 #include <app/AttributePathExpandIterator-DataModel.h>
 #include <app/GlobalAttributes.h>
 
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
 
 AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
-    InteractionModel::DataModel * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModel(dataModel),
+    DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath) :
+    mDataModelProvider(provider),
     mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
 {
@@ -52,7 +52,7 @@ bool AttributePathExpandIteratorDataModel::IsValidAttributeId(AttributeId attrib
     }
 
     const ConcreteAttributePath attributePath(mOutputPath.mEndpointId, mOutputPath.mClusterId, attributeId);
-    return mDataModel->GetAttributeInfo(attributePath).has_value();
+    return mDataModelProvider->GetAttributeInfo(attributePath).has_value();
 }
 
 std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId()
@@ -61,7 +61,7 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
     {
         if (mpAttributePath->mValue.HasWildcardAttributeId())
         {
-            AttributeEntry entry = mDataModel->FirstAttribute(mOutputPath);
+            AttributeEntry entry = mDataModelProvider->FirstAttribute(mOutputPath);
             return entry.IsValid()                                         //
                 ? entry.path.mAttributeId                                  //
                 : Clusters::Globals::Attributes::GeneratedCommandList::Id; //
@@ -99,7 +99,7 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
         return std::nullopt;
     }
 
-    AttributeEntry entry = mDataModel->NextAttribute(mOutputPath);
+    AttributeEntry entry = mDataModelProvider->NextAttribute(mOutputPath);
     if (entry.IsValid())
     {
         return entry.path.mAttributeId;
@@ -117,13 +117,13 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextClusterId()
     {
         if (mpAttributePath->mValue.HasWildcardClusterId())
         {
-            ClusterEntry entry = mDataModel->FirstCluster(mOutputPath.mEndpointId);
+            ClusterEntry entry = mDataModelProvider->FirstCluster(mOutputPath.mEndpointId);
             return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
         }
 
         // only return a cluster if it is valid
         const ConcreteClusterPath clusterPath(mOutputPath.mEndpointId, mpAttributePath->mValue.mClusterId);
-        if (!mDataModel->GetClusterInfo(clusterPath).has_value())
+        if (!mDataModelProvider->GetClusterInfo(clusterPath).has_value())
         {
             return std::nullopt;
         }
@@ -133,7 +133,7 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextClusterId()
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
 
-    ClusterEntry entry = mDataModel->NextCluster(mOutputPath);
+    ClusterEntry entry = mDataModelProvider->NextCluster(mOutputPath);
     return entry.IsValid() ? std::make_optional(entry.path.mClusterId) : std::nullopt;
 }
 
@@ -143,7 +143,7 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextEndpointId()
     {
         if (mpAttributePath->mValue.HasWildcardEndpointId())
         {
-            EndpointId id = mDataModel->FirstEndpoint();
+            EndpointId id = mDataModelProvider->FirstEndpoint();
             return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
         }
 
@@ -152,7 +152,7 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextEndpointId()
 
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
 
-    EndpointId id = mDataModel->NextEndpoint(mOutputPath.mEndpointId);
+    EndpointId id = mDataModelProvider->NextEndpoint(mOutputPath.mEndpointId);
     return (id != kInvalidEndpointId) ? std::make_optional(id) : std::nullopt;
 }
 

@@ -86,12 +86,7 @@ class WaterHeaterManagementCluster(
   }
 
   suspend fun boost(
-    duration: UInt,
-    oneShot: Boolean?,
-    emergencyBoost: Boolean?,
-    temporarySetpoint: Short?,
-    targetPercentage: UByte?,
-    targetReheat: UByte?,
+    boostInfo: WaterHeaterManagementClusterWaterHeaterBoostInfoStruct,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
@@ -99,29 +94,8 @@ class WaterHeaterManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_DURATION_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_DURATION_REQ), duration)
-
-    val TAG_ONE_SHOT_REQ: Int = 1
-    oneShot?.let { tlvWriter.put(ContextSpecificTag(TAG_ONE_SHOT_REQ), oneShot) }
-
-    val TAG_EMERGENCY_BOOST_REQ: Int = 2
-    emergencyBoost?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_EMERGENCY_BOOST_REQ), emergencyBoost)
-    }
-
-    val TAG_TEMPORARY_SETPOINT_REQ: Int = 3
-    temporarySetpoint?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_TEMPORARY_SETPOINT_REQ), temporarySetpoint)
-    }
-
-    val TAG_TARGET_PERCENTAGE_REQ: Int = 4
-    targetPercentage?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_TARGET_PERCENTAGE_REQ), targetPercentage)
-    }
-
-    val TAG_TARGET_REHEAT_REQ: Int = 5
-    targetReheat?.let { tlvWriter.put(ContextSpecificTag(TAG_TARGET_REHEAT_REQ), targetReheat) }
+    val TAG_BOOST_INFO_REQ: Int = 0
+    boostInfo.toTlv(ContextSpecificTag(TAG_BOOST_INFO_REQ), tlvWriter)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

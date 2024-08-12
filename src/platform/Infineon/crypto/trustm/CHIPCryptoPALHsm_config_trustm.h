@@ -33,11 +33,6 @@
 #define ENABLE_TRUSTM_ECDSA_VERIFY 1
 
 /*
- * Enable Key Import for trustm
- */
-#define ENABLE_TRUSTM_KEY_IMPORT 0
-
-/*
  * Enable trustm for HKDF SHA256
  */
 #define ENABLE_TRUSTM_HKDF_SHA256 0
@@ -51,3 +46,8 @@
  * Enable trustm for DA
  */
 #define ENABLE_TRUSTM_DEVICE_ATTESTATION 1
+
+/*
+ * Enable trustm for NOC key-pair generation
+ */
+#define ENABLE_TRUSTM_NOC_KEYGEN 0

@@ -96,8 +96,10 @@ AppTask AppTask::sAppTask;
 
 static DeviceCallbacks sDeviceCallbacks;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void StartTimer(uint32_t aTimeoutMs);
 void CancelTimer(void);
+#endif
 
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
@@ -120,9 +122,9 @@ void InitializeOTARequestor(void)
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
 }
-#endif
 
 TimerHandle_t sOTAInitTimer = 0;
+#endif
 
 // The OTA Init Timer is only started upon the first Thread State Change
 // detected if the device is already on a Thread Network, or during the AppTask
@@ -171,10 +173,12 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void OTAInitTimerEventHandler(TimerHandle_t xTimer)
 {
     InitializeOTARequestor();
 }
+#endif
 
 int AppTask::StartAppTask()
 {
@@ -217,6 +221,7 @@ int AppTask::Init()
             ;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // Create FreeRTOS sw timer for OTA timer.
     sOTAInitTimer = xTimerCreate("OTAInitTmr",                     // Just a text name, not used by the RTOS kernel
                                  OTAREQUESTOR_INIT_TIMER_DELAY_MS, // timer period (mS)
@@ -233,6 +238,7 @@ int AppTask::Init()
     {
         PLAT_LOG("sOTAInitTimer timer created successfully ");
     }
+#endif
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
@@ -353,6 +359,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void StartTimer(uint32_t aTimeoutMs)
 {
     PLAT_LOG("Start OTA Init Timer")
@@ -378,6 +385,7 @@ void CancelTimer(void)
         PLAT_LOG("sOTAInitTimer stop() failed");
     }
 }
+#endif
 
 void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
 {

@@ -51,7 +51,6 @@ using namespace chip::DeviceLayer;
 static constexpr char TAG[] = "ESP32Appserver";
 
 namespace {
-
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
@@ -103,8 +102,10 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
 #ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
-    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
+    static bool bleAlreadyShutdown = false;
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0 && (!bleAlreadyShutdown))
     {
+        bleAlreadyShutdown = true;
         chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
 #endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */

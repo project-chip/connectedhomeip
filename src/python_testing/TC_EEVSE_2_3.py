@@ -134,6 +134,9 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify Command response is Success and event EEVSE.S.E01(EVNotDetected) sent"),
             TestStep("21", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear.",
                      "Verify Command response is Success"),
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for for EVSE TimeOfUse Mode Test Event Clear.",
+                     "Verify Command response is Success"),
+
         ]
 
         return steps
@@ -448,6 +451,9 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("21")
         await self.send_test_event_trigger_basic_clear()
+
+        self.step("22")
+        await self.send_test_event_trigger_time_of_use_mode_clear()
 
 
 if __name__ == "__main__":

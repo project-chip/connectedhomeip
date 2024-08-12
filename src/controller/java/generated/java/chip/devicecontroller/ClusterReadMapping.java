@@ -4659,6 +4659,17 @@ public class ClusterReadMapping {
           readBridgedDeviceBasicInformationProductNameCommandParams
         );
         result.put("readProductNameAttribute", readBridgedDeviceBasicInformationProductNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationProductIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBridgedDeviceBasicInformationProductIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster).readProductIDAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBridgedDeviceBasicInformationProductIDCommandParams
+        );
+        result.put("readProductIDAttribute", readBridgedDeviceBasicInformationProductIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationNodeLabelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -11852,17 +11863,17 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readServiceAreaInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readServiceAreaSupportedLocationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readServiceAreaSupportedLocationsAttributeInteractionInfo = new InteractionInfo(
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readServiceAreaSupportedAreasCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaSupportedAreasAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ServiceAreaCluster) cluster).readSupportedLocationsAttribute(
-              (ChipClusters.ServiceAreaCluster.SupportedLocationsAttributeCallback) callback
+            ((ChipClusters.ServiceAreaCluster) cluster).readSupportedAreasAttribute(
+              (ChipClusters.ServiceAreaCluster.SupportedAreasAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSupportedLocationsAttributeCallback(),
-          readServiceAreaSupportedLocationsCommandParams
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSupportedAreasAttributeCallback(),
+          readServiceAreaSupportedAreasCommandParams
         );
-        result.put("readSupportedLocationsAttribute", readServiceAreaSupportedLocationsAttributeInteractionInfo);
+        result.put("readSupportedAreasAttribute", readServiceAreaSupportedAreasAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readServiceAreaSupportedMapsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readServiceAreaSupportedMapsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -11874,28 +11885,28 @@ public class ClusterReadMapping {
           readServiceAreaSupportedMapsCommandParams
         );
         result.put("readSupportedMapsAttribute", readServiceAreaSupportedMapsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readServiceAreaSelectedLocationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readServiceAreaSelectedLocationsAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readServiceAreaSelectedAreasCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaSelectedAreasAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ServiceAreaCluster) cluster).readSelectedLocationsAttribute(
-              (ChipClusters.ServiceAreaCluster.SelectedLocationsAttributeCallback) callback
+            ((ChipClusters.ServiceAreaCluster) cluster).readSelectedAreasAttribute(
+              (ChipClusters.ServiceAreaCluster.SelectedAreasAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSelectedLocationsAttributeCallback(),
-          readServiceAreaSelectedLocationsCommandParams
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSelectedAreasAttributeCallback(),
+          readServiceAreaSelectedAreasCommandParams
         );
-        result.put("readSelectedLocationsAttribute", readServiceAreaSelectedLocationsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readServiceAreaCurrentLocationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readServiceAreaCurrentLocationAttributeInteractionInfo = new InteractionInfo(
+        result.put("readSelectedAreasAttribute", readServiceAreaSelectedAreasAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaCurrentAreaCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaCurrentAreaAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ServiceAreaCluster) cluster).readCurrentLocationAttribute(
-              (ChipClusters.ServiceAreaCluster.CurrentLocationAttributeCallback) callback
+            ((ChipClusters.ServiceAreaCluster) cluster).readCurrentAreaAttribute(
+              (ChipClusters.ServiceAreaCluster.CurrentAreaAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterCurrentLocationAttributeCallback(),
-          readServiceAreaCurrentLocationCommandParams
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterCurrentAreaAttributeCallback(),
+          readServiceAreaCurrentAreaCommandParams
         );
-        result.put("readCurrentLocationAttribute", readServiceAreaCurrentLocationAttributeInteractionInfo);
+        result.put("readCurrentAreaAttribute", readServiceAreaCurrentAreaAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readServiceAreaEstimatedEndTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readServiceAreaEstimatedEndTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -12960,17 +12971,6 @@ public class ClusterReadMapping {
           readThermostatSchedulesCommandParams
         );
         result.put("readSchedulesAttribute", readThermostatSchedulesAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatPresetsSchedulesEditableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatPresetsSchedulesEditableAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readPresetsSchedulesEditableAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readThermostatPresetsSchedulesEditableCommandParams
-        );
-        result.put("readPresetsSchedulesEditableAttribute", readThermostatPresetsSchedulesEditableAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatSetpointHoldExpiryTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatSetpointHoldExpiryTimestampAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -17129,6 +17129,17 @@ public class ClusterReadMapping {
           readThreadBorderRouterManagementActiveDatasetTimestampCommandParams
         );
         result.put("readActiveDatasetTimestampAttribute", readThreadBorderRouterManagementActiveDatasetTimestampAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementPendingDatasetTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementPendingDatasetTimestampAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readPendingDatasetTimestampAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.PendingDatasetTimestampAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterPendingDatasetTimestampAttributeCallback(),
+          readThreadBorderRouterManagementPendingDatasetTimestampCommandParams
+        );
+        result.put("readPendingDatasetTimestampAttribute", readThreadBorderRouterManagementPendingDatasetTimestampAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThreadBorderRouterManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadBorderRouterManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -20835,6 +20846,17 @@ public class ClusterReadMapping {
           readUnitTestingClusterErrorBooleanCommandParams
         );
         result.put("readClusterErrorBooleanAttribute", readUnitTestingClusterErrorBooleanAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingGlobalEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingGlobalEnumAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readGlobalEnumAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readUnitTestingGlobalEnumCommandParams
+        );
+        result.put("readGlobalEnumAttribute", readUnitTestingGlobalEnumAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingUnsupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -21209,6 +21231,17 @@ public class ClusterReadMapping {
           readUnitTestingWriteOnlyInt8uCommandParams
         );
         result.put("readWriteOnlyInt8uAttribute", readUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingNullableGlobalEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingNullableGlobalEnumAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readNullableGlobalEnumAttribute(
+              (ChipClusters.UnitTestingCluster.NullableGlobalEnumAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedUnitTestingClusterNullableGlobalEnumAttributeCallback(),
+          readUnitTestingNullableGlobalEnumCommandParams
+        );
+        result.put("readNullableGlobalEnumAttribute", readUnitTestingNullableGlobalEnumAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingMeiInt8uCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingMeiInt8uAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

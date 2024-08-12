@@ -140,7 +140,11 @@ source_set("operational-state-test-srcs") {
 }
 
 source_set("thread-border-router-management-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp" ]
+  sources = [
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app",
@@ -229,7 +233,7 @@ chip_test_suite("tests") {
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
-    "${chip_root}/src/app/codegen-data-model:instance-header",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",

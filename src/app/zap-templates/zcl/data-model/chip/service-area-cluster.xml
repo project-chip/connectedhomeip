@@ -18,25 +18,37 @@ limitations under the License.
   <domain name="CHIP"/>
 
   Data types
-  <struct name="LocationInfoStruct" apiMaturity="provisional">
+  <struct name="LandmarkInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
-    <item name="LocationInfo"  type="LocationDescriptorStruct" optional="false" isNullable="true"/>
-    <item name="LandmarkTag"   type="LandmarkTag"              optional="false" isNullable="true"/>
-    <item name="PositionTag"   type="PositionTag"              optional="false" isNullable="true"/>
-    <item name="SurfaceTag"    type="FloorSurfaceTag"          optional="false" isNullable="true"/>
+    <item name="LandmarkTag" type="LandmarkTag"         optional="false" isNullable="false"/>
+    <item name="PositionTag" type="RelativePositionTag" optional="false" isNullable="true"/>
+  </struct>
+
+  <struct name="AreaInfoStruct" apiMaturity="provisional">
+    <cluster code="0x0150"/>
+    <item name="LocationInfo" type="LocationDescriptorStruct" optional="false" isNullable="true"/>
+    <item name="LandmarkInfo" type="LandmarkInfoStruct"       optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">
     <cluster code="0x0150"/>
-    <item name="MapID"   type="int8u"                   optional="false"/>
-    <item name="Name"    type="char_string" length="64" optional="false"/>
+    <item name="MapID" type="int32u"                  optional="false"/>
+    <item name="Name"  type="char_string" length="64" optional="false"/>
   </struct>
 
-  <struct name="LocationStruct">
+  <struct name="AreaStruct">
     <cluster code="0x0150"/>
-    <item name="LocationID"   type="int32u"                  optional="false" isNullable="false"/>
-    <item name="MapID"        type="int8u"                   optional="false" isNullable="true"/>
-    <item name="LocationInfo" type="LocationInfoStruct"      optional="false" isNullable="false"/>
+    <item name="AreaID"   type="int32u"         optional="false" isNullable="false"/>
+    <item name="MapID"    type="int32u"         optional="false" isNullable="true"/>
+    <item name="AreaDesc" type="AreaInfoStruct" optional="false" isNullable="false"/>
+  </struct>
+
+  <struct name="ProgressStruct">
+    <cluster code="0x0150"/>
+    <item name="AreaID"                 type="int32u"                 optional="false"/>
+    <item name="Status"                 type="OperationalStatusEnum"  optional="false"/>
+    <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
+    <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
   </struct>
 
   <enum name="OperationalStatusEnum" type="enum8">
@@ -47,82 +59,80 @@ limitations under the License.
     <item value="0x03" name="Completed"/>
   </enum>
 
-  <struct name="ProgressStruct">
-    <cluster code="0x0150"/>
-    <item name="LocationID"             type="int32u"                 optional="false"/>
-    <item name="Status"                 type="OperationalStatusEnum"  optional="false"/>
-    <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
-    <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
-  </struct>
-
-  <enum name="SelectLocationsStatus" type="enum8">
+  <enum name="SelectAreasStatus" type="enum8">
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
-    <item value="0x01" name="UnsupportedLocation"/>
-    <item value="0x02" name="DuplicatedLocations"/>
+    <item value="0x01" name="UnsupportedArea"/>
+    <item value="0x02" name="DuplicatedAreas"/>
     <item value="0x03" name="InvalidInMode"/>
     <item value="0x04" name="InvalidSet"/>
   </enum>
 
-  <enum name="SkipCurrentLocationStatus" type="enum8">
+  <enum name="SkipAreaStatus" type="enum8">
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
-    <item value="0x01" name="InvalidLocationList"/>
+    <item value="0x01" name="InvalidAreaList"/>
     <item value="0x02" name="InvalidInMode"/>
+    <item value="0x03" name="InvalidSkippedArea"/>
   </enum>
 
   <cluster apiMaturity="provisional">
     <domain>General</domain>
     <name>Service Area</name>
-    <description>The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.</description>
+    <description>The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.</description>
     <code>0x0150</code>
     <define>SERVICE_AREA_CLUSTER</define>
+    <globalAttribute side="either" code="0xFFFD" value="1" />
 
     <features>
-      <feature bit="0" code="LISTORDER" name="ListOrder" summary="The device operates at the selected locations in the list order">
+      <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
         <optionalConform/>
       </feature>
-      <feature bit="1" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected locations while running">
+      <feature bit="1" code="PROG" name="ProgressReporting" summary="The device implements the progress reporting feature">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="MAPS" name="Maps" summary="The device has map support">
         <optionalConform/>
       </feature>
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="LocationStruct"  writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
-    <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"       writable="false" isNullable="true"  optional="false">SupportedMaps</attribute>
-    <attribute side="server" code="0x0002" define="SelectedLocations"   type="array"     entryType="int32u"          writable="false" isNullable="true"  optional="false">SelectedLocations</attribute>
-    <attribute side="server" code="0x0003" define="CurrentLocation"     type="int32u"                                writable="false" isNullable="true"  optional="true">CurrentLocation</attribute>
+    <attribute side="server" code="0x0000" define="SupportedAreas"      type="array"     entryType="AreaStruct"      writable="false" isNullable="false" optional="false">SupportedAreas</attribute>
+    <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"       writable="false" isNullable="false" optional="true" >SupportedMaps</attribute>
+    <attribute side="server" code="0x0002" define="SelectedAreas"       type="array"     entryType="int32u"          writable="false" isNullable="false" optional="false">SelectedAreas</attribute>
+    <attribute side="server" code="0x0003" define="CurrentArea"         type="int32u"                                writable="false" isNullable="true"  optional="true" >CurrentArea</attribute>
     <attribute side="server" code="0x0004" define="EstimatedEndTime"    type="epoch_s"                               writable="false" isNullable="true"  optional="true" >EstimatedEndTime</attribute>
-    <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgressStruct"  writable="false" isNullable="true"  optional="true">Progress</attribute>
+    <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgressStruct"  writable="false" isNullable="false" optional="true" >Progress</attribute>
 
     <!-- Commands -->
-    <command source="client" code="0x00" name="SelectLocations" response="SelectLocationsResponse" optional="false">
+    <command source="client" code="0x00" name="SelectAreas" response="SelectAreasResponse" optional="false">
       <description>
-        Command used to select a set of device locations, where the device is to operate
+        Command used to select a set of device areas, where the device is to operate.
       </description>
-      <arg name="NewLocations" type="int32u" array="true" isNullable="true"/>
+      <arg name="NewAreas" type="int32u" array="true"/>
     </command>
 
-    <command source="server" code="0x01" name="SelectLocationsResponse" disableDefaultResponse="true" optional="false">
+    <command source="server" code="0x01" name="SelectAreasResponse" disableDefaultResponse="true" optional="false">
       <description>
-        This command is sent by the device on receipt of the SelectLocations command.
+        This command is sent by the device on receipt of the SelectAreas command.
       </description>
-      <arg name="Status"     type="SelectLocationsStatus"     optional="false"/>
-      <arg name="StatusText" type="char_string"  length="256" optional="true"/>
+      <arg name="Status"     type="SelectAreasStatus"/>
+      <arg name="StatusText" type="char_string" length="256"/>
     </command>
 
-    <command source="client" code="0x02" name="SkipCurrentLocation" response="SkipCurrentLocationResponse" optional="true">
+    <command source="client" code="0x02" name="SkipArea" response="SkipAreaResponse" optional="true">
       <description>
-        This command is used to skip the current location where the device operates.
+        This command is used to skip an area where the device operates.
       </description>
+      <arg name="SkippedArea" type="int32u"/>
     </command>
 
-    <command source="server" code="0x03" name="SkipCurrentLocationResponse" disableDefaultResponse="true" optional="true">
+    <command source="server" code="0x03" name="SkipAreaResponse" disableDefaultResponse="true" optional="true">
       <description>
-        This command is sent by the device on receipt of the SelectLocations command.
+        This command is sent by the device on receipt of the SkipArea command.
       </description>
-      <arg name="Status"     type="SkipCurrentLocationStatus"  optional="false"/>
-      <arg name="StatusText" type="char_string"                length="256" optional="true"/>
+      <arg name="Status"     type="SkipAreaStatus"/>
+      <arg name="StatusText" type="char_string" length="256"/>
     </command>
 
   </cluster>

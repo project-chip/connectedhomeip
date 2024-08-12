@@ -1,0 +1,6 @@
+chip.rpc.SynchronizedDevice.unique_id max_size:33
+chip.rpc.SynchronizedDevice.vendor_name max_size:33
+chip.rpc.SynchronizedDevice.product_name max_size:33
+chip.rpc.SynchronizedDevice.node_label max_size:33
+chip.rpc.SynchronizedDevice.hardware_version_string max_size:65
+chip.rpc.SynchronizedDevice.software_version_string max_size:65

@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/reporting/Read-Ember.h>
 
 #include <app/AppConfig.h>
@@ -25,9 +26,10 @@ namespace app {
 namespace reporting {
 namespace EmberImpl {
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE

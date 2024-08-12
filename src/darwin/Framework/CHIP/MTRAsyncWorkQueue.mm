@@ -433,6 +433,12 @@ struct ContextSnapshot {
     return NO;
 }
 
+- (NSUInteger)itemCount
+{
+    std::lock_guard lock(_lock);
+    return _items.count;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
