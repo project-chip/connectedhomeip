@@ -31,7 +31,7 @@ declare_args() {
   k32w1_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
-if (sdk_release) {
+if (sdk_release || getenv("NXP_SDK_ROOT") != "") {
   k32w1_sdk_root = getenv("NXP_SDK_ROOT")
 }
 
