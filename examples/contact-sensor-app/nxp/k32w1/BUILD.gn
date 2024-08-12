@@ -214,7 +214,8 @@ k32w1_executable("contact_sensor_app") {
   }
 
   deps += [
-    "${chip_root}/examples/providers:device_info_provider"
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/platform/logging:default"
   ]
 
   #lit and sit are using different zap files
