@@ -63,6 +63,7 @@ private:
     const uint32_t supportedAreaID_C = 10050;
     const uint32_t supportedAreaID_D = 0x88888888;
 
+public:
     /**
      * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
      */
@@ -73,7 +74,6 @@ private:
      */
     void SetNoMapTopology();
 
-public:
     CHIP_ERROR Init() override;
 
     // command support

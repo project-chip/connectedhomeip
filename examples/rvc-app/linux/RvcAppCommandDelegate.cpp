@@ -154,7 +154,7 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "RemoveArea")
     {
         VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
-        self->OnRemoveServiceAreaMap(self->mJsonValue["AreaId"].asInt());
+        self->OnRemoveServiceAreaArea(self->mJsonValue["AreaId"].asInt());
     }
     else if (name == "ErrorEvent")
     {

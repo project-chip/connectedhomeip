@@ -426,6 +426,8 @@ void RvcDevice::HandleResetMessage()
     mServiceAreaInstance.ClearProgress();
     mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
     mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+
+    mServiceAreaDelegate.SetMapTopology();
 }
 
 void RvcDevice::UpdateServiceAreaProgressOnExit()

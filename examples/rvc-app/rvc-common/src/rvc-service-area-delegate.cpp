@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::ServiceArea;
 
 void RvcServiceAreaDelegate::SetMapTopology()
 {
-    ClearSupportedMaps();
+    GetInstance()->ClearSupportedMaps();
 
     GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
     GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
@@ -65,7 +65,7 @@ void RvcServiceAreaDelegate::SetMapTopology()
 
 void RvcServiceAreaDelegate::SetNoMapTopology()
 {
-    ClearSupportedMaps();
+    GetInstance()->ClearSupportedMaps();
 
     // Area A has name, floor number.
     auto areaA =
