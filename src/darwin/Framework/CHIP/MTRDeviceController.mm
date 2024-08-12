@@ -1579,15 +1579,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 @end
 
-/**
- * Shim to allow us to treat an MTRDevicePairingDelegate as an
- * MTRDeviceControllerDelegate.
- */
-@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
-@end
-
 @implementation MTRDevicePairingDelegateShim
 - (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate
 {

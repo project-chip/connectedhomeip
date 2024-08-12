@@ -732,7 +732,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController alloc] // wat
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -1133,7 +1133,7 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (MTRDeviceController * _Nullable)initializeController:(MTRDeviceController *)controller
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
                                          withParameters:(MTRDeviceControllerParameters *)parameters
                                                   error:(NSError * __autoreleasing *)error
 {

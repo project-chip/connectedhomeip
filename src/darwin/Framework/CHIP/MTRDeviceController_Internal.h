@@ -32,6 +32,7 @@
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
 #import "MTRP256KeypairBridge.h"
@@ -46,6 +47,8 @@
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
 @class MTRAsyncWorkQueue;
+@protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
 
 namespace chip {
 class FabricTable;
@@ -281,6 +284,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
+@end
+
+/**
+ * Shim to allow us to treat an MTRDevicePairingDelegate as an
+ * MTRDeviceControllerDelegate.
+ */
+@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
+- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
 @end
 
 static NSString * const kDeviceControllerErrorCommissionerInit = @"Init failure while initializing a commissioner";

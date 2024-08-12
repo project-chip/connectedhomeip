@@ -26,6 +26,7 @@
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
+#import "MTRDeviceController.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
@@ -129,7 +130,34 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 
-- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
+- (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                               error:(NSError * __autoreleasing *)error
+{
+    // parameters here are a bit late, tbh, but maybe we're gonna have to
+    // create an XPC obj...?
+    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+//    else if ([is XPC Thing]) {
+//        // create XPC MatterDeviceController when it exists
+//        // return XPC MatterDeviceController? O_O
+//    }
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+    // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+    id controller = [factory initializeController:self // either self or XPC
+                                                      withParameters:controllerParameters
+                                                               error:error];
+    return controller;
+}
+
+- (nullable MTRDeviceController *)bogusWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                               error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
@@ -141,7 +169,11 @@ using namespace chip::Tracing::DarwinFramework;
     auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
     // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
+    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+    MTRDeviceController * controller = [factory initializeController:self
+                                                      withParameters:controllerParameters
+                                                               error:error];
+    return controller;
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -1579,63 +1611,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 @end
 
 /**
- * Shim to allow us to treat an MTRDevicePairingDelegate as an
- * MTRDeviceControllerDelegate.
- */
-@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
-@end
-
-@implementation MTRDevicePairingDelegateShim
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-    }
-    return self;
-}
-
-- (BOOL)respondsToSelector:(SEL)selector
-{
-    if (selector == @selector(controller:statusUpdate:)) {
-        return [self.delegate respondsToSelector:@selector(onStatusUpdate:)];
-    }
-
-    if (selector == @selector(controller:commissioningSessionEstablishmentDone:)) {
-        return [self.delegate respondsToSelector:@selector(onPairingComplete:)];
-    }
-
-    if (selector == @selector(controller:commissioningComplete:)) {
-        return [self.delegate respondsToSelector:@selector(onCommissioningComplete:)];
-    }
-
-    return [super respondsToSelector:selector];
-}
-
-- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
-{
-    [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
-{
-    [self.delegate onPairingComplete:error];
-}
-
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
-{
-    [self.delegate onCommissioningComplete:error];
-}
-
-- (void)onPairingDeleted:(NSError * _Nullable)error
-{
-    [self.delegate onPairingDeleted:error];
-}
-
-@end
-
-/**
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
@@ -1643,57 +1618,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
 - (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
-@end
-
-@implementation MTROperationalCertificateChainIssuerShim
-- (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
-{
-    if (self = [super init]) {
-        _nocChainIssuer = nocChainIssuer;
-        _shouldSkipAttestationCertificateValidation = YES;
-    }
-    return self;
-}
-
-- (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
-                                   controller:(MTRDeviceController *)controller
-                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
-                                                  NSError * _Nullable error))completion
-{
-    CSRInfo * oldCSRInfo = [[CSRInfo alloc] initWithNonce:csrInfo.csrNonce
-                                                 elements:csrInfo.csrElementsTLV
-                                        elementsSignature:csrInfo.attestationSignature
-                                                      csr:csrInfo.csr];
-    NSData * _Nullable firmwareInfo = attestationInfo.firmwareInfo;
-    if (firmwareInfo == nil) {
-        firmwareInfo = [NSData data];
-    }
-    AttestationInfo * oldAttestationInfo =
-        [[AttestationInfo alloc] initWithChallenge:attestationInfo.challenge
-                                             nonce:attestationInfo.nonce
-                                          elements:attestationInfo.elementsTLV
-                                 elementsSignature:attestationInfo.elementsSignature
-                                               dac:attestationInfo.deviceAttestationCertificate
-                                               pai:attestationInfo.productAttestationIntermediateCertificate
-                          certificationDeclaration:attestationInfo.certificationDeclaration
-                                      firmwareInfo:firmwareInfo];
-    [self.nocChainIssuer
-          onNOCChainGenerationNeeded:oldCSRInfo
-                     attestationInfo:oldAttestationInfo
-        onNOCChainGenerationComplete:^(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
-            NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error) {
-            auto * chain = [[MTROperationalCertificateChain alloc] initWithOperationalCertificate:operationalCertificate
-                                                                          intermediateCertificate:intermediateCertificate
-                                                                                  rootCertificate:rootCertificate
-                                                                                     adminSubject:adminSubject];
-            completion(chain, nil);
-            if (error != nil) {
-                *error = nil;
-            }
-        }];
-}
-
 @end
 
 @implementation MTRDeviceController_Concrete (Deprecated)

@@ -20,6 +20,7 @@
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
+#import "MTRDeviceController.h"
 
 @class MTRBaseDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
