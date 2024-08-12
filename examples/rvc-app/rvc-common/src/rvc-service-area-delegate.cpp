@@ -132,13 +132,13 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::
         }
     }
 
-    // If there are less than 2 supported maps, any combination of areas is valid.
+    // If there is 1 or 0 supported maps, any combination of areas is valid.
     if (!GetInstance()->HasFeature(Feature::kMaps) || GetNumberOfSupportedMaps() <= 1)
     {
         return true;
     }
 
-    // Check that all the areas are in the same map.
+    // Check that all the requested areas are in the same map.
     auto newAreasIter = req.newAreas.begin();
     newAreasIter.Next();
 
