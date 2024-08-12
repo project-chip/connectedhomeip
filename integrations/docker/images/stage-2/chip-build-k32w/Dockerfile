@@ -28,7 +28,7 @@ RUN set -x \
 
 RUN set -x \
     && mkdir -p k32w1/repo \
-    && cd k32w1/repo
+    && cd k32w1/repo \
     && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "MCUX_2.16.000" \
     && west update -o=--depth=1 -n -f smart \
     && cd - \
