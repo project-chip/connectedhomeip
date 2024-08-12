@@ -22,12 +22,12 @@ import logging
 import subprocess
 import sys
 
+from crc import Calculator, Crc16
 from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
                     ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId, ProductLabel, ProductName,
                     ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
                     Verifier)
 from default import InputArgument
-from crc import Calculator, Crc16
 
 # Global variable for hash ID
 hash_id = "CE47BA5E"
