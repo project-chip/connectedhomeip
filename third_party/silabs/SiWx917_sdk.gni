@@ -38,6 +38,9 @@ declare_args() {
 
   # enable 917 SoC M4 sleep wakeup
   si917_m4_sleep_enabled = false
+
+  # Factory Provision storage
+  use_flash_storage = true
 }
 
 # Defines an siwx917 SDK build target.
