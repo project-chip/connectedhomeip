@@ -35,11 +35,6 @@ namespace Thermostat {
 
 ThermostatAtomicWriteManager ThermostatAtomicWriteManager::sInstance;
 
-ThermostatAtomicWriteManager::ThermostatAtomicWriteManager()
-{
-    memset(mAtomicWriteSessions, 0, sizeof(mAtomicWriteSessions));
-}
-
 /**
  * @brief Callback that is called when the timeout for editing the presets expires.
  *

@@ -66,7 +66,7 @@ public:
 private:
     static ThermostatAtomicWriteManager sInstance;
 
-    ThermostatAtomicWriteManager();
+    ThermostatAtomicWriteManager()  = default;
     ~ThermostatAtomicWriteManager() = default;
 
     ThermostatAtomicWriteManager(const ThermostatAtomicWriteManager &)             = delete;
@@ -86,8 +86,8 @@ private:
     struct AtomicWriteSession
     {
         AtomicWriteState state = kAtomicWriteState_Closed;
-        ScopedNodeId nodeId;
-        EndpointId endpointId = kInvalidEndpointId;
+        ScopedNodeId nodeId    = ScopedNodeId();
+        EndpointId endpointId  = kInvalidEndpointId;
     };
 
     AtomicWriteDelegate * mDelegate;
