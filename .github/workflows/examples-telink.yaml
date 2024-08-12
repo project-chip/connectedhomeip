@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:65
+            image: ghcr.io/project-chip/chip-build-telink:66
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -189,13 +189,13 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (B91) Pump App
+            - name: Build example Telink (B91 USB) Pump App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-usb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d pump-app \
-                    out/telink-tlsr9518adk80d-pump/zephyr/zephyr.elf \
+                    telink tlsr9518adk80d pump-app-usb \
+                    out/telink-tlsr9518adk80d-pump-usb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output

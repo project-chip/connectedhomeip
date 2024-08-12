@@ -49,7 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
@@ -124,10 +124,6 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
@@ -406,7 +402,14 @@ public:
     }
 #endif
 
-    InteractionModel::DataModel * GetDataModel() const;
+    DataModel::Provider * GetDataModelProvider() const;
+
+    // MUST NOT be used while the interaction model engine is running as interaction
+    // model functionality (e.g. active reads/writes/subscriptions) rely on data model
+    // state
+    //
+    // Returns the old data model provider value.
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
 private:
     friend class reporting::Engine;
@@ -695,7 +698,7 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    InteractionModel::DataModel * mDataModel = nullptr;
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace app

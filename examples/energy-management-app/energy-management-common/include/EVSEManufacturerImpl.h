@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
@@ -33,20 +34,24 @@ namespace EnergyEvse {
  * The EVSEManufacturer example class
  */
 
-class EVSEManufacturer
+class EVSEManufacturer : public DEMManufacturerDelegate
 {
 public:
     EVSEManufacturer(EnergyEvseManager * aEvseInstance,
                      ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                     PowerTopology::PowerTopologyInstance * aPTInstance)
+                     PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
         mEPMInstance  = aEPMInstance;
         mPTInstance   = aPTInstance;
+        mDEMInstance  = aDEMInstance;
     }
+
+    virtual ~EVSEManufacturer() {}
+
     EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
+
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
-    PowerTopology::PowerTopologyInstance * GetPTInstance() { return mPTInstance; }
 
     EnergyEvseDelegate * GetEvseDelegate()
     {
@@ -75,6 +80,40 @@ public:
         return nullptr;
     }
 
+    DeviceEnergyManagementDelegate * GetDEMDelegate()
+    {
+        if (mDEMInstance)
+        {
+            return mDEMInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
+    /**
+     *
+     * Implement the DEMManufacturerDelegate interface
+     *
+     */
+    // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+    int64_t GetApproxEnergyDuringSession() override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
+                                                              AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                  AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
+    CHIP_ERROR HandleModifyForecastRequest(
+        const uint32_t forecastID,
+        const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+        AdjustmentCauseEnum cause) override;
+    CHIP_ERROR RequestConstraintBasedForecast(
+        const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
+        AdjustmentCauseEnum cause) override;
+
     /**
      * @brief   Called at start up to apply hardware settings
      */
@@ -89,6 +128,12 @@ public:
      * @brief   Main Callback handler from delegate to user code
      */
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
+
+    /**
+     * @brief   Simple example to demonstrate how an EVSE can compute the start time
+     *          and duration of a charging schedule
+     */
+    CHIP_ERROR ComputeChargingSchedule();
 
     /**
      * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
@@ -172,6 +217,7 @@ private:
     EnergyEvseManager * mEvseInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
     PowerTopology::PowerTopologyInstance * mPTInstance;
+    DeviceEnergyManagementManager * mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;

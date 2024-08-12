@@ -43,7 +43,7 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #endif
 
 namespace chip {
@@ -93,6 +93,15 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     StatusIB::RegisterErrorFormatter();
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    ChipLogError(InteractionModel, "WARNING ┌────────────────────────────────────────────────────");
+    ChipLogError(InteractionModel, "WARNING │ Interaction Model Engine running in 'Checked' mode.");
+    ChipLogError(InteractionModel, "WARNING │ This executes BOTH ember and data-model code paths.");
+    ChipLogError(InteractionModel, "WARNING │ which is inefficient and consumes more flash space.");
+    ChipLogError(InteractionModel, "WARNING │ This should be done for testing only.");
+    ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -101,9 +110,11 @@ void InteractionModelEngine::Shutdown()
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
     // TODO: individual object clears the entire command handler interface registry.
-    //       This may not be expected.
-    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
-
+    //       This may not be expected as IME does NOT own the command handler interface registry.
+    //
+    //       This is to be cleaned up once InteractionModelEngine maintains a data model fully and
+    //       the code-generation model can do its clear in its shutdown method.
+    CommandHandlerInterfaceRegistry::Instance().UnregisterAllHandlers();
     mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
@@ -476,14 +487,17 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
-            AttributePathExpandIterator pathIterator(GetDataModel(), &paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModelProvider(), &paramsList);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
-                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId };
+                // leave requestPath.entityId optional value unset to indicate wildcard
+                Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
+                                                 .endpoint    = readPath.mEndpointId,
+                                                 .requestType = Access::RequestType::kAttributeReadRequest };
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(readPath));
                 if (err == CHIP_NO_ERROR)
@@ -499,7 +513,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                paramsList.mValue.mAttributeId);
             if (ConcreteAttributePathExists(concretePath))
             {
-                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+                Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                                 .endpoint    = concretePath.mEndpointId,
+                                                 .requestType = Access::RequestType::kAttributeReadRequest,
+                                                 .entityId    = paramsList.mValue.mAttributeId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(concretePath));
@@ -521,17 +538,27 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
-                      Access::Privilege aNeededPrivilege)
+#if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
+                           Access::Privilege aNeededPrivilege)
 {
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                     .endpoint    = aPath.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest };
+    // leave requestPath.entityId optional value unset to indicate wildcard
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
 }
+#endif
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
-    return CanAccess(aSubjectDescriptor, aPath, RequiredPrivilege::ForReadEvent(aPath));
+    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                     .endpoint    = aPath.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest,
+                                     .entityId    = aPath.mEventId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
+    return (err == CHIP_NO_ERROR);
 }
 
 /**
@@ -548,7 +575,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
             // If we get here, the path exists.  We just have to do an ACL check for it.
-            bool isValid = CanAccess(aSubjectDescriptor, path);
+            bool isValid = CanAccessEvent(aSubjectDescriptor, path);
             if (isValid)
             {
                 return true;
@@ -560,7 +587,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // We have no way to expand wildcards.  Just assume that we would need
         // View permissions for whatever events are involved.
         ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
-        return CanAccess(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
+        return CanAccessEvent(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
 #endif
     }
 
@@ -570,7 +597,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // Not an existing event path.
         return false;
     }
-    return CanAccess(aSubjectDescriptor, path);
+    return CanAccessEvent(aSubjectDescriptor, path);
 }
 
 /**
@@ -840,7 +867,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
     ReadHandler * handler =
-        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModel());
+        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModelProvider());
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1673,7 +1700,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
                                              TLV::TLVReader & apPayload)
 {
     CommandHandlerInterface * handler =
-        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1697,13 +1724,23 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
-InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
+DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
+{
+    // Alternting data model should not be done while IM is actively handling requests.
+    VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
+
+    DataModel::Provider * oldModel = GetDataModelProvider();
+    mDataModelProvider             = model;
+    return oldModel;
+}
+
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
 #endif
-    return mDataModel;
+    return mDataModelProvider;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)

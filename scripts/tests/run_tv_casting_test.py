@@ -295,8 +295,14 @@ def cmd_execute_list(app_path):
     default=False,
     help="Enable the commissioner generated passcode test flow.",
 )
+@click.option(
+    "--log-directory",
+    type=str,
+    default=None,
+    help="Where to place output logs",
+)
 def test_casting_fn(
-    tv_app_rel_path, tv_casting_app_rel_path, commissioner_generated_passcode
+    tv_app_rel_path, tv_casting_app_rel_path, commissioner_generated_passcode, log_directory
 ):
     """Test if the casting experience between the Linux tv-casting-app and the Linux tv-app continues to work.
 
@@ -320,10 +326,16 @@ def test_casting_fn(
 
     # Store the log files to a temporary directory.
     with tempfile.TemporaryDirectory() as temp_dir:
-        linux_tv_app_log_path = os.path.join(temp_dir, LINUX_TV_APP_LOGS)
-        linux_tv_casting_app_log_path = os.path.join(
-            temp_dir, LINUX_TV_CASTING_APP_LOGS
-        )
+        if log_directory:
+            linux_tv_app_log_path = os.path.join(log_directory, LINUX_TV_APP_LOGS)
+            linux_tv_casting_app_log_path = os.path.join(
+                log_directory, LINUX_TV_CASTING_APP_LOGS
+            )
+        else:
+            linux_tv_app_log_path = os.path.join(temp_dir, LINUX_TV_APP_LOGS)
+            linux_tv_casting_app_log_path = os.path.join(
+                temp_dir, LINUX_TV_CASTING_APP_LOGS
+            )
 
         # Get all the test sequences.
         test_sequences = Sequence.get_test_sequences()

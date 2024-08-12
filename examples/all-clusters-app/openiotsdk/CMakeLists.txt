@@ -48,7 +48,7 @@ target_include_directories(${APP_TARGET}
     PRIVATE
         main/include
         ${ALL_CLUSTERS_COMMON}/include
-        ${ENERGY_MANAGEMENT_COMMON}/include         
+        ${ENERGY_MANAGEMENT_COMMON}/include
 )
 
 target_sources(${APP_TARGET}
@@ -60,16 +60,20 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
-        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp        
+        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/ChargingTargetsMemMgr.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp        
+        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseTargetsStore.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyTimeUtils.cpp
 )
 
 target_link_libraries(${APP_TARGET}

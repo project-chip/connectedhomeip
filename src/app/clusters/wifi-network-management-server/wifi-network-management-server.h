@@ -57,6 +57,7 @@ private:
     static_assert(std::numeric_limits<decltype(mSsidLen)>::max() >= sizeof(mSsid));
     ByteSpan SsidSpan() const { return ByteSpan(mSsid, mSsidLen); }
 
+    uint64_t mPassphraseSurrogate = 0;
     Crypto::SensitiveDataBuffer<64> mPassphrase;
     ByteSpan PassphraseSpan() const { return mPassphrase.Span(); }
 

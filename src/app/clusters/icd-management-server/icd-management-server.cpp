@@ -69,6 +69,7 @@ private:
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder);
 
     PersistentStorageDelegate * mStorage           = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
@@ -102,6 +103,9 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
         return ReadClientsSupportedPerFabric(aPath.mEndpointId, aEncoder);
+
+    case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
+        return ReadMaximumCheckInBackOff(aPath.mEndpointId, aEncoder);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
@@ -221,6 +225,11 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointI
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
 }
 
+CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
+}
+
 /**
  * @brief Function checks if the client has admin permissions to the cluster in the commandPath
  *
@@ -231,7 +240,10 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointI
  */
 CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
 {
-    RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
+    RequestPath requestPath{ .cluster     = commandPath.mClusterId,
+                             .endpoint    = commandPath.mEndpointId,
+                             .requestType = RequestType::kCommandInvokeRequest,
+                             .entityId    = commandPath.mCommandId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
     if (CHIP_NO_ERROR == err)
     {
@@ -458,7 +470,7 @@ void MatterIcdManagementPluginServerInitCallback()
 
     // Configure and register Attribute Access Override
     gAttribute.Init(storage, symmetricKeystore, fabricTable, icdConfigurationData);
-    registerAttributeAccessOverride(&gAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 
     // Configure ICD Management
     ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);

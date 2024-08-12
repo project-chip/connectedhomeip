@@ -57,15 +57,18 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Added Managed feature"/>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Managed Device feature, Extension feature, fixed conformance"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x001F" name="AccessControl"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
   <features>
-    <feature bit="0" code="MNGD" name="Managed" summary="Device is managed">
+    <feature bit="0" code="EXTS" name="Extension" summary="Device provides ACL Extension attribute">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="MNGD" name="Managed" summary="Device is managed">
       <optionalConform/>
     </feature>
   </features>
@@ -79,11 +82,6 @@ Davis, CA 95616, USA
       </item>
       <item value="3" name="Group" summary="Group authenticated session">
         <mandatoryConform/>
-      </item>
-      <item value="4" name="ALL" summary="All modes">
-        <mandatoryConform>
-          <feature name="MNGD"/>
-        </mandatoryConform>
       </item>
     </enum>
     <enum name="AccessControlEntryPrivilegeEnum">
@@ -103,6 +101,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="5" name="Administer" summary="Manage privileges, and can observe and modify the Access Control Cluster">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="AccessRestrictionTypeEnum">
+      <item value="0" name="AttributeAccessForbidden" summary="Clients on this fabric are currently forbidden from reading and writing an attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AttributeWriteForbidden" summary="Clients on this fabric are currently forbidden from writing an attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="CommandForbidden" summary="Clients on this fabric are currently forbidden from invoking a command">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="EventForbidden" summary="Clients on this fabric are currently forbidden from reading an event">
         <mandatoryConform/>
       </item>
     </enum>
@@ -164,6 +176,45 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
+    <struct name="AccessRestrictionEntryStruct">
+      <field id="0" name="Endpoint" type="endpoint-no">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Cluster" type="cluster-id">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Restrictions" type="list" default="desc">
+        <entry type="AccessRestrictionStruct"/>
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+        <constraint type="minCount" value="1"/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="AccessRestrictionStruct">
+      <field id="0" name="Type" type="AccessRestrictionTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ID" type="uint32">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="CommissioningAccessRestrictionEntryStruct">
+      <field id="0" name="Endpoint" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Cluster" type="cluster-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Restrictions" type="list" default="desc">
+        <entry type="AccessRestrictionStruct"/>
+        <mandatoryConform/>
+        <constraint type="minCount" value="1"/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="ACL" type="list" default="desc">
@@ -175,7 +226,9 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="Extension" type="list" default="desc">
       <entry type="AccessControlExtensionStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
-      <optionalConform/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16" default="4">
@@ -196,8 +249,17 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="min" value="4"/>
     </attribute>
-    <attribute id="0x0005" name="ManagedACL" type="list" default="desc">
-      <entry type="AccessControlEntryStruct"/>
+    <attribute id="0x0005" name="CommissioningARL" type="list" default="[]">
+      <entry type="CommissioningAccessRestrictionEntryStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0006" name="ARL" type="list" default="[]">
+      <entry type="AccessRestrictionEntryStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform>
         <feature name="MNGD"/>
@@ -205,6 +267,27 @@ Davis, CA 95616, USA
       <constraint type="desc"/>
     </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="ReviewFabricRestrictions" direction="commandToServer" response="ReviewFabricRestrictionsResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="ARL" type="list" default="desc">
+        <entry type="AccessRestrictionStruct"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </command>
+    <command id="0x01" name="ReviewFabricRestrictionsResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="Token" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
   <events>
     <event id="0x00" name="AccessControlEntryChanged" priority="info">
       <access readPrivilege="admin" fabricSensitive="true"/>
@@ -229,7 +312,9 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="AccessControlExtensionChanged" priority="info">
       <access readPrivilege="admin" fabricSensitive="true"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
       <field id="1" name="AdminNodeID" type="node-id">
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -246,6 +331,31 @@ Davis, CA 95616, USA
       <field id="4" name="LatestValue" type="AccessControlExtensionStruct">
         <quality nullable="true"/>
         <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="AccessRestrictionEntryChanged" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </event>
+    <event id="0x03" name="FabricRestrictionReviewUpdate" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="Token" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Instruction" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="512"/>
+      </field>
+      <field id="2" name="RedirectURL" type="string">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
       </field>
     </event>
   </events>
