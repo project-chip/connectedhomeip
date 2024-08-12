@@ -19,24 +19,24 @@ RUN set -x \
 
 RUN set -x \
     && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "MCUX_2.6.14_K32W0" \
-    && west update \
+    && west update -o=--depth=1 -n -f smart \
     && chmod +x core/tools/imagetool/sign_images.sh \
     && ln -sf ../rtos core \
     && ln -sf ../middleware core \
     && cp -R examples/* core/boards && rm -rf examples \
     && : # last line
 
+WORKDIR /opt/k32w1_sdk
+
 RUN set -x \
-    && mkdir -p k32w1/repo \
-    && cd k32w1/repo \
     && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "MCUX_2.16.000" \
     && west update -o=--depth=1 -n -f smart \
-    && cd - \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 COPY --from=build /opt/sdk/ /opt/sdk/
+COPY --from=build /opt/k32w1_sdk/ /opt/k32w1_sdk/
 
 ENV NXP_K32W0_SDK_ROOT=/opt/sdk/core
-ENV NXP_SDK_ROOT=/opt/sdk/k32w1/repo
+ENV NXP_SDK_ROOT=/opt/k32w1_sdk
