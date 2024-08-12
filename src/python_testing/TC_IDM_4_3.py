@@ -68,10 +68,10 @@ class TC_IDM_4_3(MatterBaseTest):
                          "Verify on the TH, a report data message is received. Verify on the TH the Subscribe Response has the following fields: SubscriptionId and MaxInterval In the following Steps 2, 3, 5-10, 13, and 15, the MaxInterval time reference in each step is the MaxInterval presented in the Subscribe Response of the subscription."),
                 TestStep("1b", "Change the value of the attribute which has been subscribed on the DUT by manually changing some settings on the device. Example: Temperature sensor may update the value of the room temperature. Turning on/off on a light bulb.",
                          "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent when the minimum interval time is reached and before the MaxInterval time."),
-                # TestStep(2, "DUT and TH activate the subscription. Change the value of the attribute which has been subscribed on the DUT by sending an IMWrite or Invoke message to the DUT from the TH.",
-                #          "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent when the minimum interval time is reached and before the MaxInterval time."),
-                # TestStep(3, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
-                #          "Verify that there is an empty report data message sent from the DUT to the TH after MaxInterval time."),
+                TestStep(2, "DUT and TH activate the subscription. Change the value of the attribute which has been subscribed on the DUT by sending an IMWrite or Invoke message to the DUT from the TH.",
+                         "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent when the minimum interval time is reached and before the MaxInterval time."),
+                TestStep(3, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
+                         "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
                 # TestStep(4, "DUT and TH activate the subscription. Change the value of the attribute which has been subscribed on the DUT. TH force sends a status response with an \"invalid subscription\". Change the value of the attribute which has been subscribed on the DUT.",
                 #          "Verify that DUT does not send report data for the second time after the subscription has been terminated."),
                 # TestStep(5, "Activate the subscription between the DUT and the TH for an attribute of data type bool. Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
@@ -152,7 +152,13 @@ class TC_IDM_4_3(MatterBaseTest):
     async def test_TC_IDM_4_3(self):
 
         # Test setup
+        # Mandatory writable attributes
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
+        # bc = Clusters.GeneralCommissioning.Attributes.Breadcrumb
+        
+        # Event
+        # acl = Clusters.AccessControl.Events.
+        
         node_label_attr_path = [(0, node_label_attr)]
         TH: ChipDeviceController = self.default_controller
 
@@ -228,6 +234,34 @@ class TC_IDM_4_3(MatterBaseTest):
                         f"Attribute update report data must be sent before the MaxInterval")
 
         sub_th_step1ab.Shutdown()
+        
+        # DUT and TH activate the subscription. Change the value of the attribute which has been
+        # subscribed on the DUT by sending an IMWrite or Invoke message to the DUT from the TH.
+        # Verify that there is a report data message sent from the DUT for the changed value of
+        # the attribute. Verify that the Report Data is sent when the minimum interval time is
+        # reached and before the MaxInterval time.
+        self.step(2)
+        
+        # DUT and TH activate the subscription for an attribute. Do not change the value of the
+        # attribute which has been subscribed. Verify that there is an empty report data message
+        # sent from the DUT to the TH after the MinInterval time and no later than the
+        # MaxInterval time plus an additional duration equal to the total retransmission time
+        # according to negotiated MRP parameters.
+        self.step(3)
+        
+        # Subscribe to attribute
+        sub_th_step3 = await TH.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=node_label_attr_path,
+            reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+            keepSubscriptions=False
+        )
+        
+        
+        sub_th_step3.Shutdown()
+        
+        
+        
 
 
 if __name__ == "__main__":
