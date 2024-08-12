@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import os
-import sys
 from enum import Enum
 
 # Define a branch enum for different versions or branches
