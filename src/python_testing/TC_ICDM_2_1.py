@@ -131,7 +131,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         attributes = cluster.Attributes
 
         attribute_list = await self._read_icdm_attribute_expect_success(attribute=attributes.AttributeList)
-        
+
         # Commissioning
         self.step(1)
         # Read feature map
