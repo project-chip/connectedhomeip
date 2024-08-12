@@ -30,7 +30,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #if defined(USE_SMU2_DYNAMIC)
-#include <src/platform/nxp/mcxw71_k32w1/SMU2Manager.h>
+#include <src/platform/nxp/k32w1/SMU2Manager.h>
 #endif
 
 // #include <openthread/platform/misc.h>

@@ -25,7 +25,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/nxp/mcxw71_k32w1/K32W1Config.h>
+#include <platform/nxp/k32w1/K32W1Config.h>
 #include <set>
 #include <string>
 
