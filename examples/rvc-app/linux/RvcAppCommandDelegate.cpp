@@ -146,6 +146,16 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnAddServiceAreaArea(area);
     }
+    else if (name == "RemoveMap")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("MapId"), ChipLogError(NotSpecified, "RVC App: MapId key is missing"));
+        self->OnRemoveServiceAreaMap(self->mJsonValue["MapId"].asInt());
+    }
+    else if (name == "RemoveArea")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
+        self->OnRemoveServiceAreaMap(self->mJsonValue["AreaId"].asInt());
+    }
     else if (name == "ErrorEvent")
     {
         std::string error = self->mJsonValue["Error"].asString();
@@ -216,6 +226,16 @@ void RvcAppCommandHandler::OnAddServiceAreaMap(uint32_t mapId, std::string & map
 void RvcAppCommandHandler::OnAddServiceAreaArea(chip::app::Clusters::ServiceArea::AreaStructureWrapper & area)
 {
     mRvcDevice->HandleAddServiceAreaArea(area);
+}
+
+void RvcAppCommandHandler::OnRemoveServiceAreaMap(uint32_t mapId)
+{
+    mRvcDevice->HandleRemoveServiceAreaMap(mapId);
+}
+
+void RvcAppCommandHandler::OnRemoveServiceAreaArea(uint32_t areaId)
+{
+    mRvcDevice->HandleRemoveServiceAreaArea(areaId);
 }
 
 void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)

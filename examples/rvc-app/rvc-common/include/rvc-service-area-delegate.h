@@ -101,6 +101,18 @@ public:
 
     bool ClearSupportedAreas() override;
 
+    /**
+     * This is a more sophisticated way of ensuring that we all attributes are still valid when a supported area is removed.
+     * Rather than clearing all the attributes that depend on the supported aeras, we only remove the elements that point to
+     * the removed supported areas.
+     */
+    void HandleSupportedAreasUpdated() override;
+
+    /**
+     * Note: Call the HandleSupportedAreasUpdated() method when finished removing supported areas.
+     */
+    bool RemoveSupportedArea(uint32_t areaId);
+
     //*************************************************************************
     // Supported Maps accessors
 
@@ -117,6 +129,8 @@ public:
     bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
 
     bool ClearSupportedMaps() override;
+
+    bool RemoveSupportedMap(uint32_t mapId);
 
     //*************************************************************************
     // Selected Areas accessors

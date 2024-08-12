@@ -42,6 +42,14 @@ Consult the `SupportedAreas` attribute spec for more information on what are val
 - `LandmarkTag` This is an `int` setting the landmark tag.
 - `PositianTag` This is an `int` setting the position tag.
 
+#### `RemoveMap` message
+
+This message removes a map with the given map ID. This message requires the `int` key `MapId`.
+
+#### `RemoveArea` message
+
+This message removes an area with the given area ID. This message requires the `int` key `AreaId`.
+
 #### `AreaComplete` message
 
 This indicates that the area currently being serviced as indicated by the

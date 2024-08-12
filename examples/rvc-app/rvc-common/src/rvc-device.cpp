@@ -337,6 +337,16 @@ void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & are
     mServiceAreaInstance.AddSupportedArea(area);
 }
 
+void RvcDevice::HandleRemoveServiceAreaMap(uint32_t mapId)
+{
+    mServiceAreaDelegate.RemoveSupportedMap(mapId);
+}
+
+void RvcDevice::HandleRemoveServiceAreaArea(uint32_t areaId)
+{
+    mServiceAreaDelegate.RemoveSupportedArea(areaId);
+}
+
 void RvcDevice::HandleErrorEvent(const std::string & error)
 {
     detail::Structs::ErrorStateStruct::Type err;
