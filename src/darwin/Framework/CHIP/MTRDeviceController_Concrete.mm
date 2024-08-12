@@ -133,8 +133,6 @@ using namespace chip::Tracing::DarwinFramework;
 - (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                                error:(NSError * __autoreleasing *)error
 {
-    // parameters here are a bit late, tbh, but maybe we're gonna have to
-    // create an XPC obj...?
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
@@ -142,17 +140,13 @@ using namespace chip::Tracing::DarwinFramework;
         }
         return nil;
     }
-//    else if ([is XPC Thing]) {
-//        // create XPC MatterDeviceController when it exists
-//        // return XPC MatterDeviceController? O_O
-//    }
     auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
     // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
     MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    id controller = [factory initializeController:self // either self or XPC
-                                                      withParameters:controllerParameters
-                                                               error:error];
+    id controller = [factory initializeController:self
+                                   withParameters:controllerParameters
+                                            error:error];
     return controller;
 }
 

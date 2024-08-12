@@ -732,7 +732,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc] // wat
+    return [self _startDeviceController:[MTRDeviceController alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
