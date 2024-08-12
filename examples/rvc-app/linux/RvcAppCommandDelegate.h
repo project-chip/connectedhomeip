@@ -59,6 +59,8 @@ private:
 
     void OnAddServiceAreaMap(uint32_t mapId, std::string & mapName);
 
+    void OnAddServiceAreaArea(chip::app::Clusters::ServiceArea::AreaStructureWrapper & area);
+
     void OnErrorEventHandler(const std::string & error);
 
     void OnClearErrorHandler();

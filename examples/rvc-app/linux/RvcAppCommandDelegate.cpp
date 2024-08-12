@@ -18,12 +18,14 @@
 
 #include "RvcAppCommandDelegate.h"
 #include <platform/PlatformManager.h>
+#include <app/data-model/Nullable.h>
 
 #include "rvc-device.h"
 #include <string>
 #include <utility>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 RvcAppCommandHandler * RvcAppCommandHandler::FromJSON(const char * json)
@@ -89,9 +91,60 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "AddMap")
     {
-        uint32_t  mapId = self->mJsonValue["mapId"].asInt();
-        std::string mapName = self->mJsonValue["mapName"].asString();
-        self->OnAddServiceAreaMap(mapId, mapName);
+        // Find if self->mJsonValue has the MapId and MapName Keys
+        if (self->mJsonValue.isMember("MapId") && self->mJsonValue.isMember("MapName"))
+        {
+            uint32_t mapId = self->mJsonValue["MapId"].asInt();
+            std::string mapName = self->mJsonValue["MapName"].asString();
+            self->OnAddServiceAreaMap(mapId, mapName);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "RVC App: MapId and MapName keys are missing");
+        }
+    }
+    else if (name == "AddArea")
+    {
+        VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
+        ServiceArea::AreaStructureWrapper area;
+        area.SetAreaId(self->mJsonValue["AreaId"].asInt());
+        if (self->mJsonValue.isMember("MapId"))
+        {
+            area.SetMapId(self->mJsonValue["MapId"].asInt());
+        }
+
+        // Set the location info
+        if (self->mJsonValue.isMember("LocationName") || self->mJsonValue.isMember("FloorNumber") || self->mJsonValue.isMember("AreaType"))
+        {
+            DataModel::Nullable<int16_t> floorNumber = DataModel::NullNullable;
+            if (self->mJsonValue.isMember("FloorNumber"))
+            {
+                floorNumber = self->mJsonValue["FloorNumber"].asInt();
+            }
+            DataModel::Nullable<Globals::AreaTypeTag> areaType = DataModel::NullNullable;
+            if (self->mJsonValue.isMember("AreaType"))
+            {
+                areaType = Globals::AreaTypeTag(self->mJsonValue["AreaType"].asInt());
+            }
+            auto locationName = self->mJsonValue["LocationName"].asString();
+
+            area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), floorNumber, areaType);
+        }
+
+        // Set landmark info
+        if (self->mJsonValue.isMember("LandmarkTag"))
+        {
+            DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag = DataModel::NullNullable;
+            if (self->mJsonValue.isMember("PositionTag"))
+            {
+                relativePositionTag = Globals::RelativePositionTag(self->mJsonValue["PositionTag"].asInt());
+            }
+
+            area.SetLandmarkInfo(
+                Globals::LandmarkTag(self->mJsonValue["LandmarkTag"].asInt()), relativePositionTag);
+        }
+
+        self->OnAddServiceAreaArea(area);
     }
     else if (name == "ErrorEvent")
     {
@@ -157,8 +210,12 @@ void RvcAppCommandHandler::OnAreaCompleteHandler()
 
 void RvcAppCommandHandler::OnAddServiceAreaMap(uint32_t mapId, std::string & mapName)
 {
-    // todo fix name type
-    mRvcDevice->HandleAddServiceAreaMap(mapId, mapName);
+    mRvcDevice->HandleAddServiceAreaMap(mapId, CharSpan(mapName.data(), mapName.size()));
+}
+
+void RvcAppCommandHandler::OnAddServiceAreaArea(chip::app::Clusters::ServiceArea::AreaStructureWrapper & area)
+{
+    mRvcDevice->HandleAddServiceAreaArea(area);
 }
 
 void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)

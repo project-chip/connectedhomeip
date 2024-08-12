@@ -332,6 +332,11 @@ void RvcDevice::HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName
     mServiceAreaInstance.AddSupportedMap(mapId, mapName);
 }
 
+void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area)
+{
+    mServiceAreaInstance.AddSupportedArea(area);
+}
+
 void RvcDevice::HandleErrorEvent(const std::string & error)
 {
     detail::Structs::ErrorStateStruct::Type err;

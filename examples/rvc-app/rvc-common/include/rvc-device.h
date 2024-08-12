@@ -129,6 +129,8 @@ public:
 
     void HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName);
 
+    void HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area);
+
     /**
      * Sets the device to an error state with the error state ID matching the error name given.
      * @param error The error name. Could be one of UnableToStartOrResume, UnableToCompleteOperation, CommandInvalidInState,
