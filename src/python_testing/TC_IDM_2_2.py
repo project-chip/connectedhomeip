@@ -80,7 +80,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def get_cluster_from_type(self, desired_attribute_type: type) -> None:
         # Get all clusters from device
-        
+
         for cluster in self.device_clusters:
             all_types = self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
             if all_types:
@@ -109,7 +109,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def test_TC_IDM_2_2(self):
         # Test Setup
         await self.setup_class_helper(default_to_pase=False)
-        
+
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
 
         server_list_attr = Clusters.Objects.Descriptor.Attributes.ServerList
@@ -137,7 +137,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
 
-
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, server_list_attr_path)
         returned_endpoints = read_request[0].keys()
 
@@ -152,10 +151,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT.
 
         self.print_step(2, "Send Request Message to read all attributes on a given cluster and endpoint")
-        
+
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, descriptor_obj_path)
         returned_endpoints = read_request[0].keys()
-        
+
         # Check if chip.clusters.Objects.Descriptor is in output
         asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
 
@@ -168,7 +167,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # The number of endpoints needs to be read from the device. They're also not always sequential. This should come from the descriptor cluster parts list on EP0
         self.print_step(3, "Send Request Message to read one attribute on a given cluster at all endpoints")
         all_attributes = await self.default_controller.ReadAttribute(self.dut_node_id, [0, Clusters.Objects.Descriptor])
-        
+
         endpoint_list = list(all_attributes)
         for endpoint in endpoint_list:
 
@@ -382,7 +381,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
 
                 unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
-                            == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
 
                 if unsupported:
                     result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=cluster_type, attribute=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]], error=Status.UnsupportedAttribute)
