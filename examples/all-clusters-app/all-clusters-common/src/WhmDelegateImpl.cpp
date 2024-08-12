@@ -50,12 +50,12 @@ void WaterHeaterManagementDelegate::SetWhmManufacturer(WhmManufacturer & whmManu
  *
  *********************************************************************************/
 
-BitMask<WaterHeaterTypeBitmap> WaterHeaterManagementDelegate::GetHeaterTypes()
+BitMask<WaterHeaterHeatSourceBitmap> WaterHeaterManagementDelegate::GetHeaterTypes()
 {
     return mHeaterTypes;
 }
 
-BitMask<WaterHeaterDemandBitmap> WaterHeaterManagementDelegate::GetHeatDemand()
+BitMask<WaterHeaterHeatSourceBitmap> WaterHeaterManagementDelegate::GetHeatDemand()
 {
     return mHeatDemand;
 }
@@ -80,7 +80,7 @@ BoostStateEnum WaterHeaterManagementDelegate::GetBoostState()
     return mBoostState;
 }
 
-void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterTypeBitmap> heaterTypes)
+void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap> heaterTypes)
 {
     if (mHeaterTypes != heaterTypes)
     {
@@ -90,7 +90,7 @@ void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterTypeBitmap
     }
 }
 
-void WaterHeaterManagementDelegate::SetHeatDemand(BitMask<WaterHeaterDemandBitmap> heatDemand)
+void WaterHeaterManagementDelegate::SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap> heatDemand)
 {
     if (mHeatDemand != heatDemand)
     {

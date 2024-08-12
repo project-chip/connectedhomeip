@@ -42,13 +42,6 @@ using namespace chip::app::Clusters::Thermostat::Attributes;
 
 using imcode = Protocols::InteractionModel::Status;
 
-// IMPORTANT NOTE:
-// No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
-// If a setpoint changes is required as a result of setpoint limit change
-// it does not happen here.  It is the responsibility of the device to adjust the setpoint(s)
-// as required in emberAfThermostatClusterServerPostAttributeChangedCallback
-// limit change validation assures that there is at least 1 setpoint that will be valid
-
 #define FEATURE_MAP_HEAT 0x01
 #define FEATURE_MAP_COOL 0x02
 #define FEATURE_MAP_OCC 0x04
@@ -380,6 +373,12 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
+// IMPORTANT NOTE:
+// No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
+// If a setpoint changes is required as a result of setpoint limit change
+// it does not happen here.  It is the responsibility of the device to adjust the setpoint(s)
+// as required in emberAfThermostatClusterServerPostAttributeChangedCallback
+// limit change validation assures that there is at least 1 setpoint that will be valid
 Protocols::InteractionModel::Status
 MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
@@ -1003,7 +1002,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 void MatterThermostatPluginServerInitCallback()
 {
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
-    registerAttributeAccessOverride(&gThermostatAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
 }
 
 void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)

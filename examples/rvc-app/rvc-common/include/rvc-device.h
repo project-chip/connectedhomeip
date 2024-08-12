@@ -44,7 +44,8 @@ public:
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
-        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
+        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint,
+                             BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -58,6 +59,11 @@ public:
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
+
+        mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
+        mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
+        mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
+        mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
     }
 
     /**
@@ -96,6 +102,14 @@ public:
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
+    bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
+
+    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+
+    bool SaIsSupportedAreasChangeAllowed();
+
+    bool SaIsSupportedMapChangeAllowed();
+
     /**
      * Updates the state machine when the device becomes fully-charged.
      */
@@ -111,6 +125,8 @@ public:
 
     void HandleActivityCompleteEvent();
 
+    void HandleAreaCompletedEvent();
+
     /**
      * Sets the device to an error state with the error state ID matching the error name given.
      * @param error The error name. Could be one of UnableToStartOrResume, UnableToCompleteOperation, CommandInvalidInState,
@@ -122,6 +138,12 @@ public:
     void HandleClearErrorMessage();
 
     void HandleResetMessage();
+
+    /**
+     * Updates the Service area progress elements when an activity has ended.
+     * Sets any remaining Operating or Pending states to Skipped.
+     */
+    void UpdateServiceAreaProgressOnExit();
 };
 
 } // namespace Clusters

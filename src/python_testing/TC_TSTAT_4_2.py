@@ -31,6 +31,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip.clusters import Globals
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -81,6 +82,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                  "Timeout should have the right value")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
         asserts.assert_true(found_schedules_status, "Schedules attribute should have a status")
+        asserts.assert_true(found_preset_status, "Preset attribute should have a status")
 
     async def write_presets(self,
                             endpoint,
@@ -104,7 +106,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                 expected_schedules_status: Status = Status.Success,
                                                 expected_timeout: int = None):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=0,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
                                                                                      attributeRequests=[
                                                                                          cluster.Attributes.Presets.attribute_id],
                                                                                      timeout=timeout),
@@ -124,7 +126,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                  expected_preset_status: Status = Status.Success,
                                                  expected_schedules_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=1,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
@@ -141,12 +143,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                    expected_preset_status: Status = Status.Success,
                                                    expected_schedules_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=2,
+            response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
                                                                                      attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
             self.check_atomic_response(response, expected_status, expected_overall_status,
                                        expected_preset_status, expected_schedules_status)
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
@@ -237,7 +240,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.write_presets(endpoint=endpoint, presets=new_presets, expected_status=Status.InvalidInState)
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             await self.send_atomic_request_begin_command()
 
             # Write to the presets attribute after calling AtomicRequest command
@@ -257,7 +260,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
 
         self.step("4")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -274,7 +277,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
@@ -288,7 +291,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
 
         self.step("6")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the SetActivePresetRequest command
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
@@ -310,7 +313,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
 
         self.step("7")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -325,7 +328,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("8")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -341,7 +344,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("9")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -357,7 +360,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -373,7 +376,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -388,7 +391,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("12")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -403,7 +406,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("13")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -422,11 +425,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_status=Status.InvalidInState)
 
         self.step("14")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
-
-            # Send the AtomicRequest begin command
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             await self.send_atomic_request_begin_command()
-
             # Send the AtomicRequest begin command from separate controller, which should receive busy
             status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy, expected_schedules_status=Status.Busy)
 
@@ -434,7 +434,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("15")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command()
 
@@ -444,7 +444,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("16")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.CFE.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)

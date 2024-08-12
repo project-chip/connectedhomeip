@@ -101,7 +101,8 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    auto * commandHandler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    auto * commandHandler =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
     if (commandHandler)
     {
         struct Context
@@ -293,7 +294,10 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     // depending on whether the path was expanded.
 
     {
-        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                         .endpoint    = aPath.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeReadRequest,
+                                         .entityId    = aPath.mAttributeId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
@@ -311,8 +315,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
         GlobalAttributeReader reader(attributeCluster);
-        AttributeAccessInterface * attributeOverride =
-            (attributeCluster != nullptr) ? &reader : GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+        AttributeAccessInterface * attributeOverride = (attributeCluster != nullptr)
+            ? &reader
+            : AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
         {
             bool triedEncode = false;
@@ -684,7 +689,10 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     }
 
     {
-        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                         .endpoint    = aPath.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = aPath.mAttributeId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
         CHIP_ERROR err                     = CHIP_NO_ERROR;
         if (!apWriteHandler->ACLCheckCacheHit({ aPath, requestPrivilege }))
@@ -712,7 +720,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));

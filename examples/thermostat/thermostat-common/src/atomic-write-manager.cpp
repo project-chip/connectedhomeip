@@ -37,7 +37,7 @@ ThermostatAtomicWriteManager ThermostatAtomicWriteManager::sInstance;
 
 ThermostatAtomicWriteManager::ThermostatAtomicWriteManager()
 {
-    memset(mAtomicWriteStates, 0, sizeof(mAtomicWriteStates));
+    memset(mAtomicWriteSessions, 0, sizeof(mAtomicWriteSessions));
 }
 
 /**
@@ -159,16 +159,16 @@ void ThermostatAtomicWriteManager::ClearTimer(EndpointId endpoint)
     DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
-void ThermostatAtomicWriteManager::SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress)
+void ThermostatAtomicWriteManager::SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        mAtomicWriteStates[ep].inProgress = inProgress;
-        mAtomicWriteStates[ep].endpointId = endpoint;
-        mAtomicWriteStates[ep].nodeId     = originatorNodeId;
+        mAtomicWriteSessions[ep].state      = state;
+        mAtomicWriteSessions[ep].endpointId = endpoint;
+        mAtomicWriteSessions[ep].nodeId     = originatorNodeId;
     }
 }
 
@@ -184,9 +184,9 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteStates[ep].inProgress;
+        inAtomicWrite = mAtomicWriteSessions[ep].state == kAtomicWriteState_Open;
     }
     return inAtomicWrite;
 }
@@ -371,7 +371,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
     if (status == imcode::Success)
     {
-        SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), true);
+        SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
         timeout          = std::min(timeoutRequest, timeout);
         response.timeout = MakeOptional(timeout.count());
         ScheduleTimer(endpoint, timeout);
@@ -438,15 +438,15 @@ bool ThermostatAtomicWriteManager::RollbackWrite(chip::app::CommandHandler * com
 void ThermostatAtomicWriteManager::ResetWrite(EndpointId endpoint)
 {
     ClearTimer(endpoint);
-    SetWriteState(endpoint, ScopedNodeId(), false);
+    SetWriteState(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 void ThermostatAtomicWriteManager::ResetWrite(FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(mAtomicWriteStates); ++i)
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
-        auto atomicWriteState = mAtomicWriteStates[i];
-        if (atomicWriteState.inProgress && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             ResetWrite(atomicWriteState.endpointId);
         }
@@ -460,9 +460,9 @@ ScopedNodeId ThermostatAtomicWriteManager::GetAtomicWriteScopedNodeId(const std:
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteStates))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        originatorNodeId = mAtomicWriteStates[ep].nodeId;
+        originatorNodeId = mAtomicWriteSessions[ep].nodeId;
     }
     return originatorNodeId;
 }

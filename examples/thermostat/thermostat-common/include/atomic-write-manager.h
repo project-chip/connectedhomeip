@@ -21,12 +21,18 @@
 #include <app/clusters/thermostat-server/atomic-write.h>
 #include <app/clusters/thermostat-server/thermostat-delegate.h>
 
-#include "thermostat-manager.h"
+#include "thermostat-delegate-impl.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+enum AtomicWriteState
+{
+    kAtomicWriteState_Closed = 0,
+    kAtomicWriteState_Open,
+};
 
 class ThermostatAtomicWriteManager : public AtomicWriteManager
 {
@@ -69,7 +75,7 @@ private:
     void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout);
     void ClearTimer(EndpointId endpoint);
 
-    void SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress);
+    void SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
 
     Protocols::InteractionModel::Status CheckAttributeRequests(const EndpointId endpoint, chip::app::CommandHandler * commandObj,
                                                                const Commands::AtomicRequest::DecodableType & commandData,
@@ -77,15 +83,15 @@ private:
 
     ScopedNodeId GetAtomicWriteScopedNodeId(const std::optional<AttributeId> attributeId, const EndpointId endpoint);
 
-    struct AtomicWriteState
+    struct AtomicWriteSession
     {
-        bool inProgress;
+        AtomicWriteState state = kAtomicWriteState_Closed;
         ScopedNodeId nodeId;
-        EndpointId endpointId;
+        EndpointId endpointId = kInvalidEndpointId;
     };
 
     AtomicWriteDelegate * mDelegate;
-    AtomicWriteState mAtomicWriteStates[kThermostatEndpointCount];
+    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 };
 
 } // namespace Thermostat
