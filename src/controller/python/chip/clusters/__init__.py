@@ -15,59 +15,19 @@
 #    limitations under the License.
 #
 
-#
-#    @file
-#      Provides Python APIs for CHIP.
-#
+import contextlib
 
-"""Provides Python APIs for CHIP."""
+from . import Attribute, CHIPClusters, Command, Objects
+from .ClusterObjects import Cluster
+from .Objects import Globals
 
-from . import Attribute, CHIPClusters, Command
-from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
-                      ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
-                      BinaryInputBasic, Binding, BooleanState, BooleanStateConfiguration, BridgedDeviceBasicInformation,
-                      CarbonDioxideConcentrationMeasurement, CarbonMonoxideConcentrationMeasurement, Channel, ColorControl,
-                      CommissionerControl, ContentControl, ContentLauncher, DemandResponseLoadControl, Descriptor,
-                      DeviceEnergyManagement, DeviceEnergyManagementMode, DiagnosticLogs, DishwasherAlarm, DishwasherMode, DoorLock,
-                      EcosystemInformation, ElectricalEnergyMeasurement, ElectricalMeasurement, ElectricalPowerMeasurement,
-                      EnergyEvse, EnergyEvseMode, EnergyPreference, EthernetNetworkDiagnostics, FanControl, FaultInjection,
-                      FixedLabel, FlowMeasurement, FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics,
-                      Globals, GroupKeyManagement, Groups, HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement,
-                      KeypadInput, LaundryDryerControls, LaundryWasherControls, LaundryWasherMode, LevelControl,
-                      LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl, MicrowaveOvenMode,
-                      ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement, OccupancySensing, OnOff,
-                      OnOffSwitchConfiguration, OperationalCredentials, OperationalState, OtaSoftwareUpdateProvider,
-                      OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode, OzoneConcentrationMeasurement,
-                      Pm1ConcentrationMeasurement, Pm10ConcentrationMeasurement, Pm25ConcentrationMeasurement, PowerSource,
-                      PowerSourceConfiguration, PowerTopology, PressureMeasurement, ProxyConfiguration, ProxyDiscovery, ProxyValid,
-                      PulseWidthModulation, PumpConfigurationAndControl, RadonConcentrationMeasurement, RefrigeratorAlarm,
-                      RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
-                      RvcOperationalState, RvcRunMode, ScenesManagement, ServiceArea, SmokeCoAlarm, SoftwareDiagnostics, Switch,
-                      TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-                      ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization,
-                      TimeSynchronization, TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting,
-                      UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode,
-                      WiFiNetworkDiagnostics, WindowCovering)
+__all__ = ['Attribute', 'CHIPClusters', 'Command', 'Globals']
 
-__all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
-           ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
-           BinaryInputBasic, Binding, BooleanState, BooleanStateConfiguration, BridgedDeviceBasicInformation, CarbonDioxideConcentrationMeasurement,
-           CarbonMonoxideConcentrationMeasurement, Channel, ColorControl, CommissionerControl,
-           ContentControl, ContentLauncher, DemandResponseLoadControl, Descriptor, DeviceEnergyManagementMode, DeviceEnergyManagement, DeviceEnergyManagementMode, DiagnosticLogs, DishwasherAlarm, DishwasherMode,
-           DoorLock, EcosystemInformation, ElectricalEnergyMeasurement, ElectricalMeasurement, ElectricalPowerMeasurement, EnergyEvse, EnergyEvseMode, EnergyPreference,
-           EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
-           FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, Globals, GroupKeyManagement, Groups,
-           HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement, KeypadInput, LaundryDryerControls,
-           LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl,
-           MicrowaveOvenMode, ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement,
-           OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
-           OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode,
-           OzoneConcentrationMeasurement, Pm1ConcentrationMeasurement, Pm10ConcentrationMeasurement,
-           Pm25ConcentrationMeasurement, PowerSource, PowerSourceConfiguration, PowerTopology, PressureMeasurement, ProxyConfiguration,
-           ProxyDiscovery, ProxyValid, PulseWidthModulation, PumpConfigurationAndControl, RadonConcentrationMeasurement,
-           RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
-           RvcOperationalState, RvcRunMode, ScenesManagement, ServiceArea, SmokeCoAlarm, SoftwareDiagnostics,
-           Switch, TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization, TimeSynchronization,
-           TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization,
-           UnitTesting, UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode, WiFiNetworkDiagnostics, WindowCovering]
+# The Objects.py file is auto-generated and contains all the cluster classes.
+# We dynamically add all cluster classes to the module's namespace and the
+# __all__ list for global imports (from chip.clusters import *).
+for obj in Objects.__dict__.values():
+    with contextlib.suppress(AttributeError):
+        if Cluster in obj.mro():
+            globals()[obj.__name__] = obj
+            __all__.append(obj.__name__)
