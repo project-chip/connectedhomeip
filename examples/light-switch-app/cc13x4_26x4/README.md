@@ -106,7 +106,7 @@ Ninja to build the executable.
 
     ```
     gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"] chip_generate_link_map_file=true"
-    
+
     ```
 
 ## Programming
@@ -282,8 +282,8 @@ Now you can press the Right BTN on the light-switch device and it will turn ON
 the RED LED on the lighting device. Press the Left BTN on the light-switch
 device to turn OFF the RED LED on the lighting device. If the devices aren't
 bound properly the light-switch will display on UART that the Switch On/Off
-operation has been completed but the lighting device's LEDs will not turn
-on/off accordingly.
+operation has been completed but the lighting device's LEDs will not turn on/off
+accordingly.
 
 ## TI Support
 

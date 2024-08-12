@@ -70,6 +70,8 @@ jobs:
                       --target ti-cc13x4_26x4-pump-ftd \
                       --target ti-cc13x4_26x4-pump-controller-mtd \
                       --target ti-cc13x4_26x4-pump-controller-ftd \
+                      --target ti-cc13x4_26x4-light-switch-mtd \
+                      --target ti-cc13x4_26x4-light-switch-ftd \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -101,7 +103,19 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
-                    out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    out/artifacts/ti-cc13x4_26x4-lighting-ftd/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Light Switch FTD size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 light-switch-app \
+                    out/artifacts/ti-cc13x4_26x4-light-switch-ftd/chip-LP_EM_CC1354P10_6-light-switch-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Light Switch MTD size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 light-switch-app \
+                    out/artifacts/ti-cc13x4_26x4-light-switch-mtd/chip-LP_EM_CC1354P10_6-light-switch-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

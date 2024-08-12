@@ -188,6 +188,6 @@ void LightSwitchManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 void LightSwitchManager::IdentifyEventHandler()
 {
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Identify;
+    event.Type = AppEvent::kEventType_Identify;
     AppTask::GetAppTask().PostEvent(&event);
 }

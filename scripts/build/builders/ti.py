@@ -28,6 +28,7 @@ class TIApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     LIGHTING = auto()
     SHELL = auto()
+    LIGHT_SWITCH = auto()
 
     def ExampleName(self):
         if self == TIApp.LOCK:
@@ -44,6 +45,8 @@ class TIApp(Enum):
             return 'lighting-app'
         elif self == TIApp.SHELL:
             return 'shell'
+        elif self == TIApp.LIGHT_SWITCH:
+            return 'light-switch-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -62,6 +65,8 @@ class TIApp(Enum):
             return f'chip-{board.BoardName()}-lighting-example'
         elif self == TIApp.SHELL:
             return f'chip-{board.BoardName()}-shell-example'
+        elif self == TIApp.LIGHT_SWITCH:
+            return f'chip-{board.BoardName()}-light-switch-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -123,7 +128,8 @@ class TIBuilder(GnBuilder):
             if self.app in [TIApp.LOCK,
                             TIApp.LIGHTING,
                             TIApp.PUMP,
-                            TIApp.PUMP_CONTROLLER]:
+                            TIApp.PUMP_CONTROLLER,
+                            TIApp.LIGHT_SWITCH]:
                 suffixes = [".out", "-mcuboot.hex"]
             else:
                 suffixes = [".out"]
