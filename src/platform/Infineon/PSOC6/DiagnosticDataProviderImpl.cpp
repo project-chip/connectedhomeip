@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2024 Infineon Technologies, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,18 +19,19 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for P6 platform.
+ *          for PSOC6 platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "cy_network_mw_core.h"
+#include "cy_nw_helper.h"
 #include "cyhal_system.h"
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Infineon/PSOC6/DiagnosticDataProviderImpl.h>
-#include <platform/Infineon/PSOC6/P6Utils.h>
+#include <platform/Infineon/PSOC6/PSOC6Utils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,7 +45,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     heap_info_t heap;
-    Internal::P6Utils::heap_usage(&heap);
+    Internal::PSOC6Utils::heap_usage(&heap);
     currentHeapFree = static_cast<uint64_t>(heap.HeapFree);
     return CHIP_NO_ERROR;
 }
@@ -52,7 +54,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 {
     // Calculate the Heap used based on Total heap - Free heap
     heap_info_t heap;
-    Internal::P6Utils::heap_usage(&heap);
+    Internal::PSOC6Utils::heap_usage(&heap);
     currentHeapUsed = static_cast<uint64_t>(heap.HeapUsed);
     return CHIP_NO_ERROR;
 }
@@ -60,7 +62,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     heap_info_t heap;
-    Internal::P6Utils::heap_usage(&heap);
+    Internal::PSOC6Utils::heap_usage(&heap);
     currentHeapHighWatermark = static_cast<uint64_t>(heap.HeapMax);
     return CHIP_NO_ERROR;
 }
@@ -506,7 +508,7 @@ void DiagnosticDataProviderImpl::xtlv_buffer_parsing(const uint8_t * tlv_buf, ui
     wl_cnt_ge40mcst_v1_t cnt_ge40;
 
     /* parse the tlv buffer and populate the cnt and cnt_ge40 buffer with the counter values */
-    Internal::P6Utils::unpack_xtlv_buf(tlv_buf, buflen, &cnt, &cnt_ge40);
+    Internal::PSOC6Utils::unpack_xtlv_buf(tlv_buf, buflen, &cnt, &cnt_ge40);
 
     /* Read the counter based on the Counttype passed */
     ReadCounters(Counttype, count, &cnt, &cnt_ge40);
@@ -571,17 +573,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
-            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
-            thread->id = taskStatusArray[x].xTaskNumber;
+            if (thread != NULL)
+            {
+                Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+                thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+                thread->id = taskStatusArray[x].xTaskNumber;
 
-            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
-            /* Unsupported metrics */
-            thread->stackSize.Emplace(0);
-            thread->stackFreeCurrent.Emplace(0);
+                thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+                /* Unsupported metrics */
+                thread->stackSize.Emplace(0);
+                thread->stackFreeCurrent.Emplace(0);
 
-            thread->Next = head;
-            head         = thread;
+                thread->Next = head;
+                head         = thread;
+            }
         }
 
         *threadMetricsOut = head;

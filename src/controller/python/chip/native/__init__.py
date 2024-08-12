@@ -23,7 +23,7 @@ import typing
 from dataclasses import dataclass
 
 import chip.exceptions
-import construct
+import construct  # type: ignore
 
 
 class Library(enum.Enum):
@@ -84,7 +84,9 @@ class PyChipError(ctypes.Structure):
 
     def raise_on_error(self) -> None:
         if self.code != 0:
-            raise self.to_exception()
+            exception = self.to_exception()
+            if exception is not None:  # Ensure exception is not None to avoid mypy error and only raise valid exceptions
+                raise exception
 
     @property
     def is_success(self) -> bool:
@@ -103,20 +105,21 @@ class PyChipError(ctypes.Structure):
         return (self.code) & 0xFFFFFF
 
     @property
-    def sdk_part(self) -> ErrorSDKPart:
+    def sdk_part(self) -> typing.Optional[ErrorSDKPart]:
         if not self.is_sdk_error:
             return None
         return ErrorSDKPart((self.code >> 8) & 0x07)
 
     @property
-    def sdk_code(self) -> int:
+    def sdk_code(self) -> typing.Optional[int]:
         if not self.is_sdk_error:
             return None
         return self.code & 0xFF
 
-    def to_exception(self) -> typing.Union[None, chip.exceptions.ChipStackError]:
+    def to_exception(self) -> typing.Optional[chip.exceptions.ChipStackError]:
         if not self.is_success:
-            return chip.exceptions.ChipStackError(self.code, str(self))
+            return chip.exceptions.ChipStackError.from_chip_error(self)
+        return None
 
     def __str__(self):
         buf = ctypes.create_string_buffer(256)
@@ -199,19 +202,19 @@ class NativeLibraryHandleMethodArguments:
     def Set(self, methodName: str, resultType, argumentTypes: list):
         method = getattr(self.handle, methodName)
         method.restype = resultType
-        method.argtype = argumentTypes
+        method.argtypes = argumentTypes
 
 
 @dataclass
 class _Handle:
-    dll: ctypes.CDLL = None
+    dll: ctypes.CDLL
     initialized: bool = False
 
 
 _nativeLibraryHandles: typing.Dict[Library, _Handle] = {}
 
 
-def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> ctypes.CDLL:
+def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> _Handle:
     """Get a memoized _Handle to the chip native code dll."""
 
     global _nativeLibraryHandles
@@ -236,7 +239,7 @@ def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> ctypes.CD
     return handle
 
 
-def Init(bluetoothAdapter: int = None):
+def Init(bluetoothAdapter: typing.Optional[int] = None):
     CommonStackParams = construct.Struct(
         "BluetoothAdapterId" / construct.Int32ul,
     )

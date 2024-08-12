@@ -184,8 +184,6 @@ class CoreBluetoothManager(ChipBleBase):
     def __del__(self):
         self.disconnect()
         self.setInputHook(self.orig_input_hook)
-        self.devCtrl.SetBlockingCB(None)
-        self.devCtrl.SetBleEventCB(None)
 
     def devMgrCB(self):
         """A callback used by ChipDeviceCtrl.py to drive the OSX runloop while the

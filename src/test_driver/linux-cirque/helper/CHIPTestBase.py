@@ -145,7 +145,7 @@ class CHIPVirtualHome:
             self.assertTrue(self.wait_for_device_output(
                 device_id, "Thread Border Router started on AIL", 10))
             self.assertTrue(self.wait_for_device_output(
-                device_id, "CHIP:SVR: Server Listening...", 15))
+                device_id, "[SVR] Server Listening...", 15))
             # Clear default Thread network commissioning data
             self.logger.info("Resetting thread network on {}".format(
                 self.get_device_pretty_id(device_id)))

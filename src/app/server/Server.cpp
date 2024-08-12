@@ -56,6 +56,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
+
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
 #include <lib/support/PersistentStorageAudit.h>
 #endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
@@ -182,6 +186,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mReportScheduler = initParams.reportScheduler;
 
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+    if (mTestEventTriggerDelegate == nullptr)
+    {
+        ChipLogProgress(AppServer, "WARNING: mTestEventTriggerDelegate is null");
+    }
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
@@ -210,6 +218,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                            TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                               ,
+                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
 
@@ -355,11 +367,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance());
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(mDeviceStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(mSessionKeystore)
+        .SetExchangeManager(&mExchangeMgr)
+        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
+        .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
 
     // Register Test Event Trigger Handler
-    mTestEventTriggerDelegate->AddHandler(&mICDManager);
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+    }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -596,6 +619,12 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Shut down any remaining sessions (and hence exchanges) before we do any
+    // futher teardown.  CASE handshakes have been shut down already via
+    // shutting down mCASESessionManager and mCASEServer above; shutting
+    // down mCommissioningWindowManager will shut down any PASE handshakes we
+    // have going on.
+    mSessions.ExpireAllSecureSessions();
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();
@@ -606,7 +635,10 @@ void Server::Shutdown()
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Remove Test Event Trigger Handler
-    mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
@@ -753,5 +785,8 @@ app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubs
 #endif
 app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
 Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
+#endif
 
 } // namespace chip

@@ -109,6 +109,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
+    "${chip_root}/src/credentials:test_dac_revocation_delegate",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support/jsontlv",
@@ -132,7 +133,7 @@ executable("chip-tool") {
 
   deps = [
     ":chip-tool-utils",
-    "${chip_root}/src/platform/logging:force_stdio",
+    "${chip_root}/src/platform/logging:stdio",
   ]
 
   output_dir = root_out_dir

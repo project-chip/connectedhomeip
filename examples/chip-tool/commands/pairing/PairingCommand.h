@@ -26,6 +26,8 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <optional>
+
 enum class PairingMode
 {
     None,
@@ -33,6 +35,9 @@ enum class PairingMode
     CodePaseOnly,
     Ble,
     SoftAP,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF,
+#endif
     AlreadyDiscovered,
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
@@ -44,6 +49,7 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
+    WiFiOrThread,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -71,6 +77,8 @@ public:
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
+        AddArgument("icd-client-type", 0, 1, &mICDClientType,
+                    "The ClientType of the client registering, default: Permanent client - 0");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
@@ -83,6 +91,11 @@ public:
             AddArgument("password", &mPassword);
             break;
         case PairingNetworkType::Thread:
+            AddArgument("operationalDataset", &mOperationalDataset);
+            break;
+        case PairingNetworkType::WiFiOrThread:
+            AddArgument("ssid", &mSSID);
+            AddArgument("password", &mPassword);
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }
@@ -101,32 +114,39 @@ public:
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        case PairingMode::WiFiPAF:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+#endif
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
@@ -237,6 +257,7 @@ private:
     chip::Optional<NodeId> mICDCheckInNodeId;
     chip::Optional<chip::ByteSpan> mICDSymmetricKey;
     chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
@@ -246,8 +267,14 @@ private:
         mComplex_DSTOffsets;
 
     uint16_t mRemotePort;
-    uint16_t mDiscriminator;
-    uint32_t mSetupPINCode;
+    // mDiscriminator is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint16_t> mDiscriminator;
+    // mSetupPINCode is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint32_t> mSetupPINCode;
     uint16_t mIndex;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;

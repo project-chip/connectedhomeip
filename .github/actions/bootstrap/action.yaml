@@ -26,7 +26,12 @@ runs:
         # because the bootstrapped Pigweed environment contains absolute paths.
         echo "Calculating bootstrap cache key for '$PWD'"
         FILES_HASH="${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}"
-        FINAL_HASH="$(echo "$PWD:$FILES_HASH" | shasum -a 256 | cut -d' ' -f1)"
+        case "$RUNNER_OS" in
+          macOS) OS_HASH="$(sw_vers | shasum -a 256 | cut -d' ' -f1)";;
+          *)     OS_HASH="$(shasum -a 256 /etc/lsb-release | cut -d' ' -f1)";;
+        esac
+        PYTHON_HASH="$(python --version | shasum -a 256 | cut -d' ' -f1)"
+        FINAL_HASH="$(echo "$PWD:$FILES_HASH:$OS_HASH:$PYTHON_HASH" | shasum -a 256 | cut -d' ' -f1)"
         echo key="${RUNNER_OS}-${RUNNER_ARCH}-${{ inputs.platform }}-${FINAL_HASH}" | tee -a "$GITHUB_OUTPUT"
 
         # Split caches across backends

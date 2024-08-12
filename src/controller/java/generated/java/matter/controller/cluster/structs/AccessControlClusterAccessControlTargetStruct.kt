@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class AccessControlClusterAccessControlTargetStruct(
   val cluster: UInt?,
   val endpoint: UShort?,
-  val deviceType: UInt?
+  val deviceType: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlTargetStruct {\n")

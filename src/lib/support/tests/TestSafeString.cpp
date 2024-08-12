@@ -22,8 +22,9 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/SafeString.h>
 
 using namespace chip;

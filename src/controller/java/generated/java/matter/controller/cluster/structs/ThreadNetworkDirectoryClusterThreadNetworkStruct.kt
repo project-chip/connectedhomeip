@@ -23,15 +23,17 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThreadNetworkDirectoryClusterThreadNetworkStruct(
-  val extendedPanID: ULong,
+  val extendedPanID: ByteArray,
   val networkName: String,
-  val channel: UShort
+  val channel: UShort,
+  val activeTimestamp: ULong,
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n")
     append("\textendedPanID : $extendedPanID\n")
     append("\tnetworkName : $networkName\n")
     append("\tchannel : $channel\n")
+    append("\tactiveTimestamp : $activeTimestamp\n")
     append("}\n")
   }
 
@@ -41,6 +43,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
       put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D), extendedPanID)
       put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
       put(ContextSpecificTag(TAG_CHANNEL), channel)
+      put(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP), activeTimestamp)
       endStructure()
     }
   }
@@ -49,19 +52,26 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
     private const val TAG_EXTENDED_PAN_I_D = 0
     private const val TAG_NETWORK_NAME = 1
     private const val TAG_CHANNEL = 2
+    private const val TAG_ACTIVE_TIMESTAMP = 3
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
-      val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
+      val extendedPanID = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
       val channel = tlvReader.getUShort(ContextSpecificTag(TAG_CHANNEL))
+      val activeTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP))
 
       tlvReader.exitContainer()
 
-      return ThreadNetworkDirectoryClusterThreadNetworkStruct(extendedPanID, networkName, channel)
+      return ThreadNetworkDirectoryClusterThreadNetworkStruct(
+        extendedPanID,
+        networkName,
+        channel,
+        activeTimestamp,
+      )
     }
   }
 }

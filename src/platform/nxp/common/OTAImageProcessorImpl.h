@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    Copyright 2023 NXP
  *    All rights reserved.
  *
@@ -47,7 +47,7 @@ public:
     static void TriggerNewRequestForData(intptr_t context);
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
+    void SetRebootDelaySec(uint16_t rebootDelay);
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -75,10 +75,11 @@ private:
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
     uint32_t mSoftwareVersion;
-    const char * mImageFile = nullptr;
 
     /* Buffer used for transaction storage */
     uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
+
+    uint16_t mDelayBeforeRebootSec = 0;
 };
 
 } // namespace chip

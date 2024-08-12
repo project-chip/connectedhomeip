@@ -215,16 +215,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         }
     }
 
+    // Work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    char typeStr[4 + 1 + 2 + 1];
+    snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
+
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
     ChipLogProgress(ExchangeManager,
                     ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %s (%s:%s) (B:%u)",
                     ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
-                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId), typeStr,
+                    protocolName, msgTypeName,
+                    static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + packetHeader.MICTagLength() +
+                                          payloadHeader.EncodeSizeBytes()));
 #endif
 
     MessageFlags msgFlags;
@@ -320,7 +327,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExchangeDelegate * delegate = nullptr;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.

@@ -19,8 +19,9 @@
 #include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 
@@ -53,7 +54,14 @@ static const scenes::ExtensionFieldSet EFS3(kColorControlClusterId, colorControl
 
 static scenes::ExtensionFieldSetsImpl sEFSets;
 
-void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
+class TestExtensionFieldSets : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestExtensionFieldSets, TestInsertExtensionFieldSet)
 {
     scenes::ExtensionFieldSetsImpl * EFS = &sEFSets;
     scenes::ExtensionFieldSetsImpl testEFS1;
@@ -68,118 +76,118 @@ void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
 
     memset(double_size_buffer, static_cast<uint8_t>(1), sizeof(double_size_buffer));
 
-    NL_TEST_ASSERT(aSuite, true == EFS->IsEmpty());
+    EXPECT_TRUE(EFS->IsEmpty());
 
     // Test creators of single ExtensionFieldSet
-    NL_TEST_ASSERT(aSuite, EFS1.mID == kOnOffClusterId);
-    NL_TEST_ASSERT(aSuite, EFS1.mUsedBytes == kOnOffSize);
-    NL_TEST_ASSERT(aSuite, !memcmp(onOffBuffer, EFS1.mBytesBuffer, EFS1.mUsedBytes));
+    EXPECT_EQ(EFS1.mID, kOnOffClusterId);
+    EXPECT_EQ(EFS1.mUsedBytes, kOnOffSize);
+    EXPECT_EQ(memcmp(onOffBuffer, EFS1.mBytesBuffer, EFS1.mUsedBytes), 0);
 
-    NL_TEST_ASSERT(aSuite, EFS2.mID == kLevelControlClusterId);
-    NL_TEST_ASSERT(aSuite, EFS2.mUsedBytes == kLevelControlSize);
-    NL_TEST_ASSERT(aSuite, !memcmp(levelControlBuffer, EFS2.mBytesBuffer, EFS2.mUsedBytes));
+    EXPECT_EQ(EFS2.mID, kLevelControlClusterId);
+    EXPECT_EQ(EFS2.mUsedBytes, kLevelControlSize);
+    EXPECT_EQ(memcmp(levelControlBuffer, EFS2.mBytesBuffer, EFS2.mUsedBytes), 0);
 
-    NL_TEST_ASSERT(aSuite, EFS3.mID == kColorControlClusterId);
-    NL_TEST_ASSERT(aSuite, EFS3.mUsedBytes == kColorControlSize);
-    NL_TEST_ASSERT(aSuite, !memcmp(colorControlBuffer, EFS3.mBytesBuffer, EFS3.mUsedBytes));
+    EXPECT_EQ(EFS3.mID, kColorControlClusterId);
+    EXPECT_EQ(EFS3.mUsedBytes, kColorControlSize);
+    EXPECT_EQ(memcmp(colorControlBuffer, EFS3.mBytesBuffer, EFS3.mUsedBytes), 0);
 
     // operator tests single EFS
     tempEFS = EFS1;
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
+    EXPECT_EQ(tempEFS, EFS1);
     tempEFS = EFS2;
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
+    EXPECT_EQ(tempEFS, EFS2);
     tempEFS = EFS3;
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
+    EXPECT_EQ(tempEFS, EFS3);
 
     // Test clear EFS
     tempEFS.Clear();
-    NL_TEST_ASSERT(aSuite, tempEFS.IsEmpty());
-    NL_TEST_ASSERT(aSuite, tempEFS.mID == kInvalidClusterId);
-    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == 0);
-    NL_TEST_ASSERT(aSuite, !memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)));
+    EXPECT_TRUE(tempEFS.IsEmpty());
+    EXPECT_EQ(tempEFS.mID, kInvalidClusterId);
+    EXPECT_EQ(tempEFS.mUsedBytes, 0);
+    EXPECT_EQ(memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)), 0);
 
     // Test creation of EFS from Array and ByteSpan that are to big
     tempEFS = scenes::ExtensionFieldSet(kOnOffClusterId, double_size_buffer, sizeof(double_size_buffer));
-    NL_TEST_ASSERT(aSuite, tempEFS.mID == kOnOffClusterId);
+    EXPECT_EQ(tempEFS.mID, kOnOffClusterId);
     // Confirm EFS empty
-    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == 0);
-    NL_TEST_ASSERT(aSuite, !memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(empty_buffer)));
+    EXPECT_EQ(tempEFS.mUsedBytes, 0);
+    EXPECT_EQ(memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(empty_buffer)), 0);
 
     tempEFS = scenes::ExtensionFieldSet(kLevelControlClusterId, bufferSpan);
-    NL_TEST_ASSERT(aSuite, tempEFS.mID == kLevelControlClusterId);
+    EXPECT_EQ(tempEFS.mID, kLevelControlClusterId);
     // Confirm EFS empty
-    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == 0);
-    NL_TEST_ASSERT(aSuite, !memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(empty_buffer)));
+    EXPECT_EQ(tempEFS.mUsedBytes, 0);
+    EXPECT_EQ(memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(empty_buffer)), 0);
 
     // Test creation of EFS from truncating an Array
     tempEFS = scenes::ExtensionFieldSet(kColorControlClusterId, double_size_buffer, sizeof(tempEFS.mBytesBuffer));
-    NL_TEST_ASSERT(aSuite, tempEFS.mID == kColorControlClusterId);
+    EXPECT_EQ(tempEFS.mID, kColorControlClusterId);
     // Confirm EFS was written
-    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == static_cast<uint8_t>(sizeof(tempEFS.mBytesBuffer)));
-    NL_TEST_ASSERT(aSuite, !memcmp(double_size_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)));
+    EXPECT_EQ(tempEFS.mUsedBytes, static_cast<uint8_t>(sizeof(tempEFS.mBytesBuffer)));
+    EXPECT_EQ(memcmp(double_size_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)), 0);
 
     tempEFS.Clear();
-    NL_TEST_ASSERT(aSuite, tempEFS.IsEmpty());
+    EXPECT_TRUE(tempEFS.IsEmpty());
 
     // Test insertion of uninitialized EFS
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == EFS->InsertFieldSet(tempEFS));
-    NL_TEST_ASSERT(aSuite, 0 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, EFS->InsertFieldSet(tempEFS));
+    EXPECT_EQ(0, EFS->GetFieldSetCount());
 
     // Test insertion of empty EFS
     tempEFS.mID = kOnOffClusterId;
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == EFS->InsertFieldSet(tempEFS));
-    NL_TEST_ASSERT(aSuite, 0 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, EFS->InsertFieldSet(tempEFS));
+    EXPECT_EQ(0, EFS->GetFieldSetCount());
 
     // test operators on multiple EFS struct
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS3));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS1.InsertFieldSet(EFS1));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS1.InsertFieldSet(EFS2));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS1.InsertFieldSet(EFS3));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS2.InsertFieldSet(EFS3));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS2.InsertFieldSet(EFS3));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS3.InsertFieldSet(EFS1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS3.InsertFieldSet(EFS2));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS3.InsertFieldSet(EFS1));
+    EXPECT_EQ(CHIP_NO_ERROR, testEFS3.InsertFieldSet(EFS2));
 
     tempTestEFS = testEFS1;
-    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS1);
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS2));
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS3));
+    EXPECT_EQ(tempTestEFS, testEFS1);
+    EXPECT_FALSE(tempTestEFS == testEFS2);
+    EXPECT_FALSE(tempTestEFS == testEFS3);
     tempTestEFS = testEFS2;
-    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS2);
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS1));
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS3));
+    EXPECT_EQ(tempTestEFS, testEFS2);
+    EXPECT_FALSE(tempTestEFS == testEFS1);
+    EXPECT_FALSE(tempTestEFS == testEFS3);
     tempTestEFS = testEFS3;
-    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS3);
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS1));
-    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS2));
+    EXPECT_EQ(tempTestEFS, testEFS3);
+    EXPECT_FALSE(tempTestEFS == testEFS1);
+    EXPECT_FALSE(tempTestEFS == testEFS2);
 
     // test clear multipler efs struct
     tempTestEFS.Clear();
-    NL_TEST_ASSERT(aSuite, tempTestEFS.IsEmpty());
-    NL_TEST_ASSERT(aSuite, 0 == tempTestEFS.GetFieldSetCount());
+    EXPECT_TRUE(tempTestEFS.IsEmpty());
+    EXPECT_EQ(0, tempTestEFS.GetFieldSetCount());
 
     // Test insert
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS1));
-    NL_TEST_ASSERT(aSuite, 1 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS1));
+    EXPECT_EQ(1, EFS->GetFieldSetCount());
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS2));
-    NL_TEST_ASSERT(aSuite, 2 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS2));
+    EXPECT_EQ(2, EFS->GetFieldSetCount());
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS3));
-    NL_TEST_ASSERT(aSuite, 3 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS3));
+    EXPECT_EQ(3, EFS->GetFieldSetCount());
 
     // Test get
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 0));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 0));
+    EXPECT_EQ(tempEFS, EFS1);
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 1));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 1));
+    EXPECT_EQ(tempEFS, EFS2);
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 2));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 2));
+    EXPECT_EQ(tempEFS, EFS3);
 }
 
-void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
+TEST_F(TestExtensionFieldSets, TestSerializeDerializeExtensionFieldSet)
 {
     scenes::ExtensionFieldSetsImpl * EFS = &sEFSets;
     scenes::ExtensionFieldSetsImpl testSceneEFS;
@@ -203,148 +211,105 @@ void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aConte
 
     // Individual Field Sets serialize / deserialize
     writer.Init(EFS1Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS1.Serialize(writer));
+    EXPECT_EQ(CHIP_NO_ERROR, EFS1.Serialize(writer));
     EFS1_serialized_length = writer.GetLengthWritten();
-    NL_TEST_ASSERT(aSuite, EFS1_serialized_length <= scenes::kMaxFieldBytesPerCluster);
+    EXPECT_LE(EFS1_serialized_length, scenes::kMaxFieldBytesPerCluster);
 
     writer.Init(EFS2Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS2.Serialize(writer));
+    EXPECT_EQ(CHIP_NO_ERROR, EFS2.Serialize(writer));
     EFS2_serialized_length = writer.GetLengthWritten();
-    NL_TEST_ASSERT(aSuite, EFS2_serialized_length <= scenes::kMaxFieldBytesPerCluster);
+    EXPECT_LE(EFS2_serialized_length, scenes::kMaxFieldBytesPerCluster);
 
     writer.Init(EFS3Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS3.Serialize(writer));
+    EXPECT_EQ(CHIP_NO_ERROR, EFS3.Serialize(writer));
     EFS3_serialized_length = writer.GetLengthWritten();
-    NL_TEST_ASSERT(aSuite, EFS3_serialized_length <= scenes::kMaxFieldBytesPerCluster);
+    EXPECT_LE(EFS3_serialized_length, scenes::kMaxFieldBytesPerCluster);
 
     reader.Init(EFS1Buffer);
     reader.Next(TLV::AnonymousTag());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, EFS1 == tempEFS);
+    EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
+    EXPECT_EQ(EFS1, tempEFS);
 
     reader.Init(EFS2Buffer);
     reader.Next(TLV::AnonymousTag());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, EFS2 == tempEFS);
+    EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
+    EXPECT_EQ(EFS2, tempEFS);
 
     reader.Init(EFS3Buffer);
     reader.Next(TLV::AnonymousTag());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, EFS3 == tempEFS);
+    EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
+    EXPECT_EQ(EFS3, tempEFS);
 
     // All ExtensionFieldSets serialize / deserialize
     writer.Init(sceneEFSBuffer);
     writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->Serialize(writer));
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->Serialize(writer));
     writer.EndContainer(outer);
     sceneEFS_serialized_length = writer.GetLengthWritten();
-    NL_TEST_ASSERT(aSuite, sceneEFS_serialized_length <= kPersistentSceneBufferMax);
+    EXPECT_LE(sceneEFS_serialized_length, kPersistentSceneBufferMax);
 
     reader.Init(sceneEFSBuffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testSceneEFS.Deserialize(reader));
+    EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+    EXPECT_EQ(CHIP_NO_ERROR, reader.EnterContainer(outerRead));
+    EXPECT_EQ(CHIP_NO_ERROR, testSceneEFS.Deserialize(reader));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, *EFS == testSceneEFS);
+    EXPECT_EQ(CHIP_NO_ERROR, reader.ExitContainer(outerRead));
+    EXPECT_EQ(*EFS, testSceneEFS);
 }
 
-void TestRemoveExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
+TEST_F(TestExtensionFieldSets, TestRemoveExtensionFieldSet)
 {
     scenes::ExtensionFieldSetsImpl * EFS = &sEFSets;
     scenes::ExtensionFieldSet tempEFS;
 
     // Order in EFS at this point: [EFS1, EFS2, EFS3]
     // Removal at beginning
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->RemoveFieldAtPosition(0));
-    NL_TEST_ASSERT(aSuite, 2 == EFS->GetFieldSetCount());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS1));
-    NL_TEST_ASSERT(aSuite, 3 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->RemoveFieldAtPosition(0));
+    EXPECT_EQ(2, EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS1));
+    EXPECT_EQ(3, EFS->GetFieldSetCount());
 
     // Verify order
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 0));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 1));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 2));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 0));
+    EXPECT_EQ(tempEFS, EFS2);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 1));
+    EXPECT_EQ(tempEFS, EFS3);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 2));
+    EXPECT_EQ(tempEFS, EFS1);
 
     // Order in EFS at this point: [EFS2, EFS3, EFS1]
     // Removal at middle
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->RemoveFieldAtPosition(1));
-    NL_TEST_ASSERT(aSuite, 2 == EFS->GetFieldSetCount());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS3));
-    NL_TEST_ASSERT(aSuite, 3 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->RemoveFieldAtPosition(1));
+    EXPECT_EQ(2, EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS3));
+    EXPECT_EQ(3, EFS->GetFieldSetCount());
 
     // Verify order
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 0));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 1));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 2));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 0));
+    EXPECT_EQ(tempEFS, EFS2);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 1));
+    EXPECT_EQ(tempEFS, EFS1);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 2));
+    EXPECT_EQ(tempEFS, EFS3);
 
     // Order in EFS at this point: [EFS2, EFS1, EFS3]
     // Removal at end
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->RemoveFieldAtPosition(2));
-    NL_TEST_ASSERT(aSuite, 2 == EFS->GetFieldSetCount());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS3));
-    NL_TEST_ASSERT(aSuite, 3 == EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->RemoveFieldAtPosition(2));
+    EXPECT_EQ(2, EFS->GetFieldSetCount());
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->InsertFieldSet(EFS3));
+    EXPECT_EQ(3, EFS->GetFieldSetCount());
 
     // Verify order
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 0));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 1));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->GetFieldSetAtPosition(tempEFS, 2));
-    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 0));
+    EXPECT_EQ(tempEFS, EFS2);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 1));
+    EXPECT_EQ(tempEFS, EFS1);
+    EXPECT_EQ(CHIP_NO_ERROR, EFS->GetFieldSetAtPosition(tempEFS, 2));
+    EXPECT_EQ(tempEFS, EFS3);
 
     // Emptying the table
     EFS->Clear();
-    NL_TEST_ASSERT(aSuite, true == EFS->IsEmpty());
+    EXPECT_TRUE(EFS->IsEmpty());
 }
 
 } // namespace TestEFS
-/**
- *  Tear down the test suite.
- */
-int TestSetup(void * inContext)
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-
-    return SUCCESS;
-}
-
-namespace {
-/**
- *  Setup the test suite.
- */
-int TestTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-
-    return SUCCESS;
-}
-} // namespace
-
-int TestExtensionFieldSets()
-{
-    static nlTest sTests[] = { NL_TEST_DEF("TestInsertExtensionFieldSet", TestEFS::TestInsertExtensionFieldSet),
-                               NL_TEST_DEF("TestSerializeDerializeExtensionFieldSet",
-                                           TestEFS::TestSerializeDerializeExtensionFieldSet),
-                               NL_TEST_DEF("TestRemoveExtensionFieldSet", TestEFS::TestRemoveExtensionFieldSet),
-
-                               NL_TEST_SENTINEL() };
-
-    nlTestSuite theSuite = {
-        "SceneTable",
-        &sTests[0],
-        TestSetup,
-        TestTeardown,
-    };
-
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestExtensionFieldSets)

@@ -72,6 +72,12 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+        args.enable  = false;
+        args.ExtCmds = nullptr;
+        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -84,8 +90,15 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        app::DnssdServer::Instance().AdvertiseOperational();
-        ChipLogProgress(AppServer, "Operational advertising enabled");
+        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Operational advertising enabled");
+        }
     }
 #if CONFIG_NETWORK_LAYER_BLE
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)

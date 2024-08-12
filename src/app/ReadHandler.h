@@ -212,7 +212,7 @@ public:
      *
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
-                Observer * observer);
+                Observer * observer, DataModel::Provider * apDataModel);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -222,7 +222,7 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Observer * observer);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel);
 #endif
 
     const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
@@ -332,6 +332,15 @@ private:
      *  a state where it's waiting for a response.
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
+
+    /*
+     * Get the appropriate size of a packet buffer to allocate for encoding a Report message.
+     * This size might depend on the underlying session used by the ReadHandler.
+     *
+     * The size returned here is the size not including the various prepended headers
+     * (what System::PacketBuffer calls the "available size").
+     */
+    size_t GetReportBufferMaxSize();
 
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
@@ -491,7 +500,7 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
+    AttributePathExpandIterator mAttributePathExpandIterator;
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
     // marked dirty.
@@ -573,5 +582,6 @@ private:
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
 };
+
 } // namespace app
 } // namespace chip

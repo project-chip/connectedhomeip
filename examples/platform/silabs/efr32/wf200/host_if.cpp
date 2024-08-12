@@ -335,7 +335,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         }
         ap->scan.chan = scan_result->channel;
         ap->scan.rssi = scan_result->rcpi;
-        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], BSSID_MAX_STR_LEN);
+        memcpy(&ap->scan.bssid[0], &scan_result->mac[0], BSSID_LEN);
         scan_count++;
     }
 }

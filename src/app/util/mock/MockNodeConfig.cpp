@@ -26,6 +26,63 @@
 
 namespace chip {
 namespace Test {
+namespace internal {
+uint16_t SizeForType(EmberAfAttributeType type)
+{
+    switch (type)
+    {
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+    case ZCL_INT8U_ATTRIBUTE_TYPE:
+    case ZCL_BITMAP8_ATTRIBUTE_TYPE:
+    case ZCL_ENUM8_ATTRIBUTE_TYPE:
+        return 1;
+    case ZCL_INT16S_ATTRIBUTE_TYPE:
+    case ZCL_INT16U_ATTRIBUTE_TYPE:
+    case ZCL_BITMAP16_ATTRIBUTE_TYPE:
+    case ZCL_ENUM16_ATTRIBUTE_TYPE:
+        return 2;
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+    case ZCL_INT24U_ATTRIBUTE_TYPE:
+        return 3;
+    case ZCL_SINGLE_ATTRIBUTE_TYPE:
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+    case ZCL_INT32U_ATTRIBUTE_TYPE:
+    case ZCL_BITMAP32_ATTRIBUTE_TYPE:
+        return 4;
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+    case ZCL_INT40U_ATTRIBUTE_TYPE:
+        return 5;
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+    case ZCL_INT48U_ATTRIBUTE_TYPE:
+        return 6;
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+    case ZCL_INT56U_ATTRIBUTE_TYPE:
+        return 7;
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE:
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+    case ZCL_INT64U_ATTRIBUTE_TYPE:
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:
+        return 8;
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
+    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+        return kDefaultStringSize;
+    case ZCL_ARRAY_ATTRIBUTE_TYPE:
+    case ZCL_STRUCT_ATTRIBUTE_TYPE:
+        // These items are using AAI and are acceptable for tests
+        return 0;
+    default:
+        // this type of attribute is not supported for tests, we cannot guess its size
+        //
+        // see attribute-type.h for a list of attributes
+        ChipLogError(Test, "Warning: size for attribute type 0x%x is not set", type);
+        return 0;
+    }
+}
+
+} // namespace internal
 
 namespace {
 
@@ -54,9 +111,12 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 } // namespace
 
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
-                                     std::initializer_list<MockEventConfig> aEvents) :
+                                     std::initializer_list<MockEventConfig> aEvents,
+                                     std::initializer_list<CommandId> aAcceptedCommands,
+                                     std::initializer_list<CommandId> aGeneratedCommands) :
     id(aId),
-    attributes(aAttributes), events(aEvents), mEmberCluster{}
+    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
 
@@ -71,6 +131,18 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
     mEmberCluster.eventCount     = static_cast<uint16_t>(mEmberEventList.size());
     mEmberCluster.eventList      = mEmberEventList.data();
 
+    if (!mAcceptedCommands.empty())
+    {
+        mAcceptedCommands.push_back(kInvalidCommandId);
+        mEmberCluster.acceptedCommandList = mAcceptedCommands.data();
+    }
+
+    if (!mGeneratedCommands.empty())
+    {
+        mGeneratedCommands.push_back(kInvalidCommandId);
+        mEmberCluster.generatedCommandList = mGeneratedCommands.data();
+    }
+
     for (auto & attr : attributes)
     {
         mAttributeMetaData.push_back(attr.attributeMetaData);
@@ -82,10 +154,19 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
 
 MockClusterConfig::MockClusterConfig(const MockClusterConfig & other) :
     id(other.id), attributes(other.attributes), events(other.events), mEmberCluster(other.mEmberCluster),
-    mEmberEventList(other.mEmberEventList), mAttributeMetaData(other.mAttributeMetaData)
+    mEmberEventList(other.mEmberEventList), mAttributeMetaData(other.mAttributeMetaData),
+    mAcceptedCommands(other.mAcceptedCommands), mGeneratedCommands(other.mGeneratedCommands)
 {
     // Fix self-referencial dependencies after data copy
     mEmberCluster.attributes = mAttributeMetaData.data();
+    if (!mAcceptedCommands.empty())
+    {
+        mEmberCluster.acceptedCommandList = mAcceptedCommands.data();
+    }
+    if (!mGeneratedCommands.empty())
+    {
+        mEmberCluster.generatedCommandList = mGeneratedCommands.data();
+    }
 }
 
 const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attributeId, ptrdiff_t * outIndex) const

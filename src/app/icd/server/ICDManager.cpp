@@ -21,6 +21,7 @@
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -30,10 +31,11 @@
 namespace {
 enum class ICDTestEventTriggerEvent : uint64_t
 {
-    kAddActiveModeReq            = 0x0046'0000'00000001,
-    kRemoveActiveModeReq         = 0x0046'0000'00000002,
-    kInvalidateHalfCounterValues = 0x0046'0000'00000003,
-    kInvalidateAllCounterValues  = 0x0046'0000'00000004,
+    kAddActiveModeReq                = 0x0046'0000'00000001,
+    kRemoveActiveModeReq             = 0x0046'0000'00000002,
+    kInvalidateHalfCounterValues     = 0x0046'0000'00000003,
+    kInvalidateAllCounterValues      = 0x0046'0000'00000004,
+    kForceMaximumCheckInBackOffState = 0x0046'0000'00000005,
 };
 } // namespace
 
@@ -50,15 +52,19 @@ using chip::Protocols::InteractionModel::Status;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
+void ICDManager::Init()
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    VerifyOrDie(storage != nullptr);
-    VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(symmetricKeystore != nullptr);
-    VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(subInfoProvider != nullptr);
+    VerifyOrDie(mStorage != nullptr);
+    VerifyOrDie(mFabricTable != nullptr);
+    VerifyOrDie(mSymmetricKeystore != nullptr);
+    VerifyOrDie(mExchangeManager != nullptr);
+    VerifyOrDie(mSubInfoProvider != nullptr);
+    VerifyOrDie(mICDCheckInBackOffStrategy != nullptr);
+
+    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
+                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
+                CHIP_NO_ERROR);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
@@ -79,18 +85,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    mStorage           = storage;
-    mFabricTable       = fabricTable;
-    mSymmetricKeystore = symmetricKeystore;
-    mExchangeManager   = exchangeManager;
-    mSubInfoProvider   = subInfoProvider;
-
-    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
-                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
-                CHIP_NO_ERROR);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -192,6 +186,12 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
+            if (!mICDCheckInBackOffStrategy->ShouldSendCheckInMessage(entry))
+            {
+                // continue to next entry
+                continue;
+            }
+
             // Increment counter only once to prevent depletion of the available range.
             if (!counterIncremented)
             {
@@ -245,6 +245,12 @@ bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsg
             {
                 // Try to fetch the next entry upon failure (should not happen).
                 ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            if (entry.clientType == ClientTypeEnum::kEphemeral)
+            {
+                // If the registered client is ephemeral, no Check-In message would be sent to this client
                 continue;
             }
 
@@ -674,6 +680,9 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case ICDTestEventTriggerEvent::kInvalidateAllCounterValues:
         err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateAllCheckInCounterValues();
+        break;
+    case ICDTestEventTriggerEvent::kForceMaximumCheckInBackOffState:
+        err = mICDCheckInBackOffStrategy->ForceMaximumCheckInBackoff();
         break;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:

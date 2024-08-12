@@ -172,6 +172,12 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "CHIPDeviceManager.Init() failed: %s", ErrorStr(err));
         goto exit;
     }
+    /* Make sure to initialize the Matter CLI which will include the ot-cli first.
+     * In fact it is mandatory to enable first the ot-cli before initializing the Matter openthread layer
+     * which would modify some contexts of the openthread instance.
+     */
+    err = AppMatter_Register();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error during APP features registration"));
 
 #if CONFIG_NET_L2_OPENTHREAD
     err = ThreadStackMgr().InitThreadStack();
@@ -218,12 +224,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
-    err = AppMatter_Register();
-    if (err != CHIP_NO_ERROR)
-    {
-        goto exit;
-    }
-
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
@@ -256,4 +256,80 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 
 exit:
     return err;
+}
+
+void chip::NXP::App::AppTaskBase::StartCommissioning(intptr_t arg)
+{
+    /* Check the status of the commissioning */
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Device already commissioned");
+    }
+    else if (chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        ChipLogProgress(DeviceLayer, "Commissioning window already opened");
+    }
+    else
+    {
+        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
+}
+
+void chip::NXP::App::AppTaskBase::StopCommissioning(intptr_t arg)
+{
+    /* Check the status of the commissioning */
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Device already commissioned");
+    }
+    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        ChipLogProgress(DeviceLayer, "Commissioning window not opened");
+    }
+    else
+    {
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    }
+}
+
+void chip::NXP::App::AppTaskBase::SwitchCommissioningState(intptr_t arg)
+{
+    /* Check the status of the commissioning */
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Device already commissioned");
+    }
+    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
+    else
+    {
+        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    }
+}
+
+void chip::NXP::App::AppTaskBase::StartCommissioningHandler(void)
+{
+    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
+    PlatformMgr().ScheduleWork(StartCommissioning, 0);
+}
+
+void chip::NXP::App::AppTaskBase::StopCommissioningHandler(void)
+{
+    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
+    PlatformMgr().ScheduleWork(StopCommissioning, 0);
+}
+
+void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
+{
+    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
+    PlatformMgr().ScheduleWork(SwitchCommissioningState, 0);
+}
+
+void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
+{
+    /* Emit the ShutDown event before factory reset */
+    chip::Server::GetInstance().GenerateShutDownEvent();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }

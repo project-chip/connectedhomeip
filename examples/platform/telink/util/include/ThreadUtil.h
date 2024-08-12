@@ -19,6 +19,6 @@
 
 #include "AppConfig.h"
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void StartDefaultThreadNetwork(void);
 #endif

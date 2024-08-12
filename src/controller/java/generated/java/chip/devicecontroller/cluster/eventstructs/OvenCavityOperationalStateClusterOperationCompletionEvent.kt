@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class OvenCavityOperationalStateClusterOperationCompletionEvent(
   val completionErrorCode: UInt,
   val totalOperationalTime: Optional<ULong>?,
-  val pausedTime: Optional<ULong>?
+  val pausedTime: Optional<ULong>?,
 ) {
   override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterOperationCompletionEvent {\n")
@@ -67,7 +67,7 @@ class OvenCavityOperationalStateClusterOperationCompletionEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OvenCavityOperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tlvTag)
       val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
@@ -99,7 +99,7 @@ class OvenCavityOperationalStateClusterOperationCompletionEvent(
       return OvenCavityOperationalStateClusterOperationCompletionEvent(
         completionErrorCode,
         totalOperationalTime,
-        pausedTime
+        pausedTime,
       )
     }
   }

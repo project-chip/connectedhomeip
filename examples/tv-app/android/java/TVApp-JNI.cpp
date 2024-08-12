@@ -31,6 +31,7 @@
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
@@ -139,6 +140,11 @@ JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobj
     MediaPlaybackManager::NewManager(endpoint, manager);
 }
 
+JNI_METHOD(void, setApplicationLauncherManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    ApplicationLauncherManager::NewManager(endpoint, manager);
+}
+
 JNI_METHOD(void, setMessagesManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     MessagesManager::NewManager(endpoint, manager);
@@ -240,6 +246,16 @@ class MyPincodeService : public PasscodeService
 };
 MyPincodeService gMyPincodeService;
 
+class SampleTvAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+SampleTvAppInstallationService gSampleTvAppInstallationService;
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
@@ -247,6 +263,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
@@ -372,6 +390,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPasscodeService(&gMyPincodeService);
+        cdc->SetAppInstallationService(&gSampleTvAppInstallationService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

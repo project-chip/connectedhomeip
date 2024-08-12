@@ -77,6 +77,7 @@ macro(matter_build target)
         LIB_PW_RPC
         LIB_MBEDTLS
         DEVICE_INFO_EXAMPLE_PROVIDER
+        FORCE_LOGGING_STDIO
     )
     set(multiValueArgs GN_DEPENDENCIES)
 
@@ -85,7 +86,11 @@ macro(matter_build target)
     set(MATTER_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
     # Prepare Matter libraries that the application should be linked with
-    set(MATTER_LIBRARIES -lCHIP)
+    if (FORCE_LOGGING_STDIO)
+        set(MATTER_LIBRARIES -lCHIPWithStdioLogging)
+    else()
+        set(MATTER_LIBRARIES -lCHIP)
+    endif()
 
     if (ARG_LIB_MBEDTLS)
         list(APPEND MATTER_LIBRARIES -lmbedtls)
@@ -158,6 +163,7 @@ macro(matter_build target)
         ${CHIP_ROOT}/src/include
         ${CHIP_ROOT}/third_party/nlassert/repo/include
         ${CHIP_ROOT}/third_party/nlio/repo/include
+        ${CHIP_ROOT}/third_party/nlfaultinjection/include
         ${CHIP_ROOT}/zzz_generated/app-common
         ${CMAKE_CURRENT_BINARY_DIR}/gen/include
     )

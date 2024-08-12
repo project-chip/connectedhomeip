@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ScenesManagementClusterExtensionFieldSet(
   val clusterID: ULong,
-  val attributeValueList: List<ScenesManagementClusterAttributeValuePair>
+  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>,
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterExtensionFieldSet {\n")
@@ -55,10 +55,10 @@ class ScenesManagementClusterExtensionFieldSet(
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_I_D))
       val attributeValueList =
-        buildList<ScenesManagementClusterAttributeValuePair> {
+        buildList<ScenesManagementClusterAttributeValuePairStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
           while (!tlvReader.isEndOfContainer()) {
-            add(ScenesManagementClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
+            add(ScenesManagementClusterAttributeValuePairStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
         }

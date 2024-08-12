@@ -141,6 +141,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #else
     stateParams.bleLayer = params.bleLayer;
 #endif // CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    stateParams.wifipaf_layer = params.wifipaf_layer;
+#endif
     VerifyOrReturnError(stateParams.bleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
@@ -167,6 +170,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                                             .SetAddressType(IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                            ,
+                                                        Transport::WiFiPAFListenParameters()
 #endif
                                                             ));
 
@@ -474,6 +481,15 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager->Shutdown();
         Platform::Delete(mCASESessionManager);
         mCASESessionManager = nullptr;
+    }
+
+    // The above took care of CASE handshakes, and shutting down all the
+    // controllers should have taken care of the PASE handshakes.  Clean up any
+    // outstanding secure sessions (shouldn't really be any, since controllers
+    // should have handled that, but just in case).
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->ExpireAllSecureSessions();
     }
 
     // mCASEClientPool and mSessionSetupPool must be deallocated

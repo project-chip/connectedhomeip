@@ -115,9 +115,6 @@ bouffalolab_executable("lighting_app") {
   defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
-  defines += [
-    "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}",
-  ]
   if (chip_config_network_layer_ble) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
   }
@@ -148,6 +145,7 @@ bouffalolab_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

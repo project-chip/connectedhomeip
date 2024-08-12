@@ -14,6 +14,19 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${LIT_ICD_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import re
 
@@ -96,6 +109,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             TestStep(
                 9, "TH reads from the DUT the UserActiveModeTriggerInstruction attribute"),
             TestStep(10, "TH reads from the DUT the OperatingMode attribute."),
+            TestStep(11, "TH reads from the DUT the MaximumCheckInBackoff attribute."),
         ]
         return steps
 
@@ -241,8 +255,9 @@ class TC_ICDM_2_1(MatterBaseTest):
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
 
             if uatHintInstructionDepedentBitmap > 0 and uatHintInstructionDepedentBitmap in kUatColorInstructionBitMask:
-                # TODO: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9194
-                asserts.assert_true(False, "Nothing to do for now")
+                pattern = re.compile(r'^[0-9A-F]{6}$')
+                asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
+                                    "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
         else:
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
@@ -259,6 +274,16 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             asserts.assert_less(
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
+        self.step(11)
+        if self.pics_guard(self.check_pics("ICDM.S.A0009")):
+            maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
+
+            asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
+                                "MaximumCheckInBackOff attribute is not a valid uint32.")
+            asserts.assert_greater_equal(maximumCheckInBackOff, idleModeDuration,
+                                         "MaximumCheckInBack attribute is not greater or euqal to the IdleModeDuration")
+            asserts.assert_less_equal(maximumCheckInBackOff, 64800,
+                                      "MaximumCheckInBackOff attribute is greater than maximum value (64800).")
 
 
 if __name__ == "__main__":

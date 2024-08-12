@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
-from yaml.paths_finder import PathsFinder
+from chipyaml.paths_finder import PathsFinder
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -240,6 +240,9 @@ def cmd_list(context):
     '--lock-app',
     help='what lock app to use')
 @click.option(
+    '--fabric-bridge-app',
+    help='what fabric bridge app to use')
+@click.option(
     '--ota-provider-app',
     help='what ota provider app to use')
 @click.option(
@@ -260,6 +263,9 @@ def cmd_list(context):
 @click.option(
     '--rvc-app',
     help='what rvc app to use')
+@click.option(
+    '--network-manager-app',
+    help='what network-manager app to use')
 @click.option(
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
@@ -291,7 +297,8 @@ def cmd_list(context):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -305,6 +312,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if lock_app is None:
         lock_app = paths_finder.get('chip-lock-app')
+
+    if fabric_bridge_app is None:
+        fabric_bridge_app = paths_finder.get('fabric-bridge-app')
 
     if ota_provider_app is None:
         ota_provider_app = paths_finder.get('chip-ota-provider-app')
@@ -327,6 +337,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if rvc_app is None:
         rvc_app = paths_finder.get('chip-rvc-app')
 
+    if network_manager_app is None:
+        network_manager_app = paths_finder.get('matter-network-manager-app')
+
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
@@ -341,6 +354,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
         lock_app=[lock_app],
+        fabric_bridge_app=[fabric_bridge_app],
         ota_provider_app=[ota_provider_app],
         ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app],
@@ -348,6 +362,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         lit_icd_app=[lit_icd_app],
         microwave_oven_app=[microwave_oven_app],
         rvc_app=[rvc_app],
+        network_manager_app=[network_manager_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )

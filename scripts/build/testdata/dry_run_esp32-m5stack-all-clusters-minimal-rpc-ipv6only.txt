@@ -10,6 +10,8 @@ rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults'
 
+bash -c 'echo -e "\nCONFIG_LWIP_IPV4=n\n" >>{out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults'
+
 bash -c 'echo -e "\nCONFIG_ESP_INSIGHTS_ENABLED=n\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=n\n" >>{out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 

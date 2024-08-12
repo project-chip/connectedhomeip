@@ -33,11 +33,33 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
-        SetupPayload ignored;
-        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mCommissioningWindowTimeout), mIteration,
-                                                      mDiscriminator, NullOptional, NullOptional,
-                                                      &mOnOpenCommissioningWindowCallback, ignored,
-                                                      /* readVIDPIDAttributes */ true);
+        if (mVerifier.HasValue())
+        {
+            VerifyOrReturnError(mSalt.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            return mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                              .SetNodeId(mNodeId)
+                                                              .SetEndpointId(mEndpointId)
+                                                              .SetTimeout(mCommissioningWindowTimeout)
+                                                              .SetIteration(mIteration)
+                                                              .SetDiscriminator(mDiscriminator)
+                                                              .SetVerifier(mVerifier.Value())
+                                                              .SetSalt(mSalt.Value())
+                                                              .SetCallback(&mOnOpenCommissioningWindowVerifierCallback));
+        }
+        else
+        {
+            SetupPayload ignored;
+            return mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                              .SetNodeId(mNodeId)
+                                                              .SetEndpointId(mEndpointId)
+                                                              .SetTimeout(mCommissioningWindowTimeout)
+                                                              .SetIteration(mIteration)
+                                                              .SetDiscriminator(mDiscriminator)
+                                                              .SetSalt(mSalt)
+                                                              .SetReadVIDPIDAttributes(true)
+                                                              .SetCallback(&mOnOpenCommissioningWindowCallback),
+                                                          ignored);
+        }
     }
 
     ChipLogError(NotSpecified, "Unknown commissioning window option: %d", to_underlying(mCommissioningWindowOption));
@@ -47,8 +69,19 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err,
                                                                        chip::SetupPayload payload)
 {
-    LogErrorOnFailure(err);
+    OpenCommissioningWindowCommand * self = static_cast<OpenCommissioningWindowCommand *>(context);
+    if (self->mDelegate)
+    {
+        self->mDelegate->OnCommissioningWindowOpened(remoteId, err, payload);
+        self->UnregisterDelegate();
+    }
 
+    LogErrorOnFailure(err);
+    OnOpenBasicCommissioningWindowResponse(context, remoteId, err);
+}
+
+void OpenCommissioningWindowCommand::OnOpenCommissioningWindowVerifierResponse(void * context, NodeId remoteId, CHIP_ERROR err)
+{
     OnOpenBasicCommissioningWindowResponse(context, remoteId, err);
 }
 

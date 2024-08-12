@@ -78,23 +78,24 @@ class PendingDiscovery:
 
 @dataclass
 class CommissionableNode():
-    instanceName: str = None
-    hostName: str = None
-    port: int = None
-    longDiscriminator: int = None
-    vendorId: int = None
-    productId: int = None
-    commissioningMode: int = None
-    deviceType: int = None
-    deviceName: str = None
-    pairingInstruction: str = None
-    pairingHint: int = None
-    mrpRetryIntervalIdle: int = None
-    mrpRetryIntervalActive: int = None
-    mrpRetryActiveThreshold: int = None
-    supportsTcp: bool = None
-    isICDOperatingAsLIT: bool = None
-    addresses: List[str] = None
+    instanceName: Optional[str] = None
+    hostName: Optional[str] = None
+    port: Optional[int] = None
+    longDiscriminator: Optional[int] = None
+    vendorId: Optional[int] = None
+    productId: Optional[int] = None
+    commissioningMode: Optional[int] = None
+    deviceType: Optional[int] = None
+    deviceName: Optional[str] = None
+    pairingInstruction: Optional[str] = None
+    pairingHint: Optional[int] = None
+    mrpRetryIntervalIdle: Optional[int] = None
+    mrpRetryIntervalActive: Optional[int] = None
+    mrpRetryActiveThreshold: Optional[int] = None
+    supportsTcpClient: Optional[bool] = None
+    supportsTcpServer: Optional[bool] = None
+    isICDOperatingAsLIT: Optional[bool] = None
+    addresses: Optional[List[str]] = None
     rotatingId: Optional[str] = None
 
 
@@ -236,8 +237,7 @@ def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):
     )
 
     res = _GetDiscoveryLibraryHandle().pychip_discovery_resolve(fabricid, nodeid)
-    if res != 0:
-        raise Exception("Failed to start node resolution")
+    res.raise_on_error()
 
 
 class _SyncAddressFinder:

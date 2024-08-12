@@ -142,7 +142,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
+    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
     if (status == RSI_SUCCESS)
     {
@@ -493,7 +493,7 @@ static void wfx_rsi_save_ap_info() // translation
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
+    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_LEN);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -753,9 +753,9 @@ void ProcessEvent(WfxEvent_t inEvent)
                     strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
                     ap.security = scan->security_mode;
                     ap.rssi     = (-1) * scan->rssi_val;
-                    configASSERT(sizeof(ap.bssid) >= BSSID_MAX_STR_LEN);
-                    configASSERT(sizeof(scan->bssid) >= BSSID_MAX_STR_LEN);
-                    memcpy(ap.bssid, scan->bssid, BSSID_MAX_STR_LEN);
+                    configASSERT(sizeof(ap.bssid) >= BSSID_LEN);
+                    configASSERT(sizeof(scan->bssid) >= BSSID_LEN);
+                    memcpy(ap.bssid, scan->bssid, BSSID_LEN);
                     (*wfx_rsi.scan_cb)(&ap);
 
                     if (wfx_rsi.scan_ssid)

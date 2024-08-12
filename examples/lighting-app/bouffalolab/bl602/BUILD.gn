@@ -110,9 +110,6 @@ bouffalolab_executable("lighting_app") {
   defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
-  defines += [
-    "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}",
-  ]
 
   bl_plat_name = "bl602"
   sources = [
@@ -146,6 +143,7 @@ bouffalolab_executable("lighting_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

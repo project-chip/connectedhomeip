@@ -126,6 +126,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
@@ -178,7 +179,9 @@ chip_python_wheel_action("chip-core") {
         "chip/commissioning/commissioning_flow_blocks.py",
         "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/__init__.py",
         "chip/credentials/cert.py",
+        "chip/crypto/__init__.py",
         "chip/crypto/fabric.py",
         "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",

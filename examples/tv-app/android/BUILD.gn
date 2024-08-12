@@ -28,8 +28,6 @@ shared_library("jni") {
     "include/account-login/AccountLoginManager.h",
     "include/application-basic/ApplicationBasicManager.cpp",
     "include/application-basic/ApplicationBasicManager.h",
-    "include/application-launcher/ApplicationLauncherManager.cpp",
-    "include/application-launcher/ApplicationLauncherManager.h",
     "include/audio-output/AudioOutputManager.cpp",
     "include/audio-output/AudioOutputManager.h",
     "include/cluster-init.cpp",
@@ -80,6 +78,8 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/application-launcher/ApplicationLauncherManager.cpp",
+    "java/application-launcher/ApplicationLauncherManager.h",
   ]
 
   deps = [
@@ -88,6 +88,7 @@ shared_library("jni") {
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/inipp",
   ]
 
@@ -114,6 +115,8 @@ android_library("java") {
   sources = [
     "java/src/com/matter/tv/server/tvapp/AppPlatform.java",
     "java/src/com/matter/tv/server/tvapp/AppPlatformShellCommands.java",
+    "java/src/com/matter/tv/server/tvapp/Application.java",
+    "java/src/com/matter/tv/server/tvapp/ApplicationLauncherManager.java",
     "java/src/com/matter/tv/server/tvapp/ChannelInfo.java",
     "java/src/com/matter/tv/server/tvapp/ChannelLineupInfo.java",
     "java/src/com/matter/tv/server/tvapp/ChannelManager.java",
@@ -122,6 +125,7 @@ android_library("java") {
     "java/src/com/matter/tv/server/tvapp/ChannelProgramResponse.java",
     "java/src/com/matter/tv/server/tvapp/Clusters.java",
     "java/src/com/matter/tv/server/tvapp/ContentAppEndpointManager.java",
+    "java/src/com/matter/tv/server/tvapp/ContentAppSupportedCluster.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchBrandingInformation.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchEntry.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchManager.java",
@@ -134,6 +138,7 @@ android_library("java") {
     "java/src/com/matter/tv/server/tvapp/DeviceEventProvider.java",
     "java/src/com/matter/tv/server/tvapp/KeypadInputManager.java",
     "java/src/com/matter/tv/server/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/LauncherResponse.java",
     "java/src/com/matter/tv/server/tvapp/LevelManager.java",
     "java/src/com/matter/tv/server/tvapp/LevelManagerStub.java",
     "java/src/com/matter/tv/server/tvapp/LowPowerManager.java",

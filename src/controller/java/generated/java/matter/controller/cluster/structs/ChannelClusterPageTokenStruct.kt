@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ChannelClusterPageTokenStruct(
   val limit: Optional<UShort>,
   val after: Optional<String>,
-  val before: Optional<String>
+  val before: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterPageTokenStruct {\n")

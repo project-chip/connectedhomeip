@@ -80,6 +80,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case PairingMode::WiFiPAF:
+        err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
+        break;
+#endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
@@ -109,6 +114,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
         break;
     case PairingNetworkType::Thread:
+        params.SetThreadOperationalDataset(mOperationalDataset);
+        break;
+    case PairingNetworkType::WiFiOrThread:
+        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
     case PairingNetworkType::None:
@@ -153,6 +162,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -162,6 +175,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
     }
 
     return params;
@@ -212,7 +226,12 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
+    if (mDiscriminator.has_value())
+    {
+        params.SetDiscriminator(mDiscriminator.value());
+    }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -232,9 +251,11 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t in
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
 
+    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+
     RendezvousParameters params;
     ReturnErrorOnFailure(GetDeviceScanner().Get(index, params));
-    params.SetSetupPINCode(mSetupPINCode);
+    params.SetSetupPINCode(mSetupPINCode.value());
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -254,6 +275,10 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t in
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index)
 {
+    // We might or might not have a setup code.  We don't know yet, but if we
+    // do, we'll emplace it at that point.
+    mSetupPINCode.reset();
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -277,7 +302,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
             VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        mSetupPINCode = payload.setUpPINCode;
+        mSetupPINCode.emplace(payload.setUpPINCode);
         return PairWithMdnsOrBleByIndex(remoteId, index);
     }
 
@@ -444,7 +469,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = nodeId;
+    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 

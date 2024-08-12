@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 import("lib.gni")
 
-static_library("lib") {
+source_set("without-logging") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/ble",
@@ -53,8 +54,29 @@ static_library("lib") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+static_library("lib") {
+  public_deps = [
+    ":without-logging",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   output_name = "libCHIP"
+
+  output_dir = "${root_out_dir}/lib"
+
+  complete_static_lib = true
+}
+
+# This version of libCHIP is only meant for internal use by some test drivers
+static_library("with-stdio-logging") {
+  public_deps = [
+    ":without-logging",
+    "${chip_root}/src/platform/logging:stdio",
+  ]
+
+  output_name = "libCHIPWithStdioLogging"
 
   output_dir = "${root_out_dir}/lib"
 

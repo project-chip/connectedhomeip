@@ -22,7 +22,7 @@ RUN set -x \
    curl gnupg-agent apt-transport-https ca-certificates \
    software-properties-common \
    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
-   && python3.8 `which add-apt-repository` \
+   && python3 `which add-apt-repository` \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
@@ -33,14 +33,22 @@ RUN set -x \
 RUN set -x \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-   sudo socat psmisc tigervnc-standalone-server xorg xauth \
-   python3-pip python3-venv libdbus-glib-1-dev \
-   uuid-runtime libgirepository1.0-dev \
+   libdbus-glib-1-dev \
+   libgirepository1.0-dev \
+   psmisc \
+   python3-pip \
+   python3-venv \
+   socat \
+   sudo \
+   tigervnc-standalone-server \
+   uuid-runtime \
+   xauth \
+   xorg \
    && : # aids diffs
 
 COPY requirements_nogrpc.txt /requirements.txt
 
 RUN set -x \
-   && pip3 install -r requirements.txt \
+   && pip3 install --break-system-packages -r requirements.txt \
    && xinit -- /usr/bin/Xvnc \
    && : # aids diffs

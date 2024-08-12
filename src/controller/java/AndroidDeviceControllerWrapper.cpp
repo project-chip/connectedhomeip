@@ -526,6 +526,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
+    jmethodID getClientTypeMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Integer;",
+                                                        &getClientTypeMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jClientType = env->CallObjectMethod(icdRegistrationInfo, getClientTypeMethod);
+
     chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
     if (jCheckInNodeId != nullptr)
     {
@@ -555,6 +561,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
         chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
     }
     params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
+
+    chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    if (jClientType != nullptr)
+    {
+        clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(jClientType));
+    }
+    params.SetICDClientType(clientType);
 
     return err;
 }

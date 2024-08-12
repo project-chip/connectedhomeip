@@ -85,6 +85,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # devices with multiple radios that have different sleep behavior for
     # different radios.
     chip_device_config_enable_dynamic_mrp_config = false
+
+    # Define the default endpoint id for the generic Thread network commissioning instance
+    chip_device_config_thread_network_endpoint_id = 0
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -137,6 +140,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
       "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
+      "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
@@ -389,6 +393,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
 
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
+      defines += [ "CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID=${chip_device_config_thread_network_endpoint_id}" ]
+    }
+
     visibility = [
       ":platform_config_header",
       "${chip_root}/src/ble:ble_config_header",
@@ -601,6 +610,9 @@ if (chip_device_platform != "none") {
 } else {
   group("platform") {
     public_deps = [ ":platform_buildconfig" ]
+  }
+
+  source_set("platform_base") {
   }
 }
 

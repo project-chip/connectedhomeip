@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
-#include <lib/core/OTAImageHeader.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/OTAImageHeader.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 

@@ -54,6 +54,8 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     // must be restored on the boot. If there's no backup, the below function is a no-op.
     RevertConfiguration();
 
+    CheckInterfaceEnabled();
+
     return CHIP_NO_ERROR;
 }
 
@@ -94,6 +96,16 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+
+    if (!GetEnabled())
+    {
+        // When reverting configuration, set InterfaceEnabled to default value (true).
+        // From the spec:
+        // If InterfaceEnabled is written to false on the same interface as that which is used to write the value, the Administrator
+        // could await the recovery of network configuration to prior safe values, before being able to communicate with the
+        // node again.
+        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
+    }
 
     ChipLogProgress(NetworkProvisioning, "Reverting Thread operational dataset");
 
@@ -166,6 +178,12 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
 {
     NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
 
+    if (!GetEnabled())
+    {
+        // Set InterfaceEnabled to default value (true).
+        ReturnOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
+    }
+
     if (status == Status::kSuccess && BackupConfiguration() != CHIP_NO_ERROR)
     {
         status = Status::kUnknownError;
@@ -181,6 +199,30 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
     {
         callback->OnResult(status, CharSpan(), 0);
     }
+}
+
+CHIP_ERROR GenericThreadDriver::SetEnabled(bool enabled)
+{
+    if (enabled == GetEnabled())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kInterfaceEnabled, &enabled, sizeof(enabled)));
+
+    if ((!enabled && ThreadStackMgrImpl().IsThreadEnabled()) || (enabled && ThreadStackMgrImpl().IsThreadProvisioned()))
+    {
+        ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(enabled));
+    }
+    return CHIP_NO_ERROR;
+}
+
+bool GenericThreadDriver::GetEnabled()
+{
+    bool value;
+    // InterfaceEnabled default value is true.
+    VerifyOrReturnValue(PersistedStorage::KeyValueStoreMgr().Get(kInterfaceEnabled, &value, sizeof(value)) == CHIP_NO_ERROR, true);
+    return value;
 }
 
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
@@ -221,6 +263,18 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
     ByteSpan dataset = mStagingNetwork.AsByteSpan();
 
     return KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), dataset.data(), dataset.size());
+}
+
+void GenericThreadDriver::CheckInterfaceEnabled()
+{
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+    // If the Thread interface is enabled and stack has been provisioned, but is not currently enabled, enable it now.
+    if (GetEnabled() && ThreadStackMgrImpl().IsThreadProvisioned() && !ThreadStackMgrImpl().IsThreadEnabled())
+    {
+        ReturnOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+        ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
+    }
+#endif
 }
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()

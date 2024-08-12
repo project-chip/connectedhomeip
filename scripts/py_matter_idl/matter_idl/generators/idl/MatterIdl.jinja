@@ -18,27 +18,79 @@
 {% macro render_struct(s) -%}{#
  Macro for the output of a complete struct
 #}
-  {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
-  {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
-  struct {{s.name}} {##}
-  {%- if s.code is not none %}= {{s.code}} {% endif -%}
-  {
-    {% for field in s.fields %}
-    {{render_field(field)}}
-    {% endfor %}
-  }
+{%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
+{% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
+struct {{s.name}} {##}
+{%- if s.code is not none %}= {{s.code}} {% endif -%}
+{
+  {% for field in s.fields %}
+  {{render_field(field)}}
+  {% endfor %}
+}
 {%- endmacro -%}
 
 
 // This IDL was auto-generated from a parsed data structure
 
-{%  for cluster in idl.clusters %}
+{% for enum in idl.global_enums %}
+enum {{enum.name}} : {{ enum.base_type}} {
+  {% for entry in enum.entries %}
+  {{entry.name}} = {{entry.code}};
+  {% endfor %}
+}
+
+{% endfor %}
+
+{%- for bitmap in idl.global_bitmaps %}
+bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
+  {% for entry in bitmap.entries %}
+  {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+  {% endfor %}
+}
+
+{% endfor %}
+
+{%- for s in idl.global_structs %}
+{{render_struct(s)}}
+
+{% endfor %}
+
+{%- for cluster in idl.clusters %}
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
 {{cluster.api_maturity | idltxt}}cluster {{cluster.name}} = {{cluster.code}} {
   revision {{cluster.revision}};
 
-  {% for enum in cluster.enums %}
+  {% for enum in cluster.enums | selectattr("is_global")%}
+  /* GLOBAL:
+  enum {{enum.name}} : {{ enum.base_type}} {
+    {% for entry in enum.entries %}
+    {{entry.name}} = {{entry.code}};
+    {% endfor %}
+  }
+  */
+
+  {% endfor %}
+
+  {%- for bitmap in cluster.bitmaps | selectattr("is_global")%}
+  /* GLOBAL:
+  bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
+    {% for entry in bitmap.entries %}
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+    {% endfor %}
+  }
+  */
+
+  {% endfor %}
+
+  {%- for s in cluster.structs | selectattr("is_global") %}
+  /* GLOBAL:
+  {{render_struct(s) | indent(2)}}
+   */
+
+  {% endfor %}
+
+  {%- for enum in cluster.enums | rejectattr("is_global")%}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
     {{entry.name}} = {{entry.code}};
@@ -47,7 +99,7 @@
 
   {% endfor %}
 
-  {%- for bitmap in cluster.bitmaps %}
+  {%- for bitmap in cluster.bitmaps | rejectattr("is_global")%}
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
     {{entry.name}} = 0x{{"%X" | format(entry.code)}};
@@ -56,8 +108,8 @@
 
   {% endfor %}
 
-  {%- for s in cluster.structs | rejectattr("tag") %}
-  {{render_struct(s)}}
+  {%- for s in cluster.structs | rejectattr("tag") | rejectattr("is_global") %}
+  {{render_struct(s) | indent(2)}}
 
   {% endfor %}
 
@@ -72,12 +124,12 @@
   {% endfor %}
 
   {%- for a in cluster.attributes %}
-  {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
+  {{a.api_maturity|idltxt}}{{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
   {% endfor %}
 
   {%- for s in cluster.structs | selectattr("tag") %}
 
-  {{render_struct(s)}}
+  {{render_struct(s) | indent(2)}}
   {% endfor %}
 
   {%- for c in cluster.commands %}

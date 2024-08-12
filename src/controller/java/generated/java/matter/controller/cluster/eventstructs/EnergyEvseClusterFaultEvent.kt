@@ -26,7 +26,7 @@ class EnergyEvseClusterFaultEvent(
   val sessionID: UInt?,
   val state: UByte,
   val faultStatePreviousState: UByte,
-  val faultStateCurrentState: UByte
+  val faultStateCurrentState: UByte,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterFaultEvent {\n")
@@ -79,7 +79,7 @@ class EnergyEvseClusterFaultEvent(
         sessionID,
         state,
         faultStatePreviousState,
-        faultStateCurrentState
+        faultStateCurrentState,
       )
     }
   }

@@ -28,11 +28,12 @@
 #include <string.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
@@ -682,7 +683,9 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
 
-    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    // The receipt of a message exceeding the allowed size should have
+    // closed the connection.
+    EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
 }
 
 } // namespace

@@ -79,8 +79,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Will return the compressed fabric id of the fabric if the controller is
  * running, else nil.
- *
- * This property MUST be gotten from the Matter work queue.
  */
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 
@@ -266,7 +264,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
 
-- (NSNumber * _Nullable)syncGetCompressedFabricID;
+/**
+ * Since getSessionForNode now enqueues by the subscription pool for Thread
+ * devices, MTRDevice needs a direct non-queued access because it already
+ * makes use of the subscription pool.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 @end
 

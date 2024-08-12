@@ -347,8 +347,8 @@ template("ti_simplelink_sdk") {
       configs -= [ "${build_root}/config/compiler:std_default" ]
       configs += [ ":${sdk_target_name}_posix_config" ]
       sources = [
+        "${chip_root}/src/platform/cc13xx_26xx/nvocmp.c",
         "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
-        "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp.c",
       ]
 
       public_configs = [ ":${sdk_target_name}_config" ]
@@ -398,7 +398,7 @@ template("ti_simplelink_sdk") {
 
     defines += [
       "ONE_BLE_LIB_SIZE_OPTIMIZATION",
-      "NVOCMP_NVPAGES=5",
+      "NVOCMP_NVPAGES=12",
       "NVOCMP_NWSAMEITEM=1",
       "CC13X2P",
       "SYSCFG",

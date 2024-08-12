@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,16 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
+namespace chip {
+namespace app {
+namespace Clusters {
+
+DeviceEnergyManagementManager::DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate,
+                                                             Feature aFeature) :
+    DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature),
+    mDelegate(&aDelegate)
+{}
+
 CHIP_ERROR DeviceEnergyManagementManager::Init()
 {
     return Instance::Init();
@@ -31,3 +41,7 @@ void DeviceEnergyManagementManager::Shutdown()
 {
     Instance::Shutdown();
 }
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

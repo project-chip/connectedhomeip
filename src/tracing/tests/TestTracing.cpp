@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <gtest/gtest.h>
-#include <lib/support/UnitTestRegistration.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <tracing/backend.h>
 #include <tracing/macros.h>
 #include <tracing/registry.h>

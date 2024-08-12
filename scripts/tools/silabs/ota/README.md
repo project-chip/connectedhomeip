@@ -21,12 +21,11 @@ This is a wrapper over standard `ota_image_tool.py`, so the options for `create`
 are also available here:
 
 ```
-python3 ./scripts/tools/silabs/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
+python3 ./scripts/tools/silabs/ota/ota_multi_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
 ```
 
 followed by \*_custom options_- and a positional argument (should be last) that
-specifies the output file. Please see the `create_ota_images.sh` for some
-reference commands.
+specifies the output file.
 
 The list of **custom options**:
 
@@ -38,18 +37,16 @@ The list of **custom options**:
 --app-version-str  --> Application version string. Same as above.
 --app-build-date   --> Application build date. Same as above.
 
-# SSBL options
---bl-input-file    --> Path to the SSBL binary.
---bl-version       --> SSBL version.
---bl-version-str   --> SSBL version string.
---bl-build-date    --> SSBL build date.
-
 # Factory data options
 --factory-data     --> If set, enables the generation of factory data.
 --cert_declaration --> Certification Declaration.
 --dac_cert         --> DAC certificate.
 --dac_key          --> DAC private key.
 --pai_cert         --> PAI certificate.
+
+# Encryption options
+--enc_enable       --> Enable ota encryption
+--input_ota_key    --> 16 Byte AES key
 
 # Custom TLV options
 --json             --> Path to a JSON file following ota_payload.schema
@@ -67,5 +64,5 @@ processing.
 When defining a custom processor, a user is able to also specify the custom
 format of the TLV by creating a JSON file based on the `ota_payload.schema`. The
 tool offers support for describing multiple TLV in the same JSON file. Please
-see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
+see the `examples/ota_custom_entries_example.json` for a multi-binary example.
 Option `--json` must be used to specify the path to the JSON file.

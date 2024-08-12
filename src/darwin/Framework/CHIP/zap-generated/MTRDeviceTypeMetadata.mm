@@ -73,6 +73,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x0000007B, DeviceTypeClass::Simple, "Matter Oven" },
     { 0x0000007C, DeviceTypeClass::Simple, "Matter Laundry Dryer" },
     { 0x00000090, DeviceTypeClass::Simple, "Matter Network Infrastructure Manager" },
+    { 0x00000091, DeviceTypeClass::Simple, "Matter Thread Border Router" },
     { 0x00000100, DeviceTypeClass::Simple, "Matter On/Off Light" },
     { 0x00000101, DeviceTypeClass::Simple, "Matter Dimmable Light" },
     { 0x00000103, DeviceTypeClass::Simple, "Matter On/Off Light Switch" },

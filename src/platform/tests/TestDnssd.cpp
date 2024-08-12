@@ -17,12 +17,13 @@
 
 #include <atomic>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "lib/dnssd/platform/Dnssd.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "platform/ConnectivityManager.h"
 #include "platform/PlatformManager.h"
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>

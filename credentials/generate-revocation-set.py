@@ -32,6 +32,7 @@ import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.x509.oid import NameOID
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -62,6 +63,32 @@ def extract_single_integer_attribute(subject, oid):
         return int(attribute_list[0].value, 16)
 
     return None
+
+
+def extract_fallback_tag_from_common_name(cn, marker):
+    val_len = 4
+    start_idx = cn.find(marker)
+
+    if start_idx != -1:
+        val_start_idx = start_idx + len(marker)
+        val = cn[val_start_idx:val_start_idx + val_len]
+        return int(val, 16) if len(val) == 4 else None
+
+    return None
+
+
+def parse_vid_pid_from_distinguished_name(distinguished_name):
+    # VID/PID encoded using Matter specific RDNs
+    vid = extract_single_integer_attribute(distinguished_name, OID_VENDOR_ID)
+    pid = extract_single_integer_attribute(distinguished_name, OID_PRODUCT_ID)
+
+    # Fallback method to get the VID/PID, encoded in CN as "Mvid:FFFF Mpid:1234"
+    if vid is None and pid is None:
+        cn = distinguished_name.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
+        vid = extract_fallback_tag_from_common_name(cn, 'Mvid:')
+        pid = extract_fallback_tag_from_common_name(cn, 'Mpid:')
+
+    return vid, pid
 
 
 class DCLDClient:
@@ -248,14 +275,11 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         is_paa = revocation_point["isPAA"]
 
         # 3. && 4. Validate VID/PID
-        # TODO: Need to support alternate representation of VID/PID (see spec "6.2.2.2. Encoding of Vendor ID and Product ID in subject and issuer fields")
-        crl_vid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_VENDOR_ID)
-        crl_pid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_PRODUCT_ID)
+        crl_vid, crl_pid = parse_vid_pid_from_distinguished_name(crl_signer_certificate.subject)
 
         if is_paa:
             if crl_vid is not None:
                 if vid != crl_vid:
-                    # TODO: Need to log all situations where a continue is called
                     logging.warning("VID is not CRL VID, continue...")
                     continue
         else:

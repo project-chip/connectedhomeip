@@ -1,0 +1,2 @@
+chip.rpc.DeviceCommissioningWindowInfo.verifier max_size:97  // kSpake2p_VerifierSerialized_Length
+chip.rpc.DeviceCommissioningWindowInfo.salt max_size:32      // kSpake2p_Max_PBKDF_Salt_Length

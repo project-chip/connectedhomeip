@@ -23,6 +23,8 @@
 #include <cstring>
 #include <utility>
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -118,3 +120,21 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer, uint16_t maxReadLength);
+#endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

@@ -65,11 +65,7 @@
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #endif // SL_MX25CTRL_MUX
 
-#if defined(EFR32MG12)
-#include "em_usart.h"
-#include "sl_spidrv_exp_config.h"
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
+#if defined(EFR32MG24)
 #include "em_eusart.h"
 #include "sl_spidrv_eusart_exp_config.h"
 #include "spi_multiplex.h"
@@ -183,7 +179,7 @@ void rsi_hal_board_init(void)
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* SL_SPICTRL_MUX */
 
-    /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
+    /* GPIO INIT of MG24 : Reset, Wakeup, Interrupt */
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */

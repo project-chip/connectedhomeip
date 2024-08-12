@@ -28,7 +28,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import EventChangeCallback, TestStep
+from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
 
 
@@ -122,7 +122,7 @@ class TC_OPSTATE_BASE():
             self.write_to_app_pipe(command)
             time.sleep(0.1)
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
 
     def send_manual_or_pipe_command(self, device: str, name: str, operation: str, param: Any = None):
         command = {
@@ -354,7 +354,7 @@ class TC_OPSTATE_BASE():
             if phase_list is not NullValue:
                 phase_list_len = len(phase_list)
                 asserts.assert_less_equal(phase_list_len, 32,
-                                          f"PhaseList length({phase_list_len}) must be less than 32!")
+                                          f"PhaseList length({phase_list_len}) must be at most 32 entries!")
 
         # STEP 3: TH reads from the DUT the CurrentPhase attribute
         self.step(3)
@@ -364,8 +364,9 @@ class TC_OPSTATE_BASE():
             if (phase_list == NullValue) or (not phase_list):
                 asserts.assert_true(current_phase == NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
-                asserts.assert_true(0 <= current_phase and current_phase < phase_list_len,
-                                    f"CurrentPhase({current_phase}) must be between 0 and {(phase_list_len - 1)}")
+                asserts.assert_greater_equal(current_phase, 0, f"CurrentPhase({current_phase}) must be >= 0")
+                asserts.assert_less(current_phase, phase_list_len,
+                                    f"CurrentPhase({current_phase}) must be less than {phase_list_len}")
 
         # STEP 4: TH reads from the DUT the CountdownTime attribute
         self.step(4)
@@ -652,7 +653,7 @@ class TC_OPSTATE_BASE():
             if phase_list is not NullValue:
                 phase_list_len = len(phase_list)
                 asserts.assert_less_equal(phase_list_len, 32,
-                                          f"PhaseList length({phase_list_len}) must be less than 32!")
+                                          f"PhaseList length({phase_list_len}) must be at most 32 entries!")
 
         # STEP 9: TH reads from the DUT the CurrentPhase attribute
         self.step(9)
@@ -662,10 +663,10 @@ class TC_OPSTATE_BASE():
             if (phase_list == NullValue) or (not phase_list):
                 asserts.assert_equal(current_phase, NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
-                asserts.assert_less_equal(0, current_phase,
-                                          f"CurrentPhase({current_phase}) must be greater or equal than 0")
-                asserts.assert_less(current_phase < phase_list_len,
-                                    f"CurrentPhase({current_phase}) must be less then {(phase_list_len - 1)}")
+                asserts.assert_greater_equal(current_phase, 0,
+                                             f"CurrentPhase({current_phase}) must be greater or equal to 0")
+                asserts.assert_less(current_phase, phase_list_len,
+                                    f"CurrentPhase({current_phase}) must be less than {(phase_list_len)}")
 
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
@@ -679,6 +680,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
+                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
+                logging.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_less_equal(countdown_time, (initial_countdown_time - wait_time),
                                           f"The countdown time shall have decreased at least {wait_time:.1f} since start command")
 
@@ -821,6 +824,7 @@ class TC_OPSTATE_BASE():
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
+                logging.info(f" -> Initial ountdown time: {initial_countdown_time}")
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     f"CountdownTime({initial_countdown_time}) must be between 0 and 259200")
 
@@ -835,6 +839,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
+                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
+                logging.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_equal(countdown_time, initial_countdown_time,
                                      "The countdown time shall be equal since pause command")
 
@@ -1076,6 +1082,7 @@ class TC_OPSTATE_BASE():
 
             # STEP 7: TH waits for initial-countdown-time
             self.step(7)
+            logging.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
             time.sleep(initial_countdown_time)
 
             # STEP 8: TH sends Stop command to the DUT
@@ -1095,7 +1102,8 @@ class TC_OPSTATE_BASE():
                                      f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
                 if event_data.totalOperationalTime is not NullValue:
-                    asserts.assert_less_equal(initial_countdown_time, event_data.totalOperationalTime,
+                    time_diff = abs(initial_countdown_time - event_data.totalOperationalTime)
+                    asserts.assert_less_equal(time_diff, 1,
                                               f"The total operation time shall be at least {initial_countdown_time:.1f}")
 
                 asserts.assert_equal(0, event_data.pausedTime,
@@ -1113,7 +1121,7 @@ class TC_OPSTATE_BASE():
             # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
             # reboot outside CI environment.
             if not self.is_ci:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
@@ -1215,3 +1223,130 @@ class TC_OPSTATE_BASE():
             self.skip_step(20)
             self.skip_step(21)
             self.skip_step(22)
+
+    ############################
+    #   TEST CASE 2.6 - Optional Reports with DUT as Server
+    ############################
+    def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
+        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                 TestStep(2, "Subscribe to CountdownTime attribute"),
+                 TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                             "the initial value of the CountdownTime is greater than 30, "
+                             "and it will begin counting down the CountdownTime attribute. "
+                             "Test harness reads the CountdownTime attribute."),
+                 TestStep(4, "Test harness reads the CountdownTime attribute."),
+                 TestStep(5, "Over a period of 30 seconds, TH counts all report transactions with an attribute "
+                             "report for the CountdownTime attribute in numberOfReportsReceived"),
+                 TestStep(6, "Test harness reads the CountdownTime attribute."),
+                 TestStep(7, "Until the current operation finishes, TH counts all report transactions with "
+                             "an attribute report for the CountdownTime attribute in numberOfReportsReceived and saves up to 5 such reports."),
+                 TestStep(8, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                             "the initial value of the CountdownTime is greater than 30, and it will begin counting down the CountdownTime attribute."
+                             "Test harness reads the CountdownTime attribute."),
+                 TestStep(9, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(10, "Test harness reads the CountdownTime attribute."),
+                 TestStep(11, "Manually put the device in the Paused(0x02) operational state")
+                 ]
+        return steps
+
+    async def TEST_TC_OPSTATE_BASE_2_6(self, endpoint=1):
+        cluster = self.test_info.cluster
+        attributes = cluster.Attributes
+
+        self.init_test()
+
+        # commission
+        self.step(1)
+
+        # Note that this does a subscribe-all instead of subscribing only to the CountdownTime attribute.
+        # To-Do: Update the TP to subscribe-all.
+        self.step(2)
+        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
+
+        self.step(3)
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                             device=self.device,
+                                             operation="Start")
+            time.sleep(1)
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+            countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+            if countdownTime is not NullValue:
+                count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+                asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(3)
+
+        sub_handler.reset()
+        self.step(4)
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        if countdownTime is not NullValue:
+            self.step(5)
+            logging.info('Test will now collect data for 10 seconds')
+            time.sleep(10)
+
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            sub_handler.reset()
+            asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+            asserts.assert_greater_equal(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(5)
+
+        self.step(6)
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        attr_value = await self.read_expect_success(
+            endpoint=endpoint,
+            attribute=attributes.OperationalState)
+        if attr_value == cluster.Enums.OperationalStateEnum.kRunning and countdownTime is not NullValue:
+            self.step(7)
+            wait_count = 0
+            while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
+                time.sleep(1)
+                wait_count = wait_count + 1
+                attr_value = await self.read_expect_success(
+                    endpoint=endpoint,
+                    attribute=attributes.OperationalState)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(7)
+
+        sub_handler.reset()
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.step(8)
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                             device=self.device,
+                                             operation="Start")
+            time.sleep(1)
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+            countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+            if countdownTime is not NullValue:
+                count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+                asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(8)
+
+        self.step(9)
+        await self.read_and_expect_value(endpoint=endpoint,
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+        sub_handler.reset()
+        self.step(10)
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")) and countdownTime is not NullValue:
+            self.step(11)
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                             device=self.device,
+                                             operation="Pause")
+            time.sleep(1)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(11)

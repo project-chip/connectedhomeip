@@ -177,6 +177,11 @@ public:
      */
     jdouble DoubleToPrimitive(jobject boxedObject);
 
+    /**
+     * Get a primitive jshort from the Java boxed type Short, using shortValue().
+     */
+    jshort ShortToPrimitive(jobject boxedShort);
+
     CHIP_ERROR CreateArrayList(jobject & outList);
 
     CHIP_ERROR AddToList(jobject list, jobject objectToAdd);

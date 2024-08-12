@@ -25,7 +25,10 @@ shared_library("jni") {
   output_name = "libCHIPMessaging"
 
   sources = [ "MessagingContext-JNI.cpp" ]
-  deps = [ "${chip_root}/src/messaging/tests:helpers" ]
+  deps = [
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -33,7 +36,11 @@ shared_library("jni") {
     defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
     include_dirs = java_matter_controller_dependent_paths
 
-    deps += [ "${chip_root}/src/platform/Linux" ]
+    if (current_os == "mac") {
+      deps += [ "${chip_root}/src/platform/Darwin" ]
+    } else {
+      deps += [ "${chip_root}/src/platform/Linux" ]
+    }
 
     cflags = [ "-Wno-unknown-pragmas" ]
 

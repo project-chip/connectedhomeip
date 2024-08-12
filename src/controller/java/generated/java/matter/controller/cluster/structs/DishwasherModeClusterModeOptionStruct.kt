@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class DishwasherModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<DishwasherModeClusterModeTagStruct>
+  val modeTags: List<DishwasherModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("DishwasherModeClusterModeOptionStruct {\n")

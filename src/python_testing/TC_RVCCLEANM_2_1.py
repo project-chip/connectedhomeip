@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_RVC_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2
+# === END CI TEST ARGUMENTS ===
+
 import logging
 from time import sleep
 
@@ -138,7 +150,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                 print("Changing mode to Cleaning")
                 await self.send_run_change_to_mode_cmd(1)
             else:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(
+                    prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when done" % (self.mode_fail))
 
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -169,7 +182,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             print("Changing mode to Idle")
             await self.send_run_change_to_mode_cmd(0)
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(
+                prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when done" % (self.mode_ok))
 
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_RVC_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 from time import sleep
 
 import chip.clusters as Clusters
@@ -63,7 +75,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
         self.print_step(step_number, instruction)
-        input("Press Enter when done.\n")
+        self.wait_for_user_input(prompt_msg=f"{instruction}, and press Enter when ready.")
 
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
@@ -101,7 +113,8 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(
+                prompt_msg="Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag, and press Enter when done.")
 
         self.print_step(3, "Read the RvcRunMode SupportedModes attribute")
         supported_run_modes = await self.read_run_supported_modes()

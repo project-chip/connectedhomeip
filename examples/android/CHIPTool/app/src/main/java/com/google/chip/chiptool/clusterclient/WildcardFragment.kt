@@ -174,7 +174,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
       setVisibilityEachView(radioBtnId)
     }
 
-    binding.sendBtn.setOnClickListener { showDialog() }
+    binding.sendBtn.setOnClickListener { showDialog(isICDQueueBtn = false) }
 
     binding.shutdownSubscriptionBtn.setOnClickListener { showShutdownSubscriptionDialog() }
 
@@ -183,6 +183,16 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
     binding.addListBtn.setOnClickListener { addRequest() }
     binding.resetBtn.setOnClickListener { resetPath() }
     binding.writeInvokeresetBtn.setOnClickListener { resetPath() }
+    binding.icdQueueBtn.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        val isSetting = showDialog(isICDQueueBtn = true)
+        if (!isSetting) {
+          binding.icdQueueBtn.isChecked = false
+        }
+      } else {
+        resetICDConfig()
+      }
+    }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
@@ -202,11 +212,11 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
 
   override fun notifyCheckInMessage() {
     Log.d(TAG, "notifyCheckInMessage")
-    if (attributePath.isNotEmpty() || eventPath.isNotEmpty()) {
-      if (binding.readRadioBtn.isChecked && readICDConfig != null) {
-        scope.launch { read(readICDConfig!!.isFabricFiltered, readICDConfig!!.eventMin) }
-      } else if (binding.subscribeRadioBtn.isChecked && subscribeICDConfig != null) {
-        scope.launch {
+    scope.launch {
+      if (attributePath.isNotEmpty() || eventPath.isNotEmpty()) {
+        if (binding.readRadioBtn.isChecked && readICDConfig != null) {
+          read(readICDConfig!!.isFabricFiltered, readICDConfig!!.eventMin)
+        } else if (binding.subscribeRadioBtn.isChecked && subscribeICDConfig != null) {
           subscribe(
             subscribeICDConfig!!.minInterval,
             subscribeICDConfig!!.maxInterval,
@@ -215,18 +225,25 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
             subscribeICDConfig!!.eventMin
           )
         }
-      }
-    } else if (
-      binding.writeRadioBtn.isChecked && writePath.isNotEmpty() && writeICDConfig != null
-    ) {
-      scope.launch { write(writeICDConfig!!.timedRequestTimeoutMs, writeICDConfig!!.imTimeoutMs) }
-    } else if (
-      binding.invokeRadioBtn.isChecked && invokePath.isNotEmpty() && invokeICDConfig != null
-    ) {
-      scope.launch {
+      } else if (
+        binding.writeRadioBtn.isChecked && writePath.isNotEmpty() && writeICDConfig != null
+      ) {
+        write(writeICDConfig!!.timedRequestTimeoutMs, writeICDConfig!!.imTimeoutMs)
+      } else if (
+        binding.invokeRadioBtn.isChecked && invokePath.isNotEmpty() && invokeICDConfig != null
+      ) {
         invoke(invokeICDConfig!!.timedRequestTimeoutMs, invokeICDConfig!!.imTimeoutMs)
       }
+      requireActivity().runOnUiThread { binding.icdQueueBtn.isChecked = false }
+      resetICDConfig()
     }
+  }
+
+  private fun resetICDConfig() {
+    readICDConfig = null
+    subscribeICDConfig = null
+    writeICDConfig = null
+    invokeICDConfig = null
   }
 
   private fun setVisibilityEachView(radioBtnId: Int) {
@@ -261,16 +278,20 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
     resetPath()
   }
 
-  private fun showDialog() {
+  private fun showDialog(isICDQueueBtn: Boolean): Boolean {
+    var ret = false
     if (binding.readRadioBtn.isChecked) {
-      showReadDialog()
+      ret = showReadDialog(isICDQueueBtn)
     } else if (binding.subscribeRadioBtn.isChecked) {
-      showSubscribeDialog()
+      ret = showSubscribeDialog(isICDQueueBtn)
     } else if (binding.writeRadioBtn.isChecked) {
-      showWriteDialog()
+      showWriteDialog(isICDQueueBtn)
+      ret = true
     } else if (binding.invokeRadioBtn.isChecked) {
-      showInvokeDialog()
+      showInvokeDialog(isICDQueueBtn)
+      ret = true
     }
+    return ret
   }
 
   private fun addRequest() {
@@ -547,7 +568,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
     )
   }
 
-  private fun showReadDialog() {
+  private fun showReadDialog(isICDQueueBtn: Boolean): Boolean {
     if (attributePath.isEmpty() && eventPath.isEmpty()) {
       requireActivity().runOnUiThread {
         Toast.makeText(
@@ -557,7 +578,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
           )
           .show()
       }
-      return
+      return false
     }
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.read_dialog, null)
     val eventMinEd = dialogView.findViewById<EditText>(R.id.eventMinEd)
@@ -576,7 +597,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
         if (eventPath.isNotEmpty() && eventMinEd.text.isNotBlank()) {
           eventMin = eventMinEd.text.toString().toULong().toLong()
         }
-        if (addressUpdateFragment.isICDDevice()) {
+        if (isICDQueueBtn) {
           readICDConfig =
             ReadICDConfig(isFabricFilteredEd.selectedItem.toString().toBoolean(), eventMin)
         } else {
@@ -586,9 +607,10 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
       }
     }
     dialog.show()
+    return true
   }
 
-  private fun showWriteDialog() {
+  private fun showWriteDialog(isICDQueueBtn: Boolean) {
     binding.outputTv.text = ""
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.write_dialog, null)
     val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
@@ -610,7 +632,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
           } else {
             imTimeout.toInt()
           }
-        if (addressUpdateFragment.isICDDevice()) {
+        if (isICDQueueBtn) {
           writeICDConfig = WriteInvokeICDConfig(timedRequestTimeoutInt, imTimeoutInt)
         } else {
           write(timedRequestTimeoutInt, imTimeoutInt)
@@ -621,7 +643,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
     dialog.show()
   }
 
-  private fun showSubscribeDialog() {
+  private fun showSubscribeDialog(isICDQueueBtn: Boolean): Boolean {
     if (attributePath.isEmpty() && eventPath.isEmpty()) {
       requireActivity().runOnUiThread {
         Toast.makeText(
@@ -631,7 +653,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
           )
           .show()
       }
-      return
+      return false
     }
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.subscribe_dialog, null)
     val eventMinEd = dialogView.findViewById<EditText>(R.id.eventMinEd)
@@ -654,7 +676,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
           if (eventPath.isNotEmpty() && eventMinEd.text.isNotBlank()) {
             eventMin = eventMinEd.text.toString().toULong().toLong()
           }
-          if (addressUpdateFragment.isICDDevice()) {
+          if (isICDQueueBtn) {
             subscribeICDConfig =
               SubscribeICDConfig(
                 minIntervalEd.text.toString().toInt(),
@@ -679,9 +701,10 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
       }
     }
     dialog.show()
+    return true
   }
 
-  private fun showInvokeDialog() {
+  private fun showInvokeDialog(isICDQueueBtn: Boolean) {
     binding.outputTv.text = ""
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.invoke_dialog, null)
     val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
@@ -703,7 +726,7 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
           } else {
             imTimeout.toInt()
           }
-        if (addressUpdateFragment.isICDDevice()) {
+        if (isICDQueueBtn) {
           invokeICDConfig = WriteInvokeICDConfig(timedRequestTimeoutInt, imTimeoutInt)
         } else {
           invoke(timedRequestTimeoutInt, imTimeoutInt)

@@ -299,6 +299,46 @@ tests:
               minValue: 0
               maxValue: 3
 
+    - label:
+          "Step 7a: TH sends EnhancedStepHue command to DUT with StepMode=0x01
+          (up), StepSize=0"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 1
+              - name: "StepSize"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 7b: TH sends EnhancedStepHue command to DUT with StepMode=0x03
+          (down), StepSize=0"
+      PICS: CC.S.F01 && CC.S.C42.Rsp
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 3
+              - name: "StepSize"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"

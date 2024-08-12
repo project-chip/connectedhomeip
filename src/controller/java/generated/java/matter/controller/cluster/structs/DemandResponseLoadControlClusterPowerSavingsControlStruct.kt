@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
       val powerSavings = tlvReader.getUByte(ContextSpecificTag(TAG_POWER_SAVINGS))

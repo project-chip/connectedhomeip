@@ -22,15 +22,6 @@ if CHIP
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
-
 config CHIP_NFC_COMMISSIONING
 	bool "Share onboarding payload in NFC tag"
 	default n
@@ -178,9 +169,18 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  full configuration enabled by this option in the
 	  platform/telink/CHIPPlatformConfig.h file.
 
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	default n
+	depends on NET_IPV4
+	help
+	  If disabled, it allows to build Telink SDK application
+	  with IPv4 support independently of the Matter stack still
+	  running over IPv6.
+
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
-	default PM || BOARD_TLSR9118BDK40D
+	default PM
 	help
 	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 
 	  GPIO events are working only with GPIO IRQ. This option changes button matrix configuration. 

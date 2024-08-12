@@ -85,6 +85,15 @@ darwin-framework-tool/README
 energy-management-app/**/README
 ```
 
+## Fabric Admin example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+fabric-admin/README
+```
+
 ## Fabric Bridge example
 
 ```{toctree}
@@ -360,4 +369,13 @@ network-manager-app/README
 :maxdepth: 1
 
 lit-icd-app/**/README
+```
+
+## Thread Border Router example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+thread-br-app/**/README
 ```

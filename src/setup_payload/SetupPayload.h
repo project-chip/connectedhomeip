@@ -101,6 +101,7 @@ enum class RendezvousInformationFlag : uint8_t
     kSoftAP    = 1 << 0, ///< Device supports Wi-Fi softAP
     kBLE       = 1 << 1, ///< Device supports BLE
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
+    kWiFiPAF   = 1 << 3, ///< Device supports Wi-Fi Public Action Frame for discovery
 };
 using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
 
@@ -126,7 +127,7 @@ struct PayloadContents
     // payload parsed from a QR code would always have a value for
     // rendezvousInformation.
     Optional<RendezvousInformationFlags> rendezvousInformation;
-    SetupDiscriminator discriminator;
+    SetupDiscriminator discriminator{};
     uint32_t setUpPINCode = 0;
 
     enum class ValidationMode : uint8_t

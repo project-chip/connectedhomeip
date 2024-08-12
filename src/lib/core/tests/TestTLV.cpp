@@ -23,21 +23,21 @@
  *
  */
 
-#include <gtest/gtest.h>
 #include <nlbyteorder.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
 

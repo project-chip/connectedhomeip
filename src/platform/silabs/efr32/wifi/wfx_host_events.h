@@ -114,12 +114,9 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_CONNECT_IND_ID 2
 #define SL_WFX_DISCONNECT_IND_ID 3
 #define SL_WFX_SCAN_COMPLETE_ID 4
-#define WFX_RSI_SSID_SIZE 64
-
 #endif /* WF200 */
 
 /* LwIP includes. */
-#include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
@@ -141,14 +138,19 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 1
 #define WLAN_DRIVER_TASK_PRIORITY 1
+#define BLE_DRIVER_TASK_PRIORITY 1
 #define MAX_JOIN_RETRIES_COUNT 5
 
 #else /* WF200 */
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 1
-#define BLE_TASK_PRIORITY 1
 #define MAX_JOIN_RETRIES_COUNT 5
-#endif
+#endif // RS911X_WIFI
+
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH (64)
 
 // WLAN retry time intervals in milli seconds
 #define WLAN_MAX_RETRY_TIMER_MS 30000
@@ -159,7 +161,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 // WLAN related Macros
 #define ETH_FRAME 0
 #define CMP_SUCCESS 0
-#define BSSID_MAX_STR_LEN 6
+#define BSSID_LEN (6)
 #define MAC_ADDRESS_FIRST_OCTET 6
 #define AP_START_SUCCESS 0
 #define BITS_TO_WAIT 0
@@ -254,8 +256,8 @@ typedef enum
 
 typedef struct
 {
-    char ssid[32 + 1];
-    char passkey[64 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -270,9 +272,9 @@ typedef enum
 
 typedef struct wfx_wifi_scan_result
 {
-    char ssid[32 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
     wfx_sec_t security;
-    uint8_t bssid[6];
+    uint8_t bssid[BSSID_LEN];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
@@ -386,12 +388,6 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
-sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);
-sl_status_t sl_si91x_allocate_command_buffer(sl_wifi_buffer_t ** host_buffer, void ** buffer, uint32_t requested_buffer_size,
-                                             uint32_t wait_duration_ms);
-#endif
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
 #ifdef __cplusplus

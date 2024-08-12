@@ -243,11 +243,17 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    virtual CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               1, nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               transportPayloadCapability);
         return CHIP_NO_ERROR;
     }
 
@@ -267,11 +273,16 @@ public:
      */
     CHIP_ERROR
     GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
+                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection,
-                                                               onSetupFailure);
+                                                               onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               1, nullptr,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               transportPayloadCapability);
         return CHIP_NO_ERROR;
     }
 
@@ -375,7 +386,7 @@ public:
      * @param[in] noc                                NOC in CHIP certificate format.
      * @param[in] icac                               ICAC in CHIP certificate format. If no icac is present, an empty
      *                                               ByteSpan should be passed.
-     * @param[in] externalOperationalKeypair         External operational keypair. If null, use keypair in OperationalKeystore.
+     * @param[in] operationalKeypair                 External operational keypair. If null, use keypair in OperationalKeystore.
      * @param[in] operationalKeypairExternalOwned    If true, external operational keypair must outlive the fabric.
      *                                               If false, the keypair is copied and owned in heap of a FabricInfo.
      *
@@ -457,7 +468,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override {}
+    ~DeviceCommissioner() override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -636,7 +647,7 @@ public:
      * @brief
      *   This function validates the Attestation Information sent by the device.
      *
-     * @param[in] info Structure contatining all the required information for validating the device attestation.
+     * @param[in] info Structure containing all the required information for validating the device attestation.
      */
     CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
@@ -657,7 +668,7 @@ public:
      * As a result, commissioning can advance to the next stage.
      *
      * The DevicePairingDelegate may call this method from the OnScanNetworksSuccess and OnScanNetworksFailure callbacks,
-     * or it may call this method after obtaining network credentials using asyncronous methods (prompting user, cloud API call,
+     * or it may call this method after obtaining network credentials using asynchronous methods (prompting user, cloud API call,
      * etc).
      *
      * If an error happens in the subsequent network commissioning step (either NetworkConfig or ConnectNetwork commands)
@@ -676,7 +687,7 @@ public:
      * using CommissioningDelegate.SetCommissioningParameters(). As a result, commissioning can advance to the next stage.
      *
      * The DevicePairingDelegate may call this method from the OnICDRegistrationInfoRequired callback, or it may call this
-     * method after obtaining required parameters for ICD registration using asyncronous methods (like RPC call etc).
+     * method after obtaining required parameters for ICD registration using asynchronous methods (like RPC call etc).
      *
      * When the ICD Registration completes, OnICDRegistrationComplete will be called.
      *
@@ -820,6 +831,7 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
+    Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
@@ -835,8 +847,11 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverBle;
 #endif
-
-    CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    static void OnWiFiPAFSubscribeComplete(void * appState);
+    static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
+    RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+#endif
 
     static void OnBasicFailure(void * context, CHIP_ERROR err);
     static void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
@@ -965,6 +980,8 @@ private:
     OnICDManagementStayActiveResponse(void * context,
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
 
+    static void OnInterfaceEnableWriteSuccessResponse(void * context);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -996,19 +1013,11 @@ private:
 
     /**
      * @brief
-     *   This function processes the DAC or PAI certificate sent by the device.
-     */
-    CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
-
-    /**
-     * @brief
      *   This function validates the revocation status of the DAC Chain sent by the device.
      *
-     * @param[in] info Structure contatining all the required information for validating the device attestation.
+     * @param[in] info Structure containing all the required information for validating the device attestation.
      */
     CHIP_ERROR CheckForRevokedDACChain(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
-
-    void HandleAttestationResult(CHIP_ERROR err);
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
@@ -1025,6 +1034,10 @@ private:
                                         Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
+    template <typename AttrType>
+    CHIP_ERROR SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                                             const AttrType & requestData, WriteResponseSuccessCallback successCb,
+                                             WriteResponseFailureCallback failureCb);
     void CancelCommissioningInteractions();
     void CancelCASECallbacks();
 

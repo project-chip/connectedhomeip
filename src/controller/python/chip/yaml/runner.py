@@ -20,10 +20,11 @@ import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
+from typing import Any, Optional, Tuple
 
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
-import stringcase
+import stringcase  # type: ignore
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
 from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
@@ -31,14 +32,11 @@ from chip.clusters.Attribute import (AttributeStatus, EventReadResult, Subscript
 from chip.exceptions import ChipStackError
 from chip.yaml.data_model_lookup import DataModelLookup
 from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
-from matter_yamltests.pseudo_clusters.clusters.delay_commands import DelayCommands
-from matter_yamltests.pseudo_clusters.clusters.log_commands import LogCommands
-from matter_yamltests.pseudo_clusters.clusters.system_commands import SystemCommands
-from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters
+from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
 from .data_model_lookup import PreDefinedDataModelLookup
 
-_PSEUDO_CLUSTERS = PseudoClusters([DelayCommands(), LogCommands(), SystemCommands()])
+_PSEUDO_CLUSTERS = get_default_pseudo_clusters()
 logger = logging.getLogger('YamlParser')
 
 
@@ -66,7 +64,7 @@ class EventResponse:
 @dataclass
 class _ActionResult:
     status: _ActionStatus
-    response: object
+    response: Any
 
 
 @dataclass
@@ -86,7 +84,7 @@ class _EventSubscriptionCallbackResult:
 class _ExecutionContext:
     ''' Objects that is commonly passed around this file that are vital to test execution.'''
     # Data model lookup to get python attribute, cluster, command object.
-    data_model_lookup: DataModelLookup = None
+    data_model_lookup: DataModelLookup
     # List of subscriptions.
     subscriptions: list = field(default_factory=list)
     # The key is the attribute/event name, and the value is a queue of subscription callback results
@@ -129,8 +127,8 @@ class DefaultPseudoCluster(BaseAction):
             raise ActionCreationError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        _ = await _PSEUDO_CLUSTERS.execute(self._test_step)
-        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+        response = await _PSEUDO_CLUSTERS.execute(self._test_step)
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=response[0])
 
 
 class InvokeAction(BaseAction):
@@ -664,10 +662,10 @@ class CommissionerCommandAction(BaseAction):
         if self._command == 'GetCommissionerNodeId':
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
-        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
-        if resp:
+        try:
+            await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
-        else:
+        except ChipStackError:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
 
@@ -675,7 +673,7 @@ class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand implementation (FindCommissionable* methods)."""
 
     @staticmethod
-    def _filter_for_step(test_step) -> (discovery.FilterType, any):
+    def _filter_for_step(test_step) -> Tuple[discovery.FilterType, Any]:
         """Given a test step, figure out the correct filters to give to
            DiscoverCommissionableNodes.
         """
@@ -712,7 +710,7 @@ class DiscoveryCommandAction(BaseAction):
         self.filterType, self.filter = DiscoveryCommandAction._filter_for_step(test_step)
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        devices = dev_ctrl.DiscoverCommissionableNodes(
+        devices = await dev_ctrl.DiscoverCommissionableNodes(
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
@@ -837,8 +835,8 @@ class ReplTestRunner:
         except ActionCreationError:
             return None
 
-    def encode(self, request) -> BaseAction:
-        action = None
+    def encode(self, request) -> Optional[BaseAction]:
+        action: Optional[BaseAction] = None
         cluster = request.cluster.replace(' ', '').replace('/', '').replace('.', '')
         command = request.command
         if cluster == 'CommissionerCommands':
@@ -884,8 +882,12 @@ class ReplTestRunner:
         response = result.response
 
         decoded_response = {}
+        if isinstance(response, dict):
+            return response
+
         if isinstance(response, chip.interaction_model.InteractionModelError):
             decoded_response['error'] = stringcase.snakecase(response.status.name).upper()
+            decoded_response['clusterError'] = response.clusterStatus
             return decoded_response
 
         if isinstance(response, chip.interaction_model.Status):
@@ -912,7 +914,8 @@ class ReplTestRunner:
                 'mrpRetryIntervalIdle': response.mrpRetryIntervalIdle,
                 'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
                 'mrpRetryActiveThreshold': response.mrpRetryActiveThreshold,
-                'supportsTcp': response.supportsTcp,
+                'supportsTcpClient': response.supportsTcpClient,
+                'supportsTcpServer': response.supportsTcpServer,
                 'isICDOperatingAsLIT': response.isICDOperatingAsLIT,
                 'addresses': response.addresses,
                 'rotatingId': response.rotatingId,
@@ -939,12 +942,13 @@ class ReplTestRunner:
                 cluster_id = event.Header.ClusterId
                 cluster_name = self._test_spec_definition.get_cluster_name(cluster_id)
                 event_id = event.Header.EventId
+                event_number = event.Header.EventNumber
                 event_name = self._test_spec_definition.get_event_name(cluster_id, event_id)
                 event_definition = self._test_spec_definition.get_event_by_name(cluster_name, event_name)
                 is_fabric_scoped = bool(event_definition.is_fabric_sensitive)
                 decoded_event = Converter.from_data_model_to_test_definition(
                     self._test_spec_definition, cluster_name, event_definition.fields, event.Data, is_fabric_scoped)
-                decoded_response.append({'value': decoded_event})
+                decoded_response.append({'value': decoded_event, 'eventNumber': event_number})
             return decoded_response
 
         if isinstance(response, ChipStackError):

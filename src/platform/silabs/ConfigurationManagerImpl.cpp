@@ -260,6 +260,18 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+/// @brief Helper to erase Thread info from device
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -272,17 +284,16 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GetDefaultInstance().ClearThreadStack();
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    sl_status_t status = wfx_sta_discon();
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "wfx_sta_discon() failed: %lx", status);
+    }
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     wfx_clear_wifi_provision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

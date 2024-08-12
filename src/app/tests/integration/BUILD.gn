@@ -44,10 +44,12 @@ executable("chip-im-initiator") {
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
@@ -66,11 +68,13 @@ executable("chip-im-responder") {
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]

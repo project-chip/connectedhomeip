@@ -34,11 +34,11 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
-    default MATTER_LOG_LEVEL_INF
+    default MATTER_LOG_LEVEL_DBG
 endchoice
 
 config CHIP_APP_LOG_LEVEL
-    default 3 # info
+    default 4 # debug
 
 config LOG_DEFAULT_LEVEL
     default 1 # error
@@ -108,7 +108,6 @@ config GPIO
 # Bluetooth Low Energy configs
 
 config BT
-    default n if BOARD_TLSR9118BDK40D
     default y
 
 if BT
@@ -138,10 +137,12 @@ config BT_BUF_ACL_TX_SIZE
     default 251
 
 config BT_RX_STACK_SIZE
-    default 810
+    default 810 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640
+    default 640 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
@@ -285,10 +286,10 @@ config NET_IPV6_NBR_CACHE
     default n
 
 config NET_MAX_CONN
-    default 1
+    default 1 if !WIFI
 
 config NET_MAX_CONTEXTS
-    default 1
+    default 1 if !WIFI
 
 config NET_CONFIG_INIT_TIMEOUT
     default 0
@@ -300,12 +301,31 @@ config CHIP_WIFI
 	select WIFI_W91
 	select WIFI
 	select NET_STATISTICS
-	select NET_L2_ETHERNET
 	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
+#	select NET_IPV4 # TODO: remove IPv4 when IPv6 will be ready (see CHIP_IPV4)
+#	select NET_CONFIG_NEED_IPV4
+#	select NET_DHCPV4
 
 if CHIP_WIFI
+
+config DEFAULT_WIFI_SSID
+	string "Default WiFi SSID"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The SSID of network to connect to if no WiFi station configuration exists in NV storage
+	  at the time the device boots.
+	  This option is for testing only and should be disabled in production releases
+
+config DEFAULT_WIFI_PASSWORD
+	string "Default WiFi Password"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The password for the default WiFi network.
+	  This option is for testing only and should be disabled in production releases.
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"

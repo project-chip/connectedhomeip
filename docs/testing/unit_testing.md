@@ -218,8 +218,8 @@ your overriding function make sure to check `HasFailure()` and return if the
 parent function failed.
 
 If you don't override any of the setup/teardown functions, you can simply make a
-type alias: `using YourTestContext = Test::AppContextPW;` instead of defining
-your own text context class.
+type alias: `using YourTestContext = Test::AppContext;` instead of defining your
+own text context class.
 
 ## Best practices
 

@@ -392,6 +392,19 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
+jshort JniReferences::ShortToPrimitive(jobject boxedShort)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Short", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "ShortToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "shortValue", "()S");
+    return env->CallShortMethod(boxedShort, valueMethod);
+}
+
 CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

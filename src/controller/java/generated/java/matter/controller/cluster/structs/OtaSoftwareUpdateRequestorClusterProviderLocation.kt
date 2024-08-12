@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class OtaSoftwareUpdateRequestorClusterProviderLocation(
   val providerNodeID: ULong,
   val endpoint: UShort,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
@@ -52,7 +52,7 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tlvTag)
       val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
@@ -64,7 +64,7 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
       return OtaSoftwareUpdateRequestorClusterProviderLocation(
         providerNodeID,
         endpoint,
-        fabricIndex
+        fabricIndex,
       )
     }
   }

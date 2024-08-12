@@ -52,7 +52,7 @@ struct ConcreteClusterPath
     // to alignment requirements it's "free" in the sense of not needing more
     // memory to put it here.  But we don't initialize it, because that
     // increases codesize for the non-consumers.
-    bool mExpanded; // NOTE: in between larger members
+    bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
     ClusterId mClusterId = 0;
 };
 

@@ -87,6 +87,9 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_ENABLE_OPENTHREAD
     Inet::InterfaceId GetExternalInterface();
     Inet::InterfaceId GetThreadInterface();

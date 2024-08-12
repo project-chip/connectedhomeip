@@ -14,9 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/ActiveResolveAttempts.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/ActiveResolveAttempts.h>
 
 namespace {
 
@@ -126,10 +128,7 @@ TEST(TestActiveResolveAttempts, TestSingleBrowseAddRemove)
     EXPECT_EQ(attempts.GetTimeUntilNextExpectedResponse(), std::make_optional<Timeout>(1900_ms32));
 
     // once complete, nothing to schedule
-    Dnssd::DiscoveredNodeData data;
-    data.Set<chip::Dnssd::CommissionNodeData>();
-    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
-    attempts.CompleteCommissionable(data);
+    attempts.CompleteAllBrowses();
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());
 }
@@ -377,10 +376,7 @@ TEST(TestActiveResolveAttempts, TestCombination)
     // Complete all, we should see no more scheduled.
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
-    Dnssd::DiscoveredNodeData data;
-    data.Set<chip::Dnssd::CommissionNodeData>();
-    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
-    attempts.CompleteCommissionable(data);
+    attempts.CompleteAllBrowses();
 
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());
