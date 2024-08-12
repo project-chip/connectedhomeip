@@ -78,7 +78,6 @@ extern CHIP_ERROR ECDSA_validate_msg_signature_H(const P256PublicKey * public_ke
 extern CHIP_ERROR ECDSA_validate_hash_signature_H(const P256PublicKey * public_key, const uint8_t * hash, const size_t hash_length,
                                                   const P256ECDSASignature & signature);
 
-#if (ENABLE_TRUSTM_GENERATE_EC_KEY || ENABLE_TRUSTM_ECDSA_VERIFY)
 static CHIP_ERROR get_trustm_keyid_from_keypair(const P256KeypairContext mKeypair, uint32_t * key_id)
 {
     if (0 != memcmp(&mKeypair.mBytes[0], trustm_magic_no, sizeof(trustm_magic_no)))
@@ -87,21 +86,14 @@ static CHIP_ERROR get_trustm_keyid_from_keypair(const P256KeypairContext mKeypai
     }
 
     *key_id += (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET]) | (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << 8);
-
     return CHIP_NO_ERROR;
 }
-#endif // #if (ENABLE_TRUSTM_GENERATE_EC_KEY || ENABLE_TRUSTM_ECDSA_VERIFY)
 
 P256Keypair::~P256Keypair()
 {
-    // Add method to get the keyid
     if (CHIP_NO_ERROR != get_trustm_keyid_from_keypair(mKeypair, &keyid))
     {
         Clear();
-    }
-    else
-    {
-        // Delete the key in SE
     }
 }
 
@@ -109,14 +101,6 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 
-#if !ENABLE_TRUSTM_GENERATE_EC_KEY
-    if (CHIP_NO_ERROR == Initialize_H(this, &mPublicKey, &mKeypair))
-    {
-        mInitialized = true;
-    }
-    error = CHIP_NO_ERROR;
-    return error;
-#else
     uint8_t pubkey[128] = {
         0,
     };
@@ -136,11 +120,20 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     }
     else
     {
+#if !ENABLE_TRUSTM_NOC_KEYGEN
+        error = Initialize_H(this, &mPublicKey, &mKeypair);
+        if (CHIP_NO_ERROR == error)
+        {
+            mInitialized = true;
+        }
+        return error;
+#else
         // Add the logic to use different keyid
         keyid = TRUSTM_NODE_OID_KEY_START;
         // Trust M ECC 256 Key Gen
         ChipLogDetail(Crypto, "Generating NIST256 key in TrustM !");
         key_usage = (optiga_key_usage_t) (OPTIGA_KEY_USAGE_SIGN | OPTIGA_KEY_USAGE_AUTHENTICATION);
+#endif //! ENABLE_TRUSTM_NOC_KEYGEN
     }
     // Trust M init
     trustm_Open();
@@ -167,14 +160,13 @@ exit:
         trustm_close();
     }
     return error;
-#endif
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
-#if !ENABLE_TRUSTM_GENERATE_EC_KEY
-    return ECDSA_sign_msg_H(&mKeypair, msg, msg_length, out_signature);
-#else
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    uint16_t keyid = (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET]) | (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << 8);
+
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
 
@@ -188,20 +180,31 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
 
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Crypto, "TrustM: ECDSA_sign_msg");
     // Trust M Init
     trustm_Open();
     // Hash to get the digest
     Hash_SHA256(msg, msg_length, &digest[0]);
-    uint16_t keyid = (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET]) | (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << 8);
-    // Api call to calculate the signature
-    if (keyid == OPTIGA_KEY_ID_E0F2)
+
+    if (keyid == OPTIGA_KEY_ID_E0F0)
     {
-        return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F2, digest, digest_length, signature_trustm, &signature_trustm_len);
+        ChipLogDetail(Crypto, "TrustM: ECDSA_sign_msg");
+
+        // Api call to calculate the signature
+        return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F0, digest, digest_length, signature_trustm, &signature_trustm_len);
     }
     else
     {
-        return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F0, digest, digest_length, signature_trustm, &signature_trustm_len);
+#if !ENABLE_TRUSTM_NOC_KEYGEN
+        // Use the mbedtls based method
+        ChipLogDetail(Crypto, "ECDSA sing msg mbedtls");
+        return ECDSA_sign_msg_H(&mKeypair, msg, msg_length, out_signature);
+#else
+        if (keyid == OPTIGA_KEY_ID_E0F2)
+        {
+            ChipLogDetail(Crypto, "TrustM: ECDSA_sign_msg");
+            return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F2, digest, digest_length, signature_trustm, &signature_trustm_len);
+        }
+#endif //! ENABLE_TRUSTM_NOC_KEYGEN
     }
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -220,14 +223,10 @@ exit:
         trustm_close();
     }
     return error;
-#endif
 }
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-#if !ENABLE_TRUSTM_GENERATE_EC_KEY
-    return ECDH_derive_secret_H(&mKeypair, remote_public_key, out_secret);
-#else
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
     size_t secret_length              = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
@@ -262,7 +261,6 @@ exit:
         trustm_close();
     }
     return error;
-#endif
 }
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
@@ -313,6 +311,12 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
         0,
     };
 
+    if (0 != memcmp(&mKeypair.mBytes[0], trustm_magic_no, sizeof(trustm_magic_no)))
+    {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+        return Serialize_H(mKeypair, mPublicKey, output);
+    }
+
     /* Set the public key */
     P256PublicKey & public_key = const_cast<P256PublicKey &>(Pubkey());
     bbuf.Put(Uint8::to_uchar(public_key), public_key.Length());
@@ -358,16 +362,11 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     }
     else
     {
-#if !ENABLE_TRUSTM_KEY_IMPORT
         if (CHIP_NO_ERROR == (error = Deserialize_H(this, &mPublicKey, &mKeypair, input)))
         {
             mInitialized = true;
         }
         return error;
-#else
-        // Add in code for Trust M
-        return CHIP_NO_ERROR;
-#endif
     }
 }
 
@@ -430,9 +429,6 @@ static void add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, ui
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
-#if !ENABLE_TRUSTM_GENERATE_EC_KEY
-    return NewCertificateSigningRequest_H(&mKeypair, csr, csr_length);
-#else
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
 
@@ -585,8 +581,6 @@ exit:
         trustm_close();
     }
     return error;
-
-#endif
 }
 
 } // namespace Crypto
