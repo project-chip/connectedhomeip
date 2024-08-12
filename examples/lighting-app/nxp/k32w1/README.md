@@ -122,11 +122,10 @@ does a clean soft reset that takes into account Matter shutdown procedure.
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in
-[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution. Supported Operating Systems and prerequisites are listed in
+[BUILDING](../../../../docs/guides/BUILDING.md).
 
--   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
