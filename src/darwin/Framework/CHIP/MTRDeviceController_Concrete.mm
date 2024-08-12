@@ -27,12 +27,12 @@
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDeviceController.h"
-#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -87,7 +87,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
-
 @interface MTRDeviceController_Concrete ()
 
 // MTRDeviceController ivar internal access
@@ -113,9 +112,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
-
 @end
-
 
 @implementation MTRDeviceController_Concrete
 
@@ -131,7 +128,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 
 - (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                               error:(NSError * __autoreleasing *)error
+                                                        error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
@@ -151,7 +148,7 @@ using namespace chip::Tracing::DarwinFramework;
 }
 
 - (nullable MTRDeviceController *)bogusWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                               error:(NSError * __autoreleasing *)error
+                                                error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);

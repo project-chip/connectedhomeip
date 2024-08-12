@@ -129,7 +129,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
 }
 
-
 - (instancetype)initForSubclasses
 {
     if (self = [super init]) {
