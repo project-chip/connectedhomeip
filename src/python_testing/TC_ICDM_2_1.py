@@ -130,6 +130,8 @@ class TC_ICDM_2_1(MatterBaseTest):
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
 
+        attribute_list = await self._read_icdm_attribute_expect_success(attribute=attributes.AttributeList)
+        
         # Commissioning
         self.step(1)
         # Read feature map
@@ -138,8 +140,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeThreshold
         self.step(2)
-        if self.check_pics("ICDM.S.A0002"):
-
+        if attributes.ActiveModeThreshold.attribute_id in attribute_list:
             activeModeThreshold = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeThreshold)
             # Verify ActiveModeThreshold is not bigger than uint16
@@ -156,7 +157,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ActiveModeDuration
         self.step(3)
-        if self.check_pics("ICDM.S.A0001"):
+        if attributes.ActiveModeDuration.attribute_id in attribute_list:
             activeModeDuration = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeDuration)
             # Verify ActiveModeDuration is not bigger than uint32
@@ -168,7 +169,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate IdleModeDuration
         self.step(4)
-        if self.check_pics("ICDM.S.A0000"):
+        if attributes.IdleModeDuration.attribute_id in attribute_list:
             idleModeDuration = await self._read_icdm_attribute_expect_success(
                 attributes.IdleModeDuration)
             # Verify IdleModeDuration is not bigger than uint32
@@ -184,7 +185,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ClientsSupportedPerFabric
         self.step(5)
-        if self.pics_guard(self.check_pics("ICDM.S.A0005")):
+        if attributes.ClientsSupportedPerFabric.attribute_id in attribute_list:
             clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
                 attributes.ClientsSupportedPerFabric)
 
@@ -197,7 +198,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate RegisteredClients
         self.step(6)
-        if self.pics_guard(self.check_pics("ICDM.S.A0003")):
+        if attributes.RegisteredClients.attribute_id in attribute_list:
             registeredClients = await self._read_icdm_attribute_expect_success(
                 attributes.RegisteredClients)
 
@@ -206,8 +207,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate ICDCounter
         self.step(7)
-        if self.pics_guard(self.check_pics("ICDM.S.A0004")):
-
+        if attributes.ICDCounter.attribute_id in attribute_list:
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
@@ -216,7 +216,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        if self.pics_guard(self.check_pics("ICDM.S.A0006")):
+        if attributes.UserActiveModeTriggerHint.attribute_id in attribute_list:
             userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerHint)
 
@@ -233,7 +233,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
-        if self.check_pics("ICDM.S.A0007"):
+        if attributes.UserActiveModeTriggerInstruction.attribute_id in attribute_list:
             userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
                 attributes.UserActiveModeTriggerInstruction)
 
@@ -265,7 +265,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Verify OperatingMode
         self.step(10)
-        if self.pics_guard(self.check_pics("ICDM.S.A0008")):
+        if attributes.OperatingMode.attribute_id in attribute_list:
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
@@ -274,8 +274,9 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             asserts.assert_less(
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
+
         self.step(11)
-        if self.pics_guard(self.check_pics("ICDM.S.A0009")):
+        if attributes.MaximumCheckInBackOff.attribute_id in attribute_list:
             maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
 
             asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
