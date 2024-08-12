@@ -42,7 +42,7 @@
 #include <uart.h>
 #endif
 
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 #include <platform/bouffalolab/common/FactoryDataProvider.h>
 #endif
 
@@ -87,7 +87,7 @@ chip::app::Clusters::NetworkCommissioning::Instance
 }
 #endif
 
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 namespace {
 FactoryDataProvider sFactoryDataProvider;
 }
@@ -180,7 +180,7 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
     chip::RendezvousInformationFlags rendezvousMode(chip::RendezvousInformationFlag::kOnNetwork);
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
     CHIP_ERROR retFactoryData = sFactoryDataProvider.Init();
 #endif
 
@@ -213,7 +213,6 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #else
     ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
-
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -221,7 +220,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #endif
 
     // Initialize device attestation config
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
     if (CHIP_NO_ERROR == retFactoryData)
     {
         SetDeviceInstanceInfoProvider(&sFactoryDataProvider);

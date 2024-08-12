@@ -1351,8 +1351,12 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
     ]):
+        if isinstance(pathTuple, ClusterAttribute.AttributePath):
+            return pathTuple
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
             return ClusterAttribute.AttributePath()
@@ -1437,7 +1441,9 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
     ]]] = None,
         dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[typing.List[
             typing.Union[
@@ -1475,6 +1481,8 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ 1 ] ) -- case 4 above.
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
+
+            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
 
         dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
 
@@ -1543,7 +1551,9 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
     ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
             returnClusterObject: bool = False,
             reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
@@ -1567,6 +1577,8 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ 1 ] ) -- case 4 above.
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
+
+            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
 
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
