@@ -18913,20 +18913,12 @@ typedef NS_OPTIONS(uint32_t, MTRWaterHeaterManagementFeature) {
     MTRWaterHeaterManagementFeatureTankPercent MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterDemandBitmap) {
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterTypeBitmap) {
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
+typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterHeatSourceBitmap) {
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlCriticalityLevel) {

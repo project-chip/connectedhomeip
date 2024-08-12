@@ -88,6 +88,8 @@ static void InitServer(intptr_t context)
     sThreadBRDelegate = chip::Platform::New<ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate>(storageDelegate);
     sThreadBRMgmtInstance = chip::Platform::New<ThreadBorderRouterManagement::ServerInstance>(
         kThreadBRMgmtEndpoint, sThreadBRDelegate, chip::Server::GetInstance().GetFailSafeContext());
+    char borderRouterName[] = "Espressif-ThreadBR";
+    sThreadBRDelegate->SetThreadBorderRouterName(CharSpan(borderRouterName));
     sThreadBRMgmtInstance->Init();
 }
 

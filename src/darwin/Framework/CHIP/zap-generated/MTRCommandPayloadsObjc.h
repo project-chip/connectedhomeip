@@ -5495,17 +5495,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWaterHeaterManagementClusterBoostParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable oneShot MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable emergencyBoost MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable temporarySetpoint MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable targetPercentage MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable targetReheat MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct * _Nonnull boostInfo MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
