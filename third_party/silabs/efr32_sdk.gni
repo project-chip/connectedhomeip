@@ -84,7 +84,7 @@ declare_args() {
   chip_enable_ota_custom_tlv_testing = false
 
   # Factory Provision storage
-  use_flash_storage = false
+  use_flash_storage = wifi_soc
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
