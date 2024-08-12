@@ -13,26 +13,26 @@ into an existing Matter network and can be controlled by this network.
 
 <hr>
 
-- [Matter K32W1 Contact Sensor Example Application](#matter-k32w1-contact-sensor-example-application)
-  - [Introduction](#introduction)
-    - [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    - [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-    - [Thread Provisioning](#thread-provisioning)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-  - [Long Idle Time ICD Support](#long-idle-time-icd-support)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [OTA](#ota)
-    - [Convert `srec` into `sb3` file](#convert-srec-into-sb3-file)
-    - [Convert `sb3` into `ota` file](#convert-sb3-into-ota-file)
-    - [OTA factory data](#ota-factory-data)
-    - [Running OTA](#running-ota)
-  - [Low power](#low-power)
-    - [Known issues](#known-issues)
+-   [Matter K32W1 Contact Sensor Example Application](#matter-k32w1-contact-sensor-example-application)
+    -   [Introduction](#introduction)
+        -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+        -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+        -   [Thread Provisioning](#thread-provisioning)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+    -   [Long Idle Time ICD Support](#long-idle-time-icd-support)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [OTA](#ota)
+        -   [Convert `srec` into `sb3` file](#convert-srec-into-sb3-file)
+        -   [Convert `sb3` into `ota` file](#convert-sb3-into-ota-file)
+        -   [OTA factory data](#ota-factory-data)
+        -   [Running OTA](#running-ota)
+    -   [Low power](#low-power)
+        -   [Known issues](#known-issues)
 
 ## Introduction
 
@@ -119,9 +119,12 @@ Matter shutdown procedure.
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -129,11 +132,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```
 
 -   Step 1: checkout NXP specific submodules only
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 ```
 
--   Step 2: activate local environment 
+-   Step 2: activate local environment
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
 ```
@@ -150,7 +155,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform common_sdk
 ```
-Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+
+Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP
+SDKs. Arg "-- help" could be used to view all available options.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w1

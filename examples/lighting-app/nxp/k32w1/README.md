@@ -15,27 +15,27 @@ into an existing Matter network and can be controlled by this network.
 
 <hr>
 
-- [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
-  - [Introduction](#introduction)
-    - [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    - [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-    - [Thread Provisioning](#thread-provisioning)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-    - [`SMU2` Memory](#smu2-memory)
-    - [LED PWM](#led-pwm)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [OTA](#ota)
-    - [Convert `srec` into `sb3` file](#convert-srec-into-sb3-file)
-    - [Convert `sb3` into `ota` file](#convert-sb3-into-ota-file)
-    - [OTA factory data](#ota-factory-data)
-    - [Running OTA](#running-ota)
-    - [Known issues](#known-issues)
-  - [Running RPC console](#running-rpc-console)
+-   [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
+    -   [Introduction](#introduction)
+        -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+        -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+        -   [Thread Provisioning](#thread-provisioning)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+        -   [`SMU2` Memory](#smu2-memory)
+        -   [LED PWM](#led-pwm)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [OTA](#ota)
+        -   [Convert `srec` into `sb3` file](#convert-srec-into-sb3-file)
+        -   [Convert `sb3` into `ota` file](#convert-sb3-into-ota-file)
+        -   [OTA factory data](#ota-factory-data)
+        -   [Running OTA](#running-ota)
+        -   [Known issues](#known-issues)
+    -   [Running RPC console](#running-rpc-console)
 
 </hr>
 
@@ -122,9 +122,12 @@ does a clean soft reset that takes into account Matter shutdown procedure.
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -132,11 +135,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```
 
 -   Step 1: checkout NXP specific submodules only
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 ```
 
--   Step 2: activate local environment 
+-   Step 2: activate local environment
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
 ```
@@ -153,7 +158,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform common_sdk
 ```
-Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+
+Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP
+SDKs. Arg "-- help" could be used to view all available options.
 
 -   Start building the application.
 
@@ -184,8 +191,8 @@ memory:
 These instances and global variables are placed in `SMU2` memory through name
 matching in the application linker script. They should not be changed or, if
 changed, the names must be updated in `k32w1_app.ld`. See
-[k32w1_app.ld](../../../platform/nxp/k32w1/app/ldscripts/k32w1_app.ld)
-for names and `SMU2` memory range size.
+[k32w1_app.ld](../../../platform/nxp/k32w1/app/ldscripts/k32w1_app.ld) for names
+and `SMU2` memory range size.
 
 The OpenThread buffers can be allocated from a 13KB `SMU2` range after a
 successful commissioning process until a factory reset is initiated. This way,
@@ -381,7 +388,6 @@ The OTA image used must be updated to include the new factory data.
 
 [OTA image tool guide](../../../../scripts/tools/nxp/ota/README.md).
 
-
 ### Running OTA
 
 The OTA topology used for OTA testing is illustrated in the figure below.
@@ -507,11 +513,11 @@ the `chip-console`, a user can send specific commands to the device.
 For button commands, please run `rpcs.chip.rpc.Button.Event(index)` based on the
 table below:
 
-| index | action |
-| ----- | ------ |
-| 0 | Start/stop BLE advertising |
-| 1 | Factory reset the device |
-| 2 | Application specific action (e.g. toggle LED) |
-| 3 | Soft reset the device |
+| index | action                                        |
+| ----- | --------------------------------------------- |
+| 0     | Start/stop BLE advertising                    |
+| 1     | Factory reset the device                      |
+| 2     | Application specific action (e.g. toggle LED) |
+| 3     | Soft reset the device                         |
 
 To reboot the device, please run `rpcs.chip.rpc.Device.Reboot()`.
