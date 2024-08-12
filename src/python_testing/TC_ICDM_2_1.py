@@ -130,8 +130,8 @@ class TC_ICDM_2_1(MatterBaseTest):
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
 
-        attribute_list = await self._read_icdm_attribute_expect_success(attribute=attributes.AttributeList)
-
+        attribute_list = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attributes.AttributeList)
+        
         # Commissioning
         self.step(1)
         # Read feature map
