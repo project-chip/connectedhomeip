@@ -32,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
-//@class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
 @class MTRFabricInfo;
 
