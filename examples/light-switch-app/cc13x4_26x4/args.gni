@@ -28,9 +28,9 @@ ti_simplelink_board = "LP_EM_CC1354P10_6"
 optimize_debug_level = "s"
 lwip_debug = false
 
-chip_enable_ota_requestor = false
+chip_enable_ota_requestor = true
 
-chip_openthread_ftd = false
+chip_openthread_ftd = true
 
 ot_ti_lib_dir = ""
 openthread_external_platform =
@@ -58,7 +58,7 @@ matter_device_pid = "0x8004"
 matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0.1+1"
 
-custom_factory_data = true
+custom_factory_data = false
 
 # ICD Default configurations
 # when enabled the device will be configured as a sleepy end device
