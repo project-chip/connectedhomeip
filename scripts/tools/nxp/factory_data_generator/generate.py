@@ -138,7 +138,8 @@ class KlvGenerator:
                     calculator = Calculator(Crc16.XMODEM)
                     crc_sum = calculator.checksum(fullContent)
 
-                    fullContent = bytearray(b"APP_FACT_DATA:  ") + size.to_bytes(4,'little') + fullContent + crc_sum.to_bytes(2,'little')
+                    fullContent = bytearray(b"APP_FACT_DATA:  ") + size.to_bytes(4, 'little') + \
+                        fullContent + crc_sum.to_bytes(2, 'little')
 
                     size = len(fullContent)
 
