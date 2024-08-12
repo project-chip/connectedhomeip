@@ -57,9 +57,9 @@ private:
 
     void OnAreaCompleteHandler();
 
-    void OnAddServiceAreaMap(uint32_t mapId, std::string & mapName);
+    void OnAddServiceAreaMap(Json::Value jsonValue);
 
-    void OnAddServiceAreaArea(chip::app::Clusters::ServiceArea::AreaStructureWrapper & area);
+    void OnAddServiceAreaArea(Json::Value jsonValue);
 
     void OnRemoveServiceAreaMap(uint32_t mapId);
 
