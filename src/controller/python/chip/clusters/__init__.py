@@ -15,19 +15,5 @@
 #    limitations under the License.
 #
 
-import contextlib
-
-from . import Attribute, CHIPClusters, Command, Objects
-from .ClusterObjects import Cluster
-from .Objects import Globals
-
-__all__ = ['Attribute', 'CHIPClusters', 'Command', 'Globals']
-
-# The Objects.py file is auto-generated and contains all the cluster classes.
-# We dynamically add all cluster classes to the module's namespace and the
-# __all__ list for global imports (from chip.clusters import *).
-for obj in Objects.__dict__.values():
-    with contextlib.suppress(AttributeError):
-        if Cluster in obj.mro():
-            globals()[obj.__name__] = obj
-            __all__.append(obj.__name__)
+from . import Attribute, CHIPClusters, Command, Objects  # noqa: F401
+from .Objects import *  # noqa: F401, F403
