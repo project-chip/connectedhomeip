@@ -390,7 +390,7 @@ void RvcServiceAreaDelegate::HandleSupportedAreasUpdated()
 {
     // Get a list of supported area IDs as `supportedAreaIDs`
     std::vector<uint32_t> supportedAreaIDs;
-    for (const auto& supportedArea : mSupportedAreas)
+    for (const auto & supportedArea : mSupportedAreas)
     {
         supportedAreaIDs.push_back(supportedArea.areaID);
     }
@@ -472,7 +472,7 @@ bool RvcServiceAreaDelegate::RemoveSupportedMap(uint32_t mapId)
     // Get the supported area IDs where the map ID matches the removed map ID
     std::vector<uint32_t> supportedAreaIds;
     {
-        for (const auto& supportedArea : mSupportedAreas)
+        for (const auto & supportedArea : mSupportedAreas)
         {
             if (supportedArea.mapID == mapId)
             {
@@ -484,7 +484,7 @@ bool RvcServiceAreaDelegate::RemoveSupportedMap(uint32_t mapId)
     // Remove the supported areas with the matching map ID
     if (!supportedAreaIds.empty())
     {
-        for (const auto& supportedAreaId : supportedAreaIds)
+        for (const auto & supportedAreaId : supportedAreaIds)
         {
             RemoveSupportedArea(supportedAreaId);
         }

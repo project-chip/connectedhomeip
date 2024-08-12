@@ -17,8 +17,8 @@
  */
 
 #include "RvcAppCommandDelegate.h"
-#include <platform/PlatformManager.h>
 #include <app/data-model/Nullable.h>
+#include <platform/PlatformManager.h>
 
 #include "rvc-device.h"
 #include <string>
@@ -175,7 +175,7 @@ void RvcAppCommandHandler::OnAddServiceAreaMap(Json::Value jsonValue)
     // Find if self->mJsonValue has the MapId and MapName Keys
     if (jsonValue.isMember("MapId") && jsonValue.isMember("MapName"))
     {
-        uint32_t mapId = jsonValue["MapId"].asInt();
+        uint32_t mapId      = jsonValue["MapId"].asInt();
         std::string mapName = jsonValue["MapName"].asString();
         mRvcDevice->HandleAddServiceAreaMap(mapId, CharSpan(mapName.data(), mapName.size()));
     }
@@ -221,8 +221,7 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
             relativePositionTag = Globals::RelativePositionTag(jsonValue["PositionTag"].asInt());
         }
 
-        area.SetLandmarkInfo(
-            Globals::LandmarkTag(jsonValue["LandmarkTag"].asInt()), relativePositionTag);
+        area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asInt()), relativePositionTag);
     }
 
     mRvcDevice->HandleAddServiceAreaArea(area);
