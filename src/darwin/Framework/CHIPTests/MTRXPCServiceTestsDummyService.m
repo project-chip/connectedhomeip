@@ -28,7 +28,6 @@
 
 - (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply
 {
-    NSLog(@"gesticulating mimes in %s", __PRETTY_FUNCTION__);
     reply(42);
 }
 
