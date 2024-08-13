@@ -327,6 +327,26 @@ void RvcDevice::HandleAreaCompletedEvent()
     }
 }
 
+void RvcDevice::HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName)
+{
+    mServiceAreaInstance.AddSupportedMap(mapId, mapName);
+}
+
+void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area)
+{
+    mServiceAreaInstance.AddSupportedArea(area);
+}
+
+void RvcDevice::HandleRemoveServiceAreaMap(uint32_t mapId)
+{
+    mServiceAreaDelegate.RemoveSupportedMap(mapId);
+}
+
+void RvcDevice::HandleRemoveServiceAreaArea(uint32_t areaId)
+{
+    mServiceAreaDelegate.RemoveSupportedArea(areaId);
+}
+
 void RvcDevice::HandleErrorEvent(const std::string & error)
 {
     detail::Structs::ErrorStateStruct::Type err;
@@ -406,6 +426,8 @@ void RvcDevice::HandleResetMessage()
     mServiceAreaInstance.ClearProgress();
     mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
     mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+
+    mServiceAreaDelegate.SetMapTopology();
 }
 
 void RvcDevice::UpdateServiceAreaProgressOnExit()

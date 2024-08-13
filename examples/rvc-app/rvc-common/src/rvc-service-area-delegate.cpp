@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::ServiceArea;
 
 void RvcServiceAreaDelegate::SetMapTopology()
 {
-    ClearSupportedMaps();
+    GetInstance()->ClearSupportedMaps();
 
     GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
     GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
@@ -65,7 +65,7 @@ void RvcServiceAreaDelegate::SetMapTopology()
 
 void RvcServiceAreaDelegate::SetNoMapTopology()
 {
-    ClearSupportedMaps();
+    GetInstance()->ClearSupportedMaps();
 
     // Area A has name, floor number.
     auto areaA =
@@ -279,6 +279,20 @@ bool RvcServiceAreaDelegate::ClearSupportedAreas()
     return false;
 }
 
+bool RvcServiceAreaDelegate::RemoveSupportedArea(uint32_t areaId)
+{
+    for (auto it = mSupportedAreas.begin(); it != mSupportedAreas.end(); ++it)
+    {
+        if (it->areaID == areaId)
+        {
+            mSupportedAreas.erase(it);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //*************************************************************************
 // Supported Maps accessors
 
@@ -370,6 +384,114 @@ bool RvcServiceAreaDelegate::ClearSupportedMaps()
     }
 
     return false;
+}
+
+void RvcServiceAreaDelegate::HandleSupportedAreasUpdated()
+{
+    // Get a list of supported area IDs as `supportedAreaIDs`
+    std::vector<uint32_t> supportedAreaIDs;
+    for (const auto & supportedArea : mSupportedAreas)
+    {
+        supportedAreaIDs.push_back(supportedArea.areaID);
+    }
+
+    if (supportedAreaIDs.empty())
+    {
+        // Clear all selected areas, current area, and progress if there are no supported areas.
+        GetInstance()->ClearSelectedAreas();
+        GetInstance()->SetCurrentArea(DataModel::NullNullable);
+        GetInstance()->ClearProgress();
+        return;
+    }
+
+    // Remove mSelectedArea elements that do not exist is `supportedAreaIDs`
+    {
+        for (auto it = mSelectedAreas.begin(); it != mSelectedAreas.end();)
+        {
+            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), *it) == supportedAreaIDs.end())
+            {
+                it = mSelectedAreas.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    // Set current Area to null if current area is not in `supportedAreaIDs`
+    {
+        auto currentAreaId = GetInstance()->GetCurrentArea();
+        if (!currentAreaId.IsNull() &&
+            std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), currentAreaId.Value()) == supportedAreaIDs.end())
+        {
+            GetInstance()->SetCurrentArea(DataModel::NullNullable);
+        }
+    }
+
+    // Remove mProgress elements that do not exist is `supportedAreaIDs`
+    {
+        for (auto it = mProgressList.begin(); it != mProgressList.end();)
+        {
+            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), it->areaID) == supportedAreaIDs.end())
+            {
+                it = mProgressList.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+}
+
+bool RvcServiceAreaDelegate::RemoveSupportedMap(uint32_t mapId)
+{
+    bool removedEntry = false;
+    for (auto it = mSupportedMaps.begin(); it != mSupportedMaps.end(); ++it)
+    {
+        if (it->mapID == mapId)
+        {
+            mSupportedMaps.erase(it);
+            removedEntry = true;
+        }
+    }
+
+    if (!removedEntry)
+    {
+        return false;
+    }
+
+    // If there are no supported maps left, none of the supported areas are vaild and their MapID needs to be null.
+    if (GetNumberOfSupportedMaps() == 0)
+    {
+        ClearSupportedAreas();
+        return true;
+    }
+
+    // Get the supported area IDs where the map ID matches the removed map ID
+    std::vector<uint32_t> supportedAreaIds;
+    {
+        for (const auto & supportedArea : mSupportedAreas)
+        {
+            if (supportedArea.mapID == mapId)
+            {
+                supportedAreaIds.push_back(supportedArea.areaID);
+            }
+        }
+    }
+
+    // Remove the supported areas with the matching map ID
+    if (!supportedAreaIds.empty())
+    {
+        for (const auto & supportedAreaId : supportedAreaIds)
+        {
+            RemoveSupportedArea(supportedAreaId);
+        }
+        HandleSupportedAreasUpdated();
+    }
+
+    return true;
 }
 
 //*************************************************************************
