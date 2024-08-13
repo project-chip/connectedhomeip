@@ -289,11 +289,7 @@
             "ClientsSupportedPerFabric",
             "MaximumCheckInBackOff"
         ],
-        "Occupancy Sensing": [
-            "HoldTimeLimits",
-            "HoldTime",
-            "FeatureMap"
-        ],
+        "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -664,15 +660,9 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
-        "Power Topology": [
-            "FeatureMap"
-        ],
-        "Valve Configuration and Control": [
-            "RemainingDuration"
-        ],
-        "Boolean State Configuration": [
-            "CurrentSensitivityLevel"
-        ],
+        "Power Topology": ["FeatureMap"],
+        "Valve Configuration and Control": ["RemainingDuration"],
+        "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
             "HeaterTypes",
             "HeatDemand",
@@ -683,25 +673,14 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Water Heater Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
-        "Wi-Fi Network Management": [
-            "SSID",
-            "PassphraseSurrogate"
-        ],
+        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": [
-            "CurrentArea",
-            "EstimatedEndTime",
-            "FeatureMap"
-        ]
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
