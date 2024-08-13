@@ -19,7 +19,6 @@
 #include "IcdManager.h"
 #include <app/InteractionModelEngine.h>
 
-
 IcdManager IcdManager::sInstance;
 
 IcdManager & IcdManager::Instance()
@@ -36,7 +35,8 @@ void IcdManager::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
     }
 
     uint32_t activeDurationMs = 30000;
-    auto stayActiveSender = chip::Platform::New<StayActiveSender>(activeDurationMs, clientInfo.peer_node, chip::app::InteractionModelEngine::GetInstance());
+    auto stayActiveSender     = chip::Platform::New<StayActiveSender>(activeDurationMs, clientInfo.peer_node,
+                                                                  chip::app::InteractionModelEngine::GetInstance());
     if (stayActiveSender == nullptr)
     {
         ChipLogProgress(ICD, "Fail to allocate stayActiveSender");

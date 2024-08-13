@@ -24,7 +24,6 @@
 
 #include "StayActiveSender.h"
 
-
 class IcdManager : public chip::app::DefaultCheckInDelegate
 {
 public:

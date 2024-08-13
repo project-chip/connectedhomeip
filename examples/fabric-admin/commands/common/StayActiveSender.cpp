@@ -16,34 +16,36 @@
  */
 
 #include "StayActiveSender.h"
-#include <controller/InvokeInteraction.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/OperationalSessionSetup.h>
+#include <controller/InvokeInteraction.h>
 #include <memory>
 
 StayActiveSender::StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode,
-                     chip::app::InteractionModelEngine * engine) :
-    mStayActiveDuration(stayActiveDuration), mPeerNode(peerNode), mpImEngine(engine),
-    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+                                   chip::app::InteractionModelEngine * engine) :
+    mStayActiveDuration(stayActiveDuration),
+    mPeerNode(peerNode), mpImEngine(engine), mOnConnectedCallback(HandleDeviceConnected, this),
+    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
 
-CHIP_ERROR StayActiveSender::SendStayActiveCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle)
+CHIP_ERROR StayActiveSender::SendStayActiveCommand(chip::Messaging::ExchangeManager & exchangeMgr,
+                                                   const chip::SessionHandle & sessionHandle)
 {
-    auto onSuccess = [&](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & status, const auto & dataResponse) {
+    auto onSuccess = [&](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & status,
+                         const auto & dataResponse) {
         uint32_t promisedActiveDuration = dataResponse.promisedActiveDuration;
         ChipLogProgress(ICD, "StayActive command succeeded with promised duration %u", promisedActiveDuration);
-        // TODO: please send multiple stayActive request with 30 seconds up to x min since active duration in server side is upper bound to 30 seconds
+        // TODO: please send multiple stayActive request with 30 seconds up to x min since active duration in server side is upper
+        // bound to 30 seconds
         if (mStayActiveDuration > dataResponse.promisedActiveDuration)
         {
             mStayActiveDuration -= dataResponse.promisedActiveDuration;
         }
     };
 
-    auto onFailure = [&](CHIP_ERROR error) {
-        ChipLogError(ICD, "StayActive command failed: %" CHIP_ERROR_FORMAT, error.Format());
-    };
+    auto onFailure = [&](CHIP_ERROR error) { ChipLogError(ICD, "StayActive command failed: %" CHIP_ERROR_FORMAT, error.Format()); };
 
     chip::EndpointId endpointId = 0;
     chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Type request;
@@ -77,5 +79,6 @@ void StayActiveSender::HandleDeviceConnectionFailure(void * context, const chip:
 {
     StayActiveSender * const _this = static_cast<StayActiveSender *>(context);
     VerifyOrDie(_this != nullptr);
-    ChipLogError(ICD, "Failed to establish CASE for stay active command with error '%" CHIP_ERROR_FORMAT "'", err.Format());;
+    ChipLogError(ICD, "Failed to establish CASE for stay active command with error '%" CHIP_ERROR_FORMAT "'", err.Format());
+    ;
 }

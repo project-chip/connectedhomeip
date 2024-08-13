@@ -17,29 +17,27 @@
 
 #pragma once
 
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
 #include <app/OperationalSessionSetup.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
 
+#include <app/InteractionModelEngine.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/ExchangeContext.h>
 #include <lib/support/CodeUtils.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <stddef.h>
-#include <app/InteractionModelEngine.h>
 
-namespace chip
-{
-namespace app
-{
+namespace chip {
+namespace app {
 class InteractionModelEngine;
 }
-}
+} // namespace chip
 
 /**
  * @brief StayActiveSender contains all the data and methods needed for active period extension of an ICD client.
@@ -47,8 +45,7 @@ class InteractionModelEngine;
 class StayActiveSender
 {
 public:
-    StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode,
-                     chip::app::InteractionModelEngine * engine);
+    StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine);
 
     /**
      * @brief Sets up a CASE session to the peer for extend a client active period with the peer.
@@ -86,7 +83,7 @@ private:
 
     uint32_t mStayActiveDuration = 0;
     chip::ScopedNodeId mPeerNode;
-    chip::app::InteractionModelEngine * mpImEngine   = nullptr;
+    chip::app::InteractionModelEngine * mpImEngine = nullptr;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
