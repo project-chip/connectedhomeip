@@ -32,7 +32,8 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.clusters.Types import NullValue
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
 
@@ -175,6 +176,12 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("1")
         # Commission DUT - already done
 
+        # Subscribe to Events and when they are sent push them to a queue for checking later
+        events_callback = EventChangeCallback(Clusters.WaterHeaterManagement)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    self.matter_test_config.endpoint)
+
         self.step("2")
         await self.check_test_event_triggers_enabled()
 
@@ -235,6 +242,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("8b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 5)
+        asserts.assert_equal(event_data.boostInfo.oneShot, True)
+        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
+        asserts.assert_true(event_data.boostInfo.temporarySetpoint is None, "temporarySetpoint should be None")
+        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
+        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
+        ################################################################################
+
         self.step("9")
         time.sleep(6)
 
@@ -244,6 +261,10 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("9b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
+        ################################################################################
 
         self.step("10")
         await self.send_boost_command(duration=600, one_shot=True)
@@ -256,6 +277,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("10b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 600)
+        asserts.assert_equal(event_data.boostInfo.oneShot, True)
+        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
+        asserts.assert_true(event_data.boostInfo.temporarySetpoint is None, "temporarySetpoint should be None")
+        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
+        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
+        ################################################################################
+
         self.step("11")
         await self.send_test_event_trigger_water_temperature61C_test_event()
 
@@ -265,6 +296,10 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("11b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
+        ################################################################################
 
         self.step("12")
         await self.send_test_event_trigger_water_temperature20C_test_event()
@@ -283,6 +318,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("13b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 600)
+        asserts.assert_true(event_data.boostInfo.oneShot is None, "oneShot should be None")
+        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
+        asserts.assert_true(event_data.boostInfo.temporarySetpoint is None, "temporarySetpoint should be None")
+        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
+        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
+        ################################################################################
 
         self.step("14")
         await self.send_test_event_trigger_water_temperature61C_test_event()
@@ -315,6 +360,10 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("16b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
+        ################################################################################
+
         self.step("17")
         await self.send_boost_command(duration=600, temporary_setpoint=6500)
 
@@ -325,6 +374,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("17b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 600)
+        asserts.assert_true(event_data.boostInfo.oneShot is None, "oneShot should be None")
+        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
+        asserts.assert_equal(event_data.boostInfo.temporarySetpoint, 6500)
+        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
+        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
+        ################################################################################
 
         self.step("18")
         await self.send_test_event_trigger_water_temperature61C_test_event()
@@ -358,6 +417,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("20b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 600)
+        asserts.assert_true(event_data.boostInfo.oneShot is None, "oneShot should be None")
+        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
+        asserts.assert_equal(event_data.boostInfo.temporarySetpoint, 7000)
+        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
+        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
+        ################################################################################
+
         self.step("21")
         await self.send_cancel_boost_command()
 
@@ -368,8 +437,16 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("21b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
+        ################################################################################
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
+        ################################################################################
+
         self.step("22")
         await self.send_cancel_boost_command()
+
+        ################################################################################
+        event_data = events_callback.wait_for_event_expect_no_report()
+        ################################################################################
 
         self.step("23")
         await self.send_test_event_trigger_basic_installation_test_event_clear()
