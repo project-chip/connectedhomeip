@@ -45,6 +45,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
         # TODO: confirm whether we can open processes like this on the TH
+        self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
@@ -73,11 +74,14 @@ class TC_CCTRL_2_2(MatterBaseTest):
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process.send_signal(signal.SIGTERM.value)
-        self.app_process.wait()
+        # In case the th_server_app_path does not exist, then we failed the test
+        # and there is nothing to remove
+        if self.app_process:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process.send_signal(signal.SIGTERM.value)
+            self.app_process.wait()
+            os.remove(self.kvs)
 
-        os.remove(self.kvs)
         super().teardown_class()
 
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:
