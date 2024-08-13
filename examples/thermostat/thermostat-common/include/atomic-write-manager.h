@@ -74,6 +74,7 @@ private:
 
     void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout);
     void ClearTimer(EndpointId endpoint);
+    void OnTimerExpired(EndpointId endpoint);
 
     void SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
 
@@ -82,6 +83,8 @@ private:
                                                                size_t & attributeRequestCount);
 
     ScopedNodeId GetAtomicWriteScopedNodeId(const std::optional<AttributeId> attributeId, const EndpointId endpoint);
+
+    friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
 
     struct AtomicWriteSession
     {

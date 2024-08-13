@@ -44,7 +44,7 @@ ThermostatAtomicWriteManager ThermostatAtomicWriteManager::sInstance;
 void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
-    ThermostatAtomicWriteManager::GetInstance().ResetWrite(endpoint);
+    ThermostatAtomicWriteManager::GetInstance().OnTimerExpired(endpoint);
 }
 
 imcode countAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
@@ -103,20 +103,6 @@ imcode validateAttributeRequests(const Commands::AtomicRequest::DecodableType & 
     return imcode::InvalidCommand;
 }
 
-void sendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, imcode status, imcode presetsStatus,
-                        imcode schedulesStatus, Optional<uint16_t> timeout = NullOptional)
-{
-    Commands::AtomicResponse::Type response;
-    Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
-        { .attributeID = Presets::Id, .statusCode = to_underlying(presetsStatus) },
-        { .attributeID = Schedules::Id, .statusCode = to_underlying(schedulesStatus) }
-    };
-    response.statusCode      = to_underlying(status);
-    response.attributeStatus = attributeStatus;
-    response.timeout         = timeout;
-    commandObj->AddResponse(commandPath, response);
-}
-
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {
     ScopedNodeId sourceNodeId = ScopedNodeId();
@@ -153,6 +139,24 @@ void ThermostatAtomicWriteManager::ScheduleTimer(EndpointId endpoint, System::Cl
 void ThermostatAtomicWriteManager::ClearTimer(EndpointId endpoint)
 {
     DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
+
+void ThermostatAtomicWriteManager::OnTimerExpired(EndpointId endpoint)
+{
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
+    {
+
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.endpointId == endpoint)
+        {
+            if (mDelegate != nullptr)
+            {
+                mDelegate->OnRollbackWrite(endpoint, Presets::Id);
+                mDelegate->OnRollbackWrite(endpoint, Schedules::Id);
+            }
+            ResetWrite(endpoint);
+        }
+    }
 }
 
 void ThermostatAtomicWriteManager::SetWriteState(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
@@ -423,6 +427,15 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
                 status = imcode::Failure;
             }
             attributeStatus.statusCode = to_underlying(statusCode);
+        }
+    }
+    if (status == imcode::Failure)
+    {
+        // Either one of the calls to OnPreCommitWrite failed, or one of the calls to OnCommitWrite failed; in the former case,
+        // discard any pending writes Do the same for the latter, knowing that the server may be in an inconsistent state
+        for (auto & attributeStatus : attributeStatuses)
+        {
+            mDelegate->OnRollbackWrite(endpoint, attributeStatus.attributeID);
         }
     }
     Commands::AtomicResponse::Type response;
