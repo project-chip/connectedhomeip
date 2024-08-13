@@ -34,16 +34,16 @@ static uint32_t ParseNumber(const char * pString);
 
 // Parses the --featureMap option
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
-                                    const char * aName, const char * aValue);
+                                   const char * aName, const char * aValue);
 
 constexpr uint16_t kOptionApplication = 0xffd0;
 constexpr uint16_t kOptionFeatureMap  = 0xffd1;
 
-constexpr const char *kDemApp   = "dem";
-constexpr const char *kEevseApp = "eevse";
-constexpr const char *kWhmApp   = "whm";
+constexpr const char * kDemApp   = "dem";
+constexpr const char * kEevseApp = "eevse";
+constexpr const char * kWhmApp   = "whm";
 
-constexpr const char *kValidApps[] = { kDemApp, kEevseApp, kWhmApp };
+constexpr const char * kValidApps[] = { kDemApp, kEevseApp, kWhmApp };
 
 // Define the chip::ArgParser command line structures for extending the command line to support the
 // energy apps
@@ -53,13 +53,11 @@ static chip::ArgParser::OptionDef sEnergyAppOptionDefs[] = {
     { nullptr }
 };
 
-static chip::ArgParser::OptionSet sCmdLineOptions = {
-    EnergyAppOptionHandler,               // handler function
-    sEnergyAppOptionDefs,                 // array of option definitions
-    "PROGRAM OPTIONS",                    // help group
-    "-a, --application <dem|eevse|whm>\n"
-    "-f, --featureSet <value>\n"
-};
+static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyAppOptionHandler, // handler function
+                                                      sEnergyAppOptionDefs,   // array of option definitions
+                                                      "PROGRAM OPTIONS",      // help group
+                                                      "-a, --application <dem|eevse|whm>\n"
+                                                      "-f, --featureSet <value>\n" };
 
 namespace chip {
 namespace app {
@@ -71,7 +69,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kP
                                           Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 
-static const char *spApp = nullptr;
+static const char * spApp = nullptr;
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
@@ -142,7 +140,7 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
     switch (aIdentifier)
     {
     case kOptionApplication:
-        for (uint16_t idx = 0; idx < sizeof(kValidApps)/sizeof(kValidApps[0]); idx++)
+        for (uint16_t idx = 0; idx < sizeof(kValidApps) / sizeof(kValidApps[0]); idx++)
         {
             ChipLogError(Support, "kValidApps[%d] %s", idx, kValidApps[idx]);
             if (strcmp(kValidApps[idx], aValue) == 0)

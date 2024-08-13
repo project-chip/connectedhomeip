@@ -20,7 +20,6 @@
 
 #include <lib/core/CHIPError.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
