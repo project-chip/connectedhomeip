@@ -371,8 +371,6 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 {
     uint16_t targetTemperature = GetActiveTargetWaterTemperature();
 
-    VerifyOrReturnValue(mWaterTemperature >= targetTemperature, false);
-
     if (mBoostState == BoostStateEnum::kActive)
     {
         if (mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
@@ -395,6 +393,15 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
             // If tank percentage is supported AND the targetPercentage.HasValue() then use target percentage to heat up.
             VerifyOrReturnValue(mTankPercentage >= mBoostTargetPercentage.Value(), false);
         }
+        else
+        {
+            VerifyOrReturnValue(mWaterTemperature >= targetTemperature, false);
+        }
+    }
+    else
+    {
+        // Just relying on mWaterTemperature to determine whether the temperature is at the target temperature
+        VerifyOrReturnValue(mWaterTemperature >= targetTemperature, false);
     }
 
     // Must have reached the right temperature
