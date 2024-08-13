@@ -21,7 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRXPCService : NSObject<MTRXPCServiceProtocol>
-
+- (void)ping;
 @end
 
 NS_ASSUME_NONNULL_END

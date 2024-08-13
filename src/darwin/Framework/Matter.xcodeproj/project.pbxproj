@@ -304,9 +304,10 @@
 		99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 99D466E02798936D0089A18F /* MTRCommissioningParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9B231B042C62EF650030EB37 /* MTRDeviceController_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B231B022C62EF650030EB37 /* MTRDeviceController_Concrete.h */; };
 		9BC064942C6BCB6F00996FEF /* MTRXPCService.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064922C6BCB6F00996FEF /* MTRXPCService.h */; };
-		9BC064952C6BCB6F00996FEF /* MTRXPCService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064932C6BCB6F00996FEF /* MTRXPCService.m */; };
+		9BC064952C6BCB6F00996FEF /* MTRXPCService.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064932C6BCB6F00996FEF /* MTRXPCService.mm */; };
 		9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */; };
 		9BC064972C6BCBAE00996FEF /* MTRXPCServiceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */; };
+		9BC064992C6BCEA000996FEF /* MTRXPCServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */; };
 		9BDA2A062C5D9AF800A32BDD /* MTRDevice_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */; };
 		9BDA2A082C5D9AFB00A32BDD /* MTRDevice_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */; };
 		AF1CB86E2874B03B00865A96 /* MTROTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -738,11 +739,11 @@
 		99AECC7F2798A57E00B6355B /* MTRCommissioningParameters.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommissioningParameters.mm; sourceTree = "<group>"; };
 		99C65E0F267282F1003402F6 /* MTRControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRControllerTests.m; sourceTree = "<group>"; };
 		99D466E02798936D0089A18F /* MTRCommissioningParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningParameters.h; sourceTree = "<group>"; };
-		9B231B022C62EF650030EB37 /* MTRDeviceController_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Concrete.h; sourceTree = "<group>"; };
 		9BC064922C6BCB6F00996FEF /* MTRXPCService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCService.h; sourceTree = "<group>"; };
 		9BC064932C6BCB6F00996FEF /* MTRXPCService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRXPCService.m; sourceTree = "<group>"; };
 		9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceController_Concrete.mm; sourceTree = "<group>"; };
 		9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCServiceProtocol.h; sourceTree = "<group>"; };
+		9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRXPCServiceTests.m; sourceTree = "<group>"; };
 		9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice_Concrete.mm; sourceTree = "<group>"; };
 		9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_Concrete.h; sourceTree = "<group>"; };
 		AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROTAProviderDelegate.h; sourceTree = "<group>"; };
@@ -1324,7 +1325,7 @@
 				7596A84328762729004DAE0E /* MTRDevice.mm */,
 				9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */,
 				9BC064922C6BCB6F00996FEF /* MTRXPCService.h */,
-				9BC064932C6BCB6F00996FEF /* MTRXPCService.m */,
+				9BC064932C6BCB6F00996FEF /* MTRXPCService.mm */,
 				9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */,
 				9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */,
 				88EBF8CB27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h */,
@@ -1459,6 +1460,7 @@
 				5A7947DD27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m */,
 				5A6FEC9C27B5E48800F25F42 /* MTRXPCProtocolTests.m */,
 				51189FC72A33ACE900184508 /* TestHelpers */,
+				9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */,
 			);
 			path = CHIPTests;
 			sourceTree = "<group>";
@@ -2030,7 +2032,7 @@
 				5A7947E427C0129600434CF2 /* MTRDeviceController+XPC.mm in Sources */,
 				5A6FEC9027B563D900F25F42 /* MTRDeviceControllerOverXPC.mm in Sources */,
 				516415FC2B6ACA8300D5CE11 /* MTRServerAccessControl.mm in Sources */,
-				9BC064952C6BCB6F00996FEF /* MTRXPCService.m in Sources */,
+				9BC064952C6BCB6F00996FEF /* MTRXPCService.mm in Sources */,
 				B289D4222639C0D300D4E314 /* MTROnboardingPayloadParser.mm in Sources */,
 				3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */,
 				2C1B027A2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.mm in Sources */,
@@ -2100,6 +2102,7 @@
 				5165A4B32C5AB978002B9799 /* MTRClusterNamesTests.m in Sources */,
 				51E95DF82A78110900A434F0 /* MTRPerControllerStorageTests.m in Sources */,
 				51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */,
+				9BC064992C6BCEA000996FEF /* MTRXPCServiceTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2422,6 +2425,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N42PSN93C7;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2592,7 +2596,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = N42PSN93C7;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
