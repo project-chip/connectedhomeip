@@ -18,6 +18,7 @@
 
 #include <AppMain.h>
 #include <EnergyEvseMain.h>
+#include <WaterHeaterMain.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BitMask.h>
 
@@ -26,27 +27,38 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
+using namespace chip::app::Clusters::WaterHeaterManagement;
 
 // Parse a hex (prefixed by 0x) or decimal (no-prefix) string
 static uint32_t ParseNumber(const char * pString);
 
 // Parses the --featureMap option
-static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
+static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
                                     const char * aName, const char * aValue);
 
-constexpr uint16_t kOptionFeatureMap = 'f';
+constexpr uint16_t kOptionApplication = 0xffd0;
+constexpr uint16_t kOptionFeatureMap  = 0xffd1;
+
+constexpr const char *kDemApp   = "dem";
+constexpr const char *kEevseApp = "eevse";
+constexpr const char *kWhmApp   = "whm";
+
+constexpr const char *kValidApps[] = { kDemApp, kEevseApp, kWhmApp };
 
 // Define the chip::ArgParser command line structures for extending the command line to support the
-// -f/--featureMap option
-static chip::ArgParser::OptionDef sFeatureMapOptionDefs[] = {
-    { "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap }, { nullptr }
+// energy apps
+static chip::ArgParser::OptionDef sEnergyAppOptionDefs[] = {
+    { "application", chip::ArgParser::kArgumentRequired, kOptionApplication },
+    { "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap },
+    { nullptr }
 };
 
 static chip::ArgParser::OptionSet sCmdLineOptions = {
-    FeatureMapOptionHandler,   // handler function
-    sFeatureMapOptionDefs,     // array of option definitions
-    "GENERAL OPTIONS",         // help group
-    "-f, --featureSet <value>" // option help text
+    EnergyAppOptionHandler,               // handler function
+    sEnergyAppOptionDefs,                 // array of option definitions
+    "PROGRAM OPTIONS",                    // help group
+    "-a, --application <dem|eevse|whm>\n"
+    "-f, --featureSet <value>\n"
 };
 
 namespace chip {
@@ -58,6 +70,8 @@ namespace DeviceEnergyManagement {
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
                                           Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+
+static const char *spApp = nullptr;
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
@@ -87,22 +101,66 @@ static uint32_t ParseNumber(const char * pString)
 void ApplicationInit()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
-    EvseApplicationInit();
+    if (strcmp(spApp, kDemApp) == 0 || strcmp(spApp, kEevseApp) == 0)
+    {
+        EvseApplicationInit();
+    }
+    else if (strcmp(spApp, kWhmApp) == 0)
+    {
+        FullWhmApplicationInit();
+    }
+    else
+    {
+        ChipLogError(Support, "Unexpected application %s", spApp);
+    }
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
-    EvseApplicationShutdown();
+
+    if (strcmp(spApp, kDemApp) == 0 || strcmp(spApp, kEevseApp) == 0)
+    {
+        EvseApplicationShutdown();
+    }
+    else if (strcmp(spApp, kWhmApp) == 0)
+    {
+        FullWhmApplicationShutdown();
+    }
+    else
+    {
+        ChipLogError(Support, "Unexpected application %s", spApp);
+    }
 }
 
-static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
-                                    const char * aName, const char * aValue)
+static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
+                                   const char * aName, const char * aValue)
 {
     bool retval = true;
 
+    ChipLogError(Support, "aIdentifier 0x%04x aValue %s", aIdentifier, aValue);
     switch (aIdentifier)
     {
+    case kOptionApplication:
+        for (uint16_t idx = 0; idx < sizeof(kValidApps)/sizeof(kValidApps[0]); idx++)
+        {
+            ChipLogError(Support, "kValidApps[%d] %s", idx, kValidApps[idx]);
+            if (strcmp(kValidApps[idx], aValue) == 0)
+            {
+                spApp = aValue;
+                break;
+            }
+        }
+
+        if (spApp != nullptr)
+        {
+            ChipLogDetail(Support, "Running application %s", spApp);
+        }
+        else
+        {
+            retval = false;
+        }
+        break;
     case kOptionFeatureMap:
         sFeatureMap = BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature>(ParseNumber(aValue));
         ChipLogDetail(Support, "Using FeatureMap 0x%04x", sFeatureMap.Raw());
