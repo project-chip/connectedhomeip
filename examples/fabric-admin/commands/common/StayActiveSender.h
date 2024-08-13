@@ -25,7 +25,7 @@
 
 /**
  * @brief StayActiveSender contains all the data and methods needed for active period extension of an ICD client.
- * 
+ *
  * Lifetime of instance of StayActiveSender is entirely self managed.
  */
 class StayActiveSender
@@ -42,12 +42,12 @@ public:
 
     /**
      * @brief Attempts to send a StayActiveRequest command
-     * 
+     *
      * @param[in] stayActiveDurationMs StayActiveRequest command parameter.
-     * @param[in] peerNode Peer node we sending StayActiveRequest command to 
+     * @param[in] peerNode Peer node we sending StayActiveRequest command to
      * @param[in] engine Interaction Model Engine instance for sending command.
      * @param[in] onDone Upon this function returning success, it is expected that onDone will be called after we
-     *            have successfully recieved a response 
+     *            have successfully recieved a response
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
