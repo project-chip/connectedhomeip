@@ -41,13 +41,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @interface MTRDeviceController_Concrete : MTRDeviceController
 
 /**
- * Controllers are created via the MTRDeviceControllerFactory object or
- * initialized via initWithParameters:error:.
- */
-//- (instancetype)init NS_UNAVAILABLE;
-//+ (instancetype)new NS_UNAVAILABLE;
-
-/**
  * Initialize a device controller with the provided parameters.  This will:
  *
  * 1) Auto-start the MTRDeviceControllerFactory in storage-per-controller mode
