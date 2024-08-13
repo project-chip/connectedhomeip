@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <vector>
+
 #include <lib/support/Span.h>
 #include <messaging/ExchangeContext.h>
 
@@ -47,7 +49,7 @@ public:
 
     BdxTransfer(System::Layer * systemLayer) : mSystemLayer(systemLayer) {}
 
-    ~BdxTransfer() override;
+    ~BdxTransfer() override = default;
 
     // Accepts the transfer. When a block of data arrives the delegate is invoked with the block. This must only be called if the
     // transfer sends data to this controller.
@@ -79,7 +81,7 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
 
-    uint8_t * mData              = nullptr;
+    std::vector<uint8_t> mData;
     size_t mDataCount            = 0;
     size_t mDataTransferredCount = 0;
 };
