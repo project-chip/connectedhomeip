@@ -161,7 +161,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(9)
         cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         # If no exception is raised, this is success
-        await self.send_single_cmd(cmd)
+        await self.send_single_cmd(cmd, timedRequestTimeoutMs=5000)
 
         self.step(10)
         if not events:
