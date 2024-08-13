@@ -57,7 +57,7 @@ public:
         // Should be indicated in some manner, or identify a better recovery mechanism here.
         mPendingKeepActive.erase(nodeId);
 
-        auto onDone = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
+        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(stayActiveDurationMs, clientInfo.peer_node,
                                                                  chip::app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)

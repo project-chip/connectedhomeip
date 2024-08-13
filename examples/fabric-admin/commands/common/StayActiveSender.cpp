@@ -22,9 +22,8 @@
 #include <controller/InvokeInteraction.h>
 #include <support/CHIPMem.h>
 
-
-CHIP_ERROR StayActiveSender::SendStayActiveCommand(uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine,
-                                                   OnDoneCallbackType onDone)
+CHIP_ERROR StayActiveSender::SendStayActiveCommand(uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode,
+                                                   chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone)
 {
     ConstructorOnlyInternallyCallable internal;
     auto stayActiveSender = chip::Platform::New<StayActiveSender>(internal, stayActiveDurationMs, peerNode,
@@ -38,8 +37,9 @@ CHIP_ERROR StayActiveSender::SendStayActiveCommand(uint32_t stayActiveDurationMs
     return err;
 }
 
-StayActiveSender::StayActiveSender(const ConstructorOnlyInternallyCallable & _, uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode,
-                                   chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone) :
+StayActiveSender::StayActiveSender(const ConstructorOnlyInternallyCallable & _, uint32_t stayActiveDurationMs,
+                                   const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine,
+                                   OnDoneCallbackType onDone) :
     mStayActiveDurationMs(stayActiveDurationMs),
     mPeerNode(peerNode), mpImEngine(engine), mOnDone(onDone), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)

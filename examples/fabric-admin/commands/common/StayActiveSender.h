@@ -35,7 +35,9 @@ private:
     // does not have access to private constructors. As a workaround we have defined this private struct that can
     // be forwarded by Platform::New that allows us to enforce that the only way StayActiveSender is constructed is
     // if SendStayActiveCommand is called.
-    struct ConstructorOnlyInternallyCallable {};
+    struct ConstructorOnlyInternallyCallable
+    {
+    };
 
 public:
     using OnDoneCallbackType = std::function<void(uint32_t promisedActiveDurationMs)>;
@@ -51,15 +53,15 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    static CHIP_ERROR SendStayActiveCommand(uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine,
-                                            OnDoneCallbackType onDone);
+    static CHIP_ERROR SendStayActiveCommand(uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode,
+                                            chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone);
 
     // Ideally this would be a private constructor, unfortunately that is not possible as Platform::New does not
     // have access to private constructors. As a workaround we have defined a private struct that can be forwarded
     // by Platform::New that allows us to enforce that the only way this is constructed is if SendStayActiveCommand
     // is called.
-    StayActiveSender(const ConstructorOnlyInternallyCallable & _, uint32_t stayActiveDurationMs, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine,
-                     OnDoneCallbackType onDone);
+    StayActiveSender(const ConstructorOnlyInternallyCallable & _, uint32_t stayActiveDurationMs,
+                     const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone);
 
 private:
     /**
