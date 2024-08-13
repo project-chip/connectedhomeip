@@ -24,6 +24,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -312,24 +313,24 @@ bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
     return false;
 }
 
-imcode ThermostatAttrAccess::BeginPresets(EndpointId endpoint)
+Status ThermostatAttrAccess::BeginPresets(EndpointId endpoint)
 {
     auto delegate = GetDelegate(endpoint);
     if (delegate == nullptr)
     {
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
     delegate->InitializePendingPresets();
-    return imcode::Success;
+    return Status::Success;
 }
 
-imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
+Status ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
 {
     auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -349,7 +350,7 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
                          "CommitPresets: GetPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return imcode::InvalidInState;
+            return Status::InvalidInState;
         }
 
         bool found = MatchingPendingPresetExists(delegate, preset);
@@ -358,7 +359,7 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
         // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
-            return imcode::ConstraintError;
+            return Status::ConstraintError;
         }
     }
 
@@ -372,7 +373,7 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
 
     if (err != CHIP_NO_ERROR)
     {
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 
     if (!activePresetHandle.empty())
@@ -380,7 +381,7 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
         uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle);
         if (count == 0)
         {
-            return imcode::InvalidInState;
+            return Status::InvalidInState;
         }
     }
 
@@ -400,7 +401,7 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
                          "CommitPresets: GetPendingPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return imcode::InvalidInState;
+            return Status::InvalidInState;
         }
 
         // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
@@ -425,32 +426,32 @@ imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
     if (numberOfPresetsSupported == 0)
     {
         ChipLogError(Zcl, "CommitPresets: Failed to get NumberOfPresets");
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 
     // If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
     // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
     if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
     {
-        return imcode::ResourceExhausted;
+        return Status::ResourceExhausted;
     }
 
     // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
     // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
 
-    return imcode::Success;
+    return Status::Success;
 }
 
-imcode ThermostatAttrAccess::CommitPresets(EndpointId endpoint)
+Status ThermostatAttrAccess::CommitPresets(EndpointId endpoint)
 {
     auto delegate  = GetDelegate(endpoint);
     CHIP_ERROR err = delegate->ApplyPendingPresets();
 
     if (err != CHIP_NO_ERROR)
     {
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
-    return imcode::Success;
+    return Status::Success;
 }
 
 CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & preset)
@@ -507,26 +508,26 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     return delegate->AppendToPendingPresetList(preset);
 }
 
-imcode ThermostatAttrAccess::RollbackPresets(EndpointId endpoint)
+Status ThermostatAttrAccess::RollbackPresets(EndpointId endpoint)
 {
     auto delegate = GetDelegate(endpoint);
     delegate->ClearPendingPresetList();
-    return imcode::Success;
+    return Status::Success;
 }
 
-imcode ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan newPresetHandle)
+Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan newPresetHandle)
 {
     auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null");
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 
     if (!IsPresetHandlePresentInPresets(delegate, newPresetHandle))
     {
-        return imcode::InvalidCommand;
+        return Status::InvalidCommand;
     }
 
     CHIP_ERROR err = delegate->SetActivePresetHandle(DataModel::MakeNullable(newPresetHandle));
@@ -536,7 +537,7 @@ imcode ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan newPr
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
         return StatusIB(err).mStatus;
     }
-    return imcode::Success;
+    return Status::Success;
 }
 
 } // namespace Thermostat

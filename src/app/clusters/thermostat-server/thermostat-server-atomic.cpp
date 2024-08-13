@@ -22,61 +22,62 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-imcode ThermostatAttrAccess::OnBeginWrite(EndpointId endpoint, AttributeId attributeId)
+Status ThermostatAttrAccess::OnBeginWrite(EndpointId endpoint, AttributeId attributeId)
 {
     switch (attributeId)
     {
     case Presets::Id:
         return BeginPresets(endpoint);
     case Schedules::Id:
-        return imcode::Success;
+        return Status::Success;
     default:
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 }
 
-imcode ThermostatAttrAccess::OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId)
+Status ThermostatAttrAccess::OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId)
 {
     switch (attributeId)
     {
     case Presets::Id:
         return PreCommitPresets(endpoint);
     case Schedules::Id:
-        return imcode::Success;
+        return Status::Success;
     default:
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 }
 
-imcode ThermostatAttrAccess::OnCommitWrite(EndpointId endpoint, AttributeId attributeId)
+Status ThermostatAttrAccess::OnCommitWrite(EndpointId endpoint, AttributeId attributeId)
 {
     switch (attributeId)
     {
     case Presets::Id:
         return CommitPresets(endpoint);
     case Schedules::Id:
-        return imcode::Success;
+        return Status::Success;
     default:
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 }
 
-imcode ThermostatAttrAccess::OnRollbackWrite(EndpointId endpoint, AttributeId attributeId)
+Status ThermostatAttrAccess::OnRollbackWrite(EndpointId endpoint, AttributeId attributeId)
 {
     switch (attributeId)
     {
     case Presets::Id:
         return RollbackPresets(endpoint);
     case Schedules::Id:
-        return imcode::Success;
+        return Status::Success;
     default:
-        return imcode::InvalidInState;
+        return Status::InvalidInState;
     }
 }
 

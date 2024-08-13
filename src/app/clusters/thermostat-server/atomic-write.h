@@ -24,8 +24,6 @@
 #include <app/data-model/DecodableList.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using imcode = chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -51,7 +49,7 @@ public:
      * @param attributeId The attribute for the associated atomic write
      * @return Success, if the server is able to pend writes; otherwise an error code.
      */
-    virtual imcode OnBeginWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual chip::Protocols::InteractionModel::Status OnBeginWrite(EndpointId endpoint, AttributeId attributeId) = 0;
 
     /**
      * @brief OnPreCommitWrite is called when a client attempts to commit an atomic write. The server should evaluate writes to this
@@ -63,7 +61,7 @@ public:
      * @param attributeId The attribute for the associated atomic write
      * @return Success, if the pending writes would succeed; otherwise an error code.
      */
-    virtual imcode OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual chip::Protocols::InteractionModel::Status OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) = 0;
 
     /**
      * @brief OnCommitWrite is called when a client attempts to commit an atomic write, and all calls to OnPreCommitWrite were
@@ -73,7 +71,7 @@ public:
      * @param attributeId The attribute for the associated atomic write
      * @return Success, if the pending writes succeeded; otherwise an error code.
      */
-    virtual imcode OnCommitWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual chip::Protocols::InteractionModel::Status OnCommitWrite(EndpointId endpoint, AttributeId attributeId) = 0;
 
     /**
      * @brief OnRollbackWrite is called when a client attempts to rollback an atomic write, or when the timeout expires without the
@@ -83,7 +81,7 @@ public:
      * @param attributeId The attribute for the associated atomic write
      * @return Success, if rolling back pending writes succeeded; otherwise an error code.
      */
-    virtual imcode OnRollbackWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual chip::Protocols::InteractionModel::Status OnRollbackWrite(EndpointId endpoint, AttributeId attributeId) = 0;
 
     /**
      * @brief Get the maximum write time out for a given attribute

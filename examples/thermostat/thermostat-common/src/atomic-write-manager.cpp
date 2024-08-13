@@ -25,8 +25,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
-
-using imcode = chip::Protocols::InteractionModel::Status;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -47,7 +46,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     ThermostatAtomicWriteManager::GetInstance().OnTimerExpired(endpoint);
 }
 
-imcode countAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
+Status countAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
 {
     attributeRequestCount = 0;
     auto attributeIdsIter = commandData.attributeRequests.begin();
@@ -57,12 +56,12 @@ imcode countAttributeRequests(const Commands::AtomicRequest::DecodableType & com
     }
     if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
     {
-        return imcode::InvalidCommand;
+        return Status::InvalidCommand;
     }
-    return imcode::Success;
+    return Status::Success;
 }
 
-imcode validateAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
+Status validateAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
 {
     attributeRequestCount = 0;
     bool requestedPresets = false, requestedSchedules = false;
@@ -76,31 +75,31 @@ imcode validateAttributeRequests(const Commands::AtomicRequest::DecodableType & 
         case Presets::Id:
             if (requestedPresets) // Double-requesting an attribute is invalid
             {
-                return imcode::InvalidCommand;
+                return Status::InvalidCommand;
             }
             requestedPresets = true;
             break;
         case Schedules::Id:
             if (requestedSchedules) // Double-requesting an attribute is invalid
             {
-                return imcode::InvalidCommand;
+                return Status::InvalidCommand;
             }
             requestedSchedules = true;
             break;
         default:
             // TODO: If this is a valid attribute on thermostat, but just isn't atomic, we shouldn't return an error code here
-            return imcode::InvalidCommand;
+            return Status::InvalidCommand;
         }
     }
     if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
     {
-        return imcode::InvalidCommand;
+        return Status::InvalidCommand;
     }
     if (requestedPresets && requestedSchedules)
     {
-        return imcode::Success;
+        return Status::Success;
     }
-    return imcode::InvalidCommand;
+    return Status::InvalidCommand;
 }
 
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
@@ -222,19 +221,19 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
 
     if (mDelegate == nullptr)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return false;
     }
 
     auto status = countAttributeRequests(commandData, attributeRequestCount);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
         return false;
     }
     if (attributeRequestCount == 0)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return false;
     }
 
@@ -255,7 +254,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
             if (attributeStatus.attributeID == attributeId)
             {
                 // Double-requesting an attribute is invalid
-                commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+                commandObj->AddStatus(commandPath, Status::InvalidCommand);
                 return false;
             }
         }
@@ -263,7 +262,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         if (InWrite(attributeId, commandObj, endpoint))
         {
             // This client already has an open atomic write on the requested attribute
-            commandObj->AddStatus(commandPath, imcode::InvalidInState);
+            commandObj->AddStatus(commandPath, Status::InvalidInState);
             return false;
         }
 
@@ -272,7 +271,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         if (metadata == nullptr)
         {
             // This is not a valid attribute on the Thermostat cluster
-            commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return false;
         }
 
@@ -287,38 +286,38 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         requestedPresets   = requestedPresets || attributeId == Presets::Id;
         requestedSchedules = requestedSchedules || attributeId == Schedules::Id;
 
-        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(imcode::Success) });
+        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(Status::Success) });
     }
 
     if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return false;
     }
 
     // This atomic write manager forces both presets and schedules to be locked simultaneously
     if (!requestedPresets)
     {
-        attributeStatuses.push_back({ .attributeID = Presets::Id, .statusCode = to_underlying(imcode::Success) });
+        attributeStatuses.push_back({ .attributeID = Presets::Id, .statusCode = to_underlying(Status::Success) });
     }
 
     if (!requestedSchedules)
     {
-        attributeStatuses.push_back({ .attributeID = Schedules::Id, .statusCode = to_underlying(imcode::Success) });
+        attributeStatuses.push_back({ .attributeID = Schedules::Id, .statusCode = to_underlying(Status::Success) });
     }
 
     if (!commandData.timeout.HasValue())
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return false;
     }
 
-    status = imcode::Success;
+    status = Status::Success;
 
     for (auto & attributeStatus : attributeStatuses)
     {
 
-        imcode statusCode;
+        Status statusCode;
         switch (attributeStatus.attributeID)
         {
         case Presets::Id:
@@ -326,7 +325,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
             if (InWrite(attributeStatus.attributeID, endpoint))
             {
                 // There's an existing atomic write that doesn't belong to us (if it did, we'd have failed above)
-                statusCode = imcode::Busy;
+                statusCode = Status::Busy;
             }
             else
             {
@@ -337,12 +336,12 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         default:
             // All other attributes are non-atomic
             // TODO: This should be in EmberAfAttributeMetadata
-            statusCode = imcode::InvalidCommand;
+            statusCode = Status::InvalidCommand;
             break;
         }
-        if (statusCode != imcode::Success)
+        if (statusCode != Status::Success)
         {
-            status = imcode::Failure;
+            status = Status::Failure;
         }
         attributeStatus.statusCode = to_underlying(statusCode);
     }
@@ -351,7 +350,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
     response.statusCode = to_underlying(status);
     response.attributeStatus =
         DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
-    if (status == imcode::Success)
+    if (status == Status::Success)
     {
         SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
         timeout          = std::min(timeoutRequest, timeout);
@@ -368,14 +367,14 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
     size_t attributeRequestCount = 0;
     if (mDelegate == nullptr)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return false;
     }
 
-    imcode status = validateAttributeRequests(commandData, attributeRequestCount);
-    if (status != imcode::Success)
+    Status status = validateAttributeRequests(commandData, attributeRequestCount);
+    if (status != Status::Success)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return false;
     }
     EndpointId endpoint = commandPath.mEndpointId;
@@ -383,35 +382,35 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
     attributeStatuses.reserve(attributeRequestCount);
     auto attributeIdsIter = commandData.attributeRequests.begin();
 
-    status = imcode::Success;
+    status = Status::Success;
     while (attributeIdsIter.Next())
     {
         auto & attributeId = attributeIdsIter.GetValue();
         if (!InWrite(attributeId, commandObj, endpoint))
         {
-            commandObj->AddStatus(commandPath, imcode::InvalidInState);
+            commandObj->AddStatus(commandPath, Status::InvalidInState);
             return false;
         };
-        imcode attributeStatus = mDelegate->OnPreCommitWrite(endpoint, attributeId);
-        if (attributeStatus != imcode::Success)
+        Status attributeStatus = mDelegate->OnPreCommitWrite(endpoint, attributeId);
+        if (attributeStatus != Status::Success)
         {
-            status = imcode::Failure;
+            status = Status::Failure;
         }
         attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(attributeStatus) });
     }
-    if (status == imcode::Success)
+    if (status == Status::Success)
     {
         for (auto & attributeStatus : attributeStatuses)
         {
-            imcode statusCode = mDelegate->OnCommitWrite(endpoint, attributeStatus.attributeID);
-            if (statusCode != imcode::Success)
+            Status statusCode = mDelegate->OnCommitWrite(endpoint, attributeStatus.attributeID);
+            if (statusCode != Status::Success)
             {
-                status = imcode::Failure;
+                status = Status::Failure;
             }
             attributeStatus.statusCode = to_underlying(statusCode);
         }
     }
-    if (status == imcode::Failure)
+    if (status == Status::Failure)
     {
         // Either one of the calls to OnPreCommitWrite failed, or one of the calls to OnCommitWrite failed; in the former case,
         // discard any pending writes Do the same for the latter, knowing that the server may be in an inconsistent state
@@ -435,14 +434,14 @@ bool ThermostatAtomicWriteManager::RollbackWrite(chip::app::CommandHandler * com
     size_t attributeRequestCount = 0;
     if (mDelegate == nullptr)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return false;
     }
 
-    imcode status = validateAttributeRequests(commandData, attributeRequestCount);
-    if (status != imcode::Success)
+    Status status = validateAttributeRequests(commandData, attributeRequestCount);
+    if (status != Status::Success)
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return false;
     }
     EndpointId endpoint = commandPath.mEndpointId;
@@ -454,19 +453,19 @@ bool ThermostatAtomicWriteManager::RollbackWrite(chip::app::CommandHandler * com
         auto & attributeId = attributeIdsIter.GetValue();
         if (!InWrite(attributeId, commandObj, endpoint))
         {
-            commandObj->AddStatus(commandPath, imcode::InvalidInState);
+            commandObj->AddStatus(commandPath, Status::InvalidInState);
             return false;
         };
 
-        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(imcode::Success) });
+        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(Status::Success) });
     }
 
     for (auto & attributeStatus : attributeStatuses)
     {
-        imcode statusCode = mDelegate->OnRollbackWrite(endpoint, attributeStatus.attributeID);
-        if (statusCode != imcode::Success)
+        Status statusCode = mDelegate->OnRollbackWrite(endpoint, attributeStatus.attributeID);
+        if (statusCode != Status::Success)
         {
-            status = imcode::Failure;
+            status = Status::Failure;
         }
         attributeStatus.statusCode = to_underlying(statusCode);
     }

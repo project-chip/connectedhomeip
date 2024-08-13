@@ -24,6 +24,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
@@ -41,7 +42,7 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
 
     // Note that the limits are initialized above per the spec limits
     // if they are not present Get() will not update the value so the defaults are used
-    imcode status;
+    Status status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
     // behavior is not specified when Abs * values are not present and user values are present
@@ -51,24 +52,24 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
     // if a attribute is not present then it's default shall be used.
 
     status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         ChipLogError(Zcl, "Warning: AbsMinHeatSetpointLimit missing using default");
     }
 
     status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         ChipLogError(Zcl, "Warning: AbsMaxHeatSetpointLimit missing using default");
     }
     status = MinHeatSetpointLimit::Get(endpoint, &MinHeatSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
     }
 
     status = MaxHeatSetpointLimit::Get(endpoint, &MaxHeatSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
     }
@@ -112,7 +113,7 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     // Note that the limits are initialized above per the spec limits
     // if they are not present Get() will not update the value so the defaults are used
-    imcode status;
+    Status status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
     // behavior is not specified when Abs * values are not present and user values are present
@@ -122,25 +123,25 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     // if a attribute is not present then it's default shall be used.
 
     status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         ChipLogError(Zcl, "Warning: AbsMinCoolSetpointLimit missing using default");
     }
 
     status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         ChipLogError(Zcl, "Warning: AbsMaxCoolSetpointLimit missing using default");
     }
 
     status = MinCoolSetpointLimit::Get(endpoint, &MinCoolSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
     }
 
     status = MaxCoolSetpointLimit::Get(endpoint, &MaxCoolSetpointLimit);
-    if (status != imcode::Success)
+    if (status != Status::Success)
     {
         MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
     }
