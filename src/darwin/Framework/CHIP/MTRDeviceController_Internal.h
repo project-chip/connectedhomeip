@@ -35,7 +35,7 @@
 #import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 
-#import "MTRP256KeypairBridge.h"
+#import <Matter/MTRP256KeypairBridge.h>
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
@@ -49,6 +49,7 @@
 @class MTRAsyncWorkQueue;
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
+@class MTRDevice_Concrete;
 
 namespace chip {
 class FabricTable;
@@ -60,13 +61,7 @@ namespace Controller {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController () {
-@protected
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
-}
+@interface MTRDeviceController () 
 
 - (instancetype)initForSubclasses;
 

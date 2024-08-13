@@ -17,9 +17,16 @@
 
 #import <Foundation/Foundation.h>
 
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+
+
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
+#import <Matter/MTRP256KeypairBridge.h>
+
+
 
 @class MTRBaseDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
@@ -338,6 +345,15 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                     queue:(dispatch_queue_t)queue
     MTR_DEPRECATED("Please set the operationalCertificateIssuer in the MTRDeviceControllerStartupParams instead.", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@end
+
+@interface MTRDeviceController () {
+@protected
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
+}
 @end
 
 NS_ASSUME_NONNULL_END
