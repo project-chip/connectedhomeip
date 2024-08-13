@@ -20,6 +20,14 @@
 
 #include <app/icd/client/DefaultCheckInDelegate.h>
 
+/**
+ * @brief Manages check-ins from ICD devices.
+ * 
+ * Intended to be used as a thin CheckInDelegate. This allows a delegate register
+ * themselves so they can be aware when ICD device checks-in allowing the
+ * delegate to interact with the ICD device during the short window that it is
+ * awake.
+ */
 class IcdManager : public chip::app::DefaultCheckInDelegate
 {
 public:

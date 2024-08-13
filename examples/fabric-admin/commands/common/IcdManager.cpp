@@ -17,7 +17,6 @@
  */
 
 #include "IcdManager.h"
-#include <app/InteractionModelEngine.h>
 
 IcdManager IcdManager::sInstance;
 

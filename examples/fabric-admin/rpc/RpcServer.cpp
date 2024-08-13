@@ -58,20 +58,11 @@ public:
         mPendingKeepActive.erase(nodeId);
 
         auto onDone = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
-
-        auto stayActiveSender = chip::Platform::New<StayActiveSender>(stayActiveDurationMs, clientInfo.peer_node,
-                                                                      chip::app::InteractionModelEngine::GetInstance(), onDone);
-        if (stayActiveSender == nullptr)
+        CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(stayActiveDurationMs, clientInfo.peer_node,
+                                                                 chip::app::InteractionModelEngine::GetInstance(), onDone);
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(ICD, "Fail to allocate stayActiveSender");
-            return;
-        }
-        CHIP_ERROR err = stayActiveSender->EstablishSessionToPeer();
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
-            chip::Platform::Delete(stayActiveSender);
-            return;
+            ChipLogError(NotSpecified, "Failed to send StayActive command %s", err.AsString());
         }
     }
 
