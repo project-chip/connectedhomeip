@@ -47,6 +47,7 @@
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
         "ecosystem-information-cluster.xml",
+        "energy-calendar-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
@@ -135,7 +136,6 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "energy-calendar-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"
@@ -660,6 +660,16 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
+        "Energy Calendar": [
+            "CalendarPeriods",
+            "SpecialDays",
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod",
+            "FeatureMap"
+        ],
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
@@ -681,16 +691,6 @@
             "ThreadNetworkTableSize"
         ],
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
-        "Energy Calendar": [
-            "CalendarPeriods",
-            "SpecialDays",
-            "CurrentDay",
-            "NextDay",
-            "CurrentTransition",
-            "CurrentPeakPeriod",
-            "NextPeakPeriod",
-            "FeatureMap"
-        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
