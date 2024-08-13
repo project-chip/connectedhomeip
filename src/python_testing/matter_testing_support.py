@@ -30,13 +30,13 @@ import sys
 import time
 import typing
 import uuid
-from time import sleep
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
+from time import sleep
 from typing import Any, List, Optional, Tuple
 
 from chip.tlv import float32, uint
