@@ -33,7 +33,7 @@
 #include <stddef.h>
 #include <app/InteractionModelEngine.h>
 
-namespace chip 
+namespace chip
 {
 namespace app
 {
@@ -51,7 +51,7 @@ public:
                      chip::app::InteractionModelEngine * engine);
 
     /**
-     * @brief Sets up a CASE session to the peer for extend a client active period with the peer. 
+     * @brief Sets up a CASE session to the peer for extend a client active period with the peer.
      * Returns error if we did not even manage to kick off a CASE attempt.
      */
     CHIP_ERROR EstablishSessionToPeer();
@@ -59,7 +59,7 @@ public:
 private:
     // CASE session callbacks
     /**
-     *@brief Callback received on successfully establishing a CASE session in order to keep the 'lit icd device' active 
+     *@brief Callback received on successfully establishing a CASE session in order to keep the 'lit icd device' active
      *
      * @param[in] context       - context of the client establishing the CASE session
      * @param[in] exchangeMgr   - exchange manager to use for the re-registration
