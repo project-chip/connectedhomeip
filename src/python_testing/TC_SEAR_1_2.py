@@ -190,14 +190,6 @@ class TC_SEAR_1_2(MatterBaseTest):
                                         f"Progress entry should have a null TotalOperationalTime value (Status is {p.status})")
                 # TODO how to check that InitialTimeEstimate is either null or uint32?
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakyness which is very annoying for everyone in CI.
-        sleep(0.001)
-
     def TC_SEAR_1_2(self) -> list[str]:
         return ["SEAR.S"]
 
@@ -245,7 +237,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=11)
@@ -278,7 +272,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=15)
@@ -311,7 +307,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=19)
@@ -319,7 +317,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             asserts.assert_true(len(old_supported_areas) > len(new_supported_areas), "Failed to remove area(s)")
 
             # NOTE the following operations are all part of step 19 - read all these attributes and check the data consistency
-            #     after removing areas(s)
+            #     after removing areas(s)   
 
             await self.read_and_validate_selected_areas(step=19)
 
@@ -343,7 +341,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=23)

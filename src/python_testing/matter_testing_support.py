@@ -877,6 +877,60 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
+    # Sends an out-of-band command to a Matter app
+    def write_to_app_pipe(self, command):
+        """
+        Use the following environment variables:
+        
+         - LINUX_DUT_IP 
+            * if not provided, the Matter app is assumed to run on the same machine as this test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_UNAME
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * if LINUX_DUT_NAME is not provided, a default value is used ("root")
+            * To ensure this script can log in to the DUT with the user name above, if a remote password is needed:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        - LINUX_DUT_APPNAME
+            * if LINUX_DUT_IP is provided, use this for the name of the Matter application used by the named pipe
+            * for example: "rvc", "air_quality", "all_clusters" etc
+            * the named pipe file name format is chip_<linux_dut_appname>_fifo_<pid> (e.g. chip_rvc_1009)
+            * if not provided, a default value is used ("rvc")
+        """
+        import os
+        dut_ip = os.getenv('LINUX_DUT_IP')
+
+        if dut_ip is None:
+            with open(self.app_pipe, "w") as app_pipe:
+                app_pipe.write(command + "\n")
+            # TODO(#31239): remove the need for sleep
+            sleep(0.001)
+        else:
+            print(f"DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_UNAME')
+            if dut_uname is None:
+                dut_uname = "root"
+                print(f"Using default DUT user name (root)")
+            else:      
+                print(f"Using DUT user name: {dut_uname}")
+
+            app_name = os.getenv('LINUX_DUT_APPNAME')
+            if app_name is None:
+                app_name = "rvc"
+                print(f"Using default DUT app name (rvc)")
+            else:      
+                print(f"Using DUT app name: {app_name}")    
+    
+            pid = self.matter_test_config.app_pid
+            #use the dut's IP address below
+            ip = dut_ip
+            command_fixed = command.replace('\"','\\"')
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > /tmp/chip_%s_fifo_%d\'" % (command_fixed, dut_uname, ip, app_name, pid)
+            os.system(cmd)
+
     # Override this if the test requires a different default timeout.
     # This value will be overridden if a timeout is supplied on the command line.
     @property

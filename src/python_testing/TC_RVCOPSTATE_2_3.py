@@ -138,14 +138,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                                          endpoint=self.endpoint)
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
         self.print_step(step_number, instruction)

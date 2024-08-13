@@ -89,15 +89,6 @@ class TC_SEAR_1_5(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    # Sends and out-of-band command to the rvc-app
-
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakiness which is very annoying for everyone in CI.
-        sleep(0.001)
-
     def TC_SEAR_1_5(self) -> list[str]:
         return ["SEAR.S", "SEAR.S.C02.Rsp"]
 

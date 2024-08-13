@@ -60,14 +60,6 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                             "Unexpected return type for ChangeToMode")
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     def pics_TC_RVCRUNM_2_1(self) -> list[str]:
         return ["RVCRUNM.S"]
 

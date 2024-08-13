@@ -112,11 +112,6 @@ class TC_OPSTATE_BASE():
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-    # Sends and out-of-band command to test-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-
     def send_raw_manual_or_pipe_command(self, command):
         if self.is_ci:
             self.write_to_app_pipe(command)
