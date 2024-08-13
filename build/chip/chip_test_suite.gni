@@ -59,7 +59,12 @@ template("chip_test_suite") {
     _target_type = "source_set"
   }
   target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests", "test_sources" ])
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "tests",
+                             "test_sources",
+                           ])
 
     output_dir = "${root_out_dir}/lib"
 
@@ -92,15 +97,12 @@ template("chip_test_suite") {
       pw_test(_test_name) {
         # Forward certain variables from the invoker.
         forward_variables_from(invoker,
-                              [
-                                "deps",
-                                "public_deps",
-                                "cflags",
-                                "configs",
-                              ])
-
-        # Link to the common lib for this suite so we get its `sources`.
-        public_deps += [ ":${_suite_name}.lib" ]
+                               [
+                                 "deps",
+                                 "public_deps",
+                                 "cflags",
+                                 "configs",
+                               ])
 
         # Set variables that the platform executable may need.
         if (test_executable_output_name != "") {
@@ -126,7 +128,7 @@ template("chip_test_suite") {
       deps += [ ":${_test}" ]
     }
 
-    # Add the common library.
+    # Add the common lib for this suite so we get its `sources`.
     deps += [ ":${_suite_name}.lib" ]
   }
 

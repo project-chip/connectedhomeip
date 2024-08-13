@@ -105,6 +105,8 @@ source_set("efr32_test_main") {
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 }
 
+# This target is referred to by BuildRoot in scripts/build/builders/efr32.py, as well as the example in README.md.
+# It builds the root target "src:tests", which builds the chip_test_suite target in each test directory, which builds a pw_test target for each test source file, which builds a silabs_executable, which includes the "efr32_test_main" target defined above.
 group("efr32") {
   deps = [ "${chip_root}/src:tests" ]
 }

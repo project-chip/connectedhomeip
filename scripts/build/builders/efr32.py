@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
+import logging
 import os
 import shlex
 import subprocess
@@ -78,7 +80,7 @@ class Efr32App(Enum):
         elif self == Efr32App.PUMP:
             return 'pump_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
-            return 'efr32_device_tests.flashbundle.txt'
+            return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -259,13 +261,44 @@ class Efr32Builder(GnBuilder):
     def GnBuildArgs(self):
         return self.extra_gn_options
 
+    def _bundle(self):
+        # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
+        if self.app == Efr32App.UNIT_TEST:
+            flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
+            logging.info(f'Generating flashbundle {flash_bundle_path}')
+
+            patterns = [
+                os.path.join(self.output_dir, "tests", "*.flash.py"),
+                os.path.join(self.output_dir, "tests", "*.s37"),
+                os.path.join(self.output_dir, "tests", "silabs_firmware_utils.py"),
+                os.path.join(self.output_dir, "tests", "firmware_utils.py"),
+            ]
+
+            # Generate the list of files by globbing each pattern.
+            files = []
+            for pattern in patterns:
+                files += list(map(lambda x: os.path.basename(x), glob.glob(pattern)))
+            
+            # Create the bundle file.
+            with open(flash_bundle_path, 'w') as bundle_file:
+                bundle_file.write("\n".join(files))
+
     def build_outputs(self):
         extensions = ["out", "hex"]
         if self.options.enable_link_map_file:
             extensions.append("out.map")
-        for ext in extensions:
-            name = f"{self.app.AppNamePrefix()}.{ext}"
-            yield BuilderOutput(os.path.join(self.output_dir, name), name)
+
+        if self.app == Efr32App.UNIT_TEST:
+            # Efr32 unit-test generates the "tests" subdir with a set of files for each individual unit test source.
+            for ext in extensions:
+                pattern = os.path.join(self.output_dir, "tests", f"*.{ext}")
+                for name in map(lambda x: os.path.basename(x), glob.glob(pattern)):
+                    yield BuilderOutput(os.path.join(self.output_dir, "tests", name), name)
+        else:
+            # All other examples have just one set of files.
+            for ext in extensions:
+                name = f"{self.app.AppNamePrefix()}.{ext}"
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
@@ -275,11 +308,17 @@ class Efr32Builder(GnBuilder):
                         os.path.join(root, file),
                         os.path.join("chip_pw_test_runner_wheels", file))
 
-        # Figure out flash bundle files and build accordingly
+    def bundle_outputs(self):
+        # If flashbundle creation is enabled, the outputs will include the s37 and flash.py files, plus the two firmware utils scripts that support flash.py.
+        # For the unit-test example, there will be a s37 and flash.py file for each unit test source.
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for name in filter(None, [x.strip() for x in f.readlines()]):
+                if self.app == Efr32App.UNIT_TEST:
+                    sourcepath = os.path.join(self.output_dir, "tests", name)  # Unit tests are in the "tests" subdir.
+                else:
+                    sourcepath = os.path.join(self.output_dir, name)
                 yield BuilderOutput(
-                    os.path.join(self.output_dir, name),
+                    sourcepath,
                     os.path.join("flashbundle", name))
 
     def generate(self):
