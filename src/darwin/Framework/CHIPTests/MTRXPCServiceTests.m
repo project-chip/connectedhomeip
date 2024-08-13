@@ -16,6 +16,8 @@
  */
 
 #import <XCTest/XCTest.h>
+#import <Matter/Matter.h>
+#import "MTRXPCService.h"
 
 @interface MTRXPCServiceTests<NSXPCListenerDelegate> : XCTestCase
 @property (nonatomic, readwrite, strong) NSXPCListener * xpcListener;
@@ -67,13 +69,6 @@
 - (void)testExample {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
-}
-
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
 }
 
 @end
