@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRDeviceController.h"
+#import <Matter/MTRDeviceController.h>
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
@@ -38,7 +38,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDeviceController_Concrete : MTRDeviceController
 
 /**
