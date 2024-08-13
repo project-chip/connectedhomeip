@@ -17,9 +17,11 @@
 
 #import <Foundation/Foundation.h>
 #import "MTRXPCServiceProtocol.h"
+#import "MTRDefines_Internal.h"     // MTR_TESTABLE
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_TESTABLE
 @interface MTRXPCService : NSObject<MTRXPCServiceProtocol>
 - (void)ping;
 + (NSXPCInterface *)xpcInterfaceForServiceServerProtocol;
