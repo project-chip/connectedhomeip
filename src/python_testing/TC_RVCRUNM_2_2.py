@@ -30,10 +30,9 @@
 from time import sleep
 
 import chip.clusters as Clusters
-
-from TC_ICDM_3_1 import cluster
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_ICDM_3_1 import cluster
 
 # This test requires several additional command line arguments.
 # Run the test with
