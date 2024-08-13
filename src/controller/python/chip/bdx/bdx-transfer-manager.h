@@ -26,8 +26,13 @@
 namespace chip {
 namespace bdx {
 
-// This class implements the pool interface used to allocate BdxTransfer objects. It keeps track of the number of transfers
-// that are expected to be created and only allocates a BdxTransfer object if a transfer is expected.
+// This class implements the pool interface used to allocate BdxTransfer objects. It keeps track of the number of expected
+// transfers, and will only allocate BdxTransfer objects if a transfer is expected.
+//
+// The controller must inform this manager when a transfer is expected:
+//   bdxTransferManager->ExpectATransfer();
+// At which point the BDX unsolicited message handler can use this (as a BdxTransferPool) to allocate a BdxTransfer object.
+//   bdxTransferPool->Allocate();
 class BdxTransferManager : public BdxTransferPool
 {
 public:
@@ -36,10 +41,12 @@ public:
 
     CHIP_ERROR Init(System::Layer * systemLayer);
 
-    // These keep track of the number of expected transfers.
+    // These keep track of the number of expected transfers. A transfer must be expected before this will allocate a
+    // BdxTransfer object.
     void ExpectATransfer();
     void StopExpectingATransfer();
 
+    // This will only allocate a BdxTransfer object if a transfer is expected.
     BdxTransfer * Allocate() override;
     void Release(BdxTransfer * bdxTransfer) override;
 
