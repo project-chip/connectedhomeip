@@ -53,7 +53,7 @@ class TestBdxTransfer(MatterBaseTest):
     @async_test_body
     async def test_bdx_transfer(self):
         self.step(1)
-        bdx_future: asyncio.futures.Future = self.default_controller.PrepareToReceiveBdxData()
+        bdx_future: asyncio.futures.Future = self.default_controller.TestOnlyPrepareToReceiveBdxData()
 
         self.step(2)
         file_designator = "filename"
