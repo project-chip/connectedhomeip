@@ -1344,7 +1344,7 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
-    def PrepareToReceiveBdxData(self) -> asyncio.Future:
+    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
@@ -1359,7 +1359,7 @@ class ChipDeviceControllerBase():
         Bdx.PrepareToReceiveBdxData(future).raise_on_error()
         return future
 
-    def PrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
+    def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
 

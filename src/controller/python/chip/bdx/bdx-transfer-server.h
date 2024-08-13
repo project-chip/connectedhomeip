@@ -28,10 +28,10 @@ namespace bdx {
 
 // This class handles incoming BDX init messages to start BDX transfers. It requests the BdxTransfer objects from a pool
 // and uses them as exchange delegates.
-class BdxTransferServer : public Messaging::UnsolicitedMessageHandler
+class TestBdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    BdxTransferServer(BdxTransferPool & bdxTransferPool) : mBdxTransferPool(&bdxTransferPool) {}
+    TestBdxTransferServer(BdxTransferPool & bdxTransferPool) : mBdxTransferPool(&bdxTransferPool) {}
 
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager);
     void Shutdown();

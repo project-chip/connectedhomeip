@@ -164,7 +164,7 @@ private:
 TransferMap gTransfers;
 TransferDelegate gBdxTransferDelegate(&gTransfers);
 bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
-bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
+bdx::TestBdxTransferServer gBdxTransferServer(gBdxTransferManager);
 
 void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer)
 {
