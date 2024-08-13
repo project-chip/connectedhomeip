@@ -216,7 +216,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("6c")
-        #await self.check_whm_attribute("TankPercentage", 75)
+        # await self.check_whm_attribute("TankPercentage", 75)
         await self.check_whm_attribute("TankPercentage", 76)
 
         self.step("7")
@@ -229,7 +229,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("7c")
-        #await self.check_whm_attribute("TankPercentage", 75)
+        # await self.check_whm_attribute("TankPercentage", 75)
         await self.check_whm_attribute("TankPercentage", 76)
 
         ################################################################################
@@ -248,7 +248,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("8c")
-        #await self.check_whm_attribute("TankPercentage", 75)
+        # await self.check_whm_attribute("TankPercentage", 75)
         await self.check_whm_attribute("TankPercentage", 76)
 
         ################################################################################
@@ -283,7 +283,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("10c")
-        #await self.check_whm_attribute("TankPercentage", 75)
+        # await self.check_whm_attribute("TankPercentage", 75)
         await self.check_whm_attribute("TankPercentage", 76)
 
         self.step("11")
@@ -298,7 +298,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("11c")
-        #await self.check_whm_attribute("TankPercentage", 50)
+        # await self.check_whm_attribute("TankPercentage", 50)
         await self.check_whm_attribute("TankPercentage", 57)
 
         self.step("12")
@@ -311,7 +311,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("12c")
-        #await self.check_whm_attribute("TankPercentage", 50)
+        # await self.check_whm_attribute("TankPercentage", 50)
         await self.check_whm_attribute("TankPercentage", 57)
 
         ################################################################################
