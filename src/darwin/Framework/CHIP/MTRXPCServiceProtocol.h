@@ -20,7 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRXPCServiceProtocol <NSObject>
-
+- (void)ping;
 @end
 
 NS_ASSUME_NONNULL_END
