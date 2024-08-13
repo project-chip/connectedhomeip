@@ -17,27 +17,11 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandSender.h>
-#include <app/OperationalSessionSetup.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
-
-#include <app/InteractionModelEngine.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CHIPConfig.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/core/ScopedNodeId.h>
-#include <lib/support/CodeUtils.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <stddef.h>
 
-namespace chip {
-namespace app {
-class InteractionModelEngine;
-}
-} // namespace chip
+#include <app/InteractionModelEngine.h>
+#include <lib/core/ScopedNodeId.h>
+#include <messaging/ExchangeMgr.h>
 
 /**
  * @brief StayActiveSender contains all the data and methods needed for active period extension of an ICD client.

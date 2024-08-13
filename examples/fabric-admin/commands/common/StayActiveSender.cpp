@@ -16,12 +16,10 @@
  */
 
 #include "StayActiveSender.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppConfig.h>
-#include <app/CommandPathParams.h>
-#include <app/OperationalSessionSetup.h>
+#include <app/ConcreteCommandPath.h>
 #include <controller/InvokeInteraction.h>
-#include <memory>
 #include <support/CHIPMem.h>
 
 StayActiveSender::StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode,
