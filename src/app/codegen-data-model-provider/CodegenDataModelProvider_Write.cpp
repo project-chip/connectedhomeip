@@ -278,7 +278,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
-        Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
+                                         .endpoint    = request.path.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForWriteAttribute(request.path));
 
@@ -346,7 +349,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
-    AttributeAccessInterface * aai       = GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId);
+    AttributeAccessInterface * aai =
+        AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {

@@ -215,7 +215,6 @@ template("siwx917_sdk") {
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
-      "BRD4325A",  #TODO: should be removed after SoC macro clean-up
       "SLI_SI917B0=1",
       "SLI_SI91X_MCU_COMMON_FLASH_MODE=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_VER2=1",
@@ -259,7 +258,10 @@ template("siwx917_sdk") {
     }
 
     if (chip_build_libshell) {
-      defines += [ "ENABLE_CHIP_SHELL" ]
+      defines += [
+        "ENABLE_CHIP_SHELL",
+        "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1",
+      ]
     }
 
     defines += [ "LWIP_NETIF_API=1" ]
@@ -301,7 +303,6 @@ template("siwx917_sdk") {
 
     if (!disable_lcd) {
       defines += [
-        "CONFIG_ENABLE_UART",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
@@ -310,12 +311,7 @@ template("siwx917_sdk") {
 
     # Enabling led interface
     if (use_wstk_leds) {
-      defines += [
-        "ENABLE_WSTK_LEDS",
-
-        # TODO: remove this when it is added to the board config from wifi sdk
-        "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
-      ]
+      defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
     if (chip_enable_icd_server) {

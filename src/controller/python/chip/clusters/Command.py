@@ -382,7 +382,7 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: List[In
     '''
     handle = chip.native.GetLibraryHandle()
 
-    responseTypes = []
+    responseTypes: List[Type] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs, responseTypes)
 
     transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
@@ -417,7 +417,7 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[
 
     handle = chip.native.GetLibraryHandle()
 
-    responseTypes = []
+    responseTypes: List[Type] = []
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
                                                     responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
 

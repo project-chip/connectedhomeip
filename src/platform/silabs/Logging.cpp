@@ -15,13 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef BRD4325A
-
-#ifdef RAIL_ASSERT_DEBUG_STRING
-#include "rail_assert_error_codes.h"
-#endif
-#endif // BRD4325A
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif

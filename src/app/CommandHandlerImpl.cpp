@@ -402,7 +402,10 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                         .endpoint    = concretePath.mEndpointId,
+                                         .requestType = Access::RequestType::kCommandInvokeRequest,
+                                         .entityId    = concretePath.mCommandId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
@@ -548,7 +551,10 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+            Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                             .endpoint    = concretePath.mEndpointId,
+                                             .requestType = Access::RequestType::kCommandInvokeRequest,
+                                             .entityId    = concretePath.mCommandId };
             Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
             if (err != CHIP_NO_ERROR)
