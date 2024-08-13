@@ -867,7 +867,8 @@ JNI_METHOD(void, establishPaseConnectionByCode)
 
     JniUtfString setUpCodeJniString(env, setUpCode);
 
-    err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(), discoveryType);
+    err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(),
+                                                         discoveryType);
 
     if (err != CHIP_NO_ERROR)
     {
