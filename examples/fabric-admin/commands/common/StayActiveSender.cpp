@@ -21,14 +21,13 @@
 #include <app/CommandPathParams.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/InvokeInteraction.h>
-#include <support/CHIPMem.h>
 #include <memory>
+#include <support/CHIPMem.h>
 
 StayActiveSender::StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode,
                                    chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone) :
     mStayActiveDuration(stayActiveDuration),
-    mPeerNode(peerNode), mpImEngine(engine), mOnDone(onDone),
-    mOnConnectedCallback(HandleDeviceConnected, this),
+    mPeerNode(peerNode), mpImEngine(engine), mOnDone(onDone), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
 

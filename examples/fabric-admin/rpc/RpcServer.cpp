@@ -53,13 +53,10 @@ public:
         uint32_t stayActiveDurationMs = it->second;
         mPendingKeepActive.erase(nodeId);
 
-        auto onDone = [=](uint32_t promisedActiveDuration) {
-            ActiveChanged(nodeId, promisedActiveDuration);
-        };
+        auto onDone = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
 
         auto stayActiveSender = chip::Platform::New<StayActiveSender>(stayActiveDurationMs, clientInfo.peer_node,
-                                                                      chip::app::InteractionModelEngine::GetInstance(),
-                                                                      onDone);
+                                                                      chip::app::InteractionModelEngine::GetInstance(), onDone);
         if (stayActiveSender == nullptr)
         {
             ChipLogProgress(ICD, "Fail to allocate stayActiveSender");
@@ -111,8 +108,8 @@ public:
         // fabric-admin.
         KeepActiveWorkData * data = chip::Platform::New<KeepActiveWorkData>();
         VerifyOrReturnValue(data, pw::Status::Internal());
-        data->mFabricAdmin = this;
-        data->mNodeId = request.node_id;
+        data->mFabricAdmin          = this;
+        data->mNodeId               = request.node_id;
         data->mStayActiveDurationMs = request.stay_active_duration_ms;
         chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();

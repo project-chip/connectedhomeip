@@ -47,7 +47,8 @@ class StayActiveSender
 public:
     using OnDoneCallbackType = std::function<void(uint32_t promisedActiveDurationMs)>;
 
-    StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine, OnDoneCallbackType onDone);
+    StayActiveSender(uint32_t stayActiveDuration, const chip::ScopedNodeId & peerNode, chip::app::InteractionModelEngine * engine,
+                     OnDoneCallbackType onDone);
 
     /**
      * @brief Sets up a CASE session to the peer for extend a client active period with the peer.
