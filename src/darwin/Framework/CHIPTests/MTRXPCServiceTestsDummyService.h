@@ -14,13 +14,12 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "MTRXPCServiceProtocol.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRXPCServiceTestsDummyService: NSObject<MTRXPCServiceProtocol>
-{
+@interface MTRXPCServiceTestsDummyService : NSObject <MTRXPCServiceProtocol> {
 }
 @end
 

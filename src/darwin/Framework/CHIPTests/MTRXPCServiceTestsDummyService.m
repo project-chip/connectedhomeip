@@ -18,10 +18,10 @@
 #import "MTRXPCServiceProtocol.h"
 
 @implementation MTRXPCServiceTestsDummyService {
-
 }
 
-- (void)ping {
+- (void)ping
+{
     NSLog(@"PONG! %s", __PRETTY_FUNCTION__);
 }
 

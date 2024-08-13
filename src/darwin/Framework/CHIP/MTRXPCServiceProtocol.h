@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^MTRXPCServiceIntReplyBlock)(int);
+typedef void (^MTRXPCServiceIntReplyBlock)(int);
 
 @protocol MTRXPCServiceProtocol <NSObject>
 - (void)ping;

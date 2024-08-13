@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import "MTRDefines_Internal.h" // MTR_TESTABLE
 #import "MTRXPCServiceProtocol.h"
-#import "MTRDefines_Internal.h"     // MTR_TESTABLE
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_TESTABLE
-@interface MTRXPCService : NSObject<MTRXPCServiceProtocol>
+@interface MTRXPCService : NSObject <MTRXPCServiceProtocol>
 - (void)ping;
 + (NSXPCInterface *)xpcInterfaceForServiceServerProtocol;
 @end
