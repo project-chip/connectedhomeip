@@ -39,6 +39,7 @@ using namespace ::chip;
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
+
 class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 {
 public:
@@ -105,17 +106,39 @@ public:
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
-        // TODO(#33221):
-        //   1. Is there an imporvement to check if the device is already active?
-        //   2. We should really be using ScopedNode, but that requires larger fixes
-
-        // We are okay with overriding an existing entry
-        // TODO we should likely make sure we are called from the Matter event loop.
-        mPendingKeepActive[request.node_id] = request.stay_active_duration_ms;
+        // TODO(#33221): We should really be using ScopedNode, but that requires larger fixes in communication between
+        // fabric-admin and fabric-bridge. For now we make the assumption that there is only one fabric used by
+        // fabric-admin.
+        KeepActiveWorkData * data = chip::Platform::New<KeepActiveWorkData>();
+        VerifyOrReturnValue(data, pw::Status::Internal());
+        data->mFabricAdmin = this;
+        data->mNodeId = request.node_id;
+        data->mStayActiveDurationMs = request.stay_active_duration_ms;
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
+    void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
+    {
+        mPendingKeepActive[nodeId] = stayActiveDurationMs;
+    }
+
 private:
+    struct KeepActiveWorkData
+    {
+        FabricAdmin * mFabricAdmin;
+        chip::NodeId mNodeId;
+        uint32_t mStayActiveDurationMs;
+    };
+
+    static void KeepActiveWork(intptr_t arg)
+    {
+        KeepActiveWorkData * data = reinterpret_cast<KeepActiveWorkData *>(arg);
+        data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs);
+        chip::Platform::Delete(data);
+    }
+
+    // Modifications to mPendingKeepActive should be done on the MatterEventLoop thread
     std::map<chip::NodeId, uint32_t> mPendingKeepActive;
 };
 

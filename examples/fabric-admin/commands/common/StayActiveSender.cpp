@@ -39,7 +39,6 @@ CHIP_ERROR StayActiveSender::SendStayActiveCommand(chip::Messaging::ExchangeMana
                          const auto & dataResponse) {
         uint32_t promisedActiveDuration = dataResponse.promisedActiveDuration;
         ChipLogProgress(ICD, "StayActive command succeeded with promised duration %u", promisedActiveDuration);
-        // TODO call a callback here indicating that we have recieved the response.
         mOnDone(promisedActiveDuration);
         chip::Platform::Delete(this);
     };
