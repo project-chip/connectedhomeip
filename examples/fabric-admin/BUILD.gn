@@ -73,6 +73,8 @@ static_library("fabric-admin-utils") {
     "commands/common/IcdManager.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/common/StayActiveSender.cpp",
+    "commands/common/StayActiveSender.h",
     "commands/fabric-sync/FabricSyncCommand.cpp",
     "commands/pairing/DeviceSynchronization.cpp",
     "commands/pairing/DeviceSynchronization.h",
