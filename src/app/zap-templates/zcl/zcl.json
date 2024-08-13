@@ -37,7 +37,7 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
-        "5meter-identification-cluster.xml",
+        "meter-identification-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
