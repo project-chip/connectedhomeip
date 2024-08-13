@@ -30,6 +30,7 @@ import sys
 import time
 import typing
 import uuid
+from time import sleep
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -913,14 +914,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             dut_uname = os.getenv('LINUX_DUT_UNAME')
             if dut_uname is None:
                 dut_uname = "root"
-                print(f"Using default DUT user name (root)")
+                print("Using default DUT user name (root)")
             else:
                 print(f"Using DUT user name: {dut_uname}")
 
             app_name = os.getenv('LINUX_DUT_APPNAME')
             if app_name is None:
                 app_name = "rvc"
-                print(f"Using default DUT app name (rvc)")
+                print("Using default DUT app name (rvc)")
             else:
                 print(f"Using DUT app name: {app_name}")
 
