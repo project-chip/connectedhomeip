@@ -48,6 +48,7 @@ public:
                     &mIteration, "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
         AddArgument("discriminator", 0, 4096, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
+        AddArgument("setup-pin", 1, 99999998, &mSetupPIN, "The setup PIN (Passcode) to use.");
         AddArgument("salt", &mSalt,
                     "Salt payload encoded in hexadecimal. Random salt will be generated if absent. "
                     "This needs to be present if verifier is provided, corresponding to salt used for generating verifier");
@@ -76,6 +77,7 @@ private:
     uint16_t mDiscriminator;
 
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<uint32_t> mSetupPIN;
     chip::Optional<chip::ByteSpan> mSalt;
     chip::Optional<chip::ByteSpan> mVerifier;
 

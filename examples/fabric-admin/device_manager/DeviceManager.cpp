@@ -33,7 +33,6 @@ namespace {
 // Constants
 constexpr uint32_t kSetupPinCode               = 20202021;
 constexpr uint16_t kRemoteBridgePort           = 5540;
-constexpr uint16_t kDiscriminator              = 3840;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;
@@ -132,11 +131,16 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     // Open the commissioning window of a device from another fabric via its fabric bridge.
     // This method constructs and sends a command to open the commissioning window for a device
     // that is part of a different fabric, accessed through a fabric bridge.
-    StringBuilder<kMaxCommandSize> commandBuilder;
+    StringBuilder<512> commandBuilder;
+
+    // Use random discriminator to have less chance of collission.
+    uint16_t discriminator = Crypto::GetRandU16() % 4097; // 4097 to include the upper limit 4096
 
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
-                             kWindowTimeout, kIteration, kDiscriminator);
+                             kWindowTimeout, kIteration, discriminator);
+    commandBuilder.Add(" --setup-pin 20202021");
+    commandBuilder.Add(" --salt hex:4c38d8d7708e777b5df816886167839828578ee98280ddac6e801124e8e695e7");
 
     PushCommand(commandBuilder.c_str());
 }
