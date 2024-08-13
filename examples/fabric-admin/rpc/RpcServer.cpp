@@ -124,8 +124,9 @@ public:
 private:
     struct KeepActiveWorkData
     {
-        KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs)
-          : mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs) {}
+        KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs) :
+            mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs)
+        {}
 
         FabricAdmin * mFabricAdmin;
         chip::NodeId mNodeId;
