@@ -30,7 +30,9 @@
 from time import sleep
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.interaction_model import Status
+
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -62,6 +64,11 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         ret = await self.read_mod_attribute_expect_success(
             Clusters.RvcCleanMode,
             Clusters.RvcCleanMode.Attributes.SupportedModes)
+        return ret
+
+    async def read_feature_map_attribute(self):
+        ret = await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
+                                                           Clusters.RvcCleanMode.Attributes.FeatureMap)
         return ret
 
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
@@ -157,11 +164,24 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
                 self.new_clean_mode_th = mode
                 break
 
-        self.print_step(7, "Send ChangeToMode command")
-        response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_equal(response.status, 3,
-                             "The response should contain a ChangeToModeResponse command "
-                             "with the Status set to InvalidInMode(0x03).")
+        self.print_step("7a", "Read FeatureMap Attribute")
+        directmodech = await self.read_feature_map_attribute()
+
+        self.print_step("7b", "Send ChangeToMode command")
+        if directmodech == 1:
+            response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
+            asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+                                "The response should ChangeToModeResponse command")
+            asserts.assert_equal(response.status, Status.Success,
+                                 "The response should contain a ChangeToModeResponse command "
+                                 "with the Status set to Success(0x0).")
+        else:
+            response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
+            asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+                                "The response should ChangeToModeResponse command")
+            asserts.assert_equal(response.status, 3,
+                                 "The response should contain a ChangeToModeResponse command "
+                                 "with the Status set to InvalidInMode(0x03).")
 
 
 if __name__ == "__main__":

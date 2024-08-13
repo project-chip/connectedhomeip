@@ -30,6 +30,8 @@
 from time import sleep
 
 import chip.clusters as Clusters
+
+from TC_ICDM_3_1 import cluster
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -197,8 +199,15 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.mode_a)
 
-        self.print_step(6, "Send ChangeToMode MODE_B command")
-        await self.send_change_to_mode_with_check(self.mode_b, 3)
+        self.print_step("6a", "Send ChangeToMode MODE_B command")
+        directmodech = await self.read_mod_attribute_expect_success(cluster=Clusters.RvcRunMode,
+                                                                    attribute=Clusters.RvcRunMode.Attributes.FeatureMap)
+
+        self.print_step('6b', "Send ChangeToMode MODE_B command")
+        if directmodech == 1:
+            response = await self.send_change_to_mode_with_check(self.mode_b, 0)
+        else:
+            response = await self.send_change_to_mode_with_check(self.mode_b, 3)
 
         self.print_step(7, "Send ChangeToMode idle command")
         await self.send_change_to_mode_with_check(self.idle_mode_dut, 0)
