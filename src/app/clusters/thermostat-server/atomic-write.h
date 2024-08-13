@@ -139,19 +139,6 @@ public:
     virtual bool InWrite(const std::optional<AttributeId> attributeId, CommandHandler * commandObj, EndpointId endpoint) = 0;
 
     /**
-     * @brief Check if there is an open atomic write on an endpoint, associated with the source node for a given command invocation,
-     * and associated with the set of attribute IDs
-     *
-     * @param attributeIds The set of attribute IDs to check against
-     * @param commandObj The command being invoked
-     * @param endpoint The endpoint for the atomic write
-     * @return true if there is an open atomic write
-     * @return false if there is not an open atomic write
-     */
-    virtual bool InWrite(const DataModel::DecodableList<AttributeId>::Iterator attributeIds, CommandHandler * commandObj,
-                         EndpointId endpoint) = 0;
-
-    /**
      * @brief Attempt to start an atomic write
      *
      * @param commandObj The AtomicRequest command

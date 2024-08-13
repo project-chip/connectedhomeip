@@ -213,24 +213,6 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
     return GetAtomicWriteScopedNodeId(attributeId, endpoint) == sourceNodeId;
 }
 
-bool ThermostatAtomicWriteManager::InWrite(DataModel::DecodableList<AttributeId>::Iterator attributeIds,
-                                           CommandHandler * commandObj, EndpointId endpoint)
-{
-    while (attributeIds.Next())
-    {
-        auto & attributeId = attributeIds.GetValue();
-        if (!InWrite(attributeId, commandObj, endpoint))
-        {
-            return false;
-        }
-    }
-    if (attributeIds.GetStatus() != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
-}
-
 bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                               const Commands::AtomicRequest::DecodableType & commandData)
 {
