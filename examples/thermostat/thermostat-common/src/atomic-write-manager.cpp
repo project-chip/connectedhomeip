@@ -62,14 +62,15 @@ imcode countAttributeRequests(const Commands::AtomicRequest::DecodableType & com
     return imcode::Success;
 }
 
-imcode validateAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData)
+imcode validateAttributeRequests(const Commands::AtomicRequest::DecodableType & commandData, size_t & attributeRequestCount)
 {
+    attributeRequestCount = 0;
     bool requestedPresets = false, requestedSchedules = false;
     auto attributeIdsIter = commandData.attributeRequests.begin();
     while (attributeIdsIter.Next())
     {
         auto & attributeId = attributeIdsIter.GetValue();
-
+        attributeRequestCount++;
         switch (attributeId)
         {
         case Presets::Id:
@@ -378,55 +379,108 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
 bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                const Commands::AtomicRequest::DecodableType & commandData)
 {
-    imcode status = validateAttributeRequests(commandData);
+    size_t attributeRequestCount = 0;
+    if (mDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return false;
+    }
+
+    imcode status = validateAttributeRequests(commandData, attributeRequestCount);
     if (status != imcode::Success)
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
         return false;
     }
     EndpointId endpoint = commandPath.mEndpointId;
-    if (!InWrite(Presets::Id, commandObj, endpoint) || !InWrite(Schedules::Id, commandObj, endpoint))
+    std::vector<AtomicAttributeStatusStruct::Type> attributeStatuses;
+    attributeStatuses.reserve(attributeRequestCount);
+    auto attributeIdsIter = commandData.attributeRequests.begin();
+
+    status = imcode::Success;
+    while (attributeIdsIter.Next())
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return false;
+        auto & attributeId = attributeIdsIter.GetValue();
+        if (!InWrite(attributeId, commandObj, endpoint))
+        {
+            commandObj->AddStatus(commandPath, imcode::InvalidInState);
+            return false;
+        };
+        imcode attributeStatus = mDelegate->OnPreCommitWrite(endpoint, attributeId);
+        if (attributeStatus != imcode::Success)
+        {
+            status = imcode::Failure;
+        }
+        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(attributeStatus) });
     }
-    auto presetsStatus = imcode::Success, schedulesStatus = imcode::Success;
-    if (mDelegate != nullptr)
+    if (status == imcode::Success)
     {
-        presetsStatus   = mDelegate->OnCommitWrite(endpoint, Presets::Id);
-        schedulesStatus = mDelegate->OnCommitWrite(endpoint, Schedules::Id);
+        for (auto & attributeStatus : attributeStatuses)
+        {
+            imcode statusCode = mDelegate->OnCommitWrite(endpoint, attributeStatus.attributeID);
+            if (statusCode != imcode::Success)
+            {
+                status = imcode::Failure;
+            }
+            attributeStatus.statusCode = to_underlying(statusCode);
+        }
     }
-    status = (presetsStatus == imcode::Success && schedulesStatus == imcode::Success) ? imcode::Success : imcode::Failure;
+    Commands::AtomicResponse::Type response;
+    response.statusCode = to_underlying(status);
+    response.attributeStatus =
+        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
+    commandObj->AddResponse(commandPath, response);
     ResetWrite(endpoint);
-    sendAtomicResponse(commandObj, commandPath, status, presetsStatus, schedulesStatus);
     return true;
 }
 
 bool ThermostatAtomicWriteManager::RollbackWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                  const Commands::AtomicRequest::DecodableType & commandData)
 {
-    imcode status = validateAttributeRequests(commandData);
+    size_t attributeRequestCount = 0;
+    if (mDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return false;
+    }
+
+    imcode status = validateAttributeRequests(commandData, attributeRequestCount);
     if (status != imcode::Success)
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
         return false;
     }
     EndpointId endpoint = commandPath.mEndpointId;
-    if (!InWrite(Presets::Id, commandObj, endpoint) || !InWrite(Schedules::Id, commandObj, endpoint))
+    std::vector<AtomicAttributeStatusStruct::Type> attributeStatuses;
+    attributeStatuses.reserve(attributeRequestCount);
+    auto attributeIdsIter = commandData.attributeRequests.begin();
+    while (attributeIdsIter.Next())
     {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return false;
-    }
-    auto presetsStatus = imcode::Success, schedulesStatus = imcode::Success;
-    if (mDelegate != nullptr)
-    {
-        presetsStatus   = mDelegate->OnRollbackWrite(endpoint, Presets::Id);
-        schedulesStatus = mDelegate->OnRollbackWrite(endpoint, Schedules::Id);
-    }
-    status = (presetsStatus == imcode::Success && schedulesStatus == imcode::Success) ? imcode::Success : imcode::Failure;
-    ResetWrite(endpoint);
-    sendAtomicResponse(commandObj, commandPath, status, presetsStatus, schedulesStatus);
+        auto & attributeId = attributeIdsIter.GetValue();
+        if (!InWrite(attributeId, commandObj, endpoint))
+        {
+            commandObj->AddStatus(commandPath, imcode::InvalidInState);
+            return false;
+        };
 
+        attributeStatuses.push_back({ .attributeID = attributeId, .statusCode = to_underlying(imcode::Success) });
+    }
+
+    for (auto & attributeStatus : attributeStatuses)
+    {
+        imcode statusCode = mDelegate->OnRollbackWrite(endpoint, attributeStatus.attributeID);
+        if (statusCode != imcode::Success)
+        {
+            status = imcode::Failure;
+        }
+        attributeStatus.statusCode = to_underlying(statusCode);
+    }
+    Commands::AtomicResponse::Type response;
+    response.statusCode = to_underlying(status);
+    response.attributeStatus =
+        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
+    commandObj->AddResponse(commandPath, response);
+    ResetWrite(endpoint);
     return true;
 }
 

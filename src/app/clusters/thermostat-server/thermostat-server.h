@@ -49,6 +49,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
     imcode OnBeginWrite(EndpointId endpoint, AttributeId attributeId) override;
+    imcode OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
     imcode OnCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
     imcode OnRollbackWrite(EndpointId endpoint, AttributeId attributeId) override;
     std::optional<System::Clock::Milliseconds16> GetWriteTimeout(EndpointId endpoint, chip::AttributeId attributeId) override;
@@ -61,6 +62,7 @@ private:
     CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
 
     imcode BeginPresets(EndpointId endpoint);
+    imcode PreCommitPresets(EndpointId endpoint);
     imcode CommitPresets(EndpointId endpoint);
     imcode RollbackPresets(EndpointId endpoint);
 

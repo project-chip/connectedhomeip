@@ -38,9 +38,10 @@ public:
 
     virtual ~AtomicWriteDelegate() = default;
 
-    virtual imcode OnBeginWrite(EndpointId endpoint, AttributeId attributeId)    = 0;
-    virtual imcode OnCommitWrite(EndpointId endpoint, AttributeId attributeId)   = 0;
-    virtual imcode OnRollbackWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual imcode OnBeginWrite(EndpointId endpoint, AttributeId attributeId)     = 0;
+    virtual imcode OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) = 0;
+    virtual imcode OnCommitWrite(EndpointId endpoint, AttributeId attributeId)    = 0;
+    virtual imcode OnRollbackWrite(EndpointId endpoint, AttributeId attributeId)  = 0;
 
     virtual std::optional<System::Clock::Milliseconds16> GetWriteTimeout(EndpointId endpoint, AttributeId attributeId) = 0;
 };

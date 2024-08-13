@@ -323,9 +323,14 @@ imcode ThermostatAttrAccess::BeginPresets(EndpointId endpoint)
     return imcode::Success;
 }
 
-imcode ThermostatAttrAccess::CommitPresets(EndpointId endpoint)
+imcode ThermostatAttrAccess::PreCommitPresets(EndpointId endpoint)
 {
     auto delegate = GetDelegate(endpoint);
+
+    if (delegate == nullptr)
+    {
+        return imcode::InvalidInState;
+    }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -433,7 +438,13 @@ imcode ThermostatAttrAccess::CommitPresets(EndpointId endpoint)
     // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
     // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
 
-    err = delegate->ApplyPendingPresets();
+    return imcode::Success;
+}
+
+imcode ThermostatAttrAccess::CommitPresets(EndpointId endpoint)
+{
+    auto delegate  = GetDelegate(endpoint);
+    CHIP_ERROR err = delegate->ApplyPendingPresets();
 
     if (err != CHIP_NO_ERROR)
     {

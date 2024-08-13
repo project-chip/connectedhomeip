@@ -41,6 +41,19 @@ imcode ThermostatAttrAccess::OnBeginWrite(EndpointId endpoint, AttributeId attri
     }
 }
 
+imcode ThermostatAttrAccess::OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case Presets::Id:
+        return PreCommitPresets(endpoint);
+    case Schedules::Id:
+        return imcode::Success;
+    default:
+        return imcode::InvalidInState;
+    }
+}
+
 imcode ThermostatAttrAccess::OnCommitWrite(EndpointId endpoint, AttributeId attributeId)
 {
     switch (attributeId)
