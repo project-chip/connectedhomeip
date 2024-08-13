@@ -317,7 +317,8 @@ uint16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
 uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
 {
     int16_t tankPercentage =
-        100 * (mWaterTemperature - mColdWaterTemperature) / (GetActiveTargetWaterTemperature() - mColdWaterTemperature);
+        100 * (static_cast<int16_t>(mWaterTemperature) - static_cast<int16_t>(mColdWaterTemperature)) /
+        (static_cast<int16_t>(GetActiveTargetWaterTemperature()) - static_cast<int16_t>(mColdWaterTemperature));
 
     tankPercentage = std::min(tankPercentage, static_cast<int16_t>(100));
     tankPercentage = std::max(tankPercentage, static_cast<int16_t>(0));
@@ -355,7 +356,7 @@ void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWat
 void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature)
 {
     // First calculate the new average water temperature
-    mWaterTemperature = (mWaterTemperature * (100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100;
+    mWaterTemperature = (mWaterTemperature * static_cast<uint16_t>(100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100;
 
     // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
     // Only supported if the kTankPercent feature is supported.
