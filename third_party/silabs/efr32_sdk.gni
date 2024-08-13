@@ -84,7 +84,7 @@ declare_args() {
   chip_enable_ota_custom_tlv_testing = false
 
   # Factory Provision storage
-  use_flash_storage = wifi_soc
+  use_provision_flash_storage = wifi_soc
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -472,10 +472,10 @@ template("efr32_sdk") {
       defines += [ "SL_USE_COAP_CONFIG=0" ]
     }
 
-    if (use_flash_storage) {
-      defines += [ "SL_PROVISION_FLASH=1" ]
+    if (use_provision_flash_storage) {
+      defines += [ "SL_MATTER_PROVISION_FLASH=1" ]
     } else {
-      defines += [ "SL_PROVISION_FLASH=0" ]
+      defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
     if (chip_enable_ble_rs911x) {

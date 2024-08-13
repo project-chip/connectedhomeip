@@ -171,7 +171,7 @@ config("silabs-wifi-config") {
 }
 
 source_set("siwx917-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:provision-storage" ]
+  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
   public_deps = []
   public_configs = [

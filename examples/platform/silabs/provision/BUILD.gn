@@ -22,10 +22,10 @@ if (wifi_soc) {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
 }
 
-source_set("provision-storage") {
+source_set("storage") {
   sources = [ "ProvisionStorageCustom.cpp" ]
 
-  if (use_flash_storage) {
+  if (use_provision_flash_storage) {
     sources += [ "ProvisionStorageFlash.cpp" ]
   } else {
     sources += [ "ProvisionStorageDefault.cpp" ]
@@ -39,7 +39,7 @@ source_set("provision-storage") {
       libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
     }
   } else {
-    if (use_flash_storage) {
+    if (use_provision_flash_storage) {
       libs = [ "${sdk_support_root}/matter/provision/lib/libProvisionFlash_${silabs_family}.a" ]
     } else {
       libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_${silabs_family}.a" ]
