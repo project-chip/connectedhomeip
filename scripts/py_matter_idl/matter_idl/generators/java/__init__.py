@@ -20,11 +20,11 @@ import os
 from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.filters import upfirst
 from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
 from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
-from matter_idl.generators.filters import upfirst
 
 
 @dataclasses.dataclass

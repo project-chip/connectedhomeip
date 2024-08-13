@@ -68,10 +68,11 @@ def to_snake_case(s):
 
 def to_constant_case(s):
     """convert to constant case; all words are seperated by underscore and are upper case
+       similar to a snake case but with upper case
        examples:
-        FooBarBaz --> FOO_BAR_BAZ
-        foo BarBaz --> FOO_BAR_BAZ
-        FOOBarBaz --> FOO_BAR_BAZ
+       FooBarBaz --> FOO_BAR_BAZ
+       foo BarBaz --> FOO_BAR_BAZ
+       FOOBarBaz --> FOO_BAR_BAZ
     """
     snake_case = to_snake_case(s)
     constant_case = snake_case.upper()
@@ -80,15 +81,13 @@ def to_constant_case(s):
 
 def to_spinal_case(s):
     """convert to spinal case; all words sperated by hypen and are lower case
-        same as pascal case but first letter is lower case
+        similar to a snake case but with hyphen seperator instead of underscore 
         examples:
         FooBarBaz --> foo-bar-baz
         foo BarBaz --> foo-bar-baz
         FOOBarBaz --> foo-bar-baz
     """
     snake_case = to_snake_case(s)
-    snake_case.replace('_', '-')
-
     return snake_case.replace('_', '-')
 
 
