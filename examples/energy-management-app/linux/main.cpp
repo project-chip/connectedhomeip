@@ -39,11 +39,10 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
 constexpr uint16_t kOptionApplication = 0xffd0;
 constexpr uint16_t kOptionFeatureMap  = 0xffd1;
 
-constexpr const char * kDemApp   = "dem";
-constexpr const char * kEevseApp = "eevse";
-constexpr const char * kWhmApp   = "whm";
+constexpr const char * kEvseApp = "evse";
+constexpr const char * kWhmApp  = "water-heater";
 
-constexpr const char * kValidApps[] = { kDemApp, kEevseApp, kWhmApp };
+constexpr const char * kValidApps[] = { kEvseApp, kWhmApp };
 
 // Define the chip::ArgParser command line structures for extending the command line to support the
 // energy apps
@@ -56,7 +55,7 @@ static chip::ArgParser::OptionDef sEnergyAppOptionDefs[] = {
 static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyAppOptionHandler, // handler function
                                                       sEnergyAppOptionDefs,   // array of option definitions
                                                       "PROGRAM OPTIONS",      // help group
-                                                      "-a, --application <dem|eevse|whm>\n"
+                                                      "-a, --application <evse|water-heater>\n"
                                                       "-f, --featureSet <value>\n" };
 
 namespace chip {
@@ -99,7 +98,7 @@ static uint32_t ParseNumber(const char * pString)
 void ApplicationInit()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
-    if (strcmp(spApp, kDemApp) == 0 || strcmp(spApp, kEevseApp) == 0)
+    if (strcmp(spApp, kEvseApp) == 0)
     {
         EvseApplicationInit();
     }
@@ -117,7 +116,7 @@ void ApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
-    if (strcmp(spApp, kDemApp) == 0 || strcmp(spApp, kEevseApp) == 0)
+    if (strcmp(spApp, kEvseApp) == 0)
     {
         EvseApplicationShutdown();
     }
