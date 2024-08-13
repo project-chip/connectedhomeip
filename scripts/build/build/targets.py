@@ -548,7 +548,6 @@ def BuildCC13x4Target():
         TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
         TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER,
                    openthread_ftd=False),
-        TargetPart('light-switch', app=TIApp.LIGHT_SWITCH),
     ])
 
     target.AppendModifier(name="mtd", openthread_ftd=False)
