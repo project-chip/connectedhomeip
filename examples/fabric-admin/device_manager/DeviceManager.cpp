@@ -134,13 +134,12 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     StringBuilder<512> commandBuilder;
 
     // Use random discriminator to have less chance of collission.
-    uint16_t discriminator = Crypto::GetRandU16() % 4097; // 4097 to include the upper limit 4096
+    uint16_t discriminator = Crypto::GetRandU16() % 4096; // 4096 to include the upper limit 4095
 
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
                              kWindowTimeout, kIteration, discriminator);
     commandBuilder.Add(" --setup-pin 20202021");
-    commandBuilder.Add(" --salt hex:4c38d8d7708e777b5df816886167839828578ee98280ddac6e801124e8e695e7");
 
     PushCommand(commandBuilder.c_str());
 }
