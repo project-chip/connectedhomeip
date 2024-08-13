@@ -80,7 +80,9 @@ class TC_CCTRL_2_2(MatterBaseTest):
             logging.warning("Stopping app with SIGTERM")
             self.app_process.send_signal(signal.SIGTERM.value)
             self.app_process.wait()
-            os.remove(self.kvs)
+
+            if os.path.exists(self.kvs):
+                os.remove(self.kvs)
 
         super().teardown_class()
 
