@@ -32,7 +32,6 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
