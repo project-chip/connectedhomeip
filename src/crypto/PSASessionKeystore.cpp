@@ -84,7 +84,7 @@ public:
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
-    psa_destroy_key(key.As<psa_key_id_t>());
+    DestroyKey(key);
 
     AesKeyAttributes attrs;
     psa_status_t status =
@@ -98,7 +98,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key)
 {
     // Destroy the old key if already allocated
-    psa_destroy_key(key.As<psa_key_id_t>());
+    DestroyKey(key);
 
     HmacKeyAttributes attrs;
     psa_status_t status =
@@ -188,6 +188,73 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
     psa_destroy_key(keyId);
     keyId = PSA_KEY_ID_NULL;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+CHIP_ERROR PSASessionKeystore::PersistICDKey(Aes128KeyHandle & key)
+{
+    CHIP_ERROR err;
+    AesKeyAttributes attrs;
+    psa_key_id_t previousKeyId = key.As<psa_key_id_t>();
+    psa_key_attributes_t previousKeyAttrs;
+
+    psa_get_key_attributes(previousKeyId, &previousKeyAttrs);
+    // Exit early if key is already persistent
+    if (psa_get_key_lifetime(&previousKeyAttrs) == PSA_KEY_LIFETIME_PERSISTENT)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(key.AsMutable<psa_key_id_t>(), to_underlying(KeyIdBase::ICDAesKeyRangeStart),
+                                                       kMaxICDClientKeys));
+
+    SuccessOrExit(err = attrs.SetKeyPersistence(key.As<psa_key_id_t>()));
+    VerifyOrExit(psa_copy_key(previousKeyId, &attrs.Get(), &key.AsMutable<psa_key_id_t>()) == PSA_SUCCESS,
+                 err = CHIP_ERROR_INTERNAL);
+
+    psa_destroy_key(previousKeyId);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        psa_destroy_key(previousKeyId);
+        psa_destroy_key(key.As<psa_key_id_t>());
+    }
+
+    return err;
+}
+
+CHIP_ERROR PSASessionKeystore::PersistICDKey(Hmac128KeyHandle & key)
+{
+    CHIP_ERROR err;
+    HmacKeyAttributes attrs;
+    psa_key_id_t previousKeyId = key.As<psa_key_id_t>();
+    psa_key_attributes_t previousKeyAttrs;
+
+    psa_get_key_attributes(previousKeyId, &previousKeyAttrs);
+    // Exit early if key is already persistent
+    if (psa_get_key_lifetime(&previousKeyAttrs) == PSA_KEY_LIFETIME_PERSISTENT)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(key.AsMutable<psa_key_id_t>(),
+                                                       to_underlying(KeyIdBase::ICDHmacKeyRangeStart), kMaxICDClientKeys));
+    SuccessOrExit(err = attrs.SetKeyPersistence(key.As<psa_key_id_t>()));
+    VerifyOrExit(psa_copy_key(previousKeyId, &attrs.Get(), &key.AsMutable<psa_key_id_t>()) == PSA_SUCCESS,
+                 err = CHIP_ERROR_INTERNAL);
+
+    psa_destroy_key(previousKeyId);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        psa_destroy_key(previousKeyId);
+        psa_destroy_key(key.As<psa_key_id_t>());
+    }
+
+    return err;
+}
+#endif
 
 } // namespace Crypto
 } // namespace chip
