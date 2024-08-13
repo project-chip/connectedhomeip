@@ -76,7 +76,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     def teardown_class(self):
         # In case the th_server_app_path does not exist, then we failed the test
         # and there is nothing to remove
-        if self.app_process:
+        if self.app_process is not None:
             logging.warning("Stopping app with SIGTERM")
             self.app_process.send_signal(signal.SIGTERM.value)
             self.app_process.wait()
