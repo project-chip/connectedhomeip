@@ -29,7 +29,14 @@
     return xpcInterface;
 }
 
-- (void)ping {
-    MTR_LOG_DEBUG("PING!");
+- (void)ping 
+{
+    MTR_LOG_DEBUG("PONG! %s", __PRETTY_FUNCTION__);
 }
+
+- (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply
+{
+    reply(42);
+}
+
 @end
