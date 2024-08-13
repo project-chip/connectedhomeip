@@ -49,7 +49,7 @@ def lowfirst_except_acronym(s: str) -> str:
     return lowfirst(s)
 
 
-def to_snake_case(s):
+def to_snake_case(s: str) -> str:
     """convert to snake case; all words are seperated by underscore and are lower case
        examples:
         FooBarBaz --> foo_bar_baz
@@ -57,16 +57,17 @@ def to_snake_case(s):
         FOOBarBaz --> foo_bar_baz
         _fooBar_Baz_ --> foo_bar_baz
     """
+    s = "" if s is None else str(s)
+
     s = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s)
     s = re.sub(r'([a-z\d])([A-Z])', r'\1_\2', s)
     s = re.sub(r'[\s\-]+', '_', s)
 
     snake_case = s.lower()
-
     return snake_case.strip('_')
 
 
-def to_constant_case(s):
+def to_constant_case(s: str) -> str:
     """convert to constant case; all words are seperated by underscore and are upper case
        similar to a snake case but with upper case
        examples:
@@ -79,7 +80,7 @@ def to_constant_case(s):
     return constant_case
 
 
-def to_spinal_case(s):
+def to_spinal_case(s: str) -> str:
     """convert to spinal case; all words sperated by hypen and are lower case
         similar to a snake case but with hyphen seperator instead of underscore 
         examples:
@@ -91,7 +92,7 @@ def to_spinal_case(s):
     return snake_case.replace('_', '-')
 
 
-def to_pascal_case(s):
+def to_pascal_case(s: str) -> str:
     """convert to pascal case; with no spaces or underscore between words, first letter of all words is uppercase
        examples:
         fooBarBaz --> FooBarBaz
@@ -106,7 +107,7 @@ def to_pascal_case(s):
     return pascal_case
 
 
-def to_camel_case(s):
+def to_camel_case(s) -> str:
     """convert to camel case; with no spaces or underscore between words, first word all lowercase and following words are uppercase
         same as pascal case but first letter is lower case
        examples:
