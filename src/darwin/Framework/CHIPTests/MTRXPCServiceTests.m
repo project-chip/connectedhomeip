@@ -18,13 +18,46 @@
 #import <XCTest/XCTest.h>
 
 @interface MTRXPCServiceTests<NSXPCListenerDelegate> : XCTestCase
-
+@property (nonatomic, readwrite, strong) NSXPCListener * xpcListener;
+@property (nonatomic, readwrite, strong) NSXPCInterface * serviceInterface;
+@property (nonatomic, readwrite, strong) NSXPCInterface * clientInterface;
+@property (readwrite, strong) NSXPCConnection * xpcConnection;
 @end
 
 @implementation MTRXPCServiceTests
 
+// NSXPCListenerDelegate
+- (BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
+{
+    XCTAssertNil(_xpcConnection);
+    XCTAssertNotNil(newConnection);
+    NSLog(@"XPC listener accepting connection");
+//    newConnection.exportedInterface = _serviceInterface;
+//    newConnection.remoteObjectInterface = _clientInterface;
+//    newConnection.exportedObject = self;
+//    newConnection.invalidationHandler = ^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            NSLog(@"XPC connection disconnected");
+//            self.xpcConnection = nil;
+//            if (self.xpcDisconnectExpectation) {
+//                [self.xpcDisconnectExpectation fulfill];
+//                self.xpcDisconnectExpectation = nil;
+//            }
+//        });
+//    };
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        self.xpcConnection = newConnection;
+//        [newConnection resume];
+//    });
+    return YES;
+}
+
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.
+    _xpcListener = [NSXPCListener anonymousListener];
+    [_xpcListener setDelegate:(id<NSXPCListenerDelegate>)self];
+    _serviceInterface = [MTRXPCService xpcInterfaceForServiceServerProtocol];
+    [_xpcListener resume];
 }
 
 - (void)tearDown {

@@ -18,8 +18,17 @@
 #import "MTRXPCService.h"
 #import "MTRLogging.h"
 #import "MTRLogging_Internal.h"
+#import "MTRXPCServiceProtocol.h"
 
 @implementation MTRXPCService
+
++ (NSXPCInterface *)xpcInterfaceForServiceServerProtocol
+{
+    NSXPCInterface * xpcInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
+    // TODO:  add types for each selector
+    return xpcInterface;
+}
+
 - (void)ping {
     MTR_LOG_DEBUG("PING!");
 }
