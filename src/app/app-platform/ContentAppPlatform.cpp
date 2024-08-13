@@ -387,6 +387,57 @@ ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
     return nullptr;
 }
 
+// create a string key from vendorId and productId
+std::string createKey(uint16_t vendorId, uint16_t productId)
+{
+    return std::to_string(vendorId) + ":" + std::to_string(productId);
+}
+
+void ContentAppPlatform::StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId)
+{
+    std::string key = createKey(vendorId, productId);
+
+    ChipLogProgress(DeviceLayer, "Stored node id: " ChipLogFormatX64 " for key: %s", ChipLogValueX64(nodeId), key.c_str());
+
+    mConnectedContentAppNodeIds[key].insert(nodeId);
+}
+
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId)
+{
+    std::string key = createKey(vendorId, productId);
+
+    ChipLogProgress(DeviceLayer, "Retrieving node id for key: %s", key.c_str());
+
+    auto it = mConnectedContentAppNodeIds.find(key);
+    if (it != mConnectedContentAppNodeIds.end())
+    {
+        ChipLogProgress(DeviceLayer, "Found node id");
+        return it->second;
+    }
+
+    ChipLogProgress(DeviceLayer, "Didn't find node id");
+    // If key not found, return an empty set
+    return {};
+}
+
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowVendorId(uint16_t vendorId)
+{
+    std::set<NodeId> result;
+    std::string vendorPrefix = std::to_string(vendorId) + ":";
+
+    for (const auto & pair : mConnectedContentAppNodeIds)
+    {
+        const std::string & key = pair.first;
+        if (key.find(vendorPrefix) == 0)
+        { // Check if the key starts with the vendor prefix
+            const std::set<NodeId> & nodeIds = pair.second;
+            result.insert(nodeIds.begin(), nodeIds.end());
+        }
+    }
+
+    return result;
+}
+
 void ContentAppPlatform::SetCurrentApp(ContentApp * app)
 {
     if (!HasCurrentApp())

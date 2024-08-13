@@ -943,26 +943,30 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // no-op
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection, connHandle=%d", conId);
 
     ble::Gap & gap = ble::BLE::Instance().gap();
 
     ble_error_t mbed_err = gap.disconnect(conId, ble::local_disconnection_reason_t::USER_TERMINATION);
-    return mbed_err == BLE_ERROR_NONE;
+    VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -970,8 +974,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return sConnectionInfo.getMTU(conId);
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle pBuf)
 {
     ChipLogDetail(DeviceLayer, "BlePlatformDelegate %s", __FUNCTION__);
 
@@ -996,10 +1000,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     }
     else
     {
-        // TODO handle error with chipConnection::SendMessage as described
-        // in the BlePlatformDelegate.h.
         ChipLogError(DeviceLayer, "Send indication failed, invalid charID.");
-        return false;
+        return BLE_ERROR_GATT_INDICATE_FAILED;
     }
 
     ChipLogDetail(DeviceLayer,
@@ -1015,14 +1017,14 @@ exit:
     {
         ChipLogError(DeviceLayer, "Send indication failed, mbed-os error: %d", mbed_err);
     }
-    return err == CHIP_NO_ERROR;
+    return err;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Internal

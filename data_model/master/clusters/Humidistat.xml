@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0205" name="Humidistat Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0205" name="Humidistat"/>
@@ -174,17 +174,17 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Mode" type="Mode" default="Off">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="SystemState" type="SystemStateEnum" default="Off">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="UserSetpoint" type="percent" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CLOSED"/>
       </mandatoryConform>
@@ -192,7 +192,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="MinSetpoint" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CLOSED"/>
       </mandatoryConform>
@@ -200,7 +200,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="MaxSetpoint" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CLOSED"/>
       </mandatoryConform>
@@ -208,7 +208,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="Step" type="percent">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CLOSED"/>
       </mandatoryConform>
@@ -228,28 +228,28 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="MistType" type="MistTypeBitmap" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="HUM"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="Continuous" type="Boolean" default="False">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CONT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="Sleep" type="Boolean" default="False">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SLEEP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000A" name="Optimal" type="Boolean" default="False">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="OPT"/>
       </mandatoryConform>

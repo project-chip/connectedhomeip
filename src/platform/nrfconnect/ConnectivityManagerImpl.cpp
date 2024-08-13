@@ -24,6 +24,10 @@
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/internal/BLEManager.h>
 
+#ifndef CONFIG_ARCH_POSIX
+#include <zephyr/net/net_if.h>
+#endif
+
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

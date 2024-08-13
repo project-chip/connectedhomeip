@@ -160,8 +160,7 @@ CHIP_ERROR LogErrorAsJSON(const CHIP_ERROR & error)
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
     Json::Value value;
-    chip::app::StatusIB status;
-    status.InitFromChipError(error);
+    chip::app::StatusIB status(error);
     return LogError(value, status);
 }
 

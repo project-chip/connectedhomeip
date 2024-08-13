@@ -14,14 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVWriter.h>
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
-
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
-
-#include <gtest/gtest.h>
 
 #include "sample_data.h"
 

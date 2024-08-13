@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Add Enhanced Setup Flow"/>
   </revisionHistory>
   <clusterIds>
@@ -65,7 +65,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
   <features>
-    <feature bit="0" code="TC" name="Terms &amp; Conditions" summary="Supports Terms &amp; Conditions acknowledgement">
+    <feature bit="0" code="TC" name="Terms" summary="Supports Terms &amp; Conditions acknowledgement">
       <optionalConform/>
     </feature>
   </features>
@@ -130,7 +130,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="BasicCommissioningInfo" type="BasicCommissioningInfo">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -140,12 +140,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="LocationCapability" type="RegulatoryLocationTypeEnum" default="IndoorOutdoor">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="SupportsConcurrentConnection" type="bool" default="true">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">

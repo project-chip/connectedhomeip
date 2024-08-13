@@ -23,6 +23,7 @@
         "CHANNEL_CLUSTER": [],
         "CLIENT_MONITORING_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": [],
+        "COMMISSIONER_CONTROL_CLUSTER": [],
         "COMMISSIONING_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": [],
         "CONTENT_CONTROL_CLUSTER": [],
@@ -36,6 +37,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
+        "ECOSYSTEM_INFORMATION_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
@@ -70,7 +72,7 @@
         "NETWORK_COMMISSIONING_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
+        "OCCUPANCY_SENSING_CLUSTER": [],
         "ON_OFF_CLUSTER": [],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": [],
@@ -106,6 +108,7 @@
         "RVC_CLEAN_MODE_CLUSTER": [],
         "RVC_RUN_MODE_CLUSTER": [],
         "SCENES_CLUSTER": [],
+        "SERVICE_AREA_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
         "SWITCH_CLUSTER": [],
@@ -116,6 +119,7 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
@@ -129,6 +133,8 @@
         "WAKE_ON_LAN_CLUSTER": [],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": [],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": [],
+        "WATER_HEATER_MANAGEMENT_CLUSTER": [],
+        "WATER_HEATER_MODE_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
@@ -168,6 +174,7 @@
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
+        "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
@@ -181,6 +188,7 @@
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
+        "ECOSYSTEM_INFORMATION_CLUSTER": ["ecosystem-information-server"],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
             "electrical-energy-measurement-server"
         ],
@@ -277,6 +285,7 @@
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
+        "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SWITCH_CLUSTER": ["switch-server"],
@@ -287,11 +296,13 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
-        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
+        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [
+            "thread-border-router-management-server"
+        ],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
-        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": ["thread-network-directory-server"],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
@@ -311,6 +322,8 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
+        "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
+        "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }
 }

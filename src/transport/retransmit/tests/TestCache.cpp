@@ -14,10 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <transport/retransmit/Cache.h>
 
 #include <bitset>
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <transport/retransmit/Cache.h>
 
 // Helpers for simple payload management
 namespace {

@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature."/>
   </revisionHistory>
   <clusterIds>
@@ -200,12 +200,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="5" name="IPv4Addresses" type="list">
-        <entry type="ref_Ipv4Adr"/>
+        <entry type="ref_IPv4Address"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="4"/>
       </field>
       <field id="6" name="IPv6Addresses" type="list">
-        <entry type="ref_Ipv6Adr"/>
+        <entry type="ref_IPv6Address"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="8"/>
       </field>
@@ -223,17 +223,17 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RebootCount" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="UpTime" type="uint64">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="TotalOperationalHours" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0004" name="BootReason" type="BootReasonEnum">
@@ -310,7 +310,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="PayloadTestResponse" direction="responseFromServer">
-      <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="DMTEST"/>
       </mandatoryConform>

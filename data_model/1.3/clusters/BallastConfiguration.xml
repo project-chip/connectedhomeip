@@ -65,7 +65,9 @@ Davis, CA 95616, USA
     <revision revision="4" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0301" name="Ballast Configuration"/>
+    <clusterId id="0x0301" name="Ballast Configuration">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="BC" scope="Endpoint"/>
   <dataTypes>
@@ -116,12 +118,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0014" name="IntrinsicBallastFactor" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="BallastFactorAdjustment" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="between" from="100" to="MS"/>
     </attribute>
@@ -141,12 +143,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="LampRatedHours" type="uint24" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0033" name="LampBurnHours" type="uint24" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0034" name="LampAlarmMode" type="LampAlarmModeBitmap" default="0">
@@ -155,7 +157,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0035" name="LampBurnHoursTripPoint" type="uint24" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
   </attributes>

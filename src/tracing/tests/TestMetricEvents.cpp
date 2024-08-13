@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>

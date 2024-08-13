@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
+#include <pw_unit_test/framework.h>
+
 #include <app/icd/server/ICDMonitoringTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ClusterEnums.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 

@@ -57,10 +57,12 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050F" name="Content Control Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x050F" name="Content Control"/>
+    <clusterId id="0x050F" name="Content Control">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONCON" scope="Endpoint"/>
   <features>

@@ -24,14 +24,16 @@
  *      decode interfaces.
  *
  */
-#include <gtest/gtest.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 
 using namespace chip;

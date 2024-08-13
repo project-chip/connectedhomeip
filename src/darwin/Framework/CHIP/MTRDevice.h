@@ -114,7 +114,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
  */
-- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use addDelegate:queue:interestedPaths:");
+- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_DEPRECATED("Please use addDelegate:queue:interestedPaths:", ios(16.1, 18.0), macos(13.0, 15.0), watchos(9.1, 11.0), tvos(16.1, 18.0));
 
 /**
  * Adds a delegate to receive asynchronous callbacks about the device.
@@ -123,7 +123,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * MTRDevice holds a weak reference to the delegate object.
  */
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(18.0), macos(15.0), watchos(11.0), tvos(18.0));
 
 /**
  * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute and/or event reports to a specific set of paths.
@@ -138,12 +138,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * MTRDevice holds a weak reference to the delegate object.
  */
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_AVAILABLE(ios(18.0), macos(15.0), watchos(11.0), tvos(18.0));
 
 /**
  * Removes the delegate from receiving callbacks about the device.
  */
-- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate MTR_NEWLY_AVAILABLE;
+- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate MTR_AVAILABLE(ios(18.0), macos(15.0), watchos(11.0), tvos(18.0));
 
 /**
  * Read attribute in a designated attribute path.  If there is no value available

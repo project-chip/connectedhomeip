@@ -29,11 +29,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <CHIPVersion.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

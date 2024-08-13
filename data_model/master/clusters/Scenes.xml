@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0062" name="Scenes Management"/>
+    <clusterId id="0x0062" name="Scenes Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
@@ -165,12 +167,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LastConfiguredBy" type="node-id" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>

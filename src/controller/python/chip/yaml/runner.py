@@ -20,10 +20,11 @@ import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
+from typing import Any, Optional, Tuple
 
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
-import stringcase
+import stringcase  # type: ignore
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
 from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
@@ -63,7 +64,7 @@ class EventResponse:
 @dataclass
 class _ActionResult:
     status: _ActionStatus
-    response: object
+    response: Any
 
 
 @dataclass
@@ -83,7 +84,7 @@ class _EventSubscriptionCallbackResult:
 class _ExecutionContext:
     ''' Objects that is commonly passed around this file that are vital to test execution.'''
     # Data model lookup to get python attribute, cluster, command object.
-    data_model_lookup: DataModelLookup = None
+    data_model_lookup: DataModelLookup
     # List of subscriptions.
     subscriptions: list = field(default_factory=list)
     # The key is the attribute/event name, and the value is a queue of subscription callback results
@@ -672,7 +673,7 @@ class DiscoveryCommandAction(BaseAction):
     """DiscoveryCommand implementation (FindCommissionable* methods)."""
 
     @staticmethod
-    def _filter_for_step(test_step) -> (discovery.FilterType, any):
+    def _filter_for_step(test_step) -> Tuple[discovery.FilterType, Any]:
         """Given a test step, figure out the correct filters to give to
            DiscoverCommissionableNodes.
         """
@@ -834,8 +835,8 @@ class ReplTestRunner:
         except ActionCreationError:
             return None
 
-    def encode(self, request) -> BaseAction:
-        action = None
+    def encode(self, request) -> Optional[BaseAction]:
+        action: Optional[BaseAction] = None
         cluster = request.cluster.replace(' ', '').replace('/', '').replace('.', '')
         command = request.command
         if cluster == 'CommissionerCommands':

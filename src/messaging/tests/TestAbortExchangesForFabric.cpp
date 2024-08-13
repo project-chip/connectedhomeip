@@ -24,6 +24,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>

@@ -79,10 +79,6 @@ CHIP_ERROR SilabsPlatform::Init(void)
     sl_iostream_set_default(sl_iostream_stdio_handle);
 #endif
 
-#if CHIP_ENABLE_OPENTHREAD
-    sl_ot_sys_init();
-#endif
-
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
 #endif

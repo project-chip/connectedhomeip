@@ -82,7 +82,7 @@ tests:
       command: "readAttribute"
       attribute: "PartsList"
       response:
-          value: [1, 2]
+          value: [1, 2, 3, 4]
 
     - label: "Read attribute ClusterRevision"
       command: "readAttribute"

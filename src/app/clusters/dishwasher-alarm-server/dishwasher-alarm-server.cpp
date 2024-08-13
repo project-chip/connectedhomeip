@@ -129,12 +129,13 @@ Status DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<Ala
 Status DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
     Status status = Status::Success;
-    ;
+
     if ((status = Attributes::Supported::Set(endpoint, supported)) != Status::Success)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", to_underlying(status));
         return status;
     }
+
     // Whenever there is change in Supported attribute, Latch should change accordingly (if possible).
     BitMask<AlarmMap> latch;
     if (GetLatchValue(endpoint, &latch) == Status::Success && !supported.HasAll(latch))

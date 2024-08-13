@@ -286,10 +286,10 @@ config NET_IPV6_NBR_CACHE
     default n
 
 config NET_MAX_CONN
-    default 1
+    default 1 if !WIFI
 
 config NET_MAX_CONTEXTS
-    default 1
+    default 1 if !WIFI
 
 config NET_CONFIG_INIT_TIMEOUT
     default 0

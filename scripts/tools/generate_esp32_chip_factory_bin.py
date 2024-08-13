@@ -21,6 +21,7 @@ import base64
 import logging
 import os
 import sys
+from enum import Enum
 from types import SimpleNamespace
 
 import cryptography.x509
@@ -44,6 +45,40 @@ else:
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
+
+
+class Product_Finish_Enum(Enum):
+    other = 0
+    matte = 1
+    satin = 2
+    polished = 3
+    rugged = 4
+    fabric = 5
+
+
+class Product_Color_Enum(Enum):
+    black = 0
+    navy = 1
+    green = 2
+    teal = 3
+    maroon = 4
+    purple = 5
+    olive = 6
+    gray = 7
+    blue = 8
+    lime = 9
+    aqua = 10
+    red = 11
+    fuchsia = 12
+    yellow = 13
+    white = 14
+    nickel = 15
+    chrome = 16
+    brass = 17
+    copper = 18
+    silver = 19
+    gold = 20
+
 
 TOOLS = {}
 
@@ -149,6 +184,31 @@ FACTORY_DATA = {
         'encoding': 'hex2bin',
         'value': None,
     },
+    'product-finish': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
+    'product-color': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
+    'part-number': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-label': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-url': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
 }
 
 
@@ -158,6 +218,39 @@ def ishex(s):
         return True
     except ValueError:
         return False
+
+# get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
+# example with semantic tags
+# input  : ['0/label1/1/"1\0x8000, 2\0x8000" 1/label2/1/"1\0x8000, 2\0x8000"']
+# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
+
+# example without semantic tags
+# input  : ['0/label1/1 1/label2/1']
+# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': []}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': []}]}
+
+
+def get_supported_modes_dict(supported_modes):
+    output_dict = {}
+
+    for mode_str in supported_modes:
+        mode_label_strs = mode_str.split('/')
+        mode = mode_label_strs[0]
+        label = mode_label_strs[1]
+        ep = mode_label_strs[2]
+
+        semantic_tags = ''
+        if (len(mode_label_strs) == 4):
+            semantic_tag_strs = mode_label_strs[3].split(', ')
+            semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
+
+        mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
+
+        if ep in output_dict:
+            output_dict[ep].append(mode_dict)
+        else:
+            output_dict[ep] = [mode_dict]
+
+    return output_dict
 
 
 def check_str_range(s, min_len, max_len, name):
@@ -268,6 +361,70 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
+    if args.product_finish:
+        FACTORY_DATA['product-finish']['value'] = Product_Finish_Enum[args.product_finish].value
+    if args.product_color:
+        FACTORY_DATA['product-color']['value'] = Product_Color_Enum[args.product_color].value
+    if args.part_number:
+        FACTORY_DATA['part-number']['value'] = args.part_number
+    if args.product_url:
+        FACTORY_DATA['product-url']['value'] = args.product_url
+    if args.product_label:
+        FACTORY_DATA['product-label']['value'] = args.product_label
+
+    # SupportedModes are stored as multiple entries
+    #  - sm-sz/<ep>                 : number of supported modes for the endpoint
+    #  - sm-label/<ep>/<index>      : supported modes label key for the endpoint and index
+    #  - sm-mode/<ep>/<index>       : supported modes mode key for the endpoint and index
+    #  - sm-st-sz/<ep>/<index>      : supported modes SemanticTag key for the endpoint and index
+    #  - st-v/<ep>/<index>/<ind>    : semantic tag value key for the endpoint and index and ind
+    #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
+    if (args.supported_modes is not None):
+        dictionary = get_supported_modes_dict(args.supported_modes)
+        for ep in dictionary.keys():
+            _sz = {
+                'type': 'data',
+                'encoding': 'u32',
+                'value': len(dictionary[ep])
+            }
+            FACTORY_DATA.update({'sm-sz/{:x}'.format(int(ep)): _sz})
+            for i in range(len(dictionary[ep])):
+                item = dictionary[ep][i]
+                _label = {
+                    'type': 'data',
+                    'encoding': 'string',
+                    'value': item["Label"]
+                }
+                _mode = {
+                    'type': 'data',
+                    'encoding': 'u32',
+                    'value': item["Mode"]
+                }
+                _st_sz = {
+                    'type': 'data',
+                    'encoding': 'u32',
+                    'value': len(item["Semantic_Tag"])
+                }
+                FACTORY_DATA.update({'sm-label/{:x}/{:x}'.format(int(ep), i): _label})
+                FACTORY_DATA.update({'sm-mode/{:x}/{:x}'.format(int(ep), i): _mode})
+                FACTORY_DATA.update({'sm-st-sz/{:x}/{:x}'.format(int(ep), i): _st_sz})
+
+                for j in range(len(item["Semantic_Tag"])):
+                    entry = item["Semantic_Tag"][j]
+
+                    _value = {
+                        'type': 'data',
+                        'encoding': 'u32',
+                        'value': entry["value"]
+                    }
+                    _mfg_code = {
+                        'type': 'data',
+                        'encoding': 'u32',
+                        'value': entry["mfgCode"]
+                    }
+
+                    FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
+                    FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
 
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
@@ -380,6 +537,21 @@ def get_args():
     parser.add_argument('--rd-id-uid',
                         help=('128-bit unique identifier for generating rotating device identifier, '
                               'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
+
+    parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
+                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
+
+    product_finish_choices = [finish.name for finish in Product_Finish_Enum]
+    parser.add_argument("--product-finish", type=str, choices=product_finish_choices,
+                        help='Product finishes choices for product appearance')
+
+    product_color_choices = [color.name for color in Product_Color_Enum]
+    parser.add_argument("--product-color", type=str, choices=product_color_choices,
+                        help='Product colors choices for product appearance')
+
+    parser.add_argument("--part-number", type=str, help='human readable product number')
+    parser.add_argument("--product-label", type=str, help='human readable product label')
+    parser.add_argument("--product-url", type=str, help='link to product specific web page')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')

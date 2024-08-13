@@ -25,11 +25,16 @@
 
 #pragma once
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+
+#include "cmsis_os2.h"
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+static constexpr uint32_t threadSrpClearAllFlags = 0x0001U;
+#endif
 
 extern "C" void otSysEventSignalPending(void);
 
@@ -47,8 +52,7 @@ extern int GetEntropy_EFR32(uint8_t * buf, size_t bufSize);
  * using the Silicon Labs SDK and the OpenThread stack.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
-                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
-                                     public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -58,8 +62,6 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
-    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
-    friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 #endif
 
     // Allow glue functions called by OpenThread to call helper methods on this
@@ -72,11 +74,21 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
+    void FactoryResetThreadStack(void);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _InitThreadStack(void);
+    CHIP_ERROR _StartThreadTask(void);
+    void _LockThreadStack(void);
+    bool _TryLockThreadStack(void);
+    void _UnlockThreadStack(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     // ===== Members for internal use by the following friends.
 
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
@@ -90,6 +102,10 @@ private:
     // ===== Private members for use by this class only.
 
     ThreadStackManagerImpl() = default;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    osThreadId_t mSrpClearAllRequester = NULL;
+#endif
 };
 
 /**

@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:54
+            image: ghcr.io/project-chip/chip-build-k32w:66
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -60,14 +60,14 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-k32w0-lighting \
-                      --target nxp-k32w0-lighting-factory \
-                      --target nxp-k32w0-lighting-rotating-id \
-                      --target nxp-k32w0-contact-sensor \
-                      --target nxp-k32w0-contact-sensor-low-power \
-                      --target nxp-k32w0-contact-sensor-low-power-factory \
-                      --target nxp-k32w1-lighting \
-                      --target nxp-k32w1-contact-sensor-low-power \
+                      --target nxp-k32w0-freertos-lighting \
+                      --target nxp-k32w0-freertos-lighting-factory \
+                      --target nxp-k32w0-freertos-lighting-rotating-id \
+                      --target nxp-k32w0-freertos-contact-sensor \
+                      --target nxp-k32w0-freertos-contact-sensor-low-power \
+                      --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
+                      --target nxp-k32w1-freertos-lighting \
+                      --target nxp-k32w1-freertos-contact-sensor-low-power \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -75,24 +75,115 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release light \
-                    out/artifacts/nxp-k32w0-lighting/chip-k32w0x-light-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-lighting/chip-k32w0x-light-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w1+release light \
-                    out/artifacts/nxp-k32w1-lighting/chip-k32w1-light-example.elf \
+                    out/artifacts/nxp-k32w1-freertos-lighting/chip-k32w1-light-example.elf \
                     /tmp/bloat_reports/
             - name: Get contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w0+release contact \
-                    out/artifacts/nxp-k32w0-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
+                    out/artifacts/nxp-k32w0-freertos-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp k32w1+release contact \
-                    out/artifacts/nxp-k32w1-contact-sensor-low-power/chip-k32w1-contact-example.elf \
+                    out/artifacts/nxp-k32w1-freertos-contact-sensor-low-power/chip-k32w1-contact-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
                 platform-name: K32W
+    rw61x:
+        name: RW61X
+
+        env:
+            BUILD_TYPE: gn_rw61x
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-rw61x:66
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nxp
+                extra-submodule-parameters: --recursive
+
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                gh-context: ${{ toJson(github) }}
+
+            - name: Build RW61X all clusters example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-all-clusters-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-thread \
+                      --target nxp-rw61x-freertos-all-clusters-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            
+            - name: Build RW61X thermostat example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-thermostat-wifi \
+                      --target nxp-rw61x-freertos-thermostat-thread \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            
+            - name: Build RW61X laundry-washer example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-laundry-washer-wifi \
+                      --target nxp-rw61x-freertos-laundry-washer-thread \
+                      --target nxp-rw61x-freertos-laundry-washer-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                platform-name: RW61X
+    zephyr:
+        name: ZEPHYR_RW61X
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:66
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nxp
+
+            - name: Build RW61x Zephyr examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-zephyr-all-clusters \
+                      --target nxp-rw61x-zephyr-thermostat \
+                      --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      build \
+                  "

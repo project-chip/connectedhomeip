@@ -484,7 +484,8 @@ static int OnSubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_e
 }
 #endif
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_dsc * dsc;
@@ -493,7 +494,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     struct peer * peer = peer_find(conId);
     if (peer == nullptr)
     {
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
@@ -503,7 +504,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     {
         ChipLogError(Ble, "Peer does not have CCCD");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
 
     value[0] = 0x02;
@@ -514,15 +515,16 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_dsc * dsc;
@@ -531,7 +533,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     struct peer * peer = peer_find(conId);
     if (peer == nullptr)
     {
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
@@ -541,7 +543,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     {
         ChipLogError(Ble, "Peer does not have CCCD");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
 
     value[0] = 0x00;
@@ -552,15 +554,15 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     CHIP_ERROR err;
 
@@ -580,7 +582,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #endif
 
-    return (err == CHIP_NO_ERROR);
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -588,8 +590,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return ble_att_mtu(conId);
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    chip::System::PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          chip::System::PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -618,12 +620,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        return false;
-    }
-    return true;
+    return err;
 }
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -643,8 +640,8 @@ static int OnWriteComplete(uint16_t conn_handle, const struct ble_gatt_error * e
 }
 #endif
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            chip::System::PacketBufferHandle pBuf)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     const struct peer_chr * chr;
@@ -656,7 +653,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     {
         ChipLogError(Ble, "Peer does not have RX characteristic");
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
     }
 
     if (pBuf->DataLength() > UINT16_MAX)
@@ -670,11 +667,11 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
     }
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 

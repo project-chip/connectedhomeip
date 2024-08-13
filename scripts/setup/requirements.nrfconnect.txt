@@ -5,3 +5,4 @@ cbor2>=5.4.3
 ecdsa>=0.18.0
 qrcode==7.4.2
 python_stdnum==1.18
+typing-extensions>=4.6.0

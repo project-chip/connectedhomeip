@@ -2508,11 +2508,12 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     __block NSNumber * rootEndpoint = @0;
 
     // This test will do the following -
-    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report. The attribute report will delete endpoint 2.
+    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report.
+    //    The injected attribute report will delete endpoint 2.
     //    That should cause the endpoint and its corresponding clusters to be removed from data storage.
-    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    // 2. The data store is populated with cluster index and cluster data for the set of endpoints in our test app initially.
     // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data
-    // for endpoints 0 and 1 but not 2.
+    //    for all the other endpoints.
     __block MTRDeviceDataValueDictionary testDataForPartsList;
     __block id testClusterDataValueForPartsList;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
@@ -2534,18 +2535,21 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     };
 
     __block NSMutableDictionary<NSNumber *, NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
-    __block NSMutableArray<NSNumber *> * testEndpoints;
+    // Some of the places we get endpoint lists get them from enumerating dictionary keys, which
+    // means order is not guaranteed.  Make sure we compare sets of endpoints, not arrays, to
+    // account for that.
+    __block NSSet<NSNumber *> * testEndpoints;
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(dataVersionForPartsList);
         XCTAssertNotNil(testClusterDataValueForPartsList);
-        testEndpoints = [self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device];
+        testEndpoints = [NSSet setWithArray:[self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device]];
 
-        // Make sure that the cluster data in the data storage is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Make sure that the cluster data in the data storage is populated with cluster index and cluster data for our endpoints.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
-            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            XCTAssertEqualObjects([NSSet setWithArray:[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID]], testEndpoints);
 
             // Populate the initialClusterIndex to use as a reference for all cluster paths later.
             for (NSNumber * endpoint in testEndpoints) {
@@ -2568,8 +2572,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // Inject a fake attribute report deleting endpoint 2 from the parts list at the root endpoint.
     dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
 
-    // Delete endpoint 2 from the attribute value in parts list.
+    // Delete our to-be-deleted endpoint from the attribute value in parts list.  Make sure it's in the list to start with.
     NSNumber * toBeDeletedEndpoint = @2;
+    XCTAssertTrue([testEndpoints containsObject:toBeDeletedEndpoint]);
     id endpointData =
         @{
             MTRDataKey : @ {
@@ -2578,6 +2583,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
             }
         };
 
+    XCTAssertTrue([testClusterDataValueForPartsList containsObject:endpointData]);
     [testClusterDataValueForPartsList removeObject:endpointData];
 
     NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
@@ -2612,13 +2618,13 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(testClusterDataValueForPartsList);
-        testEndpoints = [self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device];
+        testEndpoints = [NSSet setWithArray:[self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device]];
 
-        // Make sure that the cluster data in the data storage for endpoints 0 and 1 are present but not for endpoint 2.
+        // Make sure that the cluster data is removed from the data storage for the endpoint we deleted, but still there for the others.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
-            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            XCTAssertEqualObjects([NSSet setWithArray:[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID]], testEndpoints);
             for (NSNumber * endpoint in testEndpoints) {
                 XCTAssertNotNil(initialClusterIndex);
                 for (NSNumber * cluster in [initialClusterIndex objectForKey:endpoint]) {
@@ -2828,7 +2834,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                 MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
                 if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
-                    MTRDeviceClusterData * data = [device _getClusterDataForPath:path];
+                    MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
                     XCTAssertNotNil(data);
                     XCTAssertNotNil(data.attributes);
 
@@ -2891,7 +2897,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                 MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
                 if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
-                    MTRDeviceClusterData * data = [device _getClusterDataForPath:path];
+                    MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
                     XCTAssertNotNil(data);
                     XCTAssertNotNil(data.attributes);
 
@@ -2923,6 +2929,130 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+// Run the test here since detectLeaks is set, and subscription reset needs to not cause leaks
+- (void)testMTRDeviceResetSubscription
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(333);
+    NSNumber * fabricID = @(444);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation1 = [self expectationWithDescription:@"Subscription has been set up 1"];
+
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation1 fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation1 ] timeout:60];
+
+    // Test 1: test that subscription reset works
+
+    XCTestExpectation * subscriptionExpectation2 = [self expectationWithDescription:@"Subscription has been set up 2"];
+
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation2 fulfill];
+        // reset callback so expectation not fulfilled twice
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // clear cluster data before reset
+    NSUInteger attributeCountBeforeReset = [device unitTestAttributeCount];
+    [device unitTestClearClusterData];
+
+    [device unitTestResetSubscription];
+
+    [self waitForExpectations:@[ subscriptionExpectation2 ] timeout:60];
+
+    // check that in-memory cache has recovered
+    NSUInteger attributeCountAfterReset = [device unitTestAttributeCount];
+    XCTAssertEqual(attributeCountBeforeReset, attributeCountAfterReset);
+
+    // Test 2: simulate a cache purge and loss of storage, to see:
+    //  * that subscription reestablishes
+    //  * the cache is restored
+    [device unitTestClearClusterData];
+    [controller.controllerDataStore clearAllStoredClusterData];
+
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * storedClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterData.count, 0);
+
+    XCTestExpectation * subscriptionExpectation3 = [self expectationWithDescription:@"Subscription has been set up 3"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation3 fulfill];
+        // reset callback so expectation not fulfilled twice
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // now get list of clusters, and call clusterDataForPath: to trigger the reset
+    NSSet<MTRClusterPath *> * persistedClusters = [device unitTestGetPersistedClusters];
+    MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:persistedClusters.anyObject];
+    XCTAssertNil(data);
+
+    // Also call clusterDataForPath: repeatedly to verify in logs that subscription is reset only once
+    for (MTRClusterPath * path in persistedClusters) {
+        MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
+        (void) data; // do not assert nil because subscription may happen during this time and already fill in the cache
+    }
+
+    [self waitForExpectations:@[ subscriptionExpectation3 ] timeout:60];
+
+    // Verify that after report ends all the cluster data is back
+    for (MTRClusterPath * path in persistedClusters) {
+        MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
+        XCTAssertNotNil(data);
+    }
+
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
     ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);

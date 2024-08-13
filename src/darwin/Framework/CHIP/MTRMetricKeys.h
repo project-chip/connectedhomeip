@@ -61,8 +61,11 @@ constexpr Tracing::MetricKey kMetricDeviceBeingCommissioned = "dwnfw_dev_being_c
 // Tracks the request to generate PASE verifier for a given setup code
 constexpr Tracing::MetricKey kMetricPASEVerifierForSetupCode = "dwnfw_pase_verifier_for_code";
 
+// Tracks the request to get attestation challenge for a device
+constexpr Tracing::MetricKey kMetricAttestationChallengeForDevice = "dwnfw_attestation_challenge_for_device";
+
 // Marks the request to open pairing window
-constexpr Tracing::MetricKey kMetricOpenPairingWindow = "dwnfw_pase_verifier_for_code";
+constexpr Tracing::MetricKey kMetricOpenPairingWindow = "dwnfw_open_pairing_window";
 
 // Device Vendor ID
 constexpr Tracing::MetricKey kMetricDeviceVendorID = "dwnfw_device_vendor_id";

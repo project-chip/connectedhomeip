@@ -352,9 +352,9 @@ class TestConfig(object):
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
                                        1], global_test_params=global_test_params, storage_path=self.admin_storage)
         if code_type == SetupCodeType.QR:
-            self.config.qr_code_content = code
+            self.config.qr_code_content = [code]
         else:
-            self.config.manual_code = code
+            self.config.manual_code = [code]
         self.config.paa_trust_store_path = Path(self.paa_path)
         # Set for DA-1.2, which uses the CD signing certs for verification. This test is now set to use the production CD signing certs from the DCL.
         self.config.global_test_params['cd_cert_dir'] = tmpdir_cd

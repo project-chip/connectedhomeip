@@ -65,7 +65,8 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
-    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, EnhancedCurrentHue and RemainingTime attributes"/>
+    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, EnhancedCurrentHue and RemainingTime attributes +
+             and added clarifications for behavior related to Step values"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -111,19 +112,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="ColorLoopDirectionEnum">
-      <item value="0" name="Decrement">
+      <item value="0" name="Decrement" summary="Decrement the hue in the color loop.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Increment">
-        <mandatoryConform/>
-      </item>
-      <item value="Decrement the hue in the color loop." name="M">
-        <mandatoryConform/>
-      </item>
-      <item value="Increment the hue in the color loop." name="M">
-        <mandatoryConform/>
-      </item>
-      <item value="Summary" name="Conformance">
+      <item value="1" name="Increment" summary="Increment the hue in the color loop.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -252,7 +244,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CurrentHue" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
@@ -260,7 +252,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="CurrentSaturation" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
@@ -268,13 +260,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform/>
       <constraint type="max" value="65534"/>
     </attribute>
     <attribute id="0x0003" name="CurrentX" type="uint16" default="24939 (0.381)">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
@@ -282,7 +274,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentY" type="uint16" default="24701 (0.377)">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
@@ -299,7 +291,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250 (4000K)">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
@@ -307,7 +299,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="ColorMode" type="ColorModeEnum" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
@@ -317,13 +309,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="NumberOfPrimaries" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="max" value="6"/>
     </attribute>
     <attribute id="0x0011" name="Primary1X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -337,7 +329,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="Primary1Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -351,7 +343,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="Primary1Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -364,7 +356,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0015" name="Primary2X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -378,7 +370,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="Primary2Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -392,7 +384,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0017" name="Primary2Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -405,7 +397,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0019" name="Primary3X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -419,7 +411,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001A" name="Primary3Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -433,7 +425,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001B" name="Primary3Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -446,7 +438,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0020" name="Primary4X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -460,7 +452,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="Primary4Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -474,7 +466,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0022" name="Primary4Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -487,7 +479,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0024" name="Primary5X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -501,7 +493,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0025" name="Primary5Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -515,7 +507,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0026" name="Primary5Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -528,7 +520,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0028" name="Primary6X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -542,7 +534,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0029" name="Primary6Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -556,7 +548,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x002A" name="Primary6Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -589,7 +581,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0034" name="ColorPointRIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0036" name="ColorPointGX" type="uint16">
@@ -604,7 +596,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0038" name="ColorPointGIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x003A" name="ColorPointBX" type="uint16">
@@ -619,24 +611,24 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x003C" name="ColorPointBIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="EHUE"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4001" name="EnhancedColorMode" type="EnhancedColorModeEnum" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x4002" name="ColorLoopActive" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
@@ -644,7 +636,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4003" name="ColorLoopDirection" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
@@ -652,7 +644,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="25">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
@@ -696,11 +688,11 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="" to="ColorTemperatureMireds"/>
+      <constraint type="between" from="ColorTempPhysicalMinMireds" to="ColorTemperatureMireds"/>
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CT"/>

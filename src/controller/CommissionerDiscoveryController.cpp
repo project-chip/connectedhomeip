@@ -589,12 +589,36 @@ void CommissionerDiscoveryController::Cancel()
         return;
     }
     UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
-    if (client == nullptr || client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
+
+    if (client == nullptr)
     {
-        ChipLogError(AppServer, "UX Cancel: invalid state for cancel");
+        ChipLogError(AppServer, "UX Cancel: client not found");
         return;
     }
+
+    auto state = client->GetUDCClientProcessingState();
+
+    bool isCancelableState =
+        (state == UDCClientProcessingState::kPromptingUser || state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+
+    if (!isCancelableState)
+    {
+        ChipLogError(AppServer, "UX Cancel: invalid state for cancel, state: %hhu", static_cast<uint8_t>(state));
+        return;
+    }
+
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
+
+    if (state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+        state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+    {
+        ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetCancelPasscode(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+
     mPendingConsent = false;
     ResetState();
 }
