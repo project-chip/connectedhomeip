@@ -449,23 +449,3 @@ void RvcDevice::UpdateServiceAreaProgressOnExit()
         i++;
     }
 }
-
-void RvcDevice::UpdateServiceAreaProgressOnExit()
-{
-    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting))
-    {
-        return;
-    }
-
-    uint32_t i = 0;
-    ServiceArea::Structs::ProgressStruct::Type progressElement;
-    while (mServiceAreaDelegate.GetProgressElementByIndex(i, progressElement))
-    {
-        if (progressElement.status == ServiceArea::OperationalStatusEnum::kOperating ||
-            progressElement.status == ServiceArea::OperationalStatusEnum::kPending)
-        {
-            mServiceAreaInstance.SetProgressStatus(progressElement.areaID, ServiceArea::OperationalStatusEnum::kSkipped);
-        }
-        i++;
-    }
-}
