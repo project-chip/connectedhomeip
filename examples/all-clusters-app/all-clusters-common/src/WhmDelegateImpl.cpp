@@ -516,4 +516,3 @@ Status WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
 
     return ChangeHeatingIfNecessary();
 }
-
