@@ -112,15 +112,16 @@ private:
     GLIB_Context_t glibContext;
 
 #ifdef SL_DEMO_NAME
-    uint8_t mName[] = SL_DEMO_NAME
+    uint8_t mName[] = SL_DEMO_NAME;
 #else
     uint8_t mName[APP_NAME_MAX_LENGTH + 1];
 #endif
-        customUICB customUI = nullptr;
+    customUICB customUI = nullptr;
     DemoState_t dState;
 
     DisplayStatus_t mStatus;
     uint8_t mCurrentScreen = DemoScreen;
+
 #ifdef SL_ENABLE_ICD_LCD
     sl_sleeptimer_timer_handle_t lcdTimerHandle;
     static void LcdTimeoutCallback(sl_sleeptimer_timer_handle_t * handle, void * data);
