@@ -102,7 +102,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
             new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
