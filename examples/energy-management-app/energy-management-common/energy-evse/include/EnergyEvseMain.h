@@ -31,5 +31,3 @@ CHIP_ERROR EnergyMeterShutdown();
 
 CHIP_ERROR PowerTopologyInit();
 CHIP_ERROR PowerTopologyShutdown();
-
-
