@@ -26,7 +26,7 @@
 /**
  * @brief StayActiveSender contains all the data and methods needed for active period extension of an ICD client.
  * 
- * Lifetime of instance of StayActiveSender is entirely
+ * Lifetime of instance of StayActiveSender is entirely self managed.
  */
 class StayActiveSender
 {
