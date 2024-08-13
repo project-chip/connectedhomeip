@@ -237,9 +237,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
-            if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
-            else:
+            if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=11)
@@ -272,9 +270,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
-            if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
-            else:
+            if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=15)
@@ -307,9 +303,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
-            if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
-            else:
+            if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=19)
@@ -317,7 +311,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             asserts.assert_true(len(old_supported_areas) > len(new_supported_areas), "Failed to remove area(s)")
 
             # NOTE the following operations are all part of step 19 - read all these attributes and check the data consistency
-            #     after removing areas(s)   
+            #     after removing areas(s)
 
             await self.read_and_validate_selected_areas(step=19)
 
@@ -341,9 +335,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
-            if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
-            else:
+            if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=23)
