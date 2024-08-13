@@ -881,7 +881,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def write_to_app_pipe(self, command):
         """
         Use the following environment variables:
-        
+
          - LINUX_DUT_IP 
             * if not provided, the Matter app is assumed to run on the same machine as this test,
               such as during CI, and the commands are sent to it using a local named pipe
@@ -914,20 +914,20 @@ class MatterBaseTest(base_test.BaseTestClass):
             if dut_uname is None:
                 dut_uname = "root"
                 print(f"Using default DUT user name (root)")
-            else:      
+            else:
                 print(f"Using DUT user name: {dut_uname}")
 
             app_name = os.getenv('LINUX_DUT_APPNAME')
             if app_name is None:
                 app_name = "rvc"
                 print(f"Using default DUT app name (rvc)")
-            else:      
-                print(f"Using DUT app name: {app_name}")    
-    
+            else:
+                print(f"Using DUT app name: {app_name}")
+
             pid = self.matter_test_config.app_pid
-            #use the dut's IP address below
+            # use the dut's IP address below
             ip = dut_ip
-            command_fixed = command.replace('\"','\\"')
+            command_fixed = command.replace('\"', '\\"')
             cmd = "echo \"%s\" | ssh %s@%s \'cat > /tmp/chip_%s_fifo_%d\'" % (command_fixed, dut_uname, ip, app_name, pid)
             os.system(cmd)
 
