@@ -48,6 +48,7 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
+    // AtomicWriteDelegate
     imcode OnBeginWrite(EndpointId endpoint, AttributeId attributeId) override;
     imcode OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
     imcode OnCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
@@ -66,6 +67,7 @@ private:
     imcode CommitPresets(EndpointId endpoint);
     imcode RollbackPresets(EndpointId endpoint);
 
+    // FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 };
 
