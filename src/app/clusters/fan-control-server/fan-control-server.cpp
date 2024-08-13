@@ -50,15 +50,18 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 
 Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
-typedef struct PercentCurrentQTracking {
+struct EmberAfFanControlState {
     bool initialized;
     bool moveStarted;
     DataModel::Nullable<chip::Percent> startPercent;
     DataModel::Nullable<chip::Percent> endPercent;
+    QuieterReportingAttribute<uint16_t> quietPercentCurrent{ DataModel::Nullable<chip::Percent>(0) };
     auto lastUpdateTime;
-} PercentCurrentQTracking;
+};
 
-PercentCurrentQTracking percentCurrentQTracking[kFanControlDelegateTableSize];
+static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
+
+static EmberAfFanControlState * getState(EndpointId endpoint);
 } // anonymous namespace
 
 namespace chip {
@@ -524,4 +527,57 @@ bool emberAfFanControlClusterStepCallback(app::CommandHandler * commandObj, cons
 
     commandObj->AddStatus(commandPath, status);
     return true;
+}
+
+static EmberAfFanControlState * getState(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kLevelControlStateTableSize ? nullptr : &stateTable[ep]);
+}
+
+/*
+ * @brief
+ * This function is used to update the percent current attribute
+ * while respecting its defined quiet reporting quality:
+ * The attribute will be reported:
+ * - At most once per second, or
+ * - At the start of the movement/transition, or
+ * - At the end of the movement/transition, or
+ * - When it changes from null to any other value and vice versa.
+ *
+ * @param endpoint: endpoint on which the currentLevel attribute must be updated.
+ * @param state: EmberAfFanControlState struct of this given endpoint.
+ * @param newValue: Value to update the attribute with
+ * @param isStartOrEndOfTransition: Boolean that indicate whether the update is occuring at the start or end of a level transition
+ * @return Success in setting the attribute value or the IM error code for the failure.
+ */
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, EmberAfFanControlState * state,
+                                         DataModel::Nullable<chip::Percent> newValue, bool isStartOrEndOfTransition)
+{
+    AttributeDirtyState dirtyState;
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+
+    if (isStartOrEndOfTransition)
+    {
+        // At the start or end of the movement/transition we must report
+        auto predicate = [](const decltype(state->quietPercentCurrent)::SufficientChangePredicateCandidate &) -> bool {
+            return true;
+        };
+        dirtyState = state->quietPercentCurrent.SetValue(newValue, now, predicate);
+    }
+    else
+    {
+        // During transtions, reports should be at most once per second
+        System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(1000);
+        auto predicate = state->quietPercentCurrent.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+        dirtyState     = state->quietPercentCurrent.SetValue(newValue, now, predicate);
+    }
+
+    MarkAttributeDirty markDirty = MarkAttributeDirty::kNo;
+    if (dirtyState == AttributeDirtyState::kMustReport)
+    {
+        markDirty = MarkAttributeDirty::kYes;
+    }
+    return Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value(), markDirty);
 }
