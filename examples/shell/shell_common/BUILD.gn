@@ -14,12 +14,12 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
-
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
-  # Enable server command only on linux for now.
-  chip_shell_cmd_server = current_os == "linux" || current_os == "mac"
+  chip_shell_cmd_server = matter_enable_recommended &&
+                          (current_os == "linux" || current_os == "mac")
 }
 
 config("shell_common_config") {
