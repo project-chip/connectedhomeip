@@ -128,7 +128,30 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 
 int SilabsLCD::Update(void)
 {
-    return updateDisplay();
+    int status = 0;
+#ifdef SL_ENABLE_ICD_LCD
+    SilabsLCD::TurnOn();
+#endif // SL_ENABLE_ICD_LCD
+    status = updateDisplay();
+#ifdef SL_ENABLE_ICD_LCD
+    switch (mCurrentScreen)
+    {
+    case DemoScreen:
+        SilabsLCD::TurnOff(kActivityLCDTimeout);
+        break;
+    case StatusScreen:
+        SilabsLCD::TurnOff(kActivityLCDTimeout);
+        break;
+#ifdef QR_CODE_ENABLED
+    case QRCodeScreen:
+        SilabsLCD::TurnOff(kQRCodeScreenTimeout);
+        break;
+#endif // QR_CODE_ENABLED
+    default:
+        break;
+    }
+#endif // SL_ENABLE_ICD_LCD
+    return status;
 }
 
 void SilabsLCD::WriteDemoUI(bool state)
@@ -153,6 +176,7 @@ void SilabsLCD::WriteDemoUI()
         demoUIClearMainScreen(mName);
         demoUIDisplayApp(dState.mainState);
     }
+    SilabsLCD::Update();
 }
 
 void SilabsLCD::WriteStatus()
@@ -197,7 +221,7 @@ void SilabsLCD::WriteStatus()
         GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     }
 
-    updateDisplay();
+    SilabsLCD::Update();
 }
 
 void SilabsLCD::SetCustomUI(customUICB cb)
@@ -216,29 +240,17 @@ void SilabsLCD::SetScreen(Screen_e screen)
     {
         return;
     }
-#ifdef SL_ENABLE_ICD_LCD
-    TurnOn();
-#endif // SL_ENABLE_ICD_LCD
     switch (screen)
     {
     case DemoScreen:
         WriteDemoUI();
-#ifdef SL_ENABLE_ICD_LCD
-        TurnOff(kActivityLCDTimeout);
-#endif // SL_ENABLE_ICD_LCD
         break;
     case StatusScreen:
         WriteStatus();
-#ifdef SL_ENABLE_ICD_LCD
-        TurnOff(kActivityLCDTimeout);
-#endif // SL_ENABLE_ICD_LCD
         break;
 #ifdef QR_CODE_ENABLED
     case QRCodeScreen:
         WriteQRCode();
-#ifdef SL_ENABLE_ICD_LCD
-        TurnOff(kQRCodeScreenTimeout);
-#endif // SL_ENABLE_ICD_LCD
         break;
 #endif
     default:
