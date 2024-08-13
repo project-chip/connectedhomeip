@@ -121,11 +121,8 @@ public:
      *
      * @return CHIP_NO_ERROR if the event was successfully generated, otherwise an error.
      */
-    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs,
-                                         Optional<bool> oneShot,
-                                         Optional<bool> emergencyBoost,
-                                         Optional<int16_t> temporarySetpoint,
-                                         Optional<chip::Percent> targetPercentage,
+    CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                         Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
                                          Optional<chip::Percent> targetReheat);
 
     /**

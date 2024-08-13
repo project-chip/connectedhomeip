@@ -31,11 +31,10 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
-    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mTargetWaterTemperature(0), mWaterTemperature(0),
-    mColdWaterTemperature(0), mBoostTargetTemperatureReached(false), mTankVolume(0),
-    mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
-{
-}
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mTargetWaterTemperature(0), mWaterTemperature(0), mColdWaterTemperature(0),
+    mBoostTargetTemperatureReached(false), mTankVolume(0), mEstimatedHeatRequired(0), mTankPercentage(0),
+    mBoostState(BoostStateEnum::kInactive)
+{}
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
 {
@@ -317,7 +316,8 @@ uint16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
 
 uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
 {
-    int16_t tankPercentage = 100 * (mWaterTemperature - mColdWaterTemperature) / (GetActiveTargetWaterTemperature() - mColdWaterTemperature);
+    int16_t tankPercentage =
+        100 * (mWaterTemperature - mColdWaterTemperature) / (GetActiveTargetWaterTemperature() - mColdWaterTemperature);
 
     tankPercentage = std::min(tankPercentage, static_cast<int16_t>(100));
     tankPercentage = std::max(tankPercentage, static_cast<int16_t>(0));
@@ -439,7 +439,8 @@ Status WaterHeaterManagementDelegate::ChangeHeatingIfNecessary()
             CHIP_ERROR err = GenerateBoostEndedEvent();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "ChangeHeatingIfNecessary: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(AppServer, "ChangeHeatingIfNecessary: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT,
+                             err.Format());
             }
         }
 

@@ -45,22 +45,19 @@ constexpr uint16_t kClusterRevision = 1;
  *
  ***************************************************************************/
 
-CHIP_ERROR Delegate::GenerateBoostStartedEvent(uint32_t durationSecs,
-                                               Optional<bool> oneShot,
-                                               Optional<bool> emergencyBoost,
-                                               Optional<int16_t> temporarySetpoint,
-                                               Optional<chip::Percent> targetPercentage,
+CHIP_ERROR Delegate::GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                               Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
                                                Optional<chip::Percent> targetReheat)
 {
     Events::BoostStarted::Type event;
     EventNumber eventNumber;
 
-    event.boostInfo.duration = durationSecs;
-    event.boostInfo.oneShot = oneShot;
-    event.boostInfo.emergencyBoost = emergencyBoost;
+    event.boostInfo.duration          = durationSecs;
+    event.boostInfo.oneShot           = oneShot;
+    event.boostInfo.emergencyBoost    = emergencyBoost;
     event.boostInfo.temporarySetpoint = temporarySetpoint;
-    event.boostInfo.targetPercentage = targetPercentage;
-    event.boostInfo.targetReheat = targetReheat;
+    event.boostInfo.targetPercentage  = targetPercentage;
+    event.boostInfo.targetReheat      = targetReheat;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
