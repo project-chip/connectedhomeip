@@ -28,7 +28,7 @@
     return xpcInterface;
 }
 
-- (void)ping 
+- (void)ping
 {
     MTR_LOG_DEBUG("PONG! %s", __PRETTY_FUNCTION__);
 }

@@ -83,7 +83,7 @@
 
 - (void)testExample {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    
+
     XCTAssertNotNil(_xpcListener);
     XCTAssertNotNil(_xpcListener.endpoint);
     NSXPCConnection * serviceConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:_xpcListener.endpoint];
@@ -95,7 +95,7 @@
     XCTAssertNotNil(obj);
 
     [obj ping];
-    
+
     [obj getMeaningOfLifeWithReplyBlock:^(int meaning) {
         XCTAssertEqual(meaning, 42);
     }];
