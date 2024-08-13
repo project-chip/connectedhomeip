@@ -101,12 +101,12 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "RemoveMap")
     {
         VerifyOrExit(self->mJsonValue.isMember("MapId"), ChipLogError(NotSpecified, "RVC App: MapId key is missing"));
-        self->OnRemoveServiceAreaMap(self->mJsonValue["MapId"].asInt());
+        self->OnRemoveServiceAreaMap(self->mJsonValue["MapId"].asUInt());
     }
     else if (name == "RemoveArea")
     {
         VerifyOrExit(self->mJsonValue.isMember("AreaId"), ChipLogError(NotSpecified, "RVC App: AreaId key is missing"));
-        self->OnRemoveServiceAreaArea(self->mJsonValue["AreaId"].asInt());
+        self->OnRemoveServiceAreaArea(self->mJsonValue["AreaId"].asUInt());
     }
     else if (name == "ErrorEvent")
     {
@@ -175,7 +175,7 @@ void RvcAppCommandHandler::OnAddServiceAreaMap(Json::Value jsonValue)
     // Find if self->mJsonValue has the MapId and MapName Keys
     if (jsonValue.isMember("MapId") && jsonValue.isMember("MapName"))
     {
-        uint32_t mapId      = jsonValue["MapId"].asInt();
+        uint32_t mapId      = jsonValue["MapId"].asUInt();
         std::string mapName = jsonValue["MapName"].asString();
         mRvcDevice->HandleAddServiceAreaMap(mapId, CharSpan(mapName.data(), mapName.size()));
     }
@@ -188,10 +188,10 @@ void RvcAppCommandHandler::OnAddServiceAreaMap(Json::Value jsonValue)
 void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
 {
     ServiceArea::AreaStructureWrapper area;
-    area.SetAreaId(jsonValue["AreaId"].asInt());
+    area.SetAreaId(jsonValue["AreaId"].asUInt());
     if (jsonValue.isMember("MapId"))
     {
-        area.SetMapId(jsonValue["MapId"].asInt());
+        area.SetMapId(jsonValue["MapId"].asUInt());
     }
 
     // Set the location info
@@ -205,7 +205,7 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
         DataModel::Nullable<Globals::AreaTypeTag> areaType = DataModel::NullNullable;
         if (jsonValue.isMember("AreaType"))
         {
-            areaType = Globals::AreaTypeTag(jsonValue["AreaType"].asInt());
+            areaType = Globals::AreaTypeTag(jsonValue["AreaType"].asUInt());
         }
         auto locationName = jsonValue["LocationName"].asString();
 
@@ -218,10 +218,10 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
         DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag = DataModel::NullNullable;
         if (jsonValue.isMember("PositionTag"))
         {
-            relativePositionTag = Globals::RelativePositionTag(jsonValue["PositionTag"].asInt());
+            relativePositionTag = Globals::RelativePositionTag(jsonValue["PositionTag"].asUInt());
         }
 
-        area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asInt()), relativePositionTag);
+        area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asUInt()), relativePositionTag);
     }
 
     mRvcDevice->HandleAddServiceAreaArea(area);
