@@ -34,23 +34,23 @@
     XCTAssertNil(_xpcConnection);
     XCTAssertNotNil(newConnection);
     NSLog(@"XPC listener accepting connection");
-//    newConnection.exportedInterface = _serviceInterface;
+    newConnection.exportedInterface = _serviceInterface;
 //    newConnection.remoteObjectInterface = _clientInterface;
 //    newConnection.exportedObject = self;
-//    newConnection.invalidationHandler = ^{
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            NSLog(@"XPC connection disconnected");
-//            self.xpcConnection = nil;
+    newConnection.invalidationHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"XPC connection disconnected");
+            self.xpcConnection = nil;
 //            if (self.xpcDisconnectExpectation) {
 //                [self.xpcDisconnectExpectation fulfill];
 //                self.xpcDisconnectExpectation = nil;
 //            }
-//        });
-//    };
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        self.xpcConnection = newConnection;
-//        [newConnection resume];
-//    });
+        });
+    };
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.xpcConnection = newConnection;
+        [newConnection resume];
+    });
     return YES;
 }
 
