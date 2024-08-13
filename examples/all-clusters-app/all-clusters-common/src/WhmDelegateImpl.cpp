@@ -21,6 +21,8 @@
 #include <WhmManufacturer.h>
 #include <water-heater-mode.h>
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -29,10 +31,11 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
-    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mWaterTemperature(0), mReplacedWaterTemperature(0),
-    mBoostTargetTemperatureReached(false), mTankVolume(0), mEstimatedHeatRequired(0), mTankPercentage(0),
-    mBoostState(BoostStateEnum::kInactive)
-{}
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mTargetWaterTemperature(0), mWaterTemperature(0),
+    mColdWaterTemperature(0), mBoostTargetTemperatureReached(false), mTankVolume(0),
+    mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
+{
+}
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
 {
@@ -128,8 +131,6 @@ void WaterHeaterManagementDelegate::SetTankPercentage(Percent tankPercentage)
         {
             mTankPercentage = tankPercentage;
 
-            CheckIfHeatNeedsToBeTurnedOnOrOff();
-
             MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::TankPercentage::Id);
         }
     }
@@ -201,13 +202,22 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
         ChipLogError(AppServer, "HandleBoost: mpWhmManufacturer == nullptr");
     }
 
-    if (status == Status::Success)
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    // See if the heat needs to be turned on or off as a result of this boost command
+    status = ChangeHeatingIfNecessary();
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    // Now generate a BoostStarted event
+    err = GenerateBoostStartedEvent(durationS, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+    if (err != CHIP_NO_ERROR)
     {
-        // See if the heat needs to be turned on or off as a result of this boost command
-        status = CheckIfHeatNeedsToBeTurnedOnOrOff();
+        ChipLogError(AppServer, "HandleBoost: Failed to send BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
+
+        return Status::Failure;
     }
 
-    return status;
+    return Status::Success;
 }
 
 void WaterHeaterManagementDelegate::BoostTimerExpiry(System::Layer * systemLayer, void * delegate)
@@ -236,7 +246,15 @@ void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
         ChipLogError(AppServer, "HandleBoostTimerExpiry: mpWhmManufacturer == nullptr");
     }
 
-    CheckIfHeatNeedsToBeTurnedOnOrOff();
+    // Note ChangeHeatingIfNecessary can generate a BoostEnded event but only if the boost state is kActive
+    // which it cannot be when called from here.
+    ChangeHeatingIfNecessary();
+
+    CHIP_ERROR err = GenerateBoostEndedEvent();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "HandleBoostTimerExpiry: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 /**
@@ -260,8 +278,18 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
         Status status = mpWhmManufacturer->BoostCommandCancelled();
         VerifyOrReturnValue(status == Status::Success, status);
 
-        status = CheckIfHeatNeedsToBeTurnedOnOrOff();
+        // Note ChangeHeatingIfNecessary can generate a BoostEnded event but only if the boost state is kActive
+        // which it cannot be when called from here.
+        status = ChangeHeatingIfNecessary();
         VerifyOrReturnValue(status == Status::Success, status);
+
+        CHIP_ERROR err = GenerateBoostEndedEvent();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "HandleCancelBoost: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+
+            return Status::Failure;
+        }
     }
 
     return Status::Success;
@@ -273,50 +301,7 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
  *
  *********************************************************************************/
 
-void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
-{
-    mWaterTemperature = waterTemperature;
-
-    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
-    {
-        mTankPercentage = 100;
-    }
-
-    // See if the heat needs to be turned on or off
-    CheckIfHeatNeedsToBeTurnedOnOrOff();
-}
-
-void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWaterTemperature)
-{
-    mTargetWaterTemperature = targetWaterTemperature;
-
-    // See if the heat needs to be turned on or off
-    CheckIfHeatNeedsToBeTurnedOnOrOff();
-}
-
-void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature)
-{
-    // Only supported in the kTankPercent is supported.
-    // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
-    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
-    {
-        // See if all of the water has now been replaced with replacedWaterTemperature
-        if (mTankPercentage >= percentageReplaced)
-        {
-            mTankPercentage = static_cast<Percent>(mTankPercentage - percentageReplaced);
-        }
-        else
-        {
-            mTankPercentage = 0;
-        }
-
-        mReplacedWaterTemperature = replacedWaterTemperature;
-
-        CheckIfHeatNeedsToBeTurnedOnOrOff();
-    }
-}
-
-bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
+uint16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
 {
     // Determine the target temperature. If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
     // target temperature.
@@ -326,6 +311,65 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
         ? static_cast<uint16_t>(mBoostTemporarySetpoint.Value())
         : mTargetWaterTemperature;
+
+    return targetTemperature;
+}
+
+uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
+{
+    int16_t tankPercentage = 100 * (mWaterTemperature - mColdWaterTemperature) / (GetActiveTargetWaterTemperature() - mColdWaterTemperature);
+
+    tankPercentage = std::min(tankPercentage, static_cast<int16_t>(100));
+    tankPercentage = std::max(tankPercentage, static_cast<int16_t>(0));
+
+    return static_cast<uint8_t>(tankPercentage);
+}
+
+void WaterHeaterManagementDelegate::SetColdWaterTemperature(uint16_t coldWaterTemperature)
+{
+    mColdWaterTemperature = coldWaterTemperature;
+}
+
+void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
+{
+    mWaterTemperature = waterTemperature;
+
+    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
+    {
+        // Recalculate the tankPercentage as the waterTemperature has changed
+        SetTankPercentage(CalculateTankPercentage());
+    }
+
+    // See if the heat needs to be turned on or off
+    ChangeHeatingIfNecessary();
+}
+
+void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWaterTemperature)
+{
+    mTargetWaterTemperature = targetWaterTemperature;
+
+    // See if the heat needs to be turned on or off
+    ChangeHeatingIfNecessary();
+}
+
+void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature)
+{
+    // First calculate the new average water temperature
+    mWaterTemperature = (mWaterTemperature * (100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100;
+
+    // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
+    // Only supported if the kTankPercent feature is supported.
+    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
+    {
+        SetTankPercentage(CalculateTankPercentage());
+
+        ChangeHeatingIfNecessary();
+    }
+}
+
+bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
+{
+    uint16_t targetTemperature = GetActiveTargetWaterTemperature();
 
     VerifyOrReturnValue(mWaterTemperature >= targetTemperature, false);
 
@@ -357,7 +401,7 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     return true;
 }
 
-Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
+Status WaterHeaterManagementDelegate::ChangeHeatingIfNecessary()
 {
     VerifyOrReturnError(mpWhmManufacturer != nullptr, Status::InvalidInState);
 
@@ -384,6 +428,12 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             mBoostEmergencyBoost.ClearValue();
 
             status = mpWhmManufacturer->BoostCommandCancelled();
+
+            CHIP_ERROR err = GenerateBoostEndedEvent();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "ChangeHeatingIfNecessary: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
 
         // Turn the heating off
@@ -457,5 +507,6 @@ Status WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
         return status;
     }
 
-    return CheckIfHeatNeedsToBeTurnedOnOrOff();
+    return ChangeHeatingIfNecessary();
 }
+

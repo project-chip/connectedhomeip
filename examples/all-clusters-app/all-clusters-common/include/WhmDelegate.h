@@ -104,8 +104,8 @@ public:
      * SHALL be rejected with appropriate error.
      */
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                                    Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
-                                                    Optional<chip::Percent> targetReheat) override;
+                                                    Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                                    Optional<Percent> targetReheat) override;
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.
@@ -162,9 +162,12 @@ public:
     void SetTargetWaterTemperature(uint16_t targetWaterTemperature);
 
     /**
-     * @brief Determine whether the heating sources need to be turned on or off
+     * @brief Determine whether the heating sources need to be turned on or off or left unchanged.
+     *
+     * @return Success if the heating was successfully turned on or off or left unchanged otherwise an error
+     *         code is returned if turning the heating on or off failed.
      */
-    Protocols::InteractionModel::Status CheckIfHeatNeedsToBeTurnedOnOrOff();
+    Protocols::InteractionModel::Status ChangeHeatingIfNecessary();
 
     /**
      * @brief Static timer callback for when Boost timer expires.
@@ -194,9 +197,34 @@ public:
      * @param replacedWaterTemperature  The temperature of the
      * percentageReplaced water.
      */
-    void DrawOffHotWater(chip::Percent percentageReplaced, uint16_t replacedWaterTemperature);
+    void DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature);
+
+    /**
+     * Set the temperature of the cold water that fills the tank as the hot water
+     * is drawn off.
+     *
+     * @param oldWaterTemperature  The cold water temperature in 100th of a C
+     */
+    void SetColdWaterTemperature(uint16_t coldWaterTemperature);
 
 private:
+    /**
+     * Return the target temperature.
+     * If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
+     * target temperature otherwise use the temperature set via SetTargetWaterTemperature().
+     *
+     * @return the target temperature
+     */
+    uint16_t GetActiveTargetWaterTemperature() const;
+
+    /**
+     * @brief Calculate the percentage of the water in the tank at the target
+     *        temperature.
+     *
+     * @return  Percentage of water at the target temperature
+     */
+    uint8_t CalculateTankPercentage() const;
+
     /**
      * @brief Determine whether heating needs to be turned on or off or left as
      * is.
@@ -228,8 +256,8 @@ private:
     // Actual water temperature in 100ths of a C
     uint16_t mWaterTemperature;
 
-    // The % of water at temperature mReplacedWaterTemperature
-    uint16_t mReplacedWaterTemperature;
+    // The cold water temperature in 100ths of a C
+    uint16_t mColdWaterTemperature;
 
     // Boost command parameters
 
@@ -253,7 +281,7 @@ private:
     // amount of water that SHALL be heated by this Boost command before the
     // heater is switched off. This field is optional, however it SHALL be
     // included if the TargetReheat field is included.
-    Optional<chip::Percent> mBoostTargetPercentage;
+    Optional<Percent> mBoostTargetPercentage;
 
     // If the tank supports the TankPercent feature, and the heating by this
     // Boost command has ceased because the TargetPercentage of the water in the
@@ -266,7 +294,7 @@ private:
     // heat back up to 80% of hot water. If this field and the OneShot field
     // were both omitted, heating would begin again after any water draw which
     // reduced the TankPercentage below 80%.
-    Optional<chip::Percent> mBoostTargetReheat;
+    Optional<Percent> mBoostTargetReheat;
 
     // Track whether the water temperature has reached the water temperature
     // specified in the boost command. Used in conjunction with the boost
