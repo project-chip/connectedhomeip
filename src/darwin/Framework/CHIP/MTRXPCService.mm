@@ -16,7 +16,11 @@
  */
 
 #import "MTRXPCService.h"
+#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 @implementation MTRXPCService
-
+- (void)ping {
+    MTR_LOG_DEBUG("PING!");
+}
 @end
