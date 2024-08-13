@@ -908,7 +908,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
-            print(f"DUT IP address: {dut_ip}")
+            print(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_UNAME')
             if dut_uname is None:
