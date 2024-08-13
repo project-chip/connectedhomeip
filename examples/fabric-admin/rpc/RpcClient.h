@@ -20,6 +20,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
+
 constexpr uint16_t kFabricBridgeServerPort = 33002;
 
 /**
@@ -39,13 +41,12 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * It logs the progress and checks if an `AddSynchronizedDevice` operation is already in progress.
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
- * @param nodeId The Node ID of the device to be added.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
-CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data);
 
 /**
  * @brief Removes a synchronized device from the RPC client.
@@ -61,3 +62,15 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
+
+/**
+ * @brief Received StayActiveResponse on behalf of client that previously called KeepActive
+ *
+ * @param nodeId The Node ID of the device we recieved a StayActiveResponse.
+ * @param promisedActiveDurationMs the computed duration (in milliseconds) that the ICD intends to stay active for.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs);

@@ -35,9 +35,11 @@ namespace {
 // Constants
 constexpr uint32_t kCommissionPrepareTimeMs = 500;
 constexpr uint16_t kMaxManaulCodeLength     = 21;
-constexpr uint16_t kSubscribeMinInterval    = 0;
-constexpr uint16_t kSubscribeMaxInterval    = 60;
-constexpr uint16_t kRemoteBridgePort        = 5540;
+
+void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
+{
+    DeviceMgr().ReadSupportedDeviceCategories();
+}
 
 } // namespace
 
@@ -45,8 +47,16 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, 
 {
     if (mBridgeNodeId != deviceId)
     {
-        ChipLogProgress(NotSpecified, "Commissioning complete for non-bridge device: NodeId: " ChipLogFormatX64,
-                        ChipLogValueX64(deviceId));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to pair non-bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Commissioning complete for non-bridge device: NodeId: " ChipLogFormatX64,
+                            ChipLogValueX64(deviceId));
+        }
         return;
     }
 
@@ -56,11 +66,15 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, 
         ChipLogProgress(NotSpecified, "Successfully paired bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
 
-        char command[kMaxCommandSize];
-        snprintf(command, sizeof(command), "descriptor subscribe parts-list %d %d %ld %d", kSubscribeMinInterval,
-                 kSubscribeMaxInterval, mBridgeNodeId, kAggragatorEndpointId);
+        DeviceMgr().SubscribeRemoteFabricBridge();
 
-        PushCommand(command);
+        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+        // via the Commissioner Control Cluster. However, we must first verify that the
+        // remote Fabric-Bridge supports Fabric Synchronization.
+        //
+        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+        DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
     }
     else
     {
@@ -80,10 +94,6 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    char command[kMaxCommandSize];
-    snprintf(command, sizeof(command), "pairing already-discovered %ld %d %s %d", remoteId, kSetupPinCode,
-             reinterpret_cast<const char *>(mRemoteAddr.data()), kRemoteBridgePort);
-
     PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
 
     if (pairingCommand == nullptr)
@@ -95,7 +105,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     pairingCommand->RegisterCommissioningDelegate(this);
     mBridgeNodeId = remoteId;
 
-    PushCommand(command);
+    DeviceMgr().PairRemoteFabricBridge(remoteId, reinterpret_cast<const char *>(mRemoteAddr.data()));
 
     return CHIP_NO_ERROR;
 }
@@ -136,9 +146,6 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 
     mBridgeNodeId = bridgeNodeId;
 
-    char command[kMaxCommandSize];
-    snprintf(command, sizeof(command), "pairing unpair %ld", mBridgeNodeId);
-
     PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
 
     if (pairingCommand == nullptr)
@@ -149,7 +156,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 
     pairingCommand->RegisterPairingDelegate(this);
 
-    PushCommand(command);
+    DeviceMgr().UnpairRemoteFabricBridge();
 
     return CHIP_NO_ERROR;
 }
@@ -163,9 +170,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
         {
-            char command[kMaxCommandSize];
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
-            snprintf(command, sizeof(command), "pairing code %ld %s", nodeId, payloadBuffer);
 
             PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "code"));
 
@@ -180,7 +185,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
 
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            PushCommand(command);
+            DeviceMgr().PairRemoteDevice(nodeId, payloadBuffer);
         }
         else
         {
@@ -224,10 +229,6 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
         return CHIP_NO_ERROR;
     }
 
-    char command[kMaxCommandSize];
-    snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d", DeviceMgr().GetRemoteBridgeNodeId(),
-             remoteId, kEnhancedCommissioningMethod, kWindowTimeout, kIteration, kDiscriminator);
-
     OpenCommissioningWindowCommand * openCommand =
         static_cast<OpenCommissioningWindowCommand *>(CommandMgr().GetCommandByName("pairing", "open-commissioning-window"));
 
@@ -238,7 +239,7 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 
     openCommand->RegisterDelegate(this);
 
-    PushCommand(command);
+    DeviceMgr().OpenRemoteDeviceCommissioningWindow(remoteId);
 
     return CHIP_NO_ERROR;
 }

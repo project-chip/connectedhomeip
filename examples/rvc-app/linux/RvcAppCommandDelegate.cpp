@@ -83,6 +83,10 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnActivityCompleteHandler();
     }
+    else if (name == "AreaComplete")
+    {
+        self->OnAreaCompleteHandler();
+    }
     else if (name == "ErrorEvent")
     {
         std::string error = self->mJsonValue["Error"].asString();
@@ -138,6 +142,11 @@ void RvcAppCommandHandler::OnLowChargeHandler()
 void RvcAppCommandHandler::OnActivityCompleteHandler()
 {
     mRvcDevice->HandleActivityCompleteEvent();
+}
+
+void RvcAppCommandHandler::OnAreaCompleteHandler()
+{
+    mRvcDevice->HandleAreaCompletedEvent();
 }
 
 void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)

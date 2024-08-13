@@ -9415,7 +9415,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            BoostStarted(0L),
+            BoostEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9455,7 +9457,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum BoostCommandField {Duration(0),OneShot(1),EmergencyBoost(2),TemporarySetpoint(3),TargetPercentage(4),TargetReheat(5),;
+        }public enum BoostCommandField {BoostInfo(0),;
                     private final int id;
                     BoostCommandField(int id) {
                         this.id = id;
@@ -11634,10 +11636,10 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedLocations(0L),
+            SupportedAreas(0L),
             SupportedMaps(1L),
-            SelectedLocations(2L),
-            CurrentLocation(3L),
+            SelectedAreas(2L),
+            CurrentArea(3L),
             EstimatedEndTime(4L),
             Progress(5L),
             GeneratedCommandList(65528L),
@@ -11686,8 +11688,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SelectLocations(0L),
-            SkipCurrentLocation(2L),;
+            SelectAreas(0L),
+            SkipArea(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -11705,17 +11707,34 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SelectLocationsCommandField {NewLocations(0),;
+        }public enum SelectAreasCommandField {NewAreas(0),;
                     private final int id;
-                    SelectLocationsCommandField(int id) {
+                    SelectAreasCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static SelectLocationsCommandField value(int id) throws NoSuchFieldError {
-                        for (SelectLocationsCommandField field : SelectLocationsCommandField.values()) {
+                    public static SelectAreasCommandField value(int id) throws NoSuchFieldError {
+                        for (SelectAreasCommandField field : SelectAreasCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SkipAreaCommandField {SkippedArea(0),;
+                    private final int id;
+                    SkipAreaCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SkipAreaCommandField value(int id) throws NoSuchFieldError {
+                        for (SkipAreaCommandField field : SkipAreaCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -11958,8 +11977,7 @@ public class ClusterIDMapping {
             ActiveScheduleHandle(79L),
             Presets(80L),
             Schedules(81L),
-            PresetsSchedulesEditable(82L),
-            SetpointHoldExpiryTimestamp(83L),
+            SetpointHoldExpiryTimestamp(82L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -12012,9 +12030,7 @@ public class ClusterIDMapping {
             ClearWeeklySchedule(3L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
-            StartPresetsSchedulesEditRequest(7L),
-            CancelPresetsSchedulesEditRequest(8L),
-            CommitPresetsSchedulesRequest(9L),;
+            AtomicRequest(254L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12117,17 +12133,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartPresetsSchedulesEditRequestCommandField {TimeoutSeconds(0),;
+                }public enum AtomicRequestCommandField {RequestType(0),AttributeRequests(1),Timeout(2),;
                     private final int id;
-                    StartPresetsSchedulesEditRequestCommandField(int id) {
+                    AtomicRequestCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static StartPresetsSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (StartPresetsSchedulesEditRequestCommandField field : StartPresetsSchedulesEditRequestCommandField.values()) {
+                    public static AtomicRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (AtomicRequestCommandField field : AtomicRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -14870,6 +14886,7 @@ public class ClusterIDMapping {
             ThreadVersion(2L),
             InterfaceEnabled(3L),
             ActiveDatasetTimestamp(4L),
+            PendingDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
