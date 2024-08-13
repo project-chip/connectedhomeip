@@ -31,9 +31,6 @@
 
 @end
 
-
-
-
 @implementation MTRXPCServiceTests
 
 // NSXPCListenerDelegate
