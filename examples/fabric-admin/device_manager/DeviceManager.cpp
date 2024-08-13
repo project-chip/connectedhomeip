@@ -38,6 +38,7 @@ constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;
 constexpr uint16_t kSubscribeMaxInterval       = 60;
 constexpr uint16_t kAggragatorEndpointId       = 1;
+constexpr uint16_t kMaxDiscriminatorLength     = 4095;
 constexpr uint8_t kEnhancedCommissioningMethod = 1;
 
 } // namespace
@@ -117,7 +118,7 @@ void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commis
                                                   uint32_t discriminator, const char * saltHex, const char * verifierHex)
 {
     // Open the commissioning window of a device within its own fabric.
-    StringBuilder<512> commandBuilder;
+    StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d --salt hex:%s --verifier hex:%s", nodeId, kRootEndpointId,
@@ -134,7 +135,8 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     StringBuilder<512> commandBuilder;
 
     // Use random discriminator to have less chance of collission.
-    uint16_t discriminator = Crypto::GetRandU16() % 4096; // 4096 to include the upper limit 4095
+    uint16_t discriminator =
+        Crypto::GetRandU16() % (kMaxDiscriminatorLength + 1); // Include the upper limit kMaxDiscriminatorLength
 
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
