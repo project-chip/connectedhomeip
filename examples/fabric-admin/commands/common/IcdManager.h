@@ -18,11 +18,7 @@
 
 #pragma once
 
-#include <map>
-
 #include <app/icd/client/DefaultCheckInDelegate.h>
-
-#include "StayActiveSender.h"
 
 class IcdManager : public chip::app::DefaultCheckInDelegate
 {

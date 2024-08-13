@@ -72,6 +72,7 @@ void StayActiveSender::HandleDeviceConnected(void * context, chip::Messaging::Ex
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(ICD, "Failed to send stay active command");
+        chip::Platform::Delete(_this);
     }
 }
 

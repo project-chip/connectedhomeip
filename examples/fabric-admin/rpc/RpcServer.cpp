@@ -51,6 +51,10 @@ public:
         // TODO(#33221): We also need a mechanism here to drop KeepActive
         // request if they were recieved over 60 mins ago.
         uint32_t stayActiveDurationMs = it->second;
+
+        // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
+        // Work to see if there should be update to spec on whether some sort of failure later on
+        // Should be indicated in some manner, or identify a better recovery mechanism here.
         mPendingKeepActive.erase(nodeId);
 
         auto onDone = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
@@ -103,14 +107,11 @@ public:
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
-        // TODO(#33221): We should really be using ScopedNode, but that requires larger fixes in communication between
+        // TODO(#33221): We should really be using ScopedNode, but that requires larger fix in communication between
         // fabric-admin and fabric-bridge. For now we make the assumption that there is only one fabric used by
         // fabric-admin.
-        KeepActiveWorkData * data = chip::Platform::New<KeepActiveWorkData>();
+        KeepActiveWorkData * data = chip::Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        data->mFabricAdmin          = this;
-        data->mNodeId               = request.node_id;
-        data->mStayActiveDurationMs = request.stay_active_duration_ms;
         chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
@@ -123,6 +124,9 @@ public:
 private:
     struct KeepActiveWorkData
     {
+        KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs)
+          : mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs) {}
+
         FabricAdmin * mFabricAdmin;
         chip::NodeId mNodeId;
         uint32_t mStayActiveDurationMs;
