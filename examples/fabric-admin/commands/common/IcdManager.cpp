@@ -33,21 +33,6 @@ void IcdManager::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
     {
         mDelegate->OnCheckInCompleted(clientInfo);
     }
-
-    uint32_t activeDurationMs = 30000;
-    auto stayActiveSender     = chip::Platform::New<StayActiveSender>(activeDurationMs, clientInfo.peer_node,
-                                                                  chip::app::InteractionModelEngine::GetInstance());
-    if (stayActiveSender == nullptr)
-    {
-        ChipLogProgress(ICD, "Fail to allocate stayActiveSender");
-        return;
-    }
-    CHIP_ERROR err = stayActiveSender->EstablishSessionToPeer();
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
 }
 
 void IcdManager::SetDelegate(Delegate * delegate)

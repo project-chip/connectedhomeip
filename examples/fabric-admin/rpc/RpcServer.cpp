@@ -25,6 +25,7 @@
 
 #include "RpcClient.h"
 #include <commands/common/IcdManager.h>
+#include <commands/common/StayActiveSender.h>
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <system/SystemClock.h>
@@ -51,9 +52,25 @@ public:
         uint32_t stayActiveDurationMs = it->second;
         mPendingKeepActive.erase(nodeId);
 
-        // TODO(#33221): Send the StayActiveRequest command for realy to the device. Right now we
-        // pretending that we got a StayActiveResponse.
-        ActiveChanged(nodeId, stayActiveDurationMs);
+        auto onDone = [=](uint32_t promisedActiveDuration) {
+            ActiveChanged(nodeId, promisedActiveDuration);
+        };
+
+        auto stayActiveSender = chip::Platform::New<StayActiveSender>(stayActiveDurationMs, clientInfo.peer_node,
+                                                                      chip::app::InteractionModelEngine::GetInstance(),
+                                                                      onDone);
+        if (stayActiveSender == nullptr)
+        {
+            ChipLogProgress(ICD, "Fail to allocate stayActiveSender");
+            return;
+        }
+        CHIP_ERROR err = stayActiveSender->EstablishSessionToPeer();
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
+            chip::Platform::Delete(stayActiveSender);
+            return;
+        }
     }
 
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
