@@ -222,7 +222,7 @@ def test_spec_to_attribute_cache(test_icdm: ICDMData) -> Attribute.AsyncReadTran
     resp.attributes = {0: {c: {attr.FeatureMap: test_icdm.FeatureMap, attr.IdleModeDuration: test_icdm.IdleModeDuration, attr.ActiveModeDuration: test_icdm.ActiveModeDuration, attr.ActiveModeThreshold: test_icdm.ActiveModeThreshold,
                                attr.RegisteredClients: test_icdm.RegisteredClients, attr.ICDCounter: test_icdm.ICDCounter,
                                attr.ClientsSupportedPerFabric: test_icdm.ClientsSupportedPerFabric, attr.UserActiveModeTriggerHint: test_icdm.UserActiveModeTriggerHint,
-                               attr.UserActiveModeTriggerInstruction: test_icdm.UserActiveModeTriggerInstruction, attr.OperatingMode: test_icdm.OperatingMode, attr.MaximumCheckInBackOff: test_icdm.MaximumCheckInBackOff}}}
+                               attr.UserActiveModeTriggerInstruction: test_icdm.UserActiveModeTriggerInstruction, attr.OperatingMode: test_icdm.OperatingMode, attr.MaximumCheckInBackOff: test_icdm.MaximumCheckInBackOff, attr.AttributeList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 65528, 65529, 65531, 65532, 65533]}}}
     return resp
 
 
