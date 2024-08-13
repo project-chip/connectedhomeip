@@ -138,6 +138,12 @@ public:
     void HandleClearErrorMessage();
 
     void HandleResetMessage();
+
+    /**
+     * Updates the Service area progress elements when an activity has ended.
+     * Sets any remaining Operating or Pending states to Skipped.
+     */
+    void UpdateServiceAreaProgressOnExit();
 };
 
 } // namespace Clusters
