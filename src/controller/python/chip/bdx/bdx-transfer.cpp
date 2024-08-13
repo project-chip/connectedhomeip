@@ -34,15 +34,6 @@ void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
     mDelegate = delegate;
 }
 
-BdxTransfer::~BdxTransfer()
-{
-    if (mData != nullptr)
-    {
-        delete[] mData;
-        mData = nullptr;
-    }
-}
-
 CHIP_ERROR BdxTransfer::AcceptSend()
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
@@ -60,12 +51,7 @@ CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
-    mData           = new uint8_t[data_to_send.size()];
-    if (mData == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    memcpy(mData, data_to_send.data(), data_to_send.size());
+    mData.assign(data_to_send.begin(), data_to_send.end());
     mDataCount = data_to_send.size();
 
     TransferSession::TransferAcceptData acceptData;
@@ -178,7 +164,7 @@ CHIP_ERROR BdxTransfer::SendBlock()
 
     size_t dataRemaining = mDataCount - mDataTransferredCount;
     TransferSession::BlockData block;
-    block.Data   = mData + mDataTransferredCount;
+    block.Data   = mData.data() + mDataTransferredCount;
     block.Length = std::min<size_t>(mTransfer.GetTransferBlockSize(), dataRemaining);
     block.IsEof  = block.Length == dataRemaining;
     ReturnErrorOnFailure(mTransfer.PrepareBlock(block));
