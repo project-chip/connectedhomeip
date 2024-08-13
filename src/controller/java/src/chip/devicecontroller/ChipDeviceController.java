@@ -478,9 +478,11 @@ public class ChipDeviceController {
    * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
    *     the network
    */
-  public void establishPaseConnection(long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery) {
+  public void establishPaseConnection(
+      long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery) {
     Log.d(TAG, "Establishing PASE connection using Code: " + setupCode);
-    establishPaseConnectionByCode(deviceControllerPtr, deviceId, setupCode, useOnlyOnNetworkDiscovery);
+    establishPaseConnectionByCode(
+        deviceControllerPtr, deviceId, setupCode, useOnlyOnNetworkDiscovery);
   }
 
   /**
@@ -1638,7 +1640,7 @@ public class ChipDeviceController {
       long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
 
   private native void establishPaseConnectionByCode(
-        long deviceControllerPtr, long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery);
+      long deviceControllerPtr, long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery);
 
   private native void commissionDevice(
       long deviceControllerPtr,
