@@ -35,7 +35,7 @@ limitations under the License.
     <name>Meter Identification</name>
     <code>0x0B06</code>
     <define>METER_IDENTIFICATION_CLUSTER</define>
-    <description/>
+    <description>Attributes for determining advanced information about utility metering device</description>
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">

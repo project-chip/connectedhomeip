@@ -9660,7 +9660,7 @@ deprecated cluster ElectricalMeasurement = 2820 {
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
 }
 
-/**  */
+/** Attributes for determining advanced information about utility metering device */
 cluster MeterIdentification = 2822 {
   revision 1;
 
