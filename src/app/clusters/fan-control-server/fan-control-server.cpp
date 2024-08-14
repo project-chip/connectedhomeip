@@ -51,11 +51,9 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
 struct EmberAfFanControlState {
-    bool initialized;
     bool moveStarted;
     DataModel::Nullable<chip::Percent> endPercent;
     QuieterReportingAttribute<uint16_t> quietPercentCurrent{ DataModel::Nullable<chip::Percent>(0) };
-    auto lastUpdateTime;
 };
 
 static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
