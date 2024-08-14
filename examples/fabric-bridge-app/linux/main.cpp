@@ -22,6 +22,7 @@
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
+#include "CommissionerControl.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -257,11 +258,19 @@ void ApplicationInit()
     pollingThread.detach();
 
     BridgeDeviceMgr().Init();
+
+    VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner Control Server");
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
+
+    if (CommissionerControlShutdown() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to shutdown Commissioner Control Server");
+    }
 }
 
 int main(int argc, char * argv[])

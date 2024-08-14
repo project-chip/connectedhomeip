@@ -39,6 +39,17 @@ public:
     virtual ~Delegate() = default;
 
     /**
+     * @brief Get the maximum timeout for atomically writing to a set of attributes
+     *
+     * @param[in] attributeRequests The list of attributes to write to.
+     * @param[out] timeoutRequest The timeout proposed by the client.
+     * @return The maximum allowed timeout; zero if the request is invalid.
+     */
+    virtual std::optional<System::Clock::Milliseconds16>
+    GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                          System::Clock::Milliseconds16 timeoutRequest) = 0;
+
+    /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
      *
      * @param[in] index The index of the preset type in the list.
