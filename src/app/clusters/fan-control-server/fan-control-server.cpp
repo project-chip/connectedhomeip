@@ -153,6 +153,31 @@ inline bool SupportsAirflowDirection(EndpointId endpointId)
 
 } // anonymous namespace
 
+
+void emberAfFanControlClusterServerInitCallback(EndpointId endpoint)
+{
+    EmberAfFanControlState * state = getState(endpoint);
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+
+    if (state == nullptr)
+    {
+        ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
+        return;
+    }
+
+    state->quietPercentCurrent.policy()
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+
+    DataModel::Nullable<chip::Percent> percentCurrent;
+    Status status = Attributes::PercentCurrent::Get(endpoint, percentCurrent);
+    state->moveStarted = false;
+    if (status == Status::Success)
+    {
+        state->endPercent = percentCurrent;
+        state->quietPercentCurrent.SetValue(percentCurrent, now);
+    }
+}
+
 // =============================================================================
 // Pre-change callbacks for cluster attributes
 // =============================================================================
