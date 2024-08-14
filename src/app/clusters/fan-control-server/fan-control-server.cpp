@@ -189,7 +189,6 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     Protocols::InteractionModel::Status res;
-    uint16_t ep = GetEndPoint(attributePath.mEndpointId, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     switch (attributePath.mAttributeId)
     {
@@ -279,9 +278,18 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         else
         {
             // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other logic???)
-            percentCurrentQTracking[ep].moveStarted = true;
-            percentCurrentQTracking[ep].endPercent = (DataModel::Nullable<chip::Percent>)*value;
+            EmberAfFanControlState * state = getState(endpoint);
+            if (state == nullptr)
+            {
+                ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
+                res Status::Failure;
+            }
+            else
+            {
+            state->moveStarted = true;
+            state->endPercent = (DataModel::Nullable<chip::Percent>)*value;
             res = Status::Success;
+            }
         }
         break;
     }
@@ -550,6 +558,12 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nulla
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
     EmberAfFanControlState * state = getState(endpoint);
+
+    if (state == nullptr)
+    {
+        ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
+        return Status::Failure;
+    }
 
     bool isStartOrEndOfTransition = state->moveStarted || 
         ((DataModel::Nullable<chip::Percent>)*value == state->endPercent)
