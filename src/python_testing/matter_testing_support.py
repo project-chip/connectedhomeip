@@ -1763,6 +1763,14 @@ def per_node_test(body):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+
+
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
     try:
         return cluster in wildcard.attributes[endpoint]
@@ -1795,7 +1803,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
 
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
         return attribute.attribute_id in attr_list
