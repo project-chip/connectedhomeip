@@ -4,7 +4,7 @@
     -   [Fabric Sync Example Applications](#fabric-sync-example-applications)
     -   [Bootstrap Fabric Sync Demo on Linux](#bootstrap-fabric-sync-demo-on-linux)
     -   [Bootstrap Fabric Sync Demo on RP4](#bootstrap-fabric-sync-demo-on-rp4)
-    -   [Run Fabric Sync Demo](#run-fabric-sync-demo)        
+    -   [Run Fabric Sync Demo](#run-fabric-sync-demo)
 
 ## Fabric Sync Example Applications
 
@@ -47,7 +47,7 @@ enables a seamless and efficient synchronization process.
 Run the Fabric Synchronization script:
 
 ```
-./examples/fabric-admin/scripts/run_fabric_sync.sh 
+./examples/fabric-admin/scripts/run_fabric_sync.sh
 ```
 
 ### Start Fabric Synchronization on Ecosystem 2
@@ -55,7 +55,7 @@ Run the Fabric Synchronization script:
 Run the Fabric Synchronization script:
 
 ```
-./examples/fabric-admin/scripts/run_fabric_sync.sh 
+./examples/fabric-admin/scripts/run_fabric_sync.sh
 ```
 
 ## Bootstrap Fabric Sync Demo on RP4
@@ -130,15 +130,15 @@ Pair the Light Example with node ID 3 using its payload number:
 pairing already-discovered 3 20202021 <ip> 5540
 ```
 
-After the device is successfully added, you will observe the following on Ecosystem 2
-with the newly assigned Node ID:
+After the device is successfully added, you will observe the following on
+Ecosystem 2 with the newly assigned Node ID:
 
 ```
 >>> New device with Node ID: 0x3 has been successfully added.
 ```
 
-Additionally, you should also get notified an new device is added on the Ecosystem 2 from
-the Ecosystem 1:
+Additionally, you should also get notified an new device is added on the
+Ecosystem 2 from the Ecosystem 1:
 
 ```
 >>> A new devie is added on Endpoint 3.
@@ -146,8 +146,9 @@ the Ecosystem 1:
 
 ### Synchronize Light Example to Ecosystem 1
 
-After the Light Example is successfully paired in Ecosystem 2, we can start to synchronize
-the light device to Ecosystem 1 using the new assigned dynamic endpointid on Ecosystem 2.
+After the Light Example is successfully paired in Ecosystem 2, we can start to
+synchronize the light device to Ecosystem 1 using the new assigned dynamic
+endpointid on Ecosystem 2.
 
 ```
 fabricsync sync-device <endpointid>
@@ -189,8 +190,9 @@ pairing code-wifi <node-id> <ssid> <passwd> <payload>
 
 ### Synchronize Switch to Ecosystem 1
 
-After the switch is successfully paired in Ecosystem 2, we can start to synchronize it
-to Ecosystem 1 using the new assigned dynamic endpointid on Ecosystem 2..
+After the switch is successfully paired in Ecosystem 2, we can start to
+synchronize it to Ecosystem 1 using the new assigned dynamic endpointid on
+Ecosystem 2..
 
 ```
 fabricsync sync-device <endpointid>
@@ -219,5 +221,3 @@ Unpair the switch:
 ```
 pairing unpair <node-id>
 ```
-
-
