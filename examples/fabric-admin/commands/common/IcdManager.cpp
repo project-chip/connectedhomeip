@@ -36,8 +36,11 @@ void IcdManager::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 
 void IcdManager::SetDelegate(Delegate * delegate)
 {
-    // There is an assumption that there is only ever one delegate set and it's
-    // lifetime is identical to IcdManager.
+    // To keep IcdManager simple, there is an assumption that there is only ever
+    // one delegate set and it's lifetime is identical to IcdManager. In the
+    // future this assumption can change should there be a need, but that will
+    // require code changes to IcdManager. For now we will crash if someone tries
+    // to call SetDelegate for a second time or if delegate is non-null.
     VerifyOrDie(delegate);
     VerifyOrDie(!mDelegate);
     mDelegate = delegate;

@@ -50,9 +50,9 @@ CHIP_ERROR StayActiveSender::SendStayActiveCommand(chip::Messaging::ExchangeMana
 {
     auto onSuccess = [&](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & status,
                          const auto & dataResponse) {
-        uint32_t promisedActiveDuration = dataResponse.promisedActiveDuration;
-        ChipLogProgress(ICD, "StayActive command succeeded with promised duration %u", promisedActiveDuration);
-        mOnDone(promisedActiveDuration);
+        uint32_t promisedActiveDurationMs = dataResponse.promisedActiveDuration;
+        ChipLogProgress(ICD, "StayActive command succeeded with promised duration %u", promisedActiveDurationMs);
+        mOnDone(promisedActiveDurationMs);
         chip::Platform::Delete(this);
     };
 
