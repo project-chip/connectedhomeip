@@ -1,0 +1,8 @@
+{{> header}}
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+char const * ClusterIdToText(chip::ClusterId id);
+
+char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id);
