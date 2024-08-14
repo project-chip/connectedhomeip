@@ -26,5 +26,6 @@ message OperationStatus {
 
 service FabricAdmin {
   rpc OpenCommissioningWindow(DeviceCommissioningWindowInfo) returns (OperationStatus){}
+  rpc ReverseCommissionBridge(DeviceCommissioningWindowInfo) returns (pw.protobuf.Empty){}  
   rpc KeepActive(KeepActiveParameters) returns (pw.protobuf.Empty){}
 }

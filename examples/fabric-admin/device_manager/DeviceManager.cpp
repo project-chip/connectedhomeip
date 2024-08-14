@@ -434,6 +434,41 @@ void DeviceManager::HandleEventData(const chip::app::EventHeader & header, chip:
     CommissionApprovedRequest(value.requestId, kResponseTimeoutSeconds);
 }
 
+void DeviceManager::HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(NotSpecified, "Command Response received.");
+
+    if (path.mClusterId == CommissionerControl::Id &&
+        path.mCommandId == CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id)
+    {
+        CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
+        CHIP_ERROR error = app::DataModel::Decode(*data, value);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+            return;
+        }
+
+        // Log all fields
+        ChipLogProgress(NotSpecified, "DecodableType fields:");
+        ChipLogProgress(NotSpecified, "  commissioningTimeout: %u", value.commissioningTimeout);
+        ChipLogProgress(NotSpecified, "  discriminator: %u", value.discriminator);
+        ChipLogProgress(NotSpecified, "  iterations: %u", value.iterations);
+
+        char verifierHex[Crypto::kSpake2p_VerifierSerialized_Length * 2 + 1];
+        Encoding::BytesToHex(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size(), verifierHex, sizeof(verifierHex),
+                             Encoding::HexFlags::kNullTerminate);
+        ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier: %s", verifierHex);
+
+        char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
+        Encoding::BytesToHex(value.salt.data(), value.salt.size(), saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+        ChipLogProgress(NotSpecified, "  salt: %s", saltHex);
+
+        OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.commissioningTimeout, value.iterations, value.discriminator,
+                                      saltHex, verifierHex);
+    }
+}
+
 void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 {
     if (err != CHIP_NO_ERROR)

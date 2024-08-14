@@ -91,6 +91,16 @@ public:
         return pw::OkStatus();
     }
 
+    pw::Status ReverseCommissionBridge(const chip_rpc_DeviceCommissioningWindowInfo & request,
+                                       pw_protobuf_Empty & response) override
+    {
+        ChipLogProgress(NotSpecified, "Received ReverseCommissionBridge request");
+		
+		// TODO: push the command to pair the bridge
+
+        return pw::OkStatus();
+    }
+
     pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
     {
         ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);

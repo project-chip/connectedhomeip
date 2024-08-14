@@ -158,6 +158,8 @@ public:
 
     void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
 
+    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data);
+
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
 private:
