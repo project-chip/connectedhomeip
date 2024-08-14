@@ -190,7 +190,7 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
  * @brief Schedules a timer for the given timeout in milliseconds.
  *
  * @param[in] endpoint The endpoint to use.
- * @param[in] timeoutMilliseconds The timeout in milliseconds.
+ * @param[in] timeout The timeout in milliseconds.
  */
 void ThermostatAtomicWriteManager::ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout)
 {
@@ -464,7 +464,7 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
     if (status == Status::Failure)
     {
         // Either one of the calls to OnPreCommitWrite failed, or one of the calls to OnCommitWrite failed; in the former case,
-        // discard any pending writes Do the same for the latter, knowing that the server may be in an inconsistent state
+        // discard any pending writes. Do the same for the latter, knowing that the server may be in an inconsistent state
         for (auto & attributeStatus : attributeStatuses)
         {
             mDelegate->OnRollbackWrite(endpoint, attributeStatus.attributeID);
@@ -549,7 +549,7 @@ void ThermostatAtomicWriteManager::ResetWrite(FabricIndex fabricIndex)
     }
 }
 
-ScopedNodeId ThermostatAtomicWriteManager::GetAtomicWriteScopedNodeId(const std::optional<AttributeId> attributeId,
+ScopedNodeId ThermostatAtomicWriteManager::GetAtomicWriteOriginatorScopedNodeId(const std::optional<AttributeId> attributeId,
                                                                       const EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
