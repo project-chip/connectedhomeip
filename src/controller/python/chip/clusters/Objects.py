@@ -47252,7 +47252,7 @@ class EcosystemInformation(Cluster):
                     ])
 
             uniqueLocationID: 'str' = ""
-            locationDescriptor: 'Globals.Structs.LocationDescriptorStruct' = field(default_factory=lambda: EcosystemInformation.Structs.LocationDescriptorStruct())
+            locationDescriptor: 'Globals.Structs.LocationDescriptorStruct' = field(default_factory=lambda: Globals.Structs.LocationDescriptorStruct())
             locationDescriptorLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
@@ -51090,7 +51090,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -51303,7 +51303,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -52127,7 +52127,7 @@ class UnitTesting(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=Globals.Structs.TestGlobalStruct)
 
-            value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):
