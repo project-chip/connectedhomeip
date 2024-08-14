@@ -754,12 +754,9 @@ bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, 
         return awm->CommitWrite(commandObj, commandPath, commandData);
     case Globals::AtomicRequestTypeEnum::kRollbackWrite:
         return awm->RollbackWrite(commandObj, commandPath, commandData);
-    case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
+    default:
+        return false;
     }
-
-    return false;
 }
 
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,

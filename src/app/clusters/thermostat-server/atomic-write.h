@@ -128,11 +128,11 @@ public:
      * @brief Check if there is an open atomic write on an endpoint, associated with the source node for a given command invocation,
      * and optionally associated with a specific attribute
      *
-     * @param attributeId
-     * @param commandObj
-     * @param endpoint
-     * @return true
-     * @return false
+     * @param attributeId Optional attribute filter
+     * @param commandObj The command invocation to check against
+     * @param endpoint The endpoint to check atomic write state
+     * @return true if there is an open atomic write
+     * @return false if there is not an open atomic write
      */
     virtual bool InWrite(const std::optional<AttributeId> attributeId, CommandHandler * commandObj, EndpointId endpoint) = 0;
 
@@ -142,8 +142,8 @@ public:
      * @param commandObj The AtomicRequest command
      * @param commandPath The path for the command
      * @param commandData The payload of the command
-     * @return true if the atomic write was opened
-     * @return false if the atomic write was not opened
+     * @return true if the command was handled
+     * @return false if the command was not handled
      */
     virtual bool BeginWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                             const Commands::AtomicRequest::DecodableType & commandData) = 0;
@@ -155,8 +155,8 @@ public:
      * @param commandObj The AtomicRequest command
      * @param commandPath The path for the command
      * @param commandData The payload of the command
-     * @return true if the atomic write was committed or rolled back
-     * @return false if the atomic write was not found
+     * @return true if the command was handled
+     * @return false if the command was not handled
      */
     virtual bool CommitWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AtomicRequest::DecodableType & commandData) = 0;
@@ -168,8 +168,8 @@ public:
      * @param commandObj The AtomicRequest command
      * @param commandPath The path for the command
      * @param commandData The payload of the command
-     * @return true if the atomic write was rolled back
-     * @return false if the atomic write was not found
+     * @return true if the command was handled
+     * @return false if the command was not handled
      */
     virtual bool RollbackWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                const Commands::AtomicRequest::DecodableType & commandData) = 0;
