@@ -60,8 +60,7 @@ static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
 
 static EmberAfFanControlState * getState(EndpointId endpoint);
 
-static Status SetPercentCurrentQuietReport(EndpointId endpoint, EmberAfFanControlState * state,
-                                         DataModel::Nullable<chip::Percent> newValue, bool isStartOrEndOfTransition);
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nullable<chip::Percent> newValue);
 
 } // anonymous namespace
 
