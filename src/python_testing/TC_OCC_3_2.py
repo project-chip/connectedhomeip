@@ -151,10 +151,12 @@ class TC_OCC_3_2(MatterBaseTest):
             diff_val = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         else:
             self.wait_for_user_input(
-                prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
+                prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state 1.")
+            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
             # enduce occupancy state change one more to consider priming report effect of the previous CI writing
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
+            diff_val = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
 
         self.step("3d")
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
