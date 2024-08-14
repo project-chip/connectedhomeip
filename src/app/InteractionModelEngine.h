@@ -451,8 +451,8 @@ private:
      *
      */
     CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
-                                   size_t & aRequestedAttributePathCount);
+                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aPathsIsNotEmpty,
+                                   bool & aHasValidAttributePath, size_t & aRequestedAttributePathCount);
 
     /**
      * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
@@ -464,8 +464,8 @@ private:
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
     static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                      size_t & aRequestedEventPathCount);
+                                      EventPathIBs::Parser & aEventPathListParser, bool & aPathsIsNotEmpty,
+                                      bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing

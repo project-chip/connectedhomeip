@@ -462,13 +462,14 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
 }
 
 CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                                       AttributePathIBs::Parser & aAttributePathListParser,
+                                                       AttributePathIBs::Parser & aAttributePathListParser, bool & aPathsIsNotEmpty,
                                                        bool & aHasValidAttributePath, size_t & aRequestedAttributePathCount)
 {
     TLV::TLVReader pathReader;
     aAttributePathListParser.GetReader(&pathReader);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    aPathsIsNotEmpty             = false;
     aHasValidAttributePath       = false;
     aRequestedAttributePathCount = 0;
 
@@ -494,6 +495,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
+                aPathsIsNotEmpty = true;
                 // leave requestPath.entityId optional value unset to indicate wildcard
                 Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
                                                  .endpoint    = readPath.mEndpointId,
@@ -513,6 +515,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                paramsList.mValue.mAttributeId);
             if (ConcreteAttributePathExists(concretePath))
             {
+                aPathsIsNotEmpty = true;
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
                                                  .requestType = Access::RequestType::kAttributeReadRequest,
@@ -638,13 +641,14 @@ static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathPa
 }
 
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                                   EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
-                                                   size_t & aRequestedEventPathCount)
+                                                   EventPathIBs::Parser & aEventPathListParser, bool & aPathsIsNotEmpty,
+                                                   bool & aHasValidEventPath, size_t & aRequestedEventPathCount)
 {
     TLV::TLVReader pathReader;
     aEventPathListParser.GetReader(&pathReader);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    aPathsIsNotEmpty         = false;
     aHasValidEventPath       = false;
     aRequestedEventPathCount = 0;
 
@@ -674,6 +678,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
                 {
                     continue;
                 }
+                aPathsIsNotEmpty = true;
                 aHasValidEventPath =
                     HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), eventPath, aSubjectDescriptor);
             }
@@ -682,6 +687,7 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         {
             // No need to check whether the endpoint is enabled, because
             // emberAfFindEndpointType returns null for disabled endpoints.
+            aPathsIsNotEmpty   = true;
             aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
         }
     }
@@ -752,15 +758,17 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             size_t requestedAttributePathCount = 0;
             size_t requestedEventPathCount     = 0;
             AttributePathIBs::Parser attributePathListParser;
-            bool hasValidAttributePath = false;
-            bool hasValidEventPath     = false;
+            bool hasValidAttributePath     = false;
+            bool hasValidEventPath         = false;
+            bool hasNonEmptyAttributePaths = false;
+            bool hasNonEmptyEventPaths     = false;
 
             CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
             if (err == CHIP_NO_ERROR)
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
-                err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasValidAttributePath,
-                                                             requestedAttributePathCount);
+                err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasNonEmptyAttributePaths,
+                                                             hasValidAttributePath, requestedAttributePathCount);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;
@@ -776,7 +784,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             if (err == CHIP_NO_ERROR)
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
-                err = ParseEventPaths(subjectDescriptor, eventPathListParser, hasValidEventPath, requestedEventPathCount);
+                err = ParseEventPaths(subjectDescriptor, eventPathListParser, hasNonEmptyEventPaths, hasValidEventPath,
+                                      requestedEventPathCount);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;
@@ -796,7 +805,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            if (!hasValidAttributePath && !hasValidEventPath)
+            if (!hasValidAttributePath && !hasValidEventPath && (hasNonEmptyEventPaths || hasNonEmptyAttributePaths))
             {
                 ChipLogError(InteractionModel,
                              "Subscription from [%u:" ChipLogFormatX64 "] has no access at all. Rejecting request.",
