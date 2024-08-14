@@ -325,8 +325,8 @@ ThreadCapabilities GenericThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t GenericThreadDriver::GetThreadVersion()
 {
-    uint16_t version;
-    VerifyOrReturnError(ConnectivityMgrImpl().GetThreadVersion(version) == CHIP_NO_ERROR, 0);
+    uint16_t version = 0;
+    ThreadStackMgrImpl().GetThreadVersion(version);
     return version;
 }
 
