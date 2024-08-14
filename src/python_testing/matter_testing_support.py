@@ -1808,7 +1808,8 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
         if not isinstance(attr_list, list):
-            asserts.fail(f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
+            asserts.fail(
+                f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
         return attribute.attribute_id in attr_list
     except KeyError:
         return False
@@ -1842,7 +1843,8 @@ def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectD
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
         if not isinstance(feature_map, int):
-            asserts.fail(f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
+            asserts.fail(
+                f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
 
         return (feature & feature_map) != 0
     except KeyError:

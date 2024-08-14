@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 
 SIMULATED_LONG_PRESS_LENGTH_SECONDS = 2.0
 
+
 def bump_substep(step: str) -> str:
     """Given a string like "5a", bump it to "5b", or "6c" to "6d" """
     if len(step) == 0:
@@ -96,7 +97,7 @@ class TC_SwitchTests(MatterBaseTest):
     def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
         command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "LongPressDelayMillis": int(1000 * (SIMULATED_LONG_PRESS_LENGTH_SECONDS - 0.5)),
-                        "LongPressDurationMillis": int (1000 * SIMULATED_LONG_PRESS_LENGTH_SECONDS), "FeatureMap": feature_map}
+                        "LongPressDurationMillis": int(1000 * SIMULATED_LONG_PRESS_LENGTH_SECONDS), "FeatureMap": feature_map}
         self._send_named_pipe_command(command_dict)
 
     def _send_latching_switch_named_pipe_command(self, endpoint_id: int, new_position: int):
