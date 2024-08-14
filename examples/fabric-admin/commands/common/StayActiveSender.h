@@ -65,7 +65,7 @@ public:
 
 private:
     /**
-     * @brief Sets up a CASE session to the peer for extend a client active period with the peer.
+     * @brief Sets up a CASE session with the peer to extend the client's active period with that peer.
      * Returns error if we did not even manage to kick off a CASE attempt.
      */
     CHIP_ERROR EstablishSessionToPeer();
