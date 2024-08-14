@@ -16,13 +16,24 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRSetupPayload;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRXPCServiceIntReplyBlock)(int);
+typedef void (^MTRXPCServiceBoolReplyBlock)(BOOL);
 
 @protocol MTRXPCServiceProtocol <NSObject>
 - (void)ping;
 - (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply;
+
+// these real methods will be optional for now, but not when we are done building here.
+@optional
+- (void)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+newNodeID:(NSNumber *)newNodeID
+error:(NSError * __autoreleasing *)error
+reply:(MTRXPCServiceBoolReplyBlock)reply;
+
 @end
 
 NS_ASSUME_NONNULL_END

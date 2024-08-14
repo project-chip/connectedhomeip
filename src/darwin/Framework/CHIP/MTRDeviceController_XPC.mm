@@ -17,13 +17,39 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRLogging_Internal.h"
 
+@interface MTRDeviceController_XPC ()
+@property (nonatomic, strong) NSXPCConnection * xpcConnection;
+@end
+
 @implementation MTRDeviceController_XPC
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error 
 {
     MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
+    // initiate XPC connection? kmo 14 aug 2024 12h35
     return nil;
+}
+
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error
+{
+    // xpc things obviously! kmo 14 aug 2024 12h35
+    // transform async work to sync work
+
+    MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
+    return false;
+}
+
+typedef void (^BoolReplyBlock)(bool);
+- (void)_xpc_setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                        newNodeID:(NSNumber *)newNodeID
+                                            error:(NSError * __autoreleasing *)error
+                                            reply:(BoolReplyBlock)reply
+{
+    MTR_LOG_ERROR("unimplemented XPC method %s called", __PRETTY_FUNCTION__);
+    reply(false);
 }
 
 @end
