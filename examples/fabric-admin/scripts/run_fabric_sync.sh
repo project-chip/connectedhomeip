@@ -86,19 +86,19 @@ fi
 echo "Admin path: $FABRIC_ADMIN_PATH"
 echo "Bridge path: $FABRIC_BRIDGE_APP_PATH"
 
-# Determine the path to stop_fabric_source.sh based on the location of run_fabric_source.sh
-RUN_FABRIC_SOURCE_PATH=$(find_binary "$SCRIPT_DIR/run_fabric_source.sh")
+# Determine the path to stop_fabric_sync.sh based on the location of run_fabric_sync.sh
+RUN_FABRIC_SOURCE_PATH=$(find_binary "$SCRIPT_DIR/run_fabric_sync.sh")
 if [[ $? -ne 0 ]]; then
-    echo >&2 "Could not find the run_fabric_source.sh script"
+    echo >&2 "Could not find the run_fabric_sync.sh script"
     exit 1
 fi
-STOP_FABRIC_SOURCE_PATH="${RUN_FABRIC_SOURCE_PATH/run_fabric_source/stop_fabric_source}"
+STOP_FABRIC_SYNC_PATH="${RUN_FABRIC_SOURCE_PATH/run_fabric_sync/stop_fabric_sync}"
 
 # Stop any running instances and clean up
-if [[ -e "$STOP_FABRIC_SOURCE_PATH" ]]; then
-    "$STOP_FABRIC_SOURCE_PATH"
+if [[ -e "$STOP_FABRIC_SYNC_PATH" ]]; then
+    "$STOP_FABRIC_SYNC_PATH"
 else
-    echo >&2 "Could not find the stop_fabric_source.sh script"
+    echo >&2 "Could not find the stop_fabric_sync.sh script"
     exit 1
 fi
 
