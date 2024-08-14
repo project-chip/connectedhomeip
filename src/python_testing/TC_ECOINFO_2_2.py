@@ -97,7 +97,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             cluster=Clusters.EcosystemInformation,
             attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
             fabric_filtered=False)
-        
+
         self.step(3)
         self.step("3a")
         self.wait_for_user_input(prompt_msg="Removed bridged device added in step 2a using method indicated by the manufacturer")
@@ -107,7 +107,8 @@ class TC_ECOINFO_2_2(MatterBaseTest):
         set_of_endpoints_step_3 = set(
             root_part_list_step_3[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
 
-        asserts.assert_equal(set_of_endpoints_step_3, set_of_endpoints_step_1, "Expected set of endpoints after removal to be identical to when test started")
+        asserts.assert_equal(set_of_endpoints_step_3, set_of_endpoints_step_1,
+                             "Expected set of endpoints after removal to be identical to when test started")
 
         self.step("3c")
         newly_added_endpoint = list(unique_endpoints_set)[0]
