@@ -157,6 +157,50 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    static CHIP_ERROR LogClusterId(const char * label, size_t indent, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string label = std::string("[") + std::to_string(i) + "]";
+            std::string item = std::to_string(iter.GetValue()) + " (" + ClusterIdToText(iter.GetValue()) + ")";
+            DataModelLogger::LogString(label, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
+    static CHIP_ERROR LogAttributeId(const char * label, size_t indent, const chip::app::DataModel::DecodableList<chip::AttributeId> & value, chip::ClusterId cluster)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string label = std::string("[") + std::to_string(i) + "]";
+            std::string item = std::to_string(iter.GetValue()) + " (" + AttributeIdToText(cluster, iter.GetValue()) + ")";
+            DataModelLogger::LogString(label, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
 #include <zap-generated/cluster/logging/DataModelLogger.h>
 
     static void LogString(size_t indent, const std::string string) { LogString("", indent, string); }
