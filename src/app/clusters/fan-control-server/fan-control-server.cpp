@@ -286,9 +286,9 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
             }
             else
             {
-            state->moveStarted = true;
-            state->endPercent = (DataModel::Nullable<chip::Percent>)*value;
-            res = Status::Success;
+                state->moveStarted = true;
+                state->endPercent = (DataModel::Nullable<chip::Percent>)*value;
+                res = Status::Success;
             }
         }
         break;
