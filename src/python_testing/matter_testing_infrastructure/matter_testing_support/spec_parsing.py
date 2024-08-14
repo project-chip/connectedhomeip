@@ -508,11 +508,28 @@ class DataModelLevel(str, Enum):
     kDeviceType = 'device_types'
 
 
+def _get_data_model_root() -> str:
+    """Attempts to find ${CHIP_ROOT}/data_model or equivalent."""
+
+    # Since this class is generally in a module, we have to rely on being bootstrapped or
+    # we use CWD if we cannot
+    choices = [os.getcwd()]
+
+    if 'PW_PROJECT_ROOT' in os.environ:
+        choices.insert(0, os.environ('PW_PROJECT_ROOT'))
+
+    for c in choices:
+        data_model_path = os.path.join(c, 'data_model')
+        if os.path.exists(os.path.join(data_model_path, 'master', 'scraper_version')):
+            return data_model_path
+    raise FileNotFoundError('Cannot find a CHIP_ROOT/data_model path. Tried %r as prefixes.' % choices)
+
+
 def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', data_model_level)
+        return os.path.join(_get_data_model_root(), '1.3', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', data_model_level)
+        return os.path.join(_get_data_model_root(), 'master', data_model_level)
     else:
         return data_model_directory
 
