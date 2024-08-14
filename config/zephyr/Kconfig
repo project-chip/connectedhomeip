@@ -320,7 +320,7 @@ config CHIP_PROJECT_CONFIG
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "OpenThread Service Registration Protocol"
-	default y
+	default n
 	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
@@ -330,7 +330,7 @@ config CHIP_ENABLE_DNSSD_SRP
 
 config CHIP_ENABLE_DNS_CLIENT
 	bool "OpenThread DNS client"
-	default y
+	default n
 	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_DNS_CLIENT
 	help

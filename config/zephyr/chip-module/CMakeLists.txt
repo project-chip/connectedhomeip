@@ -99,10 +99,16 @@ matter_add_gn_arg_bool  ("chip_mdns_minimal"                        CONFIG_WIFI)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                        CONFIG_NET_L2_ETHERNET)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                       CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"     CONFIG_CHIP_BUILD_TESTS)
-matter_add_gn_arg_bool  ("chip_inet_config_enable_udp_endpoint"     CONFIG_NET_UDP)
-matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"     CONFIG_NET_TCP)
 matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                     CONFIG_CHIP_MALLOC_SYS_HEAP)
+matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"     FALSE)
+matter_add_gn_arg_bool  ("chip_enable_read_client"                  CONFIG_CHIP_ENABLE_READ_CLIENT)
 
+
+if (BOARD STREQUAL "native_posix")
+    matter_add_gn_arg_string("target_cpu" "x86")
+elseif (BOARD STREQUAL "native_posix_64")
+    matter_add_gn_arg_string("target_cpu" "x64")
+endif()
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     matter_add_gn_arg_string("chip_mdns" "platform")

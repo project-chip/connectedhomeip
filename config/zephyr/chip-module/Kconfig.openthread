@@ -1,0 +1,4 @@
+# Enable OpenThread
+config NET_L2_OPENTHREAD
+	bool
+	default y
