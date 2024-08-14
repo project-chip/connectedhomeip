@@ -112,11 +112,11 @@ class OtaSoftwareUpdateProviderCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_VENDOR_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_I_D_REQ), vendorID)
+    val TAG_VENDOR_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
-    val TAG_PRODUCT_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_I_D_REQ), productID)
+    val TAG_PRODUCT_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productID)
 
     val TAG_SOFTWARE_VERSION_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_SOFTWARE_VERSION_REQ), softwareVersion)
@@ -165,7 +165,7 @@ class OtaSoftwareUpdateProviderCluster(
     val TAG_DELAYED_ACTION_TIME: Int = 1
     var delayedActionTime_decoded: UInt? = null
 
-    val TAG_IMAGE_U_R_I: Int = 2
+    val TAG_IMAGE_URI: Int = 2
     var imageURI_decoded: String? = null
 
     val TAG_SOFTWARE_VERSION: Int = 3
@@ -204,7 +204,7 @@ class OtaSoftwareUpdateProviderCluster(
           }
       }
 
-      if (tag == ContextSpecificTag(TAG_IMAGE_U_R_I)) {
+      if (tag == ContextSpecificTag(TAG_IMAGE_URI)) {
         imageURI_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
