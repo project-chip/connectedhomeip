@@ -107,6 +107,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
+        self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
@@ -135,10 +136,16 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process.send_signal(signal.SIGTERM.value)
-        self.app_process.wait()
-        os.remove(self.kvs)
+        # In case the th_server_app_path does not exist, then we failed the test
+        # and there is nothing to remove
+        if self.app_process is not None:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process.send_signal(signal.SIGTERM.value)
+            self.app_process.wait()
+
+            if os.path.exists(self.kvs):
+                os.remove(self.kvs)
+
         super().teardown_class()
 
     #
