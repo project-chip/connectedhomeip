@@ -53,7 +53,6 @@ Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 struct EmberAfFanControlState {
     bool initialized;
     bool moveStarted;
-    DataModel::Nullable<chip::Percent> startPercent;
     DataModel::Nullable<chip::Percent> endPercent;
     QuieterReportingAttribute<uint16_t> quietPercentCurrent{ DataModel::Nullable<chip::Percent>(0) };
     auto lastUpdateTime;
@@ -62,6 +61,10 @@ struct EmberAfFanControlState {
 static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
 
 static EmberAfFanControlState * getState(EndpointId endpoint);
+
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, EmberAfFanControlState * state,
+                                         DataModel::Nullable<chip::Percent> newValue, bool isStartOrEndOfTransition);
+
 } // anonymous namespace
 
 namespace chip {
@@ -254,7 +257,6 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         {
             // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other logic???)
             percentCurrentQTracking[ep].moveStarted = true;
-            percentCurrentQTracking[ep].startPercent = currentValueNeedToGetThisSomehow;
             percentCurrentQTracking[ep].endPercent = (DataModel::Nullable<chip::Percent>)*value;
             res = Status::Success;
         }
@@ -316,37 +318,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         break;
     }
     case PercentCurrent::Id: {
-        // Check if the PercentSetting is null.
-        if (NumericAttributeTraits<Percent>::IsNullValue(*value))
-        {
-            // nothing to do?
-            res = Status::Success;
-        }
-        else
-        {
-            // default to suppressing a report
-            res = Status::SuppressReport;
-            if (percentCurrentQTracking[ep].moveStarted)
-            {
-                // need a report at the start of a move.
-                percentCurrentQTracking[ep].moveStarted = false;
-                percentCurrentQTracking[ep].lastUpdateTime = GetTimeNowSomehow();
-                res = Status::ForceReport;
-            }
-            else
-            {
-                SomeTimeType currentTime = GetTimeNowSomehow();
-                if (currentTime - percentCurrentQTracking[ep].lastUpdateTime >= 1) {
-                    // 1 second elapsed, need a report
-                    percentCurrentQTracking[ep].lastUpdateTime = currentTime;
-                    res = Status::ForceReport;
-                }
-                if ((DataModel::Nullable<chip::Percent>)*value == percentCurrentQTracking[ep].endPercent) {
-                    // need a report at the end of a move.
-                    res = Status::ForceReport;
-                }
-            }
-        }
+        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, value);
         break;
     }
     default:
@@ -533,7 +505,7 @@ static EmberAfFanControlState * getState(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kLevelControlStateTableSize ? nullptr : &stateTable[ep]);
+    return (ep >= kFanControlDelegateTableSize ? nullptr : &stateTable[ep]);
 }
 
 /*
@@ -546,17 +518,19 @@ static EmberAfFanControlState * getState(EndpointId endpoint)
  * - At the end of the movement/transition, or
  * - When it changes from null to any other value and vice versa.
  *
- * @param endpoint: endpoint on which the currentLevel attribute must be updated.
- * @param state: EmberAfFanControlState struct of this given endpoint.
+ * @param endpoint: endpoint on which the percentCurrent attribute must be updated.
  * @param newValue: Value to update the attribute with
- * @param isStartOrEndOfTransition: Boolean that indicate whether the update is occuring at the start or end of a level transition
- * @return Success in setting the attribute value or the IM error code for the failure.
+ * @return WriteIgnored in setting the attribute value or the IM error code for the failure.
  */
-static Status SetPercentCurrentQuietReport(EndpointId endpoint, EmberAfFanControlState * state,
-                                         DataModel::Nullable<chip::Percent> newValue, bool isStartOrEndOfTransition)
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nullable<chip::Percent> newValue)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
+    EmberAfFanControlState * state = getState(endpoint);
+
+    bool isStartOrEndOfTransition = state->moveStarted || 
+        ((DataModel::Nullable<chip::Percent>)*value == state->endPercent)
+    state->moveStarted = false;
 
     if (isStartOrEndOfTransition)
     {
@@ -579,5 +553,11 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, EmberAfFanContro
     {
         markDirty = MarkAttributeDirty::kYes;
     }
-    return Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value(), markDirty);
+
+    Status  res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value(), markDirty);
+    if (res == Status::Success)
+    {
+        res = Status::WriteIgnored;
+    }
+    return res;
 }
