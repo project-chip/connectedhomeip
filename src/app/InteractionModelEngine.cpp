@@ -513,9 +513,9 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
+            aPathsIsNotEmpty = true;
             if (ConcreteAttributePathExists(concretePath))
             {
-                aPathsIsNotEmpty = true;
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
                                                  .endpoint    = concretePath.mEndpointId,
                                                  .requestType = Access::RequestType::kAttributeReadRequest,

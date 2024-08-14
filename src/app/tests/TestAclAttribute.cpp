@@ -187,7 +187,10 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+        // Wildcard subscriptions are ok: endpoint id is a wildcard
+        EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
+        // No report data since none of the current clusters have data
         EXPECT_FALSE(delegate.mGotReport);
         delegate.mError     = CHIP_NO_ERROR;
         delegate.mGotReport = false;
