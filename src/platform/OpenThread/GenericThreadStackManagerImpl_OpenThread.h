@@ -94,6 +94,7 @@ protected:
                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
+    uint16_t _GetThreadVersion();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);

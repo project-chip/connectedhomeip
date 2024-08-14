@@ -525,6 +525,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 }
 
 template <class ImplClass>
+uint16_t GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadVersion()
+{
+    return otThreadGetVersion();
+}
+
+template <class ImplClass>
 ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType(void)
 {
     VerifyOrReturnValue(mOTInst, ConnectivityManager::kThreadDeviceType_NotSupported);
