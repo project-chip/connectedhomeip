@@ -34,12 +34,14 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+
 class RvcStatusEnum(enum.IntEnum):
     # TODO remove this class once InvalidInMode response code is implemented in python SDK
     Success = 0x0
     UnsupportedMode = 0x1
     GenericFailure = 0x2
     InvalidInMode = 0x3
+
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
