@@ -163,6 +163,8 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 
 void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload)
 {
+    ChipLogProgress(NotSpecified, "FabricSyncDeviceCommand::OnCommissioningWindowOpened");
+
     if (err == CHIP_NO_ERROR)
     {
         char payloadBuffer[kMaxManaulCodeLength + 1];
