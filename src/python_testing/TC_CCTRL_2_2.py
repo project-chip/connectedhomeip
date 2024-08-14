@@ -161,7 +161,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(9)
         cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         # If no exception is raised, this is success
-        await self.send_single_cmd(cmd)
+        await self.send_single_cmd(cmd, timedRequestTimeoutMs=5000)
 
         self.step(10)
         if not events:
@@ -182,7 +182,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(12)
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(13)
         if not events:
@@ -257,7 +257,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(23)
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(24)
         events = new_event

@@ -23909,28 +23909,16 @@ class WaterHeaterManagement(Cluster):
             kEnergyManagement = 0x1
             kTankPercent = 0x2
 
-        class WaterHeaterDemandBitmap(IntFlag):
+        class WaterHeaterHeatSourceBitmap(IntFlag):
             kImmersionElement1 = 0x1
             kImmersionElement2 = 0x2
             kHeatPump = 0x4
             kBoiler = 0x8
             kOther = 0x10
 
-        class WaterHeaterTypeBitmap(IntFlag):
-            kImmersionElement1 = 0x1
-            kImmersionElement2 = 0x2
-            kHeatPump = 0x4
-            kBoiler = 0x8
-            kOther = 0x10
-
-    class Commands:
+    class Structs:
         @dataclass
-        class Boost(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000094
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
+        class WaterHeaterBoostInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -23949,6 +23937,23 @@ class WaterHeaterManagement(Cluster):
             temporarySetpoint: 'typing.Optional[int]' = None
             targetPercentage: 'typing.Optional[uint]' = None
             targetReheat: 'typing.Optional[uint]' = None
+
+    class Commands:
+        @dataclass
+        class Boost(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000094
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="boostInfo", Tag=0, Type=WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct),
+                    ])
+
+            boostInfo: 'WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct' = field(default_factory=lambda: WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct())
 
         @dataclass
         class CancelBoost(ClusterCommand):
@@ -24155,6 +24160,42 @@ class WaterHeaterManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class BoostStarted(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000094
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="boostInfo", Tag=0, Type=WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct),
+                    ])
+
+            boostInfo: 'WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct' = field(default_factory=lambda: WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct())
+
+        @dataclass
+        class BoostEnded(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000094
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
 
 @dataclass

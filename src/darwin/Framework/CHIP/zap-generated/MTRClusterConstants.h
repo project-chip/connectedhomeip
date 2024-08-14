@@ -7372,6 +7372,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterElectricalEnergyMeasurementEventCumulativeEnergyMeasuredID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000000,
     MTREventIDTypeClusterElectricalEnergyMeasurementEventPeriodicEnergyMeasuredID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000001,
 
+    // Cluster WaterHeaterManagement events
+    MTREventIDTypeClusterWaterHeaterManagementEventBoostStartedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterWaterHeaterManagementEventBoostEndedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster DemandResponseLoadControl events
     MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 

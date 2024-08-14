@@ -3808,6 +3808,80 @@ public static class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEven
     return output.toString();
   }
 }
+public static class WaterHeaterManagementClusterBoostStartedEvent {
+  public ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo;
+  private static final long BOOST_INFO_ID = 0L;
+
+  public WaterHeaterManagementClusterBoostStartedEvent(
+    ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo
+  ) {
+    this.boostInfo = boostInfo;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(BOOST_INFO_ID, boostInfo.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterManagementClusterBoostStartedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == BOOST_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          boostInfo = ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new WaterHeaterManagementClusterBoostStartedEvent(
+      boostInfo
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterManagementClusterBoostStartedEvent {\n");
+    output.append("\tboostInfo: ");
+    output.append(boostInfo);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WaterHeaterManagementClusterBoostEndedEvent {
+
+  public WaterHeaterManagementClusterBoostEndedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterManagementClusterBoostEndedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new WaterHeaterManagementClusterBoostEndedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterManagementClusterBoostEndedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
   public byte[] eventID;
   public @Nullable Integer transitionIndex;
