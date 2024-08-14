@@ -62,10 +62,10 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.tracing import TracingContext
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
+from matter_testing_support.pics import read_pics_from_file
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
-from matter_testing_support.pics import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks

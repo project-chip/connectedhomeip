@@ -34,15 +34,15 @@ from typing import Any, Callable
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from matter_testing_support.basic_composition import BasicCompositionTests
 from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
+from matter_testing_support.basic_composition import BasicCompositionTests
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
-from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                                   async_test_body, default_matter_test_main)
+from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+                                                   TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
                                                find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,

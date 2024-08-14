@@ -22,8 +22,8 @@ import jinja2
 from matter_testing_support.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                        evaluate_feature_choice_conformance)
 from matter_testing_support.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from mobly import asserts
 from matter_testing_support.spec_parsing import XmlCluster, add_cluster_data_from_xml
+from mobly import asserts
 
 FEATURE_TEMPLATE = '''\
     <feature bit="{{ id }}" code="{{ name }}" name="{{ name }}" summary="summary">

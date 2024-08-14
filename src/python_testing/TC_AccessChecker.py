@@ -16,12 +16,12 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
-from matter_testing_support.basic_composition import BasicCompositionTests
 from chip.interaction_model import Status
 from chip.tlv import uint
+from matter_testing_support.basic_composition import BasicCompositionTests
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
-from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                                   default_matter_test_main)
+from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep,
+                                                   async_test_body, default_matter_test_main)
 from matter_testing_support.spec_parsing import XmlCluster, build_xml_clusters
 
 

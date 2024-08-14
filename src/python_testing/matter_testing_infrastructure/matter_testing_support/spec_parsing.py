@@ -27,12 +27,14 @@ from typing import Callable, Optional
 
 import chip.clusters as Clusters
 from chip.tlv import uint
-from matter_testing_support.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                                ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                                parse_callable_from_xml, parse_device_type_callable_from_xml)
+from matter_testing_support.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision,
+                                                ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory,
+                                                optional, or_operation, parse_callable_from_xml,
+                                                parse_device_type_callable_from_xml)
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
-from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                                   EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
+from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation,
+                                                   DeviceTypePathLocation, EventPathLocation, FeaturePathLocation, ProblemNotice,
+                                                   ProblemSeverity)
 
 _PRIVILEGE_STR = {
     None: "N/A",

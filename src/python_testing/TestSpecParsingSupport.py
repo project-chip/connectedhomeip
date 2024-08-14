@@ -21,10 +21,10 @@ import xml.etree.ElementTree as ElementTree
 import chip.clusters as Clusters
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from mobly import asserts
 from matter_testing_support.spec_parsing import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
                                                  add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                                  combine_derived_clusters_with_base)
+from mobly import asserts
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -36,7 +36,7 @@ ATTRIBUTE_ID = 0x0000
 
 
 def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
-    xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{
+    xml_cluster = f'< cluster xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance" xsi: schemaLocation = "types types.xsd cluster cluster.xsd" id ="{
         CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
