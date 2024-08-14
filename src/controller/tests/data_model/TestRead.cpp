@@ -3207,7 +3207,7 @@ TEST_F(TestRead, TestSubscribeAttributeNotExistPath)
 
         // If path does not exist, we allow the subscription (in case path appears over time)
         EXPECT_EQ(callback.mOnError, 0u);
-        EXPECT_EQ(callback.mOnDone, 0u);  // subscription is active, not done
+        EXPECT_EQ(callback.mOnDone, 0u); // subscription is active, not done
     }
 
     SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
@@ -4701,8 +4701,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                                               app::ReadClient::InteractionType::Subscribe);
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
