@@ -81,7 +81,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         self.step("2c")
         newly_added_endpoint = list(unique_endpoints_set)[0]
-        foo = await self.read_single_attribute_check_success(
+        await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
             node_id=dut_node_id,
             endpoint=newly_added_endpoint,
@@ -90,7 +90,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             fabric_filtered=False)
 
         self.step("2d")
-        bar = await self.read_single_attribute_check_success(
+        await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
             node_id=dut_node_id,
             endpoint=newly_added_endpoint,
