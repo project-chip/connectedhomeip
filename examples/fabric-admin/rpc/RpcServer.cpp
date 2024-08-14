@@ -28,6 +28,7 @@
 #include <commands/common/StayActiveSender.h>
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <device_manager/DeviceManager.h>
 #include <system/SystemClock.h>
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -83,12 +84,7 @@ public:
 
         ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
 
-        char command[512];
-        snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d --salt hex:%s --verifier hex:%s",
-                 nodeId, kRootEndpointId, kEnhancedCommissioningMethod, commissioningTimeout, iterations, discriminator, saltHex,
-                 verifierHex);
-
-        PushCommand(command);
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
 
         response.success = true;
 

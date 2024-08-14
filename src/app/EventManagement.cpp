@@ -554,7 +554,10 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     ReturnErrorOnFailure(ret);
 
-    Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
+    Access::RequestPath requestPath{ .cluster     = event.mClusterId,
+                                     .endpoint    = event.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest,
+                                     .entityId    = event.mEventId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);

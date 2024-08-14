@@ -56,30 +56,52 @@ public:
      *********************************************************************************/
 
     /**
-     * @brief Delegate should implement a handler to start boosting the water temperature as required.
-     *        Upon receipt, the Water Heater SHALL transition into the BOOST state, which SHALL cause the
-     *        water in the tank (or the TargetPercentage of the water, if included) to be heated towards
-     *        the set point (or the TemporarySetpoint, if included), which in turn may cause a call for heat,
-     *        even if the mode is OFF, or is TIMED and it is during one of the Off periods.
+     * @brief Delegate should implement a handler to start boosting the water
+     *        temperature as required. Upon receipt, the Water Heater SHALL
+     *        transition into the BOOST state, which SHALL cause the water in
+     *        the tank (or the TargetPercentage of the water, if included) to be
+     *        heated towards the set point (or the TemporarySetpoint, if
+     *        included), which in turn may cause a call for heat, even if the
+     *        mode is OFF, or is TIMED and it is during one of the Off periods.
      *
-     * @param duration  Indicates the time period in seconds for which the BOOST state is activated before it
-     *                  automatically reverts to the previous mode (e.g. OFF, MANUAL or TIMED).
-     * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has
-     *                 first reached the set point temperature (or the TemporarySetpoint temperature, if specified)
-     *                 for the TargetPercentage (if specified).
-     * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable.
-     *                        This MAY cause multiple heat sources to be activated (e.g. a heat pump and direct
-     *                        electric heating element).
-     * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command.
-     *                           It SHALL be used instead of the normal set point temperature whilst the BOOST state is active.
-     * @param targetPercentage  If the tank supports the TankPercent feature, this field indicates the amount of water
-     *                          that SHALL be heated by this Boost command before the heater is switched off.
-     * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased
-     *                      because the TargetPercentage of the water in the tank has been heated to the set point (or
-     *                      TemporarySetpoint if included), this field indicates the percentage to which the hot water in
-     *                      the tank SHALL be allowed to fall before again beginning to reheat it.
+     * @param duration           Indicates the time period in seconds for which
+     *                           the BOOST state is activated before it
+     *                           automatically reverts to the previous mode
+     *                           (e.g. OFF, MANUAL or TIMED).
      *
-     * @return  Success if the boost command is accepted; otherwise the command SHALL be rejected with appropriate error.
+     * @param oneShot            Indicates whether the BOOST state should be
+     *                           automatically canceled once the hot water has
+     *                           first reached the set point temperature (or the
+     *                           TemporarySetpoint temperature, if specified)
+     *                           for the TargetPercentage (if specified).
+     *
+     * @param emergencyBoost     Indicates that the consumer wants the water to
+     *                           be heated as quickly as practicable. This MAY
+     *                           cause multiple heat sources to be activated
+     *                           (e.g. a heat pump and direct electric heating
+     *                           element).
+     *
+     * @param temporarySetpoint  Indicates the target temperature to which to
+     *                           heat the hot water for this Boost command. It
+     *                           SHALL be used instead of the normal set point
+     *                           temperature whilst the BOOST state is active.
+     *
+     * @param targetPercentage   If the tank supports the TankPercent feature,
+     *                           this field indicates the amount of water that
+     *                           SHALL be heated by this Boost command before
+     *                           the heater is switched off.
+     *
+     * @param targetReheat       If the tank supports the TankPercent feature,
+     *                           and the heating by this Boost command has
+     *                           ceased because the TargetPercentage of the
+     *                           water in the tank has been heated to the set
+     *                           point (or TemporarySetpoint if included), this
+     *                           field indicates the percentage to which the hot
+     *                           water in the tank SHALL be allowed to fall
+     *                           before again beginning to reheat it.
+     *
+     * @return  Success if the boost command is accepted; otherwise the command
+     * SHALL be rejected with appropriate error.
      */
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
                                                     Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
@@ -87,8 +109,8 @@ public:
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.
-     *        Upon receipt, the Water Heater SHALL transition back from the BOOST state to the previous mode
-     *        (e.g. OFF, MANUAL or TIMED).
+     *        Upon receipt, the Water Heater SHALL transition back from the
+     *        BOOST state to the previous mode (e.g. OFF, MANUAL or TIMED).
      *
      * @return It should report SUCCESS if successful and FAILURE otherwise.
      */
@@ -96,8 +118,8 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    BitMask<WaterHeaterTypeBitmap> GetHeaterTypes() override;
-    BitMask<WaterHeaterDemandBitmap> GetHeatDemand() override;
+    BitMask<WaterHeaterHeatSourceBitmap> GetHeaterTypes() override;
+    BitMask<WaterHeaterHeatSourceBitmap> GetHeatDemand() override;
     uint16_t GetTankVolume() override;
     int64_t GetEstimatedHeatRequired() override;
     Percent GetTankPercentage() override;
@@ -105,18 +127,18 @@ public:
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    void SetHeaterTypes(BitMask<WaterHeaterTypeBitmap> heaterTypes);
-    void SetHeatDemand(BitMask<WaterHeaterDemandBitmap> heatDemand);
+    void SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap> heaterTypes);
+    void SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap> heatDemand);
     void SetTankVolume(uint16_t tankVolume);
     void SetEstimatedHeatRequired(int64_t estimatedHeatRequired);
     void SetTankPercentage(Percent tankPercentage);
     void SetBoostState(BoostStateEnum boostState);
 
-    /*********************************************************************************
+    /***************************************************************************
      *
      * WaterHeaterManagementDelegate specific methods
      *
-     *********************************************************************************/
+     ***************************************************************************/
 
     /**
      * @brief Set the Water Header Mode and act accordingly.
@@ -155,36 +177,44 @@ public:
     void HandleBoostTimerExpiry();
 
     /**
-     * Determines whether the tank water temperature has reached the target temperature.
+     * Determines whether the tank water temperature has reached the target
+     * temperature.
      *
-     * @return Returns True is tank water temperature has reached the target temperature, False otherwise.
+     * @return Returns True is tank water temperature has reached the target
+     * temperature, False otherwise.
      */
     bool HasWaterTemperatureReachedTarget() const;
 
     /**
      * Simulates water being drawn from the water tank.
      *
-     * @param percentageReplaced  The % of water being replaced with water with a temperature of replacedWaterTemperature.
-     * @param replacedWaterTemperature  The temperature of the percentageReplaced water.
+     * @param percentageReplaced  The % of water being replaced with water with
+     * a temperature of replacedWaterTemperature.
+     *
+     * @param replacedWaterTemperature  The temperature of the
+     * percentageReplaced water.
      */
     void DrawOffHotWater(chip::Percent percentageReplaced, uint16_t replacedWaterTemperature);
 
 private:
     /**
-     * @brief Determine whether heating needs to be turned on or off or left as is.
+     * @brief Determine whether heating needs to be turned on or off or left as
+     * is.
      *
-     * @param heatingOp[out]  Set as determined whether heating needs to be turned on/off or left unchanged.
+     * @param heatingOp[out]  Set as determined whether heating needs to be
+     * turned on/off or left unchanged.
      *
-     * @return  Success if the heating operation could be determined otherwise returns with appropriate error.
+     * @return  Success if the heating operation could be determined otherwise
+     * returns with appropriate error.
      */
     Protocols::InteractionModel::Status DetermineIfChangingHeatingState(HeatingOp & heatingOp);
 
 private:
-    /*********************************************************************************
+    /***************************************************************************
      *
      * WaterHeaterManagementDelegate specific attributes
      *
-     *********************************************************************************/
+     ***************************************************************************/
 
     // Need the following so can determine which features are supported
     WaterHeaterManagement::Instance * mpWhmInstance;
@@ -203,34 +233,44 @@ private:
 
     // Boost command parameters
 
-    // This field SHALL indicate whether the BOOST state should be automatically canceled once the hot water has first reached the
-    // set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if specified).
+    // This field SHALL indicate whether the BOOST state should be automatically
+    // canceled once the hot water has first reached the set point temperature
+    // (or the TemporarySetpoint temperature, if specified) for the
+    // TargetPercentage (if specified).
     Optional<bool> mBoostOneShot;
 
-    // This field indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause multiple heat
-    // sources to be activated (e.g. a heat pump and direct electric heating element).
+    // This field indicates that the consumer wants the water to be heated as
+    // quickly as practicable. This MAY cause multiple heat sources to be
+    // activated (e.g. a heat pump and direct electric heating element).
     Optional<bool> mBoostEmergencyBoost;
 
-    // This field indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be used instead
-    // of the normal set point temperature whilst the BOOST state is active.
+    // This field indicates the target temperature to which to heat the hot
+    // water for this Boost command. It SHALL be used instead of the normal set
+    // point temperature whilst the BOOST state is active.
     Optional<int16_t> mBoostTemporarySetpoint;
 
-    // If the tank supports the TankPercent feature, this field indicates the amount of water that SHALL be heated by this Boost
-    // command before the heater is switched off. This field is optional, however it SHALL be included if the TargetReheat field is
-    // included.
+    // If the tank supports the TankPercent feature, this field indicates the
+    // amount of water that SHALL be heated by this Boost command before the
+    // heater is switched off. This field is optional, however it SHALL be
+    // included if the TargetReheat field is included.
     Optional<chip::Percent> mBoostTargetPercentage;
 
-    // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the TargetPercentage
-    // of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field indicates the
-    // percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it. For example if
-    // the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water, the tank may have
-    // hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back up to 80% of hot
-    // water. If this field and the OneShot field were both omitted, heating would begin again after any water draw which reduced
-    // the TankPercentage below 80%.
+    // If the tank supports the TankPercent feature, and the heating by this
+    // Boost command has ceased because the TargetPercentage of the water in the
+    // tank has been heated to the set point (or TemporarySetpoint if included),
+    // this field indicates the percentage to which the hot water in the tank
+    // SHALL be allowed to fall before again beginning to reheat it. For example
+    // if the TargetPercentage was 80%, and the TargetReheat was 40%, then after
+    // initial heating to 80% hot water, the tank may have hot water drawn off
+    // until only 40% hot water remains. At this point the heater will begin to
+    // heat back up to 80% of hot water. If this field and the OneShot field
+    // were both omitted, heating would begin again after any water draw which
+    // reduced the TankPercentage below 80%.
     Optional<chip::Percent> mBoostTargetReheat;
 
-    // Track whether the water temperature has reached the water temperature specified in the boost command. Used in conjunction
-    // with the boost command boostTargetReheat parameter
+    // Track whether the water temperature has reached the water temperature
+    // specified in the boost command. Used in conjunction with the boost
+    // command boostTargetReheat parameter
     bool mBoostTargetTemperatureReached;
 
     /*********************************************************************************
@@ -239,28 +279,35 @@ private:
      *
      *********************************************************************************/
 
-    // This attribute SHALL indicate the methods to call for heat that the controller supports. If a bit is set then the controller
-    // supports the corresponding method.
-    BitMask<WaterHeaterTypeBitmap> mHeaterTypes;
+    // This attribute SHALL indicate the methods to call for heat that the
+    // controller supports. If a bit is set then the controller supports the
+    // corresponding method.
+    BitMask<WaterHeaterHeatSourceBitmap> mHeaterTypes;
 
-    // This attribute SHALL indicate if the controller is asking for heat. If a bit is set then the corresponding call for heat is
-    // active.
-    BitMask<WaterHeaterDemandBitmap> mHeatDemand;
+    // This attribute SHALL indicate if the controller is asking for heat. If a
+    // bit is set then the corresponding call for heat is active.
+    BitMask<WaterHeaterHeatSourceBitmap> mHeatDemand;
 
-    // This attribute SHALL indicate the volume of water that the hot water tank can hold (in units of Litres). This allows an
-    // energy management system to estimate the required heating energy needed to reach the target temperature.
+    // This attribute SHALL indicate the volume of water that the hot water tank
+    // can hold (in units of Litres). This allows an energy management system to
+    // estimate the required heating energy needed to reach the target
+    // temperature.
     uint16_t mTankVolume;
 
-    // This attribute SHALL indicate the estimated heat energy needed to raise the water temperature to the target setpoint. This
-    // can be computed by taking the specific heat capacity of water (4182 J/kg °C) and by knowing the current temperature of the
-    // water, the tank volume and target temperature.
+    // This attribute SHALL indicate the estimated heat energy needed to raise
+    // the water temperature to the target setpoint. This can be computed by
+    // taking the specific heat capacity of water (4182 J/kg °C) and by knowing
+    // the current temperature of the water, the tank volume and target
+    // temperature.
     int64_t mEstimatedHeatRequired;
 
-    // This attribute SHALL indicate an approximate level of hot water stored in the tank, which may help consumers understand the
-    // amount of hot water remaining in the tank.
+    // This attribute SHALL indicate an approximate level of hot water stored in
+    // the tank, which may help consumers understand the amount of hot water
+    // remaining in the tank.
     Percent mTankPercentage;
 
-    // This attribute SHALL indicate if the BOOST state, as triggered by a Boost command, is currently active.
+    // This attribute SHALL indicate if the BOOST state, as triggered by a Boost
+    // command, is currently active.
     BoostStateEnum mBoostState;
 };
 

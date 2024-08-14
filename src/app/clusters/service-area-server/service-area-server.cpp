@@ -399,6 +399,8 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::Sk
         exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;
     }
+
+    exitResponse(SkipAreaStatus::kSuccess, ""_span);
 }
 
 //*************************************************************************
@@ -469,35 +471,28 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
     }
 
     // The mapID field SHALL be null if SupportedMaps is not supported or SupportedMaps is an empty list.
-    bool shouldMapsBeNull = false;
-    if (mFeature.Has(Feature::kMaps))
+    if (mFeature.Has(Feature::kMaps) && (mDelegate->GetNumberOfSupportedMaps() > 0))
     {
-        if (mDelegate->GetNumberOfSupportedMaps() == 0)
+        if (aArea.mapID.IsNull())
         {
-            shouldMapsBeNull = true;
-        }
-    }
-    else
-    {
-        shouldMapsBeNull = true;
-    }
-
-    if (shouldMapsBeNull)
-    {
-        if (!aArea.mapID.IsNull())
-        {
-            ChipLogDetail(Zcl, "IsValidSupportedArea %u - map Id %u is not in empty supported map list", aArea.areaID,
-                          aArea.mapID.Value());
+            ChipLogDetail(Zcl, "IsValidSupportedArea %u - map Id should not be null when there are supported maps", aArea.areaID);
             return false;
         }
-    }
-    else
-    {
+
         // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
         if (!IsSupportedMap(aArea.mapID.Value()))
         {
             ChipLogError(Zcl, "IsValidSupportedArea %u - map Id %u is not in supported map list", aArea.areaID,
                          aArea.mapID.Value());
+            return false;
+        }
+    }
+    else
+    {
+        if (!aArea.mapID.IsNull())
+        {
+            ChipLogDetail(Zcl, "IsValidSupportedArea %u - map Id %u is not in empty supported map list", aArea.areaID,
+                          aArea.mapID.Value());
             return false;
         }
     }
@@ -1005,7 +1000,7 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
     // TotalOperationalTime SHALL be null if the Status field is not set to Completed or Skipped.
     if ((opStatus != OperationalStatusEnum::kCompleted) && (opStatus != OperationalStatusEnum::kSkipped))
     {
-        progressElement.totalOperationalTime.Value().SetNull();
+        progressElement.totalOperationalTime.Emplace(DataModel::NullNullable);
     }
 
     // add the updated element to the progress attribute
