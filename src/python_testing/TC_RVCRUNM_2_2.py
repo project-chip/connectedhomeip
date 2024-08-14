@@ -38,6 +38,7 @@ from mobly import asserts
 # Run the test with
 # --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
 
+
 class RvcStatusEnum(enum.IntEnum):
     # TODO remove this class once InvalidInMode response code is implemented in python SDK
     Success = 0x0
