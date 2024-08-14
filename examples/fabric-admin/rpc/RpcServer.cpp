@@ -47,8 +47,8 @@ public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
         chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it             = mPendingKeepActive.find(nodeId);
-        VerifyOrReturn(it != mPendingKeepActive.end());
+        auto it             = mPendingKeepActiveTimesMs.find(nodeId);
+        VerifyOrReturn(it != mPendingKeepActiveTimesMs.end());
         // TODO(#33221): We also need a mechanism here to drop KeepActive
         // request if they were recieved over 60 mins ago.
         uint32_t stayActiveDurationMs = it->second;
@@ -56,7 +56,7 @@ public:
         // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
         // Work to see if there should be update to spec on whether some sort of failure later on
         // Should be indicated in some manner, or identify a better recovery mechanism here.
-        mPendingKeepActive.erase(nodeId);
+        mPendingKeepActiveTimesMs.erase(nodeId);
 
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(stayActiveDurationMs, clientInfo.peer_node,
@@ -105,7 +105,7 @@ public:
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
-        mPendingKeepActive[nodeId] = stayActiveDurationMs;
+        mPendingKeepActiveTimesMs[nodeId] = stayActiveDurationMs;
     }
 
 private:
@@ -127,8 +127,8 @@ private:
         chip::Platform::Delete(data);
     }
 
-    // Modifications to mPendingKeepActive should be done on the MatterEventLoop thread
-    std::map<chip::NodeId, uint32_t> mPendingKeepActive;
+    // Modifications to mPendingKeepActiveTimesMs should be done on the MatterEventLoop thread
+    std::map<chip::NodeId, uint32_t> mPendingKeepActiveTimesMs;
 };
 
 FabricAdmin fabric_admin_service;
