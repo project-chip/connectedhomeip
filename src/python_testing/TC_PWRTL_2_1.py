@@ -54,7 +54,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             return
 
         self.print_step(2, "Read AvailableAttributes attribute")
-        available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
+        available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AvailableEndpoints)
 
         if available_endpoints == NullValue:
             logging.info("AvailableEndpoints is null")
@@ -69,7 +69,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             return
 
         self.print_step(3, "Read ActiveEndpoints attribute")
-        active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
+        active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.ActiveEndpoints)
         logging.info("ActiveEndpoints: %s" % (active_endpoints))
 
         if available_endpoints == NullValue:

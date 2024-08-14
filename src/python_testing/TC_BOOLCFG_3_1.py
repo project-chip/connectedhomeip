@@ -34,10 +34,6 @@ from mobly import asserts
 
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
-    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanStateConfiguration
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_BOOLCFG_3_1(self) -> str:
         return "[TC-BOOLCFG-3.1] SensitivityLevel with DUT as Server"
 
@@ -74,7 +70,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step("2a")
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
 
         self.step("2b")
@@ -91,19 +87,19 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step("2c")
-        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
-        numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+        numberOfSupportedLevels = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
 
         self.step(4)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            default_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
+            default_level = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
         else:
             logging.info("Test step skipped")
 
         self.step(5)
-        current_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
+        current_level = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
 
         self.step(6)
         for sens_level in range(numberOfSupportedLevels):

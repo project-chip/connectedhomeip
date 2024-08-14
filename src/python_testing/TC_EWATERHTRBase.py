@@ -30,7 +30,7 @@ class EWATERHTRBase:
     async def read_whm_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         cluster = Clusters.Objects.WaterHeaterManagement
         full_attr = getattr(cluster.Attributes, attribute)
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=full_attr)
 
     async def check_whm_attribute(self, attribute, expected_value, endpoint: int = None):
         value = await self.read_whm_attribute_expect_success(endpoint=endpoint, attribute=attribute)

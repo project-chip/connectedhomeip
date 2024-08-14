@@ -39,13 +39,6 @@ _ROOT_ENDPOINT_ID = 0
 
 class TC_BRBINFO_4_1(MatterBaseTest):
 
-    #
-    # Class Helper functions
-    #
-
-    async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
-
     # Override default timeout to support a 60 min wait
     @property
     def default_timeout(self) -> int:
@@ -89,7 +82,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             asserts.fail("Timeout on event ActiveChanged")
 
     async def _get_dynamic_endpoint(self) -> int:
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
+        root_part_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
         set_of_endpoints_after_adding_device = set(root_part_list)
 
         asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
@@ -103,7 +96,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     async def setup_class(self):
         # These steps are not explicitly, but they help identify the dynamically added endpoint
         # The second part of this process happens on _get_dynamic_endpoint()
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
+        root_part_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
@@ -162,39 +155,35 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         logging.info("Ensuring DUT is commissioned to TH")
 
-        # Confirms commissioning of DUT on TH as it reads its fature map
-        await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            basic_info_cluster,
-            basic_info_attributes.FeatureMap,
-            self.dut_node_id
+        # Confirms commissioning of DUT on TH as it reads its feature map
+        await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            attribute=basic_info_attributes.FeatureMap,
+            node_id=self.dut_node_id
         )
 
         logging.info("Ensuring ICD is commissioned to TH")
 
         # Confirms commissioning of ICD on TH as it reads its feature map
-        await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            basic_info_cluster,
-            basic_info_attributes.FeatureMap,
-            self.icd_nodeid
+        await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            attribute=basic_info_attributes.FeatureMap,
+            node_id=self.icd_nodeid
         )
 
         self.step("1a")
 
-        idle_mode_duration = await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            icdm_cluster,
-            icdm_attributes.IdleModeDuration,
-            self.icd_nodeid
+        idle_mode_duration = await self.read_single_attribute_check_success(
+            endpoint=_ROOT_ENDPOINT_ID,
+            attribute=icdm_attributes.IdleModeDuration,
+            node_id=self.icd_nodeid
         )
         logging.info(f"IdleModeDuration: {idle_mode_duration}")
 
-        active_mode_duration = await self._read_attribute_expect_success(
-            _ROOT_ENDPOINT_ID,
-            icdm_cluster,
-            icdm_attributes.ActiveModeDuration,
-            self.icd_nodeid
+        active_mode_duration = await self.read_single_attribute_check_success(
+            endppoint=_ROOT_ENDPOINT_ID,
+            attribute=icdm_attributes.ActiveModeDuration,
+            node_id=self.icd_nodeid
         )
         logging.info(f"ActiveModeDuration: {active_mode_duration}")
 

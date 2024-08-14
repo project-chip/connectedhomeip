@@ -34,10 +34,6 @@ from mobly import asserts
 
 
 class TC_VALCC_4_3(MatterBaseTest):
-    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ValveConfigurationAndControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_VALCC_4_3(self) -> str:
         return "[TC-VALCC-4.3] AutoCloseTime functionality with (no synchronized time) DUT as Server"
 
@@ -70,7 +66,7 @@ class TC_VALCC_4_3(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        feature_map = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_ts_feature_supported = feature_map & Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync
 
@@ -113,7 +109,7 @@ class TC_VALCC_4_3(MatterBaseTest):
             pass
 
         self.step(5)
-        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+        auto_close_time_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
         asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
 
         self.step(6)
@@ -124,7 +120,7 @@ class TC_VALCC_4_3(MatterBaseTest):
             pass
 
         self.step(7)
-        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+        auto_close_time_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
         asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
 
 

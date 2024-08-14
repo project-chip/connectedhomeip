@@ -37,10 +37,6 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_6(MatterBaseTest):
-    async def read_ts_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def send_set_default_ntp_cmd(self, ntp: typing.Union[Nullable, str]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDefaultNTP(defaultNTP=ntp))
 
@@ -59,7 +55,8 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
     async def test_TC_TIMESYNC_2_6(self):
 
         # Time sync is required to be on endpoint 0 if it is present
-        self.endpoint = 0
+        asserts.assert_equal(self.matter_test_config.get(endpoint, 0), 0,
+                             "Time sync cluster is only allowed on endpoint 0, this test should not be run against other endpoints")
 
         self.print_step(0, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes

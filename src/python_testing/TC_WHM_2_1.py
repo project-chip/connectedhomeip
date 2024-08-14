@@ -60,10 +60,6 @@ class TC_WHM_2_1(MatterBaseTest):
         ]
         return steps
 
-    async def read_mode_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.WaterHeaterMode
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def send_change_to_mode_cmd(self, newMode) -> Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.WaterHeaterMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse),
@@ -90,7 +86,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         self.step(2)
 
-        supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
         logging.info(f"SupportedModes: {supported_modes}")
 
@@ -99,7 +95,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         self.step(3)
 
-        old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info(f"CurrentMode: {old_current_mode}")
 
@@ -124,7 +120,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         self.step(10)
 
-        old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info(f"CurrentMode: {old_current_mode}")
 
@@ -136,7 +132,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         self.step(12)
 
-        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info(f"CurrentMode: {current_mode}")
 
@@ -152,7 +148,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         self.step(14)
 
-        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info(f"CurrentMode: {current_mode}")
 

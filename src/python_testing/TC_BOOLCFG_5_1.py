@@ -36,10 +36,6 @@ sensorUntrigger = 0x0080_0000_0000_0001
 
 
 class TC_BOOLCFG_5_1(MatterBaseTest):
-    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanStateConfiguration
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_BOOLCFG_5_1(self) -> str:
         return "[TC-BOOLCFG-5.1] SuppressAlarm functionality for inactive alarms with DUT as Server"
 
@@ -83,7 +79,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step(2)
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_sprs_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAlarmSuppress
         is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
@@ -155,7 +151,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(8)
-        alarms_suppressed_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
+        alarms_suppressed_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
         asserts.assert_equal(alarms_suppressed_dut, 0, "AlarmsSuppressed is not the expected value")
 
         self.step("9a")
@@ -179,7 +175,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(10)
-        alarms_suppressed_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
+        alarms_suppressed_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
         asserts.assert_equal(alarms_suppressed_dut, 0, "AlarmsSuppressed is not the expected value")
 
 

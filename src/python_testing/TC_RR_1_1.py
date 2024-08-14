@@ -131,7 +131,7 @@ class TC_RR_1_1(MatterBaseTest):
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
 
         # Prepare clients for first fabric, that includes the default controller
-        fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=dev_ctrl)
+        fabric_index = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=dev_ctrl)
         dev_ctrl.name = generate_controller_name(fabric_index, 0)
         client_list.append(dev_ctrl)
 
@@ -176,7 +176,7 @@ class TC_RR_1_1(MatterBaseTest):
             fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
-            current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            current_fabric_index = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
             for fabric in fabrics:
                 if fabric.fabricIndex == current_fabric_index:
                     continue
@@ -201,7 +201,7 @@ class TC_RR_1_1(MatterBaseTest):
                                                                              newFabricDevCtrl=new_admin_ctrl,
                                                                              existingNodeId=self.dut_node_id,
                                                                              newNodeId=self.dut_node_id)
-            fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=new_admin_ctrl)
+            fabric_index = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=new_admin_ctrl)
             new_admin_ctrl.name = generate_controller_name(fabric_index, 0)
             client_list.append(new_admin_ctrl)
             if num_controllers_per_fabric > 1:

@@ -58,10 +58,6 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcOperationalState
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
@@ -79,7 +75,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
     # Prints the step number, reads the operational state attribute and checks if it matches with expected_state
     async def read_operational_state_with_check(self, step_number, expected_state):
         self.print_step(step_number, "Read OperationalState")
-        operational_state = await self.read_mod_attribute_expect_success(
+        operational_state = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
         logging.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, expected_state,

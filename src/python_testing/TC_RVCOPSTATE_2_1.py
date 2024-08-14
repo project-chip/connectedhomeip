@@ -43,13 +43,9 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcOperationalState
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_and_validate_opstate(self, step, expected_state):
         self.print_step(step, "Read OperationalState attribute")
-        operational_state = await self.read_mod_attribute_expect_success(
+        operational_state = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
         logging.info("OperationalState: %s" % (operational_state))
         asserts.assert_equal(operational_state, expected_state,
@@ -57,7 +53,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     async def read_and_validate_operror(self, step, expected_error):
         self.print_step(step, "Read OperationalError attribute")
-        operational_error = await self.read_mod_attribute_expect_success(
+        operational_error = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalError)
         logging.info("OperationalError: %s" % (operational_error))
         asserts.assert_equal(operational_error.errorStateID, expected_error,
@@ -104,7 +100,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0000"):
             self.print_step(2, "Read PhaseList attribute")
-            phase_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.PhaseList)
+            phase_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.PhaseList)
 
             if phase_list == NullValue:
                 logging.info("PhaseList is null")
@@ -117,7 +113,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0001"):
             self.print_step(3, "Read CurrentPhase attribute")
-            current_phase = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentPhase)
+            current_phase = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentPhase)
             logging.info("CurrentPhase: %s" % (current_phase))
 
             if phase_list == NullValue:
@@ -128,8 +124,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0002"):
             self.print_step(4, "Read CountdownTime attribute")
-            countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                          attribute=attributes.CountdownTime)
+            countdown_time = await self.read_single_attribute_check_success(endpoint=self.endpoint,
+                                                                            attribute=attributes.CountdownTime)
 
             logging.info("CountdownTime: %s" % (countdown_time))
             if countdown_time is not NullValue:
@@ -138,8 +134,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0003"):
             self.print_step(5, "Read OperationalStateList attribute")
-            operational_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                                  attribute=attributes.OperationalStateList)
+            operational_state_list = await self.read_single_attribute_check_success(endpoint=self.endpoint,
+                                                                                    attribute=attributes.OperationalStateList)
 
             logging.info("OperationalStateList: %s" % (operational_state_list))
 
@@ -161,8 +157,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0004"):
             self.print_step(6, "Read OperationalState attribute")
-            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OperationalState)
+            operational_state = await self.read_single_attribute_check_success(endpoint=self.endpoint,
+                                                                               attribute=attributes.OperationalState)
 
             logging.info("OperationalState: %s" % (operational_state))
 
@@ -228,8 +224,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         if self.check_pics("RVCOPSTATE.S.A0005"):
             self.print_step(7, "Read OperationalError attribute")
-            operational_error = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OperationalError)
+            operational_error = await self.read_single_attribute_check_success(endpoint=self.endpoint,
+                                                                               attribute=attributes.OperationalError)
 
             logging.info("OperationalError: %s" % (operational_error))
 

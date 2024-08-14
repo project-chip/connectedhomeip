@@ -226,10 +226,10 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(parsed_pai.version, x509.Version.v3, "DUT returned incorrect certificate type")
 
         self.step("4a")
-        basic_info_vendor_id = await self.read_single_attribute_check_success(basic, basic.Attributes.VendorID)
+        basic_info_vendor_id = await self.read_single_attribute_check_success(basic.Attributes.VendorID)
 
         self.step("4b")
-        basic_info_product_id = await self.read_single_attribute_check_success(basic, basic.Attributes.ProductID)
+        basic_info_product_id = await self.read_single_attribute_check_success(basic.Attributes.ProductID)
 
         self.step(5)
         elements = attestation_resp.attestationElements

@@ -39,9 +39,8 @@ from mobly import asserts
 class TC_ACE_1_5(MatterBaseTest):
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, attribute=attribute)
         return current_fabric_index
 
     async def write_acl(self, acl: Clusters.AccessControl, th: ChipDeviceCtrl):
@@ -110,27 +109,23 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(7, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
         await self.read_single_attribute_check_success(
             dev_ctrl=self.th1, endpoint=0,
-            cluster=Clusters.Objects.Descriptor,
             attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
 
         self.print_step(8, "TH1 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
         await self.read_single_attribute_expect_error(
             dev_ctrl=self.th1, endpoint=0,
-            cluster=Clusters.Objects.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorID,
             error=Status.UnsupportedAccess)
 
         self.print_step(9, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
         await self.read_single_attribute_expect_error(
             dev_ctrl=self.th2, endpoint=0,
-            cluster=Clusters.Objects.Descriptor,
             attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
             error=Status.UnsupportedAccess)
 
         self.print_step(10, "TH2 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
         await self.read_single_attribute_check_success(
             dev_ctrl=self.th2, endpoint=0,
-            cluster=Clusters.Objects.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorID)
 
         self.print_step(11, "TH1 resets the ACLs to default value by writing DUT EP0")

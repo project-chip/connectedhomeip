@@ -56,22 +56,21 @@ class TC_ACE_1_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
     async def read_descriptor_expect_success(self, endpoint: int) -> None:
-        cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+        await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attribute)
 
     async def read_descriptor_expect_unsupported_access(self, endpoint: int) -> None:
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_expect_error(
-            endpoint=endpoint, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
+            endpoint=endpoint, attribute=attribute, error=Status.UnsupportedAccess)
 
     async def read_appcluster_expect_success(self) -> None:
-        await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.attribute)
+        await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=self.attribute)
 
     async def read_appcluster_expect_unsupported_access(self) -> None:
         await self.read_single_attribute_expect_error(
-            endpoint=self.endpoint, cluster=self.cluster, attribute=self.attribute, error=Status.UnsupportedAccess)
+            endpoint=self.endpoint, attribute=self.attribute, error=Status.UnsupportedAccess)
 
     async def read_wildcard_endpoint(self, attribute: object) -> object:
         return await self.default_controller.ReadAttribute(self.dut_node_id, [(attribute)])

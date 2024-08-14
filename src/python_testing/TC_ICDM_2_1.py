@@ -81,7 +81,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         return bin(number).count("1")
 
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=attribute)
 
     async def _wildcard_cluster_read(self):
         return await self.default_controller.ReadAttribute(self.dut_node_id, [(kRootEndpointId, cluster)])

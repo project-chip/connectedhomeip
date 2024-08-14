@@ -117,11 +117,11 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
-        th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         self.step(2)
-        th_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_vid = await self.read_single_attribute_check_success(attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         self.step(3)
-        th_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_pid = await self.read_single_attribute_check_success(attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
 
         self.step(4)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
@@ -288,7 +288,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             time.sleep(30)
 
         self.step(28)
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics_new = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         # TODO: this should be mocked too.
         if not self.is_ci:
             asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),

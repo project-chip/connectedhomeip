@@ -807,7 +807,7 @@ class TestInfo:
     pics: list[str]
 
 
-class MatterBaseTest(base_test.BaseTestClass):
+class MatterBaseTestSupport(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -974,7 +974,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_check_success(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -983,6 +983,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
+        cluster = get_cluster_from_attribute(attribute)
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
@@ -1005,7 +1006,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attr_ret
 
     async def read_single_attribute_expect_error(
-            self, cluster: object, attribute: object,
+            self, attribute: object,
             error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -1015,6 +1016,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
+        cluster = get_cluster_from_attribute(attribute)
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
@@ -1763,6 +1765,14 @@ def per_node_test(body):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+
+
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
     try:
         return cluster in wildcard.attributes[endpoint]
@@ -1795,7 +1805,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
 
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
         return attribute.attribute_id in attr_list

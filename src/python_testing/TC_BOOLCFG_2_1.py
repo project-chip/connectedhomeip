@@ -34,10 +34,6 @@ from mobly import asserts
 
 
 class TC_BOOLCFG_2_1(MatterBaseTest):
-    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanStateConfiguration
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_BOOLCFG_2_1(self) -> str:
         return "[TC-BOOLCFG-2.1] Attributes with DUT as Server"
 
@@ -75,13 +71,13 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step(2)
-        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         number_of_supported_levels = 0
 
         self.step(3)
         if attributes.SupportedSensitivityLevels.attribute_id in attribute_list:
-            number_of_supported_levels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+            number_of_supported_levels = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
             asserts.assert_less_equal(number_of_supported_levels, 10, "SupportedSensitivityLevels attribute is out of range")
             asserts.assert_greater_equal(number_of_supported_levels, 2, "SupportedSensitivityLevels attribute is out of range")
         else:
@@ -89,7 +85,7 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
         self.step(4)
         if attributes.CurrentSensitivityLevel.attribute_id in attribute_list:
-            current_sensitivity_level_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
+            current_sensitivity_level_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
             asserts.assert_less_equal(current_sensitivity_level_dut, number_of_supported_levels,
                                       "CurrentSensitivityLevel is not in valid range")
         else:
@@ -97,7 +93,7 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
         self.step(5)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            default_sensitivity_level_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
+            default_sensitivity_level_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
             asserts.assert_less_equal(default_sensitivity_level_dut, number_of_supported_levels,
                                       "DefaultSensitivityLevel is not in valid range")
         else:
@@ -105,35 +101,35 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
         self.step(6)
         if attributes.AlarmsActive.attribute_id in attribute_list:
-            alarms_active_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            alarms_active_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(alarms_active_dut & ~all_alarm_mode_bitmap_bits, 0, "AlarmsActive is not in valid range")
         else:
             logging.info("Test step skipped")
 
         self.step(7)
         if attributes.AlarmsSuppressed.attribute_id in attribute_list:
-            alarms_suppressed_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
+            alarms_suppressed_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
             asserts.assert_equal(alarms_suppressed_dut & ~all_alarm_mode_bitmap_bits, 0, "AlarmsSuppressed is not in valid range")
         else:
             logging.info("Test step skipped")
 
         self.step(8)
         if attributes.AlarmsEnabled.attribute_id in attribute_list:
-            alarms_enabled_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsEnabled)
+            alarms_enabled_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsEnabled)
             asserts.assert_equal(alarms_enabled_dut & ~all_alarm_mode_bitmap_bits, 0, "AlarmsEnabled is not in valid range")
         else:
             logging.info("Test step skipped")
 
         self.step(9)
         if attributes.AlarmsSupported.attribute_id in attribute_list:
-            alarms_supported_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
+            alarms_supported_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
             asserts.assert_equal(alarms_supported_dut & ~all_alarm_mode_bitmap_bits, 0, "AlarmsSupported is not in valid range")
         else:
             logging.info("Test step skipped")
 
         self.step(10)
         if attributes.SensorFault.attribute_id in attribute_list:
-            sensor_fault_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SensorFault)
+            sensor_fault_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SensorFault)
             asserts.assert_equal(sensor_fault_dut & ~all_sensor_fault_bitmap_bits, 0, "SensorFault is not in valid range")
         else:
             logging.info("Test step skipped")

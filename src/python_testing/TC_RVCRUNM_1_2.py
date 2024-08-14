@@ -51,10 +51,6 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
         self.runTags = [tag.value for tag in Clusters.RvcRunMode.Enums.ModeTag]
         self.supported_modes_dut = []
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcRunMode
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def pics_TC_RVCRUNM_1_2(self) -> list[str]:
         return ["RVCRUNM.S"]
 
@@ -68,7 +64,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
         if self.check_pics("RVCRUNM.S.A0000"):
             self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+            supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
             logging.info("SupportedModes: %s" % (supported_modes))
 
@@ -150,7 +146,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
         if self.check_pics("RVCRUNM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (current_mode))
             asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")

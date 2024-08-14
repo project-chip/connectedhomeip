@@ -98,7 +98,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the TimeZoneListMaxSize")
-        tz_list_size = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZoneListMaxSize)
+        tz_list_size = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.TimeZoneListMaxSize)
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
@@ -120,7 +120,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(8, "TH reads LocalTime")
-        await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+        await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(9, "TH waits for TimeZoneStatus event until th_utc + 5s")
         self.wait_for_tz_status(th_utc, 5, 3600, "Not/Real")
@@ -131,7 +131,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(11, "If tz_list_size > 1, TH reads LocalTime")
         if tz_list_size > 1:
-            await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+            await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(12, "if tz_list_size > 1, TH waits for a TimeZoneStatus event until th_utc + 20s")
         if tz_list_size > 1:

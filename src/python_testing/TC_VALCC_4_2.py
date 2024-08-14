@@ -35,10 +35,6 @@ from mobly import asserts
 
 
 class TC_VALCC_4_2(MatterBaseTest):
-    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ValveConfigurationAndControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_VALCC_4_2(self) -> str:
         return "[TC-VALCC-4.2] DefaultOpenDuration functionality with DUT as Server"
 
@@ -73,7 +69,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step("2a")
-        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+        defaultOpenDuration = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
 
         self.step("2b")
         if defaultOpenDuration is NullValue:
@@ -92,12 +88,12 @@ class TC_VALCC_4_2(MatterBaseTest):
             pass
 
         self.step(4)
-        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is not NullValue, "OpenDuration is null")
         asserts.assert_equal(open_duration_dut, defaultOpenDuration, "OpenDuration is not the expected value")
 
         self.step(5)
-        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is not NullValue, "RemainingDuration is null")
         asserts.assert_greater_equal(remaining_duration_dut, (defaultOpenDuration - 5),
                                      "RemainingDuration is not in the expected range")
@@ -107,7 +103,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         time.sleep(5)
 
         self.step(7)
-        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is not NullValue, "RemainingDuration is null")
         asserts.assert_greater_equal(remaining_duration_dut, (defaultOpenDuration - 10),
                                      "RemainingDuration is not in the expected range")
@@ -122,11 +118,11 @@ class TC_VALCC_4_2(MatterBaseTest):
             pass
 
         self.step(9)
-        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is NullValue, "OpenDuration is not null")
 
         self.step(10)
-        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
 
 

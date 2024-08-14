@@ -98,7 +98,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the DSTOffsetListMaxSize")
-        dst_list_size = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.DSTOffsetListMaxSize)
+        dst_list_size = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.DSTOffsetListMaxSize)
         asserts.assert_greater_equal(dst_list_size, 1, "Invalid dst list size")
 
         self.print_step(5, "TH sets two DST items if dst_list_size > 1")
@@ -118,7 +118,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             await self.send_set_dst_cmd(dst)
 
         self.print_step(7, "TH reads LocalTime")
-        await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+        await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(8, "TH waits for DSTStatus event until th_utc + 5s")
         self.wait_for_dst_status(th_utc, 5, True)
@@ -129,7 +129,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(10, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:
-            await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+            await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(11, "If dst_list_size > 1, TH waits for DSTStatus event until th_utc + 20s")
         if dst_list_size > 1:
@@ -141,7 +141,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(13, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:
-            await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+            await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(14, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 35s")
         if dst_list_size > 1:

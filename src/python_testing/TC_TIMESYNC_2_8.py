@@ -46,10 +46,6 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         # This test has potentially 6 15 s waits, so set timeout to 100
         return 100
 
-    async def read_ts_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
@@ -69,7 +65,8 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
     async def test_TC_TIMESYNC_2_8(self):
 
         # Time sync is required to be on endpoint 0 if it is present
-        self.endpoint = 0
+        asserts.assert_equal(self.matter_test_config.get(endpoint, 0), 0,
+                             "Time sync cluster is only allowed on endpoint 0, this test should not be run against other endpoints")
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -97,11 +94,11 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
             pass
 
         self.print_step(4, "Read UTCTime")
-        utc = await self.read_ts_attribute_expect_success(utc_attr)
+        utc = await self.read_single_attribute_check_success(utc_attr)
         compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(5, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(6, "Send SetDSTOffset command")
@@ -110,22 +107,22 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(7, "Read UTCTime")
-        utc = await self.read_ts_attribute_expect_success(utc_attr)
+        utc = await self.read_single_attribute_check_success(utc_attr)
         compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(8, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(9, "Wait 15s")
         time.sleep(15)
 
         self.print_step(10, "Read UTCTime")
-        utc = await self.read_ts_attribute_expect_success(utc_attr)
+        utc = await self.read_single_attribute_check_success(utc_attr)
         compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(11, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         asserts.assert_equal(local, NullValue, "LocalTime cannot be calculated since DST is empty")
 
         self.print_step(12, "Send SetDSTOffset command")
@@ -133,18 +130,18 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(13, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(14, "Wait 15s")
         time.sleep(15)
 
         self.print_step(15, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(16, "Read DSTOffsetListMaxSize")
-        dst_list_size = await self.read_ts_attribute_expect_success(attributes.DSTOffsetListMaxSize)
+        dst_list_size = await self.read_single_attribute_check_success(attributes.DSTOffsetListMaxSize)
 
         self.print_step(17, "Send multiple DST offsets")
         if dst_list_size > 1:
@@ -155,7 +152,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(18, "Read LocalTime")
         if dst_list_size > 1:
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(19, "Wait 15s")
@@ -164,7 +161,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(20, "Read LocalTime")
         if dst_list_size > 1:
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(21, "Wait 15s")
@@ -173,7 +170,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(22, "Read LocalTime")
         if dst_list_size > 1:
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
 
         self.print_step(23, "Wait 15s")
@@ -182,7 +179,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(24, "Read LocalTime")
         if dst_list_size > 1:
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             asserts.assert_equal(local, NullValue, "LocalTime cannot be calculated since DST is empty")
 
         self.print_step(25, "Send SetDSTOffset command")
@@ -190,7 +187,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(26, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(27, "Send SetDSTOffset command with DST starting in the future")
@@ -199,14 +196,14 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(28, "Read Localtime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=0), tolerance=timedelta(seconds=5))
 
         self.print_step(29, "Wait 15s")
         time.sleep(15)
 
         self.print_step(30, "Read Localtime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(31, "Send SetDSTOffset command")

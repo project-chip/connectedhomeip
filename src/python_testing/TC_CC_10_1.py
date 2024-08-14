@@ -195,11 +195,11 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("1d")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            ColorTempPhysicalMinMiredsValue = await self.read_single_attribute_check_success(cluster, attributes.ColorTempPhysicalMinMireds)
+            ColorTempPhysicalMinMiredsValue = await self.read_single_attribute_check_success(attributes.ColorTempPhysicalMinMireds)
 
         self.step("1e")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            ColorTempPhysicalMaxMiredsValue = await self.read_single_attribute_check_success(cluster, attributes.ColorTempPhysicalMaxMireds)
+            ColorTempPhysicalMaxMiredsValue = await self.read_single_attribute_check_success(attributes.ColorTempPhysicalMaxMireds)
 
         self.step("2a")
         if self.pics_guard(self.check_pics("CC.S.F00")):
@@ -245,7 +245,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("2g")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            ColorTemperatureMireds = await self.read_single_attribute_check_success(cluster, attributes.ColorTemperatureMireds)
+            ColorTemperatureMireds = await self.read_single_attribute_check_success(attributes.ColorTemperatureMireds)
             asserts.assert_less_equal(ColorTemperatureMireds, ColorTempPhysicalMaxMiredsValue,
                                       "ColorTemperatureMireds is not less than or equal to ColorTempPhysicalMaxMireds")
             asserts.assert_greater_equal(ColorTemperatureMireds, ColorTempPhysicalMinMiredsValue,
@@ -337,7 +337,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("5c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            CurrentSaturation = await self.read_single_attribute_check_success(cluster, attributes.CurrentSaturation)
+            CurrentSaturation = await self.read_single_attribute_check_success(attributes.CurrentSaturation)
             asserts.assert_less_equal(CurrentSaturation, 0xFE, "CurrentSaturation is above limit")
             asserts.assert_greater_equal(CurrentSaturation, 0xF6, "CurrentSaturation is below limit")
 
@@ -414,7 +414,7 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("7c")
         if self.pics_guard(self.check_pics("CC.S.F04")):
-            ColorTemperatureMireds = await self.read_single_attribute_check_success(cluster, attributes.ColorTemperatureMireds)
+            ColorTemperatureMireds = await self.read_single_attribute_check_success(attributes.ColorTemperatureMireds)
             asserts.assert_less_equal(ColorTemperatureMireds,
                                       ColorTempPhysicalMaxMiredsValue, "ColorTemperatureMireds is above limit")
             asserts.assert_greater_equal(ColorTemperatureMireds,
@@ -493,17 +493,17 @@ class TC_CC_10_1(MatterBaseTest):
 
         self.step("9c")
         if self.pics_guard(self.check_pics("CC.S.F02")):
-            ColorLoopActive = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopActive)
+            ColorLoopActive = await self.read_single_attribute_check_success(attributes.ColorLoopActive)
             asserts.assert_equal(ColorLoopActive, 1, "ColorLoopActive is not 1")
 
         self.step("9d")
         if self.pics_guard(self.check_pics("CC.S.F02")):
-            ColorLoopDirection = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopDirection)
+            ColorLoopDirection = await self.read_single_attribute_check_success(attributes.ColorLoopDirection)
             asserts.assert_equal(ColorLoopDirection, 1, "ColorLoopDirection is not 1")
 
         self.step("9e")
         if self.pics_guard(self.check_pics("CC.S.F02")):
-            ColorLoopTime = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopTime)
+            ColorLoopTime = await self.read_single_attribute_check_success(attributes.ColorLoopTime)
             asserts.assert_equal(ColorLoopTime, 5, "ColorLoopTime is not 5")
 
 

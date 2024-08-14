@@ -110,7 +110,7 @@ class TC_ICDM_3_3(MatterBaseTest):
     # Class Helper functions
     #
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
@@ -303,7 +303,7 @@ class TC_ICDM_3_3(MatterBaseTest):
                                  "The RegisteredClients list must be empty. List has the wrong size.")
             self.step(7)
             ac = Clusters.AccessControl
-            previousAcl = await self.read_single_attribute_check_success(cluster=ac, attribute=ac.Attributes.Acl)
+            previousAcl = await self.read_single_attribute_check_success(attribute=ac.Attributes.Acl)
             newAcls = []
 
             # Set Admin permissions on Access Control cluster

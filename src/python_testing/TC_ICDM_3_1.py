@@ -58,7 +58,7 @@ class TC_ICDM_3_1(MatterBaseTest):
     # Class Helper functions
     #
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)

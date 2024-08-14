@@ -35,10 +35,6 @@ from mobly import asserts
 
 
 class TC_OCC_2_3(MatterBaseTest):
-    async def read_occ_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.OccupancySensing
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_OCC_2_3(self) -> str:
         return "[TC-OCC-2.3] HoldTime Backward Compatibility Test with server as DUT"
 
@@ -66,17 +62,17 @@ class TC_OCC_2_3(MatterBaseTest):
 
         self.step(1)
         attributes = Clusters.OccupancySensing.Attributes
-        attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(2)
         if attributes.HoldTime.attribute_id in attribute_list:
-            occupancy_hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
+            occupancy_hold_time_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.HoldTime)
         else:
             logging.info("No HoldTime attribute supports. Terminate this test case")
 
         self.step(3)
         if attributes.OccupancySensorType.attribute_id in attribute_list:
-            occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
+            occupancy_sensor_type_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
 
             asserts.assert_less_equal(occupancy_sensor_type_dut, 3, "OccupancySensorType attribute is out of range")
             asserts.assert_greater_equal(occupancy_sensor_type_dut, 0, "OccupancySensorType attribute is out of range")
@@ -85,7 +81,7 @@ class TC_OCC_2_3(MatterBaseTest):
 
         if occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir:
             self.step(4)
-            occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+            occupancy_pir_otou_delay_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
 
             asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut,
                                  "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
@@ -94,19 +90,19 @@ class TC_OCC_2_3(MatterBaseTest):
 
         elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic:
             self.step(4)
-            occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+            occupancy_pir_otou_delay_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
 
             asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut,
                                  "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
             self.step(5)
-            occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+            occupancy_us_otou_delay_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
 
             asserts.assert_equal(occupancy_us_otou_delay_dut, occupancy_hold_time_dut,
                                  "HoldTime attribute value is not equal to UltrasonicOccupiedToUnoccupiedDelay")
             self.skip_step(6)
 
         elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic:
-            occupancy_pirus_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+            occupancy_pirus_otou_delay_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
 
             asserts.assert_equal(occupancy_pirus_otou_delay_dut, occupancy_hold_time_dut,
                                  "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
@@ -115,7 +111,7 @@ class TC_OCC_2_3(MatterBaseTest):
             self.skip_step(4)
             self.skip_step(5)
             self.step(6)
-            occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
+            occupancy_phy_otou_delay_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
 
             asserts.assert_equal(occupancy_phy_otou_delay_dut, occupancy_hold_time_dut,
                                  "HoldTime attribute value is not equal to PhysicalContactOccupiedToUnoccupiedDelay")

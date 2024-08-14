@@ -68,7 +68,6 @@ class TC_MYTEST_1_1(MatterBaseTest):
 self.default_controlller</span>
             node_id = self.dut_node_id, <span style="color:#38761D"># defaults to
 self.dut_node_id</span>
-            cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorName,
             endpoint = 0, <span style="color:#38761D">#defaults to 0</span>
         )

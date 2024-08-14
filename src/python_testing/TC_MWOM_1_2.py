@@ -35,11 +35,6 @@ from mobly import asserts
 
 
 class TC_MWOM_1_2(MatterBaseTest):
-
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.MicrowaveOvenMode
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_MWOM_1_2(self) -> str:
         return "[TC-MWOM-1.2] Cluster attributes with DUT as Server"
 
@@ -67,7 +62,7 @@ class TC_MWOM_1_2(MatterBaseTest):
         self.step(1)
 
         self.step(2)
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SupportedModes)
         asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
         asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
         modes = set([m.mode for m in supported_modes])
@@ -110,7 +105,7 @@ class TC_MWOM_1_2(MatterBaseTest):
         asserts.assert_true(normal_present, "SupportedModes does not have an entry of Normal(0x4000)")
 
         self.step(3)
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentMode)
         logging.info("CurrentMode: %s" % current_mode)
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 

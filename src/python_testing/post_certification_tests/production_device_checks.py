@@ -128,7 +128,7 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
     async def test_TestEventTriggersCheck(self):
         self.connect_over_pase(self.default_controller)
         gd = Clusters.GeneralDiagnostics
-        ret = await self.read_single_attribute_check_success(cluster=gd, attribute=gd.Attributes.TestEventTriggersEnabled)
+        ret = await self.read_single_attribute_check_success(attribute=gd.Attributes.TestEventTriggersEnabled)
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
 
 
@@ -137,9 +137,9 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     async def setup_class(self):
         self.connect_over_pase(self.default_controller)
         bi = Clusters.BasicInformation
-        self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
-        self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
-        self.software_version = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.SoftwareVersion)
+        self.vid = await self.read_single_attribute_check_success(attribute=bi.Attributes.VendorID)
+        self.pid = await self.read_single_attribute_check_success(attribute=bi.Attributes.ProductID)
+        self.software_version = await self.read_single_attribute_check_success(attribute=bi.Attributes.SoftwareVersion)
         self.url = fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST
 
         self.vid_str = f'vid = 0x{self.vid:04X}'

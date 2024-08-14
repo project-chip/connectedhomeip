@@ -146,7 +146,7 @@ class TC_SC_3_6(MatterBaseTest):
             fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
-            current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            current_fabric_index = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
             for fabric in fabrics:
                 if fabric.fabricIndex == current_fabric_index:
                     continue

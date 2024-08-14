@@ -32,11 +32,6 @@ from mobly import asserts
 
 
 class TC_WHM_1_2(MatterBaseTest):
-
-    async def read_mode_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.WaterHeaterMode
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_WHM_1_2(self) -> str:
         return "[TC-WHM-1.2] Cluster attributes with DUT as Server"
 
@@ -64,7 +59,7 @@ class TC_WHM_1_2(MatterBaseTest):
         self.step(1)
 
         self.step(2)
-        supported_modes = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SupportedModes)
         asserts.assert_greater_equal(len(supported_modes), 2,
                                      "SupportedModes must have at least 2 entries!")
         asserts.assert_less_equal(len(supported_modes), 255,
@@ -143,7 +138,7 @@ class TC_WHM_1_2(MatterBaseTest):
                                   "SupportedModes cannot have more than one instance of Timed(0x4002)")
 
         self.step(3)
-        current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentMode)
         logging.info("CurrentMode: %s" % current_mode)
         asserts.assert_true(current_mode in modes,
                             "CurrentMode is not a supported mode!")

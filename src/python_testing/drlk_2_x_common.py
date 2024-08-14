@@ -29,8 +29,7 @@ from mobly import asserts
 
 class DRLK_COMMON:
     async def read_drlk_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.DoorLock
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attribute)
 
     async def write_drlk_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.DoorLock

@@ -39,19 +39,14 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
-
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_fan_mode(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.FanMode)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.FanMode)
 
     async def read_percent_setting(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentSetting)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.PercentSetting)
 
     async def read_percent_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentCurrent)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.PercentCurrent)
 
     async def write_fan_mode(self, endpoint, fan_mode) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.FanMode(fan_mode))])

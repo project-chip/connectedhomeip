@@ -84,10 +84,10 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH1 = TH1_fabric_admin_real.NewController(nodeId=TH1_nodeid)
 
         commissioned_fabric_count = await self.read_single_attribute_check_success(
-            cluster=opcreds, attribute=opcreds.Attributes.CommissionedFabrics)
+            attribute=opcreds.Attributes.CommissionedFabrics)
 
         supported_fabric_count = await self.read_single_attribute_check_success(
-            cluster=opcreds, attribute=opcreds.Attributes.SupportedFabrics)
+            attribute=opcreds.Attributes.SupportedFabrics)
 
         # Make sure we have space
         # TODO: Add step here to just remove extra fabrics if required.
@@ -99,7 +99,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             2, "TH0 reads the BasicCommissioningInfo field from the General commissioning cluster saves MaxCumulativeFailsafeSeconds as `failsafe_max`")
-        basic_commissioning_info = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.BasicCommissioningInfo)
+        basic_commissioning_info = await self.read_single_attribute_check_success(attribute=Clusters.GeneralCommissioning.Attributes.BasicCommissioningInfo)
         failsafe_max = basic_commissioning_info.maxCumulativeFailsafeSeconds
 
         self.print_step(3, "TH1 opens a PASE connection to the DUT")
@@ -160,16 +160,16 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH1_root_CA_malformed = writer.encoding
 
         self.print_step(9, "TH1 reads the trusted root cert list from the DUT. Save the list size as trusted_root_original_size")
-        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         trusted_root_original_size = len(trusted_root_list)
 
         self.print_step(
             10, "TH1 reads the NOCs attribute from the DUT using a non-fabric-filtered read. Save the list size as nocs_original_size")
-        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
+        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
         nocs_original_size = len(nocs)
 
         self.print_step(11, "TH1 reads the fabrics attribute from the DUT. Save the list size as fabrics_original_size")
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
+        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
         fabrics_original_size = len(fabrics)
 
         self.print_step(
@@ -183,7 +183,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                                  "Unexpected error adding trusted root cert with malformed signature")
         self.print_step(
             13, "TH1 reads the TrustedRootCertificate attribute and confirm it contains only trusted_root_original_size entries")
-        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(ret), trusted_root_original_size,
                              "Unexpected number of entries in the TrustedRootCertificates table")
 
@@ -194,7 +194,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             15, "TH1 reads the TrustedRootCertificate attribute and confirms it contains trusted_root_original_size + 1 entries")
-        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(ret), trusted_root_original_size + 1,
                              "Unexpected number of entries in the TrustedRootCertificates table")
 
@@ -205,7 +205,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             17, "TH1 reads the TrustedRootCertificate attribute and confirms it contains trusted_root_original_size + 1 entries")
-        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(ret), trusted_root_original_size + 1,
                              "Unexpected number of entries in the TrustedRootCertificates table")
 
@@ -220,7 +220,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             19, "TH1 reads the TrustedRootCertificate attribute and confirms it contains trusted_root_original_size + 1 entries")
-        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(ret), trusted_root_original_size + 1,
                              "Unexpected number of entries in the TrustedRootCertificates table")
 
@@ -233,7 +233,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                              "Unexpected error trying to write TrustedRootCertificate attribute")
 
         self.print_step(21, "TH1 reads the TrustedRootCertificates list from DUT | Verify that there is only one instance of Root CA Certificate in the list and that its content matches `Root_CA_Certificate_TH1`")
-        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        ret = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(ret), trusted_root_original_size + 1,
                              "Unexpected number of entries in the TrustedRootCertificates table")
 
@@ -288,7 +288,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error when adding NOC for a second time")
 
         self.print_step(26, "TH1 reads the NOCs attribute from DUT using a fabric-filtered read and saves the list as `NOCList`")
-        noc_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.NOCs)
+        noc_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.NOCs)
         asserts.assert_equal(len(noc_list), 1, "More than one NOC entry found for TH1")
         asserts.assert_equal(noc_list[0].noc, TH1_certs_real.nocBytes, "NOC for TH1 does not match supplied NOC")
         asserts.assert_equal(noc_list[0].icac, TH1_certs_real.icacBytes, "ICAC for TH1 does not match supplied ICAC")
@@ -303,7 +303,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             28, "TH1 reads the NOCs attribute from DUT. Verify the NOC has not been updated.")
-        noc_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.NOCs)
+        noc_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.NOCs)
         asserts.assert_equal(len(noc_list), 1, "More than one NOC entry found for TH1")
         asserts.assert_equal(noc_list[0].noc, TH1_certs_real.nocBytes, "NOC for TH1 does not match supplied NOC")
         asserts.assert_equal(noc_list[0].icac, TH1_certs_real.icacBytes, "ICAC for TH1 does not match supplied ICAC")
@@ -316,7 +316,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(30, "TH1 reads the Fabrics Attribute from DUT")
         fabrics = await self.read_single_attribute_check_success(
-            dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.Fabrics)
+            dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.Fabrics)
         asserts.assert_equal(len(fabrics), 1, "Unexpected number of fabrics returned")
 
         self.print_step(31, "Read the other fields from FabricDescriptorStruct")
@@ -356,18 +356,18 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                                         setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(34, "TH1 reads the TrustedRootCertificates list from DUT and verifies the TH1 root is not present")
-        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(trusted_root_list), trusted_root_original_size,
                              "TrustedRootCertificate was not properly removed from the list on ArmFailSafe expiration")
 
         self.print_step(
             35, "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered read and verifies that the list contains only nocs_original_size entries")
-        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
+        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
         asserts.assert_equal(len(nocs), nocs_original_size, "NOC list size does not match original")
 
         self.print_step(
             36, "TH1 reads the Fabrics attribute from the DUT using a non-fabric-filtered read and verifies that the list contains only fabric_original_size entries")
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
+        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
         asserts.assert_equal(len(fabrics), fabrics_original_size, "Fabric list size does not match original")
 
         self.print_step(37, "TH1 fully commissions DUT onto the fabric using a set of valid certificates")
@@ -375,22 +375,22 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             38, "TH1 reads the TrustedRootCertificates list from DUT and verify that there are trusted_root_original_size + 1 entries")
-        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
+        trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.TrustedRootCertificates)
         asserts.assert_equal(len(trusted_root_list), trusted_root_original_size + 1, "Unexpected number of root certificates")
 
         self.print_step(
             39, "TH1 reads the NOCs attribute from DUT using a non-fabric-filtered read and verifies that there are nocs_original_size + 1 entries")
-        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
+        nocs = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
         asserts.assert_equal(len(nocs), nocs_original_size+1, "Unexpected number of NOCs")
 
         self.print_step(
             40, "TH1 reads the Fabrics attribute from DUT using a non-fabric-filtered read and verifies that there are fabrics_original_size + 1 entries")
-        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
+        fabrics = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
         asserts.assert_equal(len(fabrics), fabrics_original_size+1, "Fabric list size is incorrect")
 
         self.print_step(41, "TH1 reads the ACL attribute from the Access Control cluster using a fabric-filtered read")
-        th1_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex)
-        acl = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=Clusters.AccessControl, attribute=Clusters.AccessControl.Attributes.Acl)
+        th1_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.CurrentFabricIndex)
+        acl = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, attribute=Clusters.AccessControl.Attributes.Acl)
         # a| * Verify that the returned list includes an entry with:
         # Fabric index of `FabricIndex_TH1`
         # Administer privilege (5)
@@ -443,7 +443,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(48, "Read the Fabrics List from DUT using a non-fabric-filtered read, verify fabrics_original_size + 2, check labels")
         fabrics = await self.read_single_attribute_check_success(
-            dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
+            dev_ctrl=TH1, node_id=newNodeId, attribute=opcreds.Attributes.Fabrics, fabric_filtered=False)
         asserts.assert_equal(len(fabrics), fabrics_original_size + 2, "Unexpected number of fabrics")
         th1_fabric = [x for x in fabrics if x.vendorID == TH1_vid]
         th2_fabric = [x for x in fabrics if x.vendorID == TH2_vid]
@@ -558,7 +558,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(
             65, "TH1 reads the TrustedRootCertificates list from DUT | Verify the list contains `trusted_root_original_size` + 2 entries")
-        resp = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, dev_ctrl=TH1, node_id=newNodeId)
+        resp = await self.read_single_attribute_check_success(attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, dev_ctrl=TH1, node_id=newNodeId)
         asserts.assert_equal(len(resp), trusted_root_original_size + 2, "Unexpected number of trusted roots")
 
         self.print_step(66, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max| Verify that the DUT sends ArmFailSafeResponse Command to TH1 with field ErrorCode as 'OK'(0)")
@@ -604,7 +604,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(72, "TH2 reads its fabric index from the CurrentFabricIndex attribute and saves as FabricIndex_TH2")
         fabric_index_th2 = await self.read_single_attribute_check_success(
-            cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex, dev_ctrl=TH2, node_id=TH2_dut_nodeid)
+            attribute=opcreds.Attributes.CurrentFabricIndex, dev_ctrl=TH2, node_id=TH2_dut_nodeid)
 
         self.print_step(73, "TH2 sends RemoveFabric command with Fabric Index as FabricIndexTH2 + 5 (Invalid Fabric Index) to DUT | Verify that DUT sends NOCResponse Command with StatusCode of InvalidFabricIndex")
         cmd = opcreds.Commands.RemoveFabric(fabric_index_th2 + 5)
@@ -612,12 +612,12 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         asserts.assert_equal(resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidFabricIndex)
 
         self.print_step(74, "TH2 reads the Fabrics List from DUT using a non-fabric-filtered read")
-        resp = await self.read_single_attribute_check_success(cluster=opcreds, attribute=opcreds.Attributes.Fabrics, dev_ctrl=TH2, node_id=TH2_dut_nodeid, fabric_filtered=False)
+        resp = await self.read_single_attribute_check_success(attribute=opcreds.Attributes.Fabrics, dev_ctrl=TH2, node_id=TH2_dut_nodeid, fabric_filtered=False)
         asserts.assert_equal(len(resp), fabrics_original_size + 2, "Unexpected number of fabrics on device")
 
         self.print_step(75, "TH1 reads its fabric index from the CurrentFabricIndex attribute and saves as FabricIndex_TH1")
         fabric_index_th1 = await self.read_single_attribute_check_success(
-            cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex, dev_ctrl=TH1, node_id=newNodeId)
+            attribute=opcreds.Attributes.CurrentFabricIndex, dev_ctrl=TH1, node_id=newNodeId)
 
         self.print_step(
             76, "TH0 sends RemoveFabric command with Fabric Index as FabricIndex_TH1")

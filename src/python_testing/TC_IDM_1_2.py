@@ -144,7 +144,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 if not members:
                     continue
 
-                dut_supported_ids = await self.read_single_attribute_check_success(cluster=cluster, endpoint=i, attribute=cluster.Attributes.AcceptedCommandList)
+                dut_supported_ids = await self.read_single_attribute_check_success(endpoint=i, attribute=cluster.Attributes.AcceptedCommandList)
                 all_supported_cmds = list(filter(None, [client_cmd(x[1]) for x in members]))
                 all_supported_ids = [x.command_id for x in all_supported_cmds]
                 unsupported_commands = list(set(all_supported_ids) - set(dut_supported_ids))

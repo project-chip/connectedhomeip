@@ -29,12 +29,12 @@ class EnergyReportingBaseTestHelper:
     async def read_epm_attribute_expect_success(self, attribute: str = "", endpoint: int = None, ):
         cluster = Clusters.Objects.ElectricalPowerMeasurement
         full_attr = getattr(cluster.Attributes, attribute)
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=full_attr)
 
     async def read_eem_attribute_expect_success(self, attribute: str = "", endpoint: int = None):
         cluster = Clusters.Objects.ElectricalEnergyMeasurement
         full_attr = getattr(cluster.Attributes, attribute)
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=full_attr)
 
     def check_value_in_range(self, attribute: str, value: int, lower_value: int, upper_value: int):
         asserts.assert_greater_equal(value, lower_value,

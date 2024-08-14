@@ -92,20 +92,20 @@ class TC_LVL_2_3(MatterBaseTest):
         lvl = Clusters.LevelControl
 
         self.step(2)
-        feature_map = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.FeatureMap)
-        attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
+        feature_map = await self.read_single_attribute_check_success(attribute=lvl.Attributes.FeatureMap)
+        attributes = await self.read_single_attribute_check_success(attribute=lvl.Attributes.AttributeList)
 
         self.step("3a")
-        attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
+        attributes = await self.read_single_attribute_check_success(attribute=lvl.Attributes.AttributeList)
 
         if lvl.Attributes.MaxLevel.attribute_id in attributes:
-            max_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MaxLevel)
+            max_level = await self.read_single_attribute_check_success(attribute=lvl.Attributes.MaxLevel)
         else:
             max_level = 254
 
         self.step("3b")
         if lvl.Attributes.MinLevel.attribute_id in attributes:
-            min_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MinLevel)
+            min_level = await self.read_single_attribute_check_success(attribute=lvl.Attributes.MinLevel)
         else:
             min_level = 1
 
@@ -117,7 +117,7 @@ class TC_LVL_2_3(MatterBaseTest):
         time.sleep(1)
 
         self.step(5)
-        start_current_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.CurrentLevel)
+        start_current_level = await self.read_single_attribute_check_success(attribute=lvl.Attributes.CurrentLevel)
 
         self.step(6)
         sub_handler = ClusterAttributeChangeAccumulator(lvl)

@@ -33,10 +33,6 @@ from mobly import asserts
 
 
 class TC_OCC_2_2(MatterBaseTest):
-    async def read_occ_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.OccupancySensing
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_OCC_2_2(self) -> str:
         return "[TC-OCC-2.2] OccupancySensorTypeBitmap and OccupancySensorType interdependency with server as DUT"
 
@@ -60,16 +56,16 @@ class TC_OCC_2_2(MatterBaseTest):
         endpoint = self.user_params.get("endpoint", 1)
 
         attributes = Clusters.OccupancySensing.Attributes
-        feature_map = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         self.step(1)
-        attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(2)
         # OccupancySensorType will be determined by FeatureMap matching table at 2.7.6.2.
         asserts.assert_in(attributes.OccupancySensorType.attribute_id, attribute_list,
                           "OccupancySensorType attribute is a mandatory attribute.")
-        occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
+        occupancy_sensor_type_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
 
         # For validation purposes, 2.7.6.2 table describes what feature flags map to what type of sensors
         TypeEnum = Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum
@@ -108,7 +104,7 @@ class TC_OCC_2_2(MatterBaseTest):
         asserts.assert_in(attributes.OccupancySensorTypeBitmap.attribute_id, attribute_list,
                           "OccupancySensorTypeBitmap attribute is a mandatory attribute.")
 
-        occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorTypeBitmap)
+        occupancy_sensor_type_bitmap_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OccupancySensorTypeBitmap)
 
         # Feature map must match the sensor type bitmap
         must_match_bits = [

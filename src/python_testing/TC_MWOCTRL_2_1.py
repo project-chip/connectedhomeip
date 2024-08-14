@@ -38,11 +38,6 @@ from mobly import asserts
 
 
 class TC_MWOCTRL_2_1(MatterBaseTest):
-
-    async def read_mwoctrl_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.MicrowaveOvenControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def set_cook_time_expect_success(self, endpoint, value):
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
         try:
@@ -60,7 +55,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
 
     async def read_and_check_cook_time_value(self, endpoint, value):
         attributes = Clusters.MicrowaveOvenControl.Attributes
-        cooktime = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CookTime)
+        cooktime = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CookTime)
         asserts.assert_equal(cooktime, value, "Cooktime value not as expected")
 
     def desc_TC_MWOCTRL_2_1(self) -> str:
@@ -105,12 +100,12 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         attributes = Clusters.MicrowaveOvenControl.Attributes
 
         self.step(2)
-        maxCookTime = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxCookTime)
+        maxCookTime = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.MaxCookTime)
         asserts.assert_greater_equal(maxCookTime, 1, "maxCookTime is less than 1")
         asserts.assert_less_equal(maxCookTime, 86400, "maxCookTime is greater than 86400")
 
         self.step(3)
-        cookTime = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CookTime)
+        cookTime = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CookTime)
         asserts.assert_greater_equal(cookTime, 1, "cookTime is less than 1")
         asserts.assert_less_equal(cookTime, maxCookTime, "cookTime is greater than maxCookTime")
 
@@ -135,7 +130,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
 
         self.step(10)
         if self.pics_guard(self.check_pics("MWOCTRL.S.F01")):
-            await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.WattRating)
+            await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.WattRating)
 
         self.step(11)
         await self.set_bad_cook_time_value_expect_failure(endpoint, 0)

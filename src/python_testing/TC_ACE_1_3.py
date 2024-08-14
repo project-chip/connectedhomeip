@@ -50,13 +50,13 @@ class TC_ACE_1_3(MatterBaseTest):
     async def read_descriptor_expect_success(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, attribute=attribute)
 
     async def read_descriptor_expect_unsupported_access(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_expect_error(
-            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
+            dev_ctrl=th, endpoint=0, attribute=attribute, error=Status.UnsupportedAccess)
 
     def desc_TC_ACE_1_3(self) -> str:
         return "[TC-ACE-1.3] Subjects"

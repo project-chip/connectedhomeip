@@ -40,11 +40,6 @@ from mobly import asserts
 
 
 class TC_MWOCTRL_2_4(MatterBaseTest):
-
-    async def read_mwoctrl_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.MicrowaveOvenControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_MWOCTRL_2_4(self) -> str:
         return "[TC-MWOCTRL-2.4] WATTS functionality with DUT as Server"
 
@@ -71,11 +66,9 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
-        feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         features = Clusters.MicrowaveOvenControl.Bitmaps.Feature
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
-
-        feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         only_watts_supported = feature_map == features.kPowerInWatts
 
@@ -85,11 +78,11 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             return
 
         self.step(2)
-        supportedWattsList = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedWatts)
+        supportedWattsList = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SupportedWatts)
         asserts.assert_true(len(supportedWattsList) > 0, "SupportedWatts list is empty")
 
         self.step(3)
-        selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
+        selectedWattIndex = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
         logging.info("SelectedWattIndex is %s" % selectedWattIndex)
         asserts.assert_true(selectedWattIndex >= 0 and selectedWattIndex < len(
             supportedWattsList), "SelectedWattIndex is out of range")
@@ -103,7 +96,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             pass
 
         self.step(5)
-        selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
+        selectedWattIndex = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
         asserts.assert_true(selectedWattIndex == newWattIndex, "SelectedWattIndex was not correctly set")
 
 
