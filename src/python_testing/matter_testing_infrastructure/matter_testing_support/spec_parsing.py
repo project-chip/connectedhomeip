@@ -525,6 +525,7 @@ def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirec
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
     files = glob.glob(f'{dir}/*.xml')
+    logging.debug(f'Searching for XML files in directory: {dir}')
     if not files:
         raise SpecParsingException(f'No data model files found in specified directory {dir}')
 
