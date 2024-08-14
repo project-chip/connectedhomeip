@@ -146,7 +146,7 @@ void ThermostatAtomicWriteManager::OnTimerExpired(EndpointId endpoint)
     {
 
         auto atomicWriteState = mAtomicWriteSessions[i];
-        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.endpointId == endpoint)
+        if (atomicWriteState.state == AtomicWriteState::Open && atomicWriteState.endpointId == endpoint)
         {
             if (mDelegate != nullptr)
             {
@@ -185,7 +185,7 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
 
     if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteSessions[ep].state == kAtomicWriteState_Open;
+        inAtomicWrite = mAtomicWriteSessions[ep].state == AtomicWriteState::Open;
     }
     return inAtomicWrite;
 }
@@ -352,7 +352,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
     if (status == Status::Success)
     {
-        SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
+        SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), AtomicWriteState::Open);
         timeout          = std::min(timeoutRequest, timeout);
         response.timeout = MakeOptional(timeout.count());
         ScheduleTimer(endpoint, timeout);
@@ -481,7 +481,7 @@ bool ThermostatAtomicWriteManager::RollbackWrite(chip::app::CommandHandler * com
 void ThermostatAtomicWriteManager::ResetWrite(EndpointId endpoint)
 {
     ClearTimer(endpoint);
-    SetWriteState(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
+    SetWriteState(endpoint, ScopedNodeId(), AtomicWriteState::Closed);
 }
 
 void ThermostatAtomicWriteManager::ResetWrite(FabricIndex fabricIndex)
@@ -489,7 +489,7 @@ void ThermostatAtomicWriteManager::ResetWrite(FabricIndex fabricIndex)
     for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
         auto atomicWriteState = mAtomicWriteSessions[i];
-        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        if (atomicWriteState.state == AtomicWriteState::Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             ResetWrite(atomicWriteState.endpointId);
         }

@@ -28,10 +28,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-enum AtomicWriteState
+enum class AtomicWriteState
 {
-    kAtomicWriteState_Closed = 0,
-    kAtomicWriteState_Open,
+    Closed = 0,
+    Open,
 };
 
 class ThermostatAtomicWriteManager : public AtomicWriteManager
@@ -158,7 +158,7 @@ private:
 
     struct AtomicWriteSession
     {
-        AtomicWriteState state = kAtomicWriteState_Closed;
+        AtomicWriteState state = AtomicWriteState::Closed;
         ScopedNodeId nodeId    = ScopedNodeId();
         EndpointId endpointId  = kInvalidEndpointId;
     };
