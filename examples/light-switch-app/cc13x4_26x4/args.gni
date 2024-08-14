@@ -41,7 +41,7 @@ openthread_external_platform =
 chip_openthread_target =
     "${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert"
 
-# Disable CHIP Logging
+# Enable CHIP Logging
 chip_progress_logging = true
 chip_detail_logging = true
 chip_automation_logging = true
