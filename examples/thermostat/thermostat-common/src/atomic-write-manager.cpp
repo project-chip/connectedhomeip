@@ -247,15 +247,14 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
         return false;
     }
 
-    bool inAtomicWrite = false;
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteSessions[ep].state == AtomicWriteState::Open;
+        return mAtomicWriteSessions[ep].state == AtomicWriteState::Open;
     }
-    return inAtomicWrite;
+    return false;
 }
 
 bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attributeId,
@@ -315,8 +314,6 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
     {
         return false;
     }
-
-    auto timeoutRequest = System::Clock::Milliseconds16(commandData.timeout.Value());
 
     bool requestedPresets = false, requestedSchedules = false;
     auto maximumTimeout = System::Clock::Milliseconds16(0);
@@ -393,6 +390,7 @@ bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * comman
         DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
     if (status == Status::Success)
     {
+        auto timeoutRequest = System::Clock::Milliseconds16(commandData.timeout.Value());
         SetWriteState(endpoint, GetSourceScopedNodeId(commandObj), AtomicWriteState::Open);
         // Take the smaller of the timeout requested by the client or the  maximum the server is willing to allow
         auto timeout     = std::min(timeoutRequest, maximumTimeout);
