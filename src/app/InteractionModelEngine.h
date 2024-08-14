@@ -418,6 +418,13 @@ private:
     friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
+    struct PathInformation
+    {
+        bool isEmptyExpansion = true;
+        bool hasValidPath     = false;
+        size_t pathCount      = 0;
+    };
+
     void OnDone(CommandResponseSender & apResponderObj) override;
     void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
@@ -448,24 +455,22 @@ private:
      *
      * aRequestedAttributePathCount will be updated to reflect the number of attribute paths in the request.
      *
-     *
      */
     CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aPathsIsNotEmpty,
-                                   bool & aHasValidAttributePath, size_t & aRequestedAttributePathCount);
+                                   AttributePathIBs::Parser & aAttributePathListParser, PathInformation & aPathInformation);
 
     /**
-     * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
-     * of concrete paths and walk each path to check if it has privileges to read that event.
+     * This parses the event path list to ensure it is well formed. If so, for each path in the list,
+     * it will expand to a list of concrete paths and walk each path to check if it has privileges to
+     * read that event.
      *
-     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege, aHasValidEventPath
-     * will be set to true. Otherwise, it will be set to false.
+     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege,
+     * aHasValidEventPath will be set to true. Otherwise, it will be set to false.
      *
      * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
      */
     static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                      EventPathIBs::Parser & aEventPathListParser, bool & aPathsIsNotEmpty,
-                                      bool & aHasValidEventPath, size_t & aRequestedEventPathCount);
+                                      EventPathIBs::Parser & aEventPathListParser, PathInformation & aPathInformation);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -487,8 +492,9 @@ private:
 
     /**
      * Called when Interaction Model receives a Timed Request message.  Errors processing
-     * the Timed Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * the Timed Request are handled entirely within this function. The caller pre-sets status to
+     * failure and the callee is expected to set it to success if it does not want an automatic
+     * status response message to be sent.
      */
     CHIP_ERROR OnTimedRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                               System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
@@ -561,14 +567,15 @@ private:
     }
 
     /**
-     * Verify and ensure (by killing oldest read handlers that make the resources used by the current fabric exceed the fabric
-     * quota)
-     * - If the subscription uses resources within the per subscription limit, this function will always success by evicting
-     * existing subscriptions.
-     * - If the subscription uses more than per subscription limit, this function will return PATHS_EXHAUSTED if we are running out
-     * of paths.
+     * Verify and ensure (by killing oldest read handlers that make the resources used by the current
+     * fabric exceed the fabric quota)
+     * - If the subscription uses resources within the per subscription limit, this function will
+     * always success by evicting existing subscriptions.
+     * - If the subscription uses more than per subscription limit, this function will return
+     * PATHS_EXHAUSTED if we are running out of paths.
      *
-     * After the checks above, we will try to ensure we have a free Readhandler for processing the subscription.
+     * After the checks above, we will try to ensure we have a free Readhandler for processing the
+     * subscription.
      *
      * @retval true when we have enough resources for the incoming subscription, false if not.
      */
@@ -576,25 +583,29 @@ private:
                                        size_t aRequestedEventPathCount);
 
     /**
-     * Verify and ensure (by killing oldest read handlers that make the resources used by the current fabric exceed the fabric
-     * quota) the resources for handling a new read transaction with the given resource requirments.
-     * - PASE sessions will be counted in a virtual fabric (i.e. kInvalidFabricIndex will be consided as a "valid" fabric in this
-     * function)
-     * - If the existing resources can serve this read transaction, this function will return Status::Success.
-     * - or if the resources used by read transactions in the fabric index meets the per fabric resource limit (i.e. 9 paths & 1
-     * read) after accepting this read request, this function will always return Status::Success by evicting existing read
-     * transactions from other fabrics which are using more than the guaranteed minimum number of read.
-     * - or if the resources used by read transactions in the fabric index will exceed the per fabric resource limit (i.e. 9 paths &
-     * 1 read) after accepting this read request, this function will return a failure status without evicting any existing
-     * transaction.
-     * - However, read transactions on PASE sessions won't evict any existing read transactions when we have already commissioned
-     * CHIP_CONFIG_MAX_FABRICS fabrics on the device.
+     * Verify and ensure (by killing oldest read handlers that make the resources used by the current
+     * fabric exceed the fabric quota) the resources for handling a new read transaction with the
+     * given resource requirments.
+     * - PASE sessions will be counted in a virtual fabric (i.e. kInvalidFabricIndex will be consided
+     * as a "valid" fabric in this function)
+     * - If the existing resources can serve this read transaction, this function will return
+     * Status::Success.
+     * - or if the resources used by read transactions in the fabric index meets the per fabric
+     * resource limit (i.e. 9 paths & 1 read) after accepting this read request, this function will
+     * always return Status::Success by evicting existing read transactions from other fabrics which
+     * are using more than the guaranteed minimum number of read.
+     * - or if the resources used by read transactions in the fabric index will exceed the per fabric
+     * resource limit (i.e. 9 paths & 1 read) after accepting this read request, this function will
+     * return a failure status without evicting any existing transaction.
+     * - However, read transactions on PASE sessions won't evict any existing read transactions when
+     * we have already commissioned CHIP_CONFIG_MAX_FABRICS fabrics on the device.
      *
      * @retval Status::Success: The read transaction can be accepted.
-     * @retval Status::Busy: The remaining resource is insufficient to handle this read request, and the accessing fabric for this
-     * read request will use more resources than we guaranteed, the client is expected to retry later.
-     * @retval Status::PathsExhausted: The attribute / event path pool is exhausted, and the read request is requesting more
-     * resources than we guaranteed.
+     * @retval Status::Busy: The remaining resource is insufficient to handle this read request, and
+     * the accessing fabric for this read request will use more resources than we guaranteed, the
+     * client is expected to retry later.
+     * @retval Status::PathsExhausted: The attribute / event path pool is exhausted, and the read
+     * request is requesting more resources than we guaranteed.
      */
     Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount, size_t aRequestedEventPathCount);
 
@@ -630,10 +641,12 @@ private:
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS >=
                       CHIP_CONFIG_MAX_FABRICS * (kMinSupportedPathsPerSubscription * kMinSupportedSubscriptionsPerFabric),
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS is too small to match the requirements of spec 8.5.1");
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS is too small to match the "
+                  "requirements of spec 8.5.1");
     static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS >=
                       CHIP_CONFIG_MAX_FABRICS * (kMinSupportedReadRequestsPerFabric * kMinSupportedPathsPerReadRequest),
-                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS is too small to match the requirements of spec 8.5.1");
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS is too small to match the "
+                  "requirements of spec 8.5.1");
     static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS >= CHIP_CONFIG_MAX_FABRICS * kMinSupportedSubscriptionsPerFabric,
                   "CHIP_IM_MAX_NUM_SUBSCRIPTIONS is too small to match the requirements of spec 8.5.1");
     static_assert(CHIP_IM_MAX_NUM_READS >= CHIP_CONFIG_MAX_FABRICS * kMinSupportedReadRequestsPerFabric,
@@ -667,8 +680,9 @@ private:
 
     int mMaxNumFabricsOverride = -1;
 
-    // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
-    // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
+    // We won't limit the handler used per fabric on platforms that are using heap for memory pools,
+    // so we introduces a flag to enforce such check based on the configured size. This flag is used
+    // for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -678,10 +692,11 @@ private:
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
-     * mNumOfSubscriptionsToResume tracks the number of subscriptions that the device will try to resume at its next resumption
-     * attempt. At boot up, the attempt will be at the highest min interval of all the subscriptions to resume.
-     * When the subscription timeout resumption feature is present, after the boot up attempt, the next attempt will be determined
-     * by ComputeTimeSecondsTillNextSubscriptionResumption.
+     * mNumOfSubscriptionsToResume tracks the number of subscriptions that the device will try to
+     * resume at its next resumption attempt. At boot up, the attempt will be at the highest min
+     * interval of all the subscriptions to resume. When the subscription timeout resumption feature
+     * is present, after the boot up attempt, the next attempt will be determined by
+     * ComputeTimeSecondsTillNextSubscriptionResumption.
      */
     int8_t mNumOfSubscriptionsToResume = 0;
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION

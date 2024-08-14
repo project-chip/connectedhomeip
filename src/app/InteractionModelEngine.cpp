@@ -462,16 +462,16 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
 }
 
 CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                                       AttributePathIBs::Parser & aAttributePathListParser, bool & aPathsIsNotEmpty,
-                                                       bool & aHasValidAttributePath, size_t & aRequestedAttributePathCount)
+                                                       AttributePathIBs::Parser & aAttributePathListParser,
+                                                       PathInformation & aPathInfo)
 {
     TLV::TLVReader pathReader;
     aAttributePathListParser.GetReader(&pathReader);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aPathsIsNotEmpty             = false;
-    aHasValidAttributePath       = false;
-    aRequestedAttributePathCount = 0;
+    aPathInfo.isEmptyExpansion = true;
+    aPathInfo.hasValidPath     = false;
+    aPathInfo.pathCount        = 0;
 
     while (CHIP_NO_ERROR == (err = pathReader.Next(TLV::AnonymousTag())))
     {
@@ -495,7 +495,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
-                aPathsIsNotEmpty = true;
+                aPathInfo.isEmptyExpansion = false;
                 // leave requestPath.entityId optional value unset to indicate wildcard
                 Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
                                                  .endpoint    = readPath.mEndpointId,
@@ -504,7 +504,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                        RequiredPrivilege::ForReadAttribute(readPath));
                 if (err == CHIP_NO_ERROR)
                 {
-                    aHasValidAttributePath = true;
+                    aPathInfo.hasValidPath = true;
                     break;
                 }
             }
@@ -513,7 +513,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
-            aPathsIsNotEmpty = true;
+            aPathInfo.isEmptyExpansion = false;
             if (ConcreteAttributePathExists(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
@@ -525,12 +525,11 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                        RequiredPrivilege::ForReadAttribute(concretePath));
                 if (err == CHIP_NO_ERROR)
                 {
-                    aHasValidAttributePath = true;
+                    aPathInfo.hasValidPath = true;
                 }
             }
         }
-
-        aRequestedAttributePathCount++;
+        aPathInfo.pathCount++;
     }
 
     if (err == CHIP_ERROR_END_OF_TLV)
@@ -641,16 +640,15 @@ static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathPa
 }
 
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                                   EventPathIBs::Parser & aEventPathListParser, bool & aPathsIsNotEmpty,
-                                                   bool & aHasValidEventPath, size_t & aRequestedEventPathCount)
+                                                   EventPathIBs::Parser & aEventPathListParser, PathInformation & aPathInfo)
 {
     TLV::TLVReader pathReader;
     aEventPathListParser.GetReader(&pathReader);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aPathsIsNotEmpty         = false;
-    aHasValidEventPath       = false;
-    aRequestedEventPathCount = 0;
+    aPathInfo.hasValidPath     = false;
+    aPathInfo.isEmptyExpansion = true;
+    aPathInfo.pathCount        = 0;
 
     while (CHIP_NO_ERROR == (err = pathReader.Next(TLV::AnonymousTag())))
     {
@@ -660,9 +658,9 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         EventPathParams eventPath;
         ReturnErrorOnFailure(path.ParsePath(eventPath));
 
-        ++aRequestedEventPathCount;
+        ++aPathInfo.pathCount;
 
-        if (aHasValidEventPath)
+        if (aPathInfo.hasValidPath)
         {
             // Can skip all the rest of the checking.
             continue;
@@ -672,14 +670,14 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         // access".  We need to do some expansion of wildcards to handle that.
         if (eventPath.HasWildcardEndpointId())
         {
-            for (uint16_t endpointIndex = 0; !aHasValidEventPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+            for (uint16_t endpointIndex = 0; !aPathInfo.hasValidPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)
             {
                 if (!emberAfEndpointIndexIsEnabled(endpointIndex))
                 {
                     continue;
                 }
-                aPathsIsNotEmpty = true;
-                aHasValidEventPath =
+                aPathInfo.isEmptyExpansion = false;
+                aPathInfo.hasValidPath =
                     HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), eventPath, aSubjectDescriptor);
             }
         }
@@ -687,8 +685,8 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
         {
             // No need to check whether the endpoint is enabled, because
             // emberAfFindEndpointType returns null for disabled endpoints.
-            aPathsIsNotEmpty   = true;
-            aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
+            aPathInfo.isEmptyExpansion = false;
+            aPathInfo.hasValidPath     = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
         }
     }
 
@@ -755,20 +753,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         }
 
         {
-            size_t requestedAttributePathCount = 0;
-            size_t requestedEventPathCount     = 0;
             AttributePathIBs::Parser attributePathListParser;
-            bool hasValidAttributePath     = false;
-            bool hasValidEventPath         = false;
-            bool hasNonEmptyAttributePaths = false;
-            bool hasNonEmptyEventPaths     = false;
+
+            PathInformation attributePathInfo;
+            PathInformation eventPathInfo;
 
             CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
             if (err == CHIP_NO_ERROR)
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
-                err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasNonEmptyAttributePaths,
-                                                             hasValidAttributePath, requestedAttributePathCount);
+                err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, attributePathInfo);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;
@@ -784,8 +778,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             if (err == CHIP_NO_ERROR)
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
-                err = ParseEventPaths(subjectDescriptor, eventPathListParser, hasNonEmptyEventPaths, hasValidEventPath,
-                                      requestedEventPathCount);
+                err                    = ParseEventPaths(subjectDescriptor, eventPathListParser, eventPathInfo);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;
@@ -796,7 +789,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            if (requestedAttributePathCount == 0 && requestedEventPathCount == 0)
+            if (attributePathInfo.pathCount == 0 && eventPathInfo.pathCount == 0)
             {
                 ChipLogError(InteractionModel,
                              "Subscription from [%u:" ChipLogFormatX64 "] has no attribute or event paths. Rejecting request.",
@@ -805,7 +798,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            if (!hasValidAttributePath && !hasValidEventPath && (hasNonEmptyEventPaths || hasNonEmptyAttributePaths))
+            if (!(attributePathInfo.hasValidPath || eventPathInfo.hasValidPath ||
+                  (attributePathInfo.isEmptyExpansion && eventPathInfo.isEmptyExpansion)))
             {
                 ChipLogError(InteractionModel,
                              "Subscription from [%u:" ChipLogFormatX64 "] has no access at all. Rejecting request.",
@@ -815,8 +809,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             }
 
             // The following cast is safe, since we can only hold a few tens of paths in one request.
-            if (!EnsureResourceForSubscription(apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount,
-                                               requestedEventPathCount))
+            if (!EnsureResourceForSubscription(apExchangeContext->GetSessionHandle()->GetFabricIndex(), attributePathInfo.pathCount,
+                                               eventPathInfo.pathCount))
             {
                 return Status::PathsExhausted;
             }
