@@ -5798,17 +5798,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace EcosystemInformation {
 namespace Attributes {
 
-namespace RemovedOn {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace RemovedOn
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);

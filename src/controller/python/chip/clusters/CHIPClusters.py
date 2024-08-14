@@ -13318,12 +13318,6 @@ class ChipClusters:
         "commands": {
         },
         "attributes": {
-            0x00000000: {
-                "attributeName": "RemovedOn",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000001: {
                 "attributeName": "DeviceDirectory",
                 "attributeId": 0x00000001,

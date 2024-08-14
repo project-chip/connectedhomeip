@@ -9395,7 +9395,6 @@ provisional cluster EcosystemInformation = 1872 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute access(read: manage) optional nullable epoch_us removedOn = 0;
   readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 1;
   readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;

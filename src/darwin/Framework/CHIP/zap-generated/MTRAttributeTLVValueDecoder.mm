@@ -17185,21 +17185,6 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
 {
     using namespace Clusters::EcosystemInformation;
     switch (aAttributeId) {
-    case Attributes::RemovedOn::Id: {
-        using TypeInfo = Attributes::RemovedOn::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::DeviceDirectory::Id: {
         using TypeInfo = Attributes::DeviceDirectory::TypeInfo;
         TypeInfo::DecodableType cppValue;

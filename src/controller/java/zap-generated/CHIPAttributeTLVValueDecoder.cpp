@@ -42973,29 +42973,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::EcosystemInformation;
         switch (aPath.mAttributeId)
         {
-        case Attributes::RemovedOn::Id: {
-            using TypeInfo = Attributes::RemovedOn::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Long";
-                std::string valueCtorSignature = "(J)V";
-                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                            jnivalue, value);
-            }
-            return value;
-        }
         case Attributes::DeviceDirectory::Id: {
             using TypeInfo = Attributes::DeviceDirectory::TypeInfo;
             TypeInfo::DecodableType cppValue;

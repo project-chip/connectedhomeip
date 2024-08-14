@@ -17237,7 +17237,6 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            RemovedOn(0L),
             DeviceDirectory(1L),
             LocationDirectory(2L),
             GeneratedCommandList(65528L),

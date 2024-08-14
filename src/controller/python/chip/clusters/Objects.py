@@ -47047,7 +47047,6 @@ class EcosystemInformation(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="removedOn", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
                 ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000002, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -47058,7 +47057,6 @@ class EcosystemInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    removedOn: 'typing.Union[None, Nullable, uint]' = None
     deviceDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]' = None
     locationDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -47125,22 +47123,6 @@ class EcosystemInformation(Cluster):
             fabricIndex: 'uint' = 0
 
     class Attributes:
-        @dataclass
-        class RemovedOn(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000750
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
-
         @dataclass
         class DeviceDirectory(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

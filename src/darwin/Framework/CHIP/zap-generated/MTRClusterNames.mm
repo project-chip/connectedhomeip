@@ -8342,10 +8342,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster EcosystemInformation attributes
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
-            result = @"RemovedOn";
-            break;
-
         case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
             result = @"DeviceDirectory";
             break;

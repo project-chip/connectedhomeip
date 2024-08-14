@@ -7490,10 +7490,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace EcosystemInformation {
 namespace Attributes {
 
-namespace RemovedOn {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace RemovedOn
-
 namespace DeviceDirectory {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace DeviceDirectory
