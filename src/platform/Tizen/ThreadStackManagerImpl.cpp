@@ -54,8 +54,11 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 
+#include <platform/Tizen/ErrorUtils.h>
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -394,22 +397,6 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
-uint16_t ThreadStackManagerImpl::_GetThreadVersion()
-{
-    int threadErr            = THREAD_ERROR_NONE;
-    thread_version_e version = 0;
-
-    VerifyOrExit(mIsInitialized, ChipLogError(DeviceLayer, "Thread stack not initialized"));
-
-    threadErr = thread_get_version(mThreadInstance, &version);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get thread version"));
-
-    ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
-
-exit:
-    return version;
-}
-
 ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceType()
 {
     VerifyOrReturnError(mIsInitialized, ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported,
@@ -528,6 +515,18 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
+
+    int threadErr = thread_get_version(mThreadInstance, &version);
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, TizenToChipError(threadErr),
+                        ChipLogError(DeviceLayer, "FAIL: Get thread version: %s", get_error_message(threadErr)));
+
+    ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)

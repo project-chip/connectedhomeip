@@ -178,7 +178,9 @@ ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t TizenThreadDriver::GetThreadVersion()
 {
-    return DeviceLayer::ThreadStackMgr().GetThreadVersion();
+    uint16_t version = 0;
+    DeviceLayer::ThreadStackMgr().GetThreadVersion(version);
+    return version;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

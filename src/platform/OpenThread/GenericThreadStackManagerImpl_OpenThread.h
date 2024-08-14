@@ -94,7 +94,6 @@ protected:
                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished();
     void _ErasePersistentInfo();
-    uint16_t _GetThreadVersion();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
@@ -112,6 +111,7 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyFull();
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetThreadVersion(uint16_t & version);
     void _ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart();

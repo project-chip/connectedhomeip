@@ -325,7 +325,9 @@ ThreadCapabilities GenericThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t GenericThreadDriver::GetThreadVersion()
 {
-    return ThreadStackMgrImpl().GetThreadVersion();
+    uint16_t version;
+    VerifyOrReturnError(ConnectivityMgrImpl().GetThreadVersion(version) == CHIP_NO_ERROR, 0);
+    return version;
 }
 
 } // namespace NetworkCommissioning

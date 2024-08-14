@@ -525,12 +525,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 }
 
 template <class ImplClass>
-uint16_t GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadVersion()
-{
-    return otThreadGetVersion();
-}
-
-template <class ImplClass>
 ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType()
 {
     VerifyOrReturnValue(mOTInst, ConnectivityManager::kThreadDeviceType_NotSupported);
@@ -1075,6 +1069,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
     }
 
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadVersion(uint16_t & version)
+{
+    version = otThreadGetVersion();
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
