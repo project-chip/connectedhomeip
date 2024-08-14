@@ -216,7 +216,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     auto sourceNodeId = GetNodeId(commandObj);
 
-    // Constraint on responseTimeoutSeconds is [0; 120] seconds
+    // Constraint on responseTimeoutSeconds is [30; 120] seconds
     if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
     {
         ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
