@@ -61,14 +61,15 @@ class TC_OCC_2_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_3(self):
+        endpoint = self.matter_test_config.endpoint
 
-        endpoint = self.user_params.get("endpoint", 1)
+        self.step(1) # Already done, immeidately go to step 2
 
-        self.step(1)
+        self.step(2)
+
         attributes = Clusters.OccupancySensing.Attributes
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
-        self.step(2)
         if attributes.HoldTime.attribute_id in attribute_list:
             occupancy_hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
         else:

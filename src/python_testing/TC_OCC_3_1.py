@@ -75,14 +75,16 @@ class TC_OCC_3_1(MatterBaseTest):
     async def test_TC_OCC_3_1(self):
         hold_time = 10  # 10 seconds for occupancy state hold time
 
-        self.step(1)  # commissioning and getting cluster attribute list
+        self.step(1)  # Commissioning already done
+
+        self.step(2)
+
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
 
         has_hold_time = attributes.HoldTime.attribute_id in attribute_list
 
-        self.step(2)
         if has_hold_time:
             # write 10 as a HoldTime attribute
             await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))

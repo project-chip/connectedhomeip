@@ -56,16 +56,16 @@ class TC_OCC_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_2(self):
+        endpoint = self.matter_test_config.endpoint
 
-        endpoint = self.user_params.get("endpoint", 1)
+        self.step(1) # Already done, immeidately go to step 2
+
+        self.step(2)
 
         attributes = Clusters.OccupancySensing.Attributes
         feature_map = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-
-        self.step(1)
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
-        self.step(2)
         # OccupancySensorType will be determined by FeatureMap matching table at 2.7.6.2.
         asserts.assert_in(attributes.OccupancySensorType.attribute_id, attribute_list,
                           "OccupancySensorType attribute is a mandatory attribute.")

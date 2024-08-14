@@ -91,8 +91,9 @@ class TC_OCC_3_2(MatterBaseTest):
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
-        self.step(1)
+        self.step(1) # Commissioning already done
 
+        self.step(2)
         occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(attribute=attributes.OccupancySensorTypeBitmap)
         has_type_pir = ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPir) != 0) or \
                        ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic) != 0)
@@ -105,7 +106,6 @@ class TC_OCC_3_2(MatterBaseTest):
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
 
-        self.step(2)
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)

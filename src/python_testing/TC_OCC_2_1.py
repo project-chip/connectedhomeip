@@ -74,14 +74,14 @@ class TC_OCC_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_1(self):
+        endpoint = self.matter_test_config.endpoint
 
-        endpoint = self.user_params.get("endpoint", 1)
+        self.step(1) # Already done, immeidately go to step 2
 
-        self.step(1)
+        self.step(2)
         attributes = Clusters.OccupancySensing.Attributes
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
-        self.step(2)
         asserts.assert_in(attributes.Occupancy.attribute_id, attribute_list, "Occupancy attribute is mandatory")
         occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
         asserts.assert_less_equal(occupancy_dut, 0b00000001, "Occupancy attribute is not in valid range")
