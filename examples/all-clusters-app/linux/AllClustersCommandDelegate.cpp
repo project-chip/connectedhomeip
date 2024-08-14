@@ -667,21 +667,65 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
 
 void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, std::string operation, Json::Value param)
 {
-    OperationalState::Instance * operationalStateInstance = nullptr;
     if (device == "Generic")
     {
-        operationalStateInstance = OperationalState::GetOperationalStateInstance();
+        OnGenericOperationalStateChange(device, operation, param);
     }
     else if (device == "Oven")
     {
-        operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+        OnOvenOperationalStateChange(device, operation, param);
     }
     else
     {
         ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
         return;
     }
+}
 
+void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance                 = OperationalState::GetOperationalStateInstance();
+    OperationalState::OperationalStateDelegate * operationalStateDelegate = OperationalState::GetOperationalStateDelegate();
+    OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(operationalStateInstance->GetCurrentOperationalState());
+    if (operation == "Start")
+    {
+        operationalStateDelegate->HandleStartStateCallback(noError);
+    }
+    else if (operation == "Resume")
+    {
+        operationalStateDelegate->HandleResumeStateCallback(noError);
+    }
+    else if (operation == "Pause")
+    {
+        operationalStateDelegate->HandlePauseStateCallback(noError);
+    }
+    else if (operation == "Stop" && state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        operationalStateDelegate->HandleStopStateCallback(noError);
+    }
+    else if (operation == "OnFault")
+    {
+        uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        if (!param.isNull())
+        {
+            event_id = to_underlying(static_cast<OperationalState::ErrorStateEnum>(param.asUInt()));
+        }
+
+        OperationalState::GenericOperationalError err(event_id);
+        operationalStateInstance->OnOperationalErrorDetected(err);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));

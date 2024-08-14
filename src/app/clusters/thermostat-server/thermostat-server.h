@@ -27,6 +27,7 @@
 #include "thermostat-delegate.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
 
 namespace chip {
 namespace app {
@@ -36,10 +37,15 @@ namespace Thermostat {
 static constexpr size_t kThermostatEndpointCount =
     MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+enum AtomicWriteState
+{
+    kAtomicWriteState_Closed = 0,
+    kAtomicWriteState_Open,
+};
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
-class ThermostatAttrAccess : public chip::app::AttributeAccessInterface
+class ThermostatAttrAccess : public chip::app::AttributeAccessInterface, public chip::FabricTable::Delegate
 {
 public:
     ThermostatAttrAccess() : AttributeAccessInterface(Optional<chip::EndpointId>::Missing(), Thermostat::Id) {}
@@ -48,45 +54,66 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
     /**
-     * @brief Sets the scoped node id of the originator that send the last successful
-     *        StartPresetsSchedulesEditRequest for the given endpoint.
-     *
-     * @param[in] endpoint The endpoint.
-     * @param[in] originatorNodeId The originator scoped node id.
-     */
-    void SetOriginatorScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId);
-
-    /**
-     * @brief Gets the scoped node id of the originator that send the last successful
-     *        StartPresetsSchedulesEditRequest for the given endpoint.
+     * @brief Gets the scoped node id of the originator that sent the last successful
+     *        AtomicRequest of type BeginWrite for the given endpoint.
      *
      * @param[in] endpoint The endpoint.
      *
      * @return the scoped node id for the given endpoint if set. Otherwise returns ScopedNodeId().
      */
-    ScopedNodeId GetOriginatorScopedNodeId(EndpointId endpoint);
+    ScopedNodeId GetAtomicWriteScopedNodeId(EndpointId endpoint);
 
     /**
-     * @brief Sets the presets editable flag for the given endpoint
+     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
      *
      * @param[in] endpoint The endpoint.
-     * @param[in] presetEditable The value of the presets editable.
+     * @param[in] originatorNodeId The originator scoped node id.
+     * @param[in] state Whether or not an atomic write is open or closed.
      */
-    void SetPresetsEditable(EndpointId endpoint, bool presetEditable);
+    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
 
     /**
-     * @brief Gets the prests editable flag value for the given endpoint
+     * @brief Gets whether an atomic write is in progress for the given endpoint
      *
      * @param[in] endpoint The endpoint.
      *
-     * @return the presets editable flag value for the given endpoint if set. Otherwise returns false.
+     * @return Whether an atomic write is in progress for the given endpoint
      */
-    bool GetPresetsEditable(EndpointId endpoint);
+    bool InAtomicWrite(EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] subjectDescriptor The subject descriptor.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] commandObj The command handler.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
-    ScopedNodeId mPresetEditRequestOriginatorNodeIds[kThermostatEndpointCount];
+    CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
 
-    bool mPresetsEditables[kThermostatEndpointCount];
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    struct AtomicWriteSession
+    {
+        AtomicWriteState state = kAtomicWriteState_Closed;
+        ScopedNodeId nodeId;
+        EndpointId endpointId = kInvalidEndpointId;
+    };
+
+    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 };
 
 /**

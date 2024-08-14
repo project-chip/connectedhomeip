@@ -14,6 +14,11 @@ message DeviceCommissioningWindowInfo {
   bytes verifier = 6;
 }
 
+message KeepActiveParameters {
+  uint64 node_id = 1;
+  uint32 stay_active_duration_ms = 2;
+}
+
 // Define the response message to convey the status of the operation
 message OperationStatus {
   bool success = 1;
@@ -21,4 +26,5 @@ message OperationStatus {
 
 service FabricAdmin {
   rpc OpenCommissioningWindow(DeviceCommissioningWindowInfo) returns (OperationStatus){}
+  rpc KeepActive(KeepActiveParameters) returns (pw.protobuf.Empty){}
 }

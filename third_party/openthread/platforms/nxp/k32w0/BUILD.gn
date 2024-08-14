@@ -1,0 +1,101 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
+
+config("openthread_k32w0_config") {
+  include_dirs = [
+    "${openthread_nxp_root}/src/k32w0/k32w061",
+    "${openthread_nxp_root}/src/k32w0/platform",
+    "${openthread_nxp_root}/src/common",
+  ]
+  include_dirs += [ "${nxp_sdk_matter_support_root}/examples/platform/k32w0" ]
+
+  if (is_clang) {
+    cflags = [ "-Wno-format-nonliteral" ]
+  }
+
+  defines = [
+    "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
+    "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
+    "K32W0_RADIO_NUM_OF_RX_BUFS=16",
+    "OPENTHREAD_PLATFORM_CORE_CONFIG_FILE=\"app/project_include/OpenThreadConfig.h\"",
+  ]
+}
+
+source_set("openthread_core_config_k32w0") {
+  sources = [
+    "${nxp_sdk_matter_support_root}/examples/platform/k32w0/app/project_include/OpenThreadConfig.h",
+    "${openthread_nxp_root}/src/k32w0/k32w061/openthread-core-k32w061-config-check.h",
+  ]
+
+  public_configs = [ ":openthread_k32w0_config" ]
+}
+
+source_set("openthread_mbedtls_config_k32w0") {
+  sources =
+      [ "${openthread_nxp_root}/src/k32w0/k32w061/k32w061-mbedtls-config.h" ]
+}
+
+source_set("libopenthread-k32w0") {
+  sources = [
+    "${openthread_nxp_root}/src/common/crypto.c",
+    "${openthread_nxp_root}/src/common/ram_storage.c",
+    "${openthread_nxp_root}/src/k32w0/platform/alarm.c",
+    "${openthread_nxp_root}/src/k32w0/platform/diag.c",
+    "${openthread_nxp_root}/src/k32w0/platform/entropy.c",
+    "${openthread_nxp_root}/src/k32w0/platform/flash.c",
+    "${openthread_nxp_root}/src/k32w0/platform/flash_pdm.c",
+    "${openthread_nxp_root}/src/k32w0/platform/logging.c",
+    "${openthread_nxp_root}/src/k32w0/platform/misc.c",
+    "${openthread_nxp_root}/src/k32w0/platform/pdm_ram_storage_glue.c",
+    "${openthread_nxp_root}/src/k32w0/platform/radio.c",
+    "${openthread_nxp_root}/src/k32w0/platform/system.c",
+    "${openthread_nxp_root}/src/k32w0/platform/uart.c",
+  ]
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    sources +=
+        [ "${openthread_nxp_root}/src/common/crypto/ecdsa_tinycrypt.cpp" ]
+  }
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "NXP-Ultrafast-P256") {
+    sources += [
+      "${openthread_nxp_root}/src/k32w0/platform/ecdsa-nxp-ultrafast-p256.cpp",
+    ]
+  }
+
+  if (chip_with_ot_cli == 1) {
+    sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
+  }
+
+  public_deps = [
+    ":openthread_core_config_k32w0",
+    "${nxp_sdk_build_root}:nxp_sdk",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls",
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "../..:libopenthread-platform",
+    "../..:libopenthread-platform-utils",
+  ]
+}

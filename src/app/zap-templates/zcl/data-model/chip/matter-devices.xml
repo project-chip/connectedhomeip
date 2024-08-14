@@ -2428,11 +2428,12 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
             <include cluster="Thread Network Directory" client="false" server="true" clientLocked="true" serverLocked="true"/>
             <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
         </clusters>
     </deviceType>
     <deviceType>
         <name>MA-thread-border-router</name>
-        <domain>HRAP</domain>
+        <domain>CHIP</domain>
         <typeName>Matter Thread Border Router</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0091</deviceId>

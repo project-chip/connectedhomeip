@@ -39,6 +39,11 @@ public:
     {
         return pw::Status::Unimplemented();
     }
+
+    virtual pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
 };
 
 } // namespace rpc

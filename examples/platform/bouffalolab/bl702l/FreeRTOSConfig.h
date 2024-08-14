@@ -159,9 +159,9 @@ to exclude the API function. */
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
 #ifdef __cplusplus
-extern "C" void (*vAssertCalled)(void);
+extern "C" void vAssertCalled(void);
 #else
-extern void (*vAssertCalled)(void);
+extern void vAssertCalled(void);
 #endif
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
@@ -182,9 +182,9 @@ Like all task stack sizes, the value is the number of words, not bytes. */
 #if (configUSE_TICKLESS_IDLE != 0)
 #include "portmacro.h"
 #ifdef __cplusplus
-extern "C" void (*vApplicationSleep)(TickType_t xExpectedIdleTime);
+extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime);
 #else
-extern void (*vApplicationSleep)(TickType_t xExpectedIdleTime);
+extern void vApplicationSleep(TickType_t xExpectedIdleTime);
 #endif
 #define portSUPPRESS_TICKS_AND_SLEEP(xExpectedIdleTime) vApplicationSleep(xExpectedIdleTime)
 #endif

@@ -103,6 +103,7 @@ declare -a args=(
     'chip_enable_python_modules=false'
     'chip_device_config_enable_dynamic_mrp_config=true'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
+    'chip_logging_backend="none"'    # os_log() is integrated via CHIP_SYSTEM_CONFIG_PLATFORM_LOG
     'chip_disable_platform_kvs=true'
     'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""

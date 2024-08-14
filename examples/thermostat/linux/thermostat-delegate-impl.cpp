@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include "include/thermostat-delegate-impl.h"
+#include <thermostat-delegate-impl.h>
+#include <thermostat-manager.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/Span.h>
@@ -28,24 +29,6 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
 ThermostatDelegate ThermostatDelegate::sInstance;
-
-namespace {
-
-/**
- * @brief Checks if the presets are matching i.e the presetHandles are the same.
- *
- * @param[in] preset The preset to check.
- * @param[in] presetToMatch The preset to match with.
- *
- * @return true If the presets match, false otherwise. If both preset handles are null, returns false
- */
-bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
-{
-    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
-        preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
-}
-
-} // anonymous namespace
 
 ThermostatDelegate::ThermostatDelegate()
 {
@@ -165,16 +148,70 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
+std::optional<System::Clock::Milliseconds16>
+ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                                          System::Clock::Milliseconds16 timeoutRequest)
+{
+    auto attributeIdsIter = attributeRequests.begin();
+    bool requestedPresets = false, requestedSchedules = false;
+    while (attributeIdsIter.Next())
+    {
+        auto & attributeId = attributeIdsIter.GetValue();
+
+        switch (attributeId)
+        {
+        case Attributes::Presets::Id:
+            requestedPresets = true;
+            break;
+        case Attributes::Schedules::Id:
+            requestedSchedules = true;
+            break;
+        default:
+            return System::Clock::Milliseconds16(0);
+        }
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return System::Clock::Milliseconds16(0);
+    }
+    auto timeout = System::Clock::Milliseconds16(0);
+    if (requestedPresets)
+    {
+        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
+        timeout += std::chrono::milliseconds(3000);
+    }
+    if (requestedSchedules)
+    {
+        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
+        timeout += std::chrono::milliseconds(9000);
+    }
+    // If the client requested an even smaller timeout, then use that one
+    return std::min(timeoutRequest, timeout);
+}
+
+void ThermostatDelegate::InitializePendingPresets()
+{
+    mNextFreeIndexInPendingPresetsList = 0;
+    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
+    {
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = mPresets[indexInPresets];
+        mNextFreeIndexInPendingPresetsList++;
+    }
+}
+
 CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Type & preset)
 {
     if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
     {
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetScenario(preset.presetScenario);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.presetHandle);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.name);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.coolingSetpoint);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.heatingSetpoint);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.builtIn);
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
+        if (preset.presetHandle.IsNull())
+        {
+            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
+            const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
+            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        }
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
     }
@@ -193,37 +230,12 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 {
-
-    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
+    mNextFreeIndexInPresetsList = 0;
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {
         const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
-
-        bool found = false;
-        for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
-        {
-            if (PresetHandlesExistAndMatch(mPresets[indexInPresets], pendingPreset))
-            {
-                found = true;
-
-                // Replace the  preset with the pending preset
-                mPresets[indexInPresets] = pendingPreset;
-            }
-        }
-
-        // If pending preset was not found in the Presets list, append to the Presets list.
-        if (!found)
-        {
-
-            mPresets[mNextFreeIndexInPresetsList] = pendingPreset;
-
-            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
-            // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };
-            mPresets[mNextFreeIndexInPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-            mNextFreeIndexInPresetsList++;
-        }
+        mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
+        mNextFreeIndexInPresetsList++;
     }
     return CHIP_NO_ERROR;
 }

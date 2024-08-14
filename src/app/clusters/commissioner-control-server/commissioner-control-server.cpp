@@ -236,15 +236,15 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     // Set IP address and port in the CommissionNodeInfo struct
     commissionNodeInfo->port = commandData.port;
     err                      = commissionNodeInfo->ipAddress.SetIPAddress(commandData.ipAddress);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Validate the commission node command.
     err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
     err = delegate->GetCommissioningWindowParams(commissionNodeInfo->params);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Add the response for the commissioning window.
     AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, commissionNodeInfo->params);
