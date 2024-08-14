@@ -564,26 +564,26 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
-    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
     boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
     err       = writeRequestParser.GetTimedRequest(&boolValue);
-    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
     boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
-    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
 
     if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
         (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))
