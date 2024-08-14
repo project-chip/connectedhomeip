@@ -3176,7 +3176,7 @@ void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t nu
 
 } // namespace SubscriptionPathQuotaHelpers
 
-TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
+TEST_F(TestRead, TestSubscribeAttributeNotExistPath)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
@@ -3205,9 +3205,9 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 
         DrainAndServiceIO();
 
-        EXPECT_EQ(callback.mOnError, 1u);
-        EXPECT_EQ(callback.mLastError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        EXPECT_EQ(callback.mOnDone, 1u);
+        // If path does not exist, we allow the subscription (in case path appears over time)
+        EXPECT_EQ(callback.mOnError, 0u);
+        EXPECT_EQ(callback.mOnDone, 0u);  // subscription is active, not done
     }
 
     SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
@@ -4701,13 +4701,14 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   app::ReadClient::InteractionType::Subscribe);
+                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                               app::ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
 
     EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    // InvalidAction due to empty param list size, however subscriptions are cleared
     EXPECT_NE(readCallback.mOnError, 0u);
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
