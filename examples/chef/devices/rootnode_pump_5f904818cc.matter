@@ -1809,7 +1809,6 @@ endpoint 1 {
     ram      attribute maxMeasuredValue default = 32767;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -1821,7 +1820,6 @@ endpoint 1 {
     ram      attribute maxMeasuredValue default = 32767;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
@@ -1833,7 +1831,6 @@ endpoint 1 {
     ram      attribute maxMeasuredValue default = 65534;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

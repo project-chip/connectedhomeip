@@ -2067,7 +2067,6 @@ endpoint 0 {
     ram      attribute supportedDeviceCategories default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
