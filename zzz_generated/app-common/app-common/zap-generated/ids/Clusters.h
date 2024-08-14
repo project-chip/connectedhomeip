@@ -385,6 +385,9 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace EcosystemInformation {
+static constexpr ClusterId Id = 0x00000750;
+} // namespace EcosystemInformation
 namespace CommissionerControl {
 static constexpr ClusterId Id = 0x00000751;
 } // namespace CommissionerControl

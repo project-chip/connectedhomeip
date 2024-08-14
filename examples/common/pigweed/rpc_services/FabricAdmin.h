@@ -34,7 +34,13 @@ class FabricAdmin : public pw_rpc::nanopb::FabricAdmin::Service<FabricAdmin>
 public:
     virtual ~FabricAdmin() = default;
 
-    virtual pw::Status OpenCommissioningWindow(const chip_rpc_DeviceInfo & request, chip_rpc_OperationStatus & response)
+    virtual pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
+                                               chip_rpc_OperationStatus & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+
+    virtual pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }

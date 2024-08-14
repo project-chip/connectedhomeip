@@ -94,6 +94,7 @@ class TestXmlParser(unittest.TestCase):
                              tofile='expected.matter',
                              )
         self.assertEqual(a, b, '\n' + ''.join(delta))
+        self.fail("IDLs are not equal (above delta should have failed)")
 
     def testBasicInput(self):
 

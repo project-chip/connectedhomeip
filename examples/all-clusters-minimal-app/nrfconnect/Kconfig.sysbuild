@@ -1,0 +1,67 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#### Radio core selection
+config NRF_DEFAULT_IPC_RADIO
+	default y
+
+# Enable IEEE802.15.4 serialization to network core
+config NETCORE_IPC_RADIO_IEEE802154
+	default y if (SOC_SERIES_NRF53X) && !WIFI_NRF700X
+
+# Enable Bluetooth serialization to network core
+config NETCORE_IPC_RADIO_BT_HCI_IPC
+	default y if SOC_SERIES_NRF53X
+
+if BOOTLOADER_MCUBOOT
+
+#### DFU multi-image support
+config DFU_MULTI_IMAGE_PACKAGE_BUILD
+	default y
+
+config DFU_MULTI_IMAGE_PACKAGE_APP
+	default y
+
+config PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY
+	default y
+
+#### DFU network core configuration
+if SOC_SERIES_NRF53X
+
+config MCUBOOT_UPDATEABLE_IMAGES
+	default 2
+
+choice MCUBOOT_MODE
+	default MCUBOOT_MODE_OVERWRITE_ONLY
+endchoice
+
+choice BOOT_SIGNATURE_TYPE
+	default BOOT_SIGNATURE_TYPE_RSA
+endchoice
+
+config SECURE_BOOT_NETCORE
+	default y
+
+config NETCORE_APP_UPDATE
+	default y
+
+config DFU_MULTI_IMAGE_PACKAGE_NET
+	default y
+
+endif # SOC_SERIES_NRF53X
+endif # BOOTLOADER_MCUBOOT
+
+source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"

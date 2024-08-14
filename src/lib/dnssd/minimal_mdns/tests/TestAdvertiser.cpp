@@ -81,7 +81,8 @@ OperationalAdvertisingParameters operationalParams1 =
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
         .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(
-            32_ms32, 30_ms32)); // Match SII, SAI. SAT not provided so it uses default 4000ms
+            32_ms32, 30_ms32)) // Match SII, SAI. SAT not provided so it uses default 4000ms
+        .SetTCPSupportModes(chip::Dnssd::TCPModeAdvertise::kTCPClientServer);
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -92,7 +93,7 @@ OperationalAdvertisingParameters operationalParams5 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams6 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-const QNamePart txtOperational1Parts[]  = { "SII=32", "SAI=30", "SAT=4000" };
+const QNamePart txtOperational1Parts[]  = { "SII=32", "SAI=30", "SAT=4000", "T=6" };
 PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
 PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
 SrvResourceRecord srvOperational1       = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);

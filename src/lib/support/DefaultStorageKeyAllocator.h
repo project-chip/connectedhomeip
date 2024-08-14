@@ -193,6 +193,17 @@ public:
         return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
     }
 
+    // Thread Network Directory
+
+    static StorageKeyName ThreadNetworkDirectoryIndex() { return StorageKeyName::FromConst("g/tnd/i"); }
+    static StorageKeyName ThreadNetworkDirectoryDataset(uint64_t extendedPanId)
+    {
+        return StorageKeyName::Formatted("g/tnd/n/%08" PRIx32 "%08" PRIx32, // some platforms can't format uint64
+                                         static_cast<uint32_t>(extendedPanId >> 32), static_cast<uint32_t>(extendedPanId));
+    }
+
+    // OTA
+
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
     static StorageKeyName OTACurrentProvider() { return StorageKeyName::FromConst("g/o/cp"); }
     static StorageKeyName OTAUpdateToken() { return StorageKeyName::FromConst("g/o/ut"); }

@@ -36,6 +36,14 @@ namespace AccessControlExtensionChanged {
 static constexpr EventId Id = 0x00000001;
 } // namespace AccessControlExtensionChanged
 
+namespace AccessRestrictionEntryChanged {
+static constexpr EventId Id = 0x00000002;
+} // namespace AccessRestrictionEntryChanged
+
+namespace FabricRestrictionReviewUpdate {
+static constexpr EventId Id = 0x00000003;
+} // namespace FabricRestrictionReviewUpdate
+
 } // namespace Events
 } // namespace AccessControl
 
@@ -219,6 +227,10 @@ static constexpr EventId Id = 0x00000002;
 namespace ReachableChanged {
 static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
+
+namespace ActiveChanged {
+static constexpr EventId Id = 0x00000080;
+} // namespace ActiveChanged
 
 } // namespace Events
 } // namespace BridgedDeviceBasicInformation
@@ -431,6 +443,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+namespace Events {
+
+namespace BoostStarted {
+static constexpr EventId Id = 0x00000000;
+} // namespace BoostStarted
+
+namespace BoostEnded {
+static constexpr EventId Id = 0x00000001;
+} // namespace BoostEnded
+
+} // namespace Events
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Events {
 
@@ -610,16 +636,6 @@ static constexpr EventId Id = 0x00000010;
 
 } // namespace Events
 } // namespace PumpConfigurationAndControl
-
-namespace ThreadNetworkDirectory {
-namespace Events {
-
-namespace NetworkChanged {
-static constexpr EventId Id = 0x00000000;
-} // namespace NetworkChanged
-
-} // namespace Events
-} // namespace ThreadNetworkDirectory
 
 namespace TargetNavigator {
 namespace Events {

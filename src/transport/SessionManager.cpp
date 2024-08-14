@@ -714,27 +714,7 @@ void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState 
 {
     VerifyOrReturn(conn != nullptr);
 
-    // Mark the corresponding secure sessions as defunct
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
-        {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
-            {
-                mConnDelegate->OnTCPConnectionClosed(handle, conErr);
-            }
-
-            // Dis-associate the connection from session by setting it to a
-            // nullptr.
-            session->SetTCPConnection(nullptr);
-            // Mark session as defunct
-            session->MarkAsDefunct();
-        }
-
-        return Loop::Continue;
-    });
+    MarkSecureSessionOverTCPForEviction(conn, conErr);
 
     // TODO: A mechanism to mark an unauthenticated session as unusable when
     // the underlying connection is broken. Issue #32323
@@ -785,6 +765,8 @@ void SessionManager::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, b
         conn->mPeerAddr.ToString(peerAddrBuf);
         ChipLogProgress(Inet, "Disconnecting TCP connection from peer at %s.", peerAddrBuf);
         mTransportMgr->TCPDisconnect(conn, shouldAbort);
+
+        MarkSecureSessionOverTCPForEviction(conn, CHIP_NO_ERROR);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1335,6 +1317,33 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 
     return mrpSession != nullptr ? MakeOptional<SessionHandle>(*mrpSession) : Optional<SessionHandle>::Missing();
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    // Mark the corresponding secure sessions for eviction
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        {
+            SessionHandle handle(*session);
+            // Notify the SessionConnection delegate of the connection
+            // closure.
+            if (mConnDelegate != nullptr)
+            {
+                mConnDelegate->OnTCPConnectionClosed(handle, conErr);
+            }
+
+            // Dis-associate the connection from session by setting it to a
+            // nullptr.
+            session->SetTCPConnection(nullptr);
+            // Mark session for eviction.
+            session->MarkForEviction();
+        }
+
+        return Loop::Continue;
+    });
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 /**
  * Provides a means to get diagnostic information such as number of sessions.

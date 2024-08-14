@@ -517,7 +517,7 @@ def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataMod
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_3) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
@@ -743,7 +743,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_3) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []

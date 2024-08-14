@@ -24,4 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 MTR_EXTERN BOOL MTREqualObjects(id<NSObject> _Nullable a, id<NSObject> _Nullable b);
 
+MTR_EXTERN NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
 NS_ASSUME_NONNULL_END

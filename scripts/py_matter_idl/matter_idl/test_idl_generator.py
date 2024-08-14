@@ -55,8 +55,8 @@ def ReadMatterIdl(repo_path: str) -> str:
         return stream.read()
 
 
-def ParseMatterIdl(repo_path: str, skip_meta: bool) -> Idl:
-    return CreateParser(skip_meta=skip_meta).parse(ReadMatterIdl(repo_path))
+def ParseMatterIdl(repo_path: str, skip_meta: bool, merge_globals: bool) -> Idl:
+    return CreateParser(skip_meta=skip_meta, merge_globals=merge_globals).parse(ReadMatterIdl(repo_path))
 
 
 def RenderAsIdlTxt(idl: Idl) -> str:
@@ -106,8 +106,10 @@ class TestIdlRendering(unittest.TestCase):
         # Files MUST be identical except the header comments which are different
         original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[
                                        " // NOTE: Default/not specifically set"])
+        # Do not merge globals because ZAP generated matter files do not contain
+        # the merge global data (will not render global reference comments).
         generated = SkipLeadingComments(RenderAsIdlTxt(
-            ParseMatterIdl(path, skip_meta=False)))
+            ParseMatterIdl(path, skip_meta=False, merge_globals=False)))
 
         self.assertTextEqual(original, generated)
 
@@ -126,9 +128,9 @@ class TestIdlRendering(unittest.TestCase):
         ]
 
         for path in test_paths:
-            idl = ParseMatterIdl(path, skip_meta=True)
+            idl = ParseMatterIdl(path, skip_meta=True, merge_globals=True)
             txt = RenderAsIdlTxt(idl)
-            idl2 = CreateParser(skip_meta=True).parse(txt)
+            idl2 = CreateParser(skip_meta=True, merge_globals=True).parse(txt)
 
             # checks that data types and content is the same
             self.assertEqual(idl, idl2)

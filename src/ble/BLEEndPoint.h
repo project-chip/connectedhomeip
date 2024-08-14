@@ -169,8 +169,8 @@ private:
     CHIP_ERROR ContinueMessageSend();
     CHIP_ERROR DoSendStandAloneAck();
     CHIP_ERROR SendCharacteristic(PacketBufferHandle && buf);
-    bool SendIndication(PacketBufferHandle && buf);
-    bool SendWrite(PacketBufferHandle && buf);
+    CHIP_ERROR SendIndication(PacketBufferHandle && buf);
+    CHIP_ERROR SendWrite(PacketBufferHandle && buf);
 
     // Receive path:
     CHIP_ERROR HandleConnectComplete();
