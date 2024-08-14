@@ -141,7 +141,7 @@ Additionally, you should also get notified an new device is added on the
 Ecosystem 2 from the Ecosystem 1:
 
 ```
->>> A new devie is added on Endpoint 3.
+>>> A new device is added on Endpoint 3.
 ```
 
 ### Synchronize Light Example to Ecosystem 1
