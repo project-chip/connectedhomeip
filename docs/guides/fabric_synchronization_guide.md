@@ -137,7 +137,7 @@ Ecosystem 2 with the newly assigned Node ID:
 >>> New device with Node ID: 0x3 has been successfully added.
 ```
 
-Additionally, you should also get notified an new device is added on the
+Additionally, you should also get notified when a new device is added to
 Ecosystem 2 from the Ecosystem 1:
 
 ```
