@@ -18,6 +18,7 @@
 
 #include <atomic-write-manager.h>
 
+#include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -436,31 +437,38 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
         };
     }
 
-    status = Status::Success;
+    bool commitSuccessful = true;
     for (auto & attributeStatus : attributeStatuses)
     {
         auto statusCode = mDelegate->OnPreCommitWrite(endpoint, attributeStatus.attributeID);
         if (statusCode != Status::Success)
         {
-            status = Status::Failure;
+            commitSuccessful = false;
         }
 
         attributeStatus.statusCode = to_underlying(statusCode);
     }
 
-    if (status == Status::Success)
+    if (commitSuccessful)
     {
         for (auto & attributeStatus : attributeStatuses)
         {
             auto statusCode = mDelegate->OnCommitWrite(endpoint, attributeStatus.attributeID);
             if (statusCode != Status::Success)
             {
-                status = Status::Failure;
+                commitSuccessful = false;
             }
             attributeStatus.statusCode = to_underlying(statusCode);
         }
     }
-    if (status == Status::Failure)
+    if (commitSuccessful) // All attributes were successfully written
+    {
+        for (auto & attributeStatus : attributeStatuses)
+        {
+            MatterReportingAttributeChangeCallback(endpoint, Clusters::Thermostat::Id, attributeStatus.attributeID);
+        }
+    }
+    else
     {
         // Either one of the calls to OnPreCommitWrite failed, or one of the calls to OnCommitWrite failed; in the former case,
         // discard any pending writes. Do the same for the latter, knowing that the server may be in an inconsistent state
@@ -470,7 +478,7 @@ bool ThermostatAtomicWriteManager::CommitWrite(chip::app::CommandHandler * comma
         }
     }
     Commands::AtomicResponse::Type response;
-    response.statusCode = to_underlying(status);
+    response.statusCode = to_underlying(commitSuccessful ? Status::Success : Status::Failure);
     response.attributeStatus =
         DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.data(), attributeStatuses.size());
     commandObj->AddResponse(commandPath, response);

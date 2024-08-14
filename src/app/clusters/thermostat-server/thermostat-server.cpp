@@ -683,47 +683,6 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
     return false;
 }
 
-bool validAtomicAttributes(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                           const Commands::AtomicRequest::DecodableType & commandData, bool requireBoth)
-{
-    auto attributeIdsIter = commandData.attributeRequests.begin();
-    bool requestedPresets = false, requestedSchedules = false;
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
-
-        switch (attributeId)
-        {
-        case Presets::Id:
-            if (requestedPresets) // Double-requesting an attribute is invalid
-            {
-                return false;
-            }
-            requestedPresets = true;
-            break;
-        case Schedules::Id:
-            if (requestedSchedules) // Double-requesting an attribute is invalid
-            {
-                return false;
-            }
-            requestedSchedules = true;
-            break;
-        default:
-            return false;
-        }
-    }
-    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    if (requireBoth)
-    {
-        return (requestedPresets && requestedSchedules);
-    }
-    // If the atomic request doesn't contain at least one of these attributes, it's invalid
-    return (requestedPresets || requestedSchedules);
-}
-
 bool emberAfThermostatClusterSetActivePresetRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
@@ -808,13 +767,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {

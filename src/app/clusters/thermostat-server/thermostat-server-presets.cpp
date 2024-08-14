@@ -18,6 +18,8 @@
 #include "thermostat-server-setpoints.h"
 #include "thermostat-server.h"
 
+#include <app/reporting/reporting.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -537,6 +539,9 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan newPr
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
         return StatusIB(err).mStatus;
     }
+
+    MatterReportingAttributeChangeCallback(endpoint, Clusters::Thermostat::Id, ActivePresetHandle::Id);
+
     return Status::Success;
 }
 
