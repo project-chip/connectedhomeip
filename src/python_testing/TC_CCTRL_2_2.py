@@ -211,7 +211,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
 
         self.step(16)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=121)
@@ -219,7 +219,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
 
         self.step(17)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
