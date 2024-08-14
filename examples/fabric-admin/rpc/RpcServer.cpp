@@ -22,6 +22,7 @@
 
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <device_manager/DeviceManager.h>
 #include <system/SystemClock.h>
 #include <thread>
 
@@ -54,14 +55,21 @@ public:
 
         ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
 
-        char command[512];
-        snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d --salt hex:%s --verifier hex:%s",
-                 nodeId, kRootEndpointId, kEnhancedCommissioningMethod, commissioningTimeout, iterations, discriminator, saltHex,
-                 verifierHex);
-
-        PushCommand(command);
+        DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
 
         response.success = true;
+
+        return pw::OkStatus();
+    }
+
+    pw::Status KeepActive(const chip_rpc_KeepActiveParameters & request, pw_protobuf_Empty & response) override
+    {
+        ChipLogProgress(NotSpecified, "Received KeepActive request: 0x%lx, %u", request.node_id, request.stay_active_duration_ms);
+        // TODO(#33221): When we get this command hopefully we are already registered with an ICD device to be
+        // notified when it wakes up. We will need to add in hooks there to make sure we send the StayActiveRequest
+        // Important thing to note:
+        //  * If we get this call multiple times before we get a wakeup from ICD, we only send out one StayActiveRequest command
+        //  * After 60 mins from last exipry we no longer will send out a StayActiveRequest.
 
         return pw::OkStatus();
     }

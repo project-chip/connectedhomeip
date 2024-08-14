@@ -431,13 +431,26 @@ tests:
     - label:
           "Step 14: TH sends Clear Credential Command to DUT with the following
           fields: a)CredentialType as 8(Invalid value) b)CredentialIndex as 2"
-      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp && !DRLK.S.F0d
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "Credential"
                 value: { CredentialType: 8, CredentialIndex: 2 }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 14: TH sends Clear Credential Command to DUT with the following
+          fields: a)CredentialType as 9(Invalid value) b)CredentialIndex as 2"
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp && DRLK.S.F0d
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 9, CredentialIndex: 2 }
       response:
           error: INVALID_COMMAND
 

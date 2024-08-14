@@ -164,7 +164,7 @@ if [[ ! -d "$NXP_K32W0_SDK_ROOT" ]]; then
     echo "Hint: Set \$NXP_K32W0_SDK_ROOT to enable building for K32W061"
 else
     echo 'To build the K32W lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
+    echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
 fi
 echo
 

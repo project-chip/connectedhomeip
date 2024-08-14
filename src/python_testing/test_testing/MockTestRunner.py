@@ -38,10 +38,12 @@ class AsyncMock(MagicMock):
 
 class MockTestRunner():
 
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None):
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path=None):
         self.test = test
         self.endpoint = endpoint
         self.pics = pics
+        self.kvs_storage = 'kvs_admin.json'
+        self.paa_path = paa_trust_store_path
         self.set_test(filename, classname, test)
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
@@ -60,6 +62,8 @@ class MockTestRunner():
         self.config = test_config
         self.config.tests = [self.test]
         self.config.endpoint = self.endpoint
+        self.config.storage_path = self.kvs_storage
+        self.config.paa_trust_store_path = self.paa_path
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
         if self.pics:

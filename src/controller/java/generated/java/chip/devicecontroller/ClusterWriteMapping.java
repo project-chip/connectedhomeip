@@ -4827,6 +4827,28 @@ public class ClusterWriteMapping {
       writeUnitTestingClusterErrorBooleanCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeClusterErrorBooleanAttribute", writeUnitTestingClusterErrorBooleanAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingGlobalEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingglobalEnumCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeUnitTestingGlobalEnumCommandParams.put(
+        "value",
+        unitTestingglobalEnumCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingGlobalEnumAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeGlobalEnumAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingGlobalEnumCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeGlobalEnumAttribute", writeUnitTestingGlobalEnumAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingunsupportedCommandParameterInfo =
         new CommandParameterInfo(
@@ -5575,6 +5597,28 @@ public class ClusterWriteMapping {
       writeUnitTestingWriteOnlyInt8uCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeWriteOnlyInt8uAttribute", writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingNullableGlobalEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingnullableGlobalEnumCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeUnitTestingNullableGlobalEnumCommandParams.put(
+        "value",
+        unitTestingnullableGlobalEnumCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingNullableGlobalEnumAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeNullableGlobalEnumAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingNullableGlobalEnumCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeNullableGlobalEnumAttribute", writeUnitTestingNullableGlobalEnumAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingMeiInt8uCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingmeiInt8uCommandParameterInfo =
         new CommandParameterInfo(

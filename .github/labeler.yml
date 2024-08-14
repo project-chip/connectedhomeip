@@ -119,6 +119,15 @@ test driver:
       - src/test_driver/*
       - src/test_driver/**/*
 
+# Cert tests touched: add current milestone delta-tracking label.
+# TODO: Change after Aug 15, 2024
+matter-1.4-te2-script-change:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/python_testing/*
+      - src/python_testing/**/*
+      - src/app/tests/suites/certification/*
+
 ############################################################
 #  Source Code
 ############################################################

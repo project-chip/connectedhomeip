@@ -123,6 +123,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class StringEchoResponse(val payload: ByteArray)
 
+  class GlobalEchoResponse(val field1: UnitTestingClusterTestGlobalStruct, val field2: UByte)
+
   class TestDifferentVendorMeiResponse(val arg1: UByte, val eventNumber: ULong)
 
   class ListInt8uAttribute(val value: List<UByte>)
@@ -201,6 +203,17 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     data class Error(val exception: Exception) : ListFabricScopedAttributeSubscriptionState()
 
     object SubscriptionEstablished : ListFabricScopedAttributeSubscriptionState()
+  }
+
+  class GlobalStructAttribute(val value: UnitTestingClusterTestGlobalStruct)
+
+  sealed class GlobalStructAttributeSubscriptionState {
+    data class Success(val value: UnitTestingClusterTestGlobalStruct) :
+      GlobalStructAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : GlobalStructAttributeSubscriptionState()
+
+    object SubscriptionEstablished : GlobalStructAttributeSubscriptionState()
   }
 
   class NullableBooleanAttribute(val value: Boolean?)
@@ -539,6 +552,27 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       NullableRangeRestrictedInt16sAttributeSubscriptionState()
 
     object SubscriptionEstablished : NullableRangeRestrictedInt16sAttributeSubscriptionState()
+  }
+
+  class NullableGlobalEnumAttribute(val value: UByte?)
+
+  sealed class NullableGlobalEnumAttributeSubscriptionState {
+    data class Success(val value: UByte?) : NullableGlobalEnumAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableGlobalEnumAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableGlobalEnumAttributeSubscriptionState()
+  }
+
+  class NullableGlobalStructAttribute(val value: UnitTestingClusterTestGlobalStruct?)
+
+  sealed class NullableGlobalStructAttributeSubscriptionState {
+    data class Success(val value: UnitTestingClusterTestGlobalStruct?) :
+      NullableGlobalStructAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableGlobalStructAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableGlobalStructAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -2384,6 +2418,68 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     tlvReader.exitContainer()
 
     return StringEchoResponse(payload_decoded)
+  }
+
+  suspend fun globalEchoRequest(
+    field1: UnitTestingClusterTestGlobalStruct,
+    field2: UByte,
+    timedInvokeTimeout: Duration? = null,
+  ): GlobalEchoResponse {
+    val commandId: UInt = 25u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_FIELD1_REQ: Int = 0
+    field1.toTlv(ContextSpecificTag(TAG_FIELD1_REQ), tlvWriter)
+
+    val TAG_FIELD2_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_FIELD2_REQ), field2)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_FIELD1: Int = 0
+    var field1_decoded: UnitTestingClusterTestGlobalStruct? = null
+
+    val TAG_FIELD2: Int = 1
+    var field2_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_FIELD1)) {
+        field1_decoded = UnitTestingClusterTestGlobalStruct.fromTlv(tag, tlvReader)
+      }
+
+      if (tag == ContextSpecificTag(TAG_FIELD2)) {
+        field2_decoded = tlvReader.getUByte(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (field1_decoded == null) {
+      throw IllegalStateException("field1 not found in TLV")
+    }
+
+    if (field2_decoded == null) {
+      throw IllegalStateException("field2 not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GlobalEchoResponse(field1_decoded, field2_decoded)
   }
 
   suspend fun testDifferentVendorMeiRequest(
@@ -8305,6 +8401,253 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     }
   }
 
+  suspend fun readGlobalEnumAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 51u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Globalenum attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
+  }
+
+  suspend fun writeGlobalEnumAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 51u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeGlobalEnumAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 51u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Globalenum attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readGlobalStructAttribute(): GlobalStructAttribute {
+    val ATTRIBUTE_ID: UInt = 52u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Globalstruct attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UnitTestingClusterTestGlobalStruct =
+      UnitTestingClusterTestGlobalStruct.fromTlv(AnonymousTag, tlvReader)
+
+    return GlobalStructAttribute(decodedValue)
+  }
+
+  suspend fun writeGlobalStructAttribute(
+    value: UnitTestingClusterTestGlobalStruct,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 52u
+
+    val tlvWriter = TlvWriter()
+    value.toTlv(AnonymousTag, tlvWriter)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeGlobalStructAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<GlobalStructAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 52u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            GlobalStructAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Globalstruct attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UnitTestingClusterTestGlobalStruct =
+            UnitTestingClusterTestGlobalStruct.fromTlv(AnonymousTag, tlvReader)
+
+          emit(GlobalStructAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(GlobalStructAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readUnsupportedAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 255u
 
@@ -13046,6 +13389,279 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readNullableGlobalEnumAttribute(): NullableGlobalEnumAttribute {
+    val ATTRIBUTE_ID: UInt = 16435u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Nullableglobalenum attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return NullableGlobalEnumAttribute(decodedValue)
+  }
+
+  suspend fun writeNullableGlobalEnumAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 16435u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableGlobalEnumAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<NullableGlobalEnumAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16435u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableGlobalEnumAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableglobalenum attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableGlobalEnumAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableGlobalEnumAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readNullableGlobalStructAttribute(): NullableGlobalStructAttribute {
+    val ATTRIBUTE_ID: UInt = 16436u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Nullableglobalstruct attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UnitTestingClusterTestGlobalStruct? =
+      if (!tlvReader.isNull()) {
+        UnitTestingClusterTestGlobalStruct.fromTlv(AnonymousTag, tlvReader)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return NullableGlobalStructAttribute(decodedValue)
+  }
+
+  suspend fun writeNullableGlobalStructAttribute(
+    value: UnitTestingClusterTestGlobalStruct,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 16436u
+
+    val tlvWriter = TlvWriter()
+    value.toTlv(AnonymousTag, tlvWriter)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableGlobalStructAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<NullableGlobalStructAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16436u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableGlobalStructAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableglobalstruct attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UnitTestingClusterTestGlobalStruct? =
+            if (!tlvReader.isNull()) {
+              UnitTestingClusterTestGlobalStruct.fromTlv(AnonymousTag, tlvReader)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableGlobalStructAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableGlobalStructAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

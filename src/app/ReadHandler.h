@@ -212,7 +212,7 @@ public:
      *
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
-                Observer * observer, InteractionModel::DataModel * apDataModel);
+                Observer * observer, DataModel::Provider * apDataModel);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -222,7 +222,7 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Observer * observer, InteractionModel::DataModel * apDataModel);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel);
 #endif
 
     const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
