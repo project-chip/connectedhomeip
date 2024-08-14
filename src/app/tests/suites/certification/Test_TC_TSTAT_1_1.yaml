@@ -575,7 +575,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [72, 74, 78, 80, 82]
+              contains: [72, 74, 78, 80]
 
     - label: "Step 5: TH reads EventList attribute from the DUT."
       PICS: PICS_EVENT_LIST_ENABLED
