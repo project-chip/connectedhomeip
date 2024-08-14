@@ -266,7 +266,8 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
         return false;
     }
     return subjectDescriptor.authMode == Access::AuthMode::kCase &&
-        GetAtomicWriteScopedNodeId(attributeId, endpoint) == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+        GetAtomicWriteOriginatorScopedNodeId(attributeId, endpoint) ==
+        ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 }
 
 bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attributeId, CommandHandler * commandObj,
@@ -277,7 +278,7 @@ bool ThermostatAtomicWriteManager::InWrite(const std::optional<AttributeId> attr
         return false;
     }
     ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
-    return GetAtomicWriteScopedNodeId(attributeId, endpoint) == sourceNodeId;
+    return GetAtomicWriteOriginatorScopedNodeId(attributeId, endpoint) == sourceNodeId;
 }
 
 bool ThermostatAtomicWriteManager::BeginWrite(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -549,8 +550,8 @@ void ThermostatAtomicWriteManager::ResetWrite(FabricIndex fabricIndex)
     }
 }
 
-ScopedNodeId ThermostatAtomicWriteManager::GetAtomicWriteScopedNodeId(const std::optional<AttributeId> attributeId,
-                                                                      const EndpointId endpoint)
+ScopedNodeId ThermostatAtomicWriteManager::GetAtomicWriteOriginatorScopedNodeId(const std::optional<AttributeId> attributeId,
+                                                                                const EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
     uint16_t ep =

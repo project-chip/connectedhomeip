@@ -79,7 +79,7 @@ private:
                                                                const Commands::AtomicRequest::DecodableType & commandData,
                                                                size_t & attributeRequestCount);
 
-    ScopedNodeId GetAtomicWriteScopedNodeId(const std::optional<AttributeId> attributeId, const EndpointId endpoint);
+    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(const std::optional<AttributeId> attributeId, const EndpointId endpoint);
 
     friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
 
