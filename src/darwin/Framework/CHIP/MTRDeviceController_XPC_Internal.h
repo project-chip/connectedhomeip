@@ -22,5 +22,6 @@
 - (id)initWithTestXPCListener;
 - (void)testPing;
 - (NSNumber *)meaningOfLife;
+- (NSNumber *)internallyAsyncMeaningOfLife;
 
 @end

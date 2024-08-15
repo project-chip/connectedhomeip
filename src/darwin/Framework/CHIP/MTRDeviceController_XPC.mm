@@ -27,6 +27,10 @@
 
 @implementation MTRDeviceController_XPC
 
+// KMO TODO:
+// startup parameters for XPC version of controller
+// MTRDevice_XPC.h/.mm
+
 - (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
 {
     if (!(self = [super initForSubclasses])) {
@@ -36,11 +40,15 @@
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
 
     // maybe poor architecture to store this instead of access it thru XPC connection every time kmo 15 aug 2024
-//    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-//        NSLog(@"%s: it's not my fault! XPC remote object proxy error.", __PRETTY_FUNCTION__);
-//    }];
-    self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
-    
+
+    // REVIEWERS: both of below inits result in proxies that complain:
+    // "Return type of methods sent over this proxy must be 'void' or 'NSProgress *'"
+    // which Internets seem to suggest is true.  kmo 15 aug 2024
+    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        NSLog(@"%s: it's not my fault! XPC remote object proxy error.", __PRETTY_FUNCTION__);
+    }];;
+    // self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
+
     [self.xpcConnection resume];
     
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
@@ -57,8 +65,21 @@
     [self.xpcRemoteObjectProxy ping];
 }
 
+// this blows up.  kmo 15 aug 2024 12h29
 - (NSNumber *)meaningOfLife {
     return [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
+}
+
+- (NSNumber *)internallyAsyncMeaningOfLife {
+    __block int result;
+    // semaphores probably not ultimately the right way to do this? kmo 15 aug 2024
+    auto semaphore = dispatch_semaphore_create(0);
+    [self.xpcRemoteObjectProxy getMeaningOfLifeWithReplyBlock:^(int reply) {
+        result = reply;
+    }];
+    dispatch_semaphore_wait(semaphore, 1.0);
+    // so, this will return an undefined value if timed out? kmo 15 aug 2024 12h21
+    return @(result);
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
