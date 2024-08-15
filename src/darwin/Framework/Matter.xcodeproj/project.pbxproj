@@ -306,6 +306,8 @@
 		9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */; };
 		9B5CCB572C6E6CC9009DD99B /* MTRXPCService.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB562C6E6CC9009DD99B /* MTRXPCService.mm */; };
 		9B5CCB592C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */; };
+		9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */; };
+		9B5CCB5D2C6EC890009DD99B /* MTRDevice_XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */; };
 		9BC064942C6BCB6F00996FEF /* MTRXPCService.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064922C6BCB6F00996FEF /* MTRXPCService.h */; };
 		9BC064972C6BCBAE00996FEF /* MTRXPCServiceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */; };
 		9BC064992C6BCEA000996FEF /* MTRXPCServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */; };
@@ -746,6 +748,8 @@
 		9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceController_Concrete.mm; sourceTree = "<group>"; };
 		9B5CCB562C6E6CC9009DD99B /* MTRXPCService.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRXPCService.mm; sourceTree = "<group>"; };
 		9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_XPC_Internal.h; sourceTree = "<group>"; };
+		9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC.h; sourceTree = "<group>"; };
+		9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice_XPC.mm; sourceTree = "<group>"; };
 		9BC064922C6BCB6F00996FEF /* MTRXPCService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCService.h; sourceTree = "<group>"; };
 		9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCServiceProtocol.h; sourceTree = "<group>"; };
 		9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRXPCServiceTests.m; sourceTree = "<group>"; };
@@ -1335,6 +1339,8 @@
 				9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */,
 				9BC064922C6BCB6F00996FEF /* MTRXPCService.h */,
 				9B5CCB562C6E6CC9009DD99B /* MTRXPCService.mm */,
+				9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */,
+				9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */,
 				9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */,
 				9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */,
 				88EBF8CB27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h */,
@@ -1734,6 +1740,7 @@
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */,
 				3D843713294977000070D20A /* NSDataSpanConversion.h in Headers */,
+				9B5CCB5D2C6EC890009DD99B /* MTRDevice_XPC.h in Headers */,
 				991DC08B247704DC00C13860 /* MTRLogging_Internal.h in Headers */,
 				51FE723F2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h in Headers */,
 				51D0B12E2B6177FD006E3511 /* MTRAccessGrant.h in Headers */,
@@ -2042,6 +2049,7 @@
 				9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				75B3269E2BCDB9EA00E17C4E /* MTRDeviceConnectivityMonitor.mm in Sources */,
+				9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
 				514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
