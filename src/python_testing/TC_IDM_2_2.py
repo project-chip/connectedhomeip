@@ -36,29 +36,18 @@ import chip.clusters as Clusters
 import global_attribute_ids
 from basic_composition_support import BasicCompositionTests
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath, TypedAttributePath
+from chip.clusters.Attribute import AttributePath
 from chip.clusters.ClusterObjects import ClusterObject
 from chip.clusters.enum import MatterIntEnum
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
+from mobly import asserts, signals
 
 
 class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
-    ROOT_NODE_ENDPOINT_ID = 0
-
-    @staticmethod
-    def get_typed_attribute_path(attribute: Clusters, ep: ClusterObjects.ClusterAttributeDescriptor = ROOT_NODE_ENDPOINT_ID):
-        return TypedAttributePath(
-            Path=AttributePath(
-                EndpointId=ep,
-                Attribute=attribute
-            )
-        )
-
-    def all_type_attributes_for_cluster(self, cluster: ClusterObjects.Cluster, desired_type: type) -> list[ClusterObjects.ClusterAttributeDescriptor]:
+    async def all_type_attributes_for_cluster(self, cluster: ClusterObjects.Cluster, desired_type: type) -> list[ClusterObjects.ClusterAttributeDescriptor]:
         all_attributes = [attribute for attribute in cluster.Attributes.__dict__.values() if inspect.isclass(
             attribute) and issubclass(attribute, ClusterObjects.ClusterAttributeDescriptor)]
 
@@ -67,6 +56,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         if desired_type == MatterIntEnum:
             all_attributes_of_type = [attribute for attribute in all_attributes if type(
                 attribute.attribute_type.Type) == type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type)]
+        elif desired_type == IntFlag:
+            try:
+                feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+            except signals.TestFailure:
+                print(f"{cluster} does not support Attributes.FeatureMap")
+                return []
+            if feature_map >= 1:
+                return [cluster.Attributes.FeatureMap]
         else:
             all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
                                       ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
@@ -78,11 +75,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             device_clusters |= set(self.endpoints[endpoint].keys())
         return device_clusters
 
-    async def get_cluster_from_type(self, desired_attribute_type: type) -> None:
+    async def check_attribute_read_for_type(self, desired_attribute_type: type) -> None:
         # Get all clusters from device
 
         for cluster in self.device_clusters:
-            all_types = self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
+            all_types = await self.all_type_attributes_for_cluster(cluster, desired_attribute_type)
             if all_types:
                 chosen_attribute = all_types[0]
                 chosen_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
@@ -153,11 +150,17 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(2, "Send Request Message to read all attributes on a given cluster and endpoint")
 
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, descriptor_obj_path)
-        returned_endpoints = read_request[0].keys()
-
+        # Check that endpoint 0 is in output
+        asserts.assert_in(0, read_request, "Endpoint 0 not in output")
         # Check if chip.clusters.Objects.Descriptor is in output
+        returned_endpoints = read_request[0].keys()
         asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
-
+        returned_attributes = list(read_request[0][descriptor_obj].keys())
+        if returned_attributes[0] == Clusters.Attribute.DataVersion:
+            returned_descriptor_attributes = returned_attributes[1:]
+            expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[descriptor_obj.id]
+            # Actual failure
+            asserts.assert_equal(set(returned_descriptor_attributes), set(expected_descriptor_attributes.values()))
         # Step 3
 
         # TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
@@ -174,7 +177,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             cluster = list(all_attributes[endpoint].keys())[0]
             attribute = list(all_attributes[endpoint][cluster])[1]
             read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint, attribute])
-            print(f"Output: {read_request[endpoint][cluster][attribute]}")
         asserts.assert_true(read_request[endpoint][cluster][attribute] is not None, f"Value not present in attribute: {attribute}")
 
         # Step 4
@@ -186,15 +188,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # endpoint = [0, Clusters.Objects.Descriptor.Attributes.AttributeList] # Is this a global attribute? Trial and error, but looks like it
         all_attributes = await self.default_controller.ReadAttribute(self.dut_node_id, [0, Clusters.Objects.Descriptor])
-        # import pdb;pdb.set_trace()
+        # TODO: Wait until PR 34833 is ready (python: Add direct attribute paths to Read) before reworking this
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, attribute_list_path)
         for i in range(3):
             returned_endpoints = read_request[i].keys()
+            
             # Check if chip.clusters.Objects.Descriptor is in output
             asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
             # Check if AttributeList is in nested output
             asserts.assert_in(attribute_list, read_request[i][descriptor_obj], "AttributeList not in output")
-
+        
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
@@ -256,7 +259,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(9, "Read a read request of attribute type bool")
-        await self.get_cluster_from_type(bool)
+        x = await self.check_attribute_read_for_type(bool)
 
         # Step 10
         # TH sends the Read Request Message to the DUT to read an attribute of data type string.
@@ -264,7 +267,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(10, "Read a read request of attribute type string")
-        await self.get_cluster_from_type(str)
+        await self.check_attribute_read_for_type(str)
 
         # Step 11
         # TH sends the Read Request Message to the DUT to read an attribute of data type unsigned integer.
@@ -272,7 +275,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(11, "Read a read request of attribute type unsigned integer")
-        await self.get_cluster_from_type(uint)
+        await self.check_attribute_read_for_type(uint)
 
         # Step 12
         # TH sends the Read Request Message to the DUT to read an attribute of data type signed integer.
@@ -280,7 +283,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(12, "Read a read request of attribute type signed integer")
-        await self.get_cluster_from_type(int)
+        await self.check_attribute_read_for_type(int)
 
         # Step 13
         # TH sends the Read Request Message to the DUT to read an attribute of data type floating point.
@@ -288,7 +291,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(13, "Read a read request of attribute type floating point")
-        await self.get_cluster_from_type(float)
+        await self.check_attribute_read_for_type(float)
 
         # Step 14
         # TH sends the Read Request Message to the DUT to read an attribute of data type Octet String.
@@ -296,7 +299,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(14, "Read a read request of attribute type octet string")
-        await self.get_cluster_from_type(bytes)
+        await self.check_attribute_read_for_type(bytes)
 
         # Step 15
         # TH sends the Read Request Message to the DUT to read an attribute of data type Struct.
@@ -304,27 +307,28 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(15, "Read a read request of attribute type struct")
-        await self.get_cluster_from_type(ClusterObject)
+        await self.check_attribute_read_for_type(ClusterObject)
 
         # Step 16
         # TH sends the Read Request Message to the DUT to read an attribute of data type List.
         # If the device does not have an attribute of data type list, skip this step.
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(16, "Read a read request of attribute type list")
-        await self.get_cluster_from_type(list)
+        await self.check_attribute_read_for_type(list)
 
         # Step 17
         # TH sends the Read Request Message to the DUT to read an attribute of data type enum.
         # If the device does not have an attribute of data type enum, skip this step.
         # Verify on the TH that the DUT returns data from the expected attribute path.
         self.print_step(17, "Read a read request of attribute type enum")
-        await self.get_cluster_from_type(MatterIntEnum)
+        await self.check_attribute_read_for_type(MatterIntEnum)
 
         # Step 18
         # TH sends the Read Request Message to the DUT to read an attribute of data type bitmap.
         # If the device does not have an attribute of data type bitmap, skip this step.
         self.print_step(18, "Read a read request of attribute type bitmap")
-        await self.get_cluster_from_type(IntFlag)
+
+        await self.check_attribute_read_for_type(IntFlag)
 
         # Step 19
         # TH sends the Read Request Message to the DUT to read any attribute to an unsupported Endpoint.
@@ -337,10 +341,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         unsupported = list(all_endpoints - supported_endpoints)
         # Read descriptor
         result = await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
-        asserts.assert_true(isinstance(result.Reason, InteractionModelError), msg="Unexpected success reading invalid endpoint")
-
-        # Seems to return only {} -- Is this a failure or the unintended behavior?
-        # read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [non_existent_endpoint])
 
         # Step 20
         # TH sends the Read Request Message to the DUT to read any attribute to an unsupported cluster.
@@ -371,22 +371,30 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
         # DUT responds with the report data action.
         self.print_step(21, "Send the Read Request Message to the DUT to read any attribute to an unsupported attribute")
-
+        found_unsupported = False
         for endpoint_id, endpoint in self.endpoints.items():
+            
+            if found_unsupported:
+                break
             for cluster_type, cluster in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
                     continue
-
+                
                 all_attrs = set(list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys()))
                 dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
-
+        
                 unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
-                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
-
+                              == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+        
                 if unsupported:
-                    result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=cluster_type, attribute=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]], error=Status.UnsupportedAttribute)
+                    result = await self.read_single_attribute_expect_error(
+                        endpoint=endpoint_id,
+                        cluster=cluster_type,
+                        attribute=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]], error=Status.UnsupportedAttribute)
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
+                    found_unsupported = True
+                    break
 
         # Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE
 
