@@ -61,7 +61,7 @@ namespace Controller {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController () 
+@interface MTRDeviceController ()
 
 - (instancetype)initForSubclasses;
 
