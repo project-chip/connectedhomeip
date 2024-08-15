@@ -86,7 +86,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     if (DeviceMgr().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge has alread been configured.");
+        fprintf(stderr, "Remote Fabric Bridge has already been configured.");
         return CHIP_NO_ERROR;
     }
 
