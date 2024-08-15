@@ -88,7 +88,7 @@ chip-tool pairing ble-wifi 0x11 xyz secret 20202021 3840
 or equivalently:
 
 ```
-chip-tool pairing ble-wifi 17 hex:787980 hex:726563726574 20202021 3840
+chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
 ```
 
 #### Pair a device over IP
