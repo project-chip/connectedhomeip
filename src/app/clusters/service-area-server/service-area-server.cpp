@@ -123,7 +123,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
     case Commands::SkipArea::Id:
         return CommandHandlerInterface::HandleCommand<Commands::SkipArea::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentAreaCmd(ctx, req); });
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipAreaCmd(ctx, req); });
     }
 }
 
@@ -356,11 +356,11 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     exitResponse(SelectAreasStatus::kSuccess, ""_span);
 }
 
-void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req)
+void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req)
 {
-    ChipLogDetail(Zcl, "Service Area: HandleSkipCurrentArea");
+    ChipLogDetail(Zcl, "Service Area: HandleSkipArea");
 
-    // On receipt of this command the device SHALL respond with a SkipCurrentAreaResponse command.
+    // On receipt of this command the device SHALL respond with a SkipAreaResponse command.
     auto exitResponse = [ctx](SkipAreaStatus status, CharSpan statusText) {
         Commands::SkipAreaResponse::Type response{
             .status     = status,
@@ -394,7 +394,7 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::Sk
     char skipStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan skipStatusText(skipStatusBuffer);
 
-    if (!mDelegate->HandleSkipCurrentArea(req.skippedArea, skipStatusText))
+    if (!mDelegate->HandleSkipArea(req.skippedArea, skipStatusText))
     {
         exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;

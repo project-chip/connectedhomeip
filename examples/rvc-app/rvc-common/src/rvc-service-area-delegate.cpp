@@ -180,7 +180,7 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::
     return true;
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
     return (mHandleSkipCurrentAreaDeviceInstance->*mHandleSkipCurrentAreaCallback)(skippedArea, skipStatusText);
 };

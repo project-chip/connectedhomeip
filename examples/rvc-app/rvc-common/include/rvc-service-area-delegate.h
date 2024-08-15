@@ -82,7 +82,7 @@ public:
     bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
                                ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan & statusText) override;
 
-    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
+    bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
     //*************************************************************************
     // Supported Areas accessors
