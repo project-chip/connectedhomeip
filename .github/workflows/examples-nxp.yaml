@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:66
+            image: ghcr.io/project-chip/chip-build-k32w:73
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -106,7 +106,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-rw61x:66
+            image: ghcr.io/project-chip/chip-build-rw61x:73
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -168,7 +168,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:66
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:73
 
         steps:
             - name: Checkout
