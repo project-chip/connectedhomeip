@@ -32,8 +32,8 @@ namespace {
 
 // Constants
 constexpr uint32_t kSetupPinCode               = 20202021;
-constexpr uint16_t kRemoteBridgePort           = 6541;
-constexpr uint16_t kLocalBridgePort            = 6540;
+constexpr uint16_t kRemoteBridgePort           = 5540;
+constexpr uint16_t kLocalBridgePort            = 5540;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;

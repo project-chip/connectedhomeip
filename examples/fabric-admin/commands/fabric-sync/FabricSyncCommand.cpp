@@ -199,12 +199,7 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
     }
 
     PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
-
-    if (pairingCommand == nullptr)
-    {
-        ChipLogError(NotSpecified, "Pairing already-discovered command is not available");
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    VerifyOrDie(pairingCommand != nullptr);
 
     pairingCommand->RegisterCommissioningDelegate(this);
     mLocalBridgeNodeId = deviceId;
@@ -271,7 +266,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
 
     if (err == CHIP_NO_ERROR)
     {
-        char payloadBuffer[kMaxManaulCodeLength + 1];
+        char payloadBuffer[kMaxManualCodeLength + 1];
         MutableCharSpan manualCode(payloadBuffer);
         CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
