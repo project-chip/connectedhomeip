@@ -17,6 +17,8 @@
 #import "MTRXPCService.h"
 #import "MTRXPCServiceProtocol.h"
 #import "MTRXPCServiceTestsDummyService.h"
+#import "MTRDeviceController_XPC.h"
+#import "MTRDeviceController_XPC_Internal.h"
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
@@ -104,6 +106,17 @@
     }];
 
     NSLog(@"done with %s", __PRETTY_FUNCTION__);
+}
+
+- (void)testMTRXPCServiceSetup
+{
+    NSXPCConnection * serviceConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:_xpcListener.endpoint];
+    serviceConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
+    MTRDeviceController_XPC * deviceController = [[MTRDeviceController_XPC alloc] initWithXPCConnection:self.xpcConnection];
+
+    [deviceController testPing];
+    NSNumber * lifeMeaning = [deviceController meaningOfLife];
+    NSLog(@"%s: lifeMeaning = %@", __PRETTY_FUNCTION__, lifeMeaning);
 }
 
 @end

@@ -23,29 +23,9 @@
 @property (retain, readwrite) NSXPCConnection * xpcConnection;
 @property (retain, readwrite) id<MTRXPCServiceProtocol> xpcRemoteObjectProxy;
 
-// testing only
-@property (retain, readwrite) NSXPCListener * testListener;
-
-@end
-
-@implementation MTRDeviceController_XPC (TestXPCListener)
-
 @end
 
 @implementation MTRDeviceController_XPC
-
-- (id)initWithTestXPCListener {
-    // TODO:  update with well-known service name
-//    self.xpcConnection = [[NSXPCConnection alloc] initWithServiceName:@"wellknown"];
-
-    // testing mode
-    self.testListener = [NSXPCListener anonymousListener];
-    [self.testListener setDelegate:self];
-    [self.testListener resume];
-    NSXPCConnection * xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:self.testListener.endpoint];
-
-    return [self initWithXPCConnection:xpcConnection];
-}
 
 - (id)initWithXPCConnection:(NSXPCConnection *)newConnection
 {
@@ -56,13 +36,22 @@
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
     self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
     [self.xpcConnection resume];
-
-    // ping and meaning of life just as a test
-    [self.xpcRemoteObjectProxy ping];
-    NSNumber * lifeMeaning = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
-    NSLog(@"meaning of life appears to be %@", lifeMeaning);
+    
+    // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
+    // fare much better.  kmo 15 aug 2024 10h52
+    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
+    NSLog(@"%s: postInitMeaningOfLife = %@", __PRETTY_FUNCTION__, postInitMeaningOfLife);
 
     return self;
+}
+
+- (void)testPing {
+    NSLog(@"pinging via %s", __PRETTY_FUNCTION__);
+    [self.xpcRemoteObjectProxy ping];
+}
+
+- (NSNumber *)meaningOfLife {
+    return [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters

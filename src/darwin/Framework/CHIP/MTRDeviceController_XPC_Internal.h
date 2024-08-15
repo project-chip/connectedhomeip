@@ -14,15 +14,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "MTRDeviceController.h"
-#import "MTRDefines_Internal.h" // MTR_TESTABLE
+#import "MTRDeviceController_XPC.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@interface MTRDeviceController_XPC (Internal)
 
-MTR_TESTABLE
-@interface MTRDeviceController_XPC : MTRDeviceController
+- (id)initWithXPCConnection:(NSXPCConnection *)newConnection;
+- (id)initWithTestXPCListener;
+- (void)testPing;
+- (NSNumber *)meaningOfLife;
 
 @end
-
-NS_ASSUME_NONNULL_END
