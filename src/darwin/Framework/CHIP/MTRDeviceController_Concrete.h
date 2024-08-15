@@ -17,9 +17,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRDeviceController.h>
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
