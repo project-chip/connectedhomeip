@@ -101,9 +101,12 @@ struct LocationDescriptorStruct
     std::optional<Globals::AreaTypeTag> mAreaType;
 };
 
-struct EcosystemLocationIdentifier {
-    bool operator<(const EcosystemLocationIdentifier& other) const {
-        return mUniqueLocationId < other.mUniqueLocationId || (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
+struct EcosystemLocationIdentifier
+{
+    bool operator<(const EcosystemLocationIdentifier & other) const
+    {
+        return mUniqueLocationId < other.mUniqueLocationId ||
+            (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
     }
     std::string mUniqueLocationId;
     FabricIndex mFabricIndex;
@@ -134,7 +137,8 @@ public:
         bool mIsAlreadyBuilt                        = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const EcosystemLocationIdentifier & aUniqueLocationId);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder,
+                      const EcosystemLocationIdentifier & aUniqueLocationId);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with

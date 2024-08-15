@@ -233,7 +233,8 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
                                            const EcosystemLocationIdentifier & aUniqueLocationId)
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
-    locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.mUniqueLocationId.c_str(), aUniqueLocationId.mUniqueLocationId.size());
+    locationStruct.uniqueLocationID =
+        CharSpan(aUniqueLocationId.mUniqueLocationId.c_str(), aUniqueLocationId.mUniqueLocationId.size());
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
     locationStruct.SetFabricIndex(aUniqueLocationId.mFabricIndex);
@@ -271,8 +272,7 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
 }
 
 CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId,
-                                                       FabricIndex aFabricIndex,
-                                                       std::unique_ptr<EcosystemLocationStruct> aLocation)
+                                                       FabricIndex aFabricIndex, std::unique_ptr<EcosystemLocationStruct> aLocation)
 {
     VerifyOrReturnError(aLocation, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
@@ -282,7 +282,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
     // TODO rename foobar
-    EcosystemLocationIdentifier foobar = {.mUniqueLocationId=aLocationId, .mFabricIndex=aFabricIndex};
+    EcosystemLocationIdentifier foobar = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(foobar) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
