@@ -89,8 +89,6 @@ def main(search_directory, env_file):
         "choice_conformance_support.py",
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
-        "TestMatterTestingSupport.py",
-        "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",
         "basic_composition_support.py",
         "conformance_support.py",
