@@ -387,9 +387,9 @@ CHIP_ERROR EcosystemInformationServer::EncodeLocationStructAttribute(EndpointId 
     }
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto & [id, device] : deviceInfo.mLocationDirectory)
+        for (auto & [key, device] : deviceInfo.mLocationDirectory)
         {
-            ReturnErrorOnFailure(device->Encode(encoder, id));
+            ReturnErrorOnFailure(device->Encode(encoder, key.mUniqueLocationId, key.mFabricIndex));
         }
         return CHIP_NO_ERROR;
     });
