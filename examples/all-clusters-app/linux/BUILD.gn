@@ -29,10 +29,10 @@ if (chip_enable_pw_rpc) {
 
 source_set("chip-all-clusters-common") {
   sources = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmDelegateImpl.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmInstance.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmMain.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
@@ -62,7 +62,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/water-heater-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
@@ -102,6 +102,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
     "${chip_root}/examples/thermostat/linux/include",
   ]
 
