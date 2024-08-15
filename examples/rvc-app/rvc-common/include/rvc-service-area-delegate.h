@@ -30,7 +30,7 @@ namespace Clusters {
 class RvcDevice;
 
 typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan & statusText);
-typedef bool (RvcDevice::* HandleSkipAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+typedef bool (RvcDevice::*HandleSkipAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
 
 namespace ServiceArea {
@@ -171,8 +171,8 @@ public:
 
     void SetHandleSkipAreaCallback(HandleSkipAreaCallback callback, RvcDevice * instance)
     {
-        mHandleSkipAreaCallback              = callback;
-        mHandleSkipAreaDeviceInstance        = instance;
+        mHandleSkipAreaCallback       = callback;
+        mHandleSkipAreaDeviceInstance = instance;
     }
 
     void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
