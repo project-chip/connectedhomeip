@@ -303,6 +303,7 @@
 		99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 99C65E0F267282F1003402F6 /* MTRControllerTests.m */; };
 		99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 99D466E02798936D0089A18F /* MTRCommissioningParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9B231B042C62EF650030EB37 /* MTRDeviceController_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B231B022C62EF650030EB37 /* MTRDeviceController_Concrete.h */; };
+		9B4143812C6E662300B86FBD /* MTRXPCServiceTestsDummyService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BC0649B2C6C152E00996FEF /* MTRXPCServiceTestsDummyService.m */; };
 		9BC064942C6BCB6F00996FEF /* MTRXPCService.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064922C6BCB6F00996FEF /* MTRXPCService.h */; };
 		9BC064952C6BCB6F00996FEF /* MTRXPCService.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064932C6BCB6F00996FEF /* MTRXPCService.mm */; };
 		9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */; };
@@ -2039,6 +2040,7 @@
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				75B3269E2BCDB9EA00E17C4E /* MTRDeviceConnectivityMonitor.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
+				9B4143812C6E662300B86FBD /* MTRXPCServiceTestsDummyService.m in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
 				514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,

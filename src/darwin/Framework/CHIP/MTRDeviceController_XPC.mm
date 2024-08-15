@@ -15,13 +15,55 @@
  */
 
 #import "MTRDeviceController_XPC.h"
+#import "MTRXPCServiceProtocol.h"
 #import "MTRLogging_Internal.h"
+#import "MTRDeviceController_Internal.h"
 
 @interface MTRDeviceController_XPC ()
-@property (nonatomic, strong) NSXPCConnection * xpcConnection;
+@property (retain, readwrite) NSXPCConnection * xpcConnection;
+@property (retain, readwrite) id<MTRXPCServiceProtocol> xpcRemoteObjectProxy;
+
+// testing only
+@property (retain, readwrite) NSXPCListener * testListener;
+
+@end
+
+@implementation MTRDeviceController_XPC (TestXPCListener)
+
 @end
 
 @implementation MTRDeviceController_XPC
+
+- (id)initWithTestXPCListener {
+    // TODO:  update with well-known service name
+//    self.xpcConnection = [[NSXPCConnection alloc] initWithServiceName:@"wellknown"];
+
+    // testing mode
+    self.testListener = [NSXPCListener anonymousListener];
+    [self.testListener setDelegate:self];
+    [self.testListener resume];
+    NSXPCConnection * xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:self.testListener.endpoint];
+
+    return [self initWithXPCConnection:xpcConnection];
+}
+
+- (id)initWithXPCConnection:(NSXPCConnection *)newConnection
+{
+//    if (!(self = [super initForSubclasses])) {
+//        return nil;
+//    }
+
+    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
+    self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
+    [self.xpcConnection resume];
+
+    // ping and meaning of life just as a test
+    [self.xpcRemoteObjectProxy ping];
+    NSNumber * lifeMeaning = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
+    NSLog(@"meaning of life appears to be %@", lifeMeaning);
+
+    return self;
+}
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error 
@@ -35,21 +77,8 @@
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
-    // xpc things obviously! kmo 14 aug 2024 12h35
-    // transform async work to sync work
-
-    MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
-    return false;
-}
-
-typedef void (^BoolReplyBlock)(bool);
-- (void)_xpc_setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
-                                        newNodeID:(NSNumber *)newNodeID
-                                            error:(NSError * __autoreleasing *)error
-                                            reply:(BoolReplyBlock)reply
-{
-    MTR_LOG_ERROR("unimplemented XPC method %s called", __PRETTY_FUNCTION__);
-    reply(false);
+    MTR_LOG_DEBUG("called XPC stub %s", __PRETTY_FUNCTION__);
+    return [self.xpcRemoteObjectProxy setupCommissioningSessionWithPayload:payload newNodeID:newNodeID error:error];
 }
 
 @end

@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController_XPC : MTRDeviceController
+@interface MTRDeviceController_XPC : MTRDeviceController<NSXPCListenerDelegate> // temporarily XPCListenerDelegate
 
 @end
 

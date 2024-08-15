@@ -33,9 +33,21 @@
     MTR_LOG_DEBUG("PONG! %s", __PRETTY_FUNCTION__);
 }
 
-- (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply
+- (nonnull NSNumber *)synchronouslyGetMeaningOfLife { 
+    return @(42);
+}
+
+- (void)getMeaningOfLifeWithReplyBlock:(nonnull MTRXPCServiceIntReplyBlock)reply
 {
     reply(42);
+}
+
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error
+{
+    // temporary stub implementation
+    return false;
 }
 
 @end

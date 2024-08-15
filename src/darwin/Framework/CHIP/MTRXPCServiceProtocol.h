@@ -25,14 +25,21 @@ typedef void (^MTRXPCServiceBoolReplyBlock)(BOOL);
 
 @protocol MTRXPCServiceProtocol <NSObject>
 - (void)ping;
+- (NSNumber *)synchronouslyGetMeaningOfLife;
 - (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply;
 
-// these real methods will be optional for now, but not when we are done building here.
-@optional
-- (void)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
-newNodeID:(NSNumber *)newNodeID
-error:(NSError * __autoreleasing *)error
-reply:(MTRXPCServiceBoolReplyBlock)reply;
+// temporary inclusion
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error;
+
+@end
+
+@protocol MTRXPCServiceDeviceControllerProtocol <NSObject>
+
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error;
 
 @end
 
