@@ -49,9 +49,9 @@
 
 - (id)initWithXPCConnection:(NSXPCConnection *)newConnection
 {
-//    if (!(self = [super initForSubclasses])) {
-//        return nil;
-//    }
+    if (!(self = [super initForSubclasses])) {
+        return nil;
+    }
 
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
     self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
