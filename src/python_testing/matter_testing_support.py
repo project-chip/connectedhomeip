@@ -29,6 +29,7 @@ import re
 import sys
 import time
 import typing
+import textwrap
 import uuid
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
@@ -1123,11 +1124,59 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+
+            try:
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                # If we failed during setup, these may not be populated
+                step_duration = 0
+            try:
+                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+            def extract_error_text() -> tuple[str, str]:
+                no_stack_trace = ("Stack Trace Unavailable", "")
+                if not record.termination_signal.stacktrace:
+                    return no_stack_trace
+                trace = record.termination_signal.stacktrace.splitlines()
+                if not trace:
+                    return no_stack_trace
+
+                if isinstance(exception, signals.TestError):
+                    # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and not "asserts.py" in line]
+                    if not assert_candidates:
+                        return "Unknown error, please see stack trace above", ""
+                    assert_candidate_idx = assert_candidates[-1]
+                else:
+                    # Normal assert is on the Last line
+                    assert_candidate_idx = -1
+                probable_error = trace[assert_candidate_idx]
+
+                # Find the file marker immediately above the probable error
+                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
+                if not file_candidates:
+                    return probable_error, "Unknown file"
+                return probable_error.strip(), trace[file_candidates[-1]].strip()
+
+            probable_error, probable_file = extract_error_text()
+            logging.error(textwrap.dedent(f"""
+
+                                          ******************************************************************
+                                          *
+                                          * Test {self.current_test_info.name} failed for the following reason:
+                                          * {exception}
+                                          *
+                                          * {probable_file}
+                                          * {probable_error}
+                                          *
+                                          *******************************************************************
+
+                                          """))
 
     def on_pass(self, record):
         ''' Called by Mobly on test pass
