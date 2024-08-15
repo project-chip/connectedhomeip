@@ -57,7 +57,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         steps = [
-            TestStep("0", "Preconditions"),
+            TestStep("0",  "DUT commissioned", is_commissioning=True),
+            TestStep("0a", "Preconditions"),
             TestStep("1a", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("1b", "Simple KeepActive command w/ subscription. ActiveChanged event received by TH contains PromisedActiveDuration"),
             TestStep("2", "Sends 3x KeepActive commands w/ subscription. ActiveChanged event received ONCE and contains PromisedActiveDuration"),
@@ -164,8 +165,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         dynamic_endpoint_id = await self._get_dynamic_endpoint()
         logging.info(f"Dynamic endpoint is {dynamic_endpoint_id}")
 
-        # Preconditions
         self.step("0")
+
+        # Preconditions
+        self.step("0a")
 
         logging.info("Ensuring DUT is commissioned to TH")
 
