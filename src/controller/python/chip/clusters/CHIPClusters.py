@@ -6658,12 +6658,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "Boost",
                 "args": {
-                    "duration": "int",
-                    "oneShot": "bool",
-                    "emergencyBoost": "bool",
-                    "temporarySetpoint": "int",
-                    "targetPercentage": "int",
-                    "targetReheat": "int",
+                    "boostInfo": "WaterHeaterBoostInfoStruct",
                 },
             },
             0x00000001: {
@@ -8571,6 +8566,7 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "SkipArea",
                 "args": {
+                    "skippedArea": "int",
                 },
             },
         },
@@ -11967,6 +11963,12 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
                 "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "PendingDatasetTimestamp",
+                "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },

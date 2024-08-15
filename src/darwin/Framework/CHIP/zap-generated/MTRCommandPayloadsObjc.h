@@ -5495,17 +5495,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWaterHeaterManagementClusterBoostParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable oneShot MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable emergencyBoost MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable temporarySetpoint MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable targetPercentage MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable targetReheat MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct * _Nonnull boostInfo MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7671,7 +7661,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRServiceAreaClusterSelectAreasResponseParams with a response-value dictionary
@@ -7689,6 +7679,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterSkipAreaParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull skippedArea MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7720,7 +7712,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRServiceAreaClusterSkipAreaResponseParams with a response-value dictionary

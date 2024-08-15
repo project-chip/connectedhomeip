@@ -20,8 +20,6 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the  NXP SDK.
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "NXPConfig.h"
 
@@ -29,6 +27,7 @@
 #include "FunctionLib.h"
 #include "board.h"
 #include <lib/core/CHIPEncoding.h>
+#include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "fwk_file_cache.h"

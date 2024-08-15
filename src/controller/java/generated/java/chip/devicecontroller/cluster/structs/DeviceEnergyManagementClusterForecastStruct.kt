@@ -52,7 +52,7 @@ class DeviceEnergyManagementClusterForecastStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_FORECAST_I_D), forecastID)
+      put(ContextSpecificTag(TAG_FORECAST_ID), forecastID)
       if (activeSlotNumber != null) {
         put(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER), activeSlotNumber)
       } else {
@@ -84,7 +84,7 @@ class DeviceEnergyManagementClusterForecastStruct(
   }
 
   companion object {
-    private const val TAG_FORECAST_I_D = 0
+    private const val TAG_FORECAST_ID = 0
     private const val TAG_ACTIVE_SLOT_NUMBER = 1
     private const val TAG_START_TIME = 2
     private const val TAG_END_TIME = 3
@@ -96,7 +96,7 @@ class DeviceEnergyManagementClusterForecastStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterForecastStruct {
       tlvReader.enterStructure(tlvTag)
-      val forecastID = tlvReader.getULong(ContextSpecificTag(TAG_FORECAST_I_D))
+      val forecastID = tlvReader.getULong(ContextSpecificTag(TAG_FORECAST_ID))
       val activeSlotNumber =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))

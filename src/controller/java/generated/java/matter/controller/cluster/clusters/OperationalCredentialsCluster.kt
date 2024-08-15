@@ -244,12 +244,12 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_C_S_R_NONCE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_C_S_R_NONCE_REQ), CSRNonce)
+    val TAG_CSR_NONCE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CSR_NONCE_REQ), CSRNonce)
 
-    val TAG_IS_FOR_UPDATE_N_O_C_REQ: Int = 1
+    val TAG_IS_FOR_UPDATE_NOC_REQ: Int = 1
     isForUpdateNOC?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_IS_FOR_UPDATE_N_O_C_REQ), isForUpdateNOC)
+      tlvWriter.put(ContextSpecificTag(TAG_IS_FOR_UPDATE_NOC_REQ), isForUpdateNOC)
     }
     tlvWriter.endStructure()
 
@@ -265,7 +265,7 @@ class OperationalCredentialsCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_N_O_C_S_R_ELEMENTS: Int = 0
+    val TAG_NOCSR_ELEMENTS: Int = 0
     var NOCSRElements_decoded: ByteArray? = null
 
     val TAG_ATTESTATION_SIGNATURE: Int = 1
@@ -274,7 +274,7 @@ class OperationalCredentialsCluster(
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_N_O_C_S_R_ELEMENTS)) {
+      if (tag == ContextSpecificTag(TAG_NOCSR_ELEMENTS)) {
         NOCSRElements_decoded = tlvReader.getByteArray(tag)
       }
 
@@ -311,14 +311,14 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_N_O_C_VALUE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_N_O_C_VALUE_REQ), NOCValue)
+    val TAG_NOC_VALUE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NOC_VALUE_REQ), NOCValue)
 
-    val TAG_I_C_A_C_VALUE_REQ: Int = 1
-    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_I_C_A_C_VALUE_REQ), ICACValue) }
+    val TAG_ICAC_VALUE_REQ: Int = 1
+    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_ICAC_VALUE_REQ), ICACValue) }
 
-    val TAG_I_P_K_VALUE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_I_P_K_VALUE_REQ), IPKValue)
+    val TAG_IPK_VALUE_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_IPK_VALUE_REQ), IPKValue)
 
     val TAG_CASE_ADMIN_SUBJECT_REQ: Int = 3
     tlvWriter.put(ContextSpecificTag(TAG_CASE_ADMIN_SUBJECT_REQ), caseAdminSubject)
@@ -405,11 +405,11 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_N_O_C_VALUE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_N_O_C_VALUE_REQ), NOCValue)
+    val TAG_NOC_VALUE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NOC_VALUE_REQ), NOCValue)
 
-    val TAG_I_C_A_C_VALUE_REQ: Int = 1
-    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_I_C_A_C_VALUE_REQ), ICACValue) }
+    val TAG_ICAC_VALUE_REQ: Int = 1
+    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_ICAC_VALUE_REQ), ICACValue) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -645,8 +645,8 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_ROOT_C_A_CERTIFICATE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ROOT_C_A_CERTIFICATE_REQ), rootCACertificate)
+    val TAG_ROOT_CA_CERTIFICATE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_ROOT_CA_CERTIFICATE_REQ), rootCACertificate)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
