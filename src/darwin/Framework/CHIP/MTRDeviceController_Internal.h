@@ -311,13 +311,4 @@ static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = 
 static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
-@interface MTRDeviceController () {
-@protected
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
-}
-@end
-
 NS_ASSUME_NONNULL_END

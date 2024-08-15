@@ -114,7 +114,13 @@ using namespace chip::Tracing::DarwinFramework;
 
 @end
 
-@implementation MTRDeviceController_Concrete
+@implementation MTRDeviceController_Concrete {
+    // queue used to serialize all work performed by the MTRDeviceController
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
+}
 
 // MTRDeviceController ivar internal access
 @synthesize uniqueIdentifier = _uniqueIdentifier;
@@ -126,6 +132,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
+@synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 
 - (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                                         error:(NSError * __autoreleasing *)error
@@ -981,8 +988,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    auto block = ^MTRBaseDevice *
-    {
+    auto block = ^MTRBaseDevice * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
@@ -1140,8 +1146,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    auto block = ^NSData *
-    {
+    auto block = ^NSData * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = CHIP_NO_ERROR;
@@ -1855,8 +1860,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return nil;
     }
 
-    auto block = ^NSString *
-    {
+    auto block = ^NSString * {
         chip::SetupPayload setupPayload;
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,

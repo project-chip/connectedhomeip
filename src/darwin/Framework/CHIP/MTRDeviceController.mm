@@ -127,6 +127,10 @@ using namespace chip::Tracing::DarwinFramework;
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
 
     MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
 - (instancetype)initForSubclasses
