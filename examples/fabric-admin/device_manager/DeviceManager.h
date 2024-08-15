@@ -55,13 +55,19 @@ public:
 
     chip::NodeId GetRemoteBridgeNodeId() const { return mRemoteBridgeNodeId; }
 
+    chip::NodeId GetLocalBridgeNodeId() const { return mLocalBridgeNodeId; }
+
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId remoteBridgeNodeId) { mRemoteBridgeNodeId = remoteBridgeNodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+
+    void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
     bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
 
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
+
+    bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
     void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
 
@@ -126,7 +132,19 @@ public:
      */
     void PairRemoteDevice(chip::NodeId nodeId, const char * payload);
 
+    /**
+     * @brief Pair a local fabric bridge with a given node ID.
+     *
+     * This function initiates the pairing process for the local fabric bridge using the specified parameters.
+
+     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
+     *                          as for the first fabric.
+     */
+    void PairLocalFabricBridge(chip::NodeId nodeId);
+
     void UnpairRemoteFabricBridge();
+
+    void UnpairLocalFabricBridge();
 
     void SubscribeRemoteFabricBridge();
 
@@ -147,8 +165,16 @@ private:
 
     static DeviceManager sInstance;
 
-    chip::NodeId mLastUsedNodeId     = 0;
+    chip::NodeId mLastUsedNodeId = 0;
+
+    // The Node ID of the remote bridge used for Fabric-Sync
+    // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
+
+    // The Node ID of the local bridge used for Fabric-Sync
+    // This represents the bridge within its own ecosystem.
+    chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
+
     std::set<Device> mSyncedDevices;
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
