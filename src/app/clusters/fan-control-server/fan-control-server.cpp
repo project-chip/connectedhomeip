@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -52,17 +53,17 @@ Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
 struct EmberAfFanControlState {
     bool moveStarted;
-    DataModel::Nullable<chip::Percent> endPercent;
-    QuieterReportingAttribute<uint16_t> quietPercentCurrent{ DataModel::Nullable<chip::Percent>(0) };
+    chip::Percent endPercent;
+    QuieterReportingAttribute<chip::Percent> quietPercentCurrent{ chip::Percent(0) };
 };
 
 static EmberAfFanControlState stateTable[kFanControlDelegateTableSize];
 
+} // anonymous namespace
+
 static EmberAfFanControlState * getState(EndpointId endpoint);
 
-static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nullable<chip::Percent> newValue);
-
-} // anonymous namespace
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent newValue);
 
 namespace chip {
 namespace app {
@@ -167,8 +168,8 @@ void emberAfFanControlClusterServerInitCallback(EndpointId endpoint)
     state->quietPercentCurrent.policy()
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 
-    DataModel::Nullable<chip::Percent> percentCurrent;
-    Status status = Attributes::PercentCurrent::Get(endpoint, percentCurrent);
+    chip::Percent percentCurrent;
+    Status status = Attributes::PercentCurrent::Get(endpoint, &percentCurrent);
     state->moveStarted = false;
     if (status == Status::Success)
     {
@@ -277,16 +278,16 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         else
         {
             // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other logic???)
-            EmberAfFanControlState * state = getState(endpoint);
+            EmberAfFanControlState * state = getState(attributePath.mEndpointId);
             if (state == nullptr)
             {
-                ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", endpoint);
-                res Status::Failure;
+                ChipLogProgress(Zcl, "ERR: Fan control cluster not available on ep%d", attributePath.mEndpointId);
+                res = Status::Failure;
             }
             else
             {
                 state->moveStarted = true;
-                state->endPercent = (DataModel::Nullable<chip::Percent>)*value;
+                state->endPercent = (chip::Percent)*value;
                 res = Status::Success;
             }
         }
@@ -348,7 +349,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         break;
     }
     case PercentCurrent::Id: {
-        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, value);
+        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, (chip::Percent)*value);
         break;
     }
     default:
@@ -552,7 +553,7 @@ static EmberAfFanControlState * getState(EndpointId endpoint)
  * @param newValue: Value to update the attribute with
  * @return WriteIgnored in setting the attribute value or the IM error code for the failure.
  */
-static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nullable<chip::Percent> newValue)
+static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent newValue)
 {
     AttributeDirtyState dirtyState;
     auto now = System::SystemClock().GetMonotonicTimestamp();
@@ -564,8 +565,7 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nulla
         return Status::Failure;
     }
 
-    bool isStartOrEndOfTransition = state->moveStarted || 
-        ((DataModel::Nullable<chip::Percent>)*value == state->endPercent)
+    bool isStartOrEndOfTransition = state->moveStarted || (newValue == state->endPercent);
     state->moveStarted = false;
 
     if (isStartOrEndOfTransition)
@@ -590,7 +590,7 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, DataModel::Nulla
         markDirty = MarkAttributeDirty::kYes;
     }
 
-    Status  res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value(), markDirty);
+    Status  res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value().Value(), markDirty);
     if (res == Status::Success)
     {
         res = Status::WriteIgnored;
