@@ -302,11 +302,11 @@ class GeneralCommissioningCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_T_C_VERSION_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_T_C_VERSION_REQ), TCVersion)
+    val TAG_TC_VERSION_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_TC_VERSION_REQ), TCVersion)
 
-    val TAG_T_C_USER_RESPONSE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_T_C_USER_RESPONSE_REQ), TCUserResponse)
+    val TAG_TC_USER_RESPONSE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_TC_USER_RESPONSE_REQ), TCUserResponse)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
