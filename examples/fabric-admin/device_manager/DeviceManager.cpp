@@ -331,7 +331,8 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     // Process added endpoints
     for (const auto & endpoint : addedEndpoints)
     {
-        ChipLogProgress(NotSpecified, "Endpoint added: %u", endpoint);
+        // print to console
+        fprintf(stderr, "A new devie is added on Endpoint: %u\n", endpoint);
 
         if (mAutoSyncEnabled)
         {
