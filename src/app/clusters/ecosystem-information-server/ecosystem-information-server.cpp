@@ -233,8 +233,7 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
                                            const std::string & aUniqueLocationId, const FabricIndex & aFabricIndex)
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
-    locationStruct.uniqueLocationID =
-        CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
+    locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
     locationStruct.SetFabricIndex(aFabricIndex);
@@ -280,7 +279,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     VerifyOrReturnError(aFabricIndex >= kMinValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aFabricIndex <= kMaxValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto & deviceInfo        = mDevicesMap[aEndpoint];
     EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);

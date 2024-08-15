@@ -126,8 +126,8 @@ public:
         bool mIsAlreadyBuilt                        = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder,
-                      const std::string & aUniqueLocationId, const FabricIndex & aFabricIndex);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
+                      const FabricIndex & aFabricIndex);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
