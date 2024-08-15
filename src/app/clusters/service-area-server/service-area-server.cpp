@@ -369,11 +369,11 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::Sk
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
 
-    // If the SelectedAreas attribute is null, the response status should be set to InvalidAreaList.
+    // The SkippedArea field SHALL match an entry in the SupportedAreas list.
     // If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
-    if (mDelegate->GetNumberOfSelectedAreas() == 0)
+    if (!IsSupportedArea(req.skippedArea))
     {
-        ChipLogError(Zcl, "Selected Areas attribute is null");
+        ChipLogError(Zcl, "SkippedArea (%u) is not in the SupportedAreas attribute.", req.skippedArea);
         exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
         return;
     }
