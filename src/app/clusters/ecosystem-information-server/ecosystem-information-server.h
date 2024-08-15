@@ -49,6 +49,7 @@ public:
         Builder & SetOriginalEndpoint(EndpointId aOriginalEndpoint);
         Builder & AddDeviceType(Structs::DeviceTypeStruct::Type aDeviceType);
         Builder & AddUniqueLocationId(std::string aUniqueLocationId, uint64_t aUniqueLocationIdsLastEditEpochUs);
+        Builder & SetFabricIndex(FabricIndex aFabricIndex);
 
         // Upon success this object will have moved all ownership of underlying
         // types to EcosystemDeviceStruct and should not be used afterwards.
@@ -62,21 +63,25 @@ public:
         std::vector<Structs::DeviceTypeStruct::Type> mDeviceTypes;
         std::vector<std::string> mUniqueLocationIds;
         uint64_t mUniqueLocationIdsLastEditEpochUs = 0;
+        FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
         bool mIsAlreadyBuilt                       = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const FabricIndex & aFabricIndex);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
     explicit EcosystemDeviceStruct(std::string && aDeviceName, uint64_t aDeviceNameLastEditEpochUs, EndpointId aBridgedEndpoint,
                                    EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> && aDeviceTypes,
-                                   std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs) :
+                                   std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs,
+                                   FabricIndex aFabricIndex) :
         mDeviceName(std::move(aDeviceName)),
         mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs), mBridgedEndpoint(aBridgedEndpoint),
         mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
-        mUniqueLocationIds(std::move(aUniqueLocationIds)), mUniqueLocationIdsLastEditEpochUs(aUniqueLocationIdsLastEditEpochUs)
+        mUniqueLocationIds(std::move(aUniqueLocationIds)), mUniqueLocationIdsLastEditEpochUs(aUniqueLocationIdsLastEditEpochUs),
+        mFabricIndex(aFabricIndex)
+
     {}
 
     const std::string mDeviceName;
@@ -86,10 +91,7 @@ private:
     std::vector<Structs::DeviceTypeStruct::Type> mDeviceTypes;
     std::vector<std::string> mUniqueLocationIds;
     uint64_t mUniqueLocationIdsLastEditEpochUs;
-    // TODO(#33223) This structure needs to contain fabric index to be spec compliant.
-    // To keep initial PR smaller, we are going to assume that all entries
-    // here are for any fabric. This will allow follow up PR introducing
-    // fabric scoped to be more throughly reviewed with focus on fabric scoping.
+    FabricIndex mFabricIndex;
 };
 
 struct LocationDescriptorStruct
@@ -113,6 +115,7 @@ public:
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
         Builder & SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag);
         Builder & SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs);
+        Builder & SetFabricIndex(FabricIndex aFabricIndex);
 
         // Upon success this object will have moved all ownership of underlying
         // types to EcosystemDeviceStruct and should not be used afterwards.
@@ -121,17 +124,17 @@ public:
     private:
         LocationDescriptorStruct mLocationDescriptor;
         uint64_t mLocationDescriptorLastEditEpochUs = 0;
+        FabricIndex mFabricIndex                    = kUndefinedFabricIndex;
         bool mIsAlreadyBuilt                        = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
-                      const FabricIndex & aFabricIndex);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
-    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs) :
-        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
+    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs, FabricIndex aFabricIndex) :
+        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs), mFabricIndex(aFabricIndex)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.
     // Because UniqueLocationId is manditory when an entry exist, and
@@ -139,10 +142,7 @@ private:
     // not explicitly in this struct.
     LocationDescriptorStruct mLocationDescriptor;
     uint64_t mLocationDescriptorLastEditEpochUs;
-    // TODO(#33223) This structure needs to contain fabric index to be spec compliant.
-    // To keep initial PR smaller, we are going to assume that all entries
-    // here are for any fabric. This will allow follow up PR introducing
-    // fabric scoped to be more throughly reviewed with focus on fabric scoping.
+    FabricIndex mFabricIndex;
 };
 
 class EcosystemInformationServer
