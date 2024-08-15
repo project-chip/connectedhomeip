@@ -215,40 +215,28 @@ EcosystemLocationStruct::Builder::SetLocationDescriptorLastEdit(uint64_t aLocati
     return *this;
 }
 
-EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFabricIndex(FabricIndex aFabricIndex)
-{
-    VerifyOrDie(!mIsAlreadyBuilt);
-    mFabricIndex = aFabricIndex;
-    return *this;
-}
-
-
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
     VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
     VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provided Location Name"));
     VerifyOrReturnValue(mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
                         ChipLogError(Zcl, "Must Location Name must be less than 64 bytes"));
-    VerifyOrReturnValue(mFabricIndex >= kMinValidFabricIndex, nullptr, ChipLogError(Zcl, "Fabric index is invalid"));
-    VerifyOrReturnValue(mFabricIndex <= kMaxValidFabricIndex, nullptr, ChipLogError(Zcl, "Fabric index is invalid"));
 
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
-                                                                              mLocationDescriptorLastEditEpochUs,
-                                                                              mFabricIndex) };
+                                                                              mLocationDescriptorLastEditEpochUs) };
     mIsAlreadyBuilt = true;
     return ret;
 }
 
 CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder,
-                                           const std::string & aUniqueLocationId)
+                                           const EcosystemLocationIdentifier & aUniqueLocationId)
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
-    VerifyOrDie(!aUniqueLocationId.empty());
-    locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
+    locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.mUniqueLocationId.c_str(), aUniqueLocationId.mUniqueLocationId.size());
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
-    locationStruct.SetFabricIndex(mFabricIndex);
+    locationStruct.SetFabricIndex(aUniqueLocationId.mFabricIndex);
 
     return aEncoder.Encode(locationStruct);
 }
@@ -283,16 +271,22 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
 }
 
 CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId,
+                                                       FabricIndex aFabricIndex,
                                                        std::unique_ptr<EcosystemLocationStruct> aLocation)
 {
     VerifyOrReturnError(aLocation, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!aLocationId.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aFabricIndex >= kMinValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aFabricIndex <= kMaxValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(aLocationId) == deviceInfo.mLocationDirectory.end()),
+    // TODO rename foobar
+    EcosystemLocationIdentifier foobar = {.mUniqueLocationId=aLocationId, .mFabricIndex=aFabricIndex};
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(foobar) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
-    deviceInfo.mLocationDirectory[aLocationId] = std::move(aLocation);
+    deviceInfo.mLocationDirectory[foobar] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
 

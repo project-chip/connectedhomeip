@@ -101,6 +101,14 @@ struct LocationDescriptorStruct
     std::optional<Globals::AreaTypeTag> mAreaType;
 };
 
+struct EcosystemLocationIdentifier {
+    bool operator<(const EcosystemLocationIdentifier& other) const {
+        return mUniqueLocationId < other.mUniqueLocationId || (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
+    }
+    std::string mUniqueLocationId;
+    FabricIndex mFabricIndex;
+};
+
 // This intentionally mirrors Structs::EcosystemLocationStruct::Type but has ownership
 // of underlying types.
 class EcosystemLocationStruct
@@ -115,7 +123,6 @@ public:
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
         Builder & SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag);
         Builder & SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs);
-        Builder & SetFabricIndex(FabricIndex aFabricIndex);
 
         // Upon success this object will have moved all ownership of underlying
         // types to EcosystemDeviceStruct and should not be used afterwards.
@@ -124,25 +131,23 @@ public:
     private:
         LocationDescriptorStruct mLocationDescriptor;
         uint64_t mLocationDescriptorLastEditEpochUs = 0;
-        FabricIndex mFabricIndex                    = kUndefinedFabricIndex;
         bool mIsAlreadyBuilt                        = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const EcosystemLocationIdentifier & aUniqueLocationId);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
-    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs, FabricIndex aFabricIndex) :
-        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs), mFabricIndex(aFabricIndex)
+    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs) :
+        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.
-    // Because UniqueLocationId is manditory when an entry exist, and
-    // it is unique, we use it as a key to the key-value pair and is why it is
+    // Because UniqueLocationId and FabricIndex are manditory when an entry exist,
+    // and needs to be unique, we use it as a key to the key-value pair and is why it is
     // not explicitly in this struct.
     LocationDescriptorStruct mLocationDescriptor;
     uint64_t mLocationDescriptorLastEditEpochUs;
-    FabricIndex mFabricIndex;
 };
 
 class EcosystemInformationServer
@@ -186,7 +191,7 @@ public:
      * @return #CHIP_NO_ERROR on success.
      * @return Other CHIP_ERROR associated with issue.
      */
-    CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId,
+    CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId, FabricIndex aFabricIndex,
                                std::unique_ptr<EcosystemLocationStruct> aLocation);
 
     /**
@@ -207,8 +212,7 @@ private:
     {
         Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
-        // Map key is using the UniqueLocationId
-        std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
+        std::map<EcosystemLocationIdentifier, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
 
     CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
