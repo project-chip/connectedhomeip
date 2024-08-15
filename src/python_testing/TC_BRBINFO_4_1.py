@@ -74,7 +74,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             f"- setupQRCode: {setupQRCode}\n"
             f"- setupManualcode: {setupManualCode}\n"
             f"If using FabricSync Admin test app, you may type:\n"
-            f">>> pairing onnetwork 111 {setupPinCode}")
+            f">>> pairing onnetwork 111 {setupPinCode} --icd-registration true")
 
     async def _send_keep_active_command(self, duration, endpoint_id) -> int:
         logging.info("Sending keep active command")
