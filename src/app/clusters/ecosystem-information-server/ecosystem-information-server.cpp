@@ -237,7 +237,6 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
     locationStruct.SetFabricIndex(aFabricIndex);
-
     return aEncoder.Encode(locationStruct);
 }
 
