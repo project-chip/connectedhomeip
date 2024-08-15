@@ -416,7 +416,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
 #if CONFIG_BOARD_TLSR9118BDK40D // TLSR9118BDK40D EVK supports only 1 PWM channel connected to LED
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
-#elif CONFIG_WS2812_STRIP 
+#elif CONFIG_WS2812_STRIP
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
