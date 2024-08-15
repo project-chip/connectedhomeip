@@ -37,10 +37,6 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_5(MatterBaseTest):
-    async def read_ts_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
@@ -59,7 +55,8 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
     async def test_TC_TIMESYNC_2_5(self):
 
         # Time sync is required to be on endpoint 0 if it is present
-        self.endpoint = 0
+        asserts.assert_equal(self.matter_test_config.get(endpoint, 0), 0,
+                             "Time sync cluster is only allowed on endpoint 0, this test should not be run against other endpoints")
 
         time_cluster = Clusters.Objects.TimeSynchronization
         dst_struct = time_cluster.Structs.DSTOffsetStruct
@@ -69,7 +66,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         dst_offset_attr = attributes.DSTOffset
 
         self.print_step(1, "Read DSTOffsetListMaxSize attribute")
-        dst_max_size_dut = await self.read_ts_attribute_expect_success(attribute=attributes.DSTOffsetListMaxSize)
+        dst_max_size_dut = await self.read_single_attribute_check_success(attribute=attributes.DSTOffsetListMaxSize)
         asserts.assert_greater_equal(dst_max_size_dut, 1, "DSTOffsetListMaxSize must be at least 1")
 
         self.print_step(2, "Send SetDSTOffset command")
@@ -77,7 +74,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         await self.send_set_dst_cmd(dst=dst)
 
         self.print_step(3, "Read DSTOffset attribute")
-        attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+        attr = await self.read_single_attribute_check_success(dst_offset_attr)
         asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(4, "Test setting unsorted list - expect error")
@@ -89,7 +86,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(5, "Read DSTOffset attribute - expect empty")
         if dst_max_size_dut > 1:
-            attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+            attr = await self.read_single_attribute_check_success(dst_offset_attr)
             asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(6, "Test setting list with invalid second entry - expect error")
@@ -101,7 +98,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(7, "Read DSTOffset attribute - expect empty")
         if dst_max_size_dut > 1:
-            attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+            attr = await self.read_single_attribute_check_success(dst_offset_attr)
             asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(8, "Test setting list with two null values - expect error")
@@ -113,7 +110,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(9, "Read DSTOffset attribute - expect empty")
         if dst_max_size_dut > 1:
-            attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+            attr = await self.read_single_attribute_check_success(dst_offset_attr)
             asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(10, "Test setting list with null value not at end - expect error")
@@ -125,7 +122,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
 
         self.print_step(11, "Read DSTOffset attribute - expect empty")
         if dst_max_size_dut > 1:
-            attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+            attr = await self.read_single_attribute_check_success(dst_offset_attr)
             asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(12, "Test setting too many entries")
@@ -140,7 +137,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ResourceExhausted)
 
         self.print_step(13, "Read DSTOffset attribute - expect empty")
-        attr = await self.read_ts_attribute_expect_success(dst_offset_attr)
+        attr = await self.read_single_attribute_check_success(dst_offset_attr)
         asserts.assert_false(attr, "DSTOffset not set correctly to empty list")
 
         self.print_step(14, "Set valid list with null ValidUntil")
@@ -149,7 +146,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         await self.send_set_dst_cmd(dst=dst)
 
         self.print_step(15, "Read back list")
-        dut_dst = await self.read_ts_attribute_expect_success(dst_offset_attr)
+        dut_dst = await self.read_single_attribute_check_success(dst_offset_attr)
         asserts.assert_equal(dut_dst, dst)
 
         self.print_step(16, "Set valid list with non-null ValidUntil")
@@ -158,7 +155,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         await self.send_set_dst_cmd(dst=dst)
 
         self.print_step(17, "Read back list")
-        dut_dst = await self.read_ts_attribute_expect_success(dst_offset_attr)
+        dut_dst = await self.read_single_attribute_check_success(dst_offset_attr)
         asserts.assert_equal(dut_dst, dst)
 
         self.print_step(18, "Test setting max entries")
@@ -173,7 +170,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         await self.send_set_dst_cmd(dst=dst)
 
         self.print_step(19, "Read back list")
-        dut_dst = await self.read_ts_attribute_expect_success(dst_offset_attr)
+        dut_dst = await self.read_single_attribute_check_success(dst_offset_attr)
         asserts.assert_equal(dut_dst, dst)
 
         self.print_step(20, "Set empty list")

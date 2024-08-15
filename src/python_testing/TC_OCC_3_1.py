@@ -38,11 +38,6 @@ from mobly import asserts
 
 
 class TC_OCC_3_1(MatterBaseTest):
-    async def read_occ_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.OccupancySensing
-        endpoint = self.matter_test_config.endpoint
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
@@ -78,7 +73,7 @@ class TC_OCC_3_1(MatterBaseTest):
         self.step(1)  # commissioning and getting cluster attribute list
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
-        attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(attribute=attributes.AttributeList)
 
         has_hold_time = attributes.HoldTime.attribute_id in attribute_list
 
@@ -91,7 +86,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(3)
         # check if Occupancy attribute is 0
-        occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+        occupancy_dut = await self.read_single_attribute_check_success(attribute=attributes.Occupancy)
 
         # if occupancy is on, then wait until the sensor occupancy state is 0.
         if occupancy_dut == 1:
@@ -103,7 +98,7 @@ class TC_OCC_3_1(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after the sensor occupancy is detection ready state (occupancy attribute = 0)")
 
         # check sensor occupancy state is 0 for the next test step
-        occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+        occupancy_dut = await self.read_single_attribute_check_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is still 1.")
 
         self.step(4)
@@ -111,7 +106,7 @@ class TC_OCC_3_1(MatterBaseTest):
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
 
         # And then check if Occupancy attribute has changed.
-        occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+        occupancy_dut = await self.read_single_attribute_check_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 1, "Occupancy state is not changed to 1")
 
         self.step(5)
@@ -122,7 +117,7 @@ class TC_OCC_3_1(MatterBaseTest):
             # Start a timer based on HoldTime
             time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
 
-            occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+            occupancy_dut = await self.read_single_attribute_check_success(attribute=attributes.Occupancy)
             asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not 0 after HoldTime period")
 
         else:

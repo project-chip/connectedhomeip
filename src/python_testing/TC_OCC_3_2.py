@@ -40,11 +40,6 @@ from mobly import asserts
 
 
 class TC_OCC_3_2(MatterBaseTest):
-    async def read_occ_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.OccupancySensing
-        endpoint_id = self.matter_test_config.endpoint
-        return await self.read_single_attribute_check_success(endpoint=endpoint_id, cluster=cluster, attribute=attribute)
-
     def desc_TC_OCC_3_2(self) -> str:
         return "[TC-OCC-3.2] Subscription Report Verification with server as DUT"
 
@@ -93,14 +88,14 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step(1)
 
-        occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(attribute=attributes.OccupancySensorTypeBitmap)
+        occupancy_sensor_type_bitmap_dut = await self.read_single_attribute_check_success(attribute=attributes.OccupancySensorTypeBitmap)
         has_type_pir = ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPir) != 0) or \
                        ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic) != 0)
         has_type_ultrasonic = ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kUltrasonic) != 0) or \
                               ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic) != 0)
         has_type_contact = (occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPhysicalContact) != 0
 
-        attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
@@ -116,7 +111,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("3b")
         if attributes.Occupancy.attribute_id in attribute_list:
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+            initial_dut = await self.read_single_attribute_check_success(attribute=attributes.Occupancy)
             asserts.assert_equal(initial_dut, 0, "Occupancy attribute is still detected state")
 
         # TODO - Will add Namepiped to assimilate the manual sensor trigger here
@@ -134,7 +129,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_all_remaining_steps("4b")
 
         self.step("4b")
-        initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        initial_dut = await self.read_single_attribute_check_success(attribute=attributes.HoldTime)
 
         self.step("4c")
         # write a different a HoldTime attribute value
@@ -153,7 +148,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("5d")
         else:
             self.step("5b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
+            initial_dut = await self.read_single_attribute_check_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
 
             self.step("5c")
             # write the new attribute value
@@ -172,7 +167,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("6d")
         else:
             self.step("6b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+            initial_dut = await self.read_single_attribute_check_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
 
             self.step("6c")
             # write the new attribute value
@@ -191,7 +186,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("7d")
         else:
             self.step("7b")
-            initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
+            initial_dut = await self.read_single_attribute_check_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
 
             self.step("7c")
             # write the new attribute value

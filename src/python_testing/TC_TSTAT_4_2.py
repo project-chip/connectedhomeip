@@ -211,7 +211,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, initial_presets, "Presets do not match initial value")
 
@@ -229,14 +229,14 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
             # Read the presets attribute and verify it was updated by the write
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were updated, as expected")
 
             await self.send_atomic_request_rollback_command()
 
             # Read the presets attribute and verify it has been properly rolled back
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=cluster.Attributes.Presets)
             asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
 
         self.step("4")
@@ -252,7 +252,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command()
 
             # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
@@ -277,7 +277,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
 
             # Read the active preset handle attribute and verify it was updated to preset handle
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
             asserts.assert_equal(activePresetHandle, b'\x03', "Active preset handle was not updated as expected")
 

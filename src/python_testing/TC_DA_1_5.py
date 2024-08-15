@@ -189,14 +189,12 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(15, "Read NOCs list for TH1")
         temp = await self.read_single_attribute_check_success(
-            cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.NOCs)
         asserts.assert_equal(len(temp), 1, "Returned NOC list does not contain one entry")
         th1_noc = temp[0].noc
 
         self.print_step(16, "Read NOCs list for TH2")
         temp = await self.read_single_attribute_check_success(
-            cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.NOCs, dev_ctrl=TH2)
         asserts.assert_equal(len(temp), 1, "Returned NOC list does not contain one entry")
         th2_noc = temp[0].noc
@@ -212,7 +210,6 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(17, "Read the fabric index for TH2")
         th2_idx = await self.read_single_attribute_check_success(
-            Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=TH2)
 
         self.print_step(18, "Remove TH2")

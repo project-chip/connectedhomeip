@@ -72,7 +72,7 @@ class TestICDManagementCluster(MatterBaseTest):
             )
         )
 
-        startingICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=Clusters.Objects.IcdManagement, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
+        startingICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
 
         asserts.assert_is_none(
             await dev_ctrl.SendCommand(
@@ -82,7 +82,7 @@ class TestICDManagementCluster(MatterBaseTest):
                                                                               eventTrigger=ICDTestEventTriggerOperations.kInvalidateHalfCounterValues)
             )
         )
-        currentICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=Clusters.Objects.IcdManagement, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
+        currentICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
 
         # Check new current counter value has the expected value
         asserts.assert_equal((ctypes.c_uint32(startingICDCounter + kHalfMaxUint32Value).value),
@@ -99,7 +99,7 @@ class TestICDManagementCluster(MatterBaseTest):
                                                                               eventTrigger=ICDTestEventTriggerOperations.kInvalidateAllCounterValues)
             )
         )
-        currentICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=Clusters.Objects.IcdManagement, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
+        currentICDCounter = await self.read_single_attribute_check_success(endpoint=kRootEndpointId, attribute=Clusters.IcdManagement.Attributes.ICDCounter)
 
         # Check new current counter value has the expected value
         asserts.assert_equal((ctypes.c_uint32(startingICDCounter + kMaxUint32Value).value),

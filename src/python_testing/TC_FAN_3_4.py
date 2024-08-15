@@ -34,23 +34,18 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-#import time
+# import time
 
 
 logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_4(MatterBaseTest):
-
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_wind_support(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.WindSupport)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.WindSupport)
 
     async def read_wind_setting(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.WindSetting)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.WindSetting)
 
     async def write_wind_setting(self, endpoint, wind_setting):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.WindSetting(wind_setting))])

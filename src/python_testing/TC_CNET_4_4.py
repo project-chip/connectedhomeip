@@ -53,17 +53,17 @@ class TC_CNET_4_4(MatterBaseTest):
         attr = cnet.Attributes
 
         self.step(1)
-        feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=attr.FeatureMap)
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logging.info('Device does not support WiFi on endpoint, skipping remaining steps')
             self.skip_all_remaining_steps(2)
             return
 
         self.step(2)
-        supported_wifi_bands = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.SupportedWiFiBands)
+        supported_wifi_bands = await self.read_single_attribute_check_success(attribute=attr.SupportedWiFiBands)
 
         self.step(3)
-        networks = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
+        networks = await self.read_single_attribute_check_success(attribute=attr.Networks)
         connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
@@ -113,14 +113,14 @@ class TC_CNET_4_4(MatterBaseTest):
         await scan_and_check(ssid_to_scan=None, breadcrumb=1, expect_results=True)
 
         self.step(5)
-        breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
+        breadcrumb = await self.read_single_attribute_check_success(attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 1, "Incorrect breadcrumb value")
 
         self.step(6)
         await scan_and_check(ssid_to_scan=known_ssid, breadcrumb=2, expect_results=True)
 
         self.step(7)
-        breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
+        breadcrumb = await self.read_single_attribute_check_success(attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 2, "Incorrect breadcrumb value")
 
         self.step(8)

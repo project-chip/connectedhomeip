@@ -67,20 +67,12 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_mod_attribute_expect_success(self, cluster, attribute):
-        return await self.read_single_attribute_check_success(
-            endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
-            Clusters.RvcRunMode,
-            Clusters.RvcRunMode.Attributes.SupportedModes)
+        ret = await self.read_single_attribute_check_success(Clusters.RvcRunMode.Attributes.SupportedModes)
         return ret
 
     async def read_current_mode_with_check(self, expected_mode):
-        run_mode = await self.read_mod_attribute_expect_success(
-            Clusters.RvcRunMode,
-            Clusters.RvcRunMode.Attributes.CurrentMode)
+        run_mode = await self.read_single_attribute_check_success(Clusters.RvcRunMode.Attributes.CurrentMode)
         asserts.assert_true(run_mode == expected_mode,
                             "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
 
@@ -96,9 +88,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
-        ret = await self.read_mod_attribute_expect_success(
-            Clusters.RvcOperationalState,
-            Clusters.RvcOperationalState.Attributes.OperationalState)
+        ret = await self.read_single_attribute_check_success(Clusters.RvcOperationalState.Attributes.OperationalState)
         return ret
 
     # Sends and out-of-band command to the rvc-app
@@ -178,9 +168,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                 asserts.fail("The mode chosen for PIXIT.RVCRUNM.MODE_B must not have the Idle(0x4000) mode tag.")
 
         self.print_step(4, "Read the RvcRunMode CurrentMode attribute")
-        current_run_mode = await self.read_mod_attribute_expect_success(
-            Clusters.RvcRunMode,
-            Clusters.RvcRunMode.Attributes.CurrentMode)
+        current_run_mode = await self.read_single_attribute_check_success(Clusters.RvcRunMode.Attributes.CurrentMode)
 
         # Save the value as idle_mode_dut
         self.idle_mode_dut = current_run_mode

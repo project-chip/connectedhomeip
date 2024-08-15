@@ -30,8 +30,7 @@ class EEVSEBaseTestHelper:
 
     async def read_evse_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         full_attr = getattr(Clusters.EnergyEvse.Attributes, attribute)
-        cluster = Clusters.Objects.EnergyEvse
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=full_attr)
 
     async def check_evse_attribute(self, attribute, expected_value, endpoint: int = None):
         value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)

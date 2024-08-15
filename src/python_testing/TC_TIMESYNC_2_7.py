@@ -41,11 +41,6 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_7(MatterBaseTest):
-
-    async def read_ts_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
@@ -65,7 +60,8 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
     async def test_TC_TIMESYNC_2_7(self):
 
         # Time sync is required to be on endpoint 0 if it is present
-        self.endpoint = 0
+        asserts.assert_equal(self.matter_test_config.get(endpoint, 0), 0,
+                             "Time sync cluster is only allowed on endpoint 0, this test should not be run against other endpoints")
 
         self.print_step(0, "Commissioning, already done")
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -93,11 +89,11 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
             pass
 
         self.print_step(4, "Read UTCTime")
-        utc = await self.read_ts_attribute_expect_success(utc_attr)
+        utc = await self.read_single_attribute_check_success(utc_attr)
         compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(5, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(6, "Send SetTimeZone command with 3600 offset")
@@ -110,15 +106,15 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(8, "Read UTCTime")
-        utc = await self.read_ts_attribute_expect_success(utc_attr)
+        utc = await self.read_single_attribute_check_success(utc_attr)
         compare_time(received=utc, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(9, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(10, "Read TZ list size")
-        tz_list_size = await self.read_ts_attribute_expect_success(attributes.TimeZoneListMaxSize)
+        tz_list_size = await self.read_single_attribute_check_success(attributes.TimeZoneListMaxSize)
 
         self.print_step(11, "Set time zone with two items")
         if tz_list_size > 1:
@@ -134,13 +130,13 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
 
         self.print_step(13, "Read LocalTime")
         if tz_list_size > 1:
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=3600), tolerance=timedelta(seconds=5))
 
         self.print_step(14, "Wait 15s and read LocalTime")
         if tz_list_size > 1:
             time.sleep(15)
-            local = await self.read_ts_attribute_expect_success(local_attr)
+            local = await self.read_single_attribute_check_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
 
         self.print_step(15, "Send SetTimeZone with negative offset")
@@ -153,7 +149,7 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(17, "Read LocalTime")
-        local = await self.read_ts_attribute_expect_success(local_attr)
+        local = await self.read_single_attribute_check_success(local_attr)
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(18, "Send SetTimeZone with 0 offset")

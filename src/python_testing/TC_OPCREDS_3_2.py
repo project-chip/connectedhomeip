@@ -119,7 +119,6 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         cr2_read_fabricIndex = await self.read_single_attribute_check_success(
             dev_ctrl=cr2_new_admin_ctrl,
             node_id=cr2_dut_node_id,
-            cluster=opcreds,
             attribute=opcreds.Attributes.CurrentFabricIndex
         )
 
@@ -130,7 +129,6 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         cr3_read_fabricIndex = await self.read_single_attribute_check_success(
             dev_ctrl=cr3_new_admin_ctrl,
             node_id=cr3_dut_node_id,
-            cluster=opcreds,
             attribute=opcreds.Attributes.CurrentFabricIndex
         )
 
@@ -141,7 +139,6 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         cr2_fabric = await self.read_single_attribute_check_success(
             dev_ctrl=cr2_new_admin_ctrl,
             node_id=cr2_dut_node_id,
-            cluster=opcreds,
             attribute=opcreds.Attributes.Fabrics,
             fabric_filtered=True
         )
@@ -165,7 +162,6 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         cr3_fabric = await self.read_single_attribute_check_success(
             dev_ctrl=cr3_new_admin_ctrl,
             node_id=cr3_dut_node_id,
-            cluster=opcreds,
             attribute=opcreds.Attributes.Fabrics,
             fabric_filtered=True
         )

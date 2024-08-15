@@ -89,16 +89,14 @@ class TC_CNET_1_4(MatterBaseTest):
         for endpoint in endpoints:
             if endpoint == kRootEndpointId:
                 continue
-            device_type_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor,
-                                                                              attribute=Clusters.Descriptor.Attributes.DeviceTypeList, endpoint=endpoint)
+            device_type_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.DeviceTypeList, endpoint=endpoint)
             required_device_types = {kSecondaryNetworkInterfaceDeviceTypeId}
             found_device_types = {device.deviceType for device in device_type_list}
             asserts.assert_true(required_device_types.intersection(found_device_types),
                                 "Network Commissioning Cluster is not on Root Node or Secondary Network Interface")
 
         self.step(6)
-        concurrent_connection = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning,
-                                                                               attribute=Clusters.GeneralCommissioning.Attributes.SupportsConcurrentConnection)
+        concurrent_connection = await self.read_single_attribute_check_success(attribute=Clusters.GeneralCommissioning.Attributes.SupportsConcurrentConnection)
         asserts.assert_true(concurrent_connection, "The device does not support concurrent connection commissioning")
 
 

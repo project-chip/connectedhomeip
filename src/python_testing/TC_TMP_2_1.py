@@ -45,7 +45,6 @@ class TC_TMP_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_TMP_2_1(self):
-        cluster = Clusters.TemperatureMeasurement
         attr = Clusters.TemperatureMeasurement.Attributes
 
         # Commission DUT - already done
@@ -56,12 +55,12 @@ class TC_TMP_2_1(MatterBaseTest):
         max_bound = 32767
 
         self.step(3)
-        min_measured_value = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.MinMeasuredValue)
+        min_measured_value = await self.read_single_attribute_check_success(attribute=attr.MinMeasuredValue)
         if min_measured_value != NullValue:
             min_bound = min_measured_value
 
         self.step(4)
-        max_measured_value = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.MaxMeasuredValue)
+        max_measured_value = await self.read_single_attribute_check_success(attribute=attr.MaxMeasuredValue)
         if max_measured_value != NullValue:
             max_bound = max_measured_value
             asserts.assert_greater(max_measured_value, min_bound,
@@ -77,7 +76,7 @@ class TC_TMP_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(6)
-        measured_value = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.MeasuredValue)
+        measured_value = await self.read_single_attribute_check_success(attribute=attr.MeasuredValue)
         if measured_value != NullValue:
             print(measured_value)
             print(min_bound)
@@ -87,7 +86,7 @@ class TC_TMP_2_1(MatterBaseTest):
                 measured_value, max_bound, "Measured value is greater than max bound")
 
         self.step(7)
-        tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
+        tolerance = await self.read_single_attribute_check_success(attribute=attr.Tolerance)
         asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
         asserts.assert_less_equal(
             tolerance, 2048, "Tolerance is greater than 2048")

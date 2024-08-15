@@ -71,7 +71,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(3, "TH2 reads the current fabric")
         th2_fabric_idx = await self.read_single_attribute_check_success(
-            dev_ctrl=TH2, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            dev_ctrl=TH2, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
 
         self.print_step(4, "TH2 sends the SetTrustedTimeSource command to the DUT with its nodeID")
         tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(nodeID=TH2.nodeId, endpoint=0)

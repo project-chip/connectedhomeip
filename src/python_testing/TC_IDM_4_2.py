@@ -94,7 +94,6 @@ class TC_IDM_4_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
 
@@ -102,7 +101,6 @@ class TC_IDM_4_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.PartsList
         )
 
@@ -110,7 +108,6 @@ class TC_IDM_4_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
-            cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.IdleModeDuration
         )
 

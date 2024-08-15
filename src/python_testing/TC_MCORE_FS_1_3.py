@@ -121,7 +121,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.step(1)
         # These steps are not explicitly in step 1, but they help identify the dynamically added endpoint in step 1.
         root_node_endpoint = 0
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
+        root_part_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_before_adding_device = set(root_part_list)
 
         kvs = f'kvs_{str(uuid.uuid4())}'
@@ -144,7 +144,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             f"If using FabricSync Admin, you may type:\n"
             f">>> pairing onnetwork <desired_node_id> {params.commissioningParameters.setupPinCode}")
 
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
+        root_part_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_after_adding_device = set(root_part_list)
 
         asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
@@ -153,7 +153,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
         newly_added_endpoint = list(unique_endpoints_set)[0]
 
-        th_sed_dut_unique_id = await self.read_single_attribute_check_success(cluster=Clusters.BridgedDeviceBasicInformation, attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID, endpoint=newly_added_endpoint)
+        th_sed_dut_unique_id = await self.read_single_attribute_check_success(attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID, endpoint=newly_added_endpoint)
         asserts.assert_true(type_matches(th_sed_dut_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_sed_dut_unique_id, "UniqueID should not be an empty string")
 

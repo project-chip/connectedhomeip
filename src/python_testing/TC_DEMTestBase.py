@@ -31,7 +31,7 @@ class DEMTestBase:
         cluster = Clusters.Objects.DeviceEnergyManagement
         full_attr = getattr(cluster.Attributes, attribute)
         logging.info(f"endpoint {endpoint} full_attr {full_attr}")
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=full_attr)
 
     async def check_dem_attribute(self, attribute, expected_value, endpoint: int = None):
         value = await self.read_dem_attribute_expect_success(endpoint=endpoint, attribute=attribute)

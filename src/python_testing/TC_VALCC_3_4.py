@@ -33,10 +33,6 @@ from mobly import asserts
 
 
 class TC_VALCC_3_4(MatterBaseTest):
-    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ValveConfigurationAndControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_VALCC_3_4(self) -> str:
         return "[TC-VALCC-3.4] LevelStep behavior with DUT as Server"
 
@@ -66,7 +62,7 @@ class TC_VALCC_3_4(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step(2)
-        attribute_list = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
         if attributes.LevelStep.attribute_id not in attribute_list:
@@ -83,7 +79,7 @@ class TC_VALCC_3_4(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(4)
-        levelStep = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)
+        levelStep = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.LevelStep)
 
         self.step(5)
 

@@ -42,10 +42,6 @@ class TC_SEAR_1_4(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_sear_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ServiceArea
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def TC_SEAR_1_4(self) -> list[str]:
         return ["SEAR.S"]
 
@@ -62,14 +58,14 @@ class TC_SEAR_1_4(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
 
-        attribute_list = await self.read_sear_attribute_expect_success(
+        attribute_list = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
         logging.info("AttributeList: %s" % (attribute_list))
 
         if Clusters.ServiceArea.Attributes.CurrentArea not in attribute_list \
                 and Clusters.ServiceArea.Attributes.Progress not in attribute_list:
 
-            cmd_list = await self.read_sear_attribute_expect_success(
+            cmd_list = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
             logging.info("AcceptedCommandList: %s" % (cmd_list))
             asserts.assert_true(Clusters.ServiceArea.Commands.SkipArea not in cmd_list,

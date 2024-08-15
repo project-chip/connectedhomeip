@@ -39,21 +39,19 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
     # This test should be run using the provided "TestTimeSyncTrustedTimeSourceRunner.py" script
     @async_test_body
     async def test_SimulateNoInternalTime(self):
-        ret = await self.read_single_attribute_check_success(
-            cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        ret = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_equal(ret, NullValue, "Non-null value returned for time")
 
     @async_test_body
     async def test_HaveInternalTime(self):
-        ret = await self.read_single_attribute_check_success(
-            cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        ret = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_not_equal(ret, NullValue, "Null value returned for time")
 
     @async_test_body
     async def test_SetupTimeSourceACL(self):
         # We just want to append to this list
         ac = Clusters.AccessControl
-        acl = await self.read_single_attribute_check_success(cluster=ac, attribute=ac.Attributes.Acl)
+        acl = await self.read_single_attribute_check_success(attribute=ac.Attributes.Acl)
         new_acl_entry = ac.Structs.AccessControlEntryStruct(privilege=ac.Enums.AccessControlEntryPrivilegeEnum.kView,
                                                             authMode=ac.Enums.AccessControlEntryAuthModeEnum.kCase,
                                                             subjects=NullValue, targets=[ac.Structs.AccessControlTargetStruct(
@@ -66,13 +64,13 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
         # Give the node a couple of seconds to reach out and set itself up
         # TODO: Subscribe to granularity instead.
         time.sleep(6)
-        ret = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        ret = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_not_equal(ret, NullValue, "Returned time is null")
-        ret = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.Granularity)
+        ret = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.Granularity)
         asserts.assert_not_equal(ret, Clusters.TimeSynchronization.Enums.GranularityEnum.kNoTimeGranularity,
                                  "Returned Granularity is kNoTimeGranularity")
         # TODO: needs to be gated on the optional attribute
-        ret = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeSource)
+        ret = await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.TimeSource)
         asserts.assert_equal(ret, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kNodeTimeCluster,
                              "Returned time source is incorrect")
 

@@ -49,10 +49,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcCleanMode
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse),
@@ -110,7 +106,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             self.write_to_app_pipe('{"Name": "Reset"}')
 
         self.print_step(2, "Read SupportedModes attribute")
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
         logging.info("SupportedModes: %s" % (supported_modes))
 
@@ -120,7 +116,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         self.print_step(3, "Read CurrentMode attribute")
 
-        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (old_current_mode))
 
@@ -154,7 +150,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                     prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when done" % (self.mode_fail))
 
             self.print_step(6, "Read CurrentMode attribute")
-            old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            old_current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (old_current_mode))
 
@@ -171,7 +167,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
             self.print_step(8, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+            current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (current_mode))
 
@@ -186,7 +182,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                 prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when done" % (self.mode_ok))
 
         self.print_step(10, "Read CurrentMode attribute")
-        old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        old_current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (old_current_mode))
 
@@ -197,7 +193,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                             "Changing to mode %d must succeed due to the current state of the device" % (self.mode_ok))
 
         self.print_step(12, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 
@@ -211,7 +207,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                             "Attempt to change to invalid mode %d didn't fail as expected" % (invalid_mode))
 
         self.print_step(14, "Read CurrentMode attribute")
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
         logging.info("CurrentMode: %s" % (current_mode))
 

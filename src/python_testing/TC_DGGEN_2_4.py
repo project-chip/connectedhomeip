@@ -41,14 +41,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_DGGEN_2_4(MatterBaseTest):
-    async def read_diags_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.GeneralDiagnostics
-        return await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-
-    async def read_timesync_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-
     async def set_time_in_timesync(self, current_time: int):
         endpoint = 0
         time_cluster = Clusters.Objects.TimeSynchronization
@@ -101,14 +93,14 @@ class TC_DGGEN_2_4(MatterBaseTest):
             await self.set_time_in_timesync(th_utc)
 
             self.print_step("1c", "Read current time from DUT")
-            testvar_UTCTime1 = await self.read_timesync_attribute_expect_success(Clusters.TimeSynchronization.Attributes.UTCTime)
+            testvar_UTCTime1 = await self.read_single_attribute_check_success(Clusters.TimeSynchronization.Attributes.UTCTime)
             asserts.assert_true(testvar_UTCTime1 != NullValue,
                                 "UTCTime1 readback must not be null after SetUTCTime (per Time Synchronization cluster spec)")
 
             testvar_TimeSyncSupported = True
 
         self.print_step(2, "Read UpTime attribute, save as UpTime1")
-        testvar_UpTime1 = await self.read_diags_attribute_expect_success(Clusters.GeneralDiagnostics.Attributes.UpTime)
+        testvar_UpTime1 = await self.read_single_attribute_check_success(Clusters.GeneralDiagnostics.Attributes.UpTime)
         asserts.assert_greater(testvar_UpTime1, 0, "UpTime1 must be > 0")
 
         # Step 3 (Time Sync supported)

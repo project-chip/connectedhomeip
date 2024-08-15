@@ -39,19 +39,14 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_5(MatterBaseTest):
-
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_percent_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentCurrent)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.PercentCurrent)
 
     async def read_speed_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.SpeedCurrent)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.SpeedCurrent)
 
     async def read_speed_max(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.SpeedMax)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.SpeedMax)
 
     async def write_percent_setting(self, endpoint, percent_setting):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])

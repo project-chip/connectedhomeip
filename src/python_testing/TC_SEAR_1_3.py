@@ -43,13 +43,9 @@ class TC_SEAR_1_3(MatterBaseTest):
         self.is_ci = False
         self.app_pipe = "/tmp/chip_rvc_fifo_"
 
-    async def read_sear_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ServiceArea
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_supported_areas(self, step):
         self.print_step(step, "Read SupportedAreas attribute")
-        supported_areas = await self.read_sear_attribute_expect_success(
+        supported_areas = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
         logging.info("SupportedAreas: %s" % supported_areas)
 
@@ -59,7 +55,7 @@ class TC_SEAR_1_3(MatterBaseTest):
 
     async def read_selected_areas(self, step):
         self.print_step(step, "Read SelectedAreas attribute")
-        selected_areas = await self.read_sear_attribute_expect_success(
+        selected_areas = await self.read_single_attribute_check_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
         logging.info(f"SelectedAreas {selected_areas}")
 

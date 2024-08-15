@@ -67,7 +67,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper()
         self.xml_clusters, self.problems = build_xml_clusters()
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        self.default_acl = await self.read_single_attribute_check_success(cluster=Clusters.AccessControl, attribute=acl_attr)
+        self.default_acl = await self.read_single_attribute_check_success(attribute=acl_attr)
         self._record_errors()
         # We need to run this test from two controllers so we can test access to the ACL cluster while retaining access to the ACL cluster
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
@@ -146,14 +146,13 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].read_access
             attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
-            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
 
             if operation_allowed(spec_requires, privilege):
-                ret = await self.read_single_attribute_check_success(dev_ctrl=self.TH2, endpoint=endpoint_id, cluster=cluster_class, attribute=attribute, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
+                ret = await self.read_single_attribute_check_success(dev_ctrl=self.TH2, endpoint=endpoint_id, attribute=attribute, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
                 if ret is None:
                     self.success = False
             else:
-                ret = await self.read_single_attribute_expect_error(dev_ctrl=self.TH2, endpoint=endpoint_id, cluster=cluster_class, attribute=attribute, error=Status.UnsupportedAccess, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
+                ret = await self.read_single_attribute_expect_error(dev_ctrl=self.TH2, endpoint=endpoint_id, attribute=attribute, error=Status.UnsupportedAccess, assert_on_error=False, test_name=f"Read access Checker - {privilege}")
                 if ret is None:
                     self.success = False
 

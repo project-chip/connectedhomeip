@@ -40,11 +40,6 @@ from mobly import asserts
 
 
 class TC_MWOCTRL_2_2(MatterBaseTest):
-
-    async def read_mwoctrl_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.MicrowaveOvenControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def set_power_setting_expect_success(self, endpoint, value):
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.MicrowaveOvenControl.Commands.SetCookingParameters(powerSetting=value), endpoint=endpoint)
@@ -60,7 +55,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
                                  "Expected ConstraintError but received a different response")
 
     async def read_and_check_power_setting_value(self, endpoint, value):
-        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.MicrowaveOvenControl.Attributes.PowerSetting)
+        powerValue = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.MicrowaveOvenControl.Attributes.PowerSetting)
         asserts.assert_equal(powerValue, value, "PowerSetting was not correctly set")
 
     def desc_TC_MWOCTRL_2_2(self) -> str:
@@ -102,7 +97,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
-        feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         features = Clusters.MicrowaveOvenControl.Bitmaps.Feature
         is_pwrlmits_feature_supported = feature_map & features.kPowerNumberLimits
         is_pwrnum_feature_supported = feature_map & features.kPowerAsNumber
@@ -119,7 +114,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(3)
         if is_pwrlmits_feature_supported:
-            minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
+            minPowerValue = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.MinPower)
             asserts.assert_greater_equal(minPowerValue, 1, "MinPower is less than 1")
             asserts.assert_less_equal(minPowerValue, 99, "MinPower is less than 1")
         logging.info("MinPower is %s" % minPowerValue)
@@ -129,7 +124,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(5)
         if is_pwrlmits_feature_supported:
-            maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
+            maxPowerValue = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.MaxPower)
             asserts.assert_greater(maxPowerValue, minPowerValue, "MaxPower is less than MinPower")
             asserts.assert_less(maxPowerValue, 100, "MaxPower is greater than 100")
         logging.info("MaxPower is %s" % maxPowerValue)
@@ -139,7 +134,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(7)
         if is_pwrlmits_feature_supported:
-            powerStepValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerStep)
+            powerStepValue = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PowerStep)
             asserts.assert_greater_equal(powerStepValue, 1, "PowerStep is less than 1")
             asserts.assert_less_equal(powerStepValue, maxPowerValue, "PowerStep is greater than MaxPower")
             asserts.assert_true((maxPowerValue - minPowerValue) % powerStepValue ==
@@ -147,7 +142,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         logging.info("PowerStep is %s" % powerStepValue)
 
         self.step(8)
-        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
+        powerValue = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.PowerSetting)
         asserts.assert_greater_equal(powerValue, minPowerValue, "PowerSetting is less than the minimum.")
         asserts.assert_less_equal(powerValue, maxPowerValue, "PowerSetting is greater than the maxium")
         asserts.assert_true((powerValue-minPowerValue) % powerStepValue == 0, "PowerSetting is not a multiple of power step")

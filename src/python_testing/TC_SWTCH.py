@@ -283,7 +283,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 4: TH reads the CurrentPosition attribute from the DUT.
         # Verify that the value is 0.
         self.step(4)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Switch position value is not 0")
 
         # Step 5: Operator sets switch to second position (one) on the DUT",
@@ -299,7 +299,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
         self.step(6)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
 
         # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
@@ -327,7 +327,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 10: TH reads the CurrentPosition attribute from the DUT.
         # Verify that the value is 0
         self.step(10)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
     def steps_TC_SWTCH_2_3(self):
@@ -351,7 +351,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Commissioning - already done
         self.step(1)
         cluster = Clusters.Switch
-        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=cluster.Attributes.FeatureMap)
 
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
@@ -367,7 +367,7 @@ class TC_SwitchTests(MatterBaseTest):
         self._ask_for_switch_idle()
 
         self.step(4)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
         self.step(5)
@@ -379,7 +379,7 @@ class TC_SwitchTests(MatterBaseTest):
         event_listener.wait_for_event_report(cluster.Events.InitialPress)
 
         self.step(6)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, self.pressed_position, f"Button value is not {self.pressed_position}")
 
         self.step(7)
@@ -404,7 +404,7 @@ class TC_SwitchTests(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(9)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        button_val = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
     def desc_TC_SWTCH_2_4(self) -> str:
@@ -437,7 +437,7 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(1)
 
         # Read feature map to set bool markers
-        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=cluster.Attributes.FeatureMap)
 
         has_ms_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitch) != 0
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
@@ -463,7 +463,7 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(4)
 
         # Verify that the value is 0
-        current_position = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.CurrentPosition)
+        current_position = await self.read_single_attribute_check_success(attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(current_position, 0)
 
         # Step 5: Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, the release it
@@ -604,9 +604,9 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(1)
 
         cluster = Clusters.Switch
-        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=cluster.Attributes.FeatureMap)
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress)
-        multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
+        multi_press_max = await self.read_single_attribute_check_success(attribute=cluster.Attributes.MultiPressMax)
 
         endpoint_id = self.matter_test_config.endpoint
         pressed_position = self._default_pressed_position
@@ -651,7 +651,7 @@ class TC_SwitchTests(MatterBaseTest):
         test_multi_press_sequence("5a", count=2)
 
         self.step("6a")
-        multi_press_max = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.MultiPressMax)
+        multi_press_max = await self.read_single_attribute_check_success(attribute=cluster.Attributes.MultiPressMax)
         if multi_press_max == 2:
             self.skip_step("6b")
             self.skip_step("6c")
@@ -779,9 +779,9 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(1)
 
         cluster = Clusters.Switch
-        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=cluster.Attributes.FeatureMap)
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress)
-        multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
+        multi_press_max = await self.read_single_attribute_check_success(attribute=cluster.Attributes.MultiPressMax)
 
         endpoint_id = self.matter_test_config.endpoint
         pressed_position = self._default_pressed_position

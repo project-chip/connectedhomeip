@@ -36,10 +36,6 @@ sensorUntrigger = 0x0080_0000_0000_0001
 
 
 class TC_BOOLCFG_4_4(MatterBaseTest):
-    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanStateConfiguration
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_BOOLCFG_4_4(self) -> str:
         return "[TC-BOOLCFG-4.4] AlarmsEnabled functionality for active alarms with DUT as Server"
 
@@ -88,13 +84,13 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step("2a")
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
         is_aud_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible
 
         self.step("2b")
-        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
         if attributes.AlarmsEnabled.attribute_id not in attribute_list:
@@ -145,7 +141,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         activeAlarms = 0
 
         if is_vis_feature_supported or is_aud_feature_supported:
-            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_not_equal(activeAlarms, 0, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -171,7 +167,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
 
         self.step(10)
         if is_vis_feature_supported:
-            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal((activeAlarms & 0b01), 0, "Bit 0 in AlarmsActive is not 0")
         else:
             logging.info("Test step skipped")
@@ -197,7 +193,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
 
         self.step(13)
         if is_aud_feature_supported:
-            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal((activeAlarms & 0b10), 0, "Bit 1 in AlarmsActive is not 0")
         else:
             logging.info("Test step skipped")

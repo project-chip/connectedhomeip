@@ -158,17 +158,6 @@ class TC_DRLK_2_13(MatterBaseTest):
 
         return steps
 
-    async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
-        try:
-            attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                             attribute=attribute)
-            asserts.assert_equal(expected_status, Status.Success)
-            return attribute_value
-        except Exception as e:
-            logging.error(e)
-            asserts.assert_equal(expected_status, Status.Success,
-                                 f"Error reading attributes, response={attribute_value}")
-
     async def aliro_attribute_verifiers(self, aliro_attribute_verify_steps: list[AliroAttributeVerify]):
 
         for aliro_attribute_step in aliro_attribute_verify_steps:
@@ -184,9 +173,8 @@ class TC_DRLK_2_13(MatterBaseTest):
                 pics_condition = False
 
             if pics_condition:
-                dut_aliro_key = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                    cluster=Clusters.Objects.DoorLock,
-                                                                    attribute=aliro_attribute_step.attribute)
+                dut_aliro_key = await self.read_single_attribute_check_success(endpoint=self.app_cluster_endpoint,
+                                                                               attribute=aliro_attribute_step.attribute)
                 asserts.assert_equal(dut_aliro_key, aliro_attribute_step.attribute_value,
                                      f"Aliro Attribute key verification Failed, readAttributeResponse{dut_aliro_key}")
 
@@ -357,6 +345,7 @@ class TC_DRLK_2_13(MatterBaseTest):
         self.groupIdentifier = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4ad")
         self.groupResolvingKey = bytes.fromhex("89d0859bfcdecdf3c4adfc302ca53e27")
         self.common_cluster_endpoint = 0
+        # TODO: this cannot be hard coded like this - please see https://github.com/project-chip/matter-test-scripts/issues/334. Will update in subsequent PR.
         self.app_cluster_endpoint = 1
         self.alirouser = "AliroUser"
         self.alirocredentialissuerkey = bytes.fromhex(
@@ -371,10 +360,9 @@ class TC_DRLK_2_13(MatterBaseTest):
             "047a4c552d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
         #  step 1 TH reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute
         self.step("1a")
-        self.fabric_idx1 = await self.read_attributes_from_dut(endpoint=self.common_cluster_endpoint,
-                                                               cluster=Clusters.Objects.OperationalCredentials,
-                                                               attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-                                                               )
+        self.fabric_idx1 = await self.read_single_attribute_check_success(endpoint=self.common_cluster_endpoint,
+                                                                          attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
+                                                                          )
         self.step("1b")
         if self.pics_guard(self.check_pics("DRLK.S.C1d.Rsp")):
             await self.send_clear_user_cmd(user_index=int(0xFFFE))
@@ -433,9 +421,8 @@ class TC_DRLK_2_13(MatterBaseTest):
         #  step 12 Setting User
         self.step("12a")
         if self.pics_guard(self.check_pics("DRLK.S.A0088")):
-            self.max_aliro_keys_supported = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                                cluster=Clusters.Objects.DoorLock,
-                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfAliroEndpointKeysSupported)
+            self.max_aliro_keys_supported = await self.read_single_attribute_check_success(endpoint=self.app_cluster_endpoint,
+                                                                                           attribute=Clusters.DoorLock.Attributes.NumberOfAliroEndpointKeysSupported)
             if self.max_aliro_keys_supported < 2:
                 self.skip_all_remaining_steps("13")
                 return
@@ -565,9 +552,8 @@ class TC_DRLK_2_13(MatterBaseTest):
         # step 28
         self.step("28a")
         if self.check_pics("DRLK.S.A001c"):
-            self.numberofcredentialsupportedperuser = await self.read_attributes_from_dut(
+            self.numberofcredentialsupportedperuser = await self.read_single_attribute_check_success(
                 endpoint=self.app_cluster_endpoint,
-                cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
         self.step("28b")
         await self.clear_all_aliro_credential()

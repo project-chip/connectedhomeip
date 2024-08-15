@@ -38,16 +38,11 @@ logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_3(MatterBaseTest):
-
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     async def read_rock_support(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.RockSupport)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.RockSupport)
 
     async def read_rock_setting(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.RockSetting)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, attribute=Clusters.FanControl.Attributes.RockSetting)
 
     async def write_rock_setting(self, endpoint, rock_setting):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.RockSetting(rock_setting))])

@@ -159,7 +159,6 @@ class TC_OPSTATE_BASE():
     async def read_expect_success(self, endpoint, attribute):
         logging.info(f"##### Read {attribute}")
         attr_value = await self.read_single_attribute_check_success(endpoint=endpoint,
-                                                                    cluster=self.test_info.cluster,
                                                                     attribute=attribute)
         logging.info(f"## {attribute}: {attr_value}")
 

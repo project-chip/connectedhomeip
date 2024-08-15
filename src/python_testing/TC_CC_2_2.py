@@ -117,16 +117,16 @@ class TC_CC_2_3(MatterBaseTest):
         cc = Clusters.ColorControl
 
         self.step(2)
-        feature_map = await self.read_single_attribute_check_success(cluster=cc, attribute=cc.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(attribute=cc.Attributes.FeatureMap)
         supports_hs = (feature_map & cc.Bitmaps.Feature.kHueAndSaturation) != 0
         supports_xy = (feature_map & cc.Bitmaps.Feature.kXy) != 0
         supports_ehue = (feature_map & cc.Bitmaps.Feature.kEnhancedHue) != 0
 
         self.step(3)
-        attribute_list = await self.read_single_attribute_check_success(cluster=cc, attribute=cc.Attributes.AttributeList)
+        attribute_list = await self.read_single_attribute_check_success(attribute=cc.Attributes.AttributeList)
 
         self.step(4)
-        server_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList)
+        server_list = await self.read_single_attribute_check_success(attribute=Clusters.Descriptor.Attributes.ServerList)
 
         self.step(5)
         if Clusters.OnOff.id in server_list:

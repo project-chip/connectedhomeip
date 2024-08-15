@@ -37,10 +37,6 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_2(MatterBaseTest):
-    async def read_ts_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def pics_TC_TIMESYNC_2_2(self) -> list[str]:
         return ["TIMESYNC.S"]
 
@@ -52,14 +48,14 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
         time_cluster = Clusters.TimeSynchronization
         timesync_attr_list = time_cluster.Attributes.AttributeList
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=time_cluster, attribute=timesync_attr_list)
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=timesync_attr_list)
         timesource_attr_id = time_cluster.Attributes.TimeSource.attribute_id
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
 
         self.print_step(2, "Read UTCTime attribute")
-        utc_dut_initial = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
+        utc_dut_initial = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.UTCTime)
         th_utc = utc_time_in_matter_epoch()
 
         code = 0
@@ -77,14 +73,14 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             asserts.assert_true(code in [0, 1], "Unexpected error returned for non-null UTCTime")
 
         self.print_step(3, "Read Granulatiry attribute")
-        granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
+        granularity_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.Granularity)
         asserts.assert_less(granularity_dut, time_cluster.Enums.GranularityEnum.kUnknownEnumValue,
                             "Granularity out of expected range")
         asserts.assert_not_equal(granularity_dut, time_cluster.Enums.GranularityEnum.kNoTimeGranularity)
 
         self.print_step(4, "Read UTC time")
         th_utc = utc_time_in_matter_epoch()
-        utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
+        utc_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.UTCTime)
         asserts.assert_is_not(utc_dut, NullValue, "Received null value for UTCTime after set")
         if granularity_dut == time_cluster.Enums.GranularityEnum.kMinutesGranularity:
             tolerance = timedelta(minutes=10)
@@ -94,7 +90,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
         self.print_step(5, "Read time source")
         if timesource_attr_id in attribute_list:
-            source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
+            source = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.TimeSource)
             if utc_dut_initial is NullValue:
                 asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
 

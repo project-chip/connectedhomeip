@@ -34,10 +34,6 @@ from mobly import asserts
 
 
 class TC_VALCC_4_5(MatterBaseTest):
-    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.ValveConfigurationAndControl
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
     def desc_TC_VALCC_4_5(self) -> str:
         return "[TC-VALCC-4.5] Auto close functionality with DUT as Server"
 
@@ -77,24 +73,24 @@ class TC_VALCC_4_5(MatterBaseTest):
             pass
 
         self.step(3)
-        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is not NullValue, "OpenDuration is null")
         asserts.assert_equal(open_duration_dut, 5, "OpenDuration is not the expected value")
 
         self.step(4)
-        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is not NullValue, "RemainingDuration is null")
         asserts.assert_greater_equal(remaining_duration_dut, 1, "RemainingDuration is not in the expected range")
         asserts.assert_less_equal(remaining_duration_dut, 5, "RemainingDuration is not in the expected range")
 
         self.step(5)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        current_state_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         while current_state_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
             time.sleep(1)
 
-            current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            current_state_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentState)
             asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         asserts.assert_equal(current_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kOpen,
@@ -104,15 +100,15 @@ class TC_VALCC_4_5(MatterBaseTest):
         time.sleep(6)
 
         self.step(7)
-        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is NullValue, "OpenDuration is not null")
 
         self.step(8)
-        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
 
         self.step(9)
-        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        current_state_dut = await self.read_single_attribute_check_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
         asserts.assert_equal(current_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kClosed,
                              "CurrentState is not the expected value")

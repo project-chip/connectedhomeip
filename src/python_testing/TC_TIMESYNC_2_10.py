@@ -116,8 +116,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(9, "Read LocalTime from the DUT")
-        await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization,
-                                                       attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+        await self.read_single_attribute_check_success(attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(10, "Wait for DSTTableEmpty event")
         timeout = get_wait_seconds_from_set_time(th_utc, 20)
