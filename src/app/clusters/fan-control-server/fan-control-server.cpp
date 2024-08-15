@@ -51,7 +51,8 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 
 Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
-struct EmberAfFanControlState {
+struct EmberAfFanControlState
+{
     bool moveStarted;
     chip::Percent endPercent;
     QuieterReportingAttribute<chip::Percent> quietPercentCurrent{ chip::Percent(0) };
@@ -153,11 +154,10 @@ inline bool SupportsAirflowDirection(EndpointId endpointId)
 
 } // anonymous namespace
 
-
 void emberAfFanControlClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfFanControlState * state = getState(endpoint);
-    auto now = System::SystemClock().GetMonotonicTimestamp();
+    auto now                       = System::SystemClock().GetMonotonicTimestamp();
 
     if (state == nullptr)
     {
@@ -165,11 +165,10 @@ void emberAfFanControlClusterServerInitCallback(EndpointId endpoint)
         return;
     }
 
-    state->quietPercentCurrent.policy()
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+    state->quietPercentCurrent.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 
     chip::Percent percentCurrent;
-    Status status = Attributes::PercentCurrent::Get(endpoint, &percentCurrent);
+    Status status      = Attributes::PercentCurrent::Get(endpoint, &percentCurrent);
     state->moveStarted = false;
     if (status == Status::Success)
     {
@@ -277,7 +276,8 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         }
         else
         {
-            // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other logic???)
+            // record a movement start for this endpoint (might need to be a potential move as move could be rejected via other
+            // logic???)
             EmberAfFanControlState * state = getState(attributePath.mEndpointId);
             if (state == nullptr)
             {
@@ -287,8 +287,8 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
             else
             {
                 state->moveStarted = true;
-                state->endPercent = (chip::Percent)*value;
-                res = Status::Success;
+                state->endPercent  = (chip::Percent) *value;
+                res                = Status::Success;
             }
         }
         break;
@@ -349,7 +349,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         break;
     }
     case PercentCurrent::Id: {
-        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, (chip::Percent)*value);
+        res = SetPercentCurrentQuietReport(attributePath.mEndpointId, (chip::Percent) *value);
         break;
     }
     default:
@@ -556,7 +556,7 @@ static EmberAfFanControlState * getState(EndpointId endpoint)
 static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent newValue)
 {
     AttributeDirtyState dirtyState;
-    auto now = System::SystemClock().GetMonotonicTimestamp();
+    auto now                       = System::SystemClock().GetMonotonicTimestamp();
     EmberAfFanControlState * state = getState(endpoint);
 
     if (state == nullptr)
@@ -566,7 +566,7 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent ne
     }
 
     bool isStartOrEndOfTransition = state->moveStarted || (newValue == state->endPercent);
-    state->moveStarted = false;
+    state->moveStarted            = false;
 
     if (isStartOrEndOfTransition)
     {
@@ -590,7 +590,7 @@ static Status SetPercentCurrentQuietReport(EndpointId endpoint, chip::Percent ne
         markDirty = MarkAttributeDirty::kYes;
     }
 
-    Status  res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value().Value(), markDirty);
+    Status res = Attributes::PercentCurrent::Set(endpoint, state->quietPercentCurrent.value().Value(), markDirty);
     if (res == Status::Success)
     {
         res = Status::WriteIgnored;
