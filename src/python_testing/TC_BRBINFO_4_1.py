@@ -227,7 +227,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         timeout_s = idle_mode_duration_s + max(active_mode_duration_ms, stay_active_duration_ms)/1000
         promised_active_duration_ms = await self._wait_for_active_changed_event(timeout_s)
 
-        asserts.assert_greater_equal(promised_active_duration_ms, stay_active_duration_ms, "PromisedActiveDuration < StayActiveDuration")
+        asserts.assert_greater_equal(promised_active_duration_ms, stay_active_duration_ms,
+                                     "PromisedActiveDuration < StayActiveDuration")
 
         self.step("2")
 
