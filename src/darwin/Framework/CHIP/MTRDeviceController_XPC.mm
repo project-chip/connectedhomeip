@@ -27,18 +27,25 @@
 
 @implementation MTRDeviceController_XPC
 
-- (id)initWithXPCConnection:(NSXPCConnection *)newConnection
+- (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
 {
     if (!(self = [super initForSubclasses])) {
         return nil;
     }
-
+    self.xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:listenerEndpoint];
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
+
+    // maybe poor architecture to store this instead of access it thru XPC connection every time kmo 15 aug 2024
+//    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+//        NSLog(@"%s: it's not my fault! XPC remote object proxy error.", __PRETTY_FUNCTION__);
+//    }];
     self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
+    
     [self.xpcConnection resume];
     
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
     // fare much better.  kmo 15 aug 2024 10h52
+//    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
     NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
     NSLog(@"%s: postInitMeaningOfLife = %@", __PRETTY_FUNCTION__, postInitMeaningOfLife);
 

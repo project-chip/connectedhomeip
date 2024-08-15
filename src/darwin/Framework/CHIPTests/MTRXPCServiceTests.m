@@ -100,19 +100,29 @@
     XCTAssertNotNil(obj);
 
     [obj ping];
+    
+//    NSNumber * lifeMeaning = [obj synchronouslyGetMeaningOfLife];
+//    
+//    NSLog(@"test got lifeMeaning = %@", lifeMeaning);
 
-    [obj getMeaningOfLifeWithReplyBlock:^(int meaning) {
-        XCTAssertEqual(meaning, 42);
+    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
+    __block NSNumber * asyncLifeMeaning;
+    [obj getMeaningOfLifeWithReplyBlock:^(int reply) {
+        asyncLifeMeaning = @(reply);
+        NSLog(@"got async life meaning %@", asyncLifeMeaning);
+        [expectation fulfill];
     }];
-
+    
+    [self waitForExpectations:@[expectation] timeout:1.0];
     NSLog(@"done with %s", __PRETTY_FUNCTION__);
 }
 
 - (void)testMTRXPCServiceSetup
 {
-    NSXPCConnection * serviceConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:_xpcListener.endpoint];
-    serviceConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
-    MTRDeviceController_XPC * deviceController = [[MTRDeviceController_XPC alloc] initWithXPCConnection:self.xpcConnection];
+    XCTAssertNotNil(_xpcListener);
+    XCTAssertNotNil(_dummyService);
+
+    MTRDeviceController_XPC * deviceController = [[MTRDeviceController_XPC alloc] initWithXPCListenerEndpointForTesting:_xpcListener.endpoint];
 
     [deviceController testPing];
     NSNumber * lifeMeaning = [deviceController meaningOfLife];

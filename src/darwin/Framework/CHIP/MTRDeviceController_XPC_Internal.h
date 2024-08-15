@@ -18,7 +18,7 @@
 
 @interface MTRDeviceController_XPC (Internal)
 
-- (id)initWithXPCConnection:(NSXPCConnection *)newConnection;
+- (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint;
 - (id)initWithTestXPCListener;
 - (void)testPing;
 - (NSNumber *)meaningOfLife;

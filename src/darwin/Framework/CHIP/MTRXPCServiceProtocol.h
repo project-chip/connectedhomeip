@@ -28,6 +28,8 @@ typedef void (^MTRXPCServiceBoolReplyBlock)(BOOL);
 - (NSNumber *)synchronouslyGetMeaningOfLife;
 - (void)getMeaningOfLifeWithReplyBlock:(MTRXPCServiceIntReplyBlock)reply;
 
+// identify "who i am"
+// need invalidation and disconnect
 // temporary inclusion
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
@@ -35,12 +37,21 @@ typedef void (^MTRXPCServiceBoolReplyBlock)(BOOL);
 
 @end
 
-@protocol MTRXPCServiceDeviceControllerProtocol <NSObject>
+// Add client protocol for e.g. attribute reports coming back not in response to a method call
+// it will look an awful lot like the delegate!
+// allow server to request UUID for reflection
+// need invalidation and disconnect much like on service side
+// TODO:  see how much of Woody's work covers this
 
-- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
-                                   newNodeID:(NSNumber *)newNodeID
-                                       error:(NSError * __autoreleasing *)error;
 
-@end
+
+//@protocol MTRXPCServiceDeviceControllerProtocol <NSObject>
+
+//
+//- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+//                                   newNodeID:(NSNumber *)newNodeID
+//                                       error:(NSError * __autoreleasing *)error;
+//
+//@end
 
 NS_ASSUME_NONNULL_END
