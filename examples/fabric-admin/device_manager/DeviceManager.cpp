@@ -33,6 +33,7 @@ namespace {
 // Constants
 constexpr uint32_t kSetupPinCode               = 20202021;
 constexpr uint16_t kRemoteBridgePort           = 5540;
+constexpr uint16_t kLocalBridgePort            = 5540;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;
@@ -117,6 +118,8 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
 void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
                                                   uint32_t discriminator, const char * saltHex, const char * verifierHex)
 {
+    ChipLogProgress(NotSpecified, "Open the commissioning window of device with NodeId:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+
     // Open the commissioning window of a device within its own fabric.
     StringBuilder<kMaxCommandSize> commandBuilder;
 
@@ -132,7 +135,7 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     // Open the commissioning window of a device from another fabric via its fabric bridge.
     // This method constructs and sends a command to open the commissioning window for a device
     // that is part of a different fabric, accessed through a fabric bridge.
-    StringBuilder<512> commandBuilder;
+    StringBuilder<kMaxCommandSize> commandBuilder;
 
     // Use random discriminator to have less chance of collission.
     uint16_t discriminator =
@@ -166,12 +169,32 @@ void DeviceManager::PairRemoteDevice(chip::NodeId nodeId, const char * payload)
     PushCommand(commandBuilder.c_str());
 }
 
+void DeviceManager::PairLocalFabricBridge(NodeId nodeId)
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing already-discovered ");
+    commandBuilder.AddFormat("%lu %d ::1 %d", nodeId, kSetupPinCode, kLocalBridgePort);
+
+    PushCommand(commandBuilder.c_str());
+}
+
 void DeviceManager::UnpairRemoteFabricBridge()
 {
     StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing unpair ");
     commandBuilder.AddFormat("%lu", mRemoteBridgeNodeId);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::UnpairLocalFabricBridge()
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing unpair ");
+    commandBuilder.AddFormat("%lu", mLocalBridgeNodeId);
 
     PushCommand(commandBuilder.c_str());
 }
