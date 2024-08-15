@@ -14,7 +14,7 @@ fabrics.
 For Linux host example:
 
 ```
-./scripts/examples/gn_build_example.sh examples/fabric-admin out/debug/standalone chip_config_network_layer_ble=false 'import("//with_pw_rpc.gni")'
+./scripts/examples/gn_build_example.sh examples/fabric-admin out/debug/standalone 'import("//with_pw_rpc.gni")'
 ```
 
 For Raspberry Pi 4 example:

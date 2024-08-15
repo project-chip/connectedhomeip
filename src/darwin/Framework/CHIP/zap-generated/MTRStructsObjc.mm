@@ -5029,6 +5029,98 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _duration = @(0);
+
+        _oneShot = nil;
+
+        _emergencyBoost = nil;
+
+        _temporarySetpoint = nil;
+
+        _targetPercentage = nil;
+
+        _targetReheat = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct alloc] init];
+
+    other.duration = self.duration;
+    other.oneShot = self.oneShot;
+    other.emergencyBoost = self.emergencyBoost;
+    other.temporarySetpoint = self.temporarySetpoint;
+    other.targetPercentage = self.targetPercentage;
+    other.targetReheat = self.targetReheat;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; oneShot:%@; emergencyBoost:%@; temporarySetpoint:%@; targetPercentage:%@; targetReheat:%@; >", NSStringFromClass([self class]), _duration, _oneShot, _emergencyBoost, _temporarySetpoint, _targetPercentage, _targetReheat];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterManagementClusterBoostStartedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _boostInfo = [MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterManagementClusterBoostStartedEvent alloc] init];
+
+    other.boostInfo = self.boostInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: boostInfo:%@; >", NSStringFromClass([self class]), _boostInfo];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterManagementClusterBoostEndedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterManagementClusterBoostEndedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDemandResponseLoadControlClusterHeatingSourceControlStruct
 - (instancetype)init
 {
@@ -6640,6 +6732,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRServiceAreaClusterLandmarkInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _landmarkTag = @(0);
+
+        _positionTag = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterLandmarkInfoStruct alloc] init];
+
+    other.landmarkTag = self.landmarkTag;
+    other.positionTag = self.positionTag;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; positionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _positionTag];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRServiceAreaClusterAreaInfoStruct
 - (instancetype)init
 {
@@ -6647,11 +6769,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _locationInfo = nil;
 
-        _landmarkTag = nil;
-
-        _positionTag = nil;
-
-        _surfaceTag = nil;
+        _landmarkInfo = nil;
     }
     return self;
 }
@@ -6661,16 +6779,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRServiceAreaClusterAreaInfoStruct alloc] init];
 
     other.locationInfo = self.locationInfo;
-    other.landmarkTag = self.landmarkTag;
-    other.positionTag = self.positionTag;
-    other.surfaceTag = self.surfaceTag;
+    other.landmarkInfo = self.landmarkInfo;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationInfo:%@; landmarkTag:%@; positionTag:%@; surfaceTag:%@; >", NSStringFromClass([self class]), _locationInfo, _landmarkTag, _positionTag, _surfaceTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationInfo:%@; landmarkInfo:%@; >", NSStringFromClass([self class]), _locationInfo, _landmarkInfo];
     return descriptionString;
 }
 

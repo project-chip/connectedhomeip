@@ -25,6 +25,11 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
+
 static_library("nxp_platform") {
   defines = []
   sources = [
