@@ -48,7 +48,6 @@ private:
     Optional<CharSpan> mLabel;
 
     // Parameters needed for non-basic commissioning.
-    uint32_t mPBKDFIterations = 0;
     uint8_t mPBKDFSaltBuffer[Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     ByteSpan mPBKDFSalt;
     Crypto::Spake2pVerifierSerialized mPAKEPasscodeVerifierBuffer;

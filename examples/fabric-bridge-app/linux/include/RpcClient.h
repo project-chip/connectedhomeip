@@ -60,12 +60,12 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 /**
  * Reverse commission the bridge using the specified parameters.
  *
- * @param params    Params for commissioning the device using verifier.
+ * @param params    Params for commissioning the device using passcode.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully sent.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */
 CHIP_ERROR
-ReverseCommissionBridge(chip::Controller::CommissioningWindowVerifierParams params);
+ReverseCommissionBridge(chip::Controller::CommissioningWindowPasscodeParams params);
 
 CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs);

@@ -163,25 +163,20 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 }
 
 CHIP_ERROR
-ReverseCommissionBridge(chip::Controller::CommissioningWindowVerifierParams params)
+ReverseCommissionBridge(chip::Controller::CommissioningWindowPasscodeParams params)
 {
-    chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = params.GetNodeId();
-    device.commissioning_timeout = params.GetTimeout().count();
-    device.discriminator         = params.GetDiscriminator();
-    device.iterations            = params.GetIteration();
+    chip_rpc_DeviceCommissioningInfo device;
+    device.setup_pin     = params.GetSetupPIN();
+    device.discriminator = params.GetDiscriminator();
+    device.iterations    = params.GetIteration();
 
     VerifyOrReturnError(params.GetSalt().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(device.salt.bytes, params.GetSalt().data(), params.GetSalt().size());
     device.salt.size = static_cast<size_t>(params.GetSalt().size());
 
-    VerifyOrReturnError(params.GetVerifier().size() <= sizeof(device.verifier.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(device.verifier.bytes, params.GetVerifier().data(), params.GetVerifier().size());
-    device.verifier.size = static_cast<size_t>(params.GetVerifier().size());
-
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricAdminClient.ReverseCommissionBridgeTemplate(device);
+    auto call = fabricAdminClient.ReverseCommissionBridge(device, RpcCompletedWithEmptyResponse);
 
     if (!call.active())
     {
