@@ -101,17 +101,6 @@ struct LocationDescriptorStruct
     std::optional<Globals::AreaTypeTag> mAreaType;
 };
 
-struct EcosystemLocationIdentifier
-{
-    bool operator<(const EcosystemLocationIdentifier & other) const
-    {
-        return mUniqueLocationId < other.mUniqueLocationId ||
-            (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
-    }
-    std::string mUniqueLocationId;
-    FabricIndex mFabricIndex;
-};
-
 // This intentionally mirrors Structs::EcosystemLocationStruct::Type but has ownership
 // of underlying types.
 class EcosystemLocationStruct
@@ -138,7 +127,7 @@ public:
     };
 
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder,
-                      const EcosystemLocationIdentifier & aUniqueLocationId);
+                      const std::string & aUniqueLocationId, const FabricIndex & aFabricIndex);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
@@ -212,11 +201,22 @@ public:
     CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 
 private:
+    struct EcosystemLocationKey
+    {
+        bool operator<(const EcosystemLocationKey & other) const
+        {
+            return mUniqueLocationId < other.mUniqueLocationId ||
+                (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
+        }
+        std::string mUniqueLocationId;
+        FabricIndex mFabricIndex;
+    };
+
     struct DeviceInfo
     {
         Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
-        std::map<EcosystemLocationIdentifier, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
+        std::map<EcosystemLocationKey, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
 
     CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);

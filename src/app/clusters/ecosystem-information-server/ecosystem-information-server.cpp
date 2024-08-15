@@ -230,14 +230,14 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
 }
 
 CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder,
-                                           const EcosystemLocationIdentifier & aUniqueLocationId)
+                                           const std::string & aUniqueLocationId, const FabricIndex & aFabricIndex)
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
     locationStruct.uniqueLocationID =
-        CharSpan(aUniqueLocationId.mUniqueLocationId.c_str(), aUniqueLocationId.mUniqueLocationId.size());
+        CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
-    locationStruct.SetFabricIndex(aUniqueLocationId.mFabricIndex);
+    locationStruct.SetFabricIndex(aFabricIndex);
 
     return aEncoder.Encode(locationStruct);
 }
@@ -281,12 +281,11 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     VerifyOrReturnError(aFabricIndex <= kMaxValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    // TODO rename foobar
-    EcosystemLocationIdentifier foobar = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(foobar) == deviceInfo.mLocationDirectory.end()),
+    EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
-    deviceInfo.mLocationDirectory[foobar] = std::move(aLocation);
+    deviceInfo.mLocationDirectory[key] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
 
