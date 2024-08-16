@@ -34,7 +34,7 @@
     if (!(self = [super initForSubclasses])) {
         return nil;
     }
-    
+
     self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
     self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
@@ -44,7 +44,7 @@
     // self.xpcConnection.exportedObject = self;
 
     [self.xpcConnection resume];
-    
+
     id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
     }];
