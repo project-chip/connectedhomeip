@@ -136,7 +136,7 @@ private:
         mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.
-    // Because UniqueLocationId and FabricIndex are manditory when an entry exist,
+    // Because UniqueLocationId and FabricIndex are mandatory when an entry exist,
     // and needs to be unique, we use it as a key to the key-value pair and is why it is
     // not explicitly in this struct.
     LocationDescriptorStruct mLocationDescriptor;
