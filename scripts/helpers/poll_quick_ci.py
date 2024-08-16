@@ -12,16 +12,16 @@ def main():
     print(f"Gathering info on the {args.check} check being run for the current pull request.")
     polling = True
     poll_count = 0
-    poll_max = 300
+    poll_max = 3600
     while (polling):
         for line in subprocess.run(f"gh pr checks -R project-chip/connectedhomeip {args.pr}", stdout=subprocess.PIPE, shell=True).stdout.decode("utf-8").splitlines():
+            poll_count += 1
             if args.check in line:
                 print(line)
                 if "pending" in line:
                     if poll_count == poll_max:
                         polling = False
                     else:
-                        poll_count += 1
                         time.sleep(1)
                     break
                 elif "pass" in line:
