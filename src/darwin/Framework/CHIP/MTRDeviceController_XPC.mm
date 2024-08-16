@@ -49,7 +49,7 @@
     // self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
 
     [self.xpcConnection resume];
-    
+
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
     // fare much better.  kmo 15 aug 2024 10h52
 //    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
@@ -82,7 +82,7 @@
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error 
+                                      error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
     // initiate XPC connection? kmo 14 aug 2024 12h35

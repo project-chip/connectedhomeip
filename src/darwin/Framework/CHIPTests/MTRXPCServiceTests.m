@@ -100,9 +100,9 @@
     XCTAssertNotNil(obj);
 
     [obj ping];
-    
+
 //    NSNumber * lifeMeaning = [obj synchronouslyGetMeaningOfLife];
-//    
+//
 //    NSLog(@"test got lifeMeaning = %@", lifeMeaning);
 
     XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
@@ -112,7 +112,7 @@
         NSLog(@"got async life meaning %@", asyncLifeMeaning);
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectations:@[expectation] timeout:1.0];
     NSLog(@"done with %s", __PRETTY_FUNCTION__);
 }

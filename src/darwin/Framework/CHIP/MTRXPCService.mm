@@ -33,7 +33,7 @@
     MTR_LOG_DEBUG("PONG! %s", __PRETTY_FUNCTION__);
 }
 
-- (nonnull NSNumber *)synchronouslyGetMeaningOfLife { 
+- (nonnull NSNumber *)synchronouslyGetMeaningOfLife {
     return @(42);
 }
 
