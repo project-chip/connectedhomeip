@@ -195,6 +195,12 @@ menu "Energy Management Example App Configuration"
         help
             To use Energy Management App as Water Heater device and compile dependent files.
 
+    config CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+        bool "Enable Water Heater triggers"
+        default "y"
+        help
+            To test Energy Management App as a Water Heater device
+
     config ENABLE_EXAMPLE_EVSE_DEVICE
         bool "Enable EVSE device on EP1"
         default "n"
