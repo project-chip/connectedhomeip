@@ -82,7 +82,7 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                CHIP_ERROR err = OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams()
+                CHIP_ERROR err = OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
                                                              .SetNodeId(0x1234)
                                                              .SetTimeout(300)
                                                              .SetDiscriminator(3840)
@@ -157,7 +157,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
-        OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams()
+        OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
                                     .SetNodeId(device->GetNodeId())
                                     .SetTimeout(commandData.commissioningTimeout)
                                     .SetDiscriminator(commandData.discriminator)
