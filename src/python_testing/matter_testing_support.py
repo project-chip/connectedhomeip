@@ -1148,7 +1148,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
                 if isinstance(exception, signals.TestError):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
-                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and not "asserts.py" in line]
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
                         return "Unknown error, please see stack trace above", ""
                     assert_candidate_idx = assert_candidates[-1]
