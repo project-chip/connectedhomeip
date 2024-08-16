@@ -18,7 +18,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceControllerXPCParameters : MTRDeviceControllerAbstractParameters
+@interface MTRDeviceControllerXPCParameters: MTRDeviceControllerParameters
+@end
+
+@interface MTRDeviceControllerMachServiceXPCParameters : MTRDeviceControllerXPCParameters
+
+@property (atomic, retain) NSString * machServiceName;
+@property (atomic, readwrite) NSXPCConnectionOptions connectionOptions;
 
 @end
 

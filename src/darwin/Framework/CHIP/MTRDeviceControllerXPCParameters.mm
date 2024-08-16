@@ -17,5 +17,7 @@
 #import "MTRDeviceControllerXPCParameters.h"
 
 @implementation MTRDeviceControllerXPCParameters
+@end
 
+@implementation MTRDeviceControllerMachServiceXPCParameters
 @end
