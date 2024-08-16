@@ -33,16 +33,7 @@
 	pwm_pool {
 		compatible = "pwm-leds";
 		out {
-			pwms = <&pwm0 4 PWM_MSEC(1) PWM_POLARITY_NORMAL>,
-				   <&pwm0 2 PWM_MSEC(1) PWM_POLARITY_NORMAL>,
-				   <&pwm0 3 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
+			pwms = <&pwm0 4 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
 		};
 	};
-};
-
-&pwm0 {
-	/* On board RGB LEDs */
-	pinctrl-ch4 = <&pwm_ch4_p20_default>;
-	pinctrl-ch2 = <&pwm_ch2_p17_default>;
-	pinctrl-ch3 = <&pwm_ch3_p18_default>;
 };
