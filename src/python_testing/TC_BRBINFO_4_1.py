@@ -172,7 +172,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.app_process.send_signal(signal.SIGCONT.value)
         self.app_process_paused = False
 
-
     #
     # BRBINFO 4.1 Test Body
     #
