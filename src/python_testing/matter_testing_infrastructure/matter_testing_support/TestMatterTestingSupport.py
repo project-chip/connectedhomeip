@@ -27,9 +27,9 @@ from matter_testing import (MatterBaseTest, async_test_body, compare_time, defau
                             type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
 from pics import parse_pics, parse_pics_xml
-from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                               find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                               get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
+from taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                       find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
+                                       get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
