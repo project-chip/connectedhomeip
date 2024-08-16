@@ -88,6 +88,10 @@ class PyChipError(ctypes.Structure):
             if exception is not None:  # Ensure exception is not None to avoid mypy error and only raise valid exceptions
                 raise exception
 
+    @classmethod
+    def from_code(cls, code):
+        return cls(code=code, line=0, file=ctypes.c_void_p())
+
     @property
     def is_success(self) -> bool:
         return self.code == 0
