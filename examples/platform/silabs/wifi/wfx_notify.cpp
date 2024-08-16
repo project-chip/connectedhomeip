@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <icd/server/ICDServerConfig.h>
 #include "AppConfig.h"
 #include "BaseApplication.h"
 
@@ -37,8 +37,10 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-static uint16_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
-static osTimerId_t sRetryTimer;
+namespace {
+uint16_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+osTimerId_t sRetryTimer; 
+}
 /*
  * Notifications to the upper-layer
  * All done in the context of the RSI/WiFi task (rsi_if.c)
@@ -47,7 +49,6 @@ static osTimerId_t sRetryTimer;
 static void RetryConnectionTimerHandler(void * arg)
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    // TODO: remove this once it is fixed in the wifi sdk SI91X-15845
     wfx_rsi_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
     if (wfx_connect_to_ap() != SL_STATUS_OK)
@@ -69,12 +70,7 @@ void wfx_started_notify()
 
     // Creating a timer which will be used to retry connection with AP
     sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
-    if (sRetryTimer == NULL)
-    {
-        return;
-    }
-
-    ChipLogProgress(DeviceLayer, "wfx_started_notify: started.");
+    VerifyOrReturnError(sRetryTimer != NULL, SL_STATUS_ALLOCATION_FAILED);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_STARTUP_IND_ID;
@@ -99,15 +95,11 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 
-    ChipLogProgress(DeviceLayer, "wfx_connected_notify : started.");
-
     if (status != SUCCESS_STATUS)
     {
         ChipLogProgress(DeviceLayer, "wfx_connected_notify : error: failed status: %ld.", status);
         return;
     }
-
-    ChipLogProgress(DeviceLayer, "wfx_connected_notify : connected.");
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
@@ -132,8 +124,6 @@ void wfx_disconnected_notify(int32_t status)
 {
     sl_wfx_disconnect_ind_t evt;
 
-    ChipLogProgress(DeviceLayer, "wfx_disconnected_notify: started.");
-
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_DISCONNECT_IND_ID;
     evt.header.length = sizeof evt;
@@ -152,8 +142,6 @@ void wfx_ipv6_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
 
-    ChipLogProgress(DeviceLayer, "wfx_ipv6_notify: started.");
-
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_GOT_IP6 : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
@@ -170,8 +158,6 @@ void wfx_ipv6_notify(int got_ip)
 void wfx_ip_changed_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
-
-    ChipLogProgress(DeviceLayer, "wfx_ip_changed_notify: started.");
 
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
@@ -200,6 +186,10 @@ void wfx_retry_connection(uint16_t retryAttempt)
             if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS)) != osOK)
             {
                 ChipLogProgress(DeviceLayer, "Failed to start retry timer");
+                // Sending the join command if retry timer failed to start
+                if (wfx_connect_to_ap() != SL_STATUS_OK) {
+                    ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+                } 
                 return;
             }
         }
@@ -222,6 +212,10 @@ void wfx_retry_connection(uint16_t retryAttempt)
         if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(retryInterval)) != osOK)
         {
             ChipLogProgress(DeviceLayer, "Failed to start retry timer");
+            // Sending the join command if retry timer failed to start
+            if (wfx_connect_to_ap() != SL_STATUS_OK) {
+                ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+            } 
             return;
         }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
