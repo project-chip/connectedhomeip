@@ -17,16 +17,25 @@
  */
 
 #include "CommissionerControl.h"
+#include "RpcClient.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/commissioner-control-server/commissioner-control-server.h>
+#include <controller/CommissioningWindowOpener.h>
 #include <lib/support/ZclString.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <protocols/secure_channel/PASESession.h>
 
 using namespace chip;
 using namespace chip::app;
 
 namespace {
+
+// Constants
+constexpr uint16_t kDiscriminator = 3840;
+constexpr uint16_t kWindowTimeout = 300;
+constexpr uint16_t kIteration     = 1000;
+constexpr uint32_t kSetupPinCode  = 20202021;
 
 std::unique_ptr<Clusters::CommissionerControl::CommissionerControlDelegate> sCommissionerControlDelegate;
 
@@ -96,23 +105,43 @@ exit:
 
 CHIP_ERROR CommissionerControlDelegate::GetCommissioningWindowParams(CommissioningWindowParams & outParams)
 {
-    // TODO: Populate outParams with the required details.
-    // outParams.commissioningWindowParams.iterations = mIterations;
-    // outParams.commissioningWindowParams.commissioningTimeout = mCommissioningTimeout;
-    // outParams.commissioningWindowParams.discriminator = mDiscriminator;
-    // outParams.commissioningWindowParams.PAKEPasscodeVerifier = mPAKEPasscodeVerifier;
-    // outParams.commissioningWindowParams.salt = mSalt;
+    // Populate outParams with the required details.
+    outParams.iterations           = kIteration;
+    outParams.commissioningTimeout = kWindowTimeout;
+    outParams.discriminator        = kDiscriminator;
 
-    // outParams.ipAddress = mIpAddress;
-    // outParams.port = mPort;
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mPBKDFSaltBuffer, sizeof(mPBKDFSaltBuffer)));
+    mPBKDFSalt     = ByteSpan(mPBKDFSaltBuffer);
+    outParams.salt = mPBKDFSalt;
+
+    Crypto::Spake2pVerifier verifier;
+    uint32_t setupPIN = kSetupPinCode;
+    ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, kIteration, mPBKDFSalt, false, setupPIN));
+
+    MutableByteSpan serializedVerifierSpan(mPAKEPasscodeVerifierBuffer);
+    ReturnErrorOnFailure(verifier.Serialize(serializedVerifierSpan));
+    mPAKEPasscodeVerifier          = serializedVerifierSpan;
+    outParams.PAKEPasscodeVerifier = mPAKEPasscodeVerifier;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionerControlDelegate::ReverseCommissionNode(const CommissioningWindowParams & params,
-                                                              const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
+CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params,
+                                                             const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
 {
-    return CHIP_NO_ERROR;
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    return CommissionNode(Controller::CommissioningWindowPasscodeParams()
+                              .SetSetupPIN(kSetupPinCode)
+                              .SetTimeout(params.commissioningTimeout)
+                              .SetDiscriminator(params.discriminator)
+                              .SetIteration(params.iterations)
+                              .SetSalt(params.salt));
+#else
+    ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 }
 
 } // namespace CommissionerControl
