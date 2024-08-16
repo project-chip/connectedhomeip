@@ -138,7 +138,15 @@ using namespace chip::Tracing::DarwinFramework;
 - (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                                         error:(NSError * __autoreleasing *)error
 {
-    if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+    /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
+    /// because of the enormous overlap of params.
+    if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
+        MTR_LOG_ERROR("XPC Device Controller init not yet implemented");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
+        }
+        return nil;
+    } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
         // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
@@ -147,13 +155,7 @@ using namespace chip::Tracing::DarwinFramework;
                                        withParameters:controllerParameters
                                                 error:error];
         return controller;
-    } else if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
-        MTR_LOG_ERROR("XPC Device Controller init not yet implemented");
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
-        }
-        return nil;
-    } else {
+    } else  {
         // way out of our league
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
