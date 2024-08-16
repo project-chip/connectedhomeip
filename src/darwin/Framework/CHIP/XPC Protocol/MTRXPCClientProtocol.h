@@ -14,23 +14,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRXPCClientProtocol_MTRDevice <NSObject>
-- (oneway void)device:(NSNumber * _Nonnull)nodeID stateChanged:(MTRDeviceState)state;
-- (oneway void)device:(NSNumber * _Nonnull)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> * _Nonnull)attributeReport;
-- (oneway void)device:(NSNumber * _Nonnull)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> * _Nonnull)eventReport;
-- (oneway void)deviceBecameActive:(NSNumber * _Nonnull)nodeID;
-- (oneway void)deviceCachePrimed:(NSNumber * _Nonnull)nodeID;
-- (oneway void)deviceConfigurationChanged:(NSNumber * _Nonnull)nodeID;
+- (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state;
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+- (oneway void)deviceBecameActive:(NSNumber *)nodeID;
+- (oneway void)deviceCachePrimed:(NSNumber *)nodeID;
+- (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID;
 @end
 
 @protocol MTRXPCClientProtocol_MTRDeviceController <NSObject>
 // Not Supported via XPC
-//- (oneway void)controller:(NSUUID * _Nonnull)controller statusUpdate:(MTRCommissioningStatus)status;
-//- (oneway void)controller:(NSUUID * _Nonnull)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
-//- (oneway void)controller:(NSUUID * _Nonnull)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics;
-//- (oneway void)controller:(NSUUID * _Nonnull)controller readCommissioningInfo:(MTRProductIdentity * _Nonnull)info;
+//- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status;
+//- (oneway void)controller:(NSUUID *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
+//- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics;
+//- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info;
 @end
 
 @protocol MTRXPCClientProtocol <NSObject, MTRXPCClientProtocol_MTRDevice, MTRXPCClientProtocol_MTRDeviceController>
 @end
+
+NS_ASSUME_NONNULL_END
