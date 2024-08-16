@@ -22,8 +22,8 @@
 #import "MTRXPCClientProtocol.h"
 
 @interface MTRDeviceController_XPC ()
+
 @property (retain, readwrite) NSXPCConnection * xpcConnection;
-@property (retain, readwrite) id<MTRXPCServiceProtocol> xpcRemoteObjectProxy;
 
 @end
 
@@ -43,11 +43,14 @@
     // kmo 16 aug 2024 12h26
     // self.xpcConnection.exportedObject = self;
 
-    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+    [self.xpcConnection resume];
+    
+    id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
     }];
 
-    [self.xpcConnection resume];
+    NSDictionary * helloContext = @{ @"human_readable_context" : @"hello" };
+    [proxy deviceController:self.uniqueIdentifier checkInWithContext:helloContext];
 
     return self;
 }
@@ -59,17 +62,6 @@
     }
     self.xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:listenerEndpoint];
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
-
-    // maybe poor architecture to store this instead of access it thru XPC connection every time kmo 15 aug 2024
-
-    // REVIEWERS: both of below inits result in proxies that complain:
-    // "Return type of methods sent over this proxy must be 'void' or 'NSProgress *'"
-    // which Internets seem to suggest is true.  kmo 15 aug 2024
-    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
-    }];
-    ;
-
     [self.xpcConnection resume];
 
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't fare much better
@@ -79,43 +71,21 @@
 
 - (void)testPing
 {
-    MTR_LOG_DEBUG("pinging via %s", __PRETTY_FUNCTION__);
-    [self.xpcRemoteObjectProxy ping];
+    MTR_LOG_ERROR("ping not supported in new XPC Server protocol");
+//    MTR_LOG_DEBUG("pinging via %s", __PRETTY_FUNCTION__);
+//    id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+//        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
+//    }];
+//    [proxy ping];
 }
 
-// this blows up.  kmo 15 aug 2024 12h29
-- (NSNumber *)meaningOfLife
-{
-    return [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
-}
 
-- (NSNumber *)internallyAsyncMeaningOfLife
-{
-    __block int result;
-    // semaphores probably not ultimately the right way to do this? kmo 15 aug 2024
-    auto semaphore = dispatch_semaphore_create(0);
-    [self.xpcRemoteObjectProxy getMeaningOfLifeWithReplyBlock:^(int reply) {
-        result = reply;
-    }];
-    dispatch_semaphore_wait(semaphore, 1.0);
-    // so, this will return an undefined value if timed out? kmo 15 aug 2024 12h21
-    return @(result);
-}
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
-    // initiate XPC connection? kmo 14 aug 2024 12h35
     return nil;
-}
-
-- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
-                                   newNodeID:(NSNumber *)newNodeID
-                                       error:(NSError * __autoreleasing *)error
-{
-    MTR_LOG_DEBUG("called XPC stub %s", __PRETTY_FUNCTION__);
-    return [self.xpcRemoteObjectProxy setupCommissioningSessionWithPayload:payload newNodeID:newNodeID error:error];
 }
 
 @end
