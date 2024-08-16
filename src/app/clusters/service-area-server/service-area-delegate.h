@@ -120,7 +120,7 @@ public:
      *       InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the
      *       device, which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+    virtual bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
         // device support of this command is optional
         CopyCharSpanToMutableCharSpan("Skip Current Area command not supported by device"_span, skipStatusText);
