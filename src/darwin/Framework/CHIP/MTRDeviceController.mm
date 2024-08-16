@@ -108,10 +108,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // Atomic because they can be touched from multiple threads.
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
-
     // queue used to serialize all work performed by the MTRDeviceController
     dispatch_queue_t _chipWorkQueue;
 
@@ -120,8 +116,6 @@ using namespace chip::Tracing::DarwinFramework;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
     NSMapTable * _nodeIDToDeviceMap;
@@ -133,9 +127,22 @@ using namespace chip::Tracing::DarwinFramework;
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
 
     MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
+- (instancetype)initForSubclasses
+{
+    if (self = [super init]) {
+        // nothing, as superclass of MTRDeviceController is NSObject
+    }
+
+    return self;
+}
+
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
@@ -1573,15 +1580,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 #endif // DEBUG
 
-@end
-
-/**
- * Shim to allow us to treat an MTRDevicePairingDelegate as an
- * MTRDeviceControllerDelegate.
- */
-@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
 @end
 
 @implementation MTRDevicePairingDelegateShim

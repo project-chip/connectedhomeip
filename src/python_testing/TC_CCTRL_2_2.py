@@ -44,7 +44,6 @@ class TC_CCTRL_2_2(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: confirm whether we can open processes like this on the TH
         self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
@@ -123,7 +122,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
-        th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         self.step(2)
         th_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         self.step(3)
@@ -248,7 +247,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(20)
         print(f'server node id {self.server_nodeid}')
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         asserts.assert_equal(len(th_server_fabrics), len(th_server_fabrics_new), "Unexpected number of fabrics on TH_SERVER")
 
         self.step(21)
@@ -294,7 +293,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             time.sleep(30)
 
         self.step(28)
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
         if not self.is_ci:
             asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),

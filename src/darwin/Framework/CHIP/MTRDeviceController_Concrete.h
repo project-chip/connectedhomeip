@@ -19,6 +19,7 @@
 
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
@@ -37,15 +38,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRDeviceController : NSObject
-
-/**
- * Controllers are created via the MTRDeviceControllerFactory object or
- * initialized via initWithParameters:error:.
- */
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+@interface MTRDeviceController_Concrete : MTRDeviceController
 
 /**
  * Initialize a device controller with the provided parameters.  This will:
@@ -57,8 +50,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                               error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * If true, the controller has not been shut down yet.
@@ -262,7 +255,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @end
 
-@interface MTRDeviceController (Deprecated)
+@interface MTRDeviceController_Concrete (Deprecated)
 
 @property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_DEPRECATED(
     "Please use controllerNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
