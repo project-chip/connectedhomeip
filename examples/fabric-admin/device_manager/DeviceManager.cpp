@@ -33,12 +33,13 @@ namespace {
 // Constants
 constexpr uint32_t kSetupPinCode               = 20202021;
 constexpr uint16_t kRemoteBridgePort           = 5540;
-constexpr uint16_t kDiscriminator              = 3840;
+constexpr uint16_t kLocalBridgePort            = 5540;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;
 constexpr uint16_t kSubscribeMaxInterval       = 60;
 constexpr uint16_t kAggragatorEndpointId       = 1;
+constexpr uint16_t kMaxDiscriminatorLength     = 4095;
 constexpr uint8_t kEnhancedCommissioningMethod = 1;
 
 } // namespace
@@ -117,8 +118,10 @@ void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
 void DeviceManager::OpenDeviceCommissioningWindow(NodeId nodeId, uint32_t commissioningTimeout, uint32_t iterations,
                                                   uint32_t discriminator, const char * saltHex, const char * verifierHex)
 {
+    ChipLogProgress(NotSpecified, "Open the commissioning window of device with NodeId:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+
     // Open the commissioning window of a device within its own fabric.
-    StringBuilder<512> commandBuilder;
+    StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d --salt hex:%s --verifier hex:%s", nodeId, kRootEndpointId,
@@ -134,9 +137,14 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     // that is part of a different fabric, accessed through a fabric bridge.
     StringBuilder<kMaxCommandSize> commandBuilder;
 
+    // Use random discriminator to have less chance of collission.
+    uint16_t discriminator =
+        Crypto::GetRandU16() % (kMaxDiscriminatorLength + 1); // Include the upper limit kMaxDiscriminatorLength
+
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
-                             kWindowTimeout, kIteration, kDiscriminator);
+                             kWindowTimeout, kIteration, discriminator);
+    commandBuilder.Add(" --setup-pin 20202021");
 
     PushCommand(commandBuilder.c_str());
 }
@@ -161,12 +169,32 @@ void DeviceManager::PairRemoteDevice(chip::NodeId nodeId, const char * payload)
     PushCommand(commandBuilder.c_str());
 }
 
+void DeviceManager::PairLocalFabricBridge(NodeId nodeId)
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing already-discovered ");
+    commandBuilder.AddFormat("%lu %d ::1 %d", nodeId, kSetupPinCode, kLocalBridgePort);
+
+    PushCommand(commandBuilder.c_str());
+}
+
 void DeviceManager::UnpairRemoteFabricBridge()
 {
     StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing unpair ");
     commandBuilder.AddFormat("%lu", mRemoteBridgeNodeId);
+
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::UnpairLocalFabricBridge()
+{
+    StringBuilder<kMaxCommandSize> commandBuilder;
+
+    commandBuilder.Add("pairing unpair ");
+    commandBuilder.AddFormat("%lu", mLocalBridgeNodeId);
 
     PushCommand(commandBuilder.c_str());
 }
@@ -326,7 +354,8 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     // Process added endpoints
     for (const auto & endpoint : addedEndpoints)
     {
-        ChipLogProgress(NotSpecified, "Endpoint added: %u", endpoint);
+        // print to console
+        fprintf(stderr, "A new devie is added on Endpoint: %u\n", endpoint);
 
         if (mAutoSyncEnabled)
         {
