@@ -44,25 +44,20 @@
     // "Return type of methods sent over this proxy must be 'void' or 'NSProgress *'"
     // which Internets seem to suggest is true.  kmo 15 aug 2024
     self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-        NSLog(@"%s: it's not my fault! XPC remote object proxy error.", __PRETTY_FUNCTION__);
+        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
     }];
     ;
-    // self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
 
     [self.xpcConnection resume];
 
-    // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
-    // fare much better.  kmo 15 aug 2024 10h52
-    //    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
-    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
-    NSLog(@"%s: postInitMeaningOfLife = %@", __PRETTY_FUNCTION__, postInitMeaningOfLife);
+    // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't fare much better
 
     return self;
 }
 
 - (void)testPing
 {
-    NSLog(@"pinging via %s", __PRETTY_FUNCTION__);
+    MTR_LOG_DEBUG("pinging via %s", __PRETTY_FUNCTION__);
     [self.xpcRemoteObjectProxy ping];
 }
 
