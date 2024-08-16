@@ -135,7 +135,7 @@ MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getE
 }
 
 - (void) writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber *)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout {
-    __block NSDictionary<NSString *, id> * outValue = nil;
+//    __block NSDictionary<NSString *, id> * outValue = nil;
 
     NSXPCConnection * xpcConnection = nil;
 
