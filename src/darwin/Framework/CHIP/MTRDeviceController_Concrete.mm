@@ -144,12 +144,12 @@ using namespace chip::Tracing::DarwinFramework;
     /// because of the enormous overlap of params.
     if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
         MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithParameters:parameters error:error];
-        
+
         // TODO:  there's probably a more appropriate error here.
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
         }
-        
+
         /// Being of sound mind, I willfully and voluntarily make this static cast.  (We are counting on the factory to perform the relevant type erasure.)
         return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
     } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
