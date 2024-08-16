@@ -69,7 +69,7 @@ class ErrorSDKPart(enum.IntEnum):
 class PyChipError(ctypes.Structure):
     ''' The ChipError for Python library.
 
-    We are using the following struct for passing the infomations of CHIP_ERROR between C++ and Python:
+    We are using the following struct for passing the information of CHIP_ERROR between C++ and Python:
 
     ```c
     struct PyChipError
