@@ -371,6 +371,8 @@
 		B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */; };
 		B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
+		D444F9A72C6E8F9D007761E5 /* MTRXPCServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D444F9AA2C6E9A08007761E5 /* MTRXPCClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E04AC67D2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
 		E04AC67E2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
@@ -809,6 +811,8 @@
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
 		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
+		D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCServerProtocol.h; sourceTree = "<group>"; };
+		D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCClientProtocol.h; sourceTree = "<group>"; };
 		D4772A45285AE98300383630 /* MTRClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusterConstants.h; sourceTree = "<group>"; };
 		E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-io-storage.cpp"; path = "util/ember-io-storage.cpp"; sourceTree = "<group>"; };
 		E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-global-attribute-access-interface.cpp"; path = "util/ember-global-attribute-access-interface.cpp"; sourceTree = "<group>"; };
@@ -1246,6 +1250,7 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				D444F9A12C6E8058007761E5 /* XPC Protocol */,
 				9B231B022C62EF650030EB37 /* MTRDeviceController_Concrete.h */,
 				9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */,
 				88E07D602B9A89A4005FD53E /* MTRMetricKeys.h */,
@@ -1539,6 +1544,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D444F9A12C6E8058007761E5 /* XPC Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */,
+				D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */,
+			);
+			path = "XPC Protocol";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1609,6 +1623,7 @@
 				75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */,
 				5ACDDD7A27CD129700EFD68A /* MTRClusterStateCacheContainer.h in Headers */,
 				5A6FEC9227B5669C00F25F42 /* MTRDeviceControllerOverXPC.h in Headers */,
+				D444F9AA2C6E9A08007761E5 /* MTRXPCClientProtocol.h in Headers */,
 				5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.h in Headers */,
 				5173A47529C0E2ED00F67F48 /* MTRFabricInfo_Internal.h in Headers */,
@@ -1698,6 +1713,7 @@
 				5A7947E527C0129F00434CF2 /* MTRDeviceController+XPC.h in Headers */,
 				51E95DFB2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* MTRError_Internal.h in Headers */,
+				D444F9A72C6E8F9D007761E5 /* MTRXPCServerProtocol.h in Headers */,
 				51F5226A2AE70761000C4050 /* MTRDeviceTypeMetadata.h in Headers */,
 				5146544B2A72F9F500904E61 /* MTRDemuxingStorage.h in Headers */,
 				1EDCE545289049A100E41EC9 /* MTROTAHeader.h in Headers */,
