@@ -29,7 +29,6 @@
 
 // KMO TODO:
 // startup parameters for XPC version of controller
-// MTRDevice_XPC.h/.mm
 
 - (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
 {

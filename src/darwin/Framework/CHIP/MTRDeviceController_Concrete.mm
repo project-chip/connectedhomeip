@@ -30,6 +30,7 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceControllerOverXPCParameters.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
@@ -137,41 +138,31 @@ using namespace chip::Tracing::DarwinFramework;
 - (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                                         error:(NSError * __autoreleasing *)error
 {
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+    if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+        // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+        MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+        id controller = [factory initializeController:self
+                                       withParameters:controllerParameters
+                                                error:error];
+        return controller;
+    }
+    else if ([parameters isKindOfClass:MTRDeviceControllerOverXPCParameters.class]) {
+        MTR_LOG_ERROR("XPC Device Controller init not yet implemented");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
+        }
+        return nil;
+    }
+    else {
+        // way out of our league
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
-    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    id controller = [factory initializeController:self
-                                   withParameters:controllerParameters
-                                            error:error];
-    return controller;
-}
-
-- (nullable MTRDeviceController *)bogusWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                                error:(NSError * __autoreleasing *)error
-{
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
-        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
-        return nil;
-    }
-    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    MTRDeviceController * controller = [factory initializeController:self
-                                                      withParameters:controllerParameters
-                                                               error:error];
-    return controller;
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
