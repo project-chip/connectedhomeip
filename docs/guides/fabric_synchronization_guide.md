@@ -127,7 +127,7 @@ KVS
 Pair the Light Example with node ID 3 using its payload number:
 
 ```
-pairing already-discovered 3 20202021 <ip> 5540
+pairing already-discovered 3 20202021 <ip> 5543
 ```
 
 After the device is successfully added, you will observe the following on
