@@ -57,7 +57,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         steps = [
-            TestStep("0", "Preconditions"),
+            TestStep("0",  "DUT commissioned", is_commissioning=True),
+            TestStep("0a", "Preconditions"),
             TestStep("1a", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("1b", "Simple KeepActive command w/ subscription. ActiveChanged event received by TH contains PromisedActiveDuration"),
             TestStep("2", "Sends 3x KeepActive commands w/ subscription. ActiveChanged event received ONCE and contains PromisedActiveDuration"),
@@ -73,7 +74,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             f"- setupQRCode: {setupQRCode}\n"
             f"- setupManualcode: {setupManualCode}\n"
             f"If using FabricSync Admin test app, you may type:\n"
-            f">>> pairing onnetwork 111 {setupPinCode}")
+            f">>> pairing onnetwork 111 {setupPinCode} --icd-registration true")
 
     async def _send_keep_active_command(self, duration, endpoint_id) -> int:
         logging.info("Sending keep active command")
@@ -107,6 +108,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
+        self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
@@ -135,10 +137,16 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process.send_signal(signal.SIGTERM.value)
-        self.app_process.wait()
-        os.remove(self.kvs)
+        # In case the th_server_app_path does not exist, then we failed the test
+        # and there is nothing to remove
+        if self.app_process is not None:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process.send_signal(signal.SIGTERM.value)
+            self.app_process.wait()
+
+            if os.path.exists(self.kvs):
+                os.remove(self.kvs)
+
         super().teardown_class()
 
     #
@@ -157,8 +165,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         dynamic_endpoint_id = await self._get_dynamic_endpoint()
         logging.info(f"Dynamic endpoint is {dynamic_endpoint_id}")
 
-        # Preconditions
         self.step("0")
+
+        # Preconditions
+        self.step("0a")
 
         logging.info("Ensuring DUT is commissioned to TH")
 

@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <jni.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
@@ -49,6 +50,8 @@ public:
     const char * c_str() const { return mChars; }
 
     chip::CharSpan charSpan() const { return chip::CharSpan(c_str(), static_cast<size_t>(size())); }
+
+    chip::ByteSpan byteSpan() const { return chip::ByteSpan(chip::Uint8::from_const_char(c_str()), static_cast<size_t>(size())); }
 
     jsize size() const { return mDataLength; }
 
