@@ -86,35 +86,34 @@
 
 #import <os/lock.h>
 
-#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
-\
-- (TYPE) NAME { \
-    __block TYPE outValue = DEFAULT_VALUE; \
-\
-    NSXPCConnection * xpcConnection = nil; \
-\
-    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-        MTR_LOG_ERROR("Error: %@", error); \
-    }] deviceController:[[self deviceController] uniqueIdentifier] \
-                   nodeID:[self nodeID] \
-              GETTER_NAME:^(TYPE returnValue) { \
-            outValue = returnValue; \
-        }]; \
- \
-    return outValue;\
-} \
-
+#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                       \
+                                                                                                   \
+    -(TYPE) NAME                                                                                   \
+    {                                                                                              \
+        __block TYPE outValue = DEFAULT_VALUE;                                                     \
+                                                                                                   \
+        NSXPCConnection * xpcConnection = nil;                                                     \
+                                                                                                   \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
+            MTR_LOG_ERROR("Error: %@", error);                                                     \
+        }] deviceController:[[self deviceController] uniqueIdentifier]                             \
+                     nodeID:[self nodeID]                                                          \
+                GETTER_NAME:^(TYPE returnValue) {                                                  \
+                    outValue = returnValue;                                                        \
+                }];                                                                                \
+                                                                                                   \
+        return outValue;                                                                           \
+    }
 
 @implementation MTRDevice_XPC
-
 
 MTR_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
 MTR_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
 MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate *, nil, getEstimatedStartTimeWithReply)
 MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getEstimatedSubscriptionLatencyWithReply)
 
-
-- (NSDictionary<NSString *, id> *) readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params  {
+- (NSDictionary<NSString *, id> *)readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params
+{
     __block NSDictionary<NSString *, id> * outValue = nil;
 
     NSXPCConnection * xpcConnection = nil;
@@ -122,30 +121,34 @@ MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getE
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
-                 nodeID:[self nodeID]
-        readAttributeWithEndpointID: endpointID
-                          clusterID: clusterID
-                        attributeID: attributeID
-                             params: params // TODO: PARAMS NEEDS TO CONORM TO NSCODER
-     withReply: ^(NSDictionary<NSString *, id> * returnValue) {
-            outValue = returnValue;
-        }];
+                             nodeID:[self nodeID]
+        readAttributeWithEndpointID:endpointID
+                          clusterID:clusterID
+                        attributeID:attributeID
+                             params:params // TODO: PARAMS NEEDS TO CONORM TO NSCODER
+                          withReply:^(NSDictionary<NSString *, id> * returnValue) {
+                              outValue = returnValue;
+                          }];
 
     return outValue;
 }
 
-- (void) writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber *)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout {
-//    __block NSDictionary<NSString *, id> * outValue = nil;
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber *)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout
+{
+    //    __block NSDictionary<NSString *, id> * outValue = nil;
 
     NSXPCConnection * xpcConnection = nil;
 
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
-                 nodeID:[self nodeID]
-     writeAttributeWithEndpointID: endpointID clusterID: clusterID attributeID: attributeID value: value expectedValueInterval: expectedValueInterval timedWriteTimeout: timeout];
+                              nodeID:[self nodeID]
+        writeAttributeWithEndpointID:endpointID
+                           clusterID:clusterID
+                         attributeID:attributeID
+                               value:value
+               expectedValueInterval:expectedValueInterval
+                   timedWriteTimeout:timeout];
 }
-
-
 
 @end
