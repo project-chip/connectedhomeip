@@ -135,7 +135,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 
-- (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                                         error:(NSError * __autoreleasing *)error
 {
     /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
