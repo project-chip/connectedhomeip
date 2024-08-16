@@ -18,6 +18,7 @@
 
 @interface MTRDeviceController_XPC (Internal)
 
+- (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options;
 - (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint;
 - (id)initWithTestXPCListener;
 - (void)testPing;

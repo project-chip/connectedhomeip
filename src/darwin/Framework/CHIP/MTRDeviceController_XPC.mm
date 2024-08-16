@@ -18,6 +18,8 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCServiceProtocol.h"
+#import "MTRXPCServerProtocol.h"
+#import "MTRXPCClientProtocol.h"
 
 @interface MTRDeviceController_XPC ()
 @property (retain, readwrite) NSXPCConnection * xpcConnection;
@@ -27,8 +29,28 @@
 
 @implementation MTRDeviceController_XPC
 
-// KMO TODO:
-// startup parameters for XPC version of controller
+- (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
+{
+    if (!(self = [super initForSubclasses])) {
+        return nil;
+    }
+    
+    self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
+    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+
+    // TODO:  implement client protocol somewhere, probably on this object
+    // kmo 16 aug 2024 12h26
+    // self.xpcConnection.exportedObject = self;
+
+    self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
+    }];
+
+    [self.xpcConnection resume];
+
+    return self;
+}
 
 - (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
 {
