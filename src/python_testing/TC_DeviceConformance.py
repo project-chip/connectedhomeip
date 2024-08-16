@@ -354,7 +354,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        success, problems = self.check_device_type(fail_on_extra_clusters)
+        allow_provisional = self.user_params.get("allow_provisional", False)
+        success, problems = self.check_device_type(fail_on_extra_clusters, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
