@@ -91,7 +91,7 @@ class TC_OCC_3_2(MatterBaseTest):
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
-        self.step(1) # Commissioning already done
+        self.step(1)  # Commissioning already done
 
         self.step(2)
         feature_map = await self.read_occ_attribute_expect_success(attribute=attributes.FeatureMap)
@@ -99,7 +99,8 @@ class TC_OCC_3_2(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        logging.info(f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        logging.info(
+            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
