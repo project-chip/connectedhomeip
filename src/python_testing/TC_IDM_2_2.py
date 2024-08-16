@@ -191,12 +191,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, attribute_list_path)
         for i in range(3):
             returned_endpoints = read_request[i].keys()
-            
+
             # Check if chip.clusters.Objects.Descriptor is in output
             asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
             # Check if AttributeList is in nested output
             asserts.assert_in(attribute_list, read_request[i][descriptor_obj], "AttributeList not in output")
-        
+
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
@@ -372,19 +372,19 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(21, "Send the Read Request Message to the DUT to read any attribute to an unsupported attribute")
         found_unsupported = False
         for endpoint_id, endpoint in self.endpoints.items():
-            
+
             if found_unsupported:
                 break
             for cluster_type, cluster in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
                     continue
-                
+
                 all_attrs = set(list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys()))
                 dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
-        
+
                 unsupported = [id for id in list(all_attrs - dut_attrs) if global_attribute_ids.attribute_id_type(id)
-                              == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
-        
+                               == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
+
                 if unsupported:
                     result = await self.read_single_attribute_expect_error(
                         endpoint=endpoint_id,
