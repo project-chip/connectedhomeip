@@ -130,7 +130,7 @@ MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getE
      withReply: ^(NSDictionary<NSString *, id> * returnValue) {
             outValue = returnValue;
         }];
- 
+
     return outValue;
 }
 
