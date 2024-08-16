@@ -136,7 +136,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
-                            location=location, problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
+                            location=location, problem=f'Required feature with mask 0x{feature_mask:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
                 # Attribute conformance checking
                 for attribute_id, attribute in cluster.items():
