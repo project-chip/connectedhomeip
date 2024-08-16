@@ -18,7 +18,8 @@
 
 @implementation MTRDeviceControllerXPCParameters
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return true;
 }
 
@@ -26,7 +27,8 @@
 
 @implementation MTRDeviceControllerMachServiceXPCParameters
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return true;
 }
 

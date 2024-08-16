@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceControllerXPCParameters: MTRDeviceControllerParameters
+@interface MTRDeviceControllerXPCParameters : MTRDeviceControllerParameters
 @end
 
 @interface MTRDeviceControllerMachServiceXPCParameters : MTRDeviceControllerXPCParameters

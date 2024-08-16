@@ -17,9 +17,9 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "MTRXPCServiceProtocol.h"
-#import "MTRXPCServerProtocol.h"
 #import "MTRXPCClientProtocol.h"
+#import "MTRXPCServerProtocol.h"
+#import "MTRXPCServiceProtocol.h"
 
 @interface MTRDeviceController_XPC ()
 
@@ -72,14 +72,12 @@
 - (void)testPing
 {
     MTR_LOG_ERROR("ping not supported in new XPC Server protocol");
-//    MTR_LOG_DEBUG("pinging via %s", __PRETTY_FUNCTION__);
-//    id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-//        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
-//    }];
-//    [proxy ping];
+    //    MTR_LOG_DEBUG("pinging via %s", __PRETTY_FUNCTION__);
+    //    id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+    //        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
+    //    }];
+    //    [proxy ping];
 }
-
-
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error

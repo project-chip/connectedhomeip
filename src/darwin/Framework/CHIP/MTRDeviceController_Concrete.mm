@@ -155,7 +155,7 @@ using namespace chip::Tracing::DarwinFramework;
                                        withParameters:controllerParameters
                                                 error:error];
         return controller;
-    } else  {
+    } else {
         // way out of our league
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
