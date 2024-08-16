@@ -308,8 +308,8 @@
 		9B5CCB592C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */; };
 		9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */; };
 		9B5CCB5D2C6EC890009DD99B /* MTRDevice_XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */; };
-		9B5CCB602C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.m */; };
-		9B5CCB612C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.h */; };
+		9B5CCB602C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.m */; };
+		9B5CCB612C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.h */; };
 		9BC064942C6BCB6F00996FEF /* MTRXPCService.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064922C6BCB6F00996FEF /* MTRXPCService.h */; };
 		9BC064972C6BCBAE00996FEF /* MTRXPCServiceProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */; };
 		9BC064992C6BCEA000996FEF /* MTRXPCServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */; };
@@ -752,8 +752,8 @@
 		9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_XPC_Internal.h; sourceTree = "<group>"; };
 		9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC.h; sourceTree = "<group>"; };
 		9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice_XPC.mm; sourceTree = "<group>"; };
-		9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerOverXPCParameters.h; sourceTree = "<group>"; };
-		9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceControllerOverXPCParameters.m; sourceTree = "<group>"; };
+		9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerXPCParameters.h; sourceTree = "<group>"; };
+		9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceControllerXPCParameters.m; sourceTree = "<group>"; };
 		9BC064922C6BCB6F00996FEF /* MTRXPCService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCService.h; sourceTree = "<group>"; };
 		9BC064962C6BCBAE00996FEF /* MTRXPCServiceProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCServiceProtocol.h; sourceTree = "<group>"; };
 		9BC064982C6BCEA000996FEF /* MTRXPCServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRXPCServiceTests.m; sourceTree = "<group>"; };
@@ -1381,8 +1381,8 @@
 				51E51FBD282AD37A00FC978D /* MTRDeviceControllerStartupParams_Internal.h */,
 				51E51FBE282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm */,
 				51565CB52A7B0D6600469F18 /* MTRDeviceControllerParameters.h */,
-				9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.h */,
-				9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.m */,
+				9B5CCB5E2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.h */,
+				9B5CCB5F2C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.m */,
 				51565CB32A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h */,
 				5A6FEC9427B5976200F25F42 /* MTRDeviceControllerXPCConnection.h */,
 				5A6FEC9527B5983000F25F42 /* MTRDeviceControllerXPCConnection.mm */,
@@ -1683,7 +1683,7 @@
 				88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */,
 				2C222AD0255C620600E446B9 /* MTRBaseDevice.h in Headers */,
 				7596A84F2877E6A9004DAE0E /* MTRCluster_Internal.h in Headers */,
-				9B5CCB612C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.h in Headers */,
+				9B5CCB612C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.h in Headers */,
 				991DC0842475F45400C13860 /* MTRDeviceController.h in Headers */,
 				88FA798D2B7B257100CD4B6F /* MTRMetricsCollector.h in Headers */,
 				9BFE5D502C6D3075007D4319 /* MTRDeviceController_XPC.h in Headers */,
@@ -2017,7 +2017,7 @@
 				51D0B1392B618CC6006E3511 /* MTRServerAttribute.mm in Sources */,
 				51B22C2A2740CB47008D5055 /* MTRCommandPayloadsObjc.mm in Sources */,
 				51F522682AE70734000C4050 /* MTRDeviceTypeMetadata.mm in Sources */,
-				9B5CCB602C6EE29E009DD99B /* MTRDeviceControllerOverXPCParameters.m in Sources */,
+				9B5CCB602C6EE29E009DD99B /* MTRDeviceControllerXPCParameters.m in Sources */,
 				75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */,
 				AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */,
 				516415FF2B6B132200D5CE11 /* DataModelHandler.cpp in Sources */,

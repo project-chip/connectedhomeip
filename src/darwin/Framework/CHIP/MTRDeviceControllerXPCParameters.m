@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceControllerOverXPCParameters.h"
+#import "MTRDeviceControllerXPCParameters.h"
 
-@implementation MTRDeviceControllerOverXPCParameters
+@implementation MTRDeviceControllerXPCParameters
 
 @end

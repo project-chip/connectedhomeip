@@ -30,7 +30,7 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
-#import "MTRDeviceControllerOverXPCParameters.h"
+#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Concrete.h"
@@ -148,7 +148,7 @@ using namespace chip::Tracing::DarwinFramework;
                                                 error:error];
         return controller;
     }
-    else if ([parameters isKindOfClass:MTRDeviceControllerOverXPCParameters.class]) {
+    else if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
         MTR_LOG_ERROR("XPC Device Controller init not yet implemented");
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
