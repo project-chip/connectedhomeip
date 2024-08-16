@@ -117,21 +117,4 @@
     NSLog(@"done with %s", __PRETTY_FUNCTION__);
 }
 
-- (void)testMTRXPCServiceSetup
-{
-    XCTAssertNotNil(_xpcListener);
-    XCTAssertNotNil(_dummyService);
-
-    MTRDeviceController_XPC * deviceController = [[MTRDeviceController_XPC alloc] initWithXPCListenerEndpointForTesting:_xpcListener.endpoint];
-
-    [deviceController testPing];
-    NSNumber * internallyAsyncLifeMeaning = [deviceController internallyAsyncMeaningOfLife];
-    NSLog(@"internallyAsyncLifeMeaning: %@", internallyAsyncLifeMeaning);
-    //    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
-    //    __block NSNumber * asyncLifeMeaning;
-    //
-    //
-    //    [self waitForExpectations:@[expectation] timeout:1.0];
-}
-
 @end
