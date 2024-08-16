@@ -17,7 +17,17 @@
 #import "MTRDeviceControllerXPCParameters.h"
 
 @implementation MTRDeviceControllerXPCParameters
+
++ (BOOL)supportsSecureCoding {
+    return true;
+}
+
 @end
 
 @implementation MTRDeviceControllerMachServiceXPCParameters
+
++ (BOOL)supportsSecureCoding {
+    return true;
+}
+
 @end
