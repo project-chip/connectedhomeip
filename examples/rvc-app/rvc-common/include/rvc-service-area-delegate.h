@@ -21,7 +21,7 @@
 #include <app/clusters/service-area-server/service-area-server.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <utility>
+#include <vector>
 
 namespace chip {
 namespace app {

@@ -45,6 +45,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
         # TODO: confirm whether we can open processes like this on the TH
+        self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
@@ -73,11 +74,16 @@ class TC_CCTRL_2_2(MatterBaseTest):
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process.send_signal(signal.SIGTERM.value)
-        self.app_process.wait()
+        # In case the th_server_app_path does not exist, then we failed the test
+        # and there is nothing to remove
+        if self.app_process is not None:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process.send_signal(signal.SIGTERM.value)
+            self.app_process.wait()
 
-        os.remove(self.kvs)
+            if os.path.exists(self.kvs):
+                os.remove(self.kvs)
+
         super().teardown_class()
 
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:
@@ -117,7 +123,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         self.step(1)
-        th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         self.step(2)
         th_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         self.step(3)
@@ -161,7 +167,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(9)
         cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         # If no exception is raised, this is success
-        await self.send_single_cmd(cmd)
+        await self.send_single_cmd(cmd, timedRequestTimeoutMs=5000)
 
         self.step(10)
         if not events:
@@ -182,7 +188,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(12)
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(13)
         if not events:
@@ -211,7 +217,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
 
         self.step(16)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=121)
@@ -219,7 +225,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             await self.send_single_cmd(cmd=cmd)
             asserts.fail("Unexpected success on CommissionNode")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Incorrect error returned")
 
         self.step(17)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
@@ -242,7 +248,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(20)
         print(f'server node id {self.server_nodeid}')
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         asserts.assert_equal(len(th_server_fabrics), len(th_server_fabrics_new), "Unexpected number of fabrics on TH_SERVER")
 
         self.step(21)
@@ -257,7 +263,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(23)
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request using manufacturer specified mechanism")
 
         self.step(24)
         events = new_event
@@ -288,7 +294,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             time.sleep(30)
 
         self.step(28)
-        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
         if not self.is_ci:
             asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
