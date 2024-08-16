@@ -137,7 +137,7 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                                        error:(NSError * __autoreleasing *)error
+                                      error:(NSError * __autoreleasing *)error
 {
     /// IF YOU ARE ALARMED BY TYPES:  You are right to be alarmed, but do not panic.
     /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
