@@ -71,4 +71,3 @@
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
 - (oneway void)checkInWithContext:(NSDictionary * _Nonnull)context;
 @end
-
