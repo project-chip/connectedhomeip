@@ -43,8 +43,6 @@ typedef void (^MTRXPCServiceBoolReplyBlock)(BOOL);
 // need invalidation and disconnect much like on service side
 // TODO:  see how much of Woody's work covers this
 
-
-
 //@protocol MTRXPCServiceDeviceControllerProtocol <NSObject>
 
 //

@@ -30,9 +30,9 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
-#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
@@ -147,15 +147,13 @@ using namespace chip::Tracing::DarwinFramework;
                                        withParameters:controllerParameters
                                                 error:error];
         return controller;
-    }
-    else if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
+    } else if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
         MTR_LOG_ERROR("XPC Device Controller init not yet implemented");
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
         }
         return nil;
-    }
-    else {
+    } else {
         // way out of our league
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {

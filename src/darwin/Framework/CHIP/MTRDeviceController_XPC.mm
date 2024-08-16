@@ -15,9 +15,9 @@
  */
 
 #import "MTRDeviceController_XPC.h"
-#import "MTRXPCServiceProtocol.h"
-#import "MTRLogging_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRLogging_Internal.h"
+#import "MTRXPCServiceProtocol.h"
 
 @interface MTRDeviceController_XPC ()
 @property (retain, readwrite) NSXPCConnection * xpcConnection;
@@ -45,31 +45,35 @@
     // which Internets seem to suggest is true.  kmo 15 aug 2024
     self.xpcRemoteObjectProxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         NSLog(@"%s: it's not my fault! XPC remote object proxy error.", __PRETTY_FUNCTION__);
-    }];;
+    }];
+    ;
     // self.xpcRemoteObjectProxy = self.xpcConnection.remoteObjectProxy;
 
     [self.xpcConnection resume];
 
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't
     // fare much better.  kmo 15 aug 2024 10h52
-//    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
+    //    NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
     NSNumber * postInitMeaningOfLife = [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
     NSLog(@"%s: postInitMeaningOfLife = %@", __PRETTY_FUNCTION__, postInitMeaningOfLife);
 
     return self;
 }
 
-- (void)testPing {
+- (void)testPing
+{
     NSLog(@"pinging via %s", __PRETTY_FUNCTION__);
     [self.xpcRemoteObjectProxy ping];
 }
 
 // this blows up.  kmo 15 aug 2024 12h29
-- (NSNumber *)meaningOfLife {
+- (NSNumber *)meaningOfLife
+{
     return [self.xpcRemoteObjectProxy synchronouslyGetMeaningOfLife];
 }
 
-- (NSNumber *)internallyAsyncMeaningOfLife {
+- (NSNumber *)internallyAsyncMeaningOfLife
+{
     __block int result;
     // semaphores probably not ultimately the right way to do this? kmo 15 aug 2024
     auto semaphore = dispatch_semaphore_create(0);

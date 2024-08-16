@@ -30,14 +30,14 @@
     reply(42);
 }
 
-- (BOOL)setupCommissioningSessionWithPayload:(nonnull MTRSetupPayload *)payload newNodeID:(nonnull NSNumber *)newNodeID error:(NSError *__autoreleasing  _Nullable * _Nullable)error {
+- (BOOL)setupCommissioningSessionWithPayload:(nonnull MTRSetupPayload *)payload newNodeID:(nonnull NSNumber *)newNodeID error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
     return false;
 }
 
-
-- (nonnull NSNumber *)synchronouslyGetMeaningOfLife {
+- (nonnull NSNumber *)synchronouslyGetMeaningOfLife
+{
     return @42;
 }
-
 
 @end

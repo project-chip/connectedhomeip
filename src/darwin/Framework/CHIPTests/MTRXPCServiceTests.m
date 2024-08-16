@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
+#import "MTRDeviceController_XPC.h"
+#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRXPCService.h"
 #import "MTRXPCServiceProtocol.h"
 #import "MTRXPCServiceTestsDummyService.h"
-#import "MTRDeviceController_XPC.h"
-#import "MTRDeviceController_XPC_Internal.h"
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
@@ -101,9 +101,9 @@
 
     [obj ping];
 
-//    NSNumber * lifeMeaning = [obj synchronouslyGetMeaningOfLife];
-//
-//    NSLog(@"test got lifeMeaning = %@", lifeMeaning);
+    //    NSNumber * lifeMeaning = [obj synchronouslyGetMeaningOfLife];
+    //
+    //    NSLog(@"test got lifeMeaning = %@", lifeMeaning);
 
     XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
     __block NSNumber * asyncLifeMeaning;
@@ -113,7 +113,7 @@
         [expectation fulfill];
     }];
 
-    [self waitForExpectations:@[expectation] timeout:1.0];
+    [self waitForExpectations:@[ expectation ] timeout:1.0];
     NSLog(@"done with %s", __PRETTY_FUNCTION__);
 }
 
@@ -127,11 +127,11 @@
     [deviceController testPing];
     NSNumber * internallyAsyncLifeMeaning = [deviceController internallyAsyncMeaningOfLife];
     NSLog(@"internallyAsyncLifeMeaning: %@", internallyAsyncLifeMeaning);
-//    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
-//    __block NSNumber * asyncLifeMeaning;
-//
-//
-//    [self waitForExpectations:@[expectation] timeout:1.0];
+    //    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"should get meaning of life"];
+    //    __block NSNumber * asyncLifeMeaning;
+    //
+    //
+    //    [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 @end
