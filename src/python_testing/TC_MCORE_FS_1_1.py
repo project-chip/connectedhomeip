@@ -36,7 +36,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: confirm whether we can open processes like this on the TH
         self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
