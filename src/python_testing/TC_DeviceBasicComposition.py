@@ -43,10 +43,11 @@ from matter_testing_support.basic_composition import BasicCompositionTests
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                                    TestStep, async_test_body, default_matter_test_main)
-from mobly import asserts
-from matter_testing_support.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                                              find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
+from matter_testing_support.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
+                                                              find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                              get_direct_children_of_root, parts_list_cycles,
                                                               separate_endpoint_types)
+from mobly import asserts
 
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
