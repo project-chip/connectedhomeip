@@ -62,7 +62,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep("1a", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("1b", "Simple KeepActive command w/ subscription. ActiveChanged event received by TH contains PromisedActiveDuration"),
             TestStep("2", "Sends 3x KeepActive commands w/ subscription. ActiveChanged event received ONCE and contains PromisedActiveDuration"),
-            TestStep("3", "Sends 3x KeepActive commands w/ subscription. ActiveChanged event received ONCE and contains PromisedActiveDuration"),
+            TestStep("3", "TH waits for check-in from TH_ICD to confirm no additional ActiveChanged events are recieved"),
             TestStep("4", "KeepActive not returned after 60 minutes of offline ICD"),
         ]
         return steps
