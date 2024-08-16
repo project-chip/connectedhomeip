@@ -106,7 +106,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     async def test_TC_RVCCLEANM_2_2(self):
         # TODO Replace 0x8000 with python object of RVCCLEAN FEATURE bit map when implemented
         # 0x8000 corresponds to 16 bit DIRECTMODECH Feature map
-        self.directmodech_bit_map = 0x8000
+        self.directmodech_bit_mask = 0x8000
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
@@ -175,21 +175,18 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
                 break
 
         self.print_step("7a", "Read FeatureMap Attribute")
-        directmodech = await self.read_feature_map_attribute()
-        directmode_enabled = directmodech & self.directmodech_bit_map
+        feature_map = await self.read_feature_map_attribute()
+        directmode_enabled = feature_map & self.directmodech_bit_mask
 
         self.print_step("7b", "Send ChangeToMode command")
+        response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
+        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+                            "The response should ChangeToModeResponse command")
         if directmode_enabled:
-            response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-            asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
-                                "The response should ChangeToModeResponse command")
             asserts.assert_equal(response.status, RvcStatusEnum.Success,
                                  "The response should contain a ChangeToModeResponse command "
                                  "with the Status set to Success(0x0).")
         else:
-            response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-            asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
-                                "The response should ChangeToModeResponse command")
             asserts.assert_equal(response.status, RvcStatusEnum.InvalidInMode,
                                  "The response should contain a ChangeToModeResponse command "
                                  "with the Status set to InvalidInMode(0x03).")
