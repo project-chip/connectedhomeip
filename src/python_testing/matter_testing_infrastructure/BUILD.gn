@@ -25,7 +25,10 @@ pw_python_package("matter_testing_support") {
     "pyproject.toml",
   ]
 
-  inputs = [ "env_test.yaml" ]
+  inputs = [
+    "env_test.yaml",
+    "../test_testing/example_pics_xml_basic_info.xml",
+  ]
 
   sources = [
     "matter_testing_support/__init__.py",
@@ -40,5 +43,9 @@ pw_python_package("matter_testing_support") {
     "matter_testing_support/taglist_and_topology_test.py",
   ]
 
-  tests = [ "matter_testing_support/test_metadata.py" ]
+  tests = [
+    "matter_testing_support/test_metadata.py",
+    "matter_testing_support/TestMatterTestingSupport.py",
+    "matter_testing_support/TestSpecParsingSupport.py",
+  ]
 }
