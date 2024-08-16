@@ -163,7 +163,7 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 }
 
 CHIP_ERROR
-ReverseCommissionBridge(chip::Controller::CommissioningWindowPasscodeParams params)
+CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params)
 {
     chip_rpc_DeviceCommissioningInfo device;
     device.setup_pin     = params.GetSetupPIN();
@@ -176,7 +176,7 @@ ReverseCommissionBridge(chip::Controller::CommissioningWindowPasscodeParams para
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricAdminClient.ReverseCommissionBridge(device, RpcCompletedWithEmptyResponse);
+    auto call = fabricAdminClient.CommissionNode(device, RpcCompletedWithEmptyResponse);
 
     if (!call.active())
     {

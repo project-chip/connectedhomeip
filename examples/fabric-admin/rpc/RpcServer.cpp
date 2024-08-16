@@ -92,12 +92,12 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status ReverseCommissionBridge(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response) override
+    pw::Status CommissionNode(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response) override
     {
         char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
         Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
 
-        ChipLogProgress(NotSpecified, "Received ReverseCommissionBridge request");
+        ChipLogProgress(NotSpecified, "Received CommissionNode request");
 
         SetupPayload setupPayload = SetupPayload();
 
@@ -109,7 +109,7 @@ public:
         discriminator.SetLongValue(request.discriminator);
         setupPayload.discriminator = discriminator;
 
-        char payloadBuffer[kMaxManaulCodeLength + 1];
+        char payloadBuffer[kMaxManualCodeLength + 1];
         MutableCharSpan manualCode(payloadBuffer);
 
         CHIP_ERROR error = ManualSetupPayloadGenerator(setupPayload).payloadDecimalStringRepresentation(manualCode);
@@ -117,6 +117,8 @@ public:
         {
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
 
+            // After responding with RequestCommissioningApproval to the node where the client initiated the
+            // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
 
             DeviceMgr().PairRemoteDevice(nodeId, payloadBuffer);

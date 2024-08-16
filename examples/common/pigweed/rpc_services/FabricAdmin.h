@@ -40,7 +40,7 @@ public:
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status ReverseCommissionBridge(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response)
+    virtual pw::Status CommissionNode(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }

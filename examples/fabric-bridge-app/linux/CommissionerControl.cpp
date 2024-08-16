@@ -126,18 +126,18 @@ CHIP_ERROR CommissionerControlDelegate::GetCommissioningWindowParams(Commissioni
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionerControlDelegate::ReverseCommissionNode(const CommissioningWindowParams & params,
-                                                              const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
+CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params,
+                                                             const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
 {
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate::ReverseCommissionNode");
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    return ReverseCommissionBridge(Controller::CommissioningWindowPasscodeParams()
-                                       .SetSetupPIN(kSetupPinCode)
-                                       .SetTimeout(params.commissioningTimeout)
-                                       .SetDiscriminator(params.discriminator)
-                                       .SetIteration(params.iterations)
-                                       .SetSalt(params.salt));
+    return CommissionNode(Controller::CommissioningWindowPasscodeParams()
+                              .SetSetupPIN(kSetupPinCode)
+                              .SetTimeout(params.commissioningTimeout)
+                              .SetDiscriminator(params.discriminator)
+                              .SetIteration(params.iterations)
+                              .SetSalt(params.salt));
 #else
     ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
     return CHIP_ERROR_NOT_IMPLEMENTED;

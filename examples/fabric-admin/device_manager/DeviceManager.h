@@ -148,11 +148,7 @@ public:
 
     void SubscribeRemoteFabricBridge();
 
-    void StartReverseCommissioning();
-
     void ReadSupportedDeviceCategories();
-
-    void CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
     void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
 
@@ -164,6 +160,14 @@ public:
 
 private:
     friend DeviceManager & DeviceMgr();
+
+    void RequestCommissioningApproval();
+
+    void HandleCommissioningRequestResult(chip::TLV::TLVReader * data);
+
+    void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+
+    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader * data);
 
     static DeviceManager sInstance;
 
