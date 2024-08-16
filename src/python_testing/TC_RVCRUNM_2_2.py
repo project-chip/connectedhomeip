@@ -211,7 +211,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         self.print_step("6a", "Read Attribute FeatureMap")
         feature_map = await self.read_mod_attribute_expect_success(cluster=Clusters.RvcRunMode,
-                                                                    attribute=Clusters.RvcRunMode.Attributes.FeatureMap)
+                                                                   attribute=Clusters.RvcRunMode.Attributes.FeatureMap)
         directmode_enabled = feature_map & self.directmodech_bit_mask
 
         self.print_step('6b', "Send ChangeToMode MODE_B command")
