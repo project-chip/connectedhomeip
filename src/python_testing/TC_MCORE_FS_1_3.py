@@ -68,45 +68,31 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         super().teardown_class()
 
     async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
-        # TODO: confirm whether we can open processes like this on the TH
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
+        if not os.path.exists(app):
+            asserts.fail(f'The path {app} does not exist')
+
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {port} --discriminator {discriminator} --passcode {passcode} --KVS {kvs}'
-        cmd = f'{app} {app_args}'
+
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(port)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', kvs])
+
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info(f"Starting TH device for {device_info}")
-        self.app_process_for_dut_eco = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process_for_dut_eco = subprocess.Popen(cmd)
         logging.info(f"Started TH device for {device_info}")
         time.sleep(3)
 
         logging.info("Commissioning from separate fabric")
         await self.TH_server_controller.CommissionOnNetwork(nodeId=node_id_for_th, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         logging.info("Commissioning device for DUT ecosystem onto TH for managing")
-
-    async def create_and_commission_device_for_th_ecosystem(self):
-        # TODO: confirm whether we can open processes like this on the TH
-        app = self.user_params.get("th_server_app_path", None)
-
-        self.device_for_th_eco_kvs = f'kvs_{str(uuid.uuid4())}'
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-        app_args = f'- -secured-device-port {self.device_for_th_eco_port} - -discriminator {
-            discriminator} - -passcode {passcode} - -KVS {self.device_for_th_eco_kvs}'
-        cmd = f'{app} {app_args}'
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH device for TH ecosystem")
-        self.app_process_for_th_eco = subprocess.Popen(cmd, bufsize=0, shell=True)
-        logging.info("Started TH device for TH ecosystem")
-        time.sleep(3)
-
-        logging.info("Commissioning from separate fabric")
-        self.server_nodeid = 1112
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning TH device for TH ecosystem")
 
     def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
         steps = [TestStep(1, "DUT_FSA commissions TH_SED_DUT to DUT_FSAs fabric and generates a UniqueID", is_commissioning=True),
@@ -128,6 +114,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         kvs = f'kvs_{str(uuid.uuid4())}'
         device_info = "for DUT ecosystem"
         await self.create_device_and_commission_to_th_fabric(kvs, self.device_for_dut_eco_port, self.device_for_dut_eco_nodeid, device_info)
+
         self.device_for_dut_eco_kvs = kvs
         read_result = await self.TH_server_controller.ReadAttribute(self.device_for_dut_eco_nodeid, [(root_node_endpoint, Clusters.BasicInformation.Attributes.UniqueID)])
         result = read_result[root_node_endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.UniqueID]

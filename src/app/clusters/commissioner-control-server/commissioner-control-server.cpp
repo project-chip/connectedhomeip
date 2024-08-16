@@ -216,6 +216,14 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     auto sourceNodeId = GetNodeId(commandObj);
 
+    // Constraint on responseTimeoutSeconds is [30; 120] seconds
+    if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
+    {
+        ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {

@@ -21,9 +21,8 @@
 
 #include "AppTaskBase.h"
 
-namespace chip {
-namespace NXP {
-namespace App {
+namespace chip::NXP::App {
+
 class AppTaskZephyr : public AppTaskBase
 {
 public:
@@ -43,7 +42,7 @@ public:
      * \brief Send event to the event queue.
      *
      */
-    void PostEvent(const AppEvent & event);
+    void PostEvent(const AppEvent & event) override;
 
     /**
      * \brief Return a pointer to the NXP Wifi Driver instance.
@@ -65,6 +64,5 @@ public:
 private:
     void DispatchEvent(const AppEvent & event);
 };
-} // namespace App
-} // namespace NXP
-} // namespace chip
+
+} // namespace chip::NXP::App

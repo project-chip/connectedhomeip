@@ -48,6 +48,7 @@ pw_rpc_server = {
   ]
 
   deps = [
+    "$dir_pw_hdlc:default_addresses",
     "$dir_pw_hdlc:rpc_channel_output",
     "$dir_pw_stream:sys_io_stream",
     "$dir_pw_trace",
