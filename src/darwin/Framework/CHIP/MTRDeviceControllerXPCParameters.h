@@ -18,8 +18,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString * MatterPluginWellKnownServiceName = @"com.apple.home.matter.framework.xpc";
-
 @interface MTRDeviceControllerXPCParameters: MTRDeviceControllerParameters
 @end
 
