@@ -20,9 +20,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/reporting/reporting.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -112,7 +112,7 @@ CHIP_ERROR ChefFanControlManager::Write(const ConcreteDataAttributePath & aPath,
 
         // Ensure new speed is in bounds
         {
-            uint8_t maxSpeedSetting = 0;
+            uint8_t maxSpeedSetting                    = 0;
             Protocols::InteractionModel::Status status = SpeedMax::Get(mEndpoint, &maxSpeedSetting);
             VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_IM_GLOBAL_STATUS(Failure));
 
