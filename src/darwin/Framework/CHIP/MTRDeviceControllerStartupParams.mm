@@ -331,6 +331,24 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 }
 @end
 
+@implementation MTRXPCDeviceControllerParameters
+
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+@synthesize xpcConnectionBlock = _xpcConnectionBlock;
+
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void))xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
+    if ( self = [super _initInternal] ) {
+        _xpcConnectionBlock = [xpcConnectionBlock copy];
+        _uniqueIdentifier = [uniqueIdentifier copy];
+    }
+    
+    return self;
+}
+@end
+
+
 @implementation MTRDeviceControllerStartupParamsInternal
 
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params

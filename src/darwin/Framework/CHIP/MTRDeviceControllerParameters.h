@@ -145,4 +145,26 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRXPCDeviceControllerParameters : MTRDeviceControllerAbstractParameters
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * A controller created from this way will connect to a remote instance of an MTRDeviceController loaded in an XPC Service
+ *
+ * @param xpcConnectionBlock The XPC Connection block that will return an NSXPCConnection to the indended listener.
+ *
+ * @param uniqueIdentifier The unique id to assign to the controller.
+ *
+ */
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void))xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+
+@property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+@property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_NEWLY_AVAILABLE;
+
+@end
+
 NS_ASSUME_NONNULL_END
