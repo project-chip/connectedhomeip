@@ -67,7 +67,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
 
 #pragma mark - XPC Defines
 
-#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)               \
+#define MTR_SIMPLE_REMOTE_XPC_GETTER(XPC_CONNECTION, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)               \
                                                                                                    \
     -(TYPE) NAME                                                                                   \
     {                                                                                              \
@@ -85,7 +85,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
         return outValue;                                                                           \
     }
 
-#define MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX)              \
+#define MTR_SIMPLE_REMOTE_XPC_COMMAND(XPC_CONNECTION, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX)              \
                                                                                                    \
     -(void) METHOD_SIGNATURE                                                                       \
     {                                                                                              \
@@ -96,7 +96,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
         }] PREFIX ADDITIONAL_ARGUMENTS];                                                           \
     }
 
-#define MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX) \
+#define MTR_COMPLEX_REMOTE_XPC_GETTER(XPC_CONNECTION, SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX) \
     -(TYPE) SIGNATURE                                                                               \
     {                                                                                               \
         __block TYPE outValue = DEFAULT_VALUE;                                                      \

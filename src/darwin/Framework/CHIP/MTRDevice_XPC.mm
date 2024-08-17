@@ -34,6 +34,7 @@
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceController_XPC.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -65,17 +66,17 @@
 #import <os/lock.h>
 
 #define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)       \
-    MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
+    MTR_SIMPLE_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
                                  : [[self deviceController] uniqueIdentifier] nodeID      \
                                  : [self nodeID])
 
 #define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS)       \
-    MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController \
+    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController \
                                   : [[self deviceController] uniqueIdentifier] nodeID                    \
                                   : [self nodeID])
 
 #define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)       \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
                                   : [[self deviceController] uniqueIdentifier] nodeID      \
                                   : [self nodeID])
 
@@ -164,7 +165,7 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    NSXPCConnection * xpcConnection = nil;
+    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *)[self deviceController] xpcConnection];
 
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);

@@ -28,6 +28,8 @@ MTR_TESTABLE
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 #endif
 
-    @end
+@property (atomic, retain, readwrite) NSXPCConnection * xpcConnection;
+
+@end
 
     NS_ASSUME_NONNULL_END
