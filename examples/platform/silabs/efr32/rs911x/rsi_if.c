@@ -511,7 +511,8 @@ static void wfx_rsi_save_ap_info() // translation
         break;
     }
 
-    SILABS_LOG("wfx_rsi_save_ap_info: WLAN: connecting to %s, sec=%d, status=%02x", &wfx_rsi.sec.ssid[0], wfx_rsi.sec.security, status);
+    SILABS_LOG("wfx_rsi_save_ap_info: WLAN: connecting to %s, sec=%d, status=%02x", &wfx_rsi.sec.ssid[0], wfx_rsi.sec.security,
+               status);
 }
 
 /********************************************************************************************

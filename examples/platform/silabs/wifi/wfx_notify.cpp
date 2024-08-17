@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
+#include "AppConfig.h"
+#include "BaseApplication.h"
+#include <app/icd/server/ICDServerConfig.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <app/icd/server/ICDServerConfig.h>
-#include "AppConfig.h"
-#include "BaseApplication.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -40,10 +40,10 @@ using namespace ::chip::DeviceLayer;
 namespace {
 constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
 constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
-constexpr uint8_t kWlanRetryIntervalInSec = 5;
-uint8_t retryInterval = kWlanMinRetryIntervalsInSec;
+constexpr uint8_t kWlanRetryIntervalInSec     = 5;
+uint8_t retryInterval                         = kWlanMinRetryIntervalsInSec;
 osTimerId_t sRetryTimer;
-}
+} // namespace
 /*
  * Notifications to the upper-layer
  * All done in the context of the RSI/WiFi task (rsi_if.c)
@@ -100,7 +100,7 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 
     VerifyOrReturn(status != SUCCESS_STATUS)
 
-    memset(&evt, 0, sizeof(evt));
+        memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
     evt.header.length = sizeof evt;
 
@@ -180,13 +180,13 @@ void wfx_retry_connection(uint16_t retryAttempt)
     {
         if (retryAttempt < MAX_JOIN_RETRIES_COUNT)
         {
-            ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds",
-                            kWlanRetryIntervalInSec);
+            ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", kWlanRetryIntervalInSec);
             if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(kWlanRetryIntervalInSec))) != osOK)
             {
                 ChipLogProgress(DeviceLayer, "Failed to start retry timer");
                 // Sending the join command if retry timer failed to start
-                if (wfx_connect_to_ap() != SL_STATUS_OK) {
+                if (wfx_connect_to_ap() != SL_STATUS_OK)
+                {
                     ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
                 }
                 return;
@@ -212,7 +212,8 @@ void wfx_retry_connection(uint16_t retryAttempt)
         {
             ChipLogProgress(DeviceLayer, "Failed to start retry timer");
             // Sending the join command if retry timer failed to start
-            if (wfx_connect_to_ap() != SL_STATUS_OK) {
+            if (wfx_connect_to_ap() != SL_STATUS_OK)
+            {
                 ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
             }
             return;
