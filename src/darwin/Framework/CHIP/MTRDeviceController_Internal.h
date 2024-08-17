@@ -29,6 +29,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#include <os/lock.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
@@ -62,6 +64,9 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
+
+@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 
 - (instancetype)initForSubclasses;
 

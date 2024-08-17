@@ -35,8 +35,6 @@
 @interface MTRDeviceController_XPC ()
 
 @property (nonatomic, retain, readwrite) NSUUID * uniqueIdentifier;
-@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
-@property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 
 @end
 
