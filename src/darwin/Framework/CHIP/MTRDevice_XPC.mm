@@ -64,13 +64,14 @@
 
 #import <os/lock.h>
 
-
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)  \
     MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
-#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
-    MTR_COMPLEX_REMOTE_XPC_GETTER(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS) \
+
+#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS) \
     MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
+
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
 
 @implementation MTRDevice_XPC
 
@@ -162,7 +163,6 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key value:(
 MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey:(NSString *)key, removeClientDataForKey:key)
 
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataKeysForEndpointID:(NSNumber *)endpointID, NSArray * _Nullable, nil, clientDataKeysForEndpointID:(NSNumber *)endpointID withReply)
-
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID, id<NSSecureCoding> _Nullable, nil, clientDataForKey: key endpointID: endpointID withReply)
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value, setClientDataForKey:key endpointID:endpointID value:value)

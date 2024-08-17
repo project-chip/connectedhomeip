@@ -16,10 +16,19 @@
 
 #import "MTRDeviceController_XPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDefines_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
+
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME,TYPE,DEFAULT_VALUE,GETTER_NAME) \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController: self.uniqueIdentifier)
+
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController: self.uniqueIdentifier)
+
+
 
 @interface MTRDeviceController_XPC ()
 
@@ -93,16 +102,10 @@
     return nil;
 }
 
-
 #pragma mark - XPC Action Overrides
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME,TYPE,DEFAULT_VALUE,GETTER_NAME)\
-    MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, self.uniqueIdentifier)
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, self.uniqueIdentifier)
-
 MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSUUID *, nil, controllerNodeIDWithReply)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSNumber *, nil, controllerNodeIDWithReply)
 
 
 // Not Supported via XPC
@@ -119,7 +122,8 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSUUID *, nil, c
 //- (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void(^)(BOOL success))reply;
 //- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
-MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController:)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController: self.uniqueIdentifier)
+
 
 
 #pragma mark - MTRDeviceProtocol Client

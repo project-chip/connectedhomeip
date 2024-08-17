@@ -69,12 +69,45 @@ using namespace ::chip;
     return self;
 }
 
+#pragma mark - Copying
+
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWriteParams alloc] init];
     other.timedWriteTimeout = self.timedWriteTimeout;
     other.dataVersion = self.dataVersion;
     return other;
+}
+
+#pragma mark - Coding
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+static NSString * sTimedWriteTimeoutCodingKey = @"sTimedWriteTimeoutKey";
+static NSString * sDataVersionCodingKey = @"sDataVersionKey";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    
+    if (self == nil) {
+        return nil;
+    }
+
+    self.timedWriteTimeout = [decoder decodeObjectOfClass:[NSNumber class] forKey: sTimedWriteTimeoutCodingKey];
+    self.dataVersion = [decoder decodeObjectOfClass:[NSNumber class] forKey: sDataVersionCodingKey];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    if ( self.timedWriteTimeout )
+        [coder encodeObject:self.timedWriteTimeout forKey:sTimedWriteTimeoutCodingKey];
+    if ( self.dataVersion )
+        [coder encodeObject:self.dataVersion forKey:sDataVersionCodingKey];
 }
 
 @end
@@ -159,17 +192,66 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
     return self;
 }
 
+#pragma mark - Copying
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
+    
     other.filterByFabric = self.filterByFabric;
     other.minEventNumber = self.minEventNumber;
     other.assumeUnknownAttributesReportable = self.assumeUnknownAttributesReportable;
     other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
     other.reportEventsUrgently = self.reportEventsUrgently;
     other.resubscribeAutomatically = self.resubscribeAutomatically;
+    other.minInterval = self.minInterval;
+    other.maxInterval = self.maxInterval;
+
     return other;
 }
+
+#pragma mark - Coding
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+static NSString * sReplaceExistingSubscriptionsCoderKey = @"sFilterByFabricKey";
+static NSString * sReportEventsUrgentlyCoderKey = @"sMinEventNumberKey";
+static NSString * sResubscribeAutomaticallyCoderKey = @"sAssumeUnknownAttributesReportableKey";
+static NSString * sMinIntervalKeyCoderKey = @"sMinIntervalKeyKey";
+static NSString * sMaxIntervalKeyCoderKey = @"sMaxIntervalKeyKey";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder: decoder];
+    
+    if (self == nil) {
+        return nil;
+    }
+
+    self.replaceExistingSubscriptions = [decoder decodeBoolForKey: sReplaceExistingSubscriptionsCoderKey];
+    self.reportEventsUrgently = [decoder decodeBoolForKey: sReportEventsUrgentlyCoderKey];
+    self.resubscribeAutomatically = [decoder decodeBoolForKey: sResubscribeAutomaticallyCoderKey];
+    self.minInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMinIntervalKeyCoderKey];
+    self.maxInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMaxIntervalKeyCoderKey];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder: coder];
+    
+    [coder encodeBool: self.replaceExistingSubscriptions forKey:sReplaceExistingSubscriptionsCoderKey];
+    [coder encodeBool: self.reportEventsUrgently forKey:sReportEventsUrgentlyCoderKey];
+    [coder encodeBool: self.resubscribeAutomatically forKey:sResubscribeAutomaticallyCoderKey];
+    
+    if ( self.minInterval )
+        [coder encodeObject:self.minInterval forKey:sMinIntervalKeyCoderKey];
+    if ( self.maxInterval )
+        [coder encodeObject:self.maxInterval forKey:sMaxIntervalKeyCoderKey];
+}
+
+#pragma mark - Main
 
 - (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
 {

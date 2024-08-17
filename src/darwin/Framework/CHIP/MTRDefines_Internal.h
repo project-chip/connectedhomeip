@@ -68,51 +68,47 @@ typedef struct {} variable_hidden_by_mtr_hide;
 
 #pragma mark - XPC Defines
 
-#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)               \
-                                                                                                   \
-    -(TYPE) NAME                                                                                   \
-    {                                                                                              \
-        __block TYPE outValue = DEFAULT_VALUE;                                                     \
-                                                                                                   \
-        NSXPCConnection * xpcConnection = nil;                                                     \
-                                                                                                   \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-            MTR_LOG_ERROR("Error: %@", error);                                                     \
-        }]      PREFIX                                                                             \
-                GETTER_NAME:^(TYPE returnValue) {                                                  \
-                    outValue = returnValue;                                                        \
-                }];                                                                                \
-                                                                                                   \
-        return outValue;                                                                           \
+#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX)                    \
+                                                                                                        \
+    -(TYPE) NAME                                                                                        \
+    {                                                                                                   \
+        __block TYPE outValue = DEFAULT_VALUE;                                                          \
+                                                                                                        \
+        NSXPCConnection * xpcConnection = nil;                                                          \
+                                                                                                        \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {      \
+            MTR_LOG_ERROR("Error: %@", error);                                                          \
+        }]      PREFIX                                                                                  \
+                GETTER_NAME:^(TYPE returnValue) {                                                       \
+                    outValue = returnValue;                                                             \
+                }];                                                                                     \
+                                                                                                        \
+        return outValue;                                                                                \
     }
 
-#define MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX)              \
-                                                                                                   \
-    -(void) METHOD_SIGNATURE                                                                       \
-    {                                                                                              \
-        NSXPCConnection * xpcConnection = nil;                                                     \
-                                                                                                   \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-            MTR_LOG_ERROR("Error: %@", error);                                                     \
-        }]      PREFIX                                                                             \
-                    ADDITIONAL_ARGUMENTS];                                                         \
+#define MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX)                   \
+                                                                                                        \
+    -(void) METHOD_SIGNATURE                                                                            \
+    {                                                                                                   \
+        NSXPCConnection * xpcConnection = nil;                                                          \
+                                                                                                        \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {      \
+            MTR_LOG_ERROR("Error: %@", error);                                                          \
+        }]      PREFIX ADDITIONAL_ARGUMENTS];                                                           \
     }
 
-
-#define MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX)\
-- (TYPE) SIGNATURE \
-{ \
-    __block TYPE outValue = DEFAULT_VALUE; \
-\
-    NSXPCConnection * xpcConnection = nil; \
-\
-    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-        MTR_LOG_ERROR("Error: %@", error); \
-    }]         PREFIX                                                                             \
- \
-        ADDITIONAL_ARGUMENTS:^(TYPE returnValue) { \
-                              outValue = returnValue; \
-                          }];\
- \
-    return outValue; \
-}
+#define MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX)     \
+    - (TYPE) SIGNATURE                                                                                  \
+    {                                                                                                   \
+        __block TYPE outValue = DEFAULT_VALUE;                                                          \
+                                                                                                        \
+        NSXPCConnection * xpcConnection = nil;                                                          \
+                                                                                                        \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {      \
+            MTR_LOG_ERROR("Error: %@", error);                                                          \
+        }]  PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                           \
+                                  outValue = returnValue;                                               \
+                              }];                                                                       \
+                                                                                                        \
+        return outValue;                                                                                \
+    }
