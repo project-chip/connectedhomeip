@@ -36,6 +36,138 @@ from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
 
+
+__all__ = [
+    "Globals",
+    "Identify",
+    "Groups",
+    "OnOff",
+    "OnOffSwitchConfiguration",
+    "LevelControl",
+    "BinaryInputBasic",
+    "PulseWidthModulation",
+    "Descriptor",
+    "Binding",
+    "AccessControl",
+    "Actions",
+    "BasicInformation",
+    "OtaSoftwareUpdateProvider",
+    "OtaSoftwareUpdateRequestor",
+    "LocalizationConfiguration",
+    "TimeFormatLocalization",
+    "UnitLocalization",
+    "PowerSourceConfiguration",
+    "PowerSource",
+    "GeneralCommissioning",
+    "NetworkCommissioning",
+    "DiagnosticLogs",
+    "GeneralDiagnostics",
+    "SoftwareDiagnostics",
+    "ThreadNetworkDiagnostics",
+    "WiFiNetworkDiagnostics",
+    "EthernetNetworkDiagnostics",
+    "TimeSynchronization",
+    "BridgedDeviceBasicInformation",
+    "Switch",
+    "AdministratorCommissioning",
+    "OperationalCredentials",
+    "GroupKeyManagement",
+    "FixedLabel",
+    "UserLabel",
+    "ProxyConfiguration",
+    "ProxyDiscovery",
+    "ProxyValid",
+    "BooleanState",
+    "IcdManagement",
+    "Timer",
+    "OvenCavityOperationalState",
+    "OvenMode",
+    "LaundryDryerControls",
+    "ModeSelect",
+    "LaundryWasherMode",
+    "RefrigeratorAndTemperatureControlledCabinetMode",
+    "LaundryWasherControls",
+    "RvcRunMode",
+    "RvcCleanMode",
+    "TemperatureControl",
+    "RefrigeratorAlarm",
+    "DishwasherMode",
+    "AirQuality",
+    "SmokeCoAlarm",
+    "DishwasherAlarm",
+    "MicrowaveOvenMode",
+    "MicrowaveOvenControl",
+    "OperationalState",
+    "RvcOperationalState",
+    "ScenesManagement",
+    "HepaFilterMonitoring",
+    "ActivatedCarbonFilterMonitoring",
+    "BooleanStateConfiguration",
+    "ValveConfigurationAndControl",
+    "ElectricalPowerMeasurement",
+    "ElectricalEnergyMeasurement",
+    "WaterHeaterManagement",
+    "DemandResponseLoadControl",
+    "Messages",
+    "DeviceEnergyManagement",
+    "EnergyEvse",
+    "EnergyPreference",
+    "PowerTopology",
+    "EnergyEvseMode",
+    "WaterHeaterMode",
+    "DeviceEnergyManagementMode",
+    "DoorLock",
+    "WindowCovering",
+    "BarrierControl",
+    "ServiceArea",
+    "PumpConfigurationAndControl",
+    "Thermostat",
+    "FanControl",
+    "ThermostatUserInterfaceConfiguration",
+    "ColorControl",
+    "BallastConfiguration",
+    "IlluminanceMeasurement",
+    "TemperatureMeasurement",
+    "PressureMeasurement",
+    "FlowMeasurement",
+    "RelativeHumidityMeasurement",
+    "OccupancySensing",
+    "CarbonMonoxideConcentrationMeasurement",
+    "CarbonDioxideConcentrationMeasurement",
+    "NitrogenDioxideConcentrationMeasurement",
+    "OzoneConcentrationMeasurement",
+    "Pm25ConcentrationMeasurement",
+    "FormaldehydeConcentrationMeasurement",
+    "Pm1ConcentrationMeasurement",
+    "Pm10ConcentrationMeasurement",
+    "TotalVolatileOrganicCompoundsConcentrationMeasurement",
+    "RadonConcentrationMeasurement",
+    "WiFiNetworkManagement",
+    "ThreadBorderRouterManagement",
+    "ThreadNetworkDirectory",
+    "WakeOnLan",
+    "Channel",
+    "TargetNavigator",
+    "MediaPlayback",
+    "MediaInput",
+    "LowPower",
+    "KeypadInput",
+    "ContentLauncher",
+    "AudioOutput",
+    "ApplicationLauncher",
+    "ApplicationBasic",
+    "AccountLogin",
+    "ContentControl",
+    "ContentAppObserver",
+    "EcosystemInformation",
+    "CommissionerControl",
+    "ElectricalMeasurement",
+    "UnitTesting",
+    "FaultInjection",
+    "SampleMei",
+]
+
+
 class Globals:
     class Enums:
         class AreaTypeTag(MatterIntEnum):
@@ -247,18 +379,25 @@ class Globals:
             kMiddle = 0x04
             kRow = 0x05
             kColumn = 0x06
-            kUnder = 0x07
-            kNextTo = 0x08
-            kAround = 0x09
-            kOn = 0x0A
-            kAbove = 0x0B
-            kFrontOf = 0x0C
-            kBehind = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 14,
+            kUnknownEnumValue = 7,
+
+        class RelativePositionTag(MatterIntEnum):
+            kUnder = 0x00
+            kNextTo = 0x01
+            kAround = 0x02
+            kOn = 0x03
+            kAbove = 0x04
+            kFrontOf = 0x05
+            kBehind = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7,
 
         class TestGlobalEnum(MatterIntEnum):
             kSomeValue = 0x00
@@ -23902,28 +24041,16 @@ class WaterHeaterManagement(Cluster):
             kEnergyManagement = 0x1
             kTankPercent = 0x2
 
-        class WaterHeaterDemandBitmap(IntFlag):
+        class WaterHeaterHeatSourceBitmap(IntFlag):
             kImmersionElement1 = 0x1
             kImmersionElement2 = 0x2
             kHeatPump = 0x4
             kBoiler = 0x8
             kOther = 0x10
 
-        class WaterHeaterTypeBitmap(IntFlag):
-            kImmersionElement1 = 0x1
-            kImmersionElement2 = 0x2
-            kHeatPump = 0x4
-            kBoiler = 0x8
-            kOther = 0x10
-
-    class Commands:
+    class Structs:
         @dataclass
-        class Boost(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000094
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
+        class WaterHeaterBoostInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -23942,6 +24069,23 @@ class WaterHeaterManagement(Cluster):
             temporarySetpoint: 'typing.Optional[int]' = None
             targetPercentage: 'typing.Optional[uint]' = None
             targetReheat: 'typing.Optional[uint]' = None
+
+    class Commands:
+        @dataclass
+        class Boost(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000094
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="boostInfo", Tag=0, Type=WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct),
+                    ])
+
+            boostInfo: 'WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct' = field(default_factory=lambda: WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct())
 
         @dataclass
         class CancelBoost(ClusterCommand):
@@ -24148,6 +24292,42 @@ class WaterHeaterManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class BoostStarted(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000094
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="boostInfo", Tag=0, Type=WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct),
+                    ])
+
+            boostInfo: 'WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct' = field(default_factory=lambda: WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct())
+
+        @dataclass
+        class BoostEnded(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000094
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
 
 @dataclass
@@ -31137,11 +31317,11 @@ class ServiceArea(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedAreas", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.AreaStruct]),
-                ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]),
-                ClusterObjectFieldDescriptor(Label="selectedAreas", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.Optional[typing.List[ServiceArea.Structs.MapStruct]]),
+                ClusterObjectFieldDescriptor(Label="selectedAreas", Tag=0x00000002, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="currentArea", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="estimatedEndTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="progress", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]),
+                ClusterObjectFieldDescriptor(Label="progress", Tag=0x00000005, Type=typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -31151,11 +31331,11 @@ class ServiceArea(Cluster):
             ])
 
     supportedAreas: 'typing.List[ServiceArea.Structs.AreaStruct]' = None
-    supportedMaps: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = None
-    selectedAreas: 'typing.Union[Nullable, typing.List[uint]]' = None
+    supportedMaps: 'typing.Optional[typing.List[ServiceArea.Structs.MapStruct]]' = None
+    selectedAreas: 'typing.List[uint]' = None
     currentArea: 'typing.Union[None, Nullable, uint]' = None
     estimatedEndTime: 'typing.Union[None, Nullable, uint]' = None
-    progress: 'typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]' = None
+    progress: 'typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -31191,18 +31371,33 @@ class ServiceArea(Cluster):
             kSuccess = 0x00
             kInvalidAreaList = 0x01
             kInvalidInMode = 0x02
+            kInvalidSkippedArea = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 4,
 
     class Bitmaps:
         class Feature(IntFlag):
-            kListOrder = 0x1
-            kSelectWhileRunning = 0x2
+            kSelectWhileRunning = 0x1
+            kProgressReporting = 0x2
+            kMaps = 0x4
 
     class Structs:
+        @dataclass
+        class LandmarkInfoStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.LandmarkTag),
+                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
+                    ])
+
+            landmarkTag: 'Globals.Enums.LandmarkTag' = 0
+            positionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
+
         @dataclass
         class AreaInfoStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -31210,15 +31405,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="locationInfo", Tag=0, Type=typing.Union[Nullable, Globals.Structs.LocationDescriptorStruct]),
-                        ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.LandmarkTag]),
-                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PositionTag]),
-                        ClusterObjectFieldDescriptor(Label="surfaceTag", Tag=3, Type=typing.Union[Nullable, Globals.Enums.FloorSurfaceTag]),
+                        ClusterObjectFieldDescriptor(Label="landmarkInfo", Tag=1, Type=typing.Union[Nullable, ServiceArea.Structs.LandmarkInfoStruct]),
                     ])
 
             locationInfo: 'typing.Union[Nullable, Globals.Structs.LocationDescriptorStruct]' = NullValue
-            landmarkTag: 'typing.Union[Nullable, Globals.Enums.LandmarkTag]' = NullValue
-            positionTag: 'typing.Union[Nullable, Globals.Enums.PositionTag]' = NullValue
-            surfaceTag: 'typing.Union[Nullable, Globals.Enums.FloorSurfaceTag]' = NullValue
+            landmarkInfo: 'typing.Union[Nullable, ServiceArea.Structs.LandmarkInfoStruct]' = NullValue
 
         @dataclass
         class AreaStruct(ClusterObject):
@@ -31277,10 +31468,10 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.List[uint]),
                     ])
 
-            newAreas: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            newAreas: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class SelectAreasResponse(ClusterCommand):
@@ -31294,11 +31485,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SelectAreasStatus),
-                        ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=str),
                     ])
 
             status: 'ServiceArea.Enums.SelectAreasStatus' = 0
-            statusText: 'typing.Optional[str]' = None
+            statusText: 'str' = ""
 
         @dataclass
         class SkipArea(ClusterCommand):
@@ -31311,7 +31502,10 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="skippedArea", Tag=0, Type=uint),
                     ])
+
+            skippedArea: 'uint' = 0
 
         @dataclass
         class SkipAreaResponse(ClusterCommand):
@@ -31325,11 +31519,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SkipAreaStatus),
-                        ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=str),
                     ])
 
             status: 'ServiceArea.Enums.SkipAreaStatus' = 0
-            statusText: 'typing.Optional[str]' = None
+            statusText: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -31360,9 +31554,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ServiceArea.Structs.MapStruct]])
 
-            value: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = NullValue
+            value: 'typing.Optional[typing.List[ServiceArea.Structs.MapStruct]]' = None
 
         @dataclass
         class SelectedAreas(ClusterAttributeDescriptor):
@@ -31376,9 +31570,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[uint]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentArea(ClusterAttributeDescriptor):
@@ -31424,9 +31618,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]])
 
-            value: 'typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]' = None
+            value: 'typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -42060,6 +42254,7 @@ class ThreadBorderRouterManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="threadVersion", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000003, Type=bool),
                 ClusterObjectFieldDescriptor(Label="activeDatasetTimestamp", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="pendingDatasetTimestamp", Tag=0x00000005, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -42073,6 +42268,7 @@ class ThreadBorderRouterManagement(Cluster):
     threadVersion: 'uint' = None
     interfaceEnabled: 'bool' = None
     activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
+    pendingDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -42235,6 +42431,22 @@ class ThreadBorderRouterManagement(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class PendingDatasetTimestamp(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000452
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -45567,11 +45779,14 @@ class ApplicationLauncher(Cluster):
             kSuccess = 0x00
             kAppNotAvailable = 0x01
             kSystemBusy = 0x02
+            kPendingUserApproval = 0x03
+            kDownloading = 0x04
+            kInstalling = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 6,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -47037,7 +47252,7 @@ class EcosystemInformation(Cluster):
                     ])
 
             uniqueLocationID: 'str' = ""
-            locationDescriptor: 'Globals.Structs.LocationDescriptorStruct' = field(default_factory=lambda: EcosystemInformation.Structs.LocationDescriptorStruct())
+            locationDescriptor: 'Globals.Structs.LocationDescriptorStruct' = field(default_factory=lambda: Globals.Structs.LocationDescriptorStruct())
             locationDescriptorLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
@@ -50875,7 +51090,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -51088,7 +51303,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -51912,7 +52127,7 @@ class UnitTesting(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=Globals.Structs.TestGlobalStruct)
 
-            value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):

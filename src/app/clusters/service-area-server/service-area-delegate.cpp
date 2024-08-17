@@ -3,14 +3,14 @@
 
 using namespace chip::app::Clusters::ServiceArea;
 
-bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation)
+bool Delegate::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
     listIndex = 0;
 
-    // simple linear iteration to find the location with the desired areaId.
-    while (GetSupportedLocationByIndex(listIndex, aSupportedLocation))
+    // simple linear iteration to find the area with the desired areaId.
+    while (GetSupportedAreaByIndex(listIndex, aSupportedArea))
     {
-        if (aSupportedLocation.areaID == aAreaId)
+        if (aSupportedArea.areaID == aAreaId)
         {
             return true;
         }
@@ -28,7 +28,7 @@ void Delegate::HandleSupportedAreasUpdated()
     mInstance->ClearProgress();
 }
 
-bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+bool Delegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
     listIndex = 0;
 
@@ -45,14 +45,14 @@ bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStru
     return false;
 }
 
-bool Delegate::IsSelectedLocation(uint32_t aAreaId)
+bool Delegate::IsSelectedArea(uint32_t aAreaId)
 {
     uint32_t listIndex = 0;
-    uint32_t selectedLocation;
+    uint32_t selectedArea;
 
-    while (GetSelectedLocationByIndex(listIndex, selectedLocation))
+    while (GetSelectedAreaByIndex(listIndex, selectedArea))
     {
-        if (selectedLocation == aAreaId)
+        if (selectedArea == aAreaId)
         {
             return true;
         }
@@ -88,3 +88,6 @@ bool Delegate::IsProgressElement(uint32_t aAreaId)
 
     return GetProgressElementById(aAreaId, index, progressElement);
 }
+
+// todo: Should we add default implementations for the accessor methods of the non-mandatory attributes?
+//  This is so that devices that do not support these attributes are not forced to provide an implementation.

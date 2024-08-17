@@ -2585,6 +2585,64 @@ CHIP_ERROR DataModelLogger::LogValue(
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
+    const chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Duration", indent + 1, value.duration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Duration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OneShot", indent + 1, value.oneShot);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OneShot'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EmergencyBoost", indent + 1, value.emergencyBoost);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EmergencyBoost'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TemporarySetpoint", indent + 1, value.temporarySetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TemporarySetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TargetPercentage", indent + 1, value.targetPercentage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetPercentage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TargetReheat", indent + 1, value.targetReheat);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetReheat'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3516,17 +3574,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
-            return err;
-        }
-    }
     {
         CHIP_ERROR err = LogValue("LandmarkTag", indent + 1, value.landmarkTag);
         if (err != CHIP_NO_ERROR)
@@ -3543,11 +3593,28 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("SurfaceTag", indent + 1, value.surfaceTag);
+        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SurfaceTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LandmarkInfo", indent + 1, value.landmarkInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkInfo'");
             return err;
         }
     }
@@ -6878,6 +6945,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WaterHeaterManagement::Events::BoostStarted::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("BoostInfo", indent + 1, value.boostInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'BoostInfo'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WaterHeaterManagement::Events::BoostEnded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -13538,12 +13629,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WaterHeaterManagement::Attributes::HeaterTypes::Id: {
-            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value;
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HeaterTypes", 1, value);
         }
         case WaterHeaterManagement::Attributes::HeatDemand::Id: {
-            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value;
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HeatDemand", 1, value);
         }
@@ -14739,14 +14830,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SupportedAreas", 1, value);
         }
         case ServiceArea::Attributes::SupportedMaps::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedMaps", 1, value);
         }
         case ServiceArea::Attributes::SelectedAreas::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
+            chip::app::DataModel::DecodableList<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SelectedAreas", 1, value);
         }
@@ -14761,9 +14850,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EstimatedEndTime", 1, value);
         }
         case ServiceArea::Attributes::Progress::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Progress", 1, value);
         }
@@ -17235,6 +17322,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PendingDatasetTimestamp", 1, value);
         }
         case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -20615,6 +20707,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PeriodicEnergyMeasured", 1, value);
+        }
+        }
+        break;
+    }
+    case WaterHeaterManagement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case WaterHeaterManagement::Events::BoostStarted::Id: {
+            chip::app::Clusters::WaterHeaterManagement::Events::BoostStarted::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BoostStarted", 1, value);
+        }
+        case WaterHeaterManagement::Events::BoostEnded::Id: {
+            chip::app::Clusters::WaterHeaterManagement::Events::BoostEnded::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BoostEnded", 1, value);
         }
         }
         break;

@@ -194,13 +194,16 @@ enum PositionTag : enum8 {
   kMiddle = 4;
   kRow = 5;
   kColumn = 6;
-  kUnder = 7;
-  kNextTo = 8;
-  kAround = 9;
-  kOn = 10;
-  kAbove = 11;
-  kFrontOf = 12;
-  kBehind = 13;
+}
+
+enum RelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -2798,7 +2801,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x123;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;

@@ -54,9 +54,9 @@ class NxpBoard(Enum):
 
     def FolderName(self, os_env):
         if self == NxpBoard.K32W0:
-            return 'k32w/k32w0'
+            return 'k32w0'
         elif self == NxpBoard.K32W1:
-            return 'k32w/k32w1'
+            return 'k32w1'
         elif self == NxpBoard.RW61X:
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
@@ -250,7 +250,8 @@ class NxpBuilder(GnBuilder):
                         cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
                     elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s' % self.root
+            # add empty space at the end to avoid concatenation issue when there is no --args
+            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
 
             extra_args = []
 

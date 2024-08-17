@@ -9690,7 +9690,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Service Area
  *
- * The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.
+ * The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterServiceArea : MTRGenericBaseCluster
@@ -9706,9 +9706,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * This command is used to skip an area where the device operates.
  */
-- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)skipAreaWithCompletion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
+- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams *)params completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedAreasWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSupportedAreasWithParams:(MTRSubscribeParams *)params
@@ -13492,6 +13490,12 @@ MTR_PROVISIONALLY_AVAILABLE
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeActiveDatasetTimestampWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributePendingDatasetTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributePendingDatasetTimestampWithParams:(MTRSubscribeParams *)params
+                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributePendingDatasetTimestampWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -17381,13 +17385,16 @@ typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
     MTRDataTypePositionTagMiddle MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRDataTypePositionTagRow MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRDataTypePositionTagColumn MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDataTypePositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDataTypePositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDataTypePositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRDataTypePositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypePositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDataTypePositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRDataTypePositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
+    MTRDataTypeRelativePositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRelativePositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeRelativePositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeRelativePositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeRelativePositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeRelativePositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeRelativePositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTestGlobalEnum) {
@@ -18906,20 +18913,12 @@ typedef NS_OPTIONS(uint32_t, MTRWaterHeaterManagementFeature) {
     MTRWaterHeaterManagementFeatureTankPercent MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterDemandBitmap) {
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRWaterHeaterManagementWaterHeaterDemandBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterTypeBitmap) {
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRWaterHeaterManagementWaterHeaterTypeBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
+typedef NS_OPTIONS(uint8_t, MTRWaterHeaterManagementWaterHeaterHeatSourceBitmap) {
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapImmersionElement1 MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapImmersionElement2 MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapBoiler MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRWaterHeaterManagementWaterHeaterHeatSourceBitmapOther MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlCriticalityLevel) {
@@ -19797,11 +19796,13 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaSkipAreaStatus) {
     MTRServiceAreaSkipAreaStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRServiceAreaSkipAreaStatusInvalidAreaList MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRServiceAreaSkipAreaStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaSkipAreaStatusInvalidSkippedArea MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {
-    MTRServiceAreaFeatureListOrder MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRServiceAreaFeatureSelectWhileRunning MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRServiceAreaFeatureSelectWhileRunning MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRServiceAreaFeatureProgressReporting MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRServiceAreaFeatureMaps MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlControlMode) {
@@ -21058,6 +21059,9 @@ typedef NS_ENUM(uint8_t, MTRApplicationLauncherStatus) {
     MTRApplicationLauncherStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRApplicationLauncherStatusAppNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRApplicationLauncherStatusSystemBusy MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+    MTRApplicationLauncherStatusPendingUserApproval MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRApplicationLauncherStatusDownloading MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRApplicationLauncherStatusInstalling MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRApplicationLauncherFeature) {

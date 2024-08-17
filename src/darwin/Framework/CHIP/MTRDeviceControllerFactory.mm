@@ -1133,9 +1133,9 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (MTRDeviceController * _Nullable)initializeController:(MTRDeviceController *)controller
-                                         withParameters:(MTRDeviceControllerParameters *)parameters
-                                                  error:(NSError * __autoreleasing *)error
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
+                                        withParameters:(MTRDeviceControllerParameters *)parameters
+                                                 error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
