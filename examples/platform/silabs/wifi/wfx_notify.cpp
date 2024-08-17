@@ -98,9 +98,9 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 
-    VerifyOrReturn(status != SUCCESS_STATUS)
+    VerifyOrReturn(status != SUCCESS_STATUS);
 
-        memset(&evt, 0, sizeof(evt));
+    memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
     evt.header.length = sizeof evt;
 
