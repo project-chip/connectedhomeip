@@ -19,7 +19,6 @@
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
-#import "MTRXPCServiceProtocol.h"
 
 @interface MTRDeviceController_XPC ()
 
@@ -64,7 +63,7 @@
         return nil;
     }
     self.xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:listenerEndpoint];
-    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServiceProtocol)];
+    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
     [self.xpcConnection resume];
 
     // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't fare much better
