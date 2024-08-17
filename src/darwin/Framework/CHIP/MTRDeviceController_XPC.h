@@ -16,9 +16,8 @@
 
 #import "MTRDefines_Internal.h" // MTR_TESTABLE
 #import "MTRDeviceController.h"
+#import "MTRXPCClientProtocol.h" // MTRXPCClientProtocol_MTRDeviceController
 #import <Foundation/Foundation.h>
-
-@protocol MTRXPCClientProtocol_MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
