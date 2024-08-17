@@ -20,7 +20,7 @@
 
 + (BOOL)supportsSecureCoding
 {
-    return true;
+    return YES;
 }
 
 @end
@@ -29,7 +29,7 @@
 
 + (BOOL)supportsSecureCoding
 {
-    return true;
+    return YES;
 }
 
 @end
