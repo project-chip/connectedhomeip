@@ -181,7 +181,7 @@ CHIP_ERROR ChefFanControlManager::Read(const ConcreteReadAttributePath & aPath, 
         return aEncoder.Encode(mPercentSetting);
     }
     case SpeedCurrent::Id: {
-        // Current speed always trackssetting immediately in our implementation.
+        // Current speed always tracks setting immediately in our implementation.
         return aEncoder.Encode(mSpeedSetting.ValueOr(0));
     }
     case SpeedSetting::Id: {
