@@ -27,8 +27,10 @@
 
 @end
 
+//#define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 @implementation MTRDeviceController_XPC
 
+#ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 - (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 {
     if (!(self = [super initForSubclasses])) {
@@ -54,6 +56,7 @@
 
     return self;
 }
+#endif // MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
 - (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
 {
