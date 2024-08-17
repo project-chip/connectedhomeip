@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#import <Matter/MTRDevice.h> // for MTRDeviceState
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRXPCClientProtocol_MTRDevice <NSObject>
