@@ -20,7 +20,42 @@ must have a `"Name"` key that contains the command name. This name is shown in
 the state machine diagram above. Example
 `echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
 
-### `AreaComplete` message
+### ServiceArea related messages
+
+#### `AddMap` message
+
+This message adds a map to the SupportedMaps attribute of the Service Area
+cluster. This message requires the following extra keys.
+
+-   `MapId` This is an `int` setting the ID of the new map.
+-   `MapName` This is a `string` setting the name of the new map.
+
+#### `AddArea` message
+
+This message adds a new area to the SupportedAreas attribute of the Service Area
+cluster. This message requires the following extra keys, most of which are
+optional. Consult the `SupportedAreas` attribute spec for more information on
+what are valid areas.
+
+-   `AreaId` This is an `int` setting the ID of the area.
+-   `MapId` This is an `int` sitting the map ID the area is associated with.
+-   `LocationName` This is a `string` setting the location's name.
+-   `FloorNumber` This is an `int` setting the floor number of the area.
+-   `AreaType` This is an `int` setting the area type tag.
+-   `LandmarkTag` This is an `int` setting the landmark tag.
+-   `PositianTag` This is an `int` setting the position tag.
+
+#### `RemoveMap` message
+
+This message removes a map with the given map ID. This message requires the
+`int` key `MapId`.
+
+#### `RemoveArea` message
+
+This message removes an area with the given area ID. This message requires the
+`int` key `AreaId`.
+
+#### `AreaComplete` message
 
 This indicates that the area currently being serviced as indicated by the
 service area cluster is now complete.
