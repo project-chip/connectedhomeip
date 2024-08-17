@@ -90,3 +90,7 @@
 }
 
 @end
+
+@implementation MTRDeviceController_XPC (MTRXPCClientProtocol_MTRDeviceController)
+    // as of 2024-08-16, nothing needed here.
+@end

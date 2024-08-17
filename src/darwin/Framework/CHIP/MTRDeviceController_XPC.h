@@ -18,10 +18,12 @@
 #import "MTRDeviceController.h"
 #import <Foundation/Foundation.h>
 
+@protocol MTRXPCClientProtocol_MTRDeviceController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_TESTABLE
-@interface MTRDeviceController_XPC : MTRDeviceController
+@interface MTRDeviceController_XPC : MTRDeviceController<MTRXPCClientProtocol_MTRDeviceController>
 
 @end
 
