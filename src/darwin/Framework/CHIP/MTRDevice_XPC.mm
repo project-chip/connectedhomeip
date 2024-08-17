@@ -85,24 +85,28 @@
 #pragma mark - Client Callbacks
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
+    MTR_LOG_DEBUG("%s", __PRETTY_FUNCTION__);
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
+    MTR_LOG_DEBUG("%s", __PRETTY_FUNCTION__);
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    MTR_LOG_DEBUG("%s", __PRETTY_FUNCTION__);
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
 }
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
+    MTR_LOG_DEBUG("%s", __PRETTY_FUNCTION__);
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate deviceBecameActive:self];
     }];

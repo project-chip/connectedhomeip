@@ -51,7 +51,7 @@
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
 {
     if (self = [super initForSubclasses]) {
-        MTR_LOG("Setting up XPC Controller for UUID: %@  with connection block: %p", UUID, connectionBlock);
+        MTR_LOG("Setting up XPC Controller for UUID: %@ with connection block: %p", UUID, connectionBlock);
 
         if (UUID == nil) {
             MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil UUID");
@@ -120,6 +120,7 @@
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
+    MTR_LOG("%s", __PRETTY_FUNCTION__);
     os_unfair_lock_assert_owner(&_deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
@@ -130,7 +131,7 @@
     if ([self isRunning]) {
         [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
-
+    MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
     return deviceToReturn;
 }
 
