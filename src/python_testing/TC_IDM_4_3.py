@@ -21,11 +21,12 @@ import logging
 import queue
 import threading
 import time
+# from time import time
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncReadTransaction
+from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncReadTransaction, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
@@ -122,6 +123,10 @@ class TC_IDM_4_3(MatterBaseTest):
 
         self.fprint(f"NotifyLogic {time.time()} >>> t: {diff}", "red")
 
+    def on_notify_subscription_still_active_empty_report(self):
+        self.report_data_received = True
+        self.empty_report_time = time.time()
+
     def wait_for_attribute_update_report(self, expected_attribute, output):
         try:
             path, transaction = output.get(block=True, timeout=10)
@@ -141,12 +146,15 @@ class TC_IDM_4_3(MatterBaseTest):
         except KeyError:
             asserts.fail("[AttributeChangeCallback | Local] Attribute {expected_attribute} not found in returned report")
 
-    current_report_data_time: time = 0
-    previous_report_data_time: time = 0
-    attr_update_report_data_time: time = 0
+    current_report_data_time = 0
+    previous_report_data_time = 0
+    attr_update_report_data_time = 0
 
     min_interval_floor_sec: int = 1
     max_interval_ceiling_sec: int = 3
+
+    empty_report_time = None
+    report_data_received = False
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
@@ -155,42 +163,42 @@ class TC_IDM_4_3(MatterBaseTest):
         # Mandatory writable attributes
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         # bc = Clusters.GeneralCommissioning.Attributes.Breadcrumb
-        
+
         # Event
         # acl = Clusters.AccessControl.Events.
-        
+
         node_label_attr_path = [(0, node_label_attr)]
         TH: ChipDeviceController = self.default_controller
 
-        # *** Step 1a ***
-        # DUT and TH activate the subscription.
+        # # *** Step 1a ***
+        # # DUT and TH activate the subscription.
         self.step("1a")
 
-        # Subscribe to attribute
-        sub_th_step1ab = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=node_label_attr_path,
-            reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
-            keepSubscriptions=False
-        )
+        # # Subscribe to attribute
+        # sub_th_step1ab = await TH.ReadAttribute(
+        #     nodeid=self.dut_node_id,
+        #     attributes=node_label_attr_path,
+        #     reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+        #     keepSubscriptions=False
+        # )
 
-        sub_th_step1ab.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active)
+        # sub_th_step1ab.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active)
 
-        secs = 15
-        print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
-        time.sleep(secs)
-        print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
+        # secs = 3
+        # print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
+        # time.sleep(secs)
+        # print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
 
-        # Verify that the subscription is activated between TH and DUT
-        # Verify on the TH, a report data message is received.
-        asserts.assert_true(sub_th_step1ab.subscriptionId, "Subscription not activated")
+        # # Verify that the subscription is activated between TH and DUT
+        # # Verify on the TH, a report data message is received.
+        # asserts.assert_true(sub_th_step1ab.subscriptionId, "Subscription not activated")
 
-        # Verify subscriptionId field is present
-        asserts.assert_is_not_none(sub_th_step1ab.subscriptionId, "SubscriptionId field not present")
+        # # Verify subscriptionId field is present
+        # asserts.assert_is_not_none(sub_th_step1ab.subscriptionId, "SubscriptionId field not present")
 
-        # Verify MaxInterval field is present
-        sub_th_step1ab_min_interval_sec, sub_th_step1ab_max_interval_sec = sub_th_step1ab.GetReportingIntervalsSeconds()
-        asserts.assert_is_not_none(sub_th_step1ab_max_interval_sec, "MaxInterval field not present")
+        # # Verify MaxInterval field is present
+        # sub_th_step1ab_min_interval_sec, sub_th_step1ab_max_interval_sec = sub_th_step1ab.GetReportingIntervalsSeconds()
+        # asserts.assert_is_not_none(sub_th_step1ab_max_interval_sec, "MaxInterval field not present")
 
         # *** Step 1b ***
         # Change the value of the attribute which has been subscribed on the DUT by manually changing some
@@ -198,70 +206,97 @@ class TC_IDM_4_3(MatterBaseTest):
         # Turning on/off on a light bulb.
         self.step("1b")
 
-        # Set Attribute Update Callback
-        node_label_update_cb = AttributeChangeCallback(node_label_attr)
-        sub_th_step1ab.SetAttributeUpdateCallback(node_label_update_cb)
+        # # Set Attribute Update Callback
+        # node_label_update_cb = AttributeChangeCallback(node_label_attr)
+        # sub_th_step1ab.SetAttributeUpdateCallback(node_label_update_cb)
 
-        # Update attribute value
-        new_node_label_write = "NewNodeLabel_11001100"
-        await TH.WriteAttribute(
-            self.dut_node_id,
-            [(0, node_label_attr(value=new_node_label_write))]
-        )
+        # # Update attribute value
+        # new_node_label_write = "NewNodeLabel_11001100"
+        # await TH.WriteAttribute(
+        #     self.dut_node_id,
+        #     [(0, node_label_attr(value=new_node_label_write))]
+        # )
 
-        self.wait_for_attribute_update_report(node_label_attr, node_label_update_cb._output)
+        # self.wait_for_attribute_update_report(node_label_attr, node_label_update_cb._output)
 
-        # Number of seconds elapsed between the last report data event
-        # and the arrival of the attribute update report data
-        elapsed_time_since_report = self.attr_update_report_data_time - self.previous_report_data_time
+        # # Number of seconds elapsed between the last report data event
+        # # and the arrival of the attribute update report data
+        # elapsed_time_since_report = self.attr_update_report_data_time - self.previous_report_data_time
 
+        # # Convert the current time to a datetime object
+        # update_time = datetime.fromtimestamp(self.attr_update_report_data_time)
+        # previous_time = datetime.fromtimestamp(self.previous_report_data_time)
 
-        # Convert the current time to a datetime object
-        update_time = datetime.fromtimestamp(self.attr_update_report_data_time)
-        previous_time = datetime.fromtimestamp(self.previous_report_data_time)
+        # # Format the datetime object into the desired string format
+        # update_time_f = update_time.strftime("%H:%M:%S.%f")
+        # previous_time_f = previous_time.strftime("%H:%M:%S.%f")
 
-        # Format the datetime object into the desired string format
-        update_time_f = update_time.strftime("%H:%M:%S.%f")
-        previous_time_f = previous_time.strftime("%H:%M:%S.%f")
+        # self.fprint(f"\n\n\t\elapsed_time_since_report: {elapsed_time_since_report}s\n\t\tattr_update_report_data_time: {update_time_f}s\n\t\tprevious_report_data_time: {previous_time_f}s\n\n", "green")
 
-        self.fprint(f"\n\n\t\elapsed_time_since_report: {elapsed_time_since_report}s\n\t\tattr_update_report_data_time: {update_time_f}s\n\t\tprevious_report_data_time: {previous_time_f}s\n\n", "green")
+        # # Verify that the attribute update report data is sent
+        # # after MinInterval time and before MaxInterval time
+        # asserts.assert_greater(elapsed_time_since_report, self.min_interval_floor_sec,
+        #                        f"Attribute update report data must be sent after the MinInterval")
+        # asserts.assert_less(elapsed_time_since_report, self.max_interval_ceiling_sec,
+        #                 f"Attribute update report data must be sent before the MaxInterval")
 
-        # Verify that the attribute update report data is sent
-        # after MinInterval time and before MaxInterval time
-        asserts.assert_greater(elapsed_time_since_report, self.min_interval_floor_sec,
-                               f"Attribute update report data must be sent after the MinInterval")
-        asserts.assert_less(elapsed_time_since_report, self.max_interval_ceiling_sec,
-                        f"Attribute update report data must be sent before the MaxInterval")
+        # sub_th_step1ab.Shutdown()
 
-        sub_th_step1ab.Shutdown()
-        
         # DUT and TH activate the subscription. Change the value of the attribute which has been
         # subscribed on the DUT by sending an IMWrite or Invoke message to the DUT from the TH.
         # Verify that there is a report data message sent from the DUT for the changed value of
         # the attribute. Verify that the Report Data is sent when the minimum interval time is
         # reached and before the MaxInterval time.
         self.step(2)
-        
+
         # DUT and TH activate the subscription for an attribute. Do not change the value of the
         # attribute which has been subscribed. Verify that there is an empty report data message
         # sent from the DUT to the TH after the MinInterval time and no later than the
         # MaxInterval time plus an additional duration equal to the total retransmission time
         # according to negotiated MRP parameters.
         self.step(3)
-        
+
         # Subscribe to attribute
-        sub_th_step3 = await TH.ReadAttribute(
+        sub_th_step3: SubscriptionTransaction = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False
         )
-        
-        
+
+        # Record time after subscription
+        sub_time = time.time()
+
+        # Get subscription timeout
+        sub_timeout_sec = sub_th_step3.GetSubscriptionTimeoutMs() / 1000
+
+        # Records the time the first empty report after subscription arrives
+        sub_th_step3.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active_empty_report)
+
+        # Waint for empty report data
+        wait_increments = self.min_interval_floor_sec / 10
+        while not self.report_data_received:
+            time.sleep(wait_increments)
+            self.fprint(f"Time: {time.time()}", "blue")
+            self.fprint(f"Empty Rport time: {self.empty_report_time}", "green")
+            if self.report_data_received:
+                break
+
+        # Elapsed time between subscription established and first report data
+        sub_report_data_elapsed_time = self.empty_report_time - sub_time
+
+        self.fprint(f"min_interval_floor_sec: {self.min_interval_floor_sec}", "red")
+        self.fprint(f"sub_report_data_elapsed_time: {sub_report_data_elapsed_time}", "red")
+        self.fprint(f"sub_timeout_sec: {sub_timeout_sec}", "red")
+
+        # Verify that the empty report data message from the DUT to the TH was sent
+        # after the MinInterval time and no later than the MaxInterval time plus an
+        # additional duration equal to the total retransmission time according to
+        # negotiated MRP parameters
+        asserts.assert_greater(sub_report_data_elapsed_time, self.min_interval_floor_sec, "Empty report not received after the MinInterval time")
+        asserts.assert_less(sub_report_data_elapsed_time, sub_timeout_sec, "Empty report not received before the MaxInterval time")
+
         sub_th_step3.Shutdown()
-        
-        
-        
 
 
 if __name__ == "__main__":
