@@ -73,7 +73,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                              \
         __block TYPE outValue = DEFAULT_VALUE;                                                     \
                                                                                                    \
-        NSXPCConnection * xpcConnection = nil;                                                     \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                                     \
                                                                                                    \
         [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
             MTR_LOG_ERROR("Error: %@", error);                                                     \
@@ -89,7 +89,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                    \
     -(void) METHOD_SIGNATURE                                                                       \
     {                                                                                              \
-        NSXPCConnection * xpcConnection = nil;                                                     \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                                     \
                                                                                                    \
         [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
             MTR_LOG_ERROR("Error: %@", error);                                                     \
@@ -101,7 +101,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                               \
         __block TYPE outValue = DEFAULT_VALUE;                                                      \
                                                                                                     \
-        NSXPCConnection * xpcConnection = nil;                                                      \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                                      \
                                                                                                     \
         [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {  \
             MTR_LOG_ERROR("Error: %@", error);                                                      \
