@@ -81,7 +81,8 @@ using namespace ::chip;
 
 #pragma mark - Coding
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return YES;
 }
 
@@ -96,17 +97,17 @@ static NSString * sDataVersionCodingKey = @"sDataVersionKey";
         return nil;
     }
 
-    self.timedWriteTimeout = [decoder decodeObjectOfClass:[NSNumber class] forKey: sTimedWriteTimeoutCodingKey];
-    self.dataVersion = [decoder decodeObjectOfClass:[NSNumber class] forKey: sDataVersionCodingKey];
+    self.timedWriteTimeout = [decoder decodeObjectOfClass:[NSNumber class] forKey:sTimedWriteTimeoutCodingKey];
+    self.dataVersion = [decoder decodeObjectOfClass:[NSNumber class] forKey:sDataVersionCodingKey];
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    if ( self.timedWriteTimeout )
+    if (self.timedWriteTimeout)
         [coder encodeObject:self.timedWriteTimeout forKey:sTimedWriteTimeoutCodingKey];
-    if ( self.dataVersion )
+    if (self.dataVersion)
         [coder encodeObject:self.dataVersion forKey:sDataVersionCodingKey];
 }
 
@@ -124,7 +125,8 @@ static NSString * sDataVersionCodingKey = @"sDataVersionKey";
 
 #pragma mark - Coding
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return YES;
 }
 
@@ -140,9 +142,9 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
         return nil;
     }
 
-    self.filterByFabric = [decoder decodeBoolForKey: sFilterByFabricCoderKey];
-    self.assumeUnknownAttributesReportable = [decoder decodeBoolForKey: sAssumeUnknownAttributesReportableCoderKey];
-    self.minEventNumber = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMinEventNumberCoderKey];
+    self.filterByFabric = [decoder decodeBoolForKey:sFilterByFabricCoderKey];
+    self.assumeUnknownAttributesReportable = [decoder decodeBoolForKey:sAssumeUnknownAttributesReportableCoderKey];
+    self.minEventNumber = [decoder decodeObjectOfClass:[NSNumber class] forKey:sMinEventNumberCoderKey];
 
     return self;
 }
@@ -150,9 +152,9 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeBool:self.filterByFabric forKey:sFilterByFabricCoderKey];
-    [coder encodeBool: self.assumeUnknownAttributesReportable forKey:sAssumeUnknownAttributesReportableCoderKey];
+    [coder encodeBool:self.assumeUnknownAttributesReportable forKey:sAssumeUnknownAttributesReportableCoderKey];
 
-    if ( self.minEventNumber )
+    if (self.minEventNumber)
         [coder encodeObject:self.minEventNumber forKey:sMinEventNumberCoderKey];
 }
 
@@ -210,7 +212,8 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
 }
 
 #pragma mark - Coding
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return YES;
 }
 
@@ -222,32 +225,32 @@ static NSString * sMaxIntervalKeyCoderKey = @"sMaxIntervalKeyKey";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
-    self = [super initWithCoder: decoder];
+    self = [super initWithCoder:decoder];
 
     if (self == nil) {
         return nil;
     }
 
-    self.replaceExistingSubscriptions = [decoder decodeBoolForKey: sReplaceExistingSubscriptionsCoderKey];
-    self.reportEventsUrgently = [decoder decodeBoolForKey: sReportEventsUrgentlyCoderKey];
-    self.resubscribeAutomatically = [decoder decodeBoolForKey: sResubscribeAutomaticallyCoderKey];
-    self.minInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMinIntervalKeyCoderKey];
-    self.maxInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMaxIntervalKeyCoderKey];
+    self.replaceExistingSubscriptions = [decoder decodeBoolForKey:sReplaceExistingSubscriptionsCoderKey];
+    self.reportEventsUrgently = [decoder decodeBoolForKey:sReportEventsUrgentlyCoderKey];
+    self.resubscribeAutomatically = [decoder decodeBoolForKey:sResubscribeAutomaticallyCoderKey];
+    self.minInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:sMinIntervalKeyCoderKey];
+    self.maxInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:sMaxIntervalKeyCoderKey];
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [super encodeWithCoder: coder];
+    [super encodeWithCoder:coder];
 
-    [coder encodeBool: self.replaceExistingSubscriptions forKey:sReplaceExistingSubscriptionsCoderKey];
-    [coder encodeBool: self.reportEventsUrgently forKey:sReportEventsUrgentlyCoderKey];
-    [coder encodeBool: self.resubscribeAutomatically forKey:sResubscribeAutomaticallyCoderKey];
+    [coder encodeBool:self.replaceExistingSubscriptions forKey:sReplaceExistingSubscriptionsCoderKey];
+    [coder encodeBool:self.reportEventsUrgently forKey:sReportEventsUrgentlyCoderKey];
+    [coder encodeBool:self.resubscribeAutomatically forKey:sResubscribeAutomaticallyCoderKey];
 
-    if ( self.minInterval )
+    if (self.minInterval)
         [coder encodeObject:self.minInterval forKey:sMinIntervalKeyCoderKey];
-    if ( self.maxInterval )
+    if (self.maxInterval)
         [coder encodeObject:self.maxInterval forKey:sMaxIntervalKeyCoderKey];
 }
 

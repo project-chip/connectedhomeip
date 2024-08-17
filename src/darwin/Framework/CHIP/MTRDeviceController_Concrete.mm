@@ -145,7 +145,7 @@ using namespace chip::Tracing::DarwinFramework;
     /// because of the enormous overlap of params.
     if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
         if ([parameters isKindOfClass:MTRDeviceControllerMachServiceXPCParameters.class]) {
-            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *)parameters;
+            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *) parameters;
             MTR_LOG_DEBUG("%s: got XPC parameters, getting XPC device controller", __PRETTY_FUNCTION__);
 
             NSString * machServiceName = xpcParameters.machServiceName;

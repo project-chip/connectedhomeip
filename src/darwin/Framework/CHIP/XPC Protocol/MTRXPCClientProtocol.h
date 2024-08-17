@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDevice.h>    // for MTRDeviceState
+#import <Matter/MTRDevice.h> // for MTRDeviceState
 
 NS_ASSUME_NONNULL_BEGIN
-
 
 @protocol MTRXPCClientProtocol_MTRDevice <NSObject>
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state;
