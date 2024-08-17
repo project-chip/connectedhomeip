@@ -42,7 +42,7 @@ constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
 constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
 constexpr uint8_t kWlanRetryIntervalInSec = 5;
 uint8_t retryInterval = kWlanMinRetryIntervalsInSec;
-osTimerId_t sRetryTimer; 
+osTimerId_t sRetryTimer;
 }
 /*
  * Notifications to the upper-layer
@@ -188,7 +188,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
                 // Sending the join command if retry timer failed to start
                 if (wfx_connect_to_ap() != SL_STATUS_OK) {
                     ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
-                } 
+                }
                 return;
             }
         }
@@ -214,7 +214,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
             // Sending the join command if retry timer failed to start
             if (wfx_connect_to_ap() != SL_STATUS_OK) {
                 ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
-            } 
+            }
             return;
         }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
