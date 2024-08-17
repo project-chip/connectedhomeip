@@ -72,6 +72,9 @@ private:
     // AppDelegate
     bool isComissioningStarted = false;
     void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowClosed() override;
+
     // FabricTable::Delegate
     void OnFabricCommitted(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override;
     void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override;

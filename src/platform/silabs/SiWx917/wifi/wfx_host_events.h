@@ -60,11 +60,7 @@
 #define BLE_DRIVER_TASK_PRIORITY (2)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-// WLAN retry time intervals in milli seconds
-#define WLAN_MAX_RETRY_TIMER_MS 60000
-#define WLAN_MIN_RETRY_TIMER_MS 1000
-#define WLAN_RETRY_TIMER_MS 5000
-#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
 // WLAN related Macros
 #define ETH_FRAME (0)

@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <icd/server/ICDServerConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include "AppConfig.h"
 #include "BaseApplication.h"
 
@@ -38,7 +38,10 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-uint16_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
+constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
+constexpr uint8_t kWlanRetryIntervalInSec = 5;
+uint8_t retryInterval = kWlanMinRetryIntervalsInSec;
 osTimerId_t sRetryTimer; 
 }
 /*
@@ -70,7 +73,7 @@ void wfx_started_notify()
 
     // Creating a timer which will be used to retry connection with AP
     sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
-    VerifyOrReturnError(sRetryTimer != NULL, SL_STATUS_ALLOCATION_FAILED);
+    VerifyOrReturn(sRetryTimer != NULL);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_STARTUP_IND_ID;
@@ -182,8 +185,8 @@ void wfx_retry_connection(uint16_t retryAttempt)
         if (retryAttempt < MAX_JOIN_RETRIES_COUNT)
         {
             ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds",
-                            CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
-            if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS)) != osOK)
+                            kWlanRetryIntervalInSec);
+            if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(kWlanRetryIntervalInSec))) != osOK)
             {
                 ChipLogProgress(DeviceLayer, "Failed to start retry timer");
                 // Sending the join command if retry timer failed to start
@@ -205,11 +208,11 @@ void wfx_retry_connection(uint16_t retryAttempt)
          * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
          * WLAN_MAX_RETRY_TIMER_MS intervals.
          */
-        if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
+        if (retryInterval > kWlanMaxRetryIntervalsInSec)
         {
-            retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+            retryInterval = kWlanMaxRetryIntervalsInSec;
         }
-        if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(retryInterval)) != osOK)
+        if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(retryInterval))) != osOK)
         {
             ChipLogProgress(DeviceLayer, "Failed to start retry timer");
             // Sending the join command if retry timer failed to start
@@ -221,7 +224,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
         wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-        ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(retryInterval));
+        ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
         retryInterval += retryInterval;
         return;
     }
