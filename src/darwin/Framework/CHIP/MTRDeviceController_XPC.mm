@@ -46,7 +46,7 @@
 {
     if (self = [super initForSubclasses]) {
         MTR_LOG("Setting up XPC Controller for UUID: %@  with connection block: %p", UUID, connectionBlock);
-        
+
         if ( UUID == nil ) {
             MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil UUID");
             return nil;
@@ -55,7 +55,7 @@
             MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil connectionBlock");
             return nil;
         }
-        
+
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
 

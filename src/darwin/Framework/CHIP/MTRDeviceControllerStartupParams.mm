@@ -343,7 +343,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
         _xpcConnectionBlock = [xpcConnectionBlock copy];
         _uniqueIdentifier = [uniqueIdentifier copy];
     }
-    
+
     return self;
 }
 @end
