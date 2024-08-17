@@ -159,7 +159,7 @@ MTR_NEWLY_AVAILABLE
  * @param uniqueIdentifier The unique id to assign to the controller.
  *
  */
-- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void))xpcConnectionBlock
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 @property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;

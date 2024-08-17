@@ -34,7 +34,6 @@
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceController.h"
-#import "MTRDeviceController_XPC.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -42,6 +41,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
+#import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -65,19 +65,19 @@
 
 #import <os/lock.h>
 
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)       \
-    MTR_SIMPLE_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
-                                 : [[self deviceController] uniqueIdentifier] nodeID      \
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                                                                            \
+    MTR_SIMPLE_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
+                                 : [[self deviceController] uniqueIdentifier] nodeID                                                                           \
                                  : [self nodeID])
 
-#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS)       \
-    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController \
-                                  : [[self deviceController] uniqueIdentifier] nodeID                    \
+#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS)                                                                            \
+    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController \
+                                  : [[self deviceController] uniqueIdentifier] nodeID                                                                                         \
                                   : [self nodeID])
 
-#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)       \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND([(MTRDeviceController_XPC *)[self deviceController] xpcConnection], METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
-                                  : [[self deviceController] uniqueIdentifier] nodeID      \
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                                                                            \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND([(MTRDeviceController_XPC *) [self deviceController] xpcConnection], METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
+                                  : [[self deviceController] uniqueIdentifier] nodeID                                                                           \
                                   : [self nodeID])
 
 @implementation MTRDevice_XPC
@@ -165,7 +165,7 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *)[self deviceController] xpcConnection];
+    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);

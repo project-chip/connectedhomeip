@@ -22,12 +22,12 @@
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
-    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController     \
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                 \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
                                  : self.uniqueIdentifier)
 
-#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
-    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController     \
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                 \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(self.xpcConnection, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController \
                                   : self.uniqueIdentifier)
 
 @interface MTRDeviceController_XPC ()
@@ -47,11 +47,11 @@
     if (self = [super initForSubclasses]) {
         MTR_LOG("Setting up XPC Controller for UUID: %@  with connection block: %p", UUID, connectionBlock);
 
-        if ( UUID == nil ) {
+        if (UUID == nil) {
             MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil UUID");
             return nil;
         }
-        if ( connectionBlock == nil ) {
+        if (connectionBlock == nil) {
             MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil connectionBlock");
             return nil;
         }
