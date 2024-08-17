@@ -27,54 +27,40 @@
 @end
 
 //#define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
+
 @implementation MTRDeviceController_XPC
 
 #ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 - (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 {
+    MTR_LOG_DEBUG("%s")
     if (!(self = [super initForSubclasses])) {
         return nil;
     }
 
     self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
     self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    
     self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+    self.xpcConnection.exportedObject = self;
 
-    // TODO:  implement client protocol somewhere, probably on this object
-    // kmo 16 aug 2024 12h26
-    // self.xpcConnection.exportedObject = self;
-
+    MTR_LOG_DEBUG("%s: resuming new XPC connection");
     [self.xpcConnection resume];
 
     id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
     }];
 
-    NSDictionary * helloContext = @{ @"human_readable_context" : @"hello" };
-    [proxy deviceController:self.uniqueIdentifier checkInWithContext:helloContext];
+
 
     return self;
 }
 #endif // MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
-- (id)initWithXPCListenerEndpointForTesting:(NSXPCListenerEndpoint *)listenerEndpoint
-{
-    if (!(self = [super initForSubclasses])) {
-        return nil;
-    }
-    self.xpcConnection = [[NSXPCConnection alloc] initWithListenerEndpoint:listenerEndpoint];
-    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-    [self.xpcConnection resume];
-
-    // TODO:  something seems wrong at this point so clearly subsequent `xpcRemoteObjectProxy` calls won't fare much better
-
-    return self;
-}
-
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_ERROR("unimplemented method %s called", __PRETTY_FUNCTION__);
+    MTR_LOG_ERROR("%s: unimplemented method called", __PRETTY_FUNCTION__);
     return nil;
 }
 
