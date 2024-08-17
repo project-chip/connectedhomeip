@@ -89,6 +89,42 @@ using namespace ::chip;
     return self;
 }
 
+#pragma mark - Coding
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+static NSString * sFilterByFabricCoderKey = @"sFilterByFabricKey";
+static NSString * sMinEventNumberCoderKey = @"sMinEventNumberKey";
+static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownAttributesReportableKey";
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    
+    if (self == nil) {
+        return nil;
+    }
+
+    self.filterByFabric = [decoder decodeBoolForKey: sFilterByFabricCoderKey];
+    self.assumeUnknownAttributesReportable = [decoder decodeBoolForKey: sAssumeUnknownAttributesReportableCoderKey];
+    self.minEventNumber = [decoder decodeObjectOfClass:[NSNumber class] forKey: sMinEventNumberCoderKey];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeBool:self.filterByFabric forKey:sFilterByFabricCoderKey];
+    [coder encodeBool: self.assumeUnknownAttributesReportable forKey:sAssumeUnknownAttributesReportableCoderKey];
+
+    if ( self.minEventNumber )
+        [coder encodeObject:self.minEventNumber forKey:sMinEventNumberCoderKey];
+}
+
+#pragma mark - Copying
+
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRReadParams alloc] init];
@@ -97,6 +133,8 @@ using namespace ::chip;
     other.assumeUnknownAttributesReportable = self.assumeUnknownAttributesReportable;
     return other;
 }
+
+#pragma mark - Other
 
 - (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
 {

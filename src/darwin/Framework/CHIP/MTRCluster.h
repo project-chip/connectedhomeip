@@ -109,7 +109,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    treated as if a default-initialized object was passed in.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRReadParams : NSObject <NSCopying>
+@interface MTRReadParams : NSObject <NSCopying, NSSecureCoding>
 
 /**
  * Whether the read/subscribe is fabric-filtered. The default is YES.

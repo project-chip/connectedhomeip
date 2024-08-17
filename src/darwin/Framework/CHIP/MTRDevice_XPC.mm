@@ -42,6 +42,7 @@
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
+#import "MTRDefines_Internal.h.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
@@ -54,31 +55,8 @@
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
-#import <zap-generated/MTRBaseClusters.h>
-
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
-
-#include <platform/CHIPDeviceConfig.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/List.h>
-#include <app/server/Dnssd.h>
-#include <controller/CHIPDeviceController.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/CommissioningWindowOpener.h>
-#include <credentials/FabricTable.h>
-#include <credentials/GroupDataProvider.h>
-#include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <inet/InetInterface.h>
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <platform/LockTracker.h>
-#include <platform/PlatformManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <system/SystemClock.h>
 
 #include <atomic>
 #include <dns_sd.h>
@@ -86,73 +64,63 @@
 
 #import <os/lock.h>
 
-#define MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                       \
-                                                                                                   \
-    -(TYPE) NAME                                                                                   \
-    {                                                                                              \
-        __block TYPE outValue = DEFAULT_VALUE;                                                     \
-                                                                                                   \
-        NSXPCConnection * xpcConnection = nil;                                                     \
-                                                                                                   \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-            MTR_LOG_ERROR("Error: %@", error);                                                     \
-        }] deviceController:[[self deviceController] uniqueIdentifier]                             \
-                     nodeID:[self nodeID]                                                          \
-                GETTER_NAME:^(TYPE returnValue) {                                                  \
-                    outValue = returnValue;                                                        \
-                }];                                                                                \
-                                                                                                   \
-        return outValue;                                                                           \
-    }
 
-#define MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS)                      \
-                                                                                                   \
-    -(void) METHOD_SIGNATURE                                                                       \
-    {                                                                                              \
-        NSXPCConnection * xpcConnection = nil;                                                     \
-                                                                                                   \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-            MTR_LOG_ERROR("Error: %@", error);                                                     \
-        }] deviceController:[[self deviceController] uniqueIdentifier]                             \
-                     nodeID:[self nodeID]                                                          \
-                    ADDITIONAL_ARGUMENTS];                                                         \
-    }
-
-
-#define MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS) \
-- (TYPE) SIGNATURE \
-{ \
-    __block TYPE outValue = DEFAULT_VALUE; \
-\
-    NSXPCConnection * xpcConnection = nil; \
-\
-    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-        MTR_LOG_ERROR("Error: %@", error); \
-    }] deviceController:[[self deviceController] uniqueIdentifier] \
-                             nodeID:[self nodeID] \
-        ADDITIONAL_ARGUMENTS:^(TYPE returnValue) { \
-                              outValue = returnValue; \
-                          }];\
- \
-    return outValue; \
-}
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME) \
+    MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
+#define MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_COMPLEX_REMOTE_XPC_GETTER(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
+#define MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS) \
+    MTR_COMPLEX_REMOTE_XPC_GETTER(SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, deviceController:[[self deviceController] uniqueIdentifier] nodeID:[self nodeID])
 
 @implementation MTRDevice_XPC
 
-MTR_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
-MTR_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate *, nil, getEstimatedStartTimeWithReply)
-MTR_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getEstimatedSubscriptionLatencyWithReply)
+#pragma mark - Client Callbacks
+- (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate device:self stateChanged:state];
+    }];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate device:self receivedAttributeReport:attributeReport];
+    }];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate device:self receivedEventReport:eventReport];
+    }];
+}
+- (oneway void)deviceBecameActive:(NSNumber *)nodeID {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate deviceBecameActive:self];
+    }];
+}
+- (oneway void)deviceCachePrimed:(NSNumber *)nodeID {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate deviceCachePrimed:self];
+    }];
+}
+- (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate deviceConfigurationChanged:self];
+    }];
+}
+
+#pragma mark - Remote Commands
+
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate *, nil, getEstimatedStartTimeWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getEstimatedSubscriptionLatencyWithReply)
 
 typedef NSDictionary<NSString *, id> * readAttributeResponseType;
-// TODO: PARAMS NEEDS TO CONORM TO NSCODER
-MTR_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params,
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params,
                               readAttributeResponseType,
                               nil,
                               readAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID params:params withReply)
 
 
-MTR_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber *)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout, writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value expectedValueInterval:expectedValueInterval timedWriteTimeout:timeout)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber *)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout, writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value expectedValueInterval:expectedValueInterval timedWriteTimeout:timeout)
 
 
 
@@ -187,18 +155,18 @@ MTR_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID:(NSNumber *)endpointI
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
-MTR_SIMPLE_REMOTE_XPC_GETTER(clientDataKeys, NSArray *, nil, getClientDataKeysWithReply)
-MTR_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey:(NSString *)key, id<NSSecureCoding> _Nullable, nil, clientDataForKey:key withReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(clientDataKeys, NSArray *, nil, getClientDataKeysWithReply)
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey:(NSString *)key, id<NSSecureCoding> _Nullable, nil, clientDataForKey:key withReply)
 
-MTR_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value, setClientDataForKey:key value: value)
-MTR_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey:(NSString *)key, removeClientDataForKey:key)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value, setClientDataForKey:key value: value)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey:(NSString *)key, removeClientDataForKey:key)
 
-MTR_COMPLEX_REMOTE_XPC_GETTER(clientDataKeysForEndpointID:(NSNumber *)endpointID, NSArray * _Nullable, nil, clientDataKeysForEndpointID:(NSNumber *)endpointID withReply)
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataKeysForEndpointID:(NSNumber *)endpointID, NSArray * _Nullable, nil, clientDataKeysForEndpointID:(NSNumber *)endpointID withReply)
 
-MTR_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID, id<NSSecureCoding> _Nullable, nil, clientDataForKey: key endpointID: endpointID withReply)
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID, id<NSSecureCoding> _Nullable, nil, clientDataForKey: key endpointID: endpointID withReply)
 
-MTR_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value, setClientDataForKey:key endpointID:endpointID value:value)
-MTR_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value, removeClientDataForKey:key endpointID:endpointID)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value, setClientDataForKey:key endpointID:endpointID value:value)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value, removeClientDataForKey:key endpointID:endpointID)
 
 // Not Supported via XPC
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;

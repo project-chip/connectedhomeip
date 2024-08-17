@@ -16,13 +16,15 @@
 
 #import "MTRDeviceController_XPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDevice_XPC.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
 @interface MTRDeviceController_XPC ()
 
-@property (retain, readwrite) NSXPCConnection * xpcConnection;
+@property (atomic, retain, readwrite) NSXPCConnection * xpcConnection;
+@property (nonatomic, retain, readwrite) NSUUID * uniqueIdentifier;
 
 @end
 
@@ -30,29 +32,56 @@
 
 @implementation MTRDeviceController_XPC
 
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+
+- (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void))connectionBlock {
+    if ( self = [super initForSubclasses] ) {
+        MTR_LOG("Setting up XPC Controller for UUID: %@  with connection block: %p", UUID, connectionBlock);
+        self.xpcConnection = connectionBlock();
+        self.uniqueIdentifier = UUID;
+        
+        MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
+        if ( self.xpcConnection ) {
+            self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+            
+            self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+            self.xpcConnection.exportedObject = self;
+            
+            MTR_LOG("Resuming new XPC connection");
+            [self.xpcConnection resume];
+        } else {
+            MTR_LOG_ERROR("Failed to set up XPC Connection");
+            return nil;
+        }
+    }
+    
+    return self;
+}
+
 #ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
-- (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
+- (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 {
-    MTR_LOG_DEBUG("%s")
-    if (!(self = [super initForSubclasses])) {
-        return nil;
+    if ( self = [super initForSubclasses] ) {
+        MTR_LOG("Setting up XPC Controller for UUID: %@  with machServiceName: %s options: %d", UUID, machServiceName, options);
+        self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
+        self.uniqueIdentifier = UUID;
+        
+        MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
+        if ( self.xpcConnection ) {
+            self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+            
+            self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+            self.xpcConnection.exportedObject = self;
+            
+            MTR_LOG("%s: resuming new XPC connection");
+            [self.xpcConnection resume];
+        } else {
+            MTR_LOG_ERROR("Failed to set up XPC Connection");
+            return nil;
+        }
     }
 
-    self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
-    self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
     
-    self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
-    self.xpcConnection.exportedObject = self;
-
-    MTR_LOG_DEBUG("%s: resuming new XPC connection");
-    [self.xpcConnection resume];
-
-    id<MTRXPCServerProtocol> proxy = [self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-        MTR_LOG_ERROR("%s: XPC remote object proxy error.", __PRETTY_FUNCTION__);
-    }];
-
-
-
     return self;
 }
 #endif // MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
@@ -64,8 +93,87 @@
     return nil;
 }
 
-@end
 
-@implementation MTRDeviceController_XPC (MTRXPCClientProtocol_MTRDeviceController)
-    // as of 2024-08-16, nothing needed here.
+#pragma mark - XPC Action Overrides
+
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME,TYPE,DEFAULT_VALUE,GETTER_NAME)\
+    MTR_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, self.uniqueIdentifier)
+#define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS) \
+    MTR_SIMPLE_REMOTE_XPC_COMMAND(METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, self.uniqueIdentifier)
+
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(isRunning, BOOL, NO, getIsRunningWithReply)
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(controllerNodeID, NSUUID *, nil, controllerNodeIDWithReply)
+
+
+// Not Supported via XPC
+// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice payload:(MTRSetupPayload *)payload newNodeID:(NSNumber *)newNodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller commissionNodeWithID:(NSNumber *)nodeID commissioningParams:(MTRCommissioningParameters *)commissioningParams withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller continueCommissioningDevice:(void *)opaqueDeviceHandle ignoreAttestationFailure:(BOOL)ignoreAttestationFailure withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+// - (oneway void)deviceController:(NSUUID *)controller cancelCommissioningForNodeID:(NSNumber *)nodeID withReply:(void(^)(BOOL success, NSError * _Nullable error))reply;
+// - (nullable MTRBaseDevice *)deviceController:(NSUUID *)controller deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error;
+// - (oneway void)deviceController:(NSUUID *)controller startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate withReply:(void(^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller stopBrowseForCommissionablesWithReply:(void(^)(BOOL success))reply;
+// - (oneway void)deviceController:(NSUUID *)controller attestationChallengeForDeviceID:(NSNumber *)deviceID withReply:(void(^)(NSData * _Nullable))reply;
+
+//- (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void(^)(BOOL success))reply;
+//- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
+
+MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceController:)
+
+
+#pragma mark - MTRDeviceProtocol Client
+
+// All pass through, we could do some fancy redirection here based on protocol, but that's that for another day
+- (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received device: %@ stateChanged: %lu   found device: %@", nodeID, (unsigned long)state, device);
+    [device device: nodeID stateChanged: state];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
+    
+    [device device: nodeID receivedAttributeReport: attributeReport];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received device: %@ receivedEventReport: %@     found device: %@", nodeID, eventReport, device);
+
+    [device device: nodeID receivedEventReport: eventReport];
+}
+- (oneway void)deviceBecameActive:(NSNumber *)nodeID {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received deviceBecameActive: %@ found device: %@", nodeID, device);
+
+    [device deviceBecameActive: nodeID];
+}
+- (oneway void)deviceCachePrimed:(NSNumber *)nodeID {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received deviceCachePrimed: %@ found device: %@", nodeID, device);
+
+    [device deviceCachePrimed: nodeID];
+}
+- (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID {
+    MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
+    MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
+
+    [device deviceConfigurationChanged: nodeID];
+}
+
+#pragma mark - MTRDeviceController Protocol Client
+
+// Not Supported via XPC
+//- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status {
+//  }
+//- (oneway void)controller:(NSUUID *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error {
+//    
+//}
+//- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics {
+//    
+//}
+//- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info {
+//    
+//}
+
 @end
