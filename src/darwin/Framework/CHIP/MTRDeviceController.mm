@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -144,7 +145,11 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+    if ([parameters isKindOfClass:MTRXPCDeviceControllerParameters.class]) {
+        MTRXPCDeviceControllerParameters * resolvedParameters = (MTRXPCDeviceControllerParameters *) parameters;
+        MTR_LOG("Starting up with XPC Device Controller Parameters: %@", parameters);
+        return [[MTRDeviceController_XPC alloc] initWithUniqueIdentifier:resolvedParameters.uniqueIdentifier xpConnectionBlock:resolvedParameters.xpcConnectionBlock];
+    } else if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
