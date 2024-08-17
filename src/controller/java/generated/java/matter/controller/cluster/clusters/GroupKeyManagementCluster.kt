@@ -145,8 +145,8 @@ class GroupKeyManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_KEY_SET_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D_REQ), groupKeySetID)
+    val TAG_GROUP_KEY_SET_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID_REQ), groupKeySetID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -189,8 +189,8 @@ class GroupKeyManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_KEY_SET_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D_REQ), groupKeySetID)
+    val TAG_GROUP_KEY_SET_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID_REQ), groupKeySetID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

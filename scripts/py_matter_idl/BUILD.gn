@@ -53,6 +53,7 @@ pw_python_package("matter_idl") {
 
   tests = [
     "matter_idl/test_backwards_compatibility.py",
+    "matter_idl/test_case_conversion.py",
     "matter_idl/test_data_model_xml.py",
     "matter_idl/test_matter_idl_parser.py",
     "matter_idl/test_generators.py",
