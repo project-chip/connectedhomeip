@@ -91,7 +91,7 @@ static NSString * sDataVersionCodingKey = @"sDataVersionKey";
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
-    
+
     if (self == nil) {
         return nil;
     }
@@ -135,7 +135,7 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
-    
+
     if (self == nil) {
         return nil;
     }
@@ -196,7 +196,7 @@ static NSString * sAssumeUnknownAttributesReportableCoderKey = @"sAssumeUnknownA
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
-    
+
     other.filterByFabric = self.filterByFabric;
     other.minEventNumber = self.minEventNumber;
     other.assumeUnknownAttributesReportable = self.assumeUnknownAttributesReportable;
@@ -223,7 +223,7 @@ static NSString * sMaxIntervalKeyCoderKey = @"sMaxIntervalKeyKey";
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super initWithCoder: decoder];
-    
+
     if (self == nil) {
         return nil;
     }
@@ -240,11 +240,11 @@ static NSString * sMaxIntervalKeyCoderKey = @"sMaxIntervalKeyKey";
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [super encodeWithCoder: coder];
-    
+
     [coder encodeBool: self.replaceExistingSubscriptions forKey:sReplaceExistingSubscriptionsCoderKey];
     [coder encodeBool: self.reportEventsUrgently forKey:sReportEventsUrgentlyCoderKey];
     [coder encodeBool: self.resubscribeAutomatically forKey:sResubscribeAutomaticallyCoderKey];
-    
+
     if ( self.minInterval )
         [coder encodeObject:self.minInterval forKey:sMinIntervalKeyCoderKey];
     if ( self.maxInterval )

@@ -48,14 +48,14 @@
         MTR_LOG("Setting up XPC Controller for UUID: %@  with connection block: %p", UUID, connectionBlock);
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
-        
+
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if ( self.xpcConnection ) {
             self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-            
+
             self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
             self.xpcConnection.exportedObject = self;
-            
+
             MTR_LOG("Resuming new XPC connection");
             [self.xpcConnection resume];
         } else {
@@ -63,7 +63,7 @@
             return nil;
         }
     }
-    
+
     return self;
 }
 
@@ -74,14 +74,14 @@
         MTR_LOG("Setting up XPC Controller for UUID: %@  with machServiceName: %s options: %d", UUID, machServiceName, options);
         self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
         self.uniqueIdentifier = UUID;
-        
+
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if ( self.xpcConnection ) {
             self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-            
+
             self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
             self.xpcConnection.exportedObject = self;
-            
+
             MTR_LOG("%s: resuming new XPC connection");
             [self.xpcConnection resume];
         } else {
@@ -90,7 +90,7 @@
         }
     }
 
-    
+
     return self;
 }
 #endif // MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
@@ -137,7 +137,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceControlle
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport {
     MTRDevice_XPC * device = (MTRDevice_XPC *)[self deviceForNodeID: nodeID];
     MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
-    
+
     [device device: nodeID receivedAttributeReport: attributeReport];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport {
@@ -171,13 +171,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceControlle
 //- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status {
 //  }
 //- (oneway void)controller:(NSUUID *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error {
-//    
+//
 //}
 //- (oneway void)controller:(NSUUID *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID metrics:(MTRMetrics * _Nullable)metrics {
-//    
+//
 //}
 //- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info {
-//    
+//
 //}
 
 @end
