@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+#import <os/lock.h>
+
 #import "MTRDeviceController_XPC.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
@@ -33,6 +35,8 @@
 @interface MTRDeviceController_XPC ()
 
 @property (nonatomic, retain, readwrite) NSUUID * uniqueIdentifier;
+@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 
 @end
 
@@ -41,6 +45,8 @@
 @implementation MTRDeviceController_XPC
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
+@synthesize nodeIDToDeviceMap = _nodeIDToDeviceMap;
+@synthesize deviceMapLock = _deviceMapLock;
 
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
 {
@@ -109,6 +115,23 @@
 {
     MTR_LOG_ERROR("%s: unimplemented method called", __PRETTY_FUNCTION__);
     return nil;
+}
+
+// If prefetchedClusterData is not provided, load attributes individually from controller data store
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
+{
+    os_unfair_lock_assert_owner(&_deviceMapLock);
+
+    MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
+    // If we're not running, don't add the device to our map.  That would
+    // create a cycle that nothing would break.  Just return the device,
+    // which will be in exactly the state it would be in if it were created
+    // while we were running and then we got shut down.
+    if ([self isRunning]) {
+        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+    }
+
+    return deviceToReturn;
 }
 
 #pragma mark - XPC Action Overrides
