@@ -35,6 +35,7 @@
 #import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
+#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -143,16 +144,29 @@ using namespace chip::Tracing::DarwinFramework;
     /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
     /// because of the enormous overlap of params.
     if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
-        MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithParameters:parameters error:error];
+        if ([parameters isKindOfClass:MTRDeviceControllerMachServiceXPCParameters.class]) {
+            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *)parameters;
+            MTR_LOG_DEBUG("%s: got XPC parameters, getting XPC device controller", __PRETTY_FUNCTION__);
 
-        // TODO:  there's probably a more appropriate error here.
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
+            NSString * machServiceName = xpcParameters.machServiceName;
+            MTR_LOG_DEBUG("%s: machServiceName %@", __PRETTY_FUNCTION__, machServiceName);
+
+            MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithMachServiceName:machServiceName options:xpcParameters.connectionOptions];
+
+            /// Being of sound mind, I willfully and voluntarily make this static cast.
+            return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
+        } else {
+            MTR_LOG_ERROR("%s: unrecognized XPC parameters class %@", __PRETTY_FUNCTION__, NSStringFromClass(parameters.class));
+
+            // TODO:  there's probably a more appropriate error here.
+            if (error) {
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
+            }
+
+            return nil;
         }
-
-        /// Being of sound mind, I willfully and voluntarily make this static cast.  (We are counting on the factory to perform the relevant type erasure.)
-        return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
     } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_DEBUG("%s: got standard parameters, getting standard device controller from factory", __PRETTY_FUNCTION__);
         auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
         // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
