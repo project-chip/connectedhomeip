@@ -125,33 +125,31 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID:(NSNumber *)en
 
 
 
-//- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-//                          clusterID:(NSNumber *)clusterID
-//                          commandID:(NSNumber *)commandID
-//                      commandFields:(id)commandFields
-//                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-//              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-//                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-//                              queue:(dispatch_queue_t)queue
-//                         completion:(MTRDeviceResponseHandler)completion {
-//    NSXPCConnection * xpcConnection = nil;
-//
-//    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-//        MTR_LOG_ERROR("Error: %@", error);
-//    }] deviceController:[[self deviceController] uniqueIdentifier]
-//                             nodeID:[self nodeID]
-//        invokeCommandWithEndpointID:(NSNumber *)endpointID
-//                          clusterID:(NSNumber *)clusterID
-//                          commandID:(NSNumber *)commandID
-//                      commandFields:(id)commandFields
-//                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-//              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-//                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-//                         completion:(MTRDeviceResponseHandler response) {
-//        completion();
-//                          }];
-//
-//}
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion {
+    NSXPCConnection * xpcConnection = nil;
+
+    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        MTR_LOG_ERROR("Error: %@", error);
+    }] deviceController:[[self deviceController] uniqueIdentifier]
+                             nodeID:[self nodeID]
+        invokeCommandWithEndpointID:endpointID
+                          clusterID:clusterID
+                          commandID:commandID
+                      commandFields:commandFields
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueInterval
+                 timedInvokeTimeout:timeout
+                         completion:completion];
+
+}
 
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
