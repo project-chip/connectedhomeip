@@ -580,10 +580,6 @@ static void wfx_rsi_do_join(void)
             SILABS_LOG("wfx_rsi_do_join: rsi_wlan_connect_async failed with status: %02x on try %d", status, wfx_rsi.join_retries);
             wfx_retry_connection(++wfx_rsi.join_retries);
         }
-        else
-        {
-            SILABS_LOG("wfx_rsi_do_join: starting JOIN to %s after %d tries\n", (char *) &wfx_rsi.sec.ssid[0], wfx_rsi.join_retries);
-        }
     }
 }
 
