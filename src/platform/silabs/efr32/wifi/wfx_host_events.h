@@ -150,7 +150,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 // MAX PASSKEY LENGTH including NULL character
 #define WFX_MAX_PASSKEY_LENGTH (64)
 
-#define CONVERT_SEC_TO_MS(TimeInS) (TimeInMS * 1000)
+#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
 // WLAN MAX retry
 #define MAX_JOIN_RETRIES_COUNT 5
