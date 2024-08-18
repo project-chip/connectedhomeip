@@ -120,7 +120,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
     NSMapTable * _nodeIDToDeviceMap;
-    os_unfair_lock_t _deviceMapLock; // protects nodeIDToDeviceMap
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
