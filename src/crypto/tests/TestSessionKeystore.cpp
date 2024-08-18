@@ -18,14 +18,15 @@
 
 #include "AES_CCM_128_test_vectors.h"
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-
-#include <gtest/gtest.h>
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>

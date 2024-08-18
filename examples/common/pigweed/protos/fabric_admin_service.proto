@@ -5,8 +5,26 @@ import 'pw_protobuf_protos/common.proto';
 package chip.rpc;
 
 // Define the message for a synchronized end device with necessary fields
-message DeviceInfo {
+message DeviceCommissioningWindowInfo {
   uint64 node_id = 1;
+  uint32 commissioning_timeout = 2;
+  uint32 discriminator = 3;
+  uint32 iterations = 4;
+  bytes salt = 5;
+  bytes verifier = 6;
+}
+
+// Define the message for commissioning a device with necessary fields
+message DeviceCommissioningInfo {
+  uint32 discriminator = 1;
+  uint32 iterations = 2;
+  uint32 setup_pin = 3;
+  bytes salt = 4;
+}
+
+message KeepActiveParameters {
+  uint64 node_id = 1;
+  uint32 stay_active_duration_ms = 2;
 }
 
 // Define the response message to convey the status of the operation
@@ -15,6 +33,7 @@ message OperationStatus {
 }
 
 service FabricAdmin {
-  rpc OpenCommissioningWindow(DeviceInfo) returns (OperationStatus){}
+  rpc OpenCommissioningWindow(DeviceCommissioningWindowInfo) returns (OperationStatus){}
+  rpc CommissionNode(DeviceCommissioningInfo) returns (pw.protobuf.Empty){}  
+  rpc KeepActive(KeepActiveParameters) returns (pw.protobuf.Empty){}
 }
-

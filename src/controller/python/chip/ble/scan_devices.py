@@ -31,12 +31,12 @@ def ScanFoundCallback(closure, address: str, discriminator: int, vendor: int,
 
 
 @ScanDoneCallback
-def ScanDoneCallback(closure):
+def ScanIsDoneCallback(closure):
     closure.OnScanComplete()
 
 
 @ScanErrorCallback
-def ScanErrorCallback(closure, errorCode: int):
+def ScanHasErrorCallback(closure, errorCode: int):
     closure.OnScanError(errorCode)
 
 
@@ -106,7 +106,7 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
             scanner = handle.pychip_ble_scanner_start(
                 ctypes.py_object(receiver),
                 handle.pychip_ble_adapter_list_get_raw_adapter(nativeList),
-                timeoutMs, ScanFoundCallback, ScanDoneCallback, ScanErrorCallback)
+                timeoutMs, ScanFoundCallback, ScanIsDoneCallback, ScanHasErrorCallback)
 
             if scanner == 0:
                 raise Exception('Failed to start BLE scan')

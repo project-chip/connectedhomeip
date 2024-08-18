@@ -117,7 +117,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #endif /* WF200 */
 
 /* LwIP includes. */
-#include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"

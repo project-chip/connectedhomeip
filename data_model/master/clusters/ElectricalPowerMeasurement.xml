@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0090" name="Electrical Power Measurement"/>
@@ -170,39 +170,39 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="NumberOfMeasurementTypes" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
     <attribute id="0x0002" name="Accuracy" type="list">
       <entry type="ref_MeasurementAccuracyStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="countBetween" from="1" to="NumberOfMeasurementTypes"/>
     </attribute>
     <attribute id="0x0003" name="Ranges" type="list" default="empty">
       <entry type="MeasurementRangeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform/>
       <constraint type="countBetween" from="0" to="NumberOfMeasurementTypes"/>
     </attribute>
     <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform/>
       <constraint type="between" from="-2" to="2"/>
     </attribute>
     <attribute id="0x0005" name="ActiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform/>
       <constraint type="between" from="-2" to="2"/>
     </attribute>
     <attribute id="0x0006" name="ReactiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -210,7 +210,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="ApparentCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -218,13 +218,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="ActivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform/>
       <constraint type="between" from="-2" to="2"/>
     </attribute>
     <attribute id="0x0009" name="ReactivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -232,7 +232,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="ApparentPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -240,7 +240,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="RMSVoltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -248,7 +248,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="RMSCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -256,7 +256,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000D" name="RMSPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -264,7 +264,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000E" name="Frequency" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -273,7 +273,7 @@ Davis, CA 95616, USA
     <attribute id="0x000F" name="HarmonicCurrents" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HARM"/>
       </mandatoryConform>
@@ -282,7 +282,7 @@ Davis, CA 95616, USA
     <attribute id="0x0010" name="HarmonicPhases" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="PWRQ"/>
       </mandatoryConform>
@@ -290,7 +290,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="PowerFactor" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -298,7 +298,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="NeutralCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <feature name="POLY"/>
       </optionalConform>

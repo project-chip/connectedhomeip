@@ -576,8 +576,8 @@ class NetworkCommissioningCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_BREADCRUMB_REQ: Int = 1
     breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
@@ -701,8 +701,8 @@ class NetworkCommissioningCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_BREADCRUMB_REQ: Int = 1
     breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
@@ -788,8 +788,8 @@ class NetworkCommissioningCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_NETWORK_INDEX_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_NETWORK_INDEX_REQ), networkIndex)

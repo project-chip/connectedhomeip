@@ -35,6 +35,7 @@ public:
     OpenCommissioningWindowCommand(CredentialIssuerCommands * credIssuerCommands) :
         CHIPCommand("open-commissioning-window", credIssuerCommands),
         mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
+        mOnOpenCommissioningWindowVerifierCallback(OnOpenCommissioningWindowVerifierResponse, this),
         mOnOpenBasicCommissioningWindowCallback(OnOpenBasicCommissioningWindowResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId, "Node to send command to.");
@@ -45,8 +46,15 @@ public:
                     "Time, in seconds, before the commissioning window closes.");
         AddArgument("iteration", chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations,
                     &mIteration, "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
-        AddArgument("discriminator", 0, 4096, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
+        AddArgument("discriminator", 0, 4095, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
+        AddArgument("setup-pin", 1, chip::kSetupPINCodeMaximumValue, &mSetupPIN, "The setup PIN (Passcode) to use.");
+        AddArgument("salt", &mSalt,
+                    "Salt payload encoded in hexadecimal. Random salt will be generated if absent. "
+                    "This needs to be present if verifier is provided, corresponding to salt used for generating verifier");
+        AddArgument("verifier", &mVerifier,
+                    "PAKE Passcode verifier encoded in hexadecimal format. Will be generated from random setup pin and other "
+                    "params if absent");
     }
 
     void RegisterDelegate(CommissioningWindowDelegate * delegate) { mDelegate = delegate; }
@@ -69,12 +77,17 @@ private:
     uint16_t mDiscriminator;
 
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<uint32_t> mSetupPIN;
+    chip::Optional<chip::ByteSpan> mSalt;
+    chip::Optional<chip::ByteSpan> mVerifier;
 
     chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
 
     static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
+    static void OnOpenCommissioningWindowVerifierResponse(void * context, NodeId deviceId, CHIP_ERROR status);
     static void OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status);
 
     chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindowWithVerifier> mOnOpenCommissioningWindowVerifierCallback;
     chip::Callback::Callback<chip::Controller::OnOpenBasicCommissioningWindow> mOnOpenBasicCommissioningWindowCallback;
 };

@@ -51,39 +51,6 @@ static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
-static constexpr size_t kDoorLockDelegateTableSize =
-    MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-static_assert(kDoorLockDelegateTableSize <= kEmberInvalidEndpointIndex, "Door Lock Delegate table size error");
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DoorLock {
-
-Delegate * gDelegateTable[kDoorLockDelegateTableSize] = { nullptr };
-
-Delegate * GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kDoorLockDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < ArraySize(gDelegateTable))
-    {
-        gDelegateTable[ep] = delegate;
-    }
-}
-
-} // namespace DoorLock
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
 DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
@@ -117,7 +84,18 @@ DoorLockServer & DoorLockServer::Instance()
  *
  * @param endpointId
  */
-void DoorLockServer::InitServer(chip::EndpointId endpointId)
+void DoorLockServer::InitServer(EndpointId endpointId)
+{
+    CHIP_ERROR err = InitEndpoint(endpointId);
+
+    // We have no way to communicate this error, so just log it.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Door Lock cluster initialization on endpoint %d failed: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+}
+
+CHIP_ERROR DoorLockServer::InitEndpoint(EndpointId endpointId, Delegate * delegate)
 {
     ChipLogProgress(Zcl, "Door Lock cluster initialized at endpoint #%u", endpointId);
 
@@ -128,11 +106,48 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
     }
     SetActuatorEnabled(endpointId, true);
 
-    for (auto & ep : mEndpointCtx)
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
     {
-        ep.lockoutEndTimestamp    = ep.lockoutEndTimestamp.zero();
-        ep.wrongCodeEntryAttempts = 0;
+        ChipLogError(Zcl, "Invalid endpoint %d for initializing lock server: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    endpointContext->lockoutEndTimestamp    = endpointContext->lockoutEndTimestamp.zero();
+    endpointContext->wrongCodeEntryAttempts = 0;
+    endpointContext->delegate               = delegate;
+    return CHIP_NO_ERROR;
+}
+
+void DoorLockServer::ShutdownEndpoint(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for shutting down lock server: no endpoint context available", endpointId);
+        return;
+    }
+
+    endpointContext->delegate = nullptr;
+}
+
+CHIP_ERROR DoorLockServer::SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate)
+{
+    if (!delegate)
+    {
+        ChipLogError(Zcl, "Trying to set a null DoorLock::Delegate on endpoint %d", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for setting a delegate: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    endpointContext->delegate = delegate;
+    return CHIP_NO_ERROR;
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
@@ -788,6 +803,19 @@ void DoorLockServer::setCredentialCommandHandler(
             return;
         }
 
+        // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+        // CreatorFabricIndex of the credential being modified
+        if (existingCredential.createdBy != fabricIdx)
+        {
+            ChipLogProgress(Zcl,
+                            "[createCredential] Unable to modify credential. Fabric index differs from creator fabric "
+                            "[endpointId=%d,credentialIndex=%d,creatorIdx=%d,modifierIdx=%d]",
+                            commandPath.mEndpointId, credentialIndex, existingCredential.createdBy, fabricIdx);
+
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
@@ -942,7 +970,18 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     // Remove all the credentials of the particular type.
-    auto credentialType  = credential.Value().credentialType;
+    auto credentialType = credential.Value().credentialType;
+
+    if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
+    {
+        ChipLogProgress(Zcl,
+                        "[ClearCredential] Credential type is not supported [endpointId=%d,credentialType=%u"
+                        "]",
+                        commandPath.mEndpointId, to_underlying(credentialType));
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
     auto credentialIndex = credential.Value().credentialIndex;
     if (0xFFFE == credentialIndex)
     {
@@ -2192,6 +2231,17 @@ DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endp
         return DlStatus::kInvalidField;
     }
 
+    // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+    // CreatorFabricIndex in the user record pointed to by UserIndex
+    if (user.createdBy != modifierFabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[createCredential] Unable to create credential for user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, modifierFabricIdx);
+        return DlStatus::kInvalidField;
+    }
+
     // Add new credential to the user
     auto status = addCredentialToUser(endpointId, modifierFabricIdx, userIndex, credential);
     if (DlStatus::kSuccess != status)
@@ -2312,10 +2362,22 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         return DlStatus::kFailure;
     }
 
+    // return INVALID_COMMAND if the accessing fabric index doesn’t match the
+    // CreatorFabricIndex in the user record pointed to by UserIndex
+    if (user.createdBy != modifierFabricIdx)
+    {
+        ChipLogProgress(Zcl,
+                        "[createCredential] Unable to modify credential for user created by different fabric "
+                        "[endpointId=%d,userIndex=%d,creatorIdx=%d,fabricIdx=%d]",
+                        endpointId, userIndex, user.createdBy, modifierFabricIdx);
+        return DlStatus::kInvalidField;
+    }
+
     for (size_t i = 0; i < user.credentials.size(); ++i)
     {
-        // appclusters, 5.2.4.40: user should already be associated with given credentialIndex
-        if (user.credentials.data()[i].credentialIndex == credential.credentialIndex)
+        // appclusters, 5.2.4.40: user should already be associated with given credential
+        if (user.credentials[i].credentialType == credential.credentialType &&
+            user.credentials[i].credentialIndex == credential.credentialIndex)
         {
             chip::Platform::ScopedMemoryBuffer<CredentialStruct> newCredentials;
             if (!newCredentials.Alloc(user.credentials.size()))
@@ -2359,7 +2421,7 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         }
     }
 
-    // appclusters, 5.2.4.40: if user is not associated with credential index we should return INVALID_COMMAND
+    // appclusters, 5.2.4.40: if user is not associated with the given credential we should return INVALID_COMMAND
     ChipLogProgress(Zcl,
                     "[ModifyUserCredential] Unable to modify user credential: user is not associated with credential index "
                     "[endpointId=%d,userIndex=%d,credentialIndex=%d]",
@@ -2393,6 +2455,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
                         endpointId, credentialIndex, to_underlying(userType.Value()));
 
         return DlStatus::kInvalidField;
+    }
+
+    // For Aliro endpoint keys, there is a single shared count for the total
+    // count of evictable and non-evictable keys that can be stored.  This needs
+    // to be enforced specially, because none of the other logic we have handles that.
+    if (credentialType == CredentialTypeEnum::kAliroEvictableEndpointKey ||
+        credentialType == CredentialTypeEnum::kAliroNonEvictableEndpointKey)
+    {
+        Delegate * delegate = GetDelegate(endpointId);
+        if (delegate == nullptr)
+        {
+            ChipLogError(Zcl, "Door lock delegate is null, can't handle Aliro credentials");
+            return DlStatus::kFailure;
+        }
+
+        size_t maxEndpointKeys = delegate->GetNumberOfAliroEndpointKeysSupported();
+        size_t evictableEndpointKeys, nonEvictableEndpointKeys;
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroEvictableEndpointKey, evictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroNonEvictableEndpointKey, nonEvictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro non-evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (evictableEndpointKeys + nonEvictableEndpointKeys >= maxEndpointKeys)
+        {
+            // We have no space for another credential here.
+            ChipLogError(Zcl, "Unable to create Aliro endpoint key credential; too many exist already [endpointId=%d]", endpointId);
+            return DlStatus::kResourceExhausted;
+        }
     }
 
     CredentialStruct credential{ credentialType, credentialIndex };
@@ -2430,6 +2528,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
     }
 
     return status;
+}
+
+bool DoorLockServer::countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
+                                              size_t & occupiedCount)
+{
+    uint16_t maxCredentialCount;
+
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxCredentialCount))
+    {
+        return false;
+    }
+
+    uint16_t startIndex = 1;
+    // Programming PIN is a special case -- it is unique and its index assumed to be 0.
+    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
+    {
+        startIndex = 0;
+        maxCredentialCount--;
+    }
+
+    occupiedCount = 0;
+    for (uint16_t credentialIndex = startIndex; credentialIndex <= maxCredentialCount; ++credentialIndex)
+    {
+        EmberAfPluginDoorLockCredentialInfo credential;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
+        {
+            return false;
+        }
+
+        if (credential.status == DlCredentialStatus::kOccupied)
+        {
+            ++occupiedCount;
+        }
+    }
+
+    return true;
 }
 
 DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
@@ -2905,28 +3039,6 @@ Status DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::Fabric
                      "[clearCredential] Unable to clear credential - couldn't write new credential to database "
                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d]",
                      endpointId, to_underlying(credentialType), credentialIndex, modifier);
-        return Status::Failure;
-    }
-
-    uint8_t maxCredentialsPerUser;
-    if (!GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to get the number of available credentials per user: internal error "
-                     "[endpointId=%d,credentialType=%d,credentialIndex=%d]",
-                     endpointId, to_underlying(credentialType), credentialIndex);
-        return Status::Failure;
-    }
-
-    // Should never happen, only possible if the implementation of application is incorrect
-    if (relatedUser.credentials.size() > maxCredentialsPerUser)
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to clear credential for related user - user has too many credentials associated"
-                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d,userIndex=%d,credentialsCount=%u]",
-                     endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
-                     static_cast<unsigned int>(relatedUser.credentials.size()));
-
         return Status::Failure;
     }
 
@@ -3443,6 +3555,17 @@ EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId end
         return &mEndpointCtx[index];
     }
     return nullptr;
+}
+
+Delegate * DoorLockServer::GetDelegate(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        return nullptr;
+    }
+
+    return endpointContext->delegate;
 }
 
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
@@ -4145,7 +4268,7 @@ void MatterDoorLockPluginServerInitCallback()
     ChipLogProgress(Zcl, "Door Lock server initialized");
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 
-    registerAttributeAccessOverride(&DoorLockServer::Instance());
+    AttributeAccessInterfaceRegistry::Instance().Register(&DoorLockServer::Instance());
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}

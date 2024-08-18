@@ -59,14 +59,14 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0452" name="Thread Border Router Management Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0452" name="Thread Border Router Management"/>
   </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="TBRM" scope="Node"/>
+  <classification hierarchy="base" role="application" picsCode="TBRM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="PC" name="PAN Change" summary="The ability to change PAN configuration with pending dataset setting request.">
+    <feature bit="0" code="PC" name="PANChange" summary="The ability to change PAN configuration with pending dataset setting request.">
       <optionalConform/>
     </feature>
   </features>
@@ -79,20 +79,26 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="BorderAgentID" type="octstr">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
+      <constraint type="maxLength" value="16"/>
     </attribute>
     <attribute id="0x0002" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="InterfaceEnabled" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="ActiveDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="PendingDatasetTimestamp" type="uint64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
@@ -105,15 +111,15 @@ Davis, CA 95616, USA
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="DatasetResponse" direction="responseFromServer">
+    <command id="0x02" name="DatasetResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Dataset" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="254"/>
       </field>
     </command>
-    <command id="0x04" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+    <command id="0x03" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ActiveDataset" type="octstr">
         <mandatoryConform/>
@@ -123,8 +129,8 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x05" name="SetPendingDatasetRequest" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+    <command id="0x04" name="SetPendingDatasetRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform>
         <feature name="PC"/>
       </mandatoryConform>

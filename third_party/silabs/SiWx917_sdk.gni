@@ -215,7 +215,6 @@ template("siwx917_sdk") {
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
-      "BRD4325A",  #TODO: should be removed after SoC macro clean-up
       "SLI_SI917B0=1",
       "SLI_SI91X_MCU_COMMON_FLASH_MODE=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_VER2=1",
@@ -259,7 +258,10 @@ template("siwx917_sdk") {
     }
 
     if (chip_build_libshell) {
-      defines += [ "ENABLE_CHIP_SHELL" ]
+      defines += [
+        "ENABLE_CHIP_SHELL",
+        "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1",
+      ]
     }
 
     defines += [ "LWIP_NETIF_API=1" ]
@@ -291,25 +293,25 @@ template("siwx917_sdk") {
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (chip_enable_icd_server || !disable_lcd) {
+      defines += [
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
+      ]
+    }
+
     if (!disable_lcd) {
       defines += [
-        "CONFIG_ENABLE_UART",
-        "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
-        "SL_SLEEP_TIMER",
       ]
     }
 
     # Enabling led interface
     if (use_wstk_leds) {
-      defines += [
-        "ENABLE_WSTK_LEDS",
-
-        # TODO: remove this when it is added to the board config from wifi sdk
-        "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
-      ]
+      defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
     if (chip_enable_icd_server) {
@@ -755,6 +757,14 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_icd_server || !disable_lcd) {
+      sources += [
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+      ]
+    }
+
     if (!disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
@@ -769,13 +779,10 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
-        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/SPI.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_ulp_timer.c",
       ]
     }

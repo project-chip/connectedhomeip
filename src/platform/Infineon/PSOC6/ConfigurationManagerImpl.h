@@ -27,7 +27,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
-#include "P6Config.h"
+#include "PSOC6Config.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,7 +35,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the PSoC6 platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::P6Config>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PSOC6Config>
 {
 public:
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;

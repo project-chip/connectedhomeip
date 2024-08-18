@@ -19,9 +19,10 @@
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 
-#include <lib/core/CHIPCore.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 namespace chip {
 namespace Access {

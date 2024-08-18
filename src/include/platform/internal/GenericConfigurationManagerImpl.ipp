@@ -49,8 +49,6 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
-#include <optional>
-
 // TODO : may be we can make it configurable
 #define BLE_ADVERTISEMENT_VERSION 0
 
@@ -58,9 +56,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-std::optional<System::Clock::Seconds32> gFirmwareBuildChipEpochTime;
-}
+static Optional<System::Clock::Seconds32> sFirmwareBuildChipEpochTime;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
@@ -292,9 +288,9 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
-    if (gFirmwareBuildChipEpochTime.has_value())
+    if (sFirmwareBuildChipEpochTime.HasValue())
     {
-        chipEpochTime = gFirmwareBuildChipEpochTime.value();
+        chipEpochTime = sFirmwareBuildChipEpochTime.Value();
         return CHIP_NO_ERROR;
     }
 #ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S
@@ -327,7 +323,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpo
     //
     // Implementations that can't use the hard-coded time for whatever reason
     // should set this at each init.
-    gFirmwareBuildChipEpochTime = chipEpochTime;
+    sFirmwareBuildChipEpochTime.SetValue(chipEpochTime);
     return CHIP_NO_ERROR;
 }
 

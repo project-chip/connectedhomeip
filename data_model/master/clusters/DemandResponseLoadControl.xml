@@ -311,51 +311,51 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="LoadControlPrograms" type="list" default="empty">
       <entry type="LoadControlProgramStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="NumberOfLoadControlPrograms"/>
     </attribute>
     <attribute id="0x0001" name="NumberOfLoadControlPrograms" type="uint8" default="5">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="5"/>
     </attribute>
     <attribute id="0x0002" name="Events" type="list" default="empty">
       <entry type="LoadControlEventStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
     </attribute>
     <attribute id="0x0003" name="ActiveEvents" type="list" default="empty">
       <entry type="octstr"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
     </attribute>
     <attribute id="0x0004" name="NumberOfEventsPerProgram" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="10"/>
     </attribute>
     <attribute id="0x0005" name="NumberOfTransitions" type="uint8" default="3">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="3"/>
     </attribute>
     <attribute id="0x0006" name="DefaultRandomStart" type="uint8" default="0x1E">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="max" value="60"/>
     </attribute>
     <attribute id="0x0007" name="DefaultRandomDuration" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="max" value="60"/>
     </attribute>

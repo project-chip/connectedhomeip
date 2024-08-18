@@ -18,10 +18,11 @@
 
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/support/CHIPMem.h>
-
-#include <gtest/gtest.h>
 
 namespace {
 

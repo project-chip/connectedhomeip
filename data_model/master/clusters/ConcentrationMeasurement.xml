@@ -62,16 +62,16 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement"/>
-    <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement"/>
-    <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement"/>
-    <clusterId id="0x0415" name="Ozone Concentration Measurement"/>
-    <clusterId id="0x042A" name="PM2"/>
-    <clusterId id="0x042B" name="Formaldehyde Concentration Measurement"/>
-    <clusterId id="0x042C" name="PM1 Concentration Measurement"/>
-    <clusterId id="0x042D" name="PM10 Concentration Measurement"/>
-    <clusterId id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement"/>
-    <clusterId id="0x042F" name="Radon Concentration Measurement"/>
+    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement" picsCode="CMOCONC"/>
+    <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement" picsCode="CDOCONC"/>
+    <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement" picsCode="NDOCONC"/>
+    <clusterId id="0x0415" name="Ozone Concentration Measurement" picsCode="OZCONC"/>
+    <clusterId id="0x042A" name="PM2.5 Concentration Measurement" picsCode="PMICONC"/>
+    <clusterId id="0x042B" name="Formaldehyde Concentration Measurement" picsCode="FLDCONC"/>
+    <clusterId id="0x042C" name="PM1 Concentration Measurement" picsCode="PMHCONC"/>
+    <clusterId id="0x042D" name="PM10 Concentration Measurement" picsCode="PMKCONC"/>
+    <clusterId id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement" picsCode="TVOCCONC"/>
+    <clusterId id="0x042F" name="Radon Concentration Measurement" picsCode="RNCONC"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONC" scope="Endpoint"/>
   <features>
@@ -181,7 +181,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
@@ -189,7 +189,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
@@ -197,7 +197,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
@@ -205,7 +205,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
@@ -213,7 +213,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
@@ -221,7 +221,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="AverageMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
@@ -229,7 +229,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
@@ -244,14 +244,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="MeasurementMedium" type="MeasurementMediumEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000A" name="LevelValue" type="LevelValueEnum" default="0">

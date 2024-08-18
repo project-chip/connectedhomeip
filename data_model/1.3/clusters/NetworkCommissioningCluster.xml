@@ -161,13 +161,13 @@ Davis, CA 95616, USA
       <bitfield name="WEP" bit="1" summary="Supports Wi-Fi using WEP security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
+      <bitfield name="WPA-PERSONAL" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA2" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
+      <bitfield name="WPA2-PERSONAL" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA3" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
+      <bitfield name="WPA3-PERSONAL" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -262,7 +262,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MaxNetworks" type="uint8">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
@@ -274,7 +274,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -285,7 +285,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="ConnectMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -296,29 +296,29 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="InterfaceEnabled" type="bool" default="true">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="LastNetworkingStatus" type="NetworkCommissioningStatusEnum" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0006" name="LastNetworkID" type="octstr" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="32"/>
     </attribute>
     <attribute id="0x0007" name="LastConnectErrorValue" type="int32" default="null">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0008" name="SupportedWiFiBands" type="list" default="MS">
       <entry type="WiFiBandEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="WI"/>
       </mandatoryConform>
@@ -326,14 +326,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="SupportedThreadFeatures" type="ThreadCapabilitiesBitmap" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000A" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>

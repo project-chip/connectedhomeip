@@ -25,11 +25,13 @@
 
 #include <set>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Pool.h>
 #include <lib/support/PoolWrapper.h>
 #include <system/SystemConfig.h>
+
 namespace chip {
 
 template <class POOL>

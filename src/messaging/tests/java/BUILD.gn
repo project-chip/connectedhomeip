@@ -36,7 +36,11 @@ shared_library("jni") {
     defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
     include_dirs = java_matter_controller_dependent_paths
 
-    deps += [ "${chip_root}/src/platform/Linux" ]
+    if (current_os == "mac") {
+      deps += [ "${chip_root}/src/platform/Darwin" ]
+    } else {
+      deps += [ "${chip_root}/src/platform/Linux" ]
+    }
 
     cflags = [ "-Wno-unknown-pragmas" ]
 
