@@ -373,14 +373,14 @@ config("runtime_default") {
       "pthread",
       "rt",
     ]
-  }
 
-  #TODO: see what to do with this workaround
-  # work around because when building pw_fuzzer, the downstreamed pw_fuzzer toolchain makes us use --sysroot flag in the clang++ invocation; the sysroot flag points to the "clang_sysroot" subdirectory of the CIPD environemnt,
-  # the clang_sysroot folder is populated from CIPD  (fuchsia/third_party/sysroot/linux) which does not include the libatomic library and makes the FuzzTest linking fail
-  # FYI, using the sysroot flag is only activated when pw_toolchain_OSS_FUZZ_ENABLED=false
-  if (is_pw_fuzz == false) {
-    libs += [ "atomic" ]
+    #TODO: see what to do with this workaround
+    # work around because when building pw_fuzzer, the downstreamed pw_fuzzer toolchain makes us use --sysroot flag in the clang++ invocation; the sysroot flag points to the "clang_sysroot" subdirectory of the CIPD environemnt,
+    # the clang_sysroot folder is populated from CIPD  (fuchsia/third_party/sysroot/linux) which does not include the libatomic library and makes the FuzzTest linking fail
+    # FYI, using the sysroot flag is only activated when pw_toolchain_OSS_FUZZ_ENABLED=false
+    if (is_pw_fuzz == false) {
+      libs += [ "atomic" ]
+    }
   }
 
   cflags = []
