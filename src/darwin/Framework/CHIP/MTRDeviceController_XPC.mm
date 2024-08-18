@@ -67,8 +67,16 @@
             self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
             self.xpcConnection.exportedObject = self;
 
-            MTR_LOG("Resuming new XPC connection");
-            [self.xpcConnection resume];
+            self.xpcConnection.interruptionHandler = ^{
+                MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", UUID);
+            };
+
+            self.xpcConnection.invalidationHandler = ^{
+                MTR_LOG_ERROR("XPC Connection for device controller invalidated: %@", UUID);
+            };
+
+            MTR_LOG("Activating new XPC connection");
+            [self.xpcConnection activate];
         } else {
             MTR_LOG_ERROR("Failed to set up XPC Connection");
             return nil;
