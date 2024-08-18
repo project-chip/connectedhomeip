@@ -23,8 +23,8 @@
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
 
-#include <pw_unit_test/framework.h>
 #include <pw_fuzzer/fuzztest.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 
@@ -32,37 +32,61 @@ using namespace chip::Decoders;
 using namespace chip::FlatTree;
 using namespace chip::TLV;
 using namespace chip::TLVMeta;
+using namespace fuzztest;
 
-void RunDecodePW(const std::vector<std::uint8_t>& bytes)
+void RunDecodePW(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mProtocol, uint8_t mMessageType)
 {
-    const uint8_t* const data{bytes.data()};
-    const int size{static_cast<int>(bytes.size())};
-    
-    chip::ByteSpan payload(data, size);
 
     PayloadDecoderInitParams params;
     params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(chip::TLVMeta::clusters_meta);
-
-
-    // Try some SC variants
-    params.SetProtocol(chip::Protocols::SecureChannel::Id);
-    params.SetMessageType(0);
-
+    // Trying Different Protocols
+    params.SetProtocol(mProtocol);
+    // Trying different MessageTypes
+    params.SetMessageType(mMessageType);
     chip::Decoders::PayloadDecoder<64, 128> decoder(params);
 
-    decoder.StartDecoding(payload);
+    const uint8_t * const data{ bytes.data() };
+    const int size{ static_cast<int>(bytes.size()) };
 
-printf("Test is running");
+    chip::ByteSpan payload(data, size);
+
+    decoder.StartDecoding(payload);
 
     PayloadEntry entry;
     while (decoder.Next(entry))
     {
         // Nothing to do ...
     }
+
+    // TODO: remove
+    // PRINT BYTES: To check the combination of bytes being printed
+    //  std::cout << "bytes: ";
+    //  for (const auto& byte : bytes) {
+    //      std::cout << static_cast<int>(byte) << " ";
+    //  }
+    //  std::cout <<std::endl << std::endl;
+
+    // printing Protocol IDs
+    // std::cout << "protocol ID: " << mProtocol.GetProtocolId()<<std::endl;
+
+    // printing mMessageType
+    // std::cout << "mMessageType: " << mMessageType << std::endl;
 }
 
+// This allows us to fuzz test with all combinations of protocols
+auto ProtocolIDs()
+{
+    return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,
+                       chip::Protocols::UserDirectedCommissioning::Id });
+}
 
+FUZZ_TEST(PayloadDecoder, RunDecodePW).WithDomains(Arbitrary<std::vector<std::uint8_t>>(), ProtocolIDs(), Arbitrary<uint8_t>());
 
+// TODO: remove
+// this test just to make sure regular unit tests are working
+TEST(PayloadDecoder, OnePlustTwoIsTwoPlusOne)
+{
+    EXPECT_EQ(1 + 2, 2 + 1);
+}
 
-FUZZ_TEST(PayloadDecoder, RunDecodePW);
-} 
+} // namespace
