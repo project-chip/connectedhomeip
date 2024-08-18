@@ -120,7 +120,8 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
     NSMapTable * _nodeIDToDeviceMap;
-    os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
+    os_unfair_lock_t _deviceMapLock; // protects nodeIDToDeviceMap
+    os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
 
@@ -134,14 +135,16 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
-@synthesize deviceMapLock = _deviceMapLock;
+- (os_unfair_lock_t)deviceMapLock {
+    return &_underlyingDeviceMapLock;
+}
 
 - (instancetype)initForSubclasses
 {
     if (self = [super init]) {
         // nothing, as superclass of MTRDeviceController is NSObject
     }
-
+    _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
     return self;
 }
 
@@ -252,7 +255,7 @@ using namespace chip::Tracing::DarwinFramework;
 
         _chipWorkQueue = queue;
         _factory = factory;
-        _deviceMapLock = OS_UNFAIR_LOCK_INIT;
+        _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
@@ -332,10 +335,10 @@ using namespace chip::Tracing::DarwinFramework;
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
     MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
-    os_unfair_lock_lock(&_deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
     NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
     [_nodeIDToDeviceMap removeAllObjects];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     for (MTRDevice * device in devices) {
         [device invalidate];
@@ -636,7 +639,7 @@ using namespace chip::Tracing::DarwinFramework;
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
             MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
 
-            std::lock_guard lock(self->_deviceMapLock);
+            std::lock_guard lock(*self.deviceMapLock);
             NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
@@ -1006,7 +1009,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    os_unfair_lock_assert_owner(&_deviceMapLock);
+    os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
@@ -1045,7 +1048,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
@@ -1056,7 +1059,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)removeDevice:(MTRDevice *)device
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     auto * nodeID = device.nodeID;
     MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
@@ -1070,7 +1073,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in _nodeIDToDeviceMap) {
         deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
@@ -1510,9 +1513,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
     MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;

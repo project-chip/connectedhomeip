@@ -118,7 +118,7 @@
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    os_unfair_lock_assert_owner(&_deviceMapLock);
+    os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
