@@ -278,7 +278,7 @@ class Efr32Builder(GnBuilder):
             files = []
             for pattern in patterns:
                 files += list(map(lambda x: os.path.basename(x), glob.glob(pattern)))
-            
+
             # Create the bundle file.
             with open(flash_bundle_path, 'w') as bundle_file:
                 bundle_file.write("\n".join(files))
