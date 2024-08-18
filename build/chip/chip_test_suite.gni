@@ -140,50 +140,6 @@ template("chip_test_suite") {
       }
     }
 
-    #++++x once everything is working try deleting this.
-    if (defined(invoker.tests)) {
-      foreach(_test, invoker.tests) {
-        # `_test` is the bare name with no extension.
-
-        _test_output_dir = "${root_out_dir}/tests"
-        if (defined(invoker.output_dir)) {
-          _test_output_dir = invoker.output_dir
-        }
-
-        pw_test(_test) {
-          # Forward certain variables from the invoker.
-          forward_variables_from(invoker,
-                                [
-                                  "deps",
-                                  "public_deps",
-                                  "cflags",
-                                  "configs",
-                                ])
-
-          # Link to the common lib for this suite so we get its `sources`.
-          public_deps += [ ":${_suite_name}.lib" ]
-
-          # Set variables that the platform executable may need.
-          if (test_executable_output_name != "") {
-            output_name = test_executable_output_name + _test +
-                          test_executable_output_name_suffix
-          }
-          ldflags = test_executable_ldflags
-
-          test_main = ""
-
-          # Add the individual test source file and its driver).
-          sources = [
-            "${_test}.cpp",
-            "${_test}Driver.cpp",
-          ]
-
-          output_dir = _test_output_dir
-        }
-        tests += [ _test ]
-      }
-    }
-
     group(_suite_name) {
       deps = []
 
