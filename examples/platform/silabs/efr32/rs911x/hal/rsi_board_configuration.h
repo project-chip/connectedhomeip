@@ -35,7 +35,8 @@ typedef struct
 #elif defined(EFR32MG24_BRD4187C) || defined(BRD4187C)
 #include "brd4187c.h"
 #else
-#error "Need SPI Pins"
+#include "sl_custom_board.h"
+#warning "SPIDRV USART peripheral not configured correctly"
 #endif /* EFR32MG24_BRD4186C */
 
 #endif /* _RSI_BOARD_CONFIGURATION_H_ */
