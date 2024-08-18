@@ -16,9 +16,9 @@
 
 #import <os/lock.h>
 
-#import "MTRDeviceController_XPC.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceController_XPC.h"
 #import "MTRDevice_XPC.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"

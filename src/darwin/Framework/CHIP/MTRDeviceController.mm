@@ -134,7 +134,8 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
-- (os_unfair_lock_t)deviceMapLock {
+- (os_unfair_lock_t)deviceMapLock
+{
     return &_underlyingDeviceMapLock;
 }
 
