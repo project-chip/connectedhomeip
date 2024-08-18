@@ -49,15 +49,12 @@ declare_args() {
 #   ]
 # }
 
-# If args.gni has defined an executable name, then ensure pw_test is called for each test source even if chip_link_tests is false.
-pw_test_builds_executable = test_executable_output_name != ""
-
 #
 template("chip_test_suite") {
   _suite_name = target_name
 
   exclude_variables = [ "tests" ]
-  if (pw_test_builds_executable) {
+  if (chip_link_tests) {
     # Common library shouldn't have all the individual unit tests, only the common sources.
     exclude_variables += [ "test_sources" ]
   } else {
@@ -97,7 +94,7 @@ template("chip_test_suite") {
   }
 
   # Build a source_set or a flashable executable for each individual unit test source, which also includes the common files.
-  if (chip_link_tests || pw_test_builds_executable) {
+  if (chip_link_tests) {
     tests = []
 
     if (defined(invoker.test_sources)) {
