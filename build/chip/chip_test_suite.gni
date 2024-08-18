@@ -109,12 +109,12 @@ template("chip_test_suite") {
         pw_test(_test_name) {
           # Forward certain variables from the invoker.
           forward_variables_from(invoker,
-                                [
-                                  "deps",
-                                  "public_deps",
-                                  "cflags",
-                                  "configs",
-                                ])
+                                 [
+                                   "deps",
+                                   "public_deps",
+                                   "cflags",
+                                   "configs",
+                                 ])
 
           # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
