@@ -101,7 +101,7 @@ Other python libraries may need to be installed such as
     pip3 install pyserial
     ```
 
--   To run the tests:
+-   To run all tests:
 
     ```
     python -m pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/debug/matter-silabs-device_tests.s37 -o out.log
