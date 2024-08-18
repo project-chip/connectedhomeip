@@ -14,12 +14,19 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/build/chip/chip_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 assert(chip_build_tests)
+
+declare_args() {
+  # These may be overridden in args.gni to build platform-specific test binaries.
+  test_executable_output_name = ""
+  test_executable_output_name_suffix = ""
+  test_executable_ldflags = []
+}
 
 # Define CHIP unit tests
 #
@@ -41,42 +48,29 @@ assert(chip_build_tests)
 #     "${chip_root}/src/lib/foo",         # add dependencies here
 #   ]
 # }
-#
-#
-# Deprecated usage (writing own driver files):
-#
-# chip_test_suite("tests") {
-#   output_name = "libFooTests"
-#
-#   sources = [
-#     "TestDeclarations.h",
-#     "TestFoo.cpp",
-#     "TestBar.cpp",
-#   ]
-#
-#   public_deps = [
-#     "${chip_root}/src/lib/foo",         # add dependencies here
-#   ]
-#
-#   tests = [
-#     "TestFoo",  # Assumes TestFooDriver.cpp exists
-#     "TestBar",  # Assumes TestBarDriver.cpp exists
-#   ]
-# }
+
+# If args.gni has defined an executable name, then ensure pw_test is called for each test source even if chip_link_tests is false.
+pw_test_builds_executable = test_executable_output_name != ""
 
 #
 template("chip_test_suite") {
   _suite_name = target_name
 
-  # Ensures that the common library has sources containing both common
-  # and individual unit tests.
-  if (!defined(invoker.sources)) {
-    invoker.sources = []
+  exclude_variables = [ "tests" ]
+  if (pw_test_builds_executable) {
+    # Common library shouldn't have all the individual unit tests, only the common sources.
+    exclude_variables += [ "test_sources" ]
+  } else {
+    # Common library should have all the individual unit tests, in addition to the common sources.
+    if (!defined(invoker.sources)) {
+      invoker.sources = []
+    }
+    if (defined(invoker.test_sources)) {
+      invoker.sources += invoker.test_sources
+    }
   }
-
-  if (defined(invoker.test_sources)) {
-    invoker.sources += invoker.test_sources
-  }
+  #++++x did we change the logic here?  think about it for all cases that don't involve building efr32 test driver -- would should happen if chip_link_tests is true or false?
+  #   prior to me making my changes for efr32 test driver, was it was ok if the the test_sources were contained in both the common library and the individual libraries?
 
   if (chip_build_test_static_libraries) {
     _target_type = "static_library"
@@ -84,7 +78,7 @@ template("chip_test_suite") {
     _target_type = "source_set"
   }
   target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests" ])
+    forward_variables_from(invoker, "*", exclude_variables)
 
     output_dir = "${root_out_dir}/lib"
 
@@ -102,7 +96,7 @@ template("chip_test_suite") {
       public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
   }
-  if (chip_link_tests) {
+  if (chip_link_tests || pw_test_builds_executable) {
     tests = []
 
     if (defined(invoker.test_sources)) {
@@ -115,42 +109,72 @@ template("chip_test_suite") {
         }
 
         pw_test(_test_name) {
+          # Forward certain variables from the invoker.
           forward_variables_from(invoker,
-                                 [
-                                   "deps",
-                                   "public_deps",
-                                   "cflags",
-                                   "configs",
-                                 ])
+                                [
+                                  "deps",
+                                  "public_deps",
+                                  "cflags",
+                                  "configs",
+                                ])
+
+          # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
+
+          # Set variables that the platform executable may need.
+          if (test_executable_output_name != "") {
+            output_name = test_executable_output_name + _test_name +
+                          test_executable_output_name_suffix
+          }
+          ldflags = test_executable_ldflags
+
+          # Add the individual test source file (e.g. "TestSomething.cpp").
           sources = [ _test ]
+
           output_dir = _test_output_dir
         }
         tests += [ _test_name ]
       }
     }
 
+    #++++x once everything is working try deleting this.
     if (defined(invoker.tests)) {
       foreach(_test, invoker.tests) {
+        # `_test` is the bare name with no extension.
+
         _test_output_dir = "${root_out_dir}/tests"
         if (defined(invoker.output_dir)) {
           _test_output_dir = invoker.output_dir
         }
 
         pw_test(_test) {
+          # Forward certain variables from the invoker.
           forward_variables_from(invoker,
-                                 [
-                                   "deps",
-                                   "public_deps",
-                                   "cflags",
-                                   "configs",
-                                 ])
+                                [
+                                  "deps",
+                                  "public_deps",
+                                  "cflags",
+                                  "configs",
+                                ])
+
+          # Link to the common lib for this suite so we get its `sources`.
           public_deps += [ ":${_suite_name}.lib" ]
+
+          # Set variables that the platform executable may need.
+          if (test_executable_output_name != "") {
+            output_name = test_executable_output_name + _test +
+                          test_executable_output_name_suffix
+          }
+          ldflags = test_executable_ldflags
+
           test_main = ""
+
+          # Add the individual test source file and its driver).
           sources = [
             "${_test}.cpp",
             "${_test}Driver.cpp",
           ]
+
           output_dir = _test_output_dir
         }
         tests += [ _test ]
@@ -159,6 +183,8 @@ template("chip_test_suite") {
 
     group(_suite_name) {
       deps = []
+
+      # Add each individual unit test.
       foreach(_test, tests) {
         deps += [ ":${_test}" ]
       }
@@ -167,6 +193,8 @@ template("chip_test_suite") {
     if (chip_pw_run_tests) {
       group("${_suite_name}_run") {
         deps = []
+
+        # Add the .run targets created by pw_test.
         foreach(_test, tests) {
           deps += [ ":${_test}.run" ]
         }
