@@ -69,8 +69,6 @@ template("chip_test_suite") {
       invoker.sources += invoker.test_sources
     }
   }
-  #++++x did we change the logic here?  think about it for all cases that don't involve building efr32 test driver -- would should happen if chip_link_tests is true or false?
-  #   prior to me making my changes for efr32 test driver, was it was ok if the the test_sources were contained in both the common library and the individual libraries?
 
   # Target for the common library.  Contains all the common sources, and sometimes all the individual test sources.
   if (chip_build_test_static_libraries) {
