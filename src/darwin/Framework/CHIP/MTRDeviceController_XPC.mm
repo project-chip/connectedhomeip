@@ -43,7 +43,6 @@
 @implementation MTRDeviceController_XPC
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
-@synthesize nodeIDToDeviceMap = _nodeIDToDeviceMap;
 @synthesize deviceMapLock = _deviceMapLock;
 
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
@@ -127,7 +126,7 @@
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
     return deviceToReturn;

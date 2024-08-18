@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
 
-@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (nonatomic, readwrite, nullable) NSMapTable * nodeIDToDeviceMap;
 @property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 
 - (instancetype)initForSubclasses;

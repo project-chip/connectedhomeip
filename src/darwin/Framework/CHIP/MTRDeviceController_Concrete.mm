@@ -34,6 +34,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRDeviceController_XPC.h"
 #import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
@@ -103,8 +104,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readwrite) NSUUID * uniqueIdentifier;
 @property (nonatomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (nonatomic, readonly, nullable) MTRDeviceControllerFactory * factory;
-@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
-@property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 @property (nonatomic, readonly, nullable) MTRCommissionableBrowser * commissionableBrowser;
@@ -136,7 +135,6 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize commissionableBrowser = _commissionableBrowser;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
-@synthesize nodeIDToDeviceMap = _nodeIDToDeviceMap;
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error
@@ -275,7 +273,7 @@ using namespace chip::Tracing::DarwinFramework;
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
+        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
@@ -354,8 +352,8 @@ using namespace chip::Tracing::DarwinFramework;
     // devices before we start invalidating.
     MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
     os_unfair_lock_lock(&_deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
-    [_nodeIDToDeviceMap removeAllObjects];
+    NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+    [self.nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(&_deviceMapLock);
 
     for (MTRDevice * device in devices) {
@@ -1033,7 +1031,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
 
     if (prefetchedClusterData) {
@@ -1065,7 +1063,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
     std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
+    MTRDevice * deviceToReturn = [self.nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
@@ -1077,10 +1075,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     std::lock_guard lock(_deviceMapLock);
     auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
+    MTRDevice * deviceToRemove = [self.nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
         [deviceToRemove invalidate];
-        [_nodeIDToDeviceMap removeObjectForKey:nodeID];
+        [self.nodeIDToDeviceMap removeObjectForKey:nodeID];
     } else {
         MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
     }
@@ -1091,8 +1089,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     std::lock_guard lock(_deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
-    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+    for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1542,7 +1540,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
     os_unfair_lock_unlock(&_deviceMapLock);
 
     if (device == nil) {

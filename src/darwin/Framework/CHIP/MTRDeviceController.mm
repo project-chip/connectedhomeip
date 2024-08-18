@@ -134,6 +134,8 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
+@synthesize deviceMapLock = _deviceMapLock;
+
 - (instancetype)initForSubclasses
 {
     if (self = [super init]) {
