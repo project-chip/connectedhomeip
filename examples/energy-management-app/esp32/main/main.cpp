@@ -125,9 +125,17 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 // Keep track of the parsed featureMap option
+#if 1 // 0x7a
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable,
+                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+#else // 0x7c
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment,
                                           Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+
+static const char * spApp = nullptr;
+#endif
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {

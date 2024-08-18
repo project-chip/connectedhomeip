@@ -27,16 +27,16 @@
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
 
@@ -139,11 +139,11 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
 #endif
@@ -151,7 +151,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
 #endif
