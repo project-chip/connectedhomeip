@@ -82,7 +82,9 @@
 
 @implementation MTRDevice_XPC
 
-#pragma mark - Client Callbacks
+#pragma mark - Client Callbacks (MTRDeviceDelegate)
+
+// required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
@@ -90,6 +92,7 @@
         [delegate device:self stateChanged:state];
     }];
 }
+
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
@@ -97,6 +100,7 @@
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
 }
+
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
@@ -104,23 +108,33 @@
         [delegate device:self receivedEventReport:eventReport];
     }];
 }
+
+// optional methods for MTRDeviceDelegates - check for implementation before calling
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        [delegate deviceBecameActive:self];
+        if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+            [delegate deviceBecameActive:self];
+        }
     }];
 }
+
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        [delegate deviceCachePrimed:self];
+        if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
+            [delegate deviceCachePrimed:self];
+        }
     }];
 }
+
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        [delegate deviceConfigurationChanged:self];
+        if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
+            [delegate deviceConfigurationChanged:self];
+        }
     }];
 }
 
