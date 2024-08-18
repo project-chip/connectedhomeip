@@ -206,7 +206,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         {
             GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
             GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-            spi_enabled = false;
+            spi_enabled                                                   = false;
         }
     }
 #if SL_SPICTRL_MUX
