@@ -29,6 +29,7 @@
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <device_manager/DeviceManager.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -87,6 +88,45 @@ public:
         DeviceMgr().OpenDeviceCommissioningWindow(nodeId, commissioningTimeout, iterations, discriminator, saltHex, verifierHex);
 
         response.success = true;
+
+        return pw::OkStatus();
+    }
+
+    pw::Status CommissionNode(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response) override
+    {
+        char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
+        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+
+        ChipLogProgress(NotSpecified, "Received CommissionNode request");
+
+        SetupPayload setupPayload = SetupPayload();
+
+        setupPayload.setUpPINCode = request.setup_pin;
+        setupPayload.version      = 0;
+        setupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+
+        SetupDiscriminator discriminator{};
+        discriminator.SetLongValue(request.discriminator);
+        setupPayload.discriminator = discriminator;
+
+        char payloadBuffer[kMaxManualCodeLength + 1];
+        MutableCharSpan manualCode(payloadBuffer);
+
+        CHIP_ERROR error = ManualSetupPayloadGenerator(setupPayload).payloadDecimalStringRepresentation(manualCode);
+        if (error == CHIP_NO_ERROR)
+        {
+            NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
+
+            // After responding with RequestCommissioningApproval to the node where the client initiated the
+            // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
+            usleep(kCommissionPrepareTimeMs * 1000);
+
+            DeviceMgr().PairRemoteDevice(nodeId, payloadBuffer);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unable to generate manual code for setup payload: %" CHIP_ERROR_FORMAT, error.Format());
+        }
 
         return pw::OkStatus();
     }
