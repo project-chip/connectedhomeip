@@ -18,6 +18,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -28,30 +29,48 @@ using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
 
-static std::unique_ptr<OccupancySensingAttrAccess>
-    gAttrAccess[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+namespace {
+
+static constexpr size_t kOccupancySensingClusterTableSize =
+    MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert(kOccupancySensingClusterTableSize <= kEmberInvalidEndpointIndex, "Occupancy Sensing Cluster table size error");
+
+static std::unique_ptr<Instance> gOccupancySensingClusterInstances[kOccupancySensingClusterTableSize];
+
+} // namespace
 
 void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrDie(!gAttrAccess[endpointId]);
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::OccupancySensing::Id,
+                                                            MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    gAttrAccess[endpointId] = std::make_unique<OccupancySensingAttrAccess>(
-        BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kPassiveInfrared));
-
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
-        .holdTimeMin     = 1,
-        .holdTimeMax     = 300,
-        .holdTimeDefault = 10,
-    };
-
-    uint16_t holdTime = 10;
-
-    if (gAttrAccess[endpointId])
+    if (epIndex < kOccupancySensingClusterTableSize)
     {
-        gAttrAccess[endpointId]->Init();
+        VerifyOrDie(!gOccupancySensingClusterInstances[epIndex]);
 
-        SetHoldTimeLimits(endpointId, holdTimeLimits);
+        gOccupancySensingClusterInstances[epIndex] =
+            std::make_unique<Instance>(BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kPassiveInfrared));
 
-        SetHoldTime(endpointId, holdTime);
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
+            .holdTimeMin     = 1,
+            .holdTimeMax     = 300,
+            .holdTimeDefault = 10,
+        };
+
+        uint16_t holdTime = 10;
+
+        if (gOccupancySensingClusterInstances[epIndex])
+        {
+            gOccupancySensingClusterInstances[epIndex]->Init();
+
+            SetHoldTimeLimits(endpointId, holdTimeLimits);
+
+            SetHoldTime(endpointId, holdTime);
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "Error: invalid/unexpected OccupancySensing Cluster endpoint index.");
     }
 }

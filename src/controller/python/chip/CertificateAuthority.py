@@ -21,7 +21,7 @@ from __future__ import annotations
 import ctypes
 import logging
 from ctypes import c_void_p
-from typing import List
+from typing import List, Optional
 
 import chip.exceptions
 from chip import ChipStack, FabricAdmin
@@ -92,7 +92,7 @@ class CertificateAuthority:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
-        self._activeAdmins = []
+        self._activeAdmins: List[FabricAdmin.FabricAdmin] = []
 
     def LoadFabricAdminsFromStorage(self):
         ''' If FabricAdmins had been setup previously, this re-creates them using information from persistent storage.
@@ -221,14 +221,13 @@ class CertificateAuthorityManager:
             persistentStorage:  If provided, over-rides the default instance in the provided chipStack
                                 when initializing CertificateAuthority instances.
         '''
-        self._activeCaIndexList = []
         self._chipStack = chipStack
 
         if (persistentStorage is None):
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
-        self._activeCaList = []
+        self._activeCaList: List[CertificateAuthority] = []
         self._isActive = True
 
     def _AllocateNextCaIndex(self):
@@ -259,7 +258,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: int = None, maximizeCertChains: bool = False):
+    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 

@@ -31,6 +31,9 @@ pw_python_package("matter_idl") {
     # Dependency grammar
     "matter_idl/matter_grammar.lark",
 
+    #marker file to indicate to mypy that matter_idl is type-annotated
+    "matter_idl/py.typed",
+
     # Unit test data
     "matter_idl/tests/available_tests.yaml",
     "matter_idl/tests/inputs/cluster_struct_attribute.matter",
@@ -50,6 +53,7 @@ pw_python_package("matter_idl") {
 
   tests = [
     "matter_idl/test_backwards_compatibility.py",
+    "matter_idl/test_case_conversion.py",
     "matter_idl/test_data_model_xml.py",
     "matter_idl/test_matter_idl_parser.py",
     "matter_idl/test_generators.py",

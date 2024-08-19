@@ -276,6 +276,7 @@ def validate_args(args):
     check_int_range(args.product_id, 0x0000, 0xFFFF, 'Product id')
     check_int_range(args.vendor_id, 0x0000, 0xFFFF, 'Vendor id')
     check_int_range(args.hw_ver, 0x0000, 0xFFFF, 'Hardware version')
+    check_int_range(args.discovery_mode, 0b000, 0b111, 'Discovery-Mode')
 
     check_str_range(args.serial_num, 1, 32, 'Serial number')
     check_str_range(args.vendor_name, 1, 32, 'Vendor name')
@@ -566,9 +567,10 @@ def get_args():
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
                                           Default is 0.', choices=[0, 1, 2])
-    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=1,
-                        help='Commissionable device discovery networking technology. \
-                                         0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
+    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=2,
+                        help='3-bit bitmap representing discovery modes for commissionable device discovery \
+                                         Bit 0:WiFi-SoftAP, Bit 1:BLE, Bit 2:On-network. Default is BLE. Specify values between 0-7')
+
     parser.set_defaults(generate_bin=True)
 
     return parser.parse_args()
