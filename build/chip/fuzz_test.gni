@@ -102,13 +102,12 @@ template("chip_pw_fuzz_target") {
                                  "configs",
                                ])
 
-        # TODO see what to do with this, I added it to try running FuzzTest with compatibility mode, since this is the mode supported by OSS-fuzz
+        # TODO: remove this
+        #just a test for running FuzzTest with libfuzzer-compatibility mode, since this is the mode supported by OSS-fuzz
         # defines = [
-        #   "FUZZTEST_COMPATIBILITY_MODE=libfuzzer",
+        # "FUZZTEST_COMPATIBILITY_MODE=libfuzzer",
         #   "MAKE_BUILD_TYPE=RelWithDebug",
-        # ]
-
-        #cflags = [ "-Wno-error=format-nonliteral" ] CAN NOT USE since strict_warning defines the opposite
+        #  ]
 
         sources = [ _test ]
         output_dir = _test_output_dir

@@ -48,6 +48,11 @@ gcc_toolchain("chip_pw_fuzztest") {
     current_cpu = host_cpu
     is_clang = true
 
+    # the upstream pigweed host_clang toolchain defines a default sysroot, which results in build errors
+    # since it does not include SSL and is supposed to be minimal by design.
+    # by removing this default config, we will use the system's libs. Otherwise we can define our own sysroot.
+    remove_default_configs = [ "$dir_pw_toolchain/host_clang:linux_sysroot" ]
+
     # pw_toolchain_FUZZING_ENABLED = true
     treat_warnings_as_errors = false
 
