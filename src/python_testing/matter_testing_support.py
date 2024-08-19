@@ -884,7 +884,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Use the following environment variables:
 
          - LINUX_DUT_IP 
-            * if not provided, the Matter app is assumed to run on the same machine as this test,
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_UNAME
