@@ -22,7 +22,7 @@
 
 /**
  * @brief CADMIN cluster implementation for handling attribute read of bridged device endpoints.
- * 
+ *
  * The current Administrator Commissioning Cluster server's zap generated code will automatically
  * register an Attribute Access Interface for the root node endpoint implementation. In order to
  * properly respond to a read attribute for bridged devices we are representing, we override the
