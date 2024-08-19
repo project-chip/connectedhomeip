@@ -320,7 +320,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      */
     void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
-        mapID = aMapId;
+        mapID            = aMapId;
         auto mapNameSpan = MutableCharSpan(mMapNameBuffer, kMapNameMaxSize);
         CopyCharSpanToMutableCharSpan(aMapName, mapNameSpan);
         name = CharSpan(mapNameSpan.data(), mapNameSpan.size());
