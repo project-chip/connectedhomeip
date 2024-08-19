@@ -14,8 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${dir_pw_unit_test}/test.gni")
 
 declare_args() {
   enable_fuzz_test_targets = is_clang && chip_build_tests &&
@@ -64,6 +67,57 @@ template("chip_fuzz_target") {
       }
       if (!defined(oubput_dir)) {
         output_dir = "${root_out_dir}/tests"
+      }
+    }
+  }
+}
+
+template("chip_pw_fuzz_target") {
+  not_needed([ "target_name" ])
+  if (!defined(invoker.sources)) {
+    sources = []
+  }
+  if (!defined(invoker.public_deps)) {
+    public_deps = []
+  }
+  if (!defined(invoker.deps)) {
+    deps = []
+  }
+
+  if (defined(invoker.test_sources)) {
+    foreach(_test, invoker.test_sources) {
+      _test_name = string_replace(_test, ".cpp", "")
+
+      _test_output_dir = "${root_out_dir}/fuzz_tests"
+      if (defined(invoker.output_dir)) {
+        _test_output_dir = invoker.output_dir
+      }
+
+      pw_test(_test_name) {
+        forward_variables_from(invoker,
+                               [
+                                 "deps",
+                                 "public_deps",
+                                 "cflags",
+                                 "configs",
+                               ])
+
+        # TODO see what to do with this, I added it to try running FuzzTest with compatibility mode, since this is the mode supported by OSS-fuzz
+        # defines = [
+        #   "FUZZTEST_COMPATIBILITY_MODE=libfuzzer",
+        #   "MAKE_BUILD_TYPE=RelWithDebug",
+        # ]
+
+        #cflags = [ "-Wno-error=format-nonliteral" ] CAN NOT USE since strict_warning defines the opposite
+
+        sources = [ _test ]
+        output_dir = _test_output_dir
+
+        deps += [ "$dir_pw_fuzzer:fuzztest" ]
+
+        # this is necessary so it is not disable in third_party/pigweed/repo/pw_unit_test/test.gni
+        # otherwise it will be built successfully but with FuzzPayloadDecoderPW.DISABLED.ninja and no executable
+        enable_if = true
       }
     }
   }

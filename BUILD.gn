@@ -68,7 +68,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         #":pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
         #"$dir_pigweed:pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
         # "${chip_root}/build/toolchain/pw_fuzzer:clang_pw_fuzz",
-        "${chip_root}/src/lib/format/tests:FuzzPayloadDecoderPW(//build/toolchain/pw_fuzzer:clang_pw_fuzz)",
+        "${chip_root}/src/lib/format/tests:FuzzPayloadDecoderPW(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
     }
   }
