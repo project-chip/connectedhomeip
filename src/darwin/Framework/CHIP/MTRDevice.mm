@@ -298,7 +298,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @interface MTRDevice ()
 
-
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 
@@ -330,91 +329,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @end
 #endif
 
-@implementation MTRDevice {
-#ifdef DEBUG
-    NSUInteger _unitTestAttributesReportedSinceLastCheck;
-#endif
-
-    // _deviceCachePrimed is true if we have the data that comes from an initial
-    // subscription priming report (whether it came from storage or from our
-    // subscription).
-    BOOL _deviceCachePrimed;
-
-    // _persistedClusterData stores data that we have already persisted (when we have
-    // cluster data persistence enabled).  Nil when we have no persistence enabled.
-    NSCache<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _persistedClusterData;
-    // _clusterDataToPersist stores data that needs to be persisted.  If we
-    // don't have persistence enabled, this is our only data store.  Nil if we
-    // currently have nothing that could need persisting.
-    NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _clusterDataToPersist;
-    // _persistedClusters stores the set of "valid" keys into _persistedClusterData.
-    // These are keys that could have values in _persistedClusterData even if they don't
-    // right now (because they have been evicted).
-    NSMutableSet<MTRClusterPath *> * _persistedClusters;
-
-    // When we last failed to subscribe to the device (either via
-    // _setupSubscriptionWithReason or via the auto-resubscribe behavior
-    // of the ReadClient).  Nil if we have had no such failures.
-    NSDate * _Nullable _lastSubscriptionFailureTime;
-    MTRDeviceConnectivityMonitor * _connectivityMonitor;
-
-    // This boolean keeps track of any device configuration changes received in an attribute report.
-    // If this is true when the report ends, we notify the delegate.
-    BOOL _deviceConfigurationChanged;
-
-    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
-    //   1. Subscription establishes
-    //   2. OnResubscriptionNeeded is called
-    //   3. Subscription reset (including when getSessionForNode fails)
-    MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
-
-    // Tracking of initial subscribe latency.  When _initialSubscribeStart is
-    // nil, we are not tracking the latency.
-    NSDate * _Nullable _initialSubscribeStart;
-
-    // Storage behavior configuration and variables to keep track of the logic
-    //  _clusterDataPersistenceFirstScheduledTime is used to track the start time of the delay between
-    //      report and persistence.
-    //  _mostRecentReportTimes is a list of the most recent report timestamps used for calculating
-    //      the running average time between reports.
-    //  _deviceReportingExcessivelyStartTime tracks when a device starts reporting excessively.
-    //  _reportToPersistenceDelayCurrentMultiplier is the current multiplier that is calculated when a
-    //      report comes in.
-    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
-    NSDate * _Nullable _clusterDataPersistenceFirstScheduledTime;
-    NSMutableArray<NSDate *> * _mostRecentReportTimes;
-    NSDate * _Nullable _deviceReportingExcessivelyStartTime;
-    double _reportToPersistenceDelayCurrentMultiplier;
-
-    // System time change observer reference
-    id _systemTimeChangeObserverToken;
-
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
-
-    // Protects mutable state used by our description getter.  This is a separate lock from "lock"
-    // so that we don't need to worry about getting our description while holding "lock" (e.g due to
-    // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
-    // while it's held, to avoid deadlock.
-    os_unfair_lock _descriptionLock;
-
-    // State used by our description getter: access to these must be protected by descriptionLock.
-    NSNumber * _Nullable _vid; // nil if unknown
-    NSNumber * _Nullable _pid; // nil if unknown
-    // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
-    // present on the device, or nil if there aren't any.
-    NSNumber * _Nullable _allNetworkFeatures;
-    // Copy of _internalDeviceState that is safe to use in description.
-    MTRInternalDeviceState _internalDeviceStateForDescription;
-    // Copy of _lastSubscriptionAttemptWait that is safe to use in description.
-    uint32_t _lastSubscriptionAttemptWaitForDescription;
-    // Most recent entry in _mostRecentReportTimes, if any.
-    NSDate * _Nullable _mostRecentReportTimeForDescription;
-    // Copy of _lastSubscriptionFailureTime that is safe to use in description.
-    NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
-}
+@implementation MTRDevice
 
 @synthesize delegates = _delegates;
-
 
 - (instancetype)initForSubclasses
 {
