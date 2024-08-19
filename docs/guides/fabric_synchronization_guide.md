@@ -98,6 +98,12 @@ Run the Fabric Synchronization script:
 
 In Ecosystem 1 Fabric-Admin console:
 
+Pair the local bridge of Ecosystem 1 with node ID 1:
+
+```
+fabricsync add-local-bridge 1
+```
+
 Pair the Ecosystem 2 bridge to Ecosystem 1 with node ID 2:
 
 ```
@@ -130,7 +136,7 @@ Pair the Light Example with node ID 3 using its payload number:
 pairing already-discovered 3 20202021 <ip> 5543
 ```
 
-After the device is successfully added, you will observe the following on
+After the device is successfully added, you will observe the following message on
 Ecosystem 2 with the newly assigned Node ID:
 
 ```
