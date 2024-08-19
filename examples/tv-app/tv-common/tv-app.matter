@@ -99,6 +99,12 @@ enum AreaTypeTag : enum8 {
   kWorkshop = 94;
 }
 
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
 enum FloorSurfaceTag : enum8 {
   kCarpet = 0;
   kCeramic = 1;
@@ -188,13 +194,16 @@ enum PositionTag : enum8 {
   kMiddle = 4;
   kRow = 5;
   kColumn = 6;
-  kUnder = 7;
-  kNextTo = 8;
-  kAround = 9;
-  kOn = 10;
-  kAbove = 11;
-  kFrontOf = 12;
-  kBehind = 13;
+}
+
+enum RelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -218,6 +227,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
@@ -3245,6 +3259,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
+    kPendingUserApproval = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {

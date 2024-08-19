@@ -27,6 +27,7 @@ import queue
 import random
 import re
 import sys
+import textwrap
 import time
 import typing
 import uuid
@@ -53,6 +54,7 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
@@ -329,7 +331,7 @@ class AttributeChangeCallback:
             logging.info(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
-            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
@@ -1122,11 +1124,59 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+
+            try:
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                # If we failed during setup, these may not be populated
+                step_duration = 0
+            try:
+                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+            def extract_error_text() -> tuple[str, str]:
+                no_stack_trace = ("Stack Trace Unavailable", "")
+                if not record.termination_signal.stacktrace:
+                    return no_stack_trace
+                trace = record.termination_signal.stacktrace.splitlines()
+                if not trace:
+                    return no_stack_trace
+
+                if isinstance(exception, signals.TestError):
+                    # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
+                    if not assert_candidates:
+                        return "Unknown error, please see stack trace above", ""
+                    assert_candidate_idx = assert_candidates[-1]
+                else:
+                    # Normal assert is on the Last line
+                    assert_candidate_idx = -1
+                probable_error = trace[assert_candidate_idx]
+
+                # Find the file marker immediately above the probable error
+                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
+                if not file_candidates:
+                    return probable_error, "Unknown file"
+                return probable_error.strip(), trace[file_candidates[-1]].strip()
+
+            probable_error, probable_file = extract_error_text()
+            logging.error(textwrap.dedent(f"""
+
+                                          ******************************************************************
+                                          *
+                                          * Test {self.current_test_info.name} failed for the following reason:
+                                          * {exception}
+                                          *
+                                          * {probable_file}
+                                          * {probable_error}
+                                          *
+                                          *******************************************************************
+
+                                          """))
 
     def on_pass(self, record):
         ''' Called by Mobly on test pass
@@ -1863,7 +1913,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
 

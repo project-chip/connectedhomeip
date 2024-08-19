@@ -31,6 +31,7 @@
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
@@ -137,6 +138,11 @@ JNI_METHOD(void, setLowPowerManager)(JNIEnv *, jobject, jint endpoint, jobject m
 JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     MediaPlaybackManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(void, setApplicationLauncherManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    ApplicationLauncherManager::NewManager(endpoint, manager);
 }
 
 JNI_METHOD(void, setMessagesManager)(JNIEnv *, jobject, jint endpoint, jobject manager)

@@ -28,11 +28,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/internal/BLEManager.h>
+
+#include <android/log.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
@@ -45,6 +48,8 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
+#define JNI_LOGGING_METHOD(RETURN, METHOD_NAME)                                                                                    \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipLogging_##METHOD_NAME
 #define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME)                                                                               \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
@@ -243,6 +248,30 @@ JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject res
 {
     chip::DeviceLayer::StackLock lock;
     chip::Dnssd::InitializeWithObjects(resolver, browser, chipMdnsCallback);
+}
+
+JNI_LOGGING_METHOD(void, setLogFilter)(JNIEnv * env, jclass clazz, jint level)
+{
+    using namespace chip::Logging;
+
+    uint8_t category = kLogCategory_Detail;
+    switch (level)
+    {
+    case ANDROID_LOG_VERBOSE:
+    case ANDROID_LOG_DEBUG:
+        category = kLogCategory_Detail;
+        break;
+    case ANDROID_LOG_INFO:
+        category = kLogCategory_Progress;
+        break;
+    case ANDROID_LOG_WARN:
+    case ANDROID_LOG_ERROR:
+        category = kLogCategory_Error;
+        break;
+    default:
+        break;
+    }
+    SetLogFilter(category);
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)

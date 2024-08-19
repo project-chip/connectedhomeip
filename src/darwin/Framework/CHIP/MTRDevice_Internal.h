@@ -66,6 +66,7 @@ MTR_TESTABLE
 @end
 
 @interface MTRDevice ()
+- (instancetype)initForSubclasses;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // Called from MTRClusters for writes and commands
@@ -79,6 +80,8 @@ MTR_TESTABLE
 // is this device's identity has been observed.  This could have
 // false-positives, for example due to compressed fabric id collisions.
 - (void)nodeMayBeAdvertisingOperational;
+
+- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
 /**
  * Like the public invokeCommandWithEndpointID but:
@@ -122,15 +125,15 @@ MTR_TESTABLE
 
 @end
 
-#pragma mark - Utility for clamping numbers
-// Returns a NSNumber object that is aNumber if it falls within the range [min, max].
-// Returns min or max, if it is below or above, respectively.
-NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
-
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
+
+// ex-MTRDeviceClusterData constants
+static NSString * const sDataVersionKey = @"dataVersion";
+static NSString * const sAttributesKey = @"attributes";
+static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";

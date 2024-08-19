@@ -19,21 +19,35 @@ config("config") {
   include_dirs = [ "include" ]
 }
 
-chip_data_model("fabric-bridge-common") {
+chip_data_model("fabric-bridge-common-zap") {
   zap_file = "fabric-bridge-app.zap"
   is_server = true
   cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
+}
+
+# This includes all the clusters that only exist on the dynamic endpoint.
+source_set("fabric-bridge-common") {
+  public_configs = [ ":config" ]
+
+  sources = [
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.cpp",
+    "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
+  ]
+
+  public_deps = [ ":fabric-bridge-common-zap" ]
 }
 
 source_set("fabric-bridge-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "include/BridgedDevice.h",
+    "include/BridgedDeviceBasicInformationImpl.h",
+    "include/BridgedDeviceManager.h",
     "include/CHIPProjectAppConfig.h",
-    "include/Device.h",
-    "include/DeviceManager.h",
-    "src/Device.cpp",
-    "src/DeviceManager.cpp",
+    "src/BridgedDevice.cpp",
+    "src/BridgedDeviceBasicInformationImpl.cpp",
+    "src/BridgedDeviceManager.cpp",
     "src/ZCLCallbacks.cpp",
   ]
 

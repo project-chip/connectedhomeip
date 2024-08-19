@@ -43,6 +43,37 @@ const std::string FAILURE_KEY         = "PlatformError";
 const std::string FAILURE_STATUS_KEY  = "Status";
 const std::string RESPONSE_STATUS_KEY = "Status";
 
+bool isValidJson(const char * response)
+{
+    Json::Reader reader;
+
+    Json::CharReaderBuilder readerBuilder;
+    std::string errors;
+
+    Json::Value value;
+    std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
+
+    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
+    {
+        ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
+        return false;
+    }
+
+    // Validate and access JSON data safely
+    if (!value.isObject())
+    {
+        ChipLogError(Zcl, "Invalid JSON structure: not an object");
+        return false;
+    }
+
+    if (!reader.parse(response, value))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
 {
     if (handlerContext.mRequestPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
@@ -88,7 +119,15 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         {
             JniUtfString respStr(env, resp);
             ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
-            FormatResponseData(handlerContext, respStr.c_str());
+            if (isValidJson(respStr.c_str()))
+            {
+                FormatResponseData(handlerContext, respStr.c_str());
+            }
+            else
+            {
+                // return dummy value in case JSON is invalid
+                FormatResponseData(handlerContext, "{\"value\":{}}");
+            }
         }
         env->DeleteLocalRef(resp);
     }
@@ -136,7 +175,6 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             if (!testReader->parse(respStr.c_str(), respStr.c_str() + std::strlen(respStr.c_str()), &value, &errors))
             {
                 ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
-                env->DeleteLocalRef(resp);
                 return chip::Protocols::InteractionModel::Status::Failure;
             }
 
@@ -144,14 +182,12 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             if (!value.isObject())
             {
                 ChipLogError(Zcl, "Invalid JSON structure: not an object");
-                env->DeleteLocalRef(resp);
                 return chip::Protocols::InteractionModel::Status::Failure;
             }
 
             Json::Reader reader;
             if (!reader.parse(respStr.c_str(), value))
             {
-                env->DeleteLocalRef(resp);
                 return chip::Protocols::InteractionModel::Status::Failure;
             }
         }
@@ -183,31 +219,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
 {
     handlerContext.SetCommandHandled();
-    Json::Reader reader;
-
-    Json::CharReaderBuilder readerBuilder;
-    std::string errors;
-
     Json::Value value;
-    std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
-
-    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
-    {
-        ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
-        return;
-    }
-
-    // Validate and access JSON data safely
-    if (!value.isObject())
-    {
-        ChipLogError(Zcl, "Invalid JSON structure: not an object");
-        return;
-    }
-
-    if (!reader.parse(response, value))
-    {
-        return;
-    }
 
     // handle errors from platform-app
     if (!value[FAILURE_KEY].empty())

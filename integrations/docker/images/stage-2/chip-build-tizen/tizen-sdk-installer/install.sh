@@ -21,7 +21,7 @@ set -e
 # Default settings options
 TIZEN_SDK_ROOT=/opt/tizen-sdk
 TIZEN_SDK_DATA_PATH=$HOME/tizen-sdk-data
-TIZEN_VERSION=7.0
+TIZEN_VERSION=8.0
 SECRET_TOOL=false
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
@@ -133,7 +133,7 @@ function install_tizen_sdk() {
 
     info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
 
-    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core"
+    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     cd "$TMP_DIR" || return
 
@@ -144,7 +144,7 @@ function install_tizen_sdk() {
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
         'certificate-encryptor_1.0.10_ubuntu-64.zip'
-        'certificate-generator_0.1.3_ubuntu-64.zip'
+        'certificate-generator_0.1.4_ubuntu-64.zip'
         'new-common-cli_2.5.64_ubuntu-64.zip'
         'new-native-cli_2.5.64_ubuntu-64.zip'
         'sdb_4.2.23_ubuntu-64.zip')
@@ -167,8 +167,8 @@ function install_tizen_sdk() {
     # Different versions of Tizen have different rootstrap versions
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
-        "mobile-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
-        "mobile-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
+        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
+        "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
     # Base packages
@@ -232,13 +232,15 @@ function install_tizen_sdk() {
         'capi-system-peripheral-io-*.armv7l.rpm'
         'capi-system-peripheral-io-devel-*.armv7l.rpm'
         'capi-system-resource-1*.armv7l.rpm'
-        'libnsd-dns-sd-*.armv7l.rpm')
+        'libnsd-dns-sd-*.armv7l.rpm'
+        'sensord-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
     # Tizen Developer Platform Certificate
     URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    # Tizen site do not has this package available in version 8.0. Certificates are the same for 7.0 and 8.0.
     PKG_ARR=(
-        "$TIZEN_VERSION-iot-things-add-ons_*_ubuntu-64.zip")
+        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
     # Install all
@@ -271,7 +273,7 @@ function install_tizen_sdk() {
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
     ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
-    ln -sf openssl1.1.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
+    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
     info "Done."
     echo
@@ -282,7 +284,7 @@ function install_tizen_sdk() {
     echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
     echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
-    echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core\""
+    echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
     echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     echo -n "$COLOR_NONE"
 }

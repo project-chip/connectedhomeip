@@ -20,8 +20,8 @@
  * Includes
  *********************************************************/
 
-#include "include/thermostat-manager.h"
-#include "include/thermostat-delegate-impl.h"
+#include <thermostat-delegate-impl.h>
+#include <thermostat-manager.h>
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
@@ -60,12 +60,6 @@ static const char * RunningModeString(ThermostatRunningModeEnum runningMode);
 ThermostatManager ThermostatManager::sThermostatMgr;
 
 namespace {
-
-CHIP_ERROR ChipErrorFromStatusCode(Status status)
-{
-    StatusIB statusIB(status);
-    return statusIB.ToChipError();
-}
 
 template <typename DecodableAttributeType>
 static void OnAttributeChangeReported(const ConcreteDataAttributePath & path, const DecodableAttributeType & value);
@@ -274,7 +268,7 @@ void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attr
     break;
 
     default: {
-        ChipLogError(AppServer, "Unhandled thermostat attribute %x", attributeId);
+        ChipLogError(AppServer, "Unhandled thermostat attribute %u", static_cast<uint>(attributeId));
         return;
     }
     break;
@@ -332,7 +326,7 @@ CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
     }
 
     ChipLogError(AppServer, "Setting system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
-    return ChipErrorFromStatusCode(SystemMode::Set(kThermostatEndpoint, systemMode));
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(SystemMode::Set(kThermostatEndpoint, systemMode));
 }
 
 CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMode)
@@ -345,22 +339,22 @@ CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMo
     }
 
     ChipLogError(AppServer, "Setting running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
-    return ChipErrorFromStatusCode(ThermostatRunningMode::Set(kThermostatEndpoint, runningMode));
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(ThermostatRunningMode::Set(kThermostatEndpoint, runningMode));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentTemperature(int16_t temperature)
 {
-    return ChipErrorFromStatusCode(LocalTemperature::Set(kThermostatEndpoint, temperature));
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(LocalTemperature::Set(kThermostatEndpoint, temperature));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentHeatingSetPoint(int16_t heatingSetpoint)
 {
-    return ChipErrorFromStatusCode(OccupiedHeatingSetpoint::Set(kThermostatEndpoint, heatingSetpoint));
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(OccupiedHeatingSetpoint::Set(kThermostatEndpoint, heatingSetpoint));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentCoolingSetPoint(int16_t coolingSetpoint)
 {
-    return ChipErrorFromStatusCode(OccupiedCoolingSetpoint::Set(kThermostatEndpoint, coolingSetpoint));
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(OccupiedCoolingSetpoint::Set(kThermostatEndpoint, coolingSetpoint));
 }
 
 void ThermostatManager::EvalThermostatState()
@@ -490,25 +484,13 @@ static const char * RunningModeString(ThermostatRunningModeEnum runningMode)
     }
 }
 
-void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
-{
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI
-                    " Type: %u Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), attributePath.mEndpointId, ChipLogValueMEI(clusterId), type, *value, size);
-
-    ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
-}
-
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "Starting Thermostat Manager");
+    ThermostatManager().Init();
+
     // Register the delegate for the Thermostat
     auto & delegate = ThermostatDelegate::GetInstance();
-
     // Set the default delegate for endpoint kThermostatEndpoint.
     VerifyOrDie(endpoint == kThermostatEndpoint);
     SetDefaultDelegate(endpoint, &delegate);
