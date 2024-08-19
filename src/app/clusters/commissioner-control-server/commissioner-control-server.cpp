@@ -71,15 +71,15 @@ void RunDeferredCommissionNode(intptr_t commandArg)
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
+        CHIP_ERROR err = delegate->HandleCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ChipLogError(Zcl, "No delegate available for ReverseCommissionNode");
+        ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
     }
 
     delete info;
