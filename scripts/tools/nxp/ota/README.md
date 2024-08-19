@@ -14,7 +14,7 @@ thus the `OTAImageProcessorImpl` instance should take this into account.
 ## Supported platforms
 
 -   K32W0 -
-    [K32W OTA README](../../../../src/platform/nxp/k32w/common/K32W_OTA_README.md)
+    [K32W OTA README](../../../../src/platform/nxp/common/legacy/OTA_README.md)
 
 ## Usage
 

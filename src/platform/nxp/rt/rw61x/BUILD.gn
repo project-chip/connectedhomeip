@@ -22,6 +22,11 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
 
+source_set("nxp_factory_data") {
+}
+source_set("nxp_ota") {
+}
+
 config("nxp_platform_config") {
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
   include_dirs = [
