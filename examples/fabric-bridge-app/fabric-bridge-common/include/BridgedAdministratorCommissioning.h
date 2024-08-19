@@ -45,7 +45,7 @@ public:
 
     // We do not allow writing an attributes of a bridged device endpoint. We simply redirect write request to
     // original attribut interface.
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
     {
         VerifyOrDie(mOriginalAttributeInterface);
         return mOriginalAttributeInterface->Write(aPath, aDecoder);
