@@ -319,13 +319,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
 @property (nonatomic) uint64_t expectedValueNextID;
 
-@property (nonatomic) BOOL expirationCheckScheduled;
-
 @property (nonatomic) BOOL timeUpdateScheduled;
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
-
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
 
 /**
  * If currentReadClient is non-null, that means that we successfully
@@ -444,8 +440,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @synthesize state = _state;
 @synthesize estimatedStartTime = _estimatedStartTime;
 @synthesize estimatedSubscriptionLatency = _estimatedSubscriptionLatency;
-//@synthesize lock = _lock;
-//@synthesize persistedClusterData = _persistedClusterData;
+@synthesize lock = _lock;
+@synthesize timeSyncLock = _timeSyncLock;
+@synthesize expectedValueCache = _expectedValueCache;
+@synthesize internalDeviceState = _internalDeviceState;
+@synthesize timeUpdateScheduled = _timeUpdateScheduled;
+@synthesize receivingReport = _receivingReport;
+@synthesize lastSubscriptionAttemptWait = _lastSubscriptionAttemptWait;
+@synthesize reattemptingSubscription = _reattemptingSubscription;
+@synthesize receivingPrimingReport = _receivingPrimingReport;
+@synthesize expectedValueNextID = _expectedValueNextID;
+@synthesize estimatedStartTimeFromGeneralDiagnosticsUpTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {

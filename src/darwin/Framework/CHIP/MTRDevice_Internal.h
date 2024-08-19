@@ -22,6 +22,9 @@
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
+#import "MTRDeviceDelegateInfo.h"
+
+#import <os/lock.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -66,6 +69,7 @@ MTR_TESTABLE
 @end
 
 @interface MTRDevice ()
+
 - (instancetype)initForSubclasses;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
@@ -106,6 +110,51 @@ MTR_TESTABLE
 // Queue used for various internal bookkeeping work.
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
+@property (nonatomic, retain, readwrite) NSMutableSet<MTRDeviceDelegateInfo *> * delegates;
+
+@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
+// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
+// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
+// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
+// whatever lock protects the time sync bits.
+@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
+
+@property (nonatomic) BOOL receivingReport;
+@property (nonatomic) BOOL receivingPrimingReport;
+
+// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
+//   Actively receiving report
+//   Actively receiving priming report
+
+@property (nonatomic) MTRInternalDeviceState internalDeviceState;
+
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
+@property (nonatomic) uint32_t lastSubscriptionAttemptWait;
+
+/**
+ * If reattemptingSubscription is true, that means that we have failed to get a
+ * CASE session for the publisher and are now waiting to try again.  In this
+ * state we never have subscriptionActive true or a non-null currentReadClient.
+ */
+@property (nonatomic) BOOL reattemptingSubscription;
+
+// Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
+//   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
+// See MTRDeviceResponseHandler definition for value dictionary details.
+@property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
+
+// This is a monotonically increasing value used when adding entries to expectedValueCache
+// Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
+@property (nonatomic) uint64_t expectedValueNextID;
+
+@property (nonatomic) BOOL expirationCheckScheduled;
+
+@property (nonatomic, assign) BOOL timeUpdateScheduled;
+
+@property (nonatomic, retain) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
+
+@property (nonatomic, retain) NSMutableDictionary * temporaryMetaDataCache;
 
 // Method to insert persisted cluster data
 //   Contains data version information and attribute values.
@@ -122,6 +171,14 @@ MTR_TESTABLE
 
 // Returns whether this MTRDevice uses Thread for communication
 - (BOOL)deviceUsesThread;
+
+- (BOOL)_subscriptionsAllowed;
+- (BOOL)_deviceUsesThread;
+
+- (void)_scheduleSubscriptionPoolWork:(dispatch_block_t)workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description;
+- (void)_setupSubscriptionWithReason:(NSString *)reason;
+
+
 
 @end
 

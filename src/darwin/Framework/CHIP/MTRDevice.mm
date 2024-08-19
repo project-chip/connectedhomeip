@@ -297,52 +297,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
-// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
-// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
-// whatever lock protects the time sync bits.
-@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
+
 
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
-@property (nonatomic) BOOL receivingReport;
-@property (nonatomic) BOOL receivingPrimingReport;
-
-// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
-//   Actively receiving report
-//   Actively receiving priming report
-
-@property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
-@property (nonatomic) uint32_t lastSubscriptionAttemptWait;
-
-/**
- * If reattemptingSubscription is true, that means that we have failed to get a
- * CASE session for the publisher and are now waiting to try again.  In this
- * state we never have subscriptionActive true or a non-null currentReadClient.
- */
-@property (nonatomic) BOOL reattemptingSubscription;
-
-// Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
-//   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
-// See MTRDeviceResponseHandler definition for value dictionary details.
-@property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
-
-// This is a monotonically increasing value used when adding entries to expectedValueCache
-// Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
-@property (nonatomic) uint64_t expectedValueNextID;
-
-@property (nonatomic) BOOL expirationCheckScheduled;
-
-@property (nonatomic) BOOL timeUpdateScheduled;
-
-@property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
-
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
-
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -451,6 +412,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Copy of _lastSubscriptionFailureTime that is safe to use in description.
     NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
 }
+
+@synthesize delegates = _delegates;
+
 
 - (instancetype)initForSubclasses
 {
