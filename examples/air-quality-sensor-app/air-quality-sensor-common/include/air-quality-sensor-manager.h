@@ -32,7 +32,7 @@ public:
     /**
      * @return The current AirQuality value.
      */
-    AirQuality::AirQualityEnum GetAirQuality();
+    AirQuality::AirQualityEnum GetAirQuality();    
 
     /**
      * @brief Get an Air Quality Manager object - this class acts as a singleton device manager for the air quality device
