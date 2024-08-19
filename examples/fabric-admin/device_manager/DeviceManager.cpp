@@ -302,7 +302,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
     SendCommissionNodeRequest(value.requestId, kResponseTimeoutSeconds);
 }
 
-void DeviceManager::HanldeAttributePartsListUpdate(chip::TLV::TLVReader & data)
+void DeviceManager::HandleAttributePartsListUpdate(chip::TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Attribute PartsList change detected:");
 
@@ -456,7 +456,7 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
 
     if (path.mClusterId == Descriptor::Id && path.mAttributeId == Descriptor::Attributes::PartsList::Id)
     {
-        HanldeAttributePartsListUpdate(data);
+        HandleAttributePartsListUpdate(data);
         return;
     }
 }
