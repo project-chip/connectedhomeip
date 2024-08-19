@@ -214,13 +214,22 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     case 'C':
         filterType = Dnssd::DiscoveryFilterType::kCommissioningMode;
         break;
+    case 'I':
+        filterType = Dnssd::DiscoveryFilterType::kCompressedFabricId;
+        break;
     default:
         return false;
     }
 
-    uint16_t code;
-    VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
-
+    uint64_t code = 0;
+    if (filterType == Dnssd::DiscoveryFilterType::kCompressedFabricId)
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code, 16), false);
+    }
+    else
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
+    }
     filter = Dnssd::DiscoveryFilter(filterType, code);
     return true;
 }
