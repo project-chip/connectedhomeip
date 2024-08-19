@@ -90,6 +90,8 @@ class ClangTidyEntry:
         if compiler in ['clang++', 'clang', 'gcc', 'g++']:
             self.valid = True
             self.clang_arguments = command_items[1:]
+            # TODO remove after clang-tidy update
+            # the bug was fixed in https://github.com/llvm/llvm-project/pull/101103
             if '-c' in self.clang_arguments:
                 self.clang_arguments.remove('-c')
         else:
