@@ -696,9 +696,8 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         // NominalPower is only relevant if PFR is supported
         if (HasFeature(Feature::kPowerForecastReporting))
         {
-            if (!slotAdjustment.nominalPower.HasValue() ||
-                !slot.minPowerAdjustment.HasValue() || !slot.maxPowerAdjustment.HasValue() ||
-                slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
+            if (!slotAdjustment.nominalPower.HasValue() || !slot.minPowerAdjustment.HasValue() ||
+                !slot.maxPowerAdjustment.HasValue() || slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
                 slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
             {
                 ChipLogError(Zcl, "DEM: Bad nominalPower");
