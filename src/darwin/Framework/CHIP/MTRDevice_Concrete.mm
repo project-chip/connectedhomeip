@@ -500,7 +500,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
-    MTR_LOG("MTRDevice dealloc: %p", self);
+    MTR_LOG("%@ dealloc: %p", self, self);
 }
 
 - (NSString *)description
