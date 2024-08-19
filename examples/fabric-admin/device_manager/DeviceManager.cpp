@@ -215,8 +215,8 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     // Prepare and push the commissioner control subscribe command
     commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
-    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
-                             kRootEndpointId);
+    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true --keepSubscriptions true", kSubscribeMinInterval, kSubscribeMaxInterval,
+                             mRemoteBridgeNodeId, kRootEndpointId);
     PushCommand(commandBuilder.c_str());
 }
 
@@ -413,7 +413,7 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     for (const auto & endpoint : addedEndpoints)
     {
         // print to console
-        fprintf(stderr, "A new devie is added on Endpoint: %u\n", endpoint);
+        fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
 
         if (mAutoSyncEnabled)
         {
