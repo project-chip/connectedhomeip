@@ -1269,18 +1269,18 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
         if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-            if ((transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
-                 transportPayloadCapability == TransportPayloadCapability::kLargePayload) &&
-                session->GetTCPConnection() != nullptr)
+            if (transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
+                transportPayloadCapability == TransportPayloadCapability::kLargePayload)
             {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
-                if ((tcpSession == nullptr) || (tcpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+                if ((tcpSession == nullptr || tcpSession->GetLastActivityTime() < session->GetLastActivityTime()) &&
+                    session->GetTCPConnection() != nullptr)
                 {
                     tcpSession = session;
                 }
-            }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+            }
 
             if ((mrpSession == nullptr) || (mrpSession->GetLastActivityTime() < session->GetLastActivityTime()))
             {

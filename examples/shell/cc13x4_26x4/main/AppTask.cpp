@@ -41,6 +41,7 @@
 #include <lib/support/CHIPPlatformMemory.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <static-supported-modes-manager.h>
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -54,6 +55,7 @@ using namespace ::chip::DeviceLayer;
 using chip::Shell::Engine;
 
 AppTask AppTask::sAppTask;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 static TaskHandle_t sAppTaskHandle;
 
@@ -171,6 +173,7 @@ CHIP_ERROR AppTask::Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }
 

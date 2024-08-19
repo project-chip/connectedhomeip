@@ -563,6 +563,13 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
+{
+    // TODO https://github.com/project-chip/connectedhomeip/issues/30602
+    // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 {
     // TODO: Remove Weave legacy APIs
