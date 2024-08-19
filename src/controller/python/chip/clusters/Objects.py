@@ -50958,7 +50958,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            #field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -51171,7 +51171,7 @@ class UnitTesting(Cluster):
                         ClusterObjectFieldDescriptor(Label="field2", Tag=1, Type=Globals.Enums.TestGlobalEnum),
                     ])
 
-            field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            #field1: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
             field2: 'Globals.Enums.TestGlobalEnum' = 0
 
         @dataclass
@@ -51995,7 +51995,7 @@ class UnitTesting(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=Globals.Structs.TestGlobalStruct)
 
-            value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
+            #value: 'Globals.Structs.TestGlobalStruct' = field(default_factory=lambda: UnitTesting.Structs.TestGlobalStruct())
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):

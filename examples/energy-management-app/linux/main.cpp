@@ -68,7 +68,8 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kP
                                           Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 
-static const char * spApp = nullptr;
+// Make EVSE the default app
+static const char * spApp = kEvseApp;
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
@@ -135,16 +136,15 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
 {
     bool retval = true;
 
-    ChipLogError(Support, "aIdentifier 0x%04x aValue %s", aIdentifier, aValue);
     switch (aIdentifier)
     {
     case kOptionApplication:
+        spApp = nullptr;
         for (uint16_t idx = 0; idx < sizeof(kValidApps) / sizeof(kValidApps[0]); idx++)
         {
-            ChipLogError(Support, "kValidApps[%d] %s", idx, kValidApps[idx]);
             if (strcmp(kValidApps[idx], aValue) == 0)
             {
-                spApp = aValue;
+                spApp = kValidApps[idx];
                 break;
             }
         }
