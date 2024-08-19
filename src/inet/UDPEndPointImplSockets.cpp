@@ -106,7 +106,7 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
     sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
 
     CHIP_ERROR status = CHIP_NO_ERROR;
-    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0) // NOLINT
     {
         status = CHIP_ERROR_POSIX(errno);
     }
@@ -139,7 +139,7 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
     sa.sin_addr   = address.ToIPv4();
 
     CHIP_ERROR status = CHIP_NO_ERROR;
-    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0) // NOLINT
     {
         status = CHIP_ERROR_POSIX(errno);
     }
