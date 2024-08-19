@@ -54,6 +54,11 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     return mCurrentInput;
 }
 
+bool MediaInputManager::HandleSetCurrentInput(const uint8_t index)
+{
+    return HandleSelectInput(index);
+}
+
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     for (auto const & inputData : mInputs)
@@ -98,5 +103,12 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     }
 
     return false;
+}
+
+static MediaInputManager mediaInputManager;
+void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
+    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
 }
 #endif // MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
