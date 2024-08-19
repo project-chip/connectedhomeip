@@ -144,7 +144,6 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
                              kWindowTimeout, kIteration, discriminator);
-    commandBuilder.Add(" --setup-pin 20202021");
 
     PushCommand(commandBuilder.c_str());
 }
