@@ -54,7 +54,7 @@ class DEMTestBase:
 
         for must_not_have_feature in must_not_have_features:
             asserts.assert_false(feature_map & must_not_have_feature,
-                                f"{s_feature_strs[must_not_have_feature]} is not allowed to be set. feature_map 0x{feature_map:x}")
+                                 f"{s_feature_strs[must_not_have_feature]} is not allowed to be set. feature_map 0x{feature_map:x}")
 
     async def validate_pfr_or_sfr_in_feature_map(self):
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
