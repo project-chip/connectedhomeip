@@ -313,22 +313,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @end
 
-// Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
-#ifdef DEBUG
-@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
-- (void)unitTestReportEndForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
-- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
-- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
-- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
-- (void)unitTestClusterDataPersisted:(MTRDevice *)device;
-- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
-@end
-#endif
-
 @implementation MTRDevice
 
 @synthesize delegates = _delegates;
