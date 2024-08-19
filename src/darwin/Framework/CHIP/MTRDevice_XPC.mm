@@ -82,6 +82,36 @@
 
 @implementation MTRDevice_XPC
 
+#pragma mark - Behavior Overrides
+
+- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
+{
+//    std::lock_guard lock(_lock); // TODO: LOCKING NOT SAFE HERE
+//
+    // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
+    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
+    for (MTRDeviceDelegateInfo * delegateInfo in self.delegates) {
+        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
+        if (!strongDelegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
+        } else if (strongDelegate == delegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
+        }
+    }
+    if (delegatesToRemove.count) {
+        NSUInteger oldDelegatesCount = self.delegates.count;
+        [self.delegates minusSet:delegatesToRemove];
+        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(self.delegates.count - oldDelegatesCount));
+    }
+
+    MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
+    [self.delegates addObject:newDelegateInfo];
+    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+}
+
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
