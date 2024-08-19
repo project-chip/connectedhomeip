@@ -28,16 +28,11 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 
 CHIP_ERROR BridgedAdministratorCommissioning::Init()
 {
-    // We expect to be initialized after all the embr pluggin cluster initialization have been called,
-    // including the AdministratorCommissioning. This expectation allows us to get and unregister the
-    // existing AccessAttributeInterface for AdministratorCommissioning and register ourselves so that
-    // we can first see if the ReadAttribute is for us.
-
     // We expect initialization after all embr plugin clusters initialization. This allows us to unregister
     // the existing AccessAttributeInterface for AdministratorCommissioning and register ourselves, ensuring
     // we get the callback for reading attribute. If the read is not intended for a bridged device we will
     // forward it to the original attribute interface that we are unregistering.
-    mOriginalAttributeInterface = AttributeAccessInterfaceRegistry::Instance().Get(0, AdministratorCommissioning::Id);
+    mOriginalAttributeInterface = AttributeAccessInterfaceRegistry::Instance().Get(chip::kRootEndpointId, AdministratorCommissioning::Id);
     VerifyOrReturnError(mOriginalAttributeInterface, CHIP_ERROR_INTERNAL);
     AttributeAccessInterfaceRegistry::Instance().Unregister(mOriginalAttributeInterface);
     VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(this));

@@ -21,7 +21,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 
 /**
- * @brief CADMIN cluster implementation for handling attribute read of bridged device endpoints.
+ * @brief CADMIN cluster implementation for handling attribute interactions of bridged device endpoints.
  *
  * The current Administrator Commissioning Cluster server's zap generated code will automatically
  * register an Attribute Access Interface for the root node endpoint implementation. In order to
@@ -34,7 +34,7 @@
 class BridgedAdministratorCommissioning : public chip::app::AttributeAccessInterface
 {
 public:
-    // Register for the OperationalCredentials cluster on all endpoints.
+    // Register for the AdministratorCommissioning cluster on all endpoints.
     BridgedAdministratorCommissioning() :
         AttributeAccessInterface(chip::NullOptional, chip::app::Clusters::AdministratorCommissioning::Id)
     {}
@@ -43,8 +43,8 @@ public:
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
 
-    // We do not allow writing an attributes of a bridged device endpoint. We simply redirect write request to
-    // original attribut interface.
+    // We do not allow writing to CADMIN attributes of a bridged device endpoint. We simply redirect
+    // write requests to the original attribute interface.
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
     {
         VerifyOrDie(mOriginalAttributeInterface);
