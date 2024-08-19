@@ -54,7 +54,7 @@ template("chip_test_suite") {
   _suite_name = target_name
 
   exclude_variables = [ "tests" ]
-  if (chip_link_tests) {
+  if (chip_link_tests && chip_device_platform != "darwin") {
     # Common library shouldn't have all the individual unit tests, only the common sources.
     exclude_variables += [ "test_sources" ]
   } else {
