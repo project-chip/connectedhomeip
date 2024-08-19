@@ -219,4 +219,16 @@ menu "Energy Management Example App Configuration"
         help
             Enable test triggers used by the Water Heater Management tests
 
+    config DEM_SUPPORT_STATE_FORECAST_REPORTING
+        bool "State forecast reporting is supported"
+        default "n"
+        help
+            Ensure kStateForecastReporting (SFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set SFR and PFR.
+
+    config DEM_SUPPORT_POWER_FORECAST_REPORTING
+        bool "Power forecast reporting is supported"
+        default "y"
+        help
+            Ensure kPowerForecastReporting (PFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set PFR and SFR.
+
 endmenu

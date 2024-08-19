@@ -125,16 +125,22 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 // Keep track of the parsed featureMap option
-#if 1 // 0x7a
+#if defined(CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && defined(CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
+#error Cannot define CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+#endif
+
+#ifdef CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
                                           Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
-#else // 0x7c
+#elif CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment,
                                           Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
-
-static const char * spApp = nullptr;
+#else
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable,
+                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 #endif
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
