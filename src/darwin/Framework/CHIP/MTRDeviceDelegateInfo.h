@@ -17,8 +17,6 @@
 #import <Foundation/Foundation.h>
 #import "MTRDefines_Internal.h"
 
-#import <lib/support/CodeUtils.h>
-
 @protocol MTRDeviceDelegate;
 
 NS_ASSUME_NONNULL_BEGIN

@@ -16,6 +16,8 @@
 
 #import "MTRDeviceDelegateInfo.h"
 
+#import <lib/support/CodeUtils.h>   // VerifyOrReturnValue
+
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDeviceDelegateInfo
