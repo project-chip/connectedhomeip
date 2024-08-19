@@ -284,7 +284,7 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 
     // Make sure we have the appropriate type of socket based on the
     // destination address.
-    ReturnErrorOnFailure(GetSocket(aPktInfo->DestAddress.Type()));
+    ReturnErrorOnFailure(GetSocket(aPktInfo->DestAddress.Type())); // NOLINT
 
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -410,7 +410,7 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 #endif // INET_CONFIG_UDP_SOCKET_PKTINFO
 
     // Send IP packet.
-    const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
+    const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0); // NOLINT
     if (lenSent == -1)
     {
         return CHIP_ERROR_POSIX(errno);

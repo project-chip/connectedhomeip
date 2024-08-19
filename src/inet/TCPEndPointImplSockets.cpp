@@ -127,7 +127,7 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 
         if (res == CHIP_NO_ERROR)
         {
-            if (bind(mSocket, &sa.any, sockaddrsize) != 0)
+            if (bind(mSocket, &sa.any, sockaddrsize) != 0) // NOLINT
             {
                 res = CHIP_ERROR_POSIX(errno);
             }
@@ -248,7 +248,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
-    int conRes = connect(mSocket, &sa.any, sockaddrsize);
+    int conRes = connect(mSocket, &sa.any, sockaddrsize); // NOLINT
 
     if (conRes == -1 && errno != EINPROGRESS)
     {
