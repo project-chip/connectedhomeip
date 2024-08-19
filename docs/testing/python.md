@@ -504,7 +504,7 @@ state of the DUT. To run these tests in a CI environment, specific example apps
 can be built such that these manual steps can be achieved by matter or
 named-pipe commands.
 
-In the case that all the manual steps in a test scricpt can be achieved just
+In the case that all the manual steps in a test script can be achieved just
 using matter commands, you can check if the `PICS_SDK_CI_ONLY` PICS is set to
 decide if the test script should send the required matter commands to perform
 the manual step.
@@ -548,7 +548,7 @@ from the machine running the test script without a password. You can follow
 these steps to set this up:
 
 1. If you do not have a key, create one using `ssh-keygen`.
-2. Authorise this key on the remote host: run `ssh-copy-id user@ip` once, using
+2. Authorize this key on the remote host: run `ssh-copy-id user@ip` once, using
    your password.
 3. From now on `ssh user@ip` will no longer ask for your password.
 
