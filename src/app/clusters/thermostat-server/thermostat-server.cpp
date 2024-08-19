@@ -27,6 +27,8 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/server/Server.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -116,8 +118,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -205,8 +206,7 @@ void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), kAtomicWriteState_Closed);
 }
 
 /**
@@ -321,45 +321,20 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
 }
 
 /**
- * @brief Returns the length of the list of presets if the pending presets were to be applied. The calculation is done by
- *        adding the number of presets in Presets attribute list to the number of pending presets in the pending
- *        presets list and subtracting the number of duplicate presets. This is called before changes are actually applied.
+ * @brief Returns the length of the list of presets if the pending presets were to be applied. The size of the pending presets list
+ *        calculated, after all the constraint checks are done, is the new size of the updated Presets attribute since the pending
+ *        preset list is expected to have all existing presets with or without edits plus new presets.
+ *        This is called before changes are actually applied.
  *
  * @param[in] delegate The delegate to use.
  *
  * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
  */
-uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
+uint8_t CountNumberOfPendingPresets(Delegate * delegate)
 {
-    uint8_t numberOfPresets        = 0;
-    uint8_t numberOfMatches        = 0;
     uint8_t numberOfPendingPresets = 0;
 
     VerifyOrReturnValue(delegate != nullptr, 0);
-
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers preset;
-        CHIP_ERROR err = delegate->GetPresetAtIndex(i, preset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return 0;
-        }
-        numberOfPresets++;
-
-        bool found = MatchingPendingPresetExists(delegate, preset);
-
-        if (found)
-        {
-            numberOfMatches++;
-        }
-    }
 
     for (uint8_t i = 0; true; i++)
     {
@@ -372,16 +347,14 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
             return 0;
         }
         numberOfPendingPresets++;
     }
 
-    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
-    // This API needs to modify its logic for the deletion case.
-    return static_cast<uint8_t>(numberOfPresets + numberOfPendingPresets - numberOfMatches);
+    return numberOfPendingPresets;
 }
 
 /**
@@ -632,14 +605,16 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, bool inProgress)
+void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteState))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        mAtomicWriteState[ep] = inProgress;
+        mAtomicWriteSessions[ep].state      = state;
+        mAtomicWriteSessions[ep].endpointId = endpoint;
+        mAtomicWriteSessions[ep].nodeId     = originatorNodeId;
     }
 }
 
@@ -649,9 +624,9 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteState))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        inAtomicWrite = mAtomicWriteState[ep];
+        inAtomicWrite = (mAtomicWriteSessions[ep].state == kAtomicWriteState_Open);
     }
     return inAtomicWrite;
 }
@@ -676,26 +651,15 @@ bool ThermostatAttrAccess::InAtomicWrite(CommandHandler * commandObj, EndpointId
     return GetAtomicWriteScopedNodeId(endpoint) == sourceNodeId;
 }
 
-void ThermostatAttrAccess::SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    if (ep < ArraySize(mAtomicWriteNodeIds))
-    {
-        mAtomicWriteNodeIds[ep] = originatorNodeId;
-    }
-}
-
 ScopedNodeId ThermostatAttrAccess::GetAtomicWriteScopedNodeId(EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteNodeIds))
+    if (ep < ArraySize(mAtomicWriteSessions))
     {
-        originatorNodeId = mAtomicWriteNodeIds[ep];
+        originatorNodeId = mAtomicWriteSessions[ep].nodeId;
     }
     return originatorNodeId;
 }
@@ -731,7 +695,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         break;
     case PresetTypes::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
@@ -750,14 +714,14 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case NumberOfPresets::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfPresets()));
     }
     break;
     case Presets::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
@@ -793,7 +757,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ActivePresetHandle::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         uint8_t buffer[kPresetHandleSize];
@@ -839,7 +803,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     {
     case Presets::Id: {
 
-        Delegate * delegate = GetDelegate(endpoint);
+        auto delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
@@ -924,7 +888,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Delegate * delegate, const PresetStruct::Type & preset)
+CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & preset)
 {
     if (!IsValidPresetEntry(preset))
     {
@@ -976,6 +940,23 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Delegate * delegate, const 
     }
 
     return delegate->AppendToPendingPresetList(preset);
+}
+
+void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
+    {
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == kAtomicWriteState_Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        {
+            auto delegate = GetDelegate(atomicWriteState.endpointId);
+            if (delegate == nullptr)
+            {
+                continue;
+            }
+            resetAtomicWrite(delegate, atomicWriteState.endpointId);
+        }
+    }
 }
 
 } // namespace Thermostat
@@ -1421,8 +1402,6 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
         return;
     }
 
-    auto timeout = commandData.timeout.Value();
-
     if (!validAtomicAttributes(commandData, false))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
@@ -1439,13 +1418,18 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     // needs to keep track of a pending preset list now.
     delegate->InitializePendingPresets();
 
-    uint16_t maxTimeout = 5000;
-    timeout             = std::min(timeout, maxTimeout);
+    auto timeout =
+        delegate->GetAtomicWriteTimeout(commandData.attributeRequests, System::Clock::Milliseconds16(commandData.timeout.Value()));
 
-    ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
-    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
+    if (!timeout.has_value())
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    ScheduleTimer(endpoint, timeout.value());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), kAtomicWriteState_Open);
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success,
+                       MakeOptional(timeout.value().count()));
 }
 
 imcode commitPresets(Delegate * delegate, EndpointId endpoint)
@@ -1538,7 +1522,7 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
         }
     }
 
-    uint8_t totalCount = CountUpdatedPresetsAfterApplyingPendingPresets(delegate);
+    uint8_t totalCount = CountNumberOfPendingPresets(delegate);
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 
@@ -1895,5 +1879,17 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gThermostatAttrAccess);
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
+}
+
+void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (delegate != nullptr)
+    {
+        resetAtomicWrite(delegate, endpoint);
+    }
 }

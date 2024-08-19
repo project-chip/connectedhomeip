@@ -9415,7 +9415,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            BoostStarted(0L),
+            BoostEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9455,7 +9457,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum BoostCommandField {Duration(0),OneShot(1),EmergencyBoost(2),TemporarySetpoint(3),TargetPercentage(4),TargetReheat(5),;
+        }public enum BoostCommandField {BoostInfo(0),;
                     private final int id;
                     BoostCommandField(int id) {
                         this.id = id;
@@ -11716,6 +11718,23 @@ public class ClusterIDMapping {
                     }
                     public static SelectAreasCommandField value(int id) throws NoSuchFieldError {
                         for (SelectAreasCommandField field : SelectAreasCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SkipAreaCommandField {SkippedArea(0),;
+                    private final int id;
+                    SkipAreaCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SkipAreaCommandField value(int id) throws NoSuchFieldError {
+                        for (SkipAreaCommandField field : SkipAreaCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -14867,6 +14886,7 @@ public class ClusterIDMapping {
             ThreadVersion(2L),
             InterfaceEnabled(3L),
             ActiveDatasetTimestamp(4L),
+            PendingDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

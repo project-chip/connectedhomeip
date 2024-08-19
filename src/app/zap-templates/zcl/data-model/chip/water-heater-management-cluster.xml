@@ -16,16 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <bitmap name="WaterHeaterDemandBitmap" type="bitmap8" apiMaturity="provisional">
-    <cluster code="0x0094"/>
-    <field name="ImmersionElement1" mask="0x01"/>
-    <field name="ImmersionElement2" mask="0x02"/>
-    <field name="HeatPump" mask="0x04"/>
-    <field name="Boiler" mask="0x08"/>
-    <field name="Other" mask="0x10"/>
-  </bitmap>
-
-  <bitmap name="WaterHeaterTypeBitmap" type="bitmap8" apiMaturity="provisional">
+  <bitmap name="WaterHeaterHeatSourceBitmap" type="bitmap8" apiMaturity="provisional">
     <cluster code="0x0094"/>
     <field name="ImmersionElement1" mask="0x01"/>
     <field name="ImmersionElement2" mask="0x02"/>
@@ -40,6 +31,16 @@ limitations under the License.
     <item name="Active" value="0x01"/>
   </enum>
 
+  <struct name="WaterHeaterBoostInfoStruct" apiMaturity="provisional">
+    <cluster code="0x0094"/>
+    <item fieldId="0" name="Duration" type="elapsed_s" min="1"/>
+    <item fieldId="1" name="OneShot" type="boolean" optional="true" default="0"/>
+    <item fieldId="2" name="EmergencyBoost" type="boolean" optional="true" default="0"/>
+    <item fieldId="3" name="TemporarySetpoint" type="temperature" optional="true"/>
+    <item fieldId="4" name="TargetPercentage" type="percent" optional="true"/>
+    <item fieldId="5" name="TargetReheat" type="percent" optional="true"/>
+  </struct>
+
   <cluster code="0x0094" apiMaturity="provisional">
     <domain>Energy Management</domain>
     <name>Water Heater Management</name>
@@ -51,26 +52,21 @@ limitations under the License.
       <feature bit="0" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
         <optionalConform/>
       </feature>
-      <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of the water in the tank which is hot">
+      <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of hot water in the tank">
         <optionalConform/>
       </feature>
     </features>
     <server init="false" tick="false">true</server>
-    <globalAttribute code="0xFFFD" side="either" value="1"/>
-    <attribute code="0x0000" side="server" define="HEATER_TYPES" type="WaterHeaterTypeBitmap" min="0x00" max="0x1F" default="0x00">HeaterTypes</attribute>
-    <attribute code="0x0001" side="server" define="HEAT_DEMAND" type="WaterHeaterDemandBitmap" min="0x00" max="0x1F" default="0x00">HeatDemand</attribute>
+    <globalAttribute code="0xFFFD" side="either" value="2"/>
+    <attribute code="0x0000" side="server" define="HEATER_TYPES" type="WaterHeaterHeatSourceBitmap" min="0x00" max="0x1F" default="0x00">HeaterTypes</attribute>
+    <attribute code="0x0001" side="server" define="HEAT_DEMAND" type="WaterHeaterHeatSourceBitmap" min="0x00" max="0x1F" default="0x00">HeatDemand</attribute>
     <attribute code="0x0002" side="server" define="TANK_VOLUME" type="int16u" default="0" optional="true">TankVolume</attribute>
-    <attribute code="0x0003" side="server" define="ESTIMATED_HEAT_REQUIRED" type="energy_mwh" default="0" optional="true">EstimatedHeatRequired</attribute>
+    <attribute code="0x0003" side="server" define="ESTIMATED_HEAT_REQUIRED" type="energy_mwh" default="0" optional="true" min="0">EstimatedHeatRequired</attribute>
     <attribute code="0x0004" side="server" define="TANK_PERCENTAGE" type="percent" default="0" optional="true">TankPercentage</attribute>
     <attribute code="0x0005" side="server" define="BOOST_STATE" type="BoostStateEnum" default="0" min="0x00" max="0x01">BoostState</attribute>
     <command code="0x00" source="client" name="Boost" optional="false" apiMaturity="provisional">
       <description>Allows a client to request that the water heater is put into a Boost state.</description>
-      <arg id="0" name="Duration" type="elapsed_s"/>
-      <arg id="1" name="OneShot" type="boolean" optional="true" default="0"/>
-      <arg id="2" name="EmergencyBoost" type="boolean" optional="true" default="0"/>
-      <arg id="3" name="TemporarySetpoint" type="temperature" optional="true"/>
-      <arg id="4" name="TargetPercentage" type="percent" optional="true"/>
-      <arg id="5" name="TargetReheat" type="percent" optional="true"/>
+      <arg id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct"/>
       <access op="invoke" privilege="manage"/>
     </command>
 
@@ -78,6 +74,15 @@ limitations under the License.
       <description>Allows a client to cancel an ongoing Boost operation.</description>
       <access op="invoke" privilege="manage"/>
     </command>
+
+    <event code="0x0000" name="BoostStarted" priority="info" side="server">
+      <description>BoostStarted</description>
+      <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct"/>
+    </event>
+
+    <event code="0x0001" name="BoostEnded" priority="info" side="server">
+      <description>BoostEnded</description>
+    </event>
 
   </cluster>
 </configurator>

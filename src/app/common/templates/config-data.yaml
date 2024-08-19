@@ -81,6 +81,7 @@ ClustersWithShutdownFunctions:
     - Color Control
     - Sample MEI
     - Scenes Management
+    - Thermostat
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

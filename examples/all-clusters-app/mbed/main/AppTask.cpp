@@ -25,6 +25,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #include <lib/support/logging/CHIPLogging.h>
@@ -45,7 +46,8 @@ using namespace ::chip::Credentials;
 
 namespace {
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-}
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -90,6 +92,7 @@ int AppTask::Init()
         return EXIT_FAILURE;
     }
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return 0;
 }
 

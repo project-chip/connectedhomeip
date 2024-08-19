@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import stringcase
+import re
 
 
 def normalize_acronyms(s: str) -> str:
@@ -49,6 +49,75 @@ def lowfirst_except_acronym(s: str) -> str:
     return lowfirst(s)
 
 
+def to_snake_case(s: str) -> str:
+    """convert to snake case; all words are seperated by underscore and are lower case
+       examples:
+        FooBarBaz --> foo_bar_baz
+        foo BarBaz --> foo_bar_baz
+        FOOBarBaz --> foo_bar_baz
+        _fooBar_Baz_ --> foo_bar_baz
+    """
+    s = "" if s is None else str(s)
+
+    s = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s)
+    s = re.sub(r'([a-z\d])([A-Z])', r'\1_\2', s)
+    s = re.sub(r'[\s\-]+', '_', s)
+
+    snake_case = s.lower()
+    return snake_case.strip('_')
+
+
+def to_constant_case(s: str) -> str:
+    """convert to constant case; all words are seperated by underscore and are upper case
+       similar to a snake case but with upper case
+       examples:
+       FooBarBaz --> FOO_BAR_BAZ
+       foo BarBaz --> FOO_BAR_BAZ
+       FOOBarBaz --> FOO_BAR_BAZ
+    """
+    snake_case = to_snake_case(s)
+    constant_case = snake_case.upper()
+    return constant_case
+
+
+def to_spinal_case(s: str) -> str:
+    """convert to spinal case; all words sperated by hypen and are lower case
+        similar to a snake case but with hyphen seperator instead of underscore 
+        examples:
+        FooBarBaz --> foo-bar-baz
+        foo BarBaz --> foo-bar-baz
+        FOOBarBaz --> foo-bar-baz
+    """
+    snake_case = to_snake_case(s)
+    return snake_case.replace('_', '-')
+
+
+def to_pascal_case(s: str) -> str:
+    """convert to pascal case; with no spaces or underscore between words, first letter of all words is uppercase
+       examples:
+        fooBarBaz --> FooBarBaz
+        foo BarBaz --> FooBarBaz
+        FOOBar_Baz --> FooBarBaz
+    """
+
+    snake_case = to_snake_case(s)
+    snake_case_split = snake_case.split('_')
+    pascal_case = ''.join(word.capitalize() for word in snake_case_split)
+
+    return pascal_case
+
+
+def to_camel_case(s) -> str:
+    """convert to camel case; with no spaces or underscore between words, first word all lowercase and following words are uppercase
+        same as pascal case but first letter is lower case
+       examples:
+        FooBarBaz --> fooBarBaz
+        foo BarBaz --> fooBarBaz
+        FOOBarBaz --> fooBarBaz
+    """
+    return lowfirst(to_pascal_case(s))
+
+
 def RegisterCommonFilters(filtermap):
     """
     Register filters that are NOT considered platform-generator specific.
@@ -59,12 +128,12 @@ def RegisterCommonFilters(filtermap):
     """
 
     # General casing for output naming
-    filtermap['camelcase'] = stringcase.camelcase
-    filtermap['capitalcase'] = stringcase.capitalcase
-    filtermap['constcase'] = stringcase.constcase
-    filtermap['pascalcase'] = stringcase.pascalcase
-    filtermap['snakecase'] = stringcase.snakecase
-    filtermap['spinalcase'] = stringcase.spinalcase
+    filtermap['camelcase'] = to_camel_case
+    filtermap['capitalcase'] = upfirst
+    filtermap['constcase'] = to_constant_case
+    filtermap['pascalcase'] = to_pascal_case
+    filtermap['snakecase'] = to_snake_case
+    filtermap['spinalcase'] = to_spinal_case
 
     filtermap['normalize_acronyms'] = normalize_acronyms
     filtermap['lowfirst'] = lowfirst

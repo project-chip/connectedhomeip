@@ -49,6 +49,7 @@
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
+#include <static-supported-modes-manager.h>
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
@@ -73,6 +74,7 @@ static Button_Handle sAppRightHandle;
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -334,6 +336,7 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return 0;
 }
 

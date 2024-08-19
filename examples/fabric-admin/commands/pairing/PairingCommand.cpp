@@ -18,7 +18,10 @@
 
 #include "PairingCommand.h"
 
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <commands/common/DeviceScanner.h>
+#include <commands/interactive/InteractiveCommands.h>
+#include <commands/pairing/DeviceSynchronization.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -400,10 +403,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-
-#if defined(PW_RPC_ENABLED)
-        AddSynchronizedDevice(nodeId);
-#endif
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(CurrentCommissioner(), mNodeId, mDeviceIsICD);
     }
     else
     {
@@ -464,7 +464,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
+    clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
