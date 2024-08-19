@@ -237,12 +237,12 @@ void DeviceManager::ReadSupportedDeviceCategories()
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::HandleReadSupportedDeviceCategories(chip::TLV::TLVReader * data)
+void DeviceManager::HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Attribute SupportedDeviceCategories detected.");
 
     BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -273,12 +273,12 @@ void DeviceManager::RequestCommissioningApproval()
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader * data)
+void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "CommissioningRequestResult event received.");
 
     CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to decode event value. Error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -302,12 +302,12 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader * data)
     SendCommissionNodeRequest(value.requestId, kResponseTimeoutSeconds);
 }
 
-void DeviceManager::HanldeAttributePartsListUpdate(chip::TLV::TLVReader * data)
+void DeviceManager::HanldeAttributePartsListUpdate(chip::TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Attribute PartsList change detected:");
 
     app::DataModel::DecodableList<EndpointId> value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -416,10 +416,10 @@ void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t respo
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader * data)
+void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
 {
     CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -445,7 +445,7 @@ void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader * data)
                                   verifierHex);
 }
 
-void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
+void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader & data)
 {
     if (path.mClusterId == CommissionerControl::Id &&
         path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
@@ -461,7 +461,7 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     }
 }
 
-void DeviceManager::HandleEventData(const app::EventHeader & header, TLV::TLVReader * data)
+void DeviceManager::HandleEventData(const app::EventHeader & header, TLV::TLVReader & data)
 {
     if (header.mPath.mClusterId == CommissionerControl::Id &&
         header.mPath.mEventId == CommissionerControl::Events::CommissioningRequestResult::Id)
@@ -470,7 +470,7 @@ void DeviceManager::HandleEventData(const app::EventHeader & header, TLV::TLVRea
     }
 }
 
-void DeviceManager::HandleCommandResponse(const app::ConcreteCommandPath & path, TLV::TLVReader * data)
+void DeviceManager::HandleCommandResponse(const app::ConcreteCommandPath & path, TLV::TLVReader & data)
 {
     ChipLogProgress(NotSpecified, "Command Response received.");
 

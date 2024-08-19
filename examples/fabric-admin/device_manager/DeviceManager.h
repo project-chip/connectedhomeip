@@ -150,11 +150,11 @@ public:
 
     void ReadSupportedDeviceCategories();
 
-    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
-    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
+    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader & data);
 
-    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data);
+    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
@@ -163,15 +163,15 @@ private:
 
     void RequestCommissioningApproval();
 
-    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader * data);
+    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
 
-    void HandleCommissioningRequestResult(chip::TLV::TLVReader * data);
+    void HandleCommissioningRequestResult(chip::TLV::TLVReader & data);
 
-    void HanldeAttributePartsListUpdate(chip::TLV::TLVReader * data);
+    void HanldeAttributePartsListUpdate(chip::TLV::TLVReader & data);
 
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
-    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader * data);
+    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
 
     static DeviceManager sInstance;
 
