@@ -345,8 +345,10 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         self.step("18")
         time.sleep(10)
 
+        # Allow a little tolerance checking the duration returned in the event as CI tests can run "slower"
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerAdjustEnd)
-        asserts.assert_equal(event_data.duration, 10)
+        asserts.assert_greater_equal(event_data.duration, 10)
+        asserts.assert_less_equal(event_data.duration, 12)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
         asserts.assert_greater(event_data.energyUse, 0)
 
