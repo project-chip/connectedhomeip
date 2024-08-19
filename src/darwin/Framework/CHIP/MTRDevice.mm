@@ -31,6 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDelegateInfo.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -66,81 +67,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
-@implementation MTRDeviceDelegateInfo
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-        _delegatePointerValue = (__bridge void *) delegate;
-        _queue = queue;
-        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
-        _interestedPathsForEvents = [interestedPathsForEvents copy];
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
-}
-
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-    dispatch_async(_queue, ^{
-        block(strongDelegate);
-    });
-    return YES;
-}
-
-#ifdef DEBUG
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-
-    block(strongDelegate);
-
-    return YES;
-}
-#endif
-@end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 

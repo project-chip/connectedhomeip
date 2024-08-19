@@ -305,6 +305,8 @@
 		9B0484F52C701154006C2D5F /* MTRDeviceController_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B0484F42C701154006C2D5F /* MTRDeviceController_Concrete.h */; };
 		9B231B042C62EF650030EB37 /* (null) in Headers */ = {isa = PBXBuildFile; };
 		9B231B052C62EF650030EB37 /* MTRDeviceController_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */; };
+		9B4144652C72F9B10030CFAB /* MTRDeviceDelegateInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B4144632C72F9B10030CFAB /* MTRDeviceDelegateInfo.h */; };
+		9B4144662C72F9B10030CFAB /* MTRDeviceDelegateInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B4144642C72F9B10030CFAB /* MTRDeviceDelegateInfo.mm */; };
 		9B5CCB592C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */; };
 		9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */; };
 		9B5CCB5D2C6EC890009DD99B /* MTRDevice_XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */; };
@@ -745,6 +747,8 @@
 		99D466E02798936D0089A18F /* MTRCommissioningParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningParameters.h; sourceTree = "<group>"; };
 		9B0484F42C701154006C2D5F /* MTRDeviceController_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Concrete.h; sourceTree = "<group>"; };
 		9B231B032C62EF650030EB37 /* MTRDeviceController_Concrete.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceController_Concrete.mm; sourceTree = "<group>"; };
+		9B4144632C72F9B10030CFAB /* MTRDeviceDelegateInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceDelegateInfo.h; sourceTree = "<group>"; };
+		9B4144642C72F9B10030CFAB /* MTRDeviceDelegateInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceDelegateInfo.mm; sourceTree = "<group>"; };
 		9B5CCB582C6E6FD3009DD99B /* MTRDeviceController_XPC_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_XPC_Internal.h; sourceTree = "<group>"; };
 		9B5CCB5A2C6EC890009DD99B /* MTRDevice_XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_XPC.h; sourceTree = "<group>"; };
 		9B5CCB5B2C6EC890009DD99B /* MTRDevice_XPC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevice_XPC.mm; sourceTree = "<group>"; };
@@ -1432,6 +1436,8 @@
 				5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */,
 				515BE4EC2B72C0C5000BC1FD /* MTRUnfairLock.h */,
 				3D69867E29382E58007314E7 /* Resources */,
+				9B4144632C72F9B10030CFAB /* MTRDeviceDelegateInfo.h */,
+				9B4144642C72F9B10030CFAB /* MTRDeviceDelegateInfo.mm */,
 			);
 			path = CHIP;
 			sourceTree = "<group>";
@@ -1659,6 +1665,7 @@
 				754784672BFE93B00089C372 /* MTRDeviceStorageBehaviorConfiguration.h in Headers */,
 				5136661528067D550025EDAE /* MTRDeviceControllerFactory_Internal.h in Headers */,
 				515C1C70284F9FFB00A48F0C /* MTRFramework.h in Headers */,
+				9B4144652C72F9B10030CFAB /* MTRDeviceDelegateInfo.h in Headers */,
 				7534F12928BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h in Headers */,
 				D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */,
 				3DA1A3552ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.h in Headers */,
@@ -2020,6 +2027,7 @@
 				991DC0892475F47D00C13860 /* MTRDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */,
 				514C79F32B62ED5500DD6D7B /* attribute-storage.cpp in Sources */,
+				9B4144662C72F9B10030CFAB /* MTRDeviceDelegateInfo.mm in Sources */,
 				514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */,
 				1EDCE546289049A100E41EC9 /* MTROTAHeader.mm in Sources */,
 				51D0B13D2B61B2F2006E3511 /* MTRDeviceTypeRevision.mm in Sources */,
