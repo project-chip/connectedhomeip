@@ -205,7 +205,7 @@ class TestRunner(TestRunnerBase):
 
             if logger.is_failure():
                 hooks.step_failure(logger, logs, duration,
-                                    request, responses)
+                                   request, responses)
             else:
                 hooks.step_success(logger, logs, duration, request)
 
