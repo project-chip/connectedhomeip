@@ -59,6 +59,7 @@
 
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
+        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {
@@ -119,6 +120,8 @@
     MTR_LOG_ERROR("%s: unimplemented method called", __PRETTY_FUNCTION__);
     return nil;
 }
+
+#pragma mark - Behavior Overrides
 
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
