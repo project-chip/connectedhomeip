@@ -250,8 +250,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
+        auto rotatingIdSpan = CharSpan{ mRotatingId.data(), mRotatingId.size() };
         ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             getRotatingIdSpan(), mPasscode, bindings, OnSuccessResponse,
+                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
                                                              OnFailureResponse);
         clearContext();
     }
@@ -281,7 +282,6 @@ class MyPostCommissioningListener : public PostCommissioningListener
         mSecureSession.SessionReleased();
     }
 
-    CharSpan getRotatingIdSpan() { return CharSpan(mRotatingId.data(), mRotatingId.size()); }
 
     uint16_t mVendorId  = 0;
     uint16_t mProductId = 0;

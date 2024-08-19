@@ -445,11 +445,6 @@ public:
      */
     UDCClientState * GetUDCClientState();
 
-    /**
-     * Get the rotating ID string CharSpan view
-     */
-    inline chip::CharSpan GetRotatingIdSpan() { return chip::CharSpan(mRotatingId.data(), mRotatingId.size()); }
-
 protected:
     bool mReady          = true; // ready to start commissioning
     bool mPendingConsent = false;

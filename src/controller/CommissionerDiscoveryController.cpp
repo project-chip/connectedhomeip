@@ -616,7 +616,8 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, GetRotatingIdSpan(), mPasscode, exchangeMgr,
+        auto rotatingIdSpan = CharSpan{ mRotatingId.data(), mRotatingId.size() };
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, rotatingIdSpan, mPasscode, exchangeMgr,
                                                            sessionHandle);
     }
     else
