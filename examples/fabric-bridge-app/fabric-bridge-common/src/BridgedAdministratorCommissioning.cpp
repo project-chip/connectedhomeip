@@ -32,6 +32,11 @@ CHIP_ERROR BridgedAdministratorCommissioning::Init()
     // including the AdministratorCommissioning. This expectation allows us to get and unregister the
     // existing AccessAttributeInterface for AdministratorCommissioning and register ourselves so that
     // we can first see if the ReadAttribute is for us.
+
+    // We expect initialization after all embr plugin clusters initialization. This allows us to unregister
+    // the existing AccessAttributeInterface for AdministratorCommissioning and register ourselves, ensuring
+    // we get the callback for reading attribute. If the read is not intended for a bridged device we will
+    // forward it to the original attribute interface that we are unregistering.
     mOriginalAttributeInterface = AttributeAccessInterfaceRegistry::Instance().Get(0, AdministratorCommissioning::Id);
     VerifyOrReturnError(mOriginalAttributeInterface, CHIP_ERROR_INTERNAL);
     AttributeAccessInterfaceRegistry::Instance().Unregister(mOriginalAttributeInterface);
@@ -50,7 +55,6 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
         VerifyOrDie(mOriginalAttributeInterface);
         return mOriginalAttributeInterface->Read(aPath, aEncoder);
     }
-    // TODO Check if we are supposed to do something with this read attribute
     auto attr = device->GetAdminCommissioningAttributes();
 
     switch (aPath.mAttributeId)

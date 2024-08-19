@@ -47,7 +47,6 @@ public:
             chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
         std::optional<chip::FabricIndex> openerFabricIndex = std::nullopt;
         std::optional<chip::VendorId> openerVendorId       = std::nullopt;
-        ;
     };
 
     BridgedDevice(chip::NodeId nodeId);
