@@ -68,6 +68,7 @@ public:
 
     [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
     void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+    // TODO(#35077): Need to allow mAdminCommissioningAttributes to be set from fabric-admin.
     const AdminCommissioningAttributes & GetAdminCommissioningAttributes() const { return mAdminCommissioningAttributes; }
 
     /// Convenience method to set just the unique id of a bridged device as it
