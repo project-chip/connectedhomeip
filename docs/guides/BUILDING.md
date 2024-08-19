@@ -111,9 +111,9 @@ On macOS, install Xcode from the Mac App Store. After installing Xcode, install
 python3.11 using brew:
 
 ```sh
-    brew install python@3.11
-    python3.11 -m pip install --upgrade setuptools
-    python3.11 -m pip install --upgrade pip
+    brew install python@3.12
+    python3.12 -m pip install --upgrade setuptools
+    python3.12 -m pip install --upgrade pip
 ```
 
 #### UI builds
