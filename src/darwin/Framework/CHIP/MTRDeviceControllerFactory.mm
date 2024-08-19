@@ -900,8 +900,11 @@ MTR_DIRECT_MEMBERS
     app::DnssdServer::Instance().StartServer();
 }
 
+//#define TESTING_IGNORE_MTRDEVICECONTROLLERFACTORY_SHUTDOWN
+
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
+#ifndef TESTING_IGNORE_MTRDEVICECONTROLLERFACTORY_SHUTDOWN
     [self _assertCurrentQueueIsNotMatterQueue];
 
     if (![_controllers containsObject:controller]) {
@@ -960,6 +963,7 @@ MTR_DIRECT_MEMBERS
     });
 
     [controller deinitFromFactory];
+#endif // TESTING_IGNORE_MTRDEVICECONTROLLERFACTORY_SHUTDOWN
 }
 
 - (NSArray<MTRDeviceController *> *)getRunningControllers
