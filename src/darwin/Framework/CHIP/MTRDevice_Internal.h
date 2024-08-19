@@ -21,8 +21,8 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 #import "MTRDeviceDelegateInfo.h"
+#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 #import <os/lock.h>
 
@@ -149,7 +149,6 @@ MTR_TESTABLE
     NSDate * _Nullable _mostRecentReportTimeForDescription;
     // Copy of _lastSubscriptionFailureTime that is safe to use in description.
     NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
-
 }
 
 - (instancetype)initForSubclasses;
@@ -260,8 +259,6 @@ MTR_TESTABLE
 
 - (void)_scheduleSubscriptionPoolWork:(dispatch_block_t)workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description;
 - (void)_setupSubscriptionWithReason:(NSString *)reason;
-
-
 
 @end
 

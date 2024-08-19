@@ -900,7 +900,7 @@ MTR_DIRECT_MEMBERS
     app::DnssdServer::Instance().StartServer();
 }
 
-//#define TESTING_IGNORE_MTRDEVICECONTROLLERFACTORY_SHUTDOWN
+// #define TESTING_IGNORE_MTRDEVICECONTROLLERFACTORY_SHUTDOWN
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {

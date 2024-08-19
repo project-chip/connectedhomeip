@@ -70,7 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
 // queue used to serialize all work performed by the MTRDeviceController
 @property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
-
 - (instancetype)initForSubclasses;
 
 #pragma mark - MTRDeviceControllerFactory methods

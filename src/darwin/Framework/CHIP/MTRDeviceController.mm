@@ -311,8 +311,7 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
-
-//#define TESTING_IGNORE_MTRDEVICECONTROLLER_SHUTDOWN
+// #define TESTING_IGNORE_MTRDEVICECONTROLLER_SHUTDOWN
 
 - (void)shutdown
 {

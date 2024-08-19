@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "MTRDefines_Internal.h"
+#import <Foundation/Foundation.h>
 
 @protocol MTRDeviceDelegate;
 
