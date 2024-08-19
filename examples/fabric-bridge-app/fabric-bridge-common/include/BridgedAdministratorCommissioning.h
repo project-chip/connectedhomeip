@@ -31,7 +31,7 @@ public:
     CHIP_ERROR Init();
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    
+
     // We currently do not allow for any writes
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
     {
