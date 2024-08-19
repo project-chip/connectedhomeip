@@ -163,7 +163,11 @@ private:
 
     void RequestCommissioningApproval();
 
+    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader * data);
+
     void HandleCommissioningRequestResult(chip::TLV::TLVReader * data);
+
+    void HanldeAttributePartsListUpdate(chip::TLV::TLVReader * data);
 
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
