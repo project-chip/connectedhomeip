@@ -247,6 +247,7 @@ MTR_TESTABLE
 
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;
+- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
