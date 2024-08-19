@@ -90,6 +90,8 @@ class ClangTidyEntry:
         if compiler in ['clang++', 'clang', 'gcc', 'g++']:
             self.valid = True
             self.clang_arguments = command_items[1:]
+            if '-c' in self.clang_arguments:
+                self.clang_arguments.remove('-c')
         else:
             logging.warning(
                 "Cannot tidy %s - not a clang compile command", self.file)
