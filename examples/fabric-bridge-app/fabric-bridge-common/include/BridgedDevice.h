@@ -19,6 +19,8 @@
 #pragma once
 
 #include <app/util/attribute-storage.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 #include <string>
 
@@ -40,6 +42,13 @@ public:
         std::string softwareVersionString;
     };
 
+    struct AdminCommissioningAttributes
+    {
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum commissioningWindowStatus = chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
+        std::optional<chip::FabricIndex> openerFabricIndex = std::nullopt;
+        std::optional<chip::VendorId> openerVendorId = std::nullopt;;
+    };
+
     BridgedDevice(chip::NodeId nodeId);
     virtual ~BridgedDevice() = default;
 
@@ -59,6 +68,7 @@ public:
 
     [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
     void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+    const AdminCommissioningAttributes & GetAdminCommissioningAttributes() const { return mAdminCommissioningAttributes; }
 
     /// Convenience method to set just the unique id of a bridged device as it
     /// is one of the few attributes that is not always bulk-set
@@ -73,4 +83,5 @@ protected:
     chip::EndpointId mParentEndpointId = 0;
 
     BridgedAttributes mAttributes;
+    AdminCommissioningAttributes mAdminCommissioningAttributes;
 };

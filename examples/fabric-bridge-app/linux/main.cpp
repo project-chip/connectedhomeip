@@ -18,6 +18,7 @@
 
 #include <AppMain.h>
 
+#include "BridgedAdministratorCommissioning.h"
 #include "BridgedDevice.h"
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
@@ -234,6 +235,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
@@ -258,6 +260,7 @@ void ApplicationInit()
     pollingThread.detach();
 
     BridgeDeviceMgr().Init();
+    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
 
     VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");
