@@ -378,15 +378,6 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
         return;
     }
 
-    // If the CurrentArea attribute is null, the status should be set to InvalidInMode.
-    // If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined error
-    // description.
-    if (mCurrentArea.IsNull())
-    {
-        exitResponse(SkipAreaStatus::kInvalidInMode, "Current Area attribute is null"_span);
-        return;
-    }
-
     // have the device attempt to skip
     // If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined error
     // description. InvalidInMode | The received request cannot be handled due to the current mode of the device. (skipStatusText to
