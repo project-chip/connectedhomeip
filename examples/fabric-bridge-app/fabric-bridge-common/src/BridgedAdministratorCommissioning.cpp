@@ -42,7 +42,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Init()
 CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
-    EndpointId endpointId = aPath.mEndpointId;
+    EndpointId endpointId  = aPath.mEndpointId;
     BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
 
     if (!device)
@@ -55,12 +55,10 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
 
     switch (aPath.mAttributeId)
     {
-    case Attributes::WindowStatus::Id:
-    {
+    case Attributes::WindowStatus::Id: {
         return aEncoder.Encode(attr.commissioningWindowStatus);
     }
-    case Attributes::AdminFabricIndex::Id:
-    {
+    case Attributes::AdminFabricIndex::Id: {
         DataModel::Nullable<FabricIndex> encodeableFabricIndex = DataModel::NullNullable;
         if (attr.openerFabricIndex.has_value())
         {
@@ -68,8 +66,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
         }
         return aEncoder.Encode(encodeableFabricIndex);
     }
-    case Attributes::AdminVendorId::Id:
-    {
+    case Attributes::AdminVendorId::Id: {
         DataModel::Nullable<VendorId> encodeableVendorId = DataModel::NullNullable;
         if (attr.openerVendorId.has_value())
         {
