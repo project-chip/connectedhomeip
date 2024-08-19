@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import xml.etree.ElementTree as ElementTree
 from typing import Any
 
 import chip.clusters as Clusters
