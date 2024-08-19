@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
-import jinja2
 import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
+import jinja2
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
 from mobly import asserts

@@ -19,10 +19,10 @@ import xml.etree.ElementTree as ElementTree
 from typing import Any
 
 import chip.clusters as Clusters
-from TC_DeviceConformance import DeviceConformanceTests
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from spec_parsing_support import build_xml_clusters, build_xml_device_types
 from mobly import asserts
+from spec_parsing_support import build_xml_clusters, build_xml_device_types
+from TC_DeviceConformance import DeviceConformanceTests
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
