@@ -57,6 +57,8 @@ template("chip_test_suite") {
   if (chip_link_tests && chip_device_platform != "darwin") {
     # Common library shouldn't have all the individual unit tests, only the common sources.
     exclude_variables += [ "test_sources" ]
+
+    # NOTE: For `Build on Darwin (clang, python_lib, simulated)` the test_sources must be in common lib.
   } else {
     # Common library should have all the individual unit tests, in addition to the common sources.
     if (!defined(invoker.sources)) {
