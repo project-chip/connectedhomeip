@@ -167,7 +167,7 @@ private:
 
     void HandleCommissioningRequestResult(chip::TLV::TLVReader & data);
 
-    void HanldeAttributePartsListUpdate(chip::TLV::TLVReader & data);
+    void HandleAttributePartsListUpdate(chip::TLV::TLVReader & data);
 
     void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
 
