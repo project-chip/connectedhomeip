@@ -131,15 +131,14 @@ namespace DeviceEnergyManagement {
 
 #ifdef CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable,
-                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
 #elif CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment,
-                                          Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
-                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
 #else
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment,
-                                          Feature::kStartTimeAdjustment, Feature::kPausable,
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStartTimeAdjustment, Feature::kPausable,
                                           Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 #endif
 
