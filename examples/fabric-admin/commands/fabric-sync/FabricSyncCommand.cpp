@@ -64,7 +64,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
         DeviceMgr().SubscribeRemoteFabricBridge();
 
-        if (DeviceMgr.IsLocalBridgeReady())
+        if (DeviceMgr().IsLocalBridgeReady())
         {
             // After successful commissioning of the Commissionee, initiate Reverse Commissioning
             // via the Commissioner Control Cluster. However, we must first verify that the
