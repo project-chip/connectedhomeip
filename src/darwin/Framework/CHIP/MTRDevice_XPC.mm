@@ -86,8 +86,8 @@
 
 - (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
-//    std::lock_guard lock(_lock); // TODO: LOCKING NOT SAFE HERE
-//
+    //    std::lock_guard lock(_lock); // TODO: LOCKING NOT SAFE HERE
+    //
     // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
     NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
     for (MTRDeviceDelegateInfo * delegateInfo in self.delegates) {
@@ -110,7 +110,6 @@
     [self.delegates addObject:newDelegateInfo];
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 }
-
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
