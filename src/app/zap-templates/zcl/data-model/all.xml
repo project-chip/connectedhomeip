@@ -34,6 +34,7 @@
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
+   <xi:include href="chip/ecosystem-information-cluster.xml" />
    <xi:include href="chip/energy-evse-cluster.xml" />
    <xi:include href="chip/energy-evse-mode-cluster.xml" />   
    <xi:include href="chip/energy-preference-cluster.xml" />
@@ -46,6 +47,8 @@
    <xi:include href="chip/general-commissioning-cluster.xml" />
    <xi:include href="chip/general-diagnostics-cluster.xml" />
    <xi:include href="chip/global-attributes.xml" />
+   <xi:include href="chip/global-bitmaps.xml" />
+   <xi:include href="chip/global-enums.xml" />
    <xi:include href="chip/global-structs.xml" />
    <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />

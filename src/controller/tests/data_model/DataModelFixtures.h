@@ -22,6 +22,7 @@
 #pragma once
 
 #include <app/CommandHandler.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/DataModelTypes.h>
@@ -96,6 +97,45 @@ extern ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective;
 
 // Populated with the command handle when gCommandResponseDirective == kAsync
 extern CommandHandler::Handle gAsyncCommandHandle;
+
+/// A customized class for read/write/invoke that matches functionality
+/// with the ember-compatibility-functions functionality here.
+///
+/// TODO: these functions currently redirect to ember functions, so could
+///       be merged with test-interaction-model-api.h/cpp as well. This is not done since
+///       if we remove the direct ember dependency from IM, we can implement
+///       distinct functional classes.
+/// TODO items for above:
+///      - once IM only supports DataModel
+///      - break ember-overrides in this h/cpp file
+class CustomDataModel : public DataModel::Provider
+{
+public:
+    static CustomDataModel & Instance();
+
+    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                         CommandHandler * handler) override;
+
+    EndpointId FirstEndpoint() override;
+    EndpointId NextEndpoint(EndpointId before) override;
+    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
+    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
+    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
+    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
+    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
+    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
+    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+};
 
 } // namespace DataModelTests
 } // namespace app

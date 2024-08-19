@@ -34,6 +34,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/ecosystem-information-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
@@ -43,6 +44,8 @@ load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-enums.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-structs.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";

@@ -165,7 +165,8 @@ private:
     Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback           = nullptr;
     SetupPayload mSetupPayload;
     SetupDiscriminator mDiscriminator{};
-    NodeId mNodeId                                       = kUndefinedNodeId;
+    NodeId mNodeId               = kUndefinedNodeId;
+    EndpointId mTargetEndpointId = kRootEndpointId; // Default endpoint for Administrator Commissioning Cluster
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
     Crypto::Spake2pVerifier mVerifier; // Used for non-basic commissioning.

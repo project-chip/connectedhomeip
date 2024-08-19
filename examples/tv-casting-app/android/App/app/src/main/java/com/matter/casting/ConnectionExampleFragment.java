@@ -160,13 +160,17 @@ public class ConnectionExampleFragment extends Fragment {
                           Log.i(
                               TAG,
                               "Successfully connected to CastingPlayer with deviceId: "
-                                  + targetCastingPlayer.getDeviceId());
+                                  + targetCastingPlayer.getDeviceId()
+                                  + ", useCommissionerGeneratedPasscode: "
+                                  + useCommissionerGeneratedPasscode);
                           getActivity()
                               .runOnUiThread(
                                   () -> {
                                     connectionFragmentStatusTextView.setText(
                                         "Successfully connected to Casting Player with device name: "
                                             + targetCastingPlayer.getDeviceName()
+                                            + "\n\nUsed CastingPlayer Passcode: "
+                                            + useCommissionerGeneratedPasscode
                                             + "\n\n");
                                     connectionFragmentNextButton.setEnabled(true);
                                   });
