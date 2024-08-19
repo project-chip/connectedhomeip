@@ -1,6 +1,6 @@
 #CHIP EFR32 Test Driver
 
-This builds and runs the unit tests on the efr32 device
+This builds and runs the unit tests on the efr32 device.
 
 <hr>
 
