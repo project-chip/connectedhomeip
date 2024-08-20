@@ -64,43 +64,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-// Consider moving utility classes to their own file
-#pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
 @implementation MTRDeviceDelegateInfo
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
@@ -371,7 +334,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
 // update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
@@ -502,8 +464,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // System time change observer reference
     id _systemTimeChangeObserverToken;
 
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
-
     // Protects mutable state used by our description getter.  This is a separate lock from "lock"
     // so that we don't need to worry about getting our description while holding "lock" (e.g due to
     // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
@@ -526,10 +486,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
 }
 
-- (instancetype)initForSubclasses
+- (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
-        // nothing, as superclass of MTRDevice is NSObject
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _delegates = [NSMutableSet set];
     }
 
     return self;
@@ -875,6 +836,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // TODO: XPC: This function and all its callsites should go away from this class.
+
     // We should not allow a subscription for device controllers over XPC.
     return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
@@ -923,34 +886,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [_delegates addObject:newDelegateInfo];
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
-    __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateAdded];
+}
 
-    // For unit testing only. If this ever changes to not being for unit testing purposes,
-    // we would need to move the code outside of where we acquire the lock above.
-#ifdef DEBUG
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
-            shouldSetUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
-        }
-    }];
-#endif
-
-    if (shouldSetUpSubscription) {
-        MTR_LOG("%@ - starting subscription setup", self);
-        // Record the time of first addDelegate call that triggers initial subscribe, and do not reset this value on subsequent addDelegate calls
-        if (!_initialSubscribeStart) {
-            _initialSubscribeStart = [NSDate now];
-        }
-        if ([self _deviceUsesThread]) {
-            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
-            [self _scheduleSubscriptionPoolWork:^{
-                std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
-            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
-        } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
-        }
-    }
+- (void)_delegateAdded
+{
+    // Nothing to do; this is a hook for subclasses.  If that ever changes for
+    // some reason, subclasses need to start calling this hook on their super.
 }
 
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
@@ -962,7 +905,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
     [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate == delegate) {
+        if (!strongDelegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
+        } else if (strongDelegate == delegate) {
             [delegatesToRemove addObject:delegateInfo];
             MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
         }
@@ -976,45 +922,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)invalidate
 {
-    MTR_LOG("%@ invalidate", self);
-
-    [_asyncWorkQueue invalidate];
-
-    os_unfair_lock_lock(&self->_timeSyncLock);
-    _timeUpdateScheduled = NO;
-    os_unfair_lock_unlock(&self->_timeSyncLock);
-
-    os_unfair_lock_lock(&self->_lock);
-
-    _state = MTRDeviceStateUnknown;
+    std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
-
-    // Make sure we don't try to resubscribe if we have a pending resubscribe
-    // attempt, since we now have no delegate.
-    _reattemptingSubscription = NO;
-
-    [_deviceController asyncDispatchToMatterQueue:^{
-        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
-
-        // Destroy the read client and callback (has to happen on the Matter
-        // queue, to avoid deleting objects that are being referenced), to
-        // tear down the subscription.  We will get no more callbacks from
-        // the subscription after this point.
-        std::lock_guard lock(self->_lock);
-        self->_currentReadClient = nullptr;
-        if (self->_currentSubscriptionCallback) {
-            delete self->_currentSubscriptionCallback;
-        }
-        self->_currentSubscriptionCallback = nullptr;
-
-        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
-    }
-                                     errorHandler:nil];
-
-    [self _stopConnectivityMonitoring];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)nodeMayBeAdvertisingOperational
@@ -1145,8 +1055,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return [self _iterateDelegatesWithBlock:nil];
 }
 
-// Returns YES if any non-null delegates were found
-- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo * delegateInfo)_Nullable)block
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1198,7 +1107,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
-// Returns YES if a delegate is called
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -2496,6 +2404,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_setupSubscriptionWithReason:(NSString *)reason
 {
+    // TODO: XPC: This is not really called anymore in this class.  Should
+    // remove this function and anything only reachable from it.
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
