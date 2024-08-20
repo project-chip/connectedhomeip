@@ -26,6 +26,6 @@
 #include "brd4187c.h"
 #else
 #include "sl_custom_board.h"
-#warning "SPIDRV USART peripheral not configured correctly"
+#warning "Modify sl_custom_board.h configuration file to match your hardware SPIDRV USART peripheral"
 #endif
 #endif /* _SL_WFX_BOARD_H_ */
