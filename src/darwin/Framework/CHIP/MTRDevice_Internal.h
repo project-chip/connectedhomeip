@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDevice.h>
+#import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
@@ -65,8 +66,68 @@ MTR_TESTABLE
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
 
-@interface MTRDevice ()
-- (instancetype)initForSubclasses;
+// Consider moving utility classes to their own file
+#pragma mark - Utility Classes
+
+/**
+ * container of MTRDevice delegate weak reference, its queue, and its interested
+ * paths for attribute reports.
+ */
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceDelegateInfo : NSObject {
+@private
+    void * _delegatePointerValue;
+    __weak id _delegate;
+    dispatch_queue_t _queue;
+}
+
+// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForAttributes;
+
+// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForEvents;
+
+// Expose delegate
+@property (readonly) id delegate;
+
+// Pointer value for logging purpose only
+@property (readonly) void * delegatePointerValue;
+
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
+
+// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+#endif
+@end
+
+#pragma mark - MTRDevice internal extensions
+
+@interface MTRDevice () {
+    // Ivars needed to implement shared MTRDevice functionality.
+    //
+    // Unfortunately, we can't use @protected here, because that exports the
+    // symbols (so that subclasses that are not part of the framework can see
+    // them), but TAPI does not see these declarations, because they are in a
+    // project header.
+    //
+    // Using @package means that the symbols do not need to be exported, but
+    // unfortunately gets treated as @public from inside our framework, which
+    // means random other framework code can access these ivars.  Hopefully the
+    // naming with leading '_' will make it clearer that random other code
+    // should not touch these.
+    //
+    // TODO: Figure out some way of doing @protected but still not exporting the symbol.
+@package
+    // Lock that protects overall device state, including delegate storage.
+    os_unfair_lock _lock;
+    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+}
+
+- (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 // Called from MTRClusters for writes and commands
@@ -82,6 +143,9 @@ MTR_TESTABLE
 - (void)nodeMayBeAdvertisingOperational;
 
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
+
+// Called by MTRDevice_XPC to forward delegate callbacks
+- (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
 /**
  * Like the public invokeCommandWithEndpointID but:
@@ -122,6 +186,19 @@ MTR_TESTABLE
 
 // Returns whether this MTRDevice uses Thread for communication
 - (BOOL)deviceUsesThread;
+
+#pragma mark - MTRDevice functionality to deal with delegates.
+
+// Returns YES if any non-null delegates were found
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
+
+- (BOOL)_delegateExists;
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
+// Returns YES if a delegate is called
+- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
+#endif
 
 @end
 
