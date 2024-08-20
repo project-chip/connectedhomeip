@@ -1746,7 +1746,7 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 CHIP_ERROR BLEManagerImpl::HandleRXNotify(struct ble_gap_event * ble_event)
 {
-    uint16_t dataLen                 = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
+    uint16_t dataLen               = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(dataLen, 0);
     VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(buf->AvailableDataLength() >= dataLen, CHIP_ERROR_BUFFER_TOO_SMALL);
