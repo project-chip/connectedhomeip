@@ -117,9 +117,18 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
+CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
 {
-    return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
+    if (mActivePresetHandleDataSize != 0)
+    {
+        CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value());
+        activePresetHandle.Value().reduce_size(mActivePresetHandleDataSize);
+    }
+    else
+    {
+        activePresetHandle.SetNull();
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)

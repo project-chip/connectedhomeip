@@ -33168,10 +33168,10 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=typing.Union[Nullable, bytes]),
                     ])
 
-            presetHandle: 'bytes' = b""
+            presetHandle: 'typing.Union[Nullable, bytes]' = NullValue
 
         @dataclass
         class AtomicResponse(ClusterCommand):

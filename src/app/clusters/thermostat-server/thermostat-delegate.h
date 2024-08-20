@@ -78,11 +78,10 @@ public:
     /**
      * @brief Get the ActivePresetHandle attribute value.
      *
-     * @param[out] activePresetHandle The MutableByteSpan to copy the active preset handle into. On success,
-     *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     * @param[out] activePresetHandle The nullable MutableByteSpan to copy the active preset handle into. On success,
+     *             the size of the activePresetHandle is updated to the length of the copied data.
      */
-    virtual CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) = 0;
+    virtual CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) = 0;
 
     /**
      * @brief Set the ActivePresetHandle attribute value.

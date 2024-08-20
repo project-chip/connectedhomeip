@@ -761,19 +761,13 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandle(buffer);
+        MutableByteSpan activePresetHandleSpan(buffer);
+        DataModel::Nullable<MutableByteSpan> activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
         CHIP_ERROR err = delegate->GetActivePresetHandle(activePresetHandle);
         ReturnErrorOnFailure(err);
 
-        if (activePresetHandle.empty())
-        {
-            ReturnErrorOnFailure(aEncoder.EncodeNull());
-        }
-        else
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
-        }
+        ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
     }
     break;
     case ScheduleTypes::Id: {
@@ -1299,16 +1293,16 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
         return true;
     }
 
-    ByteSpan newPresetHandle = commandData.presetHandle;
+    DataModel::Nullable<ByteSpan> newPresetHandle = commandData.presetHandle;
 
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!IsPresetHandlePresentInPresets(delegate, newPresetHandle))
+    if (!newPresetHandle.IsNull() && !IsPresetHandlePresentInPresets(delegate, newPresetHandle.Value()))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
         return true;
     }
 
-    CHIP_ERROR err = delegate->SetActivePresetHandle(DataModel::MakeNullable(newPresetHandle));
+    CHIP_ERROR err = delegate->SetActivePresetHandle(newPresetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1470,7 +1464,8 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
     // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
     // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
-    MutableByteSpan activePresetHandle(buffer);
+    MutableByteSpan activePresetHandleSpan(buffer);
+    DataModel::Nullable<MutableByteSpan> activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
     err = delegate->GetActivePresetHandle(activePresetHandle);
 
@@ -1479,9 +1474,9 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
         return imcode::InvalidInState;
     }
 
-    if (!activePresetHandle.empty())
+    if (!activePresetHandle.IsNull())
     {
-        uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle);
+        uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle.Value());
         if (count == 0)
         {
             return imcode::InvalidInState;
