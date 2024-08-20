@@ -56,8 +56,8 @@ public:
         // request.
         mPendingCheckIn.erase(nodeId);
 
-        auto timeNowMs = System::SystemClock().GetMonotonicTimestamp();
-        if (timeNowMs > checkInData.mRequestExpiryTimestamp)
+        auto timeNow = System::SystemClock().GetMonotonicTimestamp();
+        if (timeNow > checkInData.mRequestExpiryTimestamp)
         {
             ChipLogError(NotSpecified,
                          "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
@@ -154,9 +154,9 @@ public:
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
 
-        auto timeNowMs = System::SystemClock().GetMonotonicTimestamp();
+        auto timeNow = System::SystemClock().GetMonotonicTimestamp();
         // Spec says we should expire the request 60 mins after we get it
-        System::Clock::Timestamp expiryTimestamp = timeNowMs + System::Clock::Seconds64(60 * 60);
+        System::Clock::Timestamp expiryTimestamp = timeNow + System::Clock::Seconds64(60 * 60);
         KeepActiveDataForCheckIn checkInData     = { .mStayActiveDurationMs   = stayActiveDurationMs,
                                                      .mRequestExpiryTimestamp = expiryTimestamp };
         mPendingCheckIn[nodeId]                  = checkInData;
