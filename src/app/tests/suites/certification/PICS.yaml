@@ -9740,7 +9740,7 @@ PICS:
       id: RVCOPSTATE.S.C03.Rsp
 
     - label: "Does the device implement receiving the GoHome command?"
-      id: RVCOPSTATE.S.C128.Rsp
+      id: RVCOPSTATE.S.C80.Rsp
 
     #Commands generated
     - label:
