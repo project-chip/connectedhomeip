@@ -137,14 +137,14 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(6)
         if supports_hs:
-            cmd = cc.Commands.MoveHue(moveMode=cc.Enums.HueMoveMode.kDown, rate=225)
+            cmd = cc.Commands.MoveHue(moveMode=cc.Enums.MoveModeEnum.kDown, rate=225)
             await self.send_single_cmd(cmd)
         else:
             self.mark_current_step_skipped()
 
         self.step(7)
         if supports_hs:
-            cmd = cc.Commands.MoveSaturation(moveMode=cc.Enums.SaturationMoveMode.kDown, rate=225)
+            cmd = cc.Commands.MoveSaturation(moveMode=cc.Enums.MoveModeEnum.kDown, rate=225)
             await self.send_single_cmd(cmd)
         else:
             self.mark_current_step_skipped()
