@@ -56,8 +56,10 @@ public:
         System::Clock::Milliseconds64 timeNowMs =
             std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
 
-        if (timeNowMs > checkInData.mRequestExpiresAtMs) {
-            ChipLogError(NotSpecified, "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
+        if (timeNowMs > checkInData.mRequestExpiresAtMs)
+        {
+            ChipLogError(NotSpecified,
+                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
             return;
         }
 
@@ -154,9 +156,10 @@ public:
         System::Clock::Milliseconds64 timeNowMs =
             std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
         // Spec says we should expire the request 60 mins after we get it
-        System::Clock::Milliseconds64 expireTimeMs = timeNowMs + System::Clock::Milliseconds64(60*60*1000);
-        KeepActiveDataForCheckIn checkInData = {.mStayActiveDurationMs = stayActiveDurationMs, .mRequestExpiresAtMs = expireTimeMs};
-        mPendingKeepActiveTimesMs[nodeId] = checkInData;
+        System::Clock::Milliseconds64 expireTimeMs = timeNowMs + System::Clock::Milliseconds64(60 * 60 * 1000);
+        KeepActiveDataForCheckIn checkInData       = { .mStayActiveDurationMs = stayActiveDurationMs,
+                                                       .mRequestExpiresAtMs   = expireTimeMs };
+        mPendingKeepActiveTimesMs[nodeId]          = checkInData;
     }
 
 private:
