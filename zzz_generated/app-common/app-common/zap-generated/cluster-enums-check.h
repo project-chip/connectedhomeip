@@ -2598,7 +2598,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectArea
     {
     case EnumType::kSuccess:
     case EnumType::kUnsupportedArea:
-    case EnumType::kDuplicatedAreas:
     case EnumType::kInvalidInMode:
     case EnumType::kInvalidSet:
         return val;
