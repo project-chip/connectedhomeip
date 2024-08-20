@@ -3586,10 +3586,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("PositionTag", indent + 1, value.positionTag);
+        CHIP_ERROR err = LogValue("RelativePositionTag", indent + 1, value.relativePositionTag);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PositionTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RelativePositionTag'");
             return err;
         }
     }
@@ -3644,10 +3644,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("AreaDesc", indent + 1, value.areaDesc);
+        CHIP_ERROR err = LogValue("AreaInfo", indent + 1, value.areaInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaDesc'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaInfo'");
             return err;
         }
     }

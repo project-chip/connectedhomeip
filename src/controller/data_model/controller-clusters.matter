@@ -6483,7 +6483,7 @@ provisional cluster ServiceArea = 336 {
 
   struct LandmarkInfoStruct {
     LandmarkTag landmarkTag = 0;
-    nullable RelativePositionTag positionTag = 1;
+    nullable RelativePositionTag relativePositionTag = 1;
   }
 
   struct AreaInfoStruct {
@@ -6494,7 +6494,7 @@ provisional cluster ServiceArea = 336 {
   struct AreaStruct {
     int32u areaID = 0;
     nullable int32u mapID = 1;
-    AreaInfoStruct areaDesc = 2;
+    AreaInfoStruct areaInfo = 2;
   }
 
   struct MapStruct {
