@@ -109,9 +109,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // queue used to serialize all work performed by the MTRDeviceController
-    dispatch_queue_t _chipWorkQueue;
-
     chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
@@ -314,8 +311,14 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
+// #define TESTING_IGNORE_MTRDEVICECONTROLLER_SHUTDOWN
+
 - (void)shutdown
 {
+#ifdef TESTING_IGNORE_MTRDEVICECONTROLLER_SHUTDOWN
+    MTR_LOG("****** IGNORING call to shutdown in %@", self);
+    return;
+#else
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
         // Already shut down.
@@ -324,6 +327,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     MTR_LOG("Shutting down %@: %@", NSStringFromClass(self.class), self);
     [self cleanupAfterStartup];
+#endif // TESTING_IGNORE_MTRDEVICECONTROLLER_SHUTDOWN
 }
 
 // Clean up from a state where startup was called.

@@ -319,13 +319,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
 @property (nonatomic) uint64_t expectedValueNextID;
 
-@property (nonatomic) BOOL expirationCheckScheduled;
-
 @property (nonatomic) BOOL timeUpdateScheduled;
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
-
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
 
 /**
  * If currentReadClient is non-null, that means that we successfully
@@ -336,22 +332,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) SubscriptionCallback * currentSubscriptionCallback; // valid when and only when currentReadClient is valid
 
 @end
-
-// Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
-#ifdef DEBUG
-@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
-- (void)unitTestReportEndForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
-- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
-- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
-- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
-- (void)unitTestClusterDataPersisted:(MTRDevice *)device;
-- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
-@end
-#endif
 
 @implementation MTRDevice_Concrete {
 #ifdef DEBUG
@@ -444,8 +424,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @synthesize state = _state;
 @synthesize estimatedStartTime = _estimatedStartTime;
 @synthesize estimatedSubscriptionLatency = _estimatedSubscriptionLatency;
-//@synthesize lock = _lock;
-//@synthesize persistedClusterData = _persistedClusterData;
+@synthesize lock = _lock;
+@synthesize timeSyncLock = _timeSyncLock;
+@synthesize expectedValueCache = _expectedValueCache;
+@synthesize internalDeviceState = _internalDeviceState;
+@synthesize timeUpdateScheduled = _timeUpdateScheduled;
+@synthesize receivingReport = _receivingReport;
+@synthesize lastSubscriptionAttemptWait = _lastSubscriptionAttemptWait;
+@synthesize reattemptingSubscription = _reattemptingSubscription;
+@synthesize receivingPrimingReport = _receivingPrimingReport;
+@synthesize expectedValueNextID = _expectedValueNextID;
+@synthesize estimatedStartTimeFromGeneralDiagnosticsUpTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
@@ -495,7 +484,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
-    MTR_LOG("MTRDevice dealloc: %p", self);
+    MTR_LOG("%@ dealloc: %p", self, self);
 }
 
 - (NSString *)description

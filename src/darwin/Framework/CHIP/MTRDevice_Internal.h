@@ -21,7 +21,12 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceDelegateInfo.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
+
+#import <os/lock.h>
+
+@class MTRDeviceConnectivityMonitor;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -65,7 +70,87 @@ MTR_TESTABLE
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
 
-@interface MTRDevice ()
+@interface MTRDevice () {
+#ifdef DEBUG
+    NSUInteger _unitTestAttributesReportedSinceLastCheck;
+#endif
+
+    // _deviceCachePrimed is true if we have the data that comes from an initial
+    // subscription priming report (whether it came from storage or from our
+    // subscription).
+    BOOL _deviceCachePrimed;
+
+    // _persistedClusterData stores data that we have already persisted (when we have
+    // cluster data persistence enabled).  Nil when we have no persistence enabled.
+    NSCache<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _persistedClusterData;
+    // _clusterDataToPersist stores data that needs to be persisted.  If we
+    // don't have persistence enabled, this is our only data store.  Nil if we
+    // currently have nothing that could need persisting.
+    NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _clusterDataToPersist;
+    // _persistedClusters stores the set of "valid" keys into _persistedClusterData.
+    // These are keys that could have values in _persistedClusterData even if they don't
+    // right now (because they have been evicted).
+    NSMutableSet<MTRClusterPath *> * _persistedClusters;
+
+    // When we last failed to subscribe to the device (either via
+    // _setupSubscriptionWithReason or via the auto-resubscribe behavior
+    // of the ReadClient).  Nil if we have had no such failures.
+    NSDate * _Nullable _lastSubscriptionFailureTime;
+    MTRDeviceConnectivityMonitor * _connectivityMonitor;
+
+    // This boolean keeps track of any device configuration changes received in an attribute report.
+    // If this is true when the report ends, we notify the delegate.
+    BOOL _deviceConfigurationChanged;
+
+    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
+    //   1. Subscription establishes
+    //   2. OnResubscriptionNeeded is called
+    //   3. Subscription reset (including when getSessionForNode fails)
+    MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
+
+    // Tracking of initial subscribe latency.  When _initialSubscribeStart is
+    // nil, we are not tracking the latency.
+    NSDate * _Nullable _initialSubscribeStart;
+
+    // Storage behavior configuration and variables to keep track of the logic
+    //  _clusterDataPersistenceFirstScheduledTime is used to track the start time of the delay between
+    //      report and persistence.
+    //  _mostRecentReportTimes is a list of the most recent report timestamps used for calculating
+    //      the running average time between reports.
+    //  _deviceReportingExcessivelyStartTime tracks when a device starts reporting excessively.
+    //  _reportToPersistenceDelayCurrentMultiplier is the current multiplier that is calculated when a
+    //      report comes in.
+    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
+    NSDate * _Nullable _clusterDataPersistenceFirstScheduledTime;
+    NSMutableArray<NSDate *> * _mostRecentReportTimes;
+    NSDate * _Nullable _deviceReportingExcessivelyStartTime;
+    double _reportToPersistenceDelayCurrentMultiplier;
+
+    // System time change observer reference
+    id _systemTimeChangeObserverToken;
+
+    // Protects mutable state used by our description getter.  This is a separate lock from "lock"
+    // so that we don't need to worry about getting our description while holding "lock" (e.g due to
+    // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
+    // while it's held, to avoid deadlock.
+    os_unfair_lock _descriptionLock;
+
+    // State used by our description getter: access to these must be protected by descriptionLock.
+    NSNumber * _Nullable _vid; // nil if unknown
+    NSNumber * _Nullable _pid; // nil if unknown
+    // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
+    // present on the device, or nil if there aren't any.
+    NSNumber * _Nullable _allNetworkFeatures;
+    // Copy of _internalDeviceState that is safe to use in description.
+    MTRInternalDeviceState _internalDeviceStateForDescription;
+    // Copy of _lastSubscriptionAttemptWait that is safe to use in description.
+    uint32_t _lastSubscriptionAttemptWaitForDescription;
+    // Most recent entry in _mostRecentReportTimes, if any.
+    NSDate * _Nullable _mostRecentReportTimeForDescription;
+    // Copy of _lastSubscriptionFailureTime that is safe to use in description.
+    NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
+}
+
 - (instancetype)initForSubclasses;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
@@ -106,6 +191,51 @@ MTR_TESTABLE
 // Queue used for various internal bookkeeping work.
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
+@property (nonatomic, retain, readwrite) NSMutableSet<MTRDeviceDelegateInfo *> * delegates;
+
+@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
+// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
+// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
+// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
+// whatever lock protects the time sync bits.
+@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
+
+@property (nonatomic) BOOL receivingReport;
+@property (nonatomic) BOOL receivingPrimingReport;
+
+// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
+//   Actively receiving report
+//   Actively receiving priming report
+
+@property (nonatomic) MTRInternalDeviceState internalDeviceState;
+
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
+@property (nonatomic) uint32_t lastSubscriptionAttemptWait;
+
+/**
+ * If reattemptingSubscription is true, that means that we have failed to get a
+ * CASE session for the publisher and are now waiting to try again.  In this
+ * state we never have subscriptionActive true or a non-null currentReadClient.
+ */
+@property (nonatomic) BOOL reattemptingSubscription;
+
+// Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
+//   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
+// See MTRDeviceResponseHandler definition for value dictionary details.
+@property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
+
+// This is a monotonically increasing value used when adding entries to expectedValueCache
+// Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
+@property (nonatomic) uint64_t expectedValueNextID;
+
+@property (nonatomic) BOOL expirationCheckScheduled;
+
+@property (nonatomic, assign) BOOL timeUpdateScheduled;
+
+@property (nonatomic, retain) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
+
+@property (nonatomic, retain) NSMutableDictionary * temporaryMetaDataCache;
 
 // Method to insert persisted cluster data
 //   Contains data version information and attribute values.
@@ -116,12 +246,19 @@ MTR_TESTABLE
 
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;
+- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 
 // Returns whether this MTRDevice uses Thread for communication
 - (BOOL)deviceUsesThread;
+
+- (BOOL)_subscriptionsAllowed;
+- (BOOL)_deviceUsesThread;
+
+- (void)_scheduleSubscriptionPoolWork:(dispatch_block_t)workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description;
+- (void)_setupSubscriptionWithReason:(NSString *)reason;
 
 @end
 
@@ -137,5 +274,21 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
+// Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
+#ifdef DEBUG
+@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
+- (void)unitTestReportEndForDevice:(MTRDevice *)device;
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device;
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
+@end
+#endif
 
 NS_ASSUME_NONNULL_END

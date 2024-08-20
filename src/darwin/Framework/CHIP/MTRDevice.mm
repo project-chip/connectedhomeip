@@ -31,6 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDeviceDelegateInfo.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -66,81 +67,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
-@implementation MTRDeviceDelegateInfo
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-        _delegatePointerValue = (__bridge void *) delegate;
-        _queue = queue;
-        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
-        _interestedPathsForEvents = [interestedPathsForEvents copy];
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
-}
-
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-    dispatch_async(_queue, ^{
-        block(strongDelegate);
-    });
-    return YES;
-}
-
-#ifdef DEBUG
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-
-    block(strongDelegate);
-
-    return YES;
-}
-#endif
-@end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 
@@ -371,52 +297,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
-// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
-// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
-// whatever lock protects the time sync bits.
-@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
-@property (nonatomic) BOOL receivingReport;
-@property (nonatomic) BOOL receivingPrimingReport;
-
-// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
-//   Actively receiving report
-//   Actively receiving priming report
-
-@property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
-@property (nonatomic) uint32_t lastSubscriptionAttemptWait;
-
-/**
- * If reattemptingSubscription is true, that means that we have failed to get a
- * CASE session for the publisher and are now waiting to try again.  In this
- * state we never have subscriptionActive true or a non-null currentReadClient.
- */
-@property (nonatomic) BOOL reattemptingSubscription;
-
-// Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
-//   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
-// See MTRDeviceResponseHandler definition for value dictionary details.
-@property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
-
-// This is a monotonically increasing value used when adding entries to expectedValueCache
-// Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
-@property (nonatomic) uint64_t expectedValueNextID;
-
-@property (nonatomic) BOOL expirationCheckScheduled;
-
-@property (nonatomic) BOOL timeUpdateScheduled;
-
-@property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
-
-@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
-
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -427,104 +313,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @end
 
-// Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
-#ifdef DEBUG
-@protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
-- (void)unitTestReportEndForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
-- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
-- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
-- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
-- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
-- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
-- (void)unitTestClusterDataPersisted:(MTRDevice *)device;
-- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
-@end
-#endif
+@implementation MTRDevice
 
-@implementation MTRDevice {
-#ifdef DEBUG
-    NSUInteger _unitTestAttributesReportedSinceLastCheck;
-#endif
-
-    // _deviceCachePrimed is true if we have the data that comes from an initial
-    // subscription priming report (whether it came from storage or from our
-    // subscription).
-    BOOL _deviceCachePrimed;
-
-    // _persistedClusterData stores data that we have already persisted (when we have
-    // cluster data persistence enabled).  Nil when we have no persistence enabled.
-    NSCache<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _persistedClusterData;
-    // _clusterDataToPersist stores data that needs to be persisted.  If we
-    // don't have persistence enabled, this is our only data store.  Nil if we
-    // currently have nothing that could need persisting.
-    NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _clusterDataToPersist;
-    // _persistedClusters stores the set of "valid" keys into _persistedClusterData.
-    // These are keys that could have values in _persistedClusterData even if they don't
-    // right now (because they have been evicted).
-    NSMutableSet<MTRClusterPath *> * _persistedClusters;
-
-    // When we last failed to subscribe to the device (either via
-    // _setupSubscriptionWithReason or via the auto-resubscribe behavior
-    // of the ReadClient).  Nil if we have had no such failures.
-    NSDate * _Nullable _lastSubscriptionFailureTime;
-    MTRDeviceConnectivityMonitor * _connectivityMonitor;
-
-    // This boolean keeps track of any device configuration changes received in an attribute report.
-    // If this is true when the report ends, we notify the delegate.
-    BOOL _deviceConfigurationChanged;
-
-    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
-    //   1. Subscription establishes
-    //   2. OnResubscriptionNeeded is called
-    //   3. Subscription reset (including when getSessionForNode fails)
-    MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
-
-    // Tracking of initial subscribe latency.  When _initialSubscribeStart is
-    // nil, we are not tracking the latency.
-    NSDate * _Nullable _initialSubscribeStart;
-
-    // Storage behavior configuration and variables to keep track of the logic
-    //  _clusterDataPersistenceFirstScheduledTime is used to track the start time of the delay between
-    //      report and persistence.
-    //  _mostRecentReportTimes is a list of the most recent report timestamps used for calculating
-    //      the running average time between reports.
-    //  _deviceReportingExcessivelyStartTime tracks when a device starts reporting excessively.
-    //  _reportToPersistenceDelayCurrentMultiplier is the current multiplier that is calculated when a
-    //      report comes in.
-    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
-    NSDate * _Nullable _clusterDataPersistenceFirstScheduledTime;
-    NSMutableArray<NSDate *> * _mostRecentReportTimes;
-    NSDate * _Nullable _deviceReportingExcessivelyStartTime;
-    double _reportToPersistenceDelayCurrentMultiplier;
-
-    // System time change observer reference
-    id _systemTimeChangeObserverToken;
-
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
-
-    // Protects mutable state used by our description getter.  This is a separate lock from "lock"
-    // so that we don't need to worry about getting our description while holding "lock" (e.g due to
-    // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
-    // while it's held, to avoid deadlock.
-    os_unfair_lock _descriptionLock;
-
-    // State used by our description getter: access to these must be protected by descriptionLock.
-    NSNumber * _Nullable _vid; // nil if unknown
-    NSNumber * _Nullable _pid; // nil if unknown
-    // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
-    // present on the device, or nil if there aren't any.
-    NSNumber * _Nullable _allNetworkFeatures;
-    // Copy of _internalDeviceState that is safe to use in description.
-    MTRInternalDeviceState _internalDeviceStateForDescription;
-    // Copy of _lastSubscriptionAttemptWait that is safe to use in description.
-    uint32_t _lastSubscriptionAttemptWaitForDescription;
-    // Most recent entry in _mostRecentReportTimes, if any.
-    NSDate * _Nullable _mostRecentReportTimeForDescription;
-    // Copy of _lastSubscriptionFailureTime that is safe to use in description.
-    NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
-}
+@synthesize delegates = _delegates;
 
 - (instancetype)initForSubclasses
 {
@@ -582,7 +373,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
-    MTR_LOG("MTRDevice dealloc: %p", self);
+    MTR_LOG("%@ dealloc: %p", self, self);
 }
 
 - (NSString *)description
