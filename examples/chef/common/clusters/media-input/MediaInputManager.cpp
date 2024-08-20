@@ -39,7 +39,7 @@ MediaInputManager::MediaInputManager(chip::EndpointId endpoint):mEndpoint(endpoi
                                 "High-Definition Multimedia Interface");
     mInputs.push_back(inputData3);
 
-    // Sync the attributes from delegate
+    // Sync the attributes from attribute storage
     Status status = Attributes::CurrentInput::Get(endpoint, &mCurrentInput);
 
     if (Status::Success != status) {

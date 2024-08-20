@@ -178,7 +178,7 @@ bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, 
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    Status status       = Status::Failure;
+    Status status       = Status::Success;
 
     auto & input = commandData.index;
 
@@ -189,7 +189,6 @@ bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, 
     {
         status = Status::Failure;
     }
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
