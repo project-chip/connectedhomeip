@@ -66,6 +66,6 @@ config MBEDTLS_X509_CSR_WRITE_C
 
 config MBEDTLS_PK_WRITE_C
     default y
-    
+
 endif #CHIP
 

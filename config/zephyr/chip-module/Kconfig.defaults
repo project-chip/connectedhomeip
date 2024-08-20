@@ -117,7 +117,7 @@ config NVS_LOOKUP_CACHE
 # Enable OpenThread
 config NET_L2_OPENTHREAD
 	bool
-	default n
+	default y
 
 # Enable mbedTLS
 config MBEDTLS_ENABLE_HEAP
