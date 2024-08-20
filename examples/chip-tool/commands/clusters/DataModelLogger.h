@@ -169,9 +169,9 @@ private:
         while (iter.Next())
         {
             ++i;
-            std::string label = std::string("[") + std::to_string(i) + "]";
+            std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item = std::to_string(iter.GetValue()) + " (" + ClusterIdToText(iter.GetValue()) + ")";
-            DataModelLogger::LogString(label, indent + 1, item);
+            DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
         {
@@ -191,9 +191,9 @@ private:
         while (iter.Next())
         {
             ++i;
-            std::string label = std::string("[") + std::to_string(i) + "]";
+            std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item = std::to_string(iter.GetValue()) + " (" + AttributeIdToText(cluster, iter.GetValue()) + ")";
-            DataModelLogger::LogString(label, indent + 1, item);
+            DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
         {
@@ -213,9 +213,9 @@ private:
         while (iter.Next())
         {
             ++i;
-            std::string label = std::string("[") + std::to_string(i) + "]";
+            std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item = std::to_string(iter.GetValue()) + " (" + CommandIdToText(cluster, iter.GetValue()) + ")";
-            DataModelLogger::LogString(label, indent + 1, item);
+            DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
         {
