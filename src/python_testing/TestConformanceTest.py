@@ -97,7 +97,7 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         root_endpoint[ac.id][ac.Attributes.GeneratedCommandList.attribute_id].append(
             ac.Commands.ReviewFabricRestrictionsResponse.command_id)
 
-    @ async_test_body
+    @async_test_body
     async def test_macl_handling(self):
         nim_id = self._get_device_type_id('network infrastructure manager')
         root_node_id = self._get_device_type_id('root node')
