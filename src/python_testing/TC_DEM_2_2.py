@@ -136,7 +136,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("19b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("20", "Wait 10 seconds",
-                     "Event DEM.S.E01(PowerAdjustEnd) sent with Cause=NormalCompletion, Duration=10s, EnergyUse= a valid value"),
+                     "Event DEM.S.E01(PowerAdjustEnd) sent with Cause=NormalCompletion, Duration in the range 10-12s, EnergyUse= a valid value"),
             TestStep("20a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("20b", "TH reads from the DUT the PowerAdjustmentCapability",
