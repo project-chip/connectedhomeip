@@ -48,15 +48,16 @@ public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
         chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it             = mPendingKeepActiveTimesMs.find(nodeId);
-        VerifyOrReturn(it != mPendingKeepActiveTimesMs.end());
+        auto it             = mPendingCheckIn.find(nodeId);
+        VerifyOrReturn(it != mPendingCheckIn.end());
 
         KeepActiveDataForCheckIn checkInData = it->second;
-        mPendingKeepActiveTimesMs.erase(nodeId);
-        System::Clock::Milliseconds64 timeNowMs =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
+        // Removed from pending map as check-in from this node has occured and we will handle the pending KeepActive
+        // request.
+        mPendingCheckIn.erase(nodeId);
 
-        if (timeNowMs > checkInData.mRequestExpiresAtMs)
+        auto timeNowMs = System::SystemClock().GetMonotonicTimestamp();
+        if (timeNowMs > checkInData.mRequestExpiryTimestamp)
         {
             ChipLogError(NotSpecified,
                          "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
@@ -153,20 +154,19 @@ public:
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
 
-        System::Clock::Milliseconds64 timeNowMs =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
+        auto timeNowMs = System::SystemClock().GetMonotonicTimestamp();
         // Spec says we should expire the request 60 mins after we get it
-        System::Clock::Milliseconds64 expireTimeMs = timeNowMs + System::Clock::Milliseconds64(60 * 60 * 1000);
-        KeepActiveDataForCheckIn checkInData       = { .mStayActiveDurationMs = stayActiveDurationMs,
-                                                       .mRequestExpiresAtMs   = expireTimeMs };
-        mPendingKeepActiveTimesMs[nodeId]          = checkInData;
+        System::Clock::Timestamp expiryTimestamp = timeNowMs + System::Clock::Seconds64(60 * 60);
+        KeepActiveDataForCheckIn checkInData       = { .mStayActiveDurationMs   = stayActiveDurationMs,
+                                                       .mRequestExpiryTimestamp = expiryTimestamp };
+        mPendingCheckIn[nodeId]          = checkInData;
     }
 
 private:
     struct KeepActiveDataForCheckIn
     {
         uint32_t mStayActiveDurationMs = 0;
-        System::Clock::Milliseconds64 mRequestExpiresAtMs;
+        System::Clock::Timestamp mRequestExpiryTimestamp;
     };
 
     struct KeepActiveWorkData
@@ -187,8 +187,8 @@ private:
         chip::Platform::Delete(data);
     }
 
-    // Modifications to mPendingKeepActiveTimesMs should be done on the MatterEventLoop thread
-    std::map<chip::NodeId, KeepActiveDataForCheckIn> mPendingKeepActiveTimesMs;
+    // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
+    std::map<chip::NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
 };
 
 FabricAdmin fabric_admin_service;
