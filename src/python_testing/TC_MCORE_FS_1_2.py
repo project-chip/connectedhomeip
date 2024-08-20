@@ -20,7 +20,6 @@
 #
 
 import base64
-from dataclasses import dataclass
 import hashlib
 import logging
 import os
@@ -31,7 +30,7 @@ import struct
 import subprocess
 import time
 import uuid
-
+from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
