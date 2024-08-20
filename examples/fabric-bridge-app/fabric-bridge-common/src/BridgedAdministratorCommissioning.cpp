@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 
 CHIP_ERROR BridgedAdministratorCommissioning::Init()
 {
-    // We expect initialization after all emberAfInit(). This allows us to unregister the existing
+    // We expect initialization after emberAfInit(). This allows us to unregister the existing
     // AccessAttributeInterface for AdministratorCommissioning and register ourselves, ensuring we
     // get the callback for reading attribute. If the read is not intended for a bridged device we will
     // forward it to the original attribute interface that we are unregistering.
