@@ -81,8 +81,8 @@ tests:
 
           On the TH(chip-tool) verify the received report data message has only the attributes that the TH has privilege to.
 
-          [1723642164.392] [329152:329154] [DMG]  
-          [1723642164.392] [329152:329154] [DMG] 	SuppressResponse = true, 
+          [1723642164.392] [329152:329154] [DMG]
+          [1723642164.392] [329152:329154] [DMG] 	SuppressResponse = true,
           [1723642164.392] [329152:329154] [DMG] 	InteractionModelRevision = 11
           [1723642164.392] [329152:329154] [DMG] }
           [1723642164.392] [329152:329154] [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 357555707
