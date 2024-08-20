@@ -136,7 +136,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
-                            location=location, problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
+                            location=location, problem=f'Required feature with mask 0x{feature_mask:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
                 # Attribute conformance checking
                 for attribute_id, attribute in cluster.items():
@@ -354,7 +354,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        success, problems = self.check_device_type(fail_on_extra_clusters)
+        allow_provisional = self.user_params.get("allow_provisional", False)
+        success, problems = self.check_device_type(fail_on_extra_clusters, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
