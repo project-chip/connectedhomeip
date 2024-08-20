@@ -121,7 +121,7 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 {
     if (mActivePresetHandleDataSize != 0)
     {
-        CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value());
+        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value()));
         activePresetHandle.Value().reduce_size(mActivePresetHandleDataSize);
     }
     else
