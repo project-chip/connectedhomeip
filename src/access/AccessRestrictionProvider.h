@@ -35,10 +35,7 @@
 namespace chip {
 namespace Access {
 
-template <typename T>
-using SharedPtr = chip::Platform::SharedPtr<T>;
-
-class AccessRestriction
+class AccessRestrictionProvider
 {
 public:
     static constexpr size_t kNumberOfFabrics      = CHIP_CONFIG_MAX_FABRICS;
@@ -77,38 +74,27 @@ public:
         EndpointId endpointNumber;
         ClusterId clusterId;
         std::vector<Restriction> restrictions;
-
-        bool IsValid() const
-        {
-            return endpointNumber != 0 && clusterId != app::Clusters::NetworkCommissioning::Id &&
-                clusterId != app::Clusters::Descriptor::Id;
-        }
     };
 
     /**
      * Used to notify of changes in the access restriction list and active reviews.
      */
-    class EntryListener
+    class Listener
     {
     public:
-        enum class ChangeType
-        {
-            kAdded   = 1,
-            kRemoved = 2,
-            kUpdated = 3
-        };
+        virtual ~Listener() = default;
 
-        virtual ~EntryListener() = default;
+        /**
+         * Notifies of a change in the commissioning access restriction list.
+         */
+        virtual void CommissioningRestrictionListChanged() = 0;
 
         /**
          * Notifies of a change in the access restriction list.
          *
-         * @param [in] fabricIndex  The index of the fabric in which the entry has changed.
-         * @param [in] index        Index of entry to which has changed (relative to fabric).
-         * @param [in] entry        The latest value of the entry which changed.
-         * @param [in] changeType   The type of change that occurred.
+         * @param [in] fabricIndex  The index of the fabric in which the list has changed.
          */
-        virtual void OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<Entry> entry, ChangeType changeType) = 0;
+        virtual void RestrictionListChanged(FabricIndex fabricIndex) = 0;
 
         /**
          * Notifies of an update to an active review with instructions and an optional redirect URL.
@@ -122,38 +108,45 @@ public:
                                                      const char * redirectUrl) = 0;
 
     private:
-        EntryListener * mNext = nullptr;
+        Listener * mNext = nullptr;
 
-        friend class AccessRestriction;
+        friend class AccessRestrictionProvider;
     };
 
-    AccessRestriction()          = default;
-    virtual ~AccessRestriction() = default;
+    AccessRestrictionProvider()          = default;
+    virtual ~AccessRestrictionProvider() = default;
 
-    AccessRestriction(const AccessRestriction &)             = delete;
-    AccessRestriction & operator=(const AccessRestriction &) = delete;
+    AccessRestrictionProvider(const AccessRestrictionProvider &)             = delete;
+    AccessRestrictionProvider & operator=(const AccessRestrictionProvider &) = delete;
 
     /**
-     * Create restriction entries for a fabric by populating from the commissioning entries.
-     * This should be called when the device is commissioned to a new fabric.
+     * Set the restriction entries that are to be used during commissioning when there is no accessing fabric.
+     *
+     * @param [in] entries  The entries to set.
+     */
+    CHIP_ERROR SetCommissioningEntries(const std::vector<Entry> & entries);
+
+    /**
+     * Set the restriction entries for a fabric.
      *
      * @param [in] fabricIndex  The index of the fabric for which to create entries.
+     * @param [in] entries  The entries to set for the fabric.
      */
-    CHIP_ERROR CreateFabricEntries(const FabricIndex fabricIndex);
+    CHIP_ERROR SetEntries(const FabricIndex, const std::vector<Entry> & entries);
 
     /**
      * Add a listener to be notified of changes in the access restriction list and active reviews.
      *
      * @param [in] listener  The listener to add.
      */
-    void AddListener(EntryListener & listener);
+    void AddListener(Listener & listener);
 
     /**
      * Remove a listener from being notified of changes in the access restriction list and active reviews.
      *
      * @param [in] listener  The listener to remove.
      */
-    void RemoveListener(EntryListener & listener);
+    void RemoveListener(Listener & listener);
 
     /**
      * Check whether access by a subject descriptor to a request path should be restricted (denied) for the given action.
@@ -161,9 +154,9 @@ public:
      *
      * If access is not restricted, CHIP_NO_ERROR will be returned.
      *
-     * @retval #CHIP_ERROR_ACCESS_DENIED if access is denied.
+     * @retval CHIP_ERROR_ACCESS_DENIED if access is denied.
      * @retval other errors should also be treated as restricted/denied.
-     * @retval #CHIP_NO_ERROR if access is not restricted/denied.
+     * @retval CHIP_NO_ERROR if access is not restricted/denied.
      */
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath);
 
@@ -180,82 +173,31 @@ public:
         return DoRequestFabricRestrictionReview(fabricIndex, token, arl);
     }
 
-    using EntryIterator = std::vector<SharedPtr<Entry>>::iterator;
+    /**
+     * Get the commissioning restriction entries.
+     *
+     * @retval the commissioning restriction entries.
+     */
+    const std::vector<Entry> & GetCommissioningEntries() const { return mCommissioningEntries; }
 
     /**
-     * Get iterator over the commissioning entries, which are used during commissioning
-     * and also installed as defaults for a fabric upon completion of commissioning.
+     * Get the restriction entries for a fabric.
      *
-     * @param [out] begin iterator pointing to the beginning of the entries
-     * @param [out] end iterator pointing to the end of the entries
+     * @param [in]  fabricIndex the index of the fabric for which to get entries.
+     * @param [out] entries reference to a const vector to hold the entries.
      */
-    static CHIP_ERROR CommissioningEntries(EntryIterator & begin, EntryIterator & end)
+    CHIP_ERROR GetEntries(const FabricIndex fabricIndex, const std::vector<Entry> *& entries) const
     {
-        begin = sCommissioningEntries.begin();
-        end   = sCommissioningEntries.end();
-
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * Get iterator over entries in the access restriction list by fabric.
-     *
-     * @param [in]  fabricIndex Iteration is confined to fabric
-     * @param [out] begin iterator pointing to the beginning of the entries
-     * @param [out] end iterator pointing to the end of the entries
-     */
-    CHIP_ERROR Entries(const FabricIndex fabricIndex, EntryIterator & begin, EntryIterator & end)
-    {
-        if (mFabricEntries.find(fabricIndex) == mFabricEntries.end())
+        auto it = mFabricEntries.find(fabricIndex);
+        if (it == mFabricEntries.end())
         {
             return CHIP_ERROR_NOT_FOUND;
         }
 
-        begin = mFabricEntries[fabricIndex].begin();
-        end   = mFabricEntries[fabricIndex].end();
+        entries = &(it->second);
 
         return CHIP_NO_ERROR;
     }
-
-    /**
-     * Add a restriction entry to the commissioning access restriction list. This list is automatically
-     * applied to fabrics upon completion of commissioning. This request will fail if there is already
-     * an entry with the same cluster and endpoint.
-     *
-     * @param [in]  entry       The entry to add to the commissioning access restriction list.
-     * @return                  CHIP_NO_ERROR if the entry was successfully created, or an error code.
-     */
-    static CHIP_ERROR CreateCommissioningEntry(SharedPtr<Entry> entry);
-
-    /**
-     * Add a restriction entry to the access restriction list and notify any listeners. This request
-     * will fail if there is already an entry with the same cluster and endpoint.
-     *
-     * @param [out] index       (If not nullptr) index of created entry (relative to fabric).
-     * @param [in]  entry       The entry to add to the access restriction list.
-     * @param [in]  fabricIndex The index of the fabric in which the entry should be added.
-     * @return                  CHIP_NO_ERROR if the entry was successfully created, or an error code.
-     */
-    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex fabricIndex);
-
-    /**
-     * Delete a restriction entry from the access restriction list and notify any listeners.
-     *
-     * @param [in] index           Index of entry to delete.  May be relative to fabric.
-     * @param [in] fabricIndex     Fabric to which entry `index` is relative.
-     * @return                     CHIP_NO_ERROR if the entry was successfully deleted, or an error code.
-     */
-    CHIP_ERROR DeleteEntry(size_t index, const FabricIndex fabricIndex);
-
-    /**
-     * Update a restriction entry in the access restriction list and notify any listeners.
-     *
-     * @param [in] index           Index of entry to delete.  May be relative to fabric.
-     * @param [in] entry        The updated entry to replace the existing entry.
-     * @param [in] fabricIndex  The index of the fabric in which the entry should be updated.
-     * @return                  CHIP_NO_ERROR if the entry was successfully updated, or an error code.
-     */
-    CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex fabricIndex);
 
 protected:
     /**
@@ -270,18 +212,13 @@ protected:
     virtual CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token,
                                                         const std::vector<Entry> & arl) = 0;
 
-    /**
-     * Clear all access restriction data.
-     */
-    void ClearData();
-
 private:
-    SharedPtr<Entry> GetEntry(FabricIndex fabricIndex, size_t index);
+    bool IsEntryValid(const Entry & entry) const;
 
-    static std::vector<Platform::SharedPtr<Entry>> sCommissioningEntries;
-    uint64_t mNextToken        = 1;
-    EntryListener * mListeners = nullptr;
-    std::map<FabricIndex, std::vector<Platform::SharedPtr<Entry>>> mFabricEntries;
+    uint64_t mNextToken   = 1;
+    Listener * mListeners = nullptr;
+    std::vector<Entry> mCommissioningEntries;
+    std::map<FabricIndex, std::vector<Entry>> mFabricEntries;
 };
 
 } // namespace Access

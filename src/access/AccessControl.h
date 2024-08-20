@@ -21,7 +21,7 @@
 #include <access/AccessConfig.h>
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include "AccessRestriction.h"
+#include "AccessRestrictionProvider.h"
 #endif
 
 #include "Privilege.h"
@@ -635,9 +635,12 @@ public:
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
-    void SetAccessRestriction(AccessRestriction * accessRestriction) { mAccessRestriction = accessRestriction; }
+    void SetAccessRestrictionProvider(AccessRestrictionProvider * accessRestrictionProvider)
+    {
+        mAccessRestrictionProvider = accessRestrictionProvider;
+    }
 
-    AccessRestriction * GetAccessRestriction() { return mAccessRestriction; }
+    AccessRestrictionProvider * GetAccessRestrictionProvider() { return mAccessRestrictionProvider; }
 #endif
 
     /**
@@ -651,7 +654,7 @@ public:
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
      *
-     * If an AccessRestriction object is set, it will be checked for additional access restrictions.
+     * If an AccessRestrictionProvider object is set, it will be checked for additional access restrictions.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
@@ -679,7 +682,7 @@ private:
     EntryListener * mEntryListener = nullptr;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    AccessRestriction * mAccessRestriction;
+    AccessRestrictionProvider * mAccessRestrictionProvider;
 #endif
 };
 

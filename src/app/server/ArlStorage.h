@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <access/AccessRestriction.h>
+#include <access/AccessRestrictionProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
@@ -52,7 +52,7 @@ public:
      */
     class DecodableEntry
     {
-        using Entry        = Access::AccessRestriction::Entry;
+        using Entry        = Access::AccessRestrictionProvider::Entry;
         using StagingEntry = Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::DecodableType;
 
     public:
@@ -89,12 +89,12 @@ public:
      */
     class EncodableEntry
     {
-        using Entry              = Access::AccessRestriction::Entry;
+        using Entry              = Access::AccessRestrictionProvider::Entry;
         using StagingEntry       = Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type;
         using StagingRestriction = Clusters::AccessControl::Structs::AccessRestrictionStruct::Type;
 
     public:
-        EncodableEntry(std::shared_ptr<Entry> entry) : mEntry(entry) {}
+        EncodableEntry(const Entry & entry) : mEntry(entry) {}
 
         /**
          * Constructor-provided entry is staged into a staging entry,
@@ -120,10 +120,10 @@ public:
     public:
         static constexpr bool kIsFabricScoped = true;
 
-        FabricIndex GetFabricIndex() const { return mEntry->fabricIndex; }
+        FabricIndex GetFabricIndex() const { return mEntry.fabricIndex; }
 
     private:
-        std::shared_ptr<Entry> mEntry;
+        Entry mEntry;
 
         mutable StagingEntry mStagingEntry;
         mutable StagingRestriction mStagingRestrictions[CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY];

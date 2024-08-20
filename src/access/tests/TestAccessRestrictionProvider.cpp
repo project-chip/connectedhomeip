@@ -17,7 +17,7 @@
  */
 
 #include "access/AccessControl.h"
-#include "access/AccessRestriction.h"
+#include "access/AccessRestrictionProvider.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 
 #include <pw_unit_test/framework.h>
@@ -28,19 +28,16 @@
 namespace chip {
 namespace Access {
 
-class TestAccessRestrictionImpl : public AccessRestriction
+class TestAccessRestrictionProvider : public AccessRestrictionProvider
 {
     CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token, const std::vector<Entry> & arl)
     {
         return CHIP_NO_ERROR;
     }
-
-public:
-    void Clear() { ClearData(); }
 };
 
 AccessControl accessControl;
-TestAccessRestrictionImpl accessRestriction;
+TestAccessRestrictionProvider accessRestrictionProvider;
 
 constexpr ClusterId kNetworkCommissioningCluster = 0x0000'0031; // must not be blocked by access restrictions on any endpoint
 constexpr ClusterId kDescriptorCluster           = 0x0000'001d; // must not be blocked by access restrictions on any endpoint
@@ -176,13 +173,20 @@ public:
 class TestAccessRestriction : public ::testing::Test
 {
 public: // protected
-    void SetUp() override { accessRestriction.Clear(); }
+    void SetUp() override
+    {
+        accessRestrictionProvider.SetCommissioningEntries(std::vector<AccessRestrictionProvider::Entry>());
+        accessRestrictionProvider.SetEntries(0, std::vector<AccessRestrictionProvider::Entry>());
+        accessRestrictionProvider.SetEntries(1, std::vector<AccessRestrictionProvider::Entry>());
+        accessRestrictionProvider.SetEntries(2, std::vector<AccessRestrictionProvider::Entry>());
+    }
+
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
-        GetAccessControl().SetAccessRestriction(&accessRestriction);
+        GetAccessControl().SetAccessRestrictionProvider(&accessRestrictionProvider);
         VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
         EXPECT_EQ(LoadAccessControl(accessControl, aclEntryData, aclEntryDataCount), CHIP_NO_ERROR);
     }
@@ -206,23 +210,29 @@ TEST_F(TestAccessRestriction, MetaTest)
 // ensure adding restrictons on endpoint 0 (any cluster) or for network commissioning and descriptor clusters fail
 TEST_F(TestAccessRestriction, InvalidRestrictionsTest)
 {
-    AccessRestriction::Entry entry;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
     entry.fabricIndex = 1;
     entry.clusterId   = kOnOffCluster;
-    entry.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kAttributeAccessForbidden });
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
 
     // must not restrict endpoint 0
     entry.endpointNumber = 0;
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_ERROR_INVALID_ARGUMENT);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
 
     // must not restrict network commissioning cluster
+    entries.clear();
     entry.endpointNumber = 1;
     entry.clusterId      = kNetworkCommissioningCluster;
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_ERROR_INVALID_ARGUMENT);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
 
     // must not restrict descriptor cluster
+    entries.clear();
     entry.clusterId = kDescriptorCluster;
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_ERROR_INVALID_ARGUMENT);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 constexpr CheckData accessAttributeRestrictionTestData[] = {
@@ -249,20 +259,23 @@ constexpr CheckData accessAttributeRestrictionTestData[] = {
 
 TEST_F(TestAccessRestriction, AccessAttributeRestrictionTest)
 {
-    AccessRestriction::Entry entry;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
     entry.clusterId      = kOnOffCluster;
-    entry.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kAttributeAccessForbidden });
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
 
     // test wildcarded entity id
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(accessAttributeRestrictionTestData, ArraySize(accessAttributeRestrictionTestData));
 
     // test specific entity id
-    accessRestriction.Clear();
+    entries.clear();
     entry.restrictions[0].id.SetValue(1);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(accessAttributeRestrictionTestData, ArraySize(accessAttributeRestrictionTestData));
 }
 
@@ -290,20 +303,23 @@ constexpr CheckData writeAttributeRestrictionTestData[] = {
 
 TEST_F(TestAccessRestriction, WriteAttributeRestrictionTest)
 {
-    AccessRestriction::Entry entry;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
     entry.clusterId      = kOnOffCluster;
-    entry.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kAttributeWriteForbidden });
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
 
     // test wildcarded entity id
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(writeAttributeRestrictionTestData, ArraySize(writeAttributeRestrictionTestData));
 
     // test specific entity id
-    accessRestriction.Clear();
+    entries.clear();
     entry.restrictions[0].id.SetValue(1);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(writeAttributeRestrictionTestData, ArraySize(writeAttributeRestrictionTestData));
 }
 
@@ -331,20 +347,23 @@ constexpr CheckData commandAttributeRestrictionTestData[] = {
 
 TEST_F(TestAccessRestriction, CommandRestrictionTest)
 {
-    AccessRestriction::Entry entry;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
     entry.clusterId      = kOnOffCluster;
-    entry.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kCommandForbidden });
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
 
     // test wildcarded entity id
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(commandAttributeRestrictionTestData, ArraySize(commandAttributeRestrictionTestData));
 
     // test specific entity id
-    accessRestriction.Clear();
+    entries.clear();
     entry.restrictions[0].id.SetValue(1);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(commandAttributeRestrictionTestData, ArraySize(commandAttributeRestrictionTestData));
 }
 
@@ -372,20 +391,23 @@ constexpr CheckData eventAttributeRestrictionTestData[] = {
 
 TEST_F(TestAccessRestriction, EventRestrictionTest)
 {
-    AccessRestriction::Entry entry;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
     entry.clusterId      = kOnOffCluster;
-    entry.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kEventForbidden });
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kEventForbidden });
 
     // test wildcarded entity id
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(eventAttributeRestrictionTestData, ArraySize(eventAttributeRestrictionTestData));
 
     // test specific entity id
-    accessRestriction.Clear();
+    entries.clear();
     entry.restrictions[0].id.SetValue(1);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry, 1), CHIP_NO_ERROR);
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
     RunChecks(eventAttributeRestrictionTestData, ArraySize(eventAttributeRestrictionTestData));
 }
 
@@ -434,27 +456,31 @@ constexpr CheckData combinedRestrictionTestData[] = {
 TEST_F(TestAccessRestriction, CombinedRestrictionTest)
 {
     // a restriction for all access to attribute 1 and 2, attributes 3 and 4 are allowed
-    AccessRestriction::Entry entry1;
+    std::vector<AccessRestrictionProvider::Entry> entries1;
+    AccessRestrictionProvider::Entry entry1;
     entry1.fabricIndex    = 1;
     entry1.endpointNumber = 1;
     entry1.clusterId      = kOnOffCluster;
-    entry1.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kAttributeWriteForbidden });
+    entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
     entry1.restrictions[0].id.SetValue(1);
-    entry1.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kAttributeAccessForbidden });
+    entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
     entry1.restrictions[1].id.SetValue(2);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry1, 1), CHIP_NO_ERROR);
+    entries1.push_back(entry1);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries1), CHIP_NO_ERROR);
 
     // a restriction for fabric 2 that forbids command 1 and 2.  Check that command 1 is blocked on invoke, but attribute 2 write is
     // allowed
-    AccessRestriction::Entry entry2;
+    std::vector<AccessRestrictionProvider::Entry> entries2;
+    AccessRestrictionProvider::Entry entry2;
     entry2.fabricIndex    = 2;
     entry2.endpointNumber = 1;
     entry2.clusterId      = kOnOffCluster;
-    entry2.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kCommandForbidden });
+    entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
     entry2.restrictions[0].id.SetValue(1);
-    entry2.restrictions.push_back({ .restrictionType = AccessRestriction::Type::kCommandForbidden });
+    entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
     entry2.restrictions[1].id.SetValue(2);
-    EXPECT_EQ(accessRestriction.CreateEntry(nullptr, entry2, 2), CHIP_NO_ERROR);
+    entries2.push_back(entry2);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(2, entries2), CHIP_NO_ERROR);
 
     RunChecks(combinedRestrictionTestData, ArraySize(combinedRestrictionTestData));
 }

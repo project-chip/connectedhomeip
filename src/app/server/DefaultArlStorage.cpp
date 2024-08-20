@@ -25,10 +25,10 @@ using namespace chip::app;
 using namespace chip::Access;
 
 using EncodableEntry     = ArlStorage::EncodableEntry;
-using Entry              = AccessRestriction::Entry;
-using EntryListener      = AccessRestriction::EntryListener;
+using Entry              = AccessRestrictionProvider::Entry;
+using Listener           = AccessRestrictionProvider::Listener;
 using StagingRestriction = Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type;
-using Restriction        = AccessRestriction::Restriction;
+using Restriction        = AccessRestrictionProvider::Restriction;
 
 namespace {
 
@@ -59,47 +59,70 @@ constexpr int kEncodedEntryOverheadBytes    = 17 + 8;
 constexpr int kEncodedEntryRestrictionBytes = 11 * CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY;
 constexpr int kEncodedEntryTotalBytes       = kEncodedEntryOverheadBytes + kEncodedEntryRestrictionBytes;
 
-class : public EntryListener
+class : public Listener
 {
 public:
-    void OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<Entry> entry, ChangeType changeType) override
+    void CommissioningRestrictionListChanged() override
     {
+        // first clear out any existing entries
         CHIP_ERROR err;
-
-        uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
-
-        VerifyOrExit(mPersistentStorage != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-        if (changeType == ChangeType::kRemoved)
+        for (size_t index = 0; /**/; ++index)
         {
-            // Shuffle down entries past index, then delete entry at last index.
-            while (true)
+            err = mPersistentStorage->SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::AccessControlCommissioningArlEntry(index).KeyName());
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
-                uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-                err           = mPersistentStorage->SyncGetKeyValue(
-                    DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index + 1).KeyName(), buffer, size);
-                if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-                {
-                    break;
-                }
-                SuccessOrExit(err);
-                SuccessOrExit(err = mPersistentStorage->SyncSetKeyValue(
-                                  DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index).KeyName(), buffer, size));
-                index++;
+                break;
             }
-            SuccessOrExit(err = mPersistentStorage->SyncDeleteKeyValue(
-                              DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index).KeyName()));
         }
-        else
+
+        auto entries = GetAccessControl().GetAccessRestrictionProvider()->GetCommissioningEntries();
+        size_t index = 0;
+        for (auto & entry : entries)
         {
-            // Write added/updated entry at index.
-            VerifyOrExit(entry != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
             TLV::TLVWriter writer;
             writer.Init(buffer);
             EncodableEntry encodableEntry(entry);
             SuccessOrExit(err = encodableEntry.EncodeForWrite(writer, TLV::AnonymousTag()));
             SuccessOrExit(err = mPersistentStorage->SyncSetKeyValue(
-                              DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index).KeyName(), buffer,
+                              DefaultStorageKeyAllocator::AccessControlCommissioningArlEntry(index++).KeyName(), buffer,
+                              static_cast<uint16_t>(writer.GetLengthWritten())));
+        }
+
+        return;
+
+    exit:
+        ChipLogError(DataManagement, "DefaultArlStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    void RestrictionListChanged(FabricIndex fabricIndex) override
+    {
+        // first clear out any existing entries
+        CHIP_ERROR err;
+        size_t index = 0;
+        for (size_t index = 0; /**/; ++index)
+        {
+            err = mPersistentStorage->SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index).KeyName());
+            if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                break;
+            }
+        }
+
+        const std::vector<Entry> * entries;
+        SuccessOrExit(err = GetAccessControl().GetAccessRestrictionProvider()->GetEntries(fabricIndex, entries));
+        VerifyOrExit(entries != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        for (auto & entry : *entries)
+        {
+            uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            EncodableEntry encodableEntry(entry);
+            SuccessOrExit(err = encodableEntry.EncodeForWrite(writer, TLV::AnonymousTag()));
+            SuccessOrExit(err = mPersistentStorage->SyncSetKeyValue(
+                              DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index++).KeyName(), buffer,
                               static_cast<uint16_t>(writer.GetLengthWritten())));
         }
 
@@ -132,9 +155,10 @@ CHIP_ERROR DefaultArlStorage::Init(PersistentStorageDelegate & persistentStorage
     ChipLogProgress(DataManagement, "DefaultArlStorage: initializing");
 
     CHIP_ERROR err;
+    size_t commissioningCount = 0;
+    size_t count              = 0;
 
-    [[maybe_unused]] size_t count = 0;
-
+    std::vector<Entry> commissioningEntries;
     for (size_t index = 0; /**/; ++index)
     {
         uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
@@ -154,13 +178,14 @@ CHIP_ERROR DefaultArlStorage::Init(PersistentStorageDelegate & persistentStorage
         DecodableEntry decodableEntry;
         SuccessOrExit(err = decodableEntry.Decode(reader));
 
-        SuccessOrExit(err = GetAccessControl().GetAccessRestriction()->CreateCommissioningEntry(
-                          Platform::MakeShared<Entry>(decodableEntry.GetEntry())));
-        count++;
+        commissioningEntries.push_back(decodableEntry.GetEntry());
+        commissioningCount++;
     }
+    GetAccessControl().GetAccessRestrictionProvider()->SetCommissioningEntries(commissioningEntries);
 
     for (auto it = first; it != last; ++it)
     {
+        std::vector<Entry> entries;
         auto fabric = it->GetFabricIndex();
         for (size_t index = 0; /**/; ++index)
         {
@@ -181,16 +206,17 @@ CHIP_ERROR DefaultArlStorage::Init(PersistentStorageDelegate & persistentStorage
             DecodableEntry decodableEntry;
             SuccessOrExit(err = decodableEntry.Decode(reader));
 
-            Entry & entry = decodableEntry.GetEntry();
-            SuccessOrExit(err = GetAccessControl().GetAccessRestriction()->CreateEntry(nullptr, entry, fabric));
+            entries.push_back(decodableEntry.GetEntry());
             count++;
         }
+        GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabric, commissioningEntries);
     }
 
-    ChipLogProgress(DataManagement, "DefaultArlStorage: %u entries loaded", (unsigned) count);
+    ChipLogProgress(DataManagement, "DefaultArlStorage: %u commissioning entries loaded, %u fabric entries loaded",
+                    (unsigned) commissioningCount, (unsigned) count);
 
     sEntryListener.Init(persistentStorage);
-    GetAccessControl().GetAccessRestriction()->AddListener(sEntryListener);
+    GetAccessControl().GetAccessRestrictionProvider()->AddListener(sEntryListener);
 
     return CHIP_NO_ERROR;
 

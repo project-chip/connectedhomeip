@@ -181,12 +181,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    if (initParams.accessRestriction != nullptr && initParams.arlStorage != nullptr)
+    if (initParams.accessRestrictionProvider != nullptr && initParams.arlStorage != nullptr)
     {
-        mAccessRestriction = initParams.accessRestriction;
-        mArlStorage        = initParams.arlStorage;
+        mAccessRestrictionProvider = initParams.accessRestrictionProvider;
+        mArlStorage                = initParams.arlStorage;
 
-        mAccessControl.SetAccessRestriction(mAccessRestriction);
+        mAccessControl.SetAccessRestrictionProvider(mAccessRestrictionProvider);
         SuccessOrExit(err = mArlStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
     }
 #endif

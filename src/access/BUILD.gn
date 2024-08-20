@@ -73,8 +73,8 @@ static_library("access") {
 
   if (chip_enable_access_restrictions) {
     sources += [
-      "AccessRestriction.cpp",
-      "AccessRestriction.h",
+      "AccessRestrictionProvider.cpp",
+      "AccessRestrictionProvider.h",
     ]
   }
 }

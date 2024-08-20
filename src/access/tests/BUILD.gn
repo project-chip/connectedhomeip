@@ -32,6 +32,6 @@ chip_test_suite("tests") {
   ]
 
   if (chip_enable_access_restrictions) {
-    test_sources += [ "TestAccessRestriction.cpp" ]
+    test_sources += [ "TestAccessRestrictionProvider.cpp" ]
   }
 }

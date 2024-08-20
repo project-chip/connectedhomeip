@@ -18,7 +18,7 @@
 #include <access/AccessControl.h>
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include <access/AccessRestriction.h>
+#include <access/AccessRestrictionProvider.h>
 #include <app/server/ArlStorage.h>
 #endif
 
@@ -30,6 +30,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
+#include <app/reporting/reporting.h>
 #include <app/server/AclStorage.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -66,7 +67,7 @@ class AccessControlAttribute : public AttributeAccessInterface,
                                public AccessControl::EntryListener
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     ,
-                               public AccessRestriction::EntryListener
+                               public AccessRestrictionProvider::Listener
 #endif
 {
 public:
@@ -87,8 +88,9 @@ public:
                         const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType) override;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    void OnEntryChanged(FabricIndex fabricIndex, size_t index, Platform::SharedPtr<AccessRestriction::Entry> entry,
-                        AccessRestriction::EntryListener::ChangeType changeType) override;
+    void CommissioningRestrictionListChanged() override;
+
+    void RestrictionListChanged(FabricIndex fabricIndex) override;
 
     void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
                                          const char * redirectUrl) override;
@@ -468,20 +470,18 @@ exit:
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & aEncoder)
 {
-    auto accessRestriction = GetAccessControl().GetAccessRestriction();
-    if (accessRestriction == nullptr)
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider == nullptr)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        AccessRestriction::EntryIterator begin;
-        AccessRestriction::EntryIterator end;
-        ReturnErrorOnFailure(accessRestriction->CommissioningEntries(begin, end));
+        auto entries = accessRestrictionProvider->GetCommissioningEntries();
 
-        for (AccessRestriction::EntryIterator it = begin; it != end; ++it)
+        for (auto & entry : entries)
         {
-            ArlStorage::EncodableEntry encodableEntry(*it);
+            ArlStorage::EncodableEntry encodableEntry(entry);
             ReturnErrorOnFailure(encoder.Encode(encodableEntry));
         }
         return CHIP_NO_ERROR;
@@ -490,8 +490,8 @@ CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & 
 
 CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
 {
-    auto accessRestriction = GetAccessControl().GetAccessRestriction();
-    if (accessRestriction == nullptr)
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider == nullptr)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -500,25 +500,30 @@ CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
         for (auto & info : Server::GetInstance().GetFabricTable())
         {
             auto fabric = info.GetFabricIndex();
-            AccessRestriction::EntryIterator begin;
-            AccessRestriction::EntryIterator end;
-            ReturnErrorOnFailure(accessRestriction->Entries(fabric, begin, end));
-
-            for (AccessRestriction::EntryIterator it = begin; it != end; ++it)
+            // get entries for fabric
+            const std::vector<AccessRestrictionProvider::Entry> * entries = nullptr;
+            ReturnErrorOnFailure(accessRestrictionProvider->GetEntries(fabric, entries));
+            VerifyOrReturnError(entries != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            for (auto & entry : *entries)
             {
-                ArlStorage::EncodableEntry encodableEntry(*it);
+                ArlStorage::EncodableEntry encodableEntry(entry);
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
         }
         return CHIP_NO_ERROR;
     });
 }
+void AccessControlAttribute::CommissioningRestrictionListChanged()
+{
+    MatterReportingAttributeChangeCallback(0, AccessControlCluster::Id, AccessControlCluster::Attributes::CommissioningARL::Id);
+}
 
-void AccessControlAttribute::OnEntryChanged(FabricIndex fabricIndex, size_t index,
-                                            Platform::SharedPtr<AccessRestriction::Entry> entry,
-                                            AccessRestriction::EntryListener::ChangeType changeType)
+void AccessControlAttribute::RestrictionListChanged(FabricIndex fabricIndex)
 {
     CHIP_ERROR err;
+
+    MatterReportingAttributeChangeCallback(0, AccessControlCluster::Id, AccessControlCluster::Attributes::Arl::Id);
+
     ArlChangedEvent event{ .fabricIndex = fabricIndex };
 
     EventNumber eventNumber;
@@ -601,16 +606,6 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
     return ChipErrorToImErrorMap(WriteImpl(aPath, aDecoder));
 }
 
-#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
-    {
-        Access::GetAccessControl().GetAccessRestriction()->CreateFabricEntries(event->CommissioningComplete.fabricIndex);
-    }
-}
-#endif
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
@@ -621,13 +616,11 @@ void MatterAccessControlPluginServerInitCallback()
     GetAccessControl().AddEntryListener(sAttribute);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    auto accessRestriction = GetAccessControl().GetAccessRestriction();
-    if (accessRestriction != nullptr)
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
     {
-        accessRestriction->AddListener(sAttribute);
+        accessRestrictionProvider->AddListener(sAttribute);
     }
-
-    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 #endif
 }
 
@@ -643,11 +636,11 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     }
 
     uint64_t token;
-    std::vector<AccessRestriction::Entry> entries;
+    std::vector<AccessRestrictionProvider::Entry> entries;
     auto entryIter = commandData.arl.begin();
     while (entryIter.Next())
     {
-        AccessRestriction::Entry entry;
+        AccessRestrictionProvider::Entry entry;
         entry.fabricIndex    = commandObj->GetAccessingFabricIndex();
         entry.endpointNumber = entryIter.GetValue().endpoint;
         entry.clusterId      = entryIter.GetValue().cluster;
@@ -655,8 +648,8 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
         auto restrictionIter = entryIter.GetValue().restrictions.begin();
         while (restrictionIter.Next())
         {
-            AccessRestriction::Restriction restriction;
-            restriction.restrictionType = static_cast<AccessRestriction::Type>(restrictionIter.GetValue().type);
+            AccessRestrictionProvider::Restriction restriction;
+            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>(restrictionIter.GetValue().type);
             if (!restrictionIter.GetValue().id.IsNull())
             {
                 restriction.id.SetValue(restrictionIter.GetValue().id.Value());
@@ -667,7 +660,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
         entries.push_back(entry);
     }
 
-    CHIP_ERROR err = GetAccessControl().GetAccessRestriction()->RequestFabricRestrictionReview(
+    CHIP_ERROR err = GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
         commandObj->GetAccessingFabricIndex(), entries, token);
 
     if (err == CHIP_NO_ERROR)

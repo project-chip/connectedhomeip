@@ -104,7 +104,7 @@
 #include "CommissionableInit.h"
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include "ExampleAccessRestriction.h"
+#include "ExampleAccessRestrictionProvider.h"
 #include <app/server/DefaultArlStorage.h>
 #endif
 
@@ -602,12 +602,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (LinuxDeviceOptions::GetInstance().accessRestrictionEntries.HasValue())
     {
-        initParams.accessRestriction = new ExampleAccessRestriction();
-        initParams.arlStorage        = new app::DefaultArlStorage();
-        for (const auto & entry : LinuxDeviceOptions::GetInstance().accessRestrictionEntries.Value())
-        {
-            VerifyOrDie(AccessRestriction::CreateCommissioningEntry(entry) == CHIP_NO_ERROR);
-        }
+        auto exampleAccessRestrictionProvider = new ExampleAccessRestrictionProvider();
+        exampleAccessRestrictionProvider->SetCommissioningEntries(
+            LinuxDeviceOptions::GetInstance().accessRestrictionEntries.Value());
+
+        initParams.accessRestrictionProvider = exampleAccessRestrictionProvider;
+        initParams.arlStorage                = new app::DefaultArlStorage();
     }
 #endif
 

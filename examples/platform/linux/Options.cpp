@@ -338,8 +338,7 @@ const char * sDeviceOptionHelp =
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-bool ParseAccessRestrictionEntriesFromJson(const char * jsonString,
-                                           std::vector<Platform::SharedPtr<AccessRestriction::Entry>> & entries)
+bool ParseAccessRestrictionEntriesFromJson(const char * jsonString, std::vector<AccessRestrictionProvider::Entry> & entries)
 {
     Json::Value root;
     Json::Reader reader;
@@ -347,21 +346,21 @@ bool ParseAccessRestrictionEntriesFromJson(const char * jsonString,
 
     for (Json::Value::const_iterator eIt = root.begin(); eIt != root.end(); eIt++)
     {
-        auto entry = MakeShared<AccessRestriction::Entry>();
+        AccessRestrictionProvider::Entry entry;
 
-        entry->endpointNumber = static_cast<EndpointId>((*eIt)["endpoint"].asUInt());
-        entry->clusterId      = static_cast<ClusterId>((*eIt)["cluster"].asUInt());
+        entry.endpointNumber = static_cast<EndpointId>((*eIt)["endpoint"].asUInt());
+        entry.clusterId      = static_cast<ClusterId>((*eIt)["cluster"].asUInt());
 
         Json::Value restrictions = (*eIt)["restrictions"];
         for (Json::Value::const_iterator rIt = restrictions.begin(); rIt != restrictions.end(); rIt++)
         {
-            AccessRestriction::Restriction restriction;
-            restriction.restrictionType = static_cast<AccessRestriction::Type>((*rIt)["type"].asInt());
+            AccessRestrictionProvider::Restriction restriction;
+            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>((*rIt)["type"].asInt());
             if ((*rIt).isMember("id"))
             {
                 restriction.id.SetValue((*rIt)["id"].asUInt());
             }
-            entry->restrictions.push_back(restriction);
+            entry.restrictions.push_back(restriction);
         }
 
         entries.push_back(entry);
@@ -582,7 +581,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     case kDeviceOption_UseAccessRestrictions: {
-        std::vector<Platform::SharedPtr<AccessRestriction::Entry>> accessRestrictionEntries;
+        std::vector<AccessRestrictionProvider::Entry> accessRestrictionEntries;
         retval = ParseAccessRestrictionEntriesFromJson(aValue, accessRestrictionEntries);
         if (retval)
         {

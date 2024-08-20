@@ -22,26 +22,25 @@
 
 #pragma once
 
-#include <access/AccessRestriction.h>
+#include <access/AccessRestrictionProvider.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 
 namespace chip {
 namespace Access {
 
-class ExampleAccessRestriction : public AccessRestriction
+class ExampleAccessRestrictionProvider : public AccessRestrictionProvider
 {
 public:
-    ExampleAccessRestriction() : AccessRestriction() {}
+    ExampleAccessRestrictionProvider() : AccessRestrictionProvider() {}
 
-    ~ExampleAccessRestriction() {}
+    ~ExampleAccessRestrictionProvider() {}
 
 protected:
     CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token, const std::vector<Entry> & arl)
     {
         // this example simply removes all restrictions and will generate AccessRestrictionEntryChanged events
-        while (Access::GetAccessControl().GetAccessRestriction()->DeleteEntry(0, fabricIndex) == CHIP_NO_ERROR)
-            ;
+        Access::GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabricIndex, std::vector<Entry>{});
 
         chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type event{ .fabricIndex = fabricIndex };
         EventNumber eventNumber;

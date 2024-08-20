@@ -23,28 +23,28 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Access;
 
-using Entry                  = AccessRestriction::Entry;
-using EntryListener          = AccessRestriction::EntryListener;
+using Entry                  = AccessRestrictionProvider::Entry;
+using EntryListener          = AccessRestrictionProvider::Listener;
 using StagingRestrictionType = Clusters::AccessControl::AccessRestrictionTypeEnum;
 using StagingRestriction     = Clusters::AccessControl::Structs::AccessRestrictionStruct::Type;
 
 namespace {
 
-CHIP_ERROR Convert(StagingRestrictionType from, AccessRestriction::Type & to)
+CHIP_ERROR Convert(StagingRestrictionType from, AccessRestrictionProvider::Type & to)
 {
     switch (from)
     {
     case StagingRestrictionType::kAttributeAccessForbidden:
-        to = AccessRestriction::Type::kAttributeAccessForbidden;
+        to = AccessRestrictionProvider::Type::kAttributeAccessForbidden;
         break;
     case StagingRestrictionType::kAttributeWriteForbidden:
-        to = AccessRestriction::Type::kAttributeWriteForbidden;
+        to = AccessRestrictionProvider::Type::kAttributeWriteForbidden;
         break;
     case StagingRestrictionType::kCommandForbidden:
-        to = AccessRestriction::Type::kCommandForbidden;
+        to = AccessRestrictionProvider::Type::kCommandForbidden;
         break;
     case StagingRestrictionType::kEventForbidden:
-        to = AccessRestriction::Type::kEventForbidden;
+        to = AccessRestrictionProvider::Type::kEventForbidden;
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -52,20 +52,20 @@ CHIP_ERROR Convert(StagingRestrictionType from, AccessRestriction::Type & to)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Convert(AccessRestriction::Type from, StagingRestrictionType & to)
+CHIP_ERROR Convert(AccessRestrictionProvider::Type from, StagingRestrictionType & to)
 {
     switch (from)
     {
-    case AccessRestriction::Type::kAttributeAccessForbidden:
+    case AccessRestrictionProvider::Type::kAttributeAccessForbidden:
         to = StagingRestrictionType::kAttributeAccessForbidden;
         break;
-    case AccessRestriction::Type::kAttributeWriteForbidden:
+    case AccessRestrictionProvider::Type::kAttributeWriteForbidden:
         to = StagingRestrictionType::kAttributeWriteForbidden;
         break;
-    case AccessRestriction::Type::kCommandForbidden:
+    case AccessRestrictionProvider::Type::kCommandForbidden:
         to = StagingRestrictionType::kCommandForbidden;
         break;
-    case AccessRestriction::Type::kEventForbidden:
+    case AccessRestrictionProvider::Type::kEventForbidden:
         to = StagingRestrictionType::kEventForbidden;
         break;
     default:
@@ -91,7 +91,7 @@ CHIP_ERROR ArlStorage::DecodableEntry::Decode(TLV::TLVReader & reader)
     while (iterator.Next())
     {
         auto & tmp = iterator.GetValue();
-        AccessRestriction::Restriction restriction;
+        AccessRestrictionProvider::Restriction restriction;
         ReturnErrorOnFailure(Convert(tmp.type, restriction.restrictionType));
 
         if (!tmp.id.IsNull())
@@ -122,17 +122,17 @@ CHIP_ERROR ArlStorage::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, T
 
 CHIP_ERROR ArlStorage::EncodableEntry::Stage() const
 {
-    mStagingEntry.fabricIndex = mEntry->fabricIndex;
-    mStagingEntry.endpoint    = mEntry->endpointNumber;
-    mStagingEntry.cluster     = mEntry->clusterId;
+    mStagingEntry.fabricIndex = mEntry.fabricIndex;
+    mStagingEntry.endpoint    = mEntry.endpointNumber;
+    mStagingEntry.cluster     = mEntry.clusterId;
 
     {
-        size_t count = mEntry->restrictions.size();
+        size_t count = mEntry.restrictions.size();
         if (count > 0 && count <= CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY)
         {
             for (size_t i = 0; i < count; i++)
             {
-                auto restriction = mEntry->restrictions[i];
+                auto restriction = mEntry.restrictions[i];
                 StagingRestriction tmp;
                 ReturnErrorOnFailure(Convert(restriction.restrictionType, tmp.type));
 

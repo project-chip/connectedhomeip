@@ -326,7 +326,7 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
 bool AccessControl::IsAccessRestrictionListSupported() const
 {
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    return mAccessRestriction != nullptr;
+    return mAccessRestrictionProvider != nullptr;
 #else
     return false;
 #endif
@@ -357,9 +357,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    if (mAccessRestriction != nullptr)
+    if (mAccessRestrictionProvider != nullptr)
     {
-        CHIP_ERROR result = mAccessRestriction->Check(subjectDescriptor, requestPath);
+        CHIP_ERROR result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
         if (result != CHIP_NO_ERROR)
         {
             ChipLogProgress(DataManagement, "AccessControl: %s",

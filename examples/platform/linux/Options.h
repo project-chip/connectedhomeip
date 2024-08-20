@@ -40,7 +40,7 @@
 #include <testing/CustomCSRResponse.h>
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include <access/AccessRestriction.h>
+#include <access/AccessRestrictionProvider.h>
 #endif
 
 struct LinuxDeviceOptions
@@ -88,7 +88,7 @@ struct LinuxDeviceOptions
     int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    chip::Optional<std::vector<chip::Platform::SharedPtr<chip::Access::AccessRestriction::Entry>>> accessRestrictionEntries;
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> accessRestrictionEntries;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

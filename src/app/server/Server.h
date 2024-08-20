@@ -170,7 +170,7 @@ struct ServerInitParams
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Access Restriction implementation: MUST be injected if MNGD feature enabled. Used to enforce
     // access restrictions that are managed by the device.
-    Access::AccessRestriction * accessRestriction = nullptr;
+    Access::AccessRestrictionProvider * accessRestrictionProvider = nullptr;
     // ARL storage: MUST be injected if MNGD feature enabled. Used to store ACL entries in
     // persistent storage. Must NOT be initialized before being provided.
     app::ArlStorage * arlStorage = nullptr;
@@ -693,7 +693,7 @@ private:
     app::AclStorage * mAclStorage;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    Access::AccessRestriction * mAccessRestriction;
+    Access::AccessRestrictionProvider * mAccessRestrictionProvider;
     app::ArlStorage * mArlStorage;
 #endif
 
