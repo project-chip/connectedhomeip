@@ -1264,8 +1264,8 @@ class TC_OPSTATE_BASE():
         sub_handler = ClusterAttributeChangeAccumulator(cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(3)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.step(3)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start")

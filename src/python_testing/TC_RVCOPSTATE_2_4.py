@@ -114,7 +114,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C128.Rsp"), "RVCOPSTATE.S.C128.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C80.Rsp"), "RVCOPSTATE.S.C80.Rsp must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
@@ -170,16 +170,16 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         if self.check_pics("PICS_M_ST_SEEKING_CHARGER"):
             step_name = "Manually put the device in the SEEKING CHARGER operational state"
-            self.print_step(8, step_name)
+            self.print_step(11, step_name)
             if self.is_ci:
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_cleaning)
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_idle)
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
-            await self.read_operational_state_with_check(9, rvc_op_states.kSeekingCharger)
+            await self.read_operational_state_with_check(12, rvc_op_states.kSeekingCharger)
 
-            await self.send_go_home_cmd_with_check(10, op_errors.kNoError)
+            await self.send_go_home_cmd_with_check(13, op_errors.kNoError)
 
 
 if __name__ == "__main__":
