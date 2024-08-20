@@ -44,7 +44,6 @@ extern "C" {
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
-#include "sl_si91x_m4_ps.h"
 #include "sl_si91x_types.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
