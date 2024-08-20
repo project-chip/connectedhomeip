@@ -762,7 +762,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
         uint8_t buffer[kPresetHandleSize];
         MutableByteSpan activePresetHandleSpan(buffer);
-        DataModel::Nullable<MutableByteSpan> activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
+        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
         CHIP_ERROR err = delegate->GetActivePresetHandle(activePresetHandle);
         ReturnErrorOnFailure(err);
@@ -1465,7 +1465,7 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
     // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
     MutableByteSpan activePresetHandleSpan(buffer);
-    DataModel::Nullable<MutableByteSpan> activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
+    auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
     err = delegate->GetActivePresetHandle(activePresetHandle);
 
