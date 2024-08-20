@@ -51,7 +51,11 @@ public:
     void Release(BdxTransfer * bdxTransfer) override;
 
 private:
-    ObjectPool<BdxTransfer, 2> mTransferPool;
+    // The maximum number of transfers to support at once. This number was chosen because it should be sufficient for
+    // current tests that use BDX.
+    static constexpr size_t kTransferPoolSize = 2;
+
+    ObjectPool<BdxTransfer, kTransferPoolSize> mTransferPool;
     System::Layer * mSystemLayer                 = nullptr;
     BdxTransfer::Delegate * mBdxTransferDelegate = nullptr;
     size_t mExpectedTransfers                    = 0;

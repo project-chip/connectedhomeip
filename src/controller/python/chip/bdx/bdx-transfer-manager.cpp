@@ -52,7 +52,11 @@ BdxTransfer * BdxTransferManager::Allocate()
     VerifyOrReturnValue(mExpectedTransfers != 0, nullptr);
 
     BdxTransfer * result = mTransferPool.CreateObject(mSystemLayer);
-    VerifyOrReturnValue(result != nullptr, nullptr);
+    if (result == nullptr) {
+      ChipLogError(BDX, "Failed to allocate BDX transfer. The pool (size %d) is exhausted.",
+                   static_cast<int>(kTransferPoolSize));
+      return nullptr;
+    }
     result->SetDelegate(mBdxTransferDelegate);
 
     --mExpectedTransfers;
