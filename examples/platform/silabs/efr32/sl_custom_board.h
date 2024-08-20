@@ -1,7 +1,7 @@
 /*
  * This file is used to set the pins for the SPI for Custom boards
  * The SPI pins are defined in the file
- * 
+ *
  *  !!!! MODIFY THIS FILE TO THE CORRECT PINS !!!!
  */
 
