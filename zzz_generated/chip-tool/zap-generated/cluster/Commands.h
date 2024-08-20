@@ -13800,8 +13800,8 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * DeviceDirectory                                                   | 0x0001 |
-| * LocationDirectory                                                 | 0x0002 |
+| * DeviceDirectory                                                   | 0x0000 |
+| * LocationDirectory                                                 | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |

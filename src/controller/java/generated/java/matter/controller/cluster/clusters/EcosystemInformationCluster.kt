@@ -103,7 +103,7 @@ class EcosystemInformationCluster(
   }
 
   suspend fun readDeviceDirectoryAttribute(): DeviceDirectoryAttribute {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -144,7 +144,7 @@ class EcosystemInformationCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<DeviceDirectoryAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -202,7 +202,7 @@ class EcosystemInformationCluster(
   }
 
   suspend fun readLocationDirectoryAttribute(): LocationDirectoryAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -243,7 +243,7 @@ class EcosystemInformationCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<LocationDirectoryAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)

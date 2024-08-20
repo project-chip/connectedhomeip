@@ -60768,8 +60768,8 @@ public class ChipClusters {
   public static class EcosystemInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1872L;
 
-    private static final long DEVICE_DIRECTORY_ATTRIBUTE_ID = 1L;
-    private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 2L;
+    private static final long DEVICE_DIRECTORY_ATTRIBUTE_ID = 0L;
+    private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;

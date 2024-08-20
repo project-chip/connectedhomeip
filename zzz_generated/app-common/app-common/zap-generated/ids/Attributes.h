@@ -7491,11 +7491,11 @@ namespace EcosystemInformation {
 namespace Attributes {
 
 namespace DeviceDirectory {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace DeviceDirectory
 
 namespace LocationDirectory {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace LocationDirectory
 
 namespace GeneratedCommandList {
