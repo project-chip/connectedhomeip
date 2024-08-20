@@ -149,7 +149,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
                                            const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
     {
         areaInfo.landmarkInfo.SetNonNull();
-        areaInfo.landmarkInfo.Value().landmarkTag = landmarkTag;
+        areaInfo.landmarkInfo.Value().landmarkTag         = landmarkTag;
         areaInfo.landmarkInfo.Value().relativePositionTag = relativePositionTag;
 
         return *this;
