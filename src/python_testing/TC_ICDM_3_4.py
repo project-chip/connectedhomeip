@@ -111,7 +111,7 @@ class TC_ICDM_3_4(MatterBaseTest):
             time.sleep(wait_time_reboot)
 
         self.step(3)
-        # since device has rebooted, force establishing a new CASE seesion by exipiring it
+        # since device has rebooted, force establishing a new CASE seesion by closing it
         self.config = MatterTestConfig()
         self.stack = MatterStackState(self.config)
         devCtrl = self.stack.certificate_authorities[0].adminList[0].NewController(
