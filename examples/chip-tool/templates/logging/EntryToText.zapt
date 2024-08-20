@@ -2,7 +2,10 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 char const * ClusterIdToText(chip::ClusterId id);
 
 char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id);
+
+char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id);

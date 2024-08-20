@@ -81,6 +81,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 return DataModelLogger::LogClusterId("{{name}}", 1, value);
 {{else if (isEqual name "AttributeList")}}
                 return DataModelLogger::LogAttributeId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "AcceptedCommandList")}}
+                return DataModelLogger::LogCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "GeneratedCommandList")}}
+                return DataModelLogger::LogCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
 {{else}}
                 return DataModelLogger::LogValue("{{name}}", 1, value);
 {{/if}}
