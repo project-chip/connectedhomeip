@@ -73,7 +73,6 @@ public:
         default:
             return pw::Status::InvalidArgument();
         }
-
         RETURN_STATUS_IF_NOT_OK(
             emberAfWriteAttribute(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id,
                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(data)), request.metadata.type));

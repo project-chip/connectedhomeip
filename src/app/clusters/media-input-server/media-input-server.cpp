@@ -30,8 +30,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -84,12 +82,6 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     if (ep < kMediaInputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
-        // Sync the attributes from delegate
-        Status status = Attributes::CurrentInput::Set(endpoint, delegate->HandleGetCurrentInput());
-
-        if (Status::Success != status) {
-            ChipLogError(Zcl, "Unable to save CurrentInput attribute ");
-        }
     }
     else
     {
@@ -164,7 +156,7 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
 
     return CHIP_NO_ERROR;
 }
-    
+
 CHIP_ERROR MediaInputAttrAccess::ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     return delegate->HandleGetInputList(aEncoder);
@@ -189,22 +181,14 @@ bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, 
     Status status       = Status::Failure;
 
     auto & input = commandData.index;
-    uint8_t currentInput = 0;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    currentInput = delegate->HandleGetCurrentInput();
-
-    if (currentInput == input) {
-        ChipLogProgress(Zcl, "Endpoint %x CurrentInput already set to new value: %u", endpoint, input);
-    } else {
-        VerifyOrExit(delegate->HandleSelectInput(input), err = CHIP_ERROR_INVALID_ARGUMENT);
-        // Sync attribute to storage
-        VerifyOrExit(Status::Success == (status = chip::app::Clusters::MediaInput::Attributes::CurrentInput::Set(endpoint, input)), err = CHIP_ERROR_INTERNAL);
-        ChipLogProgress(Zcl, "Endpoint %x CurrentInput set to new value: %u successfully", endpoint, input);
+    if (!delegate->HandleSelectInput(input))
+    {
+        status = Status::Failure;
     }
-    status       = Status::Success;
 
 exit:
     if (err != CHIP_NO_ERROR)

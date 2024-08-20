@@ -16,14 +16,18 @@
  */
 
 #include <app/util/config.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <map>
+
 #ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
 #include "MediaInputManager.h"
 
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
+using Protocols::InteractionModel::Status;
 
-MediaInputManager::MediaInputManager()
+MediaInputManager::MediaInputManager(chip::EndpointId endpoint):mEndpoint(endpoint)
 {
     struct InputData inputData1(1, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 1",
                                 "High-Definition Multimedia Interface");
@@ -35,7 +39,13 @@ MediaInputManager::MediaInputManager()
                                 "High-Definition Multimedia Interface");
     mInputs.push_back(inputData3);
 
-    mCurrentInput = 1;
+    // Sync the attributes from delegate
+    Status status = Attributes::CurrentInput::Get(endpoint, &mCurrentInput);
+
+    if (Status::Success != status) {
+        ChipLogError(Zcl, "Unable to save CurrentInput attribute ");
+        mCurrentInput = 1;
+    }
 }
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
@@ -56,11 +66,20 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
+    if (mCurrentInput == index) {
+        ChipLogProgress(Zcl, "CurrentInput is same as new value: %u", index);
+        return true;
+    }
     for (auto const & inputData : mInputs)
     {
         if (inputData.index == index)
         {
             mCurrentInput = index;
+            // Sync the CurrentInput to attribute storage while reporting changes
+            Status status = chip::app::Clusters::MediaInput::Attributes::CurrentInput::Set(mEndpoint, index);
+            if (Status::Success != status) { 
+                ChipLogError(Zcl, "CurrentInput is not stored successfully");
+            }
             return true;
         }
     }
@@ -100,10 +119,14 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     return false;
 }
 
-static MediaInputManager mediaInputManager;
+static std::map<chip::EndpointId, std::unique_ptr<MediaInputManager>> gMediaInputManagerInstance{};
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
-    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate, endpoint=%x", endpoint);
+
+    gMediaInputManagerInstance[endpoint] = std::make_unique<MediaInputManager>(endpoint); 
+    
+    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, gMediaInputManagerInstance[endpoint].get());
+
 }
 #endif // MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
