@@ -779,9 +779,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         # Structured dump so we can pull these back out of the logs
         def log_structured_data(start_tag: str, dump_string):
-            lines = dump_string.splitlines(keepends=True)
+            lines = dump_string.splitlines()
             logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
-            logging.info(f'{start_tag}{start_tag.join(lines)}')
+            for line in lines:
+                logging.info(f'{start_tag}{line}')
             logging.info(f'{start_tag}END ====')
 
         log_structured_data('==== json: ', json_str)
