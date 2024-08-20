@@ -79,8 +79,6 @@ MTR_DIRECT_MEMBERS
     void * _delegatePointerValue;
     __weak id _delegate;
     dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
 }
 
 // Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
@@ -110,7 +108,20 @@ MTR_DIRECT_MEMBERS
 
 @interface MTRDevice () {
     // Ivars needed to implement shared MTRDevice functionality.
-@protected
+    //
+    // Unfortunately, we can't use @protected here, because that exports the
+    // symbols (so that subclasses that are not part of the framework can see
+    // them), but TAPI does not see these declarations, because they are in a
+    // project header.
+    //
+    // Using @package means that the symbols do not need to be exported, but
+    // unfortunately gets treated as @public from inside our framework, which
+    // means random other framework code can access these ivars.  Hopefully the
+    // naming with leading '_' will make it clearer that random other code
+    // should not touch these.
+    //
+    // TODO: Figure out some way of doing @protected but still not exporting the symbol.
+@package
     // Lock that protects overall device state, including delegate storage.
     os_unfair_lock _lock;
     NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;

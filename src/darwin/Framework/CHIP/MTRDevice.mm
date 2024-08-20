@@ -334,7 +334,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
 // update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
