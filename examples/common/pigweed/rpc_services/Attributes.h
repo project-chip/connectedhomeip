@@ -22,10 +22,8 @@
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 
 #include <app-common/zap-generated/attribute-type.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-compatibility-functions.h>
@@ -44,99 +42,38 @@ public:
     ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
     {
         const void * data;
-        size_t data_len = 0;
         DeviceLayer::StackLock lock;
 
         switch (request.data.which_data)
         {
         case chip_rpc_AttributeData_data_bool_tag:
             data = &request.data.data.data_bool;
-            data_len = sizeof(request.data.data.data_bool);
             break;
         case chip_rpc_AttributeData_data_uint8_tag:
             data = &request.data.data.data_uint8;
-            data_len = sizeof(request.data.data.data_uint8);
             break;
         case chip_rpc_AttributeData_data_uint16_tag:
             data = &request.data.data.data_uint16;
-            data_len = sizeof(request.data.data.data_uint16);
             break;
         case chip_rpc_AttributeData_data_uint32_tag:
             data = &request.data.data.data_uint32;
-            data_len = sizeof(request.data.data.data_uint32);
             break;
         case chip_rpc_AttributeData_data_int8_tag:
             data = &request.data.data.data_int8;
-            data_len = sizeof(request.data.data.data_int8);
             break;
         case chip_rpc_AttributeData_data_int16_tag:
             data = &request.data.data.data_int16;
-            data_len = sizeof(request.data.data.data_int16);
             break;
         case chip_rpc_AttributeData_data_int32_tag:
             data = &request.data.data.data_int32;
-            data_len = sizeof(request.data.data.data_int32);
             break;
         case chip_rpc_AttributeData_data_bytes_tag:
             data = &request.data.data.data_bytes;
-            data_len = sizeof(request.data.data.data_bytes);
             break;
         default:
             return pw::Status::InvalidArgument();
         }
 
-#if 1 // Refering Duplicate WriteSingleClusterData to calling AttributeInterface when available
-        if (data_len == 0) {
-            ChipLogError(Zcl, "Invalid writing to PW RPC with data length: 0");
-            return pw::Status::InvalidArgument();
-        }
-        if (auto * attrOverride = chip::app::GetAttributeAccessOverride(request.metadata.endpoint, request.metadata.cluster))
-        {
-            Access::SubjectDescriptor aSubjectDescriptor{ .authMode = chip::Access::AuthMode::kPase };
-            app::ConcreteDataAttributePath aPath(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id);
-
-            uint8_t tlvBuffer[128] = { 0 };
-            uint8_t value = *(static_cast<const uint8_t *>(data));
-
-            TLV::TLVReader aReader;
-
-            TLV::TLVType outerContainerType;
-            TLV::TLVWriter writer;
-            writer.Init(tlvBuffer);
-            writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType);
-            writer.Put(TLV::AnonymousTag(), value);
-            writer.EndContainer(outerContainerType);
-            writer.Finalize();
-
-            aReader.Init(tlvBuffer);
-            app::AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
-
-#if 1 // Test Decode
-            app::DataModel::Nullable<uint8_t> nullableValue;
-
-            CHIP_ERROR err = valueDecoder.Decode(nullableValue);
-            if (CHIP_NO_ERROR != err) {
-                ChipLogError(Zcl, "Invalid writing to PW RPC due to data decoding failed");
-                return pw::Status::InvalidArgument();
-            }
-
-            if (nullableValue.IsNull()) {
-                ChipLogError(Zcl, "Invalid writing to PW RPC with null data");
-                return pw::Status::InvalidArgument();
-            }
-
-            ChipLogError(Zcl, "Writing to PW RPC with data: %u", nullableValue.Value());
-#endif
-
-            PW_TRY(ChipErrorToPwStatus(attrOverride->Write(aPath, valueDecoder)));
-
-            if (valueDecoder.TriedDecode()) // TBD
-            {
-                MatterReportingAttributeChangeCallback(aPath);
-                return pw::OkStatus();
-            }
-        }
-#endif
         RETURN_STATUS_IF_NOT_OK(
             emberAfWriteAttribute(request.metadata.endpoint, request.metadata.cluster, request.metadata.attribute_id,
                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(data)), request.metadata.type));

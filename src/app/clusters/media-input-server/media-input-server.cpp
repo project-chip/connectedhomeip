@@ -126,7 +126,6 @@ public:
     MediaInputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::MediaInput::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -166,30 +165,6 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
     return CHIP_NO_ERROR;
 }
     
-CHIP_ERROR WriteCurrentInput(EndpointId endpoint, uint8_t newInput)
-{
-    Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_ERROR_INTERNAL);
-
-    return delegate->HandleSetCurrentInput(newInput) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
-}
-
-CHIP_ERROR MediaInputAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
-{
-    app::DataModel::Nullable<uint8_t> nullableValue;
-    ReturnErrorOnFailure(aDecoder.Decode(nullableValue));
-    VerifyOrReturnError(!nullableValue.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    switch (aPath.mAttributeId)
-    {
-    case app::Clusters::MediaInput::Attributes::CurrentInput::Id:
-        return WriteCurrentInput(aPath.mEndpointId, nullableValue.Value());
-    }
-
-    ChipLogError(Zcl, "Unsupport MediaInput cluster attribute write %u", aPath.mAttributeId);
-    return CHIP_ERROR_INTERNAL;
-}
-
 CHIP_ERROR MediaInputAttrAccess::ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     return delegate->HandleGetInputList(aEncoder);
