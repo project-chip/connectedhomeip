@@ -54,11 +54,6 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     return mCurrentInput;
 }
 
-bool MediaInputManager::HandleSetCurrentInput(const uint8_t index)
-{
-    return HandleSelectInput(index);
-}
-
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     for (auto const & inputData : mInputs)

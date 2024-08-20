@@ -33,7 +33,6 @@ public:
 
     CHIP_ERROR HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint8_t HandleGetCurrentInput() override;
-    bool HandleSetCurrentInput(const uint8_t index) override;
     bool HandleSelectInput(const uint8_t index) override;
     bool HandleShowInputStatus() override;
     bool HandleHideInputStatus() override;
