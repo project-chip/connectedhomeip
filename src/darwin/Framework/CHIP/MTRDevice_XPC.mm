@@ -99,7 +99,7 @@
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
 }
@@ -107,7 +107,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
 }
@@ -115,7 +115,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
 }
@@ -124,7 +124,7 @@
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
         }
@@ -133,7 +133,7 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
         }
@@ -142,7 +142,7 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
         }
