@@ -78,7 +78,7 @@ class TC_OCC_2_1(MatterBaseTest):
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
-        self.step(1) # Already done, immediately go to step 2
+        self.step(1)  # Already done, immediately go to step 2
 
         self.step(2)
 
@@ -87,7 +87,8 @@ class TC_OCC_2_1(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        logging.info(f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        logging.info(
+            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
@@ -147,11 +148,11 @@ class TC_OCC_2_1(MatterBaseTest):
         self.step(7)
         if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
             has_feature_pir = (occupancy_sensor_type_bitmap_dut &
-                              Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPir) != 0
+                               Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPir) != 0
             has_feature_ultrasonic = (occupancy_sensor_type_bitmap_dut &
-                                     Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kUltrasonic) != 0
+                                      Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kUltrasonic) != 0
             has_feature_contact = (occupancy_sensor_type_bitmap_dut &
-                              Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPhysicalContact) != 0
+                                   Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPhysicalContact) != 0
             if has_feature_pir or (not has_feature_pir and not has_feature_ultrasonic and not has_feature_contact):
                 pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
                 asserts.assert_less_equal(pir_otou_delay_dut, 0xFFFE, "PIROccupiedToUnoccupiedDelay is not in valid range")
@@ -191,7 +192,7 @@ class TC_OCC_2_1(MatterBaseTest):
         self.step(10)
         if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
             has_feature_ultrasonic = (occupancy_sensor_type_bitmap_dut &
-                                     Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) != 0
+                                      Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) != 0
             has_ultrasonic_delay = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
             asserts.assert_equal(has_feature_ultrasonic, has_ultrasonic_delay, "Bad conformance on Ultrasonic bitmap")
 
