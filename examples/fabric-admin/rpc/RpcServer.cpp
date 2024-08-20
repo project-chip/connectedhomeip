@@ -157,9 +157,9 @@ public:
         auto timeNowMs = System::SystemClock().GetMonotonicTimestamp();
         // Spec says we should expire the request 60 mins after we get it
         System::Clock::Timestamp expiryTimestamp = timeNowMs + System::Clock::Seconds64(60 * 60);
-        KeepActiveDataForCheckIn checkInData       = { .mStayActiveDurationMs   = stayActiveDurationMs,
-                                                       .mRequestExpiryTimestamp = expiryTimestamp };
-        mPendingCheckIn[nodeId]          = checkInData;
+        KeepActiveDataForCheckIn checkInData     = { .mStayActiveDurationMs   = stayActiveDurationMs,
+                                                     .mRequestExpiryTimestamp = expiryTimestamp };
+        mPendingCheckIn[nodeId]                  = checkInData;
     }
 
 private:
