@@ -81,6 +81,8 @@ MTR_TESTABLE
 // false-positives, for example due to compressed fabric id collisions.
 - (void)nodeMayBeAdvertisingOperational;
 
+- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
+
 // Called by MTRDevice_XPC to forward delegate callbacks
 - (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
