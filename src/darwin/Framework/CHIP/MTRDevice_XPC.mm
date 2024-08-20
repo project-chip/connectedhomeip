@@ -82,6 +82,17 @@
 
 @implementation MTRDevice_XPC
 
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    // TODO: Verify that this is a valid MTRDeviceController_XPC?
+
+    if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
+        // Nothing else to do, all set.
+    }
+
+    return self;
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
