@@ -19,7 +19,6 @@
 # for details about the block below.
 #
 
-import base64
 import hashlib
 import logging
 import os
@@ -90,10 +89,10 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         cmd.extend(['--KVS', kvs])
 
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info(f"Starting TH_SERVER")
+        logging.info("Starting TH_SERVER")
         self._app_th_server_process = subprocess.Popen(cmd)
         self._th_server_kvs = kvs
-        logging.info(f"Started TH_SERVER")
+        logging.info("Started TH_SERVER")
         time.sleep(3)
         return setup_params
 
