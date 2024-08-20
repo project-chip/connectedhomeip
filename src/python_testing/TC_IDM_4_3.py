@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import inspect
 import copy
 from datetime import datetime
 import logging
@@ -30,7 +31,10 @@ from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncRead
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
-from mobly import asserts
+from chip.clusters.enum import MatterIntEnum
+from basic_composition_support import BasicCompositionTests
+from enum import IntFlag
+from mobly import asserts, signals
 
 '''
 Category:
@@ -45,7 +49,16 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 
 
-class TC_IDM_4_3(MatterBaseTest):
+class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
+    
+
+    
+    
+    
+    
+    
+    
+    
 
     # ANSI escape codes for background colors
     BACKGROUND_COLORS = {
@@ -61,54 +74,46 @@ class TC_IDM_4_3(MatterBaseTest):
     }
 
     # Function to print text with a specific background color
-    def fprint(self, text: str, background_color: str):
-        print(f"{self.BACKGROUND_COLORS.get(background_color, self.BACKGROUND_COLORS['reset'])}{text}{self.BACKGROUND_COLORS['reset']}")
+    def fprint(self, text: str, background_color: str, padding: int = 0):
+        double_space = "  " * padding
+        padding_space = "\n" * (padding - 1)
+        print(f"{padding_space}{double_space}{self.BACKGROUND_COLORS.get(background_color, self.BACKGROUND_COLORS['reset'])}{text}{self.BACKGROUND_COLORS['reset']}{padding_space}")
 
     def steps_TC_IDM_4_3(self):
-        return [TestStep("1a", "DUT and TH activate the subscription.",
-                         "Verify on the TH, a report data message is received. Verify on the TH the Subscribe Response has the following fields: SubscriptionId and MaxInterval In the following Steps 2, 3, 5-10, 13, and 15, the MaxInterval time reference in each step is the MaxInterval presented in the Subscribe Response of the subscription."),
-                TestStep("1b", "Change the value of the attribute which has been subscribed on the DUT by manually changing some settings on the device. Example: Temperature sensor may update the value of the room temperature. Turning on/off on a light bulb.",
-                         "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent when the minimum interval time is reached and before the MaxInterval time."),
-                TestStep(2, "DUT and TH activate the subscription. Change the value of the attribute which has been subscribed on the DUT by sending an IMWrite or Invoke message to the DUT from the TH.",
-                         "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent when the minimum interval time is reached and before the MaxInterval time."),
-                TestStep(3, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
+        return [TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
                          "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
-                # TestStep(4, "DUT and TH activate the subscription. Change the value of the attribute which has been subscribed on the DUT. TH force sends a status response with an \"invalid subscription\". Change the value of the attribute which has been subscribed on the DUT.",
-                #          "Verify that DUT does not send report data for the second time after the subscription has been terminated."),
-                # TestStep(5, "Activate the subscription between the DUT and the TH for an attribute of data type bool. Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(6, "Activate the subscription between the DUT and the TH for an attribute of data type string. Modify that attribute on the DUT. DUT should send the report data with the modified attribute value Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(7, "Activate the subscription between the DUT and the TH for an attribute of data type \"unsigned integer\". Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(8, "Activate the subscription between the DUT and the TH for an attribute of data type \"signed integer\". Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times)before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(9, "Activate the subscription between the DUT and the TH for an attribute of data type \"floating point\". Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(10, "Activate the subscription between the DUT and the TH for an attribute of data type list. Modify that attribute on the DUT. DUT should send the report data with the modified attribute value. Modify the attribute multiple times (3 times) before the MaxInterval time specified during the subscription activation.",
-                #          "Verify on the TH that the DUT sends the correct value of the attribute."),
-                # TestStep(11, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False After the Maximum interval time is elapsed, TH should send another subscription request message with different parameters than before. KeepSubscriptions flag should be set to False Change the value of the attribute requested on the DUT.",
+                TestStep(2, "Activate the subscription between the DUT and the TH for an attribute of data type bool. If no such attribute exists, skip this step.",
+                         "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(3, "Activate the subscription between the DUT and the TH for an attribute of data type string. If no such attribute exists, skip this step.",
+                #          "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(4, "Activate the subscription between the DUT and the TH for an attribute of data type unsigned integer. If no such attribute exists, skip this step.",
+                #          "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(5, "Activate the subscription between the DUT and the TH for an attribute of data type signed integer. If no such attribute exists, skip this step.",
+                #          "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(6, "Activate the subscription between the DUT and the TH for an attribute of data type floating point. If no such attribute exists, skip this step.",
+                #          "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(7, "Activate the subscription between the DUT and the TH for an attribute of data type list. If no such attribute exists, skip this step.",
+                #          "Verify the subscription was successfully activated and a priming data report was sent"),
+                # TestStep(8, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
                 #          "Verify that the DUT sends the changed value of the attribute with the newest subscription id sent with the second request."),
-                # TestStep(12, "Activate the subscription between the DUT and the TH for any attribute After the Maximum interval time is elapsed, change the value of the attribute requested on the DUT.",
-                #          "Verify that the DUT sends the changed value of the attribute to the TH after the next MinIntervalFloor time has passed."),
-                # TestStep(13, "Activate the subscription between the DUT and the TH for an attribute There are no attribute value changes before MaxInterval elapses.",
-                #          "Verify that the DUT sends a Report Data action with no data to keep the subscription alive."),
-                # TestStep(14, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to True. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
-                #          "Verify that both the subscriptions are active and the TH receives reports for both these attributes on both subscriptions."),
-                # TestStep(15, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to True. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
-                #          "Verify that both the subscriptions are active and the TH receives notifications for both these attributes. Verify that the first subscription is terminated after the MaxInterval of the first subscription is reached."),
-                # TestStep(16, "TH sends a subscription request action for an attribute and all events. Set the MinIntervalFloor to some value say \"N\"(seconds). Change the value of the attribute and trigger an action on the DUT to trigger any event.",
-                #          "Verify on TH that DUT sends a report action data for both the attribute and the event after N seconds."),
-                # TestStep(17, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
-                #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds."),
-                # TestStep(18, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change the attribute on the DUT",
-                #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds."),
-                # TestStep(19, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
-                #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds."),
-                # TestStep(20, "TH sends a subscription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
-                #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds."),
-                # TestStep(21, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
-                #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds.")
+                # TestStep(9, "Activate the subscription between the DUT and the TH for any attribute with MinIntervalFloor set to 5 seconds and MaxIntervalCeiling set to 10. Save the returned MaxInterval as max_interval. Wait to receive the empty report on the subscription and save the time the report was received as time_empty. TH then changes the attribute and waits for a data report. Save the time the report was received as time_data. TH then waits for a second empty report on the subscription and saves the time the report was received as time_empty_2",
+                #          "Verify that time_data - time_empty is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters. Verify that time_empty_2 - time_data is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
+                # TestStep(10, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
+                #          "Verify that the TH receives reports for both these attributes on their respective subscriptions."),
+                # TestStep(11, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
+                #          "Verify that the TH receives a report for the second attribute on the second subscription. Verify that that the TH does not receive a report on the first subscription."),
+                # TestStep(12, "TH sends a subscription request action for an attribute and all events. Change the value of the attribute and trigger an action on the DUT to trigger any event.",
+                #          "Verify on TH that DUT sends a report action data for both the attribute and the event."),
+                # TestStep(13, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]] for a cluster where more than 1 attribute can be changed by the TH. Change all or few of the attributes on the DUT",
+                #          "Verify that the DUT sends reports for all the attributes that have changed."),
+                # TestStep(14, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Change the attribute on the DUT",
+                #          "Verify that the DUT sends a priming reports for all the attributes."),
+                # TestStep(15, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Change all or few of the attributes on the DUT",
+                #          "Verify that the DUT sends reports for all the attributes that have changed."),
+                # TestStep(16, "TH sends a sub scription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Change all or few of the attributes on the DUT",
+                #          "Verify that the DUT sends reports for all the attributes that have changed."),
+                # TestStep(17, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]].",
+                #          "Verify that the DUT sends a priming reports for all the attributes."),
                 ]
 
     def on_notify_subscription_still_active(self):
@@ -146,6 +151,68 @@ class TC_IDM_4_3(MatterBaseTest):
         except KeyError:
             asserts.fail("[AttributeChangeCallback | Local] Attribute {expected_attribute} not found in returned report")
 
+
+
+    def all_device_clusters(self) -> set:
+        device_clusters = set()
+        for endpoint in self.endpoints:
+            device_clusters |= set(self.endpoints[endpoint].keys())
+        return device_clusters
+
+    async def all_type_attributes_for_cluster(self, cluster: ClusterObjects.Cluster, desired_type: type) -> list[ClusterObjects.ClusterAttributeDescriptor]:
+        all_attributes = [attribute for attribute in cluster.Attributes.__dict__.values() if inspect.isclass(
+            attribute) and issubclass(attribute, ClusterObjects.ClusterAttributeDescriptor)]
+
+        # Hackish way to get enums to return properly -- the default behavior (under else block) returns a BLANK LIST without this workaround
+        # If type(attribute.attribute_type.Type) or type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type are enums, they return <class 'aenum._enum.EnumType'>, which are equal!
+        if desired_type == MatterIntEnum:
+            all_attributes_of_type = [attribute for attribute in all_attributes if type(
+                attribute.attribute_type.Type) == type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type)]
+        elif desired_type == IntFlag:
+            try:
+                feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+            except signals.TestFailure:
+                print(f"{cluster} does not support Attributes.FeatureMap")
+                return []
+            if feature_map >= 1:
+                return [cluster.Attributes.FeatureMap]
+        else:
+            all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
+                                      ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
+        return all_attributes_of_type
+
+    async def check_attribute_read_for_type(self, attribute_type: type, return_objects: bool = False) -> None:
+        # Get all clusters from device
+        for cluster in self.device_clusters:
+            all_types = await self.all_type_attributes_for_cluster(cluster, attribute_type)
+            self.fprint(f"all_types: {all_types}", "green", 2)
+            
+            if all_types:
+                chosen_attribute = all_types[0]
+                chosen_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
+                break
+        else:
+            print(f"Attribute type not found on device: {attribute_type}")
+            chosen_cluster = None
+
+        endpoint = None
+        for endpoint in self.endpoints:
+            if (chosen_cluster in self.endpoints[endpoint]) and (chosen_attribute in self.endpoints[endpoint][chosen_cluster]):
+                break
+
+        if chosen_cluster and (endpoint is not None):
+            output = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                dev_ctrl=self.default_controller,
+                cluster=chosen_cluster,
+                attribute=chosen_attribute)
+            return chosen_cluster, chosen_attribute, output if return_objects else output
+        return
+
+
+
+
+
     current_report_data_time = 0
     previous_report_data_time = 0
     attr_update_report_data_time = 0
@@ -155,24 +222,48 @@ class TC_IDM_4_3(MatterBaseTest):
 
     empty_report_time = None
     report_data_received = False
+    
+    root_node_endpoint = 0
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
+        
+        await self.setup_class_helper(default_to_pase=False)
+        
+        # all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
+        # server_list_attr = Clusters.Objects.Descriptor.Attributes.ServerList
+        # attribute_list = Clusters.Objects.Descriptor.Attributes.AttributeList
+        # descriptor_obj = Clusters.Objects.Descriptor
+        # server_list_attr_path = [(0, server_list_attr)]
+        # descriptor_obj_path = [(0, descriptor_obj)]
+        # attribute_list_path = [0, attribute_list]
+        self.device_clusters = self.all_device_clusters()
+        self.all_supported_clusters = [cluster for cluster in Clusters.__dict__.values(
+        ) if inspect.isclass(cluster) and issubclass(cluster, ClusterObjects.Cluster)]
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         # Test setup
         # Mandatory writable attributes
-        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
-        # bc = Clusters.GeneralCommissioning.Attributes.Breadcrumb
+        node_label_attr = Clusters.Objects.BasicInformation.Attributes.NodeLabel
 
+        # bc = Clusters.GeneralCommissioning.Attributes.Breadcrumb
         # Event
         # acl = Clusters.AccessControl.Events.
 
-        node_label_attr_path = [(0, node_label_attr)]
+        node_label_attr_path = [(self.root_node_endpoint, node_label_attr)]
         TH: ChipDeviceController = self.default_controller
 
         # # *** Step 1a ***
         # # DUT and TH activate the subscription.
-        self.step("1a")
+        # self.step("1a")
 
         # # Subscribe to attribute
         # sub_th_step1ab = await TH.ReadAttribute(
@@ -204,7 +295,7 @@ class TC_IDM_4_3(MatterBaseTest):
         # Change the value of the attribute which has been subscribed on the DUT by manually changing some
         # settings on the device. Example: Temperature sensor may update the value of the room temperature.
         # Turning on/off on a light bulb.
-        self.step("1b")
+        # self.step("1b")
 
         # # Set Attribute Update Callback
         # node_label_update_cb = AttributeChangeCallback(node_label_attr)
@@ -247,17 +338,28 @@ class TC_IDM_4_3(MatterBaseTest):
         # Verify that there is a report data message sent from the DUT for the changed value of
         # the attribute. Verify that the Report Data is sent when the minimum interval time is
         # reached and before the MaxInterval time.
-        self.step(2)
+        # self.step(2)
 
         # DUT and TH activate the subscription for an attribute. Do not change the value of the
         # attribute which has been subscribed. Verify that there is an empty report data message
         # sent from the DUT to the TH after the MinInterval time and no later than the
         # MaxInterval time plus an additional duration equal to the total retransmission time
         # according to negotiated MRP parameters.
-        self.step(3)
+        # self.step(3)
+        
+        
+        
+        
+        # *** Step 1 ***
+        # DUT and TH activate the subscription for an attribute. Do not change the value of the
+        # attribute which has been subscribed. Verify that there is an empty report data message
+        # sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval
+        # time plus an additional duration equal to the total retransmission time according to
+        # negotiated MRP parameters.
+        self.step(1)
 
         # Subscribe to attribute
-        sub_th_step3: SubscriptionTransaction = await TH.ReadAttribute(
+        sub_th_step1: SubscriptionTransaction = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
@@ -268,10 +370,10 @@ class TC_IDM_4_3(MatterBaseTest):
         sub_time = time.time()
 
         # Get subscription timeout
-        sub_timeout_sec = sub_th_step3.GetSubscriptionTimeoutMs() / 1000
+        sub_timeout_sec = sub_th_step1.GetSubscriptionTimeoutMs() / 1000
 
         # Records the time the first empty report after subscription arrives
-        sub_th_step3.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active_empty_report)
+        sub_th_step1.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active_empty_report)
 
         # Waint for empty report data
         wait_increments = self.min_interval_floor_sec / 10
@@ -296,7 +398,38 @@ class TC_IDM_4_3(MatterBaseTest):
         asserts.assert_greater(sub_report_data_elapsed_time, self.min_interval_floor_sec, "Empty report not received after the MinInterval time")
         asserts.assert_less(sub_report_data_elapsed_time, sub_timeout_sec, "Empty report not received before the MaxInterval time")
 
-        sub_th_step3.Shutdown()
+        sub_th_step1.Shutdown()
+        
+        # Activate the subscription between the DUT and the TH for an attribute of
+        # data type bool. If no such attribute exists, skip this step. Verify the
+        # subscription was successfully activated and a priming data report was sent
+        self.step(2)
+        
+        # Check for attribute of type bool
+        out = await self.check_attribute_read_for_type(
+            attribute_type=bool,
+            return_objects=True
+        )
+        
+        # If found subscribe to attribute
+        if out:
+            self.fprint(f"out: {out}", "green", 5)
+            cluster, attribute, value = out
+            attr_path = [(self.root_node_endpoint, attribute)]
+
+            # Subscribe to attribute
+            sub_th_step2: SubscriptionTransaction = await TH.ReadAttribute(
+                nodeid=self.dut_node_id,
+                attributes=attr_path,
+                reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+                keepSubscriptions=False
+            )
+            
+            self.fprint(f"sub_th_step2: {sub_th_step2.subscriptionId}", "yellow", 3)
+
+            sub_th_step2.Shutdown()
+        else:
+            logging.info("No attribute of type bool was found, skipping step")
 
 
 if __name__ == "__main__":
