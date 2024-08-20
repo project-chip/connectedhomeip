@@ -33,7 +33,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Init()
     // we get the callback for reading attribute. If the read is not intended for a bridged device we will
     // forward it to the original attribute interface that we are unregistering.
     mOriginalAttributeInterface =
-        AttributeAccessInterfaceRegistry::Instance().Get(chip::kRootEndpointId, AdministratorCommissioning::Id);
+        AttributeAccessInterfaceRegistry::Instance().Get(kRootEndpointId, AdministratorCommissioning::Id);
     VerifyOrReturnError(mOriginalAttributeInterface, CHIP_ERROR_INTERNAL);
     AttributeAccessInterfaceRegistry::Instance().Unregister(mOriginalAttributeInterface);
     VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(this));
