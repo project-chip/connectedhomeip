@@ -158,7 +158,8 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    static CHIP_ERROR LogClusterId(const char * label, size_t indent, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+    static CHIP_ERROR LogClusterId(const char * label, size_t indent,
+                                   const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
     {
         size_t count = 0;
         ReturnErrorOnFailure(value.ComputeSize(&count));
@@ -170,7 +171,7 @@ private:
         {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
-            std::string item = std::to_string(iter.GetValue()) + " (" + ClusterIdToText(iter.GetValue()) + ")";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + ClusterIdToText(iter.GetValue()) + ")";
             DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -180,7 +181,8 @@ private:
         return iter.GetStatus();
     }
 
-    static CHIP_ERROR LogAttributeId(const char * label, size_t indent, const chip::app::DataModel::DecodableList<chip::AttributeId> & value, chip::ClusterId cluster)
+    static CHIP_ERROR LogAttributeId(const char * label, size_t indent,
+                                     const chip::app::DataModel::DecodableList<chip::AttributeId> & value, chip::ClusterId cluster)
     {
         size_t count = 0;
         ReturnErrorOnFailure(value.ComputeSize(&count));
@@ -192,7 +194,7 @@ private:
         {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
-            std::string item = std::to_string(iter.GetValue()) + " (" + AttributeIdToText(cluster, iter.GetValue()) + ")";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + AttributeIdToText(cluster, iter.GetValue()) + ")";
             DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -202,7 +204,8 @@ private:
         return iter.GetStatus();
     }
 
-    static CHIP_ERROR LogCommandId(const char * label, size_t indent, const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
+    static CHIP_ERROR LogCommandId(const char * label, size_t indent,
+                                   const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
     {
         size_t count = 0;
         ReturnErrorOnFailure(value.ComputeSize(&count));
@@ -214,7 +217,7 @@ private:
         {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
-            std::string item = std::to_string(iter.GetValue()) + " (" + CommandIdToText(cluster, iter.GetValue()) + ")";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + CommandIdToText(cluster, iter.GetValue()) + ")";
             DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)
