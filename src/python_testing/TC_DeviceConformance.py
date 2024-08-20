@@ -50,6 +50,22 @@ class DeviceConformanceTests(BasicCompositionTests):
         self.xml_device_types, problems = build_xml_device_types()
         self.problems.extend(problems)
 
+    def _get_device_type_id(self, device_type_name: str) -> int:
+        id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+        if len(id) != 1:
+            self.fail_current_test(f"Unable to find {device_type_name} device type")
+        return id[0]
+
+    def _has_nim(self):
+        nim_id = self._get_device_type_id('network infrastructure manager')
+        for endpoint in self.endpoints_tlv.values():
+            desc = Clusters.Descriptor
+            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            if nim_id in device_types:
+                # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
+                return True
+        return False
+
     def check_conformance(self, ignore_in_progress: bool, is_ci: bool):
         problems = []
         success = True
@@ -125,6 +141,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                 for f in feature_masks:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
+                    if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
+                        # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
+                        if not self._has_nim():
+                            record_error(
+                                location=location, problem="MACL feature is disallowed if the network infrastructure manager device type is not present")
+                        continue
+
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
