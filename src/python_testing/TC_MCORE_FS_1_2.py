@@ -52,12 +52,13 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
     return w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
 
+
 @dataclass
 class _SetupParamters:
-    setup_qr_code : str
-    manual_code :int
-    discriminator :int
-    passcode :int
+    setup_qr_code: str
+    manual_code: int
+    discriminator: int
+    passcode: int
 
 
 class TC_MCORE_FS_1_2(MatterBaseTest):
@@ -79,7 +80,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     async def _create_th_server(self, port):
         # These are default testing values
-        setup_params = _SetupParamters(setup_qr_code="MT:-24J0AFN00KA0648G00", manual_code = 34970112332, discriminator = 3840, passcode = 20202021)
+        setup_params = _SetupParamters(setup_qr_code="MT:-24J0AFN00KA0648G00",
+                                       manual_code=34970112332, discriminator=3840, passcode=20202021)
         kvs = f'kvs_{str(uuid.uuid4())}'
 
         cmd = [self._th_server_app_path]
@@ -223,16 +225,26 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         basic_info_attr = Clusters.BasicInformation.Attributes
         bridged_device_info_attr = Clusters.BridgedDeviceBasicInformation.Attributes
         Clusters.BasicInformation.Attributes
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorName], bridged_info_for_th_server[bridged_device_info_attr.VendorName], "VendorName incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorID], bridged_info_for_th_server[bridged_device_info_attr.VendorID], "VendorID incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.ProductName], bridged_info_for_th_server[bridged_device_info_attr.ProductName], "ProductName incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.ProductID], bridged_info_for_th_server[bridged_device_info_attr.ProductID], "ProductID incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.NodeLabel], bridged_info_for_th_server[bridged_device_info_attr.NodeLabel], "NodeLabel incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.HardwareVersion], bridged_info_for_th_server[bridged_device_info_attr.HardwareVersion], "HardwareVersion incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.HardwareVersionString], bridged_info_for_th_server[bridged_device_info_attr.HardwareVersionString], "HardwareVersionString incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.SoftwareVersion], bridged_info_for_th_server[bridged_device_info_attr.SoftwareVersion], "SoftwareVersion incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.SoftwareVersionString], bridged_info_for_th_server[bridged_device_info_attr.SoftwareVersionString], "SoftwareVersionString incorrectly reported by DUT")
-        asserts.assert_equal(th_server_basic_info[basic_info_attr.UniqueID], bridged_info_for_th_server[bridged_device_info_attr.UniqueID], "UniqueID incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorName],
+                             bridged_info_for_th_server[bridged_device_info_attr.VendorName], "VendorName incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.VendorID],
+                             bridged_info_for_th_server[bridged_device_info_attr.VendorID], "VendorID incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.ProductName],
+                             bridged_info_for_th_server[bridged_device_info_attr.ProductName], "ProductName incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.ProductID],
+                             bridged_info_for_th_server[bridged_device_info_attr.ProductID], "ProductID incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.NodeLabel],
+                             bridged_info_for_th_server[bridged_device_info_attr.NodeLabel], "NodeLabel incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.HardwareVersion],
+                             bridged_info_for_th_server[bridged_device_info_attr.HardwareVersion], "HardwareVersion incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.HardwareVersionString],
+                             bridged_info_for_th_server[bridged_device_info_attr.HardwareVersionString], "HardwareVersionString incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.SoftwareVersion],
+                             bridged_info_for_th_server[bridged_device_info_attr.SoftwareVersion], "SoftwareVersion incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.SoftwareVersionString],
+                             bridged_info_for_th_server[bridged_device_info_attr.SoftwareVersionString], "SoftwareVersionString incorrectly reported by DUT")
+        asserts.assert_equal(th_server_basic_info[basic_info_attr.UniqueID],
+                             bridged_info_for_th_server[bridged_device_info_attr.UniqueID], "UniqueID incorrectly reported by DUT")
 
 
 if __name__ == "__main__":
