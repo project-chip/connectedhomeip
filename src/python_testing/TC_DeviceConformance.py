@@ -145,7 +145,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
                         if not self._has_nim():
                             record_error(
-                                location=location, problem="MACL feature is disallowed if the network infrastructure manager device type is not present")
+                                location=location, problem="MACL feature is disallowed if the Network Infrastructure Manager device type is not present")
                         continue
 
                     if f not in self.xml_clusters[cluster_id].features.keys():
