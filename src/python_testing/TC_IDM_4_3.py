@@ -183,7 +183,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
     async def check_attribute_read_for_type(self, attribute_type: type, return_objects: bool = False) -> None:
         # Get all clusters from device
+        self.fprint(f"self.device_clusters: {self.device_clusters}", "red", 2)
         for cluster in self.device_clusters:
+            
+            # TEMPORARY: if cluster is SmokeCoAlarm skip, as it returns INVALID_ACTION when trying
+            # to subscribe to its TestInProgress attribute
+            # if cluster.id == 92:
+            #     continue
+            
             all_types = await self.all_type_attributes_for_cluster(cluster, attribute_type)
             self.fprint(f"all_types: {all_types}", "green", 2)
             
@@ -231,9 +238,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         await self.setup_class_helper(default_to_pase=False)
         
         # all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
-        # server_list_attr = Clusters.Objects.Descriptor.Attributes.ServerList
-        # attribute_list = Clusters.Objects.Descriptor.Attributes.AttributeList
-        # descriptor_obj = Clusters.Objects.Descriptor
+        # server_list_attr = Clusters.Descriptor.Attributes.ServerList
+        # attribute_list = Clusters.Descriptor.Attributes.AttributeList
+        # descriptor_obj = Clusters.Descriptor
         # server_list_attr_path = [(0, server_list_attr)]
         # descriptor_obj_path = [(0, descriptor_obj)]
         # attribute_list_path = [0, attribute_list]
@@ -252,7 +259,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Test setup
         # Mandatory writable attributes
-        node_label_attr = Clusters.Objects.BasicInformation.Attributes.NodeLabel
+        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
 
         # bc = Clusters.GeneralCommissioning.Attributes.Breadcrumb
         # Event
@@ -363,7 +370,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
-            keepSubscriptions=False
+            keepSubscriptions=False,
+            fabricFiltered=False
         )
 
         # Record time after subscription
@@ -375,7 +383,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Records the time the first empty report after subscription arrives
         sub_th_step1.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active_empty_report)
 
-        # Waint for empty report data
+        # Wait for empty report data
         wait_increments = self.min_interval_floor_sec / 10
         while not self.report_data_received:
             time.sleep(wait_increments)
@@ -418,18 +426,24 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             attr_path = [(self.root_node_endpoint, attribute)]
 
             # Subscribe to attribute
+            self.fprint(f"Will sub TO: {attr_path}", "black", 7)
+            logging.info(f"Attribute of type 'bool' was found")
             sub_th_step2: SubscriptionTransaction = await TH.ReadAttribute(
                 nodeid=self.dut_node_id,
                 attributes=attr_path,
                 reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
-                keepSubscriptions=False
+                keepSubscriptions=False,
+                fabricFiltered=False
             )
             
-            self.fprint(f"sub_th_step2: {sub_th_step2.subscriptionId}", "yellow", 3)
+            # Verify the subscription was successfully activated and a priming
+            # data report was sent
+            asserts.assert_is_not_none(sub_th_step2.subscriptionId, "Subscription activation to attribute of type 'bool' was unsuccessful")
+            logging.info("Subscription activation to attribute of type 'bool' successful")
 
             sub_th_step2.Shutdown()
         else:
-            logging.info("No attribute of type bool was found, skipping step")
+            logging.info("No attribute of type 'bool' was found, skipping step")
 
 
 if __name__ == "__main__":
