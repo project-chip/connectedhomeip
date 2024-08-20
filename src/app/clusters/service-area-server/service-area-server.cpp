@@ -451,7 +451,7 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
 {
     // If the LocationInfo field is null, the LandmarkInfo field SHALL NOT be null.
     // If the LandmarkInfo field is null, the LocationInfo field SHALL NOT be null.
-    if (aArea.areaDesc.locationInfo.IsNull() && aArea.areaDesc.landmarkInfo.IsNull())
+    if (aArea.areaInfo.locationInfo.IsNull() && aArea.areaInfo.landmarkInfo.IsNull())
     {
         ChipLogDetail(Zcl, "IsValidAsSupportedArea %u - must have locationInfo and/or LandmarkInfo", aArea.areaID);
         return false;
@@ -459,10 +459,10 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
 
     // If LocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
     // be null: LocationInfo's FloorNumber field, LocationInfo's AreaType field, the LandmarkInfo
-    if (!aArea.areaDesc.locationInfo.IsNull())
+    if (!aArea.areaInfo.locationInfo.IsNull())
     {
-        if (aArea.areaDesc.locationInfo.Value().locationName.empty() && aArea.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
-            aArea.areaDesc.locationInfo.Value().areaType.IsNull() && aArea.areaDesc.landmarkInfo.IsNull())
+        if (aArea.areaInfo.locationInfo.Value().locationName.empty() && aArea.areaInfo.locationInfo.Value().floorNumber.IsNull() &&
+            aArea.areaInfo.locationInfo.Value().areaType.IsNull() && aArea.areaInfo.landmarkInfo.IsNull())
         {
             ChipLogDetail(Zcl, "IsValidAsSupportedArea %u - AreaName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
                           aArea.areaID);
