@@ -2565,6 +2565,7 @@
 					"-Wl,-unexported_symbol,\"___*\"",
 					"-Wl,-unexported_symbol,\"__Unwind_*\"",
 					"-Wl,-unexported_symbol,\"_unw_*\"",
+					"-Wl,-unexported_symbol,\"_OBJC_IVAR_*\"",
 					"-Wl,-hidden-lCHIP",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
@@ -2583,6 +2584,7 @@
 					"-Wl,-unexported_symbol,\"___*\"",
 					"-Wl,-unexported_symbol,\"__Unwind_*\"",
 					"-Wl,-unexported_symbol,\"_unw_*\"",
+					"-Wl,-unexported_symbol,\"_OBJC_IVAR_*\"",
 					"-Wl,-hidden-lCHIP",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
