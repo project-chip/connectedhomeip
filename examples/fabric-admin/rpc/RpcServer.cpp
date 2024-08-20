@@ -50,17 +50,22 @@ public:
         chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
         auto it             = mPendingKeepActiveTimesMs.find(nodeId);
         VerifyOrReturn(it != mPendingKeepActiveTimesMs.end());
-        // TODO(#33221): We also need a mechanism here to drop KeepActive
-        // request if they were recieved over 60 mins ago.
-        uint32_t stayActiveDurationMs = it->second;
+
+        KeepActiveDataForCheckIn checkInData = it->second;
+        mPendingKeepActiveTimesMs.erase(nodeId);
+        System::Clock::Milliseconds64 timeNowMs =
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
+
+        if (timeNowMs > checkInData.mRequestExpiresAtMs) {
+            ChipLogError(NotSpecified, "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
+            return;
+        }
 
         // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
         // Work to see if there should be update to spec on whether some sort of failure later on
         // Should be indicated in some manner, or identify a better recovery mechanism here.
-        mPendingKeepActiveTimesMs.erase(nodeId);
-
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
-        CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(stayActiveDurationMs, clientInfo.peer_node,
+        CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  chip::app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
@@ -145,10 +150,22 @@ public:
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
-        mPendingKeepActiveTimesMs[nodeId] = stayActiveDurationMs;
+
+        System::Clock::Milliseconds64 timeNowMs =
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(System::SystemClock().GetMonotonicMilliseconds64());
+        // Spec says we should expire the request 60 mins after we get it
+        System::Clock::Milliseconds64 expireTimeMs = timeNowMs + System::Clock::Milliseconds64(60*60*1000);
+        KeepActiveDataForCheckIn checkInData = {.mStayActiveDurationMs = stayActiveDurationMs, .mRequestExpiresAtMs = expireTimeMs};
+        mPendingKeepActiveTimesMs[nodeId] = checkInData;
     }
 
 private:
+    struct KeepActiveDataForCheckIn
+    {
+        uint32_t mStayActiveDurationMs = 0;
+        System::Clock::Milliseconds64 mRequestExpiresAtMs;
+    };
+
     struct KeepActiveWorkData
     {
         KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs) :
@@ -168,7 +185,7 @@ private:
     }
 
     // Modifications to mPendingKeepActiveTimesMs should be done on the MatterEventLoop thread
-    std::map<chip::NodeId, uint32_t> mPendingKeepActiveTimesMs;
+    std::map<chip::NodeId, KeepActiveDataForCheckIn> mPendingKeepActiveTimesMs;
 };
 
 FabricAdmin fabric_admin_service;
