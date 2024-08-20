@@ -144,6 +144,9 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 
+// Called by MTRDevice_XPC to forward delegate callbacks
+- (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
+
 /**
  * Like the public invokeCommandWithEndpointID but:
  *
