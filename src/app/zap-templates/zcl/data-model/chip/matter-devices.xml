@@ -2211,7 +2211,7 @@ limitations under the License.
         <scope>Endpoint</scope>
         <endpointComposition>
             <compositionType>tree</compositionType>
-            <endpoint mandatory="true" constraint="min 1">
+            <endpoint conformance="M" constraint="min 1">
                     <deviceType>0x0071</deviceType>
             </endpoint>
         </endpointComposition>
