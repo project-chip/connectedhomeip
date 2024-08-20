@@ -74,7 +74,7 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
                      "Value has to be 0x00 (NoOptOut)"),
             TestStep("5", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID+1, SlotAdjustments[0].{SlotIndex=0, NominalPower=Forecast.Slots[0].MinPowerAdjustment, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization",
                      "Verify DUT responds w/ status FAILURE(0x01)"),
-            TestStep("6", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=4, NominalPower=Forecast.Slots[0].MinPowerAdjustment, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization",
+            TestStep("6", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=len(Forecast.Slots), NominalPower=Forecast.Slots[0].MinPowerAdjustment, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization",
                      "Verify DUT responds w/ status FAILURE(0x01)"),
             TestStep("7", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, NominalPower=Forecast.Slots[0].MinPowerAdjustment-1, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
@@ -177,7 +177,7 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
 
         self.step("6")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
-            slotIndex=4, nominalPower=forecast.slots[0].minPowerAdjustment, duration=forecast.slots[0].maxDurationAdjustment)]
+            slotIndex=len(forecast.slots), nominalPower=forecast.slots[0].minPowerAdjustment, duration=forecast.slots[0].maxDurationAdjustment)]
         await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Failure)
 
         self.step("7")
