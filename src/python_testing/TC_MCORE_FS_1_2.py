@@ -113,8 +113,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
                  TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
                  TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH reads UniqueID from TH_SERVER directly"),
-                 TestStep(7, "TH reads UniqueID from bridged TH_SERVER on DUT")]
+                 TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
+                 TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA")]
         return steps
 
     @property
