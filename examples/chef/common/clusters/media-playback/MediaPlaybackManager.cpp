@@ -15,11 +15,10 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <map>
 #include <string>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/config.h>
 #ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
 #include "MediaPlaybackManager.h"
 
@@ -103,11 +102,12 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
 
 CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
 {
-    mCurrentState  = currentState;
+    mCurrentState = currentState;
 
     Status status = Attributes::CurrentState::Set(mEndpoint, currentState);
 
-    if (Status::Success != status) {
+    if (Status::Success != status)
+    {
         ChipLogError(Zcl, "Unable to save CurrentState attribute, 0x%x", to_underlying(status));
     }
 
@@ -120,7 +120,8 @@ CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
 
     Status status = Attributes::PlaybackSpeed::Set(mEndpoint, playbackSpeed);
 
-    if (Status::Success != status) {
+    if (Status::Success != status)
+    {
         ChipLogError(Zcl, "Unable to set PlaybackSpeed attribute, 0x%x", to_underlying(status));
     }
 
