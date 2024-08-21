@@ -27,11 +27,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import random
-from dataclasses import dataclass
-
 import chip.clusters as Clusters
-from chip.clusters.Attribute import EventPriority
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from drlk_2_x_common import DRLK_COMMON
@@ -197,7 +193,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_true(response.credentialExists == credential_exists,
                                 "Error when executing GetCredentialStatus command, credentialExists={}".format(
                                     str(response.credentialExists)))
-            if (credential_exists == False):
+            if (not credential_exists):
                 asserts.assert_true(response.userIndex == NullValue,
                                     "Error when executing GetCredentialStatus command, credentialExists={}".format(
                                         str(response.userIndex)))
@@ -402,9 +398,6 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.step("11")
         if self.pics_send_setcredential_pin_cmd:
-            validPincodeString = await self.generate_pincode(self.maxpincodelength)
-            validPincode = bytes(validPincodeString, 'ascii')
-
             await self.set_credential_cmd(credentialData=self.pin_code,
                                           operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
                                           credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
@@ -424,8 +417,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             feature_map = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                               cluster=Clusters.Objects.DoorLock,
                                                               attribute=Clusters.DoorLock.Attributes.FeatureMap)
-        isALIROSupported = feature_map & Clusters.DoorLock.Bitmaps.Feature.kAliroProvisioning
-        if (isALIROSupported):
+            aliro_enabled = feature_map & Clusters.DoorLock.Bitmaps.Feature.kAliroProvisioning
+        if (aliro_enabled):
             credentials = cluster.Structs.CredentialStruct(credentialIndex=1,
                                                            credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey)
             await self.clear_credentials_cmd(step=None, credential=credentials)
