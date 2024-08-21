@@ -219,12 +219,7 @@ config NVS_LOOKUP_CACHE_SIZE
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
 
-# Set sector counter of NVS
-config SETTINGS_NVS_SECTOR_COUNT
-    default 12
-
 # Enable OpenThread
-
 config NET_L2_OPENTHREAD
     default y if !WIFI
 
