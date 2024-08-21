@@ -30,7 +30,7 @@ class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
     using Feature              = chip::app::Clusters::MediaPlayback::Feature;
 
 public:
-    MediaPlaybackManager(chip::EndpointId endpoint) : mEndpoint(endpoint){};
+    MediaPlaybackManager(chip::EndpointId endpoint);
 
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;

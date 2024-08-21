@@ -33,6 +33,24 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using chip::Protocols::InteractionModel::Status;
 
+MediaPlaybackManager::MediaPlaybackManager(chip::EndpointId endpoint) : mEndpoint(endpoint)
+{
+    // Sync the attributes from attribute storage
+    Status status = Attributes::CurrentState::Get(endpoint, &mCurrentState);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "Unable to save CurrentStage attribute, err:0x%x", to_underlying(status));
+        mCurrentState = chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying;
+    }
+
+    status = Attributes::PlaybackSpeed::Get(endpoint, &mPlaybackSpeed);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "Unable to save PlaybackSpeed attribute, err:0x%x", to_underlying(status));
+        mPlaybackSpeed = 1.0;
+    }
+};
+
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
     return mCurrentState;
