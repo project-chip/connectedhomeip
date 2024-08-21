@@ -43,6 +43,26 @@
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
 
+- (NSXPCInterface *)_interfaceForClientProtocol
+{
+    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+    NSSet * allowedClasses = [NSSet setWithArray:@[
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRAttributePath class]
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(device:receivedAttributeReport:)
+            argumentIndex:1
+                  ofReply:NO];
+    allowedClasses = [NSSet setWithArray:@[
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTREventPath class]
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(device:receivedEventReport:)
+            argumentIndex:1
+                  ofReply:NO];
+    return interface;
+}
+
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
 {
     if (self = [super initForSubclasses]) {
@@ -59,12 +79,14 @@
 
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
+        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {
             self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
 
-            self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+            self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
             self.xpcConnection.exportedObject = self;
 
             self.xpcConnection.interruptionHandler = ^{
