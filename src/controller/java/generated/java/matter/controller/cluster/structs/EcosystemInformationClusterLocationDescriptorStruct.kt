@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class EcosystemInformationClusterLocationDescriptorStruct(
   val locationName: String,
   val floorNumber: Short?,
-  val areaType: UByte?,
+  val areaType: UByte?
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterLocationDescriptorStruct {\n")
@@ -58,34 +60,25 @@ class EcosystemInformationClusterLocationDescriptorStruct(
     private const val TAG_FLOOR_NUMBER = 1
     private const val TAG_AREA_TYPE = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): EcosystemInformationClusterLocationDescriptorStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EcosystemInformationClusterLocationDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
-      val floorNumber =
-        if (!tlvReader.isNull()) {
-          tlvReader.getShort(ContextSpecificTag(TAG_FLOOR_NUMBER))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
-          null
-        }
-      val areaType =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
-          null
-        }
-
+      val floorNumber = if (!tlvReader.isNull()) {
+      tlvReader.getShort(ContextSpecificTag(TAG_FLOOR_NUMBER))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
+      null
+    }
+      val areaType = if (!tlvReader.isNull()) {
+      tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return EcosystemInformationClusterLocationDescriptorStruct(
-        locationName,
-        floorNumber,
-        areaType,
-      )
+      return EcosystemInformationClusterLocationDescriptorStruct(locationName, floorNumber, areaType)
     }
   }
 }

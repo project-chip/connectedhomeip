@@ -18,12 +18,15 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>) {
+class AccountLoginClusterLoggedOutEvent(
+  val node: Optional<ULong>
+) {
   override fun toString(): String = buildString {
     append("AccountLoginClusterLoggedOutEvent {\n")
     append("\tnode : $node\n")
@@ -44,15 +47,14 @@ class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>) {
   companion object {
     private const val TAG_NODE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccountLoginClusterLoggedOutEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccountLoginClusterLoggedOutEvent {
       tlvReader.enterStructure(tlvTag)
-      val node =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
-        } else {
-          Optional.empty()
-        }
-
+      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
+        Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
+      } else {
+        Optional.empty()
+      }
+      
       tlvReader.exitContainer()
 
       return AccountLoginClusterLoggedOutEvent(node)

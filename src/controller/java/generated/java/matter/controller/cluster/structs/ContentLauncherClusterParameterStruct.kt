@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterParameterStruct(
   val type: UByte,
   val value: String,
-  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>,
+  val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterParameterStruct {\n")
@@ -45,10 +45,10 @@ class ContentLauncherClusterParameterStruct(
       if (externalIDList.isPresent) {
         val optexternalIDList = externalIDList.get()
         startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
-        for (item in optexternalIDList.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      for (item in optexternalIDList.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       }
       endStructure()
     }
@@ -63,21 +63,18 @@ class ContentLauncherClusterParameterStruct(
       tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-      val externalIDList =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
-          Optional.of(
-            buildList<ContentLauncherClusterAdditionalInfoStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
-              while (!tlvReader.isEndOfContainer()) {
-                add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val externalIDList = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
+      Optional.of(buildList<ContentLauncherClusterAdditionalInfoStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterParameterStruct(type, value, externalIDList)
