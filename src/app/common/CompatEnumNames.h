@@ -93,7 +93,7 @@ enum class ColorMode : uint8_t
 enum class HueDirection : uint8_t
 {
     ShortestDistance   = DirectionEnum::kShortest
-    LongestDistance    = DirectionEnum::kLongest 
+    LongestDistance    = DirectionEnum::kLongest
     Up                 = DirectionEnum::kUp
     Down               = DirectionEnum::kDown
     kUnknownEnumValue  = DirectionEnum::kUnknownEnumValue
@@ -112,7 +112,7 @@ enum class ColorLoopDirection : uint8_t
 {
    DecrementHue      = ColorLoopDirectionEnum::kDecrement
    IncrementHue      = ColorLoopDirectionEnum::kIncrement
-   kUnknownEnumValue = ColorLoopDirectionEnum::kUnknownEnumValue 
+   kUnknownEnumValue = ColorLoopDirectionEnum::kUnknownEnumValue
 };
 
 using EnhancedColorMode    = EnhancedColorModeEnum;
