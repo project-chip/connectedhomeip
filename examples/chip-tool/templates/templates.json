@@ -72,7 +72,7 @@
         },
         {
             "path": "logging/EntryToText-src.zapt",
-            "name": "Entry To Text header",
+            "name": "Entry To Text",
             "output": "cluster/logging/EntryToText.cpp"
         }
     ]
