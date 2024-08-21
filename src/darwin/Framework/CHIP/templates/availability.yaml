@@ -9694,6 +9694,13 @@
           - WaterHeaterMode
           - WiFiNetworkManagement
       attributes:
+          AccessControl:
+              # Targeting 1.4
+              - CommissioningARL
+              - ARL
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - ProductID
           GeneralCommissioning:
               # Targeting 1.4
               - TCAcceptedVersion
@@ -9712,6 +9719,10 @@
               - NullableGlobalEnum
               - NullableGlobalStruct
       commands:
+          AccessControl:
+              # Targeting 1.4
+              - ReviewFabricRestrictions
+              - ReviewFabricRestrictionsResponse
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - KeepActive
@@ -9719,6 +9730,10 @@
               # Targeting 1.4
               - SetTCAcknowledgements
               - SetTCAcknowledgementsResponse
+          Thermostat:
+              # Targeting 1.4
+              - AtomicRequest
+              - AtomicResponse
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
@@ -9727,9 +9742,17 @@
               - StringEchoRequest
               - StringEchoResponse
       structs:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionEntryStruct
+              - AccessRestrictionStruct
+              - CommissioningAccessRestrictionEntryStruct
           Globals:
               # Test-only value
               - TestGlobalStruct
+              # Targeting 1.4
+              - AtomicAttributeStatusStruct
+              - LocationDescriptorStruct
           OccupancySensing:
               # Targeting 1.4
               - HoldTimeLimitsStruct
@@ -9742,21 +9765,44 @@
               NestedStruct:
                   - d
       events:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionEntryChanged
+              - FabricRestrictionReviewUpdate
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - ActiveChanged
       enums:
+          AccessControl:
+              # Targeting 1.4
+              - AccessRestrictionTypeEnum
           Globals:
               # Test-only value
               - TestGlobalEnum
-      enum values:
-          GeneralCommissioning:
               # Targeting 1.4
+              - AreaTypeTag
+              - AtomicRequestTypeEnum
+              - FloorSurfaceTag
+              - LandmarkTag
+              - PositionTag
+              - RelativePositionTag
+      enum values:
+          ApplicationLauncher:
+              StatusEnum:
+                  # Targeting 1.4
+                  - Downloading
+                  - Installing
+                  - PendingUserApproval
+          GeneralCommissioning:
               CommissioningErrorEnum:
+                  # Targeting 1.4
                   - RequiredTCNotAccepted
                   - TCAcknowledgementsNotReceived
                   - TCMinVersionNotMet
       bitmaps:
+          AccessControl:
+              # Targeting 1.4
+              - Feature
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - Feature
@@ -9766,6 +9812,9 @@
           OccupancySensing:
               # Targeting 1.4
               - Feature
+          Thermostat:
+              # Targeting 1.4
+              - OccupancyBitmap
       bitmap values:
           Switch:
               Feature:
