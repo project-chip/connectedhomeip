@@ -84,35 +84,35 @@ namespace ColorControl {
 // https://github.com/project-chip/connectedhomeip/pull/33612 renamed this
 enum class ColorMode : uint8_t
 {
-    kCurrentHueAndCurrentSaturation = ColorModeEnum::kCurrentHueAndCurrentSaturation,
-    kCurrentXAndCurrentY            = ColorModeEnum::kCurrentXAndCurrentY,
-    kColorTemperature               = ColorModeEnum::kColorTemperatureMireds,
-    kUnknownEnumValue               = ColorModeEnum::kUnknownEnumValue
+    kCurrentHueAndCurrentSaturation = to_underlying(ColorModeEnum::kCurrentHueAndCurrentSaturation),
+    kCurrentXAndCurrentY            = to_underlying(ColorModeEnum::kCurrentXAndCurrentY),
+    kColorTemperature               = to_underlying(ColorModeEnum::kColorTemperatureMireds),
+    kUnknownEnumValue               = to_underlying(ColorModeEnum::kUnknownEnumValue)
 };
 
 enum class HueDirection : uint8_t
 {
-    ShortestDistance  = DirectionEnum::kShortest,
-    LongestDistance   = DirectionEnum::kLongest,
-    Up                = DirectionEnum::kUp,
-    Down              = DirectionEnum::kDown,
-    kUnknownEnumValue = DirectionEnum::kUnknownEnumValue
+    ShortestDistance  = to_underlying(DirectionEnum::kShortest),
+    LongestDistance   = to_underlying(DirectionEnum::kLongest),
+    Up                = to_underlying(DirectionEnum::kUp),
+    Down              = to_underlying(DirectionEnum::kDown),
+    kUnknownEnumValue = to_underlying(DirectionEnum::kUnknownEnumValue)
 };
 
 enum class ColorCapabilities : uint16_t
 {
-    ColorLoopSupported        = ColorCapabilitiesBitmap::kColorLoop,
-    ColorTemperatureSupported = ColorCapabilitiesBitmap::kColorTemperature,
-    EnhancedHueSupported      = ColorCapabilitiesBitmap::kEnhancedHue,
-    HueSaturationSupported    = ColorCapabilitiesBitmap::kHueSaturation,
-    XYAttributesSupported     = ColorCapabilitiesBitmap::kXy
+    ColorLoopSupported        = to_underlying(ColorCapabilitiesBitmap::kColorLoop),
+    ColorTemperatureSupported = to_underlying(ColorCapabilitiesBitmap::kColorTemperature),
+    EnhancedHueSupported      = to_underlying(ColorCapabilitiesBitmap::kEnhancedHue),
+    HueSaturationSupported    = to_underlying(ColorCapabilitiesBitmap::kHueSaturation),
+    XYAttributesSupported     = to_underlying(ColorCapabilitiesBitmap::kXy)
 };
 
 enum class ColorLoopDirection : uint8_t
 {
-    DecrementHue      = ColorLoopDirectionEnum::kDecrement,
-    IncrementHue      = ColorLoopDirectionEnum::kIncrement,
-    kUnknownEnumValue = ColorLoopDirectionEnum::kUnknownEnumValue
+    DecrementHue      = to_underlying(ColorLoopDirectionEnum::kDecrement),
+    IncrementHue      = to_underlying(ColorLoopDirectionEnum::kIncrement),
+    kUnknownEnumValue = to_underlying(ColorLoopDirectionEnum::kUnknownEnumValue)
 };
 
 using EnhancedColorMode    = EnhancedColorModeEnum;
