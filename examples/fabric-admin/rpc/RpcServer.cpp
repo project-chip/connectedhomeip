@@ -29,7 +29,7 @@
 #include <commands/fabric-sync/FabricSyncCommand.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <device_manager/DeviceManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
@@ -103,16 +103,18 @@ public:
 
         setupPayload.setUpPINCode = request.setup_pin;
         setupPayload.version      = 0;
+        setupPayload.vendorID     = request.vendor_id;
+        setupPayload.productID    = request.product_id;
         setupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
 
         SetupDiscriminator discriminator{};
         discriminator.SetLongValue(request.discriminator);
         setupPayload.discriminator = discriminator;
 
-        char payloadBuffer[kMaxManualCodeLength + 1];
-        MutableCharSpan manualCode(payloadBuffer);
+        QRCodeSetupPayloadGenerator generator(setupPayload);
+        std::string code;
+        CHIP_ERROR error = generator.payloadBase38RepresentationWithAutoTLVBuffer(code);
 
-        CHIP_ERROR error = ManualSetupPayloadGenerator(setupPayload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
         {
             NodeId nodeId = DeviceMgr().GetNextAvailableNodeId();
@@ -121,11 +123,11 @@ public:
             // RequestCommissioningApproval, you need to wait for it to open a commissioning window on its bridge.
             usleep(kCommissionPrepareTimeMs * 1000);
 
-            DeviceMgr().PairRemoteDevice(nodeId, payloadBuffer);
+            DeviceMgr().PairRemoteDevice(nodeId, code.c_str());
         }
         else
         {
-            ChipLogError(NotSpecified, "Unable to generate manual code for setup payload: %" CHIP_ERROR_FORMAT, error.Format());
+            ChipLogError(NotSpecified, "Unable to generate pairing code for setup payload: %" CHIP_ERROR_FORMAT, error.Format());
         }
 
         return pw::OkStatus();
