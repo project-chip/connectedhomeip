@@ -156,10 +156,10 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-
 private:
     friend DeviceManager & DeviceMgr();
+
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void RequestCommissioningApproval();
 
