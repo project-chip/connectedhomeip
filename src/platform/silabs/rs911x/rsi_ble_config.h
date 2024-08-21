@@ -24,6 +24,10 @@
 #include <rsi_data_types.h>
 #endif
 
+#if SL_MATTER_GN_BUILD == 0
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -107,7 +111,7 @@
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#if (EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)

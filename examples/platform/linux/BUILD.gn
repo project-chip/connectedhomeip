@@ -93,7 +93,7 @@ source_set("app-main") {
     "${chip_root}/src/controller:controller",
     "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/src/platform/logging:default",
   ]
   deps = [
     ":ota-test-event-trigger",

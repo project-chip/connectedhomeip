@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -75,6 +76,7 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <optional>
 #include <string>
 
 #import <os/lock.h>
@@ -107,23 +109,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // Atomic because it can be touched from multiple threads.
-    std::atomic<chip::FabricIndex> _storedFabricIndex;
-
-    // queue used to serialize all work performed by the MTRDeviceController
-    dispatch_queue_t _chipWorkQueue;
-
     chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
     MTRDeviceControllerDelegateBridge * _deviceControllerDelegateBridge;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
-    MTRP256KeypairBridge _signingKeypairBridge;
-    MTRP256KeypairBridge _operationalKeypairBridge;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
     NSMapTable * _nodeIDToDeviceMap;
-    os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
+    os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
 
@@ -131,11 +125,33 @@ using namespace chip::Tracing::DarwinFramework;
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
 
     MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+    std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
+    MTRP256KeypairBridge _signingKeypairBridge;
+    MTRP256KeypairBridge _operationalKeypairBridge;
 }
 
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
+- (os_unfair_lock_t)deviceMapLock
 {
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+    return &_underlyingDeviceMapLock;
+}
+
+- (instancetype)initForSubclasses
+{
+    if (self = [super init]) {
+        // nothing, as superclass of MTRDeviceController is NSObject
+    }
+    _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
+    return self;
+}
+
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
+{
+    if ([parameters isKindOfClass:MTRXPCDeviceControllerParameters.class]) {
+        MTRXPCDeviceControllerParameters * resolvedParameters = (MTRXPCDeviceControllerParameters *) parameters;
+        MTR_LOG("Starting up with XPC Device Controller Parameters: %@", parameters);
+        return [[MTRDeviceController_XPC alloc] initWithUniqueIdentifier:resolvedParameters.uniqueIdentifier xpConnectionBlock:resolvedParameters.xpcConnectionBlock];
+    } else if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -236,7 +252,7 @@ using namespace chip::Tracing::DarwinFramework;
 
         _chipWorkQueue = queue;
         _factory = factory;
-        _deviceMapLock = OS_UNFAIR_LOCK_INIT;
+        _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
@@ -278,6 +294,7 @@ using namespace chip::Tracing::DarwinFramework;
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
@@ -286,7 +303,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceController: %p uuid %@>", self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
 }
 
 - (BOOL)isRunning
@@ -302,7 +319,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
 
-    MTR_LOG("Shutting down MTRDeviceController: %@", self);
+    MTR_LOG("Shutting down %@: %@", NSStringFromClass(self.class), self);
     [self cleanupAfterStartup];
 }
 
@@ -314,11 +331,11 @@ using namespace chip::Tracing::DarwinFramework;
     // do the secure session shutdowns.  Since we don't want to hold the lock
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
-    MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
-    os_unfair_lock_lock(&_deviceMapLock);
+    MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
+    os_unfair_lock_lock(self.deviceMapLock);
     NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
     [_nodeIDToDeviceMap removeAllObjects];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     for (MTRDevice * device in devices) {
         [device invalidate];
@@ -332,7 +349,7 @@ using namespace chip::Tracing::DarwinFramework;
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
-    MTR_LOG("shutDownCppController MTRDeviceController: %p", self);
+    MTR_LOG("%s: %p", __PRETTY_FUNCTION__, self);
     assertChipStackLockedByCurrentThread();
 
     // Shut down all our endpoints.
@@ -351,6 +368,7 @@ using namespace chip::Tracing::DarwinFramework;
         // shutdown completes, in case it wants to write to storage as it
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
@@ -590,6 +608,7 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         self->_storedFabricIndex = fabricIdx;
+        self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
         commissionerInitialized = YES;
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
@@ -617,7 +636,7 @@ using namespace chip::Tracing::DarwinFramework;
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
             MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
 
-            std::lock_guard lock(self->_deviceMapLock);
+            std::lock_guard lock(*self.deviceMapLock);
             NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
@@ -637,7 +656,7 @@ using namespace chip::Tracing::DarwinFramework;
             });
         }];
     }
-    MTR_LOG("MTRDeviceController startup: %@", self);
+    MTR_LOG("%@ startup: %@", NSStringFromClass(self.class), self);
 
     return YES;
 }
@@ -987,7 +1006,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    os_unfair_lock_assert_owner(&_deviceMapLock);
+    os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
@@ -1026,7 +1045,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
@@ -1037,7 +1056,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)removeDevice:(MTRDevice *)device
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     auto * nodeID = device.nodeID;
     MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
@@ -1051,7 +1070,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in _nodeIDToDeviceMap) {
         deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
@@ -1152,7 +1171,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (![endpoint associateWithController:self]) {
-        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with MTRDeviceController", self);
+        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with %@", self, NSStringFromClass(self.class));
         [_factory removeServerEndpoint:endpoint];
         return NO;
     }
@@ -1272,7 +1291,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return YES;
     }
 
-    MTR_LOG_ERROR("MTRDeviceController: %@ Error: %s", self, [kErrorNotRunning UTF8String]);
+    MTR_LOG_ERROR("%@: %@ Error: %s", NSStringFromClass(self.class), self, [kErrorNotRunning UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -1440,20 +1459,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (nullable NSNumber *)compressedFabricID
 {
-    assertChipStackLockedByCurrentThread();
-
-    if (!_cppCommissioner) {
-        return nil;
-    }
-
-    return @(_cppCommissioner->GetCompressedFabricId());
-}
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID
-{
-    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
-        return [self compressedFabricID];
-    } error:nil];
+    auto storedValue = _storedCompressedFabricID.load();
+    return storedValue.has_value() ? @(storedValue.value()) : nil;
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
@@ -1503,9 +1510,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
     MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;
@@ -1580,15 +1587,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 #endif // DEBUG
 
-@end
-
-/**
- * Shim to allow us to treat an MTRDevicePairingDelegate as an
- * MTRDeviceControllerDelegate.
- */
-@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
-- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
 @end
 
 @implementation MTRDevicePairingDelegateShim

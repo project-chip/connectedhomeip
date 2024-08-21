@@ -27,8 +27,8 @@ namespace Clusters {
 namespace ServiceArea {
 
 // These limits are defined in the spec.
-inline constexpr size_t kLocationNameMaxSize = 128u;
-inline constexpr size_t kMapNameMaxSize      = 64u;
+inline constexpr size_t kAreaNameMaxSize = 128u;
+inline constexpr size_t kMapNameMaxSize  = 64u;
 
 /**
  * This class is used to wrap the AreaStruct object and provide a more user-friendly interface for the data.
@@ -36,38 +36,16 @@ inline constexpr size_t kMapNameMaxSize      = 64u;
  */
 struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type
 {
+    /**
+     * @brief This is a default constructor that initializes the location object with the following
+     * values: areaID = 0, mapID = null, locationInfo = null, landmarkInfo = null.
+     */
     AreaStructureWrapper()
     {
-        Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(),
-            DataModel::Nullable<Globals::FloorSurfaceTag>());
-    }
-
-    /**
-     * @brief This is a full constructor that initializes the location object with the given values. All values are deep copied.
-     * @param[in] aAreaID The unique identifier of this location.
-     * @param[in] aMapId The identifier of the supported map associated with this location.
-     * @param[in] aLocationName A human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
-     * of a home.
-     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
-     * landmark.
-     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
-     *
-     * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
-     */
-    AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-                         const DataModel::Nullable<int16_t> & aFloorNumber,
-                         const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
-                         const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                         const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                         const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
-    {
-        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag, aSurfaceTag);
+        areaID = 0;
+        mapID  = DataModel::NullNullable;
+        SetLocationInfoNull();
+        SetLandmarkInfoNull();
     }
 
     /**
@@ -88,98 +66,119 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      */
     AreaStructureWrapper & operator=(const AreaStructureWrapper & aOther)
     {
-        if (aOther.areaDesc.locationInfo.IsNull())
-        {
-            Set(aOther.areaID, aOther.mapID, CharSpan(), NullOptional, NullOptional, aOther.areaDesc.landmarkTag,
-                aOther.areaDesc.positionTag, aOther.areaDesc.surfaceTag);
-        }
-        else
-        {
-            Set(aOther.areaID, aOther.mapID, aOther.areaDesc.locationInfo.Value().locationName,
-                aOther.areaDesc.locationInfo.Value().floorNumber, aOther.areaDesc.locationInfo.Value().areaType,
-                aOther.areaDesc.landmarkTag, aOther.areaDesc.positionTag, aOther.areaDesc.surfaceTag);
-        }
+        areaID = aOther.areaID;
+        mapID  = aOther.mapID;
+        SetLocationInfo(aOther.areaDesc.locationInfo);
+        SetLandmarkInfo(aOther.areaDesc.landmarkInfo);
+
+        return *this;
+    }
+
+    bool operator==(const AreaStructureWrapper & aOther) const
+    {
+        BitMask<IsEqualConfig> config = 0; // Do not ignore the AreaID or the MapID.
+
+        return IsEqual(aOther, config);
+    }
+
+    AreaStructureWrapper & SetAreaId(uint32_t aAreaID)
+    {
+        areaID = aAreaID;
+        return *this;
+    }
+
+    AreaStructureWrapper & SetMapId(const DataModel::Nullable<uint32_t> & aMapId)
+    {
+        mapID = aMapId;
+        return *this;
+    }
+
+    AreaStructureWrapper & SetLocationInfoNull()
+    {
+        areaDesc.locationInfo.SetNull();
+        return *this;
+    }
+
+    /**
+     * @brief Set the location information.
+     * @param[in] locationName The name of the location. If the name is larger than kAreaNameMaxSize, it will be truncated.
+     * @param[in] floorNumber The floor number of the location.
+     * @param[in] areaType The type of the area.
+     */
+    AreaStructureWrapper & SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
+                                           const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
+    {
+        areaDesc.locationInfo.SetNonNull();
+        // Copy the name
+        auto areaNameSpan = MutableCharSpan(mAreaNameBuffer, kAreaNameMaxSize);
+        CopyCharSpanToMutableCharSpan(locationName, areaNameSpan);
+        areaDesc.locationInfo.Value().locationName = CharSpan(areaNameSpan.data(), areaNameSpan.size());
+        areaDesc.locationInfo.Value().floorNumber  = floorNumber;
+        areaDesc.locationInfo.Value().areaType     = areaType;
 
         return *this;
     }
 
     /**
-     * @brief Set all fields of the location object. All values are deep copied.
-     * @param[in] aAreaID The unique identifier of this location.
-     * @param[in] aMapId The identifier of the supported map associated with this location.
-     * @param[in] aLocationName A human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
-     * of a home.
-     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
-     * landmark.
-     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @brief Set the location information form a LocationDescriptorStruct object.
      *
-     * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
+     * @note If the locationName is larger than kAreaNameMaxSize, it will be truncated.
      */
-    void Set(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-             const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
-             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-             const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+    AreaStructureWrapper & SetLocationInfo(DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo)
     {
-        areaID = aAreaID;
-        mapID  = aMapId;
-
-        // If there is at least one non-null value for locationInfo, add it to the location structure.
-        if ((!aLocationName.empty()) || (!aFloorNumber.IsNull()) || (!aAreaType.IsNull()))
+        if (locationInfo.IsNull())
         {
-            // Create a home location desc structure and fill it in except for the location name. This is done below.
-            areaDesc.locationInfo.SetNonNull(Globals::Structs::LocationDescriptorStruct::Type());
-
-            areaDesc.locationInfo.Value().floorNumber = aFloorNumber;
-            areaDesc.locationInfo.Value().areaType    = aAreaType;
-        }
-        else
-        {
-            areaDesc.locationInfo.SetNull();
+            return SetLocationInfoNull();
         }
 
-        areaDesc.landmarkTag = aLandmarkTag;
-        areaDesc.positionTag = aPositionTag;
-        areaDesc.surfaceTag  = aSurfaceTag;
+        return SetLocationInfo(locationInfo.Value().locationName, locationInfo.Value().floorNumber, locationInfo.Value().areaType);
+    }
 
-        // this assumes areaDesc structure was created above, if appropriate
-        if (!areaDesc.locationInfo.IsNull())
-        {
-            if (aLocationName.empty())
-            {
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
-            }
-            else if (aLocationName.size() > sizeof(mLocationNameBuffer))
-            {
-                // Save the truncated name that fits into available size.
-                memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
-            }
-            else
-            {
-                // Save full name.
-                memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
-            }
-        }
+    AreaStructureWrapper & SetLandmarkInfoNull()
+    {
+        areaDesc.landmarkInfo.SetNull();
+        return *this;
     }
 
     /**
-     * @brief Compare the location's name with the given text.
-     * @param[in] aLocationName The name to compare.
-     * @return true if the location structure's name field matches aLocationName.
-     * False otherwise, including if the location structure's HomeLocation structure is null.
+     * @brief Set the landmark information.
+     * @param[in] landmarkTag The landmark tag.
+     * @param[in] relativePositionTag The relative position tag.
      */
-    bool IsNameEqual(const CharSpan & aLocationName) const
+    AreaStructureWrapper & SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag,
+                                           const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
+    {
+        areaDesc.landmarkInfo.SetNonNull();
+        areaDesc.landmarkInfo.Value().landmarkTag = landmarkTag;
+        areaDesc.landmarkInfo.Value().positionTag = relativePositionTag;
+
+        return *this;
+    }
+
+    /**
+     * @brief Set the landmark information from a LandmarkInfoStruct object.
+     */
+    AreaStructureWrapper & SetLandmarkInfo(DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
+    {
+        if (landmarkInfo.IsNull())
+        {
+            return SetLandmarkInfoNull();
+        }
+
+        return SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().positionTag);
+    }
+
+    /**
+     * @brief Compare the area's name with the given text.
+     * @param[in] aAreaName The name to compare.
+     * @return true if the area structure's name field matches aAreaName.
+     * False otherwise, including if the location structure's LocationInfo structure is null.
+     */
+    bool IsNameEqual(const CharSpan & aAreaName) const
     {
         if (!areaDesc.locationInfo.IsNull())
         {
-            return areaDesc.locationInfo.Value().locationName.data_equal(aLocationName);
+            return areaDesc.locationInfo.Value().locationName.data_equal(aAreaName);
         }
 
         return false;
@@ -238,19 +237,22 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             }
         }
 
-        if (areaDesc.landmarkTag != aOther.areaDesc.landmarkTag)
+        if (areaDesc.landmarkInfo.IsNull() != aOther.areaDesc.landmarkInfo.IsNull())
         {
             return false;
         }
 
-        if (areaDesc.positionTag != aOther.areaDesc.positionTag)
+        if (!areaDesc.landmarkInfo.IsNull())
         {
-            return false;
-        }
+            if (areaDesc.landmarkInfo.Value().landmarkTag != aOther.areaDesc.landmarkInfo.Value().landmarkTag)
+            {
+                return false;
+            }
 
-        if (areaDesc.surfaceTag != aOther.areaDesc.surfaceTag)
-        {
-            return false;
+            if (areaDesc.landmarkInfo.Value().positionTag != aOther.areaDesc.landmarkInfo.Value().positionTag)
+            {
+                return false;
+            }
         }
 
         return true;
@@ -263,14 +265,14 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     {
         if (areaDesc.locationInfo.IsNull())
         {
-            return { mLocationNameBuffer, 0 };
+            return { mAreaNameBuffer, 0 };
         }
 
         return areaDesc.locationInfo.Value().locationName;
     }
 
 private:
-    char mLocationNameBuffer[kLocationNameMaxSize] = { 0 };
+    char mAreaNameBuffer[kAreaNameMaxSize] = { 0 };
 };
 
 /**
@@ -288,7 +290,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note If aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    MapStructureWrapper(uint8_t aMapId, const CharSpan & aMapName) { Set(aMapId, aMapName); }
+    MapStructureWrapper(uint32_t aMapId, const CharSpan & aMapName) { Set(aMapId, aMapName); }
 
     /**
      * @brief This is a copy constructor that initializes the map object with the values from another map object. All values are
@@ -316,26 +318,12 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note if aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    void Set(uint8_t aMapId, const CharSpan & aMapName)
+    void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
-        mapID = aMapId;
-
-        if (aMapName.empty())
-        {
-            name = CharSpan(mMapNameBuffer, 0);
-        }
-        else if (aMapName.size() > sizeof(mMapNameBuffer))
-        {
-            // Save the truncated name that fits into available size.
-            memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
-            name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
-        }
-        else
-        {
-            // Save full name.
-            memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
-            name = CharSpan(mMapNameBuffer, aMapName.size());
-        }
+        mapID            = aMapId;
+        auto mapNameSpan = MutableCharSpan(mMapNameBuffer, kMapNameMaxSize);
+        CopyCharSpanToMutableCharSpan(aMapName, mapNameSpan);
+        name = CharSpan(mapNameSpan.data(), mapNameSpan.size());
     }
 
     /**

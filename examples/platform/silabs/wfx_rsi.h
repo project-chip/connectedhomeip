@@ -62,7 +62,6 @@ typedef enum
     WFX_RSI_ST_STA_READY       = (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE),
     WFX_RSI_ST_STARTED         = (1 << 9),  /* RSI task started			*/
     WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
-    WFX_RSI_ST_SLEEP_READY     = (1 << 11)  /* Notify the M4 to go to sleep*/
 } WfxStateType_e;
 
 typedef struct WfxEvent_s

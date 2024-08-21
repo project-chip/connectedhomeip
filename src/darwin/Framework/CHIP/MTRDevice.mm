@@ -64,43 +64,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-// Consider moving utility classes to their own file
-#pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
 @implementation MTRDeviceDelegateInfo
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
@@ -208,6 +171,24 @@ bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
 bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
 {
     return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
+}
+
+NSString * InternalDeviceStateString(MTRInternalDeviceState state)
+{
+    switch (state) {
+    case MTRInternalDeviceStateUnsubscribed:
+        return @"Unsubscribed";
+    case MTRInternalDeviceStateSubscribing:
+        return @"Subscribing";
+    case MTRInternalDeviceStateInitialSubscriptionEstablished:
+        return @"InitialSubscriptionEstablished";
+    case MTRInternalDeviceStateResubscribing:
+        return @"Resubscribing";
+    case MTRInternalDeviceStateLaterSubscriptionEstablished:
+        return @"LaterSubscriptionEstablished";
+    default:
+        return @"Unknown";
+    }
 }
 } // anonymous namespace
 
@@ -353,10 +334,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset
+// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
+// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
+// whatever lock protects the time sync bits.
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
+
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
@@ -481,13 +464,35 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // System time change observer reference
     id _systemTimeChangeObserverToken;
 
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+    // Protects mutable state used by our description getter.  This is a separate lock from "lock"
+    // so that we don't need to worry about getting our description while holding "lock" (e.g due to
+    // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
+    // while it's held, to avoid deadlock.
+    os_unfair_lock _descriptionLock;
+
+    // State used by our description getter: access to these must be protected by descriptionLock.
+    NSNumber * _Nullable _vid; // nil if unknown
+    NSNumber * _Nullable _pid; // nil if unknown
+    // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
+    // present on the device, or nil if there aren't any.
+    NSNumber * _Nullable _allNetworkFeatures;
+    // Copy of _internalDeviceState that is safe to use in description.
+    MTRInternalDeviceState _internalDeviceStateForDescription;
+    // Copy of _lastSubscriptionAttemptWait that is safe to use in description.
+    uint32_t _lastSubscriptionAttemptWaitForDescription;
+    // Most recent entry in _mostRecentReportTimes, if any.
+    NSDate * _Nullable _mostRecentReportTimeForDescription;
+    // Copy of _lastSubscriptionFailureTime that is safe to use in description.
+    NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
 }
 
-- (instancetype)initForSubclasses
+- (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
-        // nothing, as superclass of MTRDevice is NSObject
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _delegates = [NSMutableSet set];
+        _deviceController = controller;
+        _nodeID = nodeID;
     }
 
     return self;
@@ -498,6 +503,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
+        _descriptionLock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
@@ -507,6 +513,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
+        _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -543,8 +550,58 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSString *)description
 {
+    id _Nullable vid;
+    id _Nullable pid;
+    NSNumber * _Nullable networkFeatures;
+    MTRInternalDeviceState internalDeviceState;
+    uint32_t lastSubscriptionAttemptWait;
+    NSDate * _Nullable mostRecentReportTime;
+    NSDate * _Nullable lastSubscriptionFailureTime;
+    {
+        std::lock_guard lock(_descriptionLock);
+        vid = _vid;
+        pid = _pid;
+        networkFeatures = _allNetworkFeatures;
+        internalDeviceState = _internalDeviceStateForDescription;
+        lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
+        mostRecentReportTime = _mostRecentReportTimeForDescription;
+        lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
+    }
+
+    if (vid == nil) {
+        vid = @"Unknown";
+    }
+
+    if (pid == nil) {
+        pid = @"Unknown";
+    }
+
+    NSString * wifi;
+    NSString * thread;
+    if (networkFeatures == nil) {
+        wifi = @"NO";
+        thread = @"NO";
+    } else {
+        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+    }
+
+    NSString * reportAge;
+    if (mostRecentReportTime) {
+        reportAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[mostRecentReportTime timeIntervalSinceNow]];
+    } else {
+        reportAge = @"";
+    }
+
+    NSString * subscriptionFailureAge;
+    if (lastSubscriptionFailureTime) {
+        subscriptionFailureAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[lastSubscriptionFailureTime timeIntervalSinceNow]];
+    } else {
+        subscriptionFailureAge = @"";
+    }
+
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: 0x%016llX]", self, _fabricIndex, _nodeID.unsignedLongLongValue];
+        stringWithFormat:@"<MTRDevice: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -661,13 +718,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
 {
-    auto partsList = [self readAttributeWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID) params:nil];
-    NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
-    if (!endpointsOnDevice) {
-        endpointsOnDevice = [[NSMutableArray<NSNumber *> alloc] init];
+    NSArray<NSNumber *> * endpointsOnDevice;
+    {
+        std::lock_guard lock(_lock);
+        endpointsOnDevice = [self _endpointList];
     }
-    // Add Root node!
-    [endpointsOnDevice addObject:@(0)];
 
     NSMutableArray<NSNumber *> * endpointsWithTimeSyncCluster = [[NSMutableArray<NSNumber *> alloc] init];
     for (NSNumber * endpoint in endpointsOnDevice) {
@@ -783,6 +838,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // TODO: XPC: This function and all its callsites should go away from this class.
+
     // We should not allow a subscription for device controllers over XPC.
     return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
@@ -831,34 +888,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [_delegates addObject:newDelegateInfo];
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
-    __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
+    // Call hook to allow subclasses to act on delegate addition.
+    [self _delegateAdded];
+}
 
-    // For unit testing only. If this ever changes to not being for unit testing purposes,
-    // we would need to move the code outside of where we acquire the lock above.
-#ifdef DEBUG
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
-            shouldSetUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
-        }
-    }];
-#endif
-
-    if (shouldSetUpSubscription) {
-        MTR_LOG("%@ - starting subscription setup", self);
-        // Record the time of first addDelegate call that triggers initial subscribe, and do not reset this value on subsequent addDelegate calls
-        if (!_initialSubscribeStart) {
-            _initialSubscribeStart = [NSDate now];
-        }
-        if ([self _deviceUsesThread]) {
-            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
-            [self _scheduleSubscriptionPoolWork:^{
-                std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
-            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
-        } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
-        }
-    }
+- (void)_delegateAdded
+{
+    // Nothing to do; this is a hook for subclasses.  If that ever changes for
+    // some reason, subclasses need to start calling this hook on their super.
 }
 
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
@@ -870,7 +907,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
     [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate == delegate) {
+        if (!strongDelegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
+        } else if (strongDelegate == delegate) {
             [delegatesToRemove addObject:delegateInfo];
             MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
         }
@@ -884,45 +924,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)invalidate
 {
-    MTR_LOG("%@ invalidate", self);
-
-    [_asyncWorkQueue invalidate];
-
-    os_unfair_lock_lock(&self->_timeSyncLock);
-    _timeUpdateScheduled = NO;
-    os_unfair_lock_unlock(&self->_timeSyncLock);
-
-    os_unfair_lock_lock(&self->_lock);
-
-    _state = MTRDeviceStateUnknown;
+    std::lock_guard lock(_lock);
 
     [_delegates removeAllObjects];
-
-    // Make sure we don't try to resubscribe if we have a pending resubscribe
-    // attempt, since we now have no delegate.
-    _reattemptingSubscription = NO;
-
-    [_deviceController asyncDispatchToMatterQueue:^{
-        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
-
-        // Destroy the read client and callback (has to happen on the Matter
-        // queue, to avoid deleting objects that are being referenced), to
-        // tear down the subscription.  We will get no more callbacks from
-        // the subscription after this point.
-        std::lock_guard lock(self->_lock);
-        self->_currentReadClient = nullptr;
-        if (self->_currentSubscriptionCallback) {
-            delete self->_currentSubscriptionCallback;
-        }
-        self->_currentSubscriptionCallback = nullptr;
-
-        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
-    }
-                                     errorHandler:nil];
-
-    [self _stopConnectivityMonitoring];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)nodeMayBeAdvertisingOperational
@@ -1053,8 +1057,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return [self _iterateDelegatesWithBlock:nil];
 }
 
-// Returns YES if any non-null delegates were found
-- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo * delegateInfo)_Nullable)block
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1104,9 +1107,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return (delegatesCalled > 0);
 }
 
+- (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
+{
+    std::lock_guard lock(self->_lock);
+    return [self _callDelegatesWithBlock:block];
+}
+
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
-// Returns YES if a delegate is called
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -1160,6 +1168,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
     MTRInternalDeviceState lastState = _internalDeviceState;
     _internalDeviceState = state;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _internalDeviceStateForDescription = _internalDeviceState;
+    }
     if (lastState != state) {
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
@@ -1201,7 +1213,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _stopConnectivityMonitoring];
 
     // reset subscription attempt wait time when subscription succeeds
-    _lastSubscriptionAttemptWait = 0;
+    [self _setLastSubscriptionAttemptWait:0];
 
     auto initialSubscribeStart = _initialSubscribeStart;
     // We no longer need to track subscribe latency for this device.
@@ -1367,6 +1379,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // former case we recently had a subscription and do not want to be forcing
     // retries immediately.
     _lastSubscriptionFailureTime = [NSDate now];
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
+    }
 
     deviceUsesThread = [self _deviceUsesThread];
 
@@ -1408,6 +1424,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _doHandleSubscriptionReset:retryDelay];
 }
 
+- (void)_setLastSubscriptionAttemptWait:(uint32_t)lastSubscriptionAttemptWait
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _lastSubscriptionAttemptWait = lastSubscriptionAttemptWait;
+
+    std::lock_guard lock(_descriptionLock);
+    _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+}
+
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     os_unfair_lock_assert_owner(&_lock);
@@ -1417,6 +1442,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // has given up completely.  Those all count as "we have tried and failed to
     // subscribe".
     _lastSubscriptionFailureTime = [NSDate now];
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
+    }
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1441,16 +1470,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // counter, so that we don't end up waiting for a long time if the next
         // attempt fails for some reason, and retry after whatever time period
         // the device told us to use.
-        _lastSubscriptionAttemptWait = 0;
+        [self _setLastSubscriptionAttemptWait:0];
         secondsToWait = retryDelay.doubleValue;
         MTR_LOG("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
             self, secondsToWait);
     } else {
-        _lastSubscriptionAttemptWait *= 2;
-        if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
-            _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
+        auto lastSubscriptionAttemptWait = _lastSubscriptionAttemptWait * 2;
+        if (lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
+            lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
         }
-        secondsToWait = _lastSubscriptionAttemptWait;
+        [self _setLastSubscriptionAttemptWait:lastSubscriptionAttemptWait];
+        secondsToWait = lastSubscriptionAttemptWait;
     }
 
     MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
@@ -1665,6 +1695,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes
 {
     _mostRecentReportTimes = mostRecentReportTimes;
+
+    std::lock_guard lock(_descriptionLock);
+    _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
 }
 #endif
 
@@ -1718,6 +1751,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [_mostRecentReportTimes removeObjectAtIndex:0];
     }
     [_mostRecentReportTimes addObject:[NSDate now]];
+
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
+    }
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -1784,6 +1822,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     _clusterDataPersistenceFirstScheduledTime = nil;
     _mostRecentReportTimes = nil;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = nil;
+    }
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
@@ -2236,6 +2278,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [clusterData storeValue:value forAttribute:path.attribute];
 
+    if ([self _attributePathAffectsDescriptionData:path]) {
+        [self _updateAttributeDependentDescriptionData];
+    }
+
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
@@ -2295,10 +2341,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_setupConnectivityMonitoring
 {
 #if ENABLE_CONNECTIVITY_MONITORING
-    // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
+    // Dispatch to own queue because we used to need to do that to get the compressedFabricID, but
+    // at this point that's not really needed anymore.
     dispatch_async(self.queue, ^{
         // Get the required info before setting up the connectivity monitor
-        NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
+        NSNumber * compressedFabricID = [self->_deviceController compressedFabricID];
         if (!compressedFabricID) {
             MTR_LOG_ERROR("%@ could not get compressed fabricID", self);
             return;
@@ -2365,6 +2412,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_setupSubscriptionWithReason:(NSString *)reason
 {
+    // TODO: XPC: This is not really called anymore in this class.  Should
+    // remove this function and anything only reachable from it.
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
@@ -3652,7 +3701,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
-                        MTR_LOG("Device configuration changed due to changes in attribute %@", attributePath);
+                        MTR_LOG("%@ device configuration changed due to changes in attribute %@", self, attributePath);
                     }
                 }
 
@@ -3760,6 +3809,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [_persistedClusters addObject:clusterPath];
         [_persistedClusterData setObject:clusterData[clusterPath] forKey:clusterPath];
     }
+
+    [self _updateAttributeDependentDescriptionData];
 
     // We have some stored data.  Since we don't store data until the end of the
     // initial priming report, our device cache must be primed.
@@ -4104,6 +4155,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
 
+    if (cachedData == nil) {
+        return nil;
+    }
+
     auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
         MTRAttributePathKey : attributePath,
         MTRDataKey : cachedData,
@@ -4133,11 +4188,96 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_addInformationalAttributesToCurrentMetricScope
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     using namespace chip::Tracing::DarwinFramework;
     MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
     MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
     BOOL usesThread = [self _deviceUsesThread];
     MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
+}
+
+#pragma mark - Description handling
+
+- (BOOL)_attributePathAffectsDescriptionData:(MTRAttributePath *)path
+{
+    // Technically this does not need to be called while locked, but in
+    // practice it is, and we want to make sure it's clear that this function
+    // should never start taking our data lock.
+    os_unfair_lock_assert_owner(&_lock);
+
+    switch (path.cluster.unsignedLongLongValue) {
+    case MTRClusterIDTypeBasicInformationID: {
+        switch (path.attribute.unsignedLongLongValue) {
+        case MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID:
+        case MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID:
+            return YES;
+        default:
+            return NO;
+        }
+    }
+    case MTRClusterIDTypeNetworkCommissioningID: {
+        return path.attribute.unsignedLongLongValue == MTRAttributeIDTypeGlobalAttributeFeatureMapID;
+    }
+    default:
+        return NO;
+    }
+}
+
+- (void)_updateAttributeDependentDescriptionData
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    NSNumber * _Nullable vid = [self _informationalVendorID];
+    NSNumber * _Nullable pid = [self _informationalProductID];
+    NSNumber * _Nullable networkFeatures = [self _networkFeatures];
+
+    std::lock_guard lock(_descriptionLock);
+    _vid = vid;
+    _pid = pid;
+    _allNetworkFeatures = networkFeatures;
+}
+
+- (NSArray<NSNumber *> *)_endpointList
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * partsListPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                               clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                             attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+    auto * partsList = [self _cachedAttributeValueForPath:partsListPath];
+    NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
+    if (!endpointsOnDevice) {
+        endpointsOnDevice = [[NSMutableArray<NSNumber *> alloc] init];
+    }
+    // Add Root node!
+    [endpointsOnDevice addObject:@(0)];
+    return endpointsOnDevice;
+}
+
+- (NSNumber * _Nullable)_networkFeatures
+{
+    NSNumber * _Nullable result = nil;
+    auto * endpoints = [self _endpointList];
+    for (NSNumber * endpoint in endpoints) {
+        auto * featureMapPath = [MTRAttributePath attributePathWithEndpointID:endpoint
+                                                                    clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                                                  attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
+        auto * featureMap = [self _informationalNumberAtAttributePath:featureMapPath];
+        if (featureMap == nil) {
+            // No network commissioning cluster on this endpoint, or no known
+            // FeatureMap attribute value for it yet.
+            continue;
+        }
+
+        if (result == nil) {
+            result = featureMap;
+        } else {
+            result = @(featureMap.unsignedLongLongValue | result.unsignedLongLongValue);
+        }
+    }
+
+    return result;
 }
 
 @end

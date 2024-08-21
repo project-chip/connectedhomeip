@@ -167,7 +167,7 @@ class CommissionerControlCluster(
     val TAG_COMMISSIONING_TIMEOUT: Int = 0
     var commissioningTimeout_decoded: UShort? = null
 
-    val TAG_P_A_K_E_PASSCODE_VERIFIER: Int = 1
+    val TAG_PAKE_PASSCODE_VERIFIER: Int = 1
     var PAKEPasscodeVerifier_decoded: ByteArray? = null
 
     val TAG_DISCRIMINATOR: Int = 2
@@ -186,7 +186,7 @@ class CommissionerControlCluster(
         commissioningTimeout_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_P_A_K_E_PASSCODE_VERIFIER)) {
+      if (tag == ContextSpecificTag(TAG_PAKE_PASSCODE_VERIFIER)) {
         PAKEPasscodeVerifier_decoded = tlvReader.getByteArray(tag)
       }
 

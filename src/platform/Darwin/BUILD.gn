@@ -151,7 +151,6 @@ static_library("logging") {
   sources = [
     "Logging.h",
     "Logging.mm",
-    "LoggingImpl.cpp",
   ]
 
   deps = [

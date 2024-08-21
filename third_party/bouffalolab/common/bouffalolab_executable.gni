@@ -40,15 +40,22 @@ template("bouffalolab_executable") {
     "${chip_root}/scripts/flashing/bouffalolab_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
   ]
-
-  if (invoker.bl_plat_name == "bl602") {
-    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
-  } else {
-    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
-  }
-
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
+    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+  }
+
+  flashing_config_target = target_name + ".config"
+
+  objcopy_image_name = output_base_name + ".bin"
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
+  } else {
+    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
+  }
+
+  copy(flashing_config_target) {
+    sources = flashing_config_inputs
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 
@@ -58,6 +65,7 @@ template("bouffalolab_executable") {
   flashing_options = [ "bouffalolab" ]
   flashing_options += [ "--chipname" ]
   flashing_options += [ "${invoker.bl_plat_name}" ]
+
   flashing_options += [ "--xtal" ]
   if (invoker.bl_plat_name == "bl602") {
     flashing_options += [ "40M" ]
@@ -81,15 +89,15 @@ template("bouffalolab_executable") {
         [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   }
 
-  flashing_options += [ "--ota" ]
-  flashing_options += [ "ota_images/" ]
-
   # set 2000000 baudrate for image download by default
   flashing_options += [ "--baudrate" ]
   flashing_options += [ "2000000" ]
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
-    data_deps = [ ":${flashing_runtime_target}" ]
+    data_deps = [
+      ":${flashing_config_target}",
+      ":${flashing_runtime_target}",
+    ]
   }
 }

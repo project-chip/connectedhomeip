@@ -3,3 +3,4 @@ click
 colorama
 diskcache
 websockets
+mypy==1.10.1

@@ -118,7 +118,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         self.step(4)
         if not self.is_ci:
-            self.wait_for_use_input(
+            self.wait_for_user_input(
                 "Commission TH_SED_DUT onto DUT_FSA’s fabric using the manufacturer specified mechanism. (ensure Synchronization is enabled.)")
         else:
             logging.info("Stopping after step 3 while running in CI to avoid manual steps.")

@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -110,10 +110,9 @@ def BuildHostTarget():
         TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
-        TargetPart('java-matter-controller',
-                   app=HostApp.JAVA_MATTER_CONTROLLER),
-        TargetPart('kotlin-matter-controller',
-                   app=HostApp.KOTLIN_MATTER_CONTROLLER),
+        # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
+        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER, data_model_interface="disabled"),
+        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER, data_model_interface="disabled"),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
         TargetPart('lock', app=HostApp.LOCK),
@@ -189,6 +188,9 @@ def BuildHostTarget():
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
+    target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
 
     return target
 
@@ -662,17 +664,19 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1',
+        TargetPart('BL602DK',
                    board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
-        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
+        TargetPart('BL602-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
+        TargetPart('BL706-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL602-IoT-Matter-V1',
+                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
+                   module_type="BL706C-22"),
     ])
 
     # Apps
@@ -680,20 +684,20 @@ def BuildBouffalolabTarget():
         TargetPart('light', app=BouffalolabApp.LIGHT),
     ])
 
-    target.AppendModifier('shell', enable_shell=True)
-    target.AppendModifier('115200', baudrate=115200)
-    target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('cdc', enable_cdc=True)
-    target.AppendModifier('resetCnt', enable_resetCnt=True)
-    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('mfd', function_mfd=BouffalolabMfd.MFD_RELEASE)
-    target.AppendModifier('mfdtest', function_mfd=BouffalolabMfd.MFD_TEST)
     target.AppendModifier('ethernet', enable_ethernet=True)
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
-    target.AppendModifier('fp', enable_frame_ptr=True)
-    target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('easyflash', enable_easyflash=True)
+    target.AppendModifier('shell', enable_shell=True)
+    target.AppendModifier('mfd', enable_mfd=True)
+    target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
+    target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('cdc', enable_cdc=True)
     target.AppendModifier('mot', use_matter_openthread=True)
+    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('115200', baudrate=115200)
+    target.AppendModifier('fp', enable_frame_ptr=True)
 
     return target
 

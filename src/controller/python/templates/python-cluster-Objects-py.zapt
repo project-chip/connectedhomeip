@@ -19,6 +19,15 @@ from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
 
+
+__all__ = [
+    "Globals",
+{{#zcl_clusters}}
+    "{{asUpperCamelCase name}}",
+{{/zcl_clusters}}
+]
+
+
 class Globals:
     class Enums:
 {{#zcl_enums}}

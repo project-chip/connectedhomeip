@@ -128,6 +128,13 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocati
     return *this;
 }
 
+EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::SetFabricIndex(FabricIndex aFabricIndex)
+{
+    VerifyOrDie(!mIsAlreadyBuilt);
+    mFabricIndex = aFabricIndex;
+    return *this;
+}
+
 std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
 {
     VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
@@ -136,6 +143,8 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
     VerifyOrReturnValue(!mDeviceTypes.empty(), nullptr, ChipLogError(Zcl, "No device types added"));
     VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr,
                         ChipLogError(Zcl, "Too many location ids"));
+    VerifyOrReturnValue(mFabricIndex >= kMinValidFabricIndex, nullptr, ChipLogError(Zcl, "Fabric index is invalid"));
+    VerifyOrReturnValue(mFabricIndex <= kMaxValidFabricIndex, nullptr, ChipLogError(Zcl, "Fabric index is invalid"));
 
     for (auto & locationId : mUniqueLocationIds)
     {
@@ -145,12 +154,12 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemDeviceStruct> ret{ new EcosystemDeviceStruct(
         std::move(mDeviceName), mDeviceNameLastEditEpochUs, mBridgedEndpoint, mOriginalEndpoint, std::move(mDeviceTypes),
-        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs) };
+        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs, mFabricIndex) };
     mIsAlreadyBuilt = true;
     return ret;
 }
 
-CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const FabricIndex & aFabricIndex)
+CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Structs::EcosystemDeviceStruct::Type deviceStruct;
     if (!mDeviceName.empty())
@@ -172,9 +181,7 @@ CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncode
     deviceStruct.uniqueLocationIDs = DataModel::List<CharSpan>(locationIds.data(), locationIds.size());
 
     deviceStruct.uniqueLocationIDsLastEdit = mUniqueLocationIdsLastEditEpochUs;
-
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
-    deviceStruct.SetFabricIndex(aFabricIndex);
+    deviceStruct.SetFabricIndex(mFabricIndex);
     return aEncoder.Encode(deviceStruct);
 }
 
@@ -226,12 +233,9 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
                                            const std::string & aUniqueLocationId, const FabricIndex & aFabricIndex)
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
-    VerifyOrDie(!aUniqueLocationId.empty());
     locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
-
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
     locationStruct.SetFabricIndex(aFabricIndex);
     return aEncoder.Encode(locationStruct);
 }
@@ -241,6 +245,17 @@ EcosystemInformationServer EcosystemInformationServer::mInstance;
 EcosystemInformationServer & EcosystemInformationServer::Instance()
 {
     return mInstance;
+}
+
+CHIP_ERROR EcosystemInformationServer::AddEcosystemInformationClusterToEndpoint(EndpointId aEndpoint)
+{
+    VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    auto it = mDevicesMap.find(aEndpoint);
+    // We expect that the device has not been previously added.
+    VerifyOrReturnError((it == mDevicesMap.end()), CHIP_ERROR_INCORRECT_STATE);
+    // This create an empty DeviceInfo in mDevicesMap.
+    mDevicesMap[aEndpoint] = DeviceInfo();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice)
@@ -255,16 +270,20 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
 }
 
 CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId,
-                                                       std::unique_ptr<EcosystemLocationStruct> aLocation)
+                                                       FabricIndex aFabricIndex, std::unique_ptr<EcosystemLocationStruct> aLocation)
 {
     VerifyOrReturnError(aLocation, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!aLocationId.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aFabricIndex >= kMinValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aFabricIndex <= kMaxValidFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(aLocationId) == deviceInfo.mLocationDirectory.end()),
+    auto & deviceInfo        = mDevicesMap[aEndpoint];
+    EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
-    deviceInfo.mLocationDirectory[aLocationId] = std::move(aLocation);
+    deviceInfo.mLocationDirectory[key] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
 
@@ -282,11 +301,11 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
     switch (aPath.mAttributeId)
     {
     case Attributes::RemovedOn::Id:
-        return EcosystemInformationServer::Instance().EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::DeviceDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::LocationDirectory::Id:
-        return EcosystemInformationServer::Instance().EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
+        return EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::ClusterRevision::Id: {
         uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
         return aEncoder.Encode(rev);
@@ -341,11 +360,10 @@ CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId
         return aEncoder.EncodeEmptyList();
     }
 
-    FabricIndex fabricIndex = aEncoder.AccessingFabricIndex();
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
         for (auto & device : deviceInfo.mDeviceDirectory)
         {
-            ReturnErrorOnFailure(device->Encode(encoder, fabricIndex));
+            ReturnErrorOnFailure(device->Encode(encoder));
         }
         return CHIP_NO_ERROR;
     });
@@ -368,11 +386,10 @@ CHIP_ERROR EcosystemInformationServer::EncodeLocationStructAttribute(EndpointId 
         return aEncoder.EncodeEmptyList();
     }
 
-    FabricIndex fabricIndex = aEncoder.AccessingFabricIndex();
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto & [id, device] : deviceInfo.mLocationDirectory)
+        for (auto & [key, device] : deviceInfo.mLocationDirectory)
         {
-            ReturnErrorOnFailure(device->Encode(encoder, id, fabricIndex));
+            ReturnErrorOnFailure(device->Encode(encoder, key.mUniqueLocationId, key.mFabricIndex));
         }
         return CHIP_NO_ERROR;
     });
@@ -391,5 +408,5 @@ chip::app::Clusters::EcosystemInformation::AttrAccess gAttrAccess;
 
 void MatterEcosystemInformationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
