@@ -92,7 +92,7 @@ enum class ColorMode : uint8_t
 
 enum class HueDirection : uint8_t
 {
-    ShortestDistance = DirectionEnum::kShortest, 
+    ShortestDistance = DirectionEnum::kShortest,
     LongestDistance = DirectionEnum::kLongest,
     Up = DirectionEnum::kUp,
     Down =DirectionEnum::kDown,
