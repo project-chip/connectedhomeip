@@ -779,7 +779,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
         filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
         dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
-        self.dump_wildcard(dump_device_composition_path)
+        json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
+
+        # Structured dump so we can pull these back out of the logs
+        def log_structured_data(start_tag: str, dump_string):
+            lines = dump_string.splitlines()
+            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+            for line in lines:
+                logging.info(f'{start_tag}{line}')
+            logging.info(f'{start_tag}END ====')
+
+        log_structured_data('==== json: ', json_str)
+        log_structured_data('==== txt: ', txt_str)
 
 
 if __name__ == "__main__":
