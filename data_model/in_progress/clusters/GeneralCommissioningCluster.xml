@@ -64,11 +64,6 @@ Davis, CA 95616, USA
     <clusterId id="0x0030" name="General Commissioning"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
-  <features>
-    <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
-      <optionalConform/>
-    </feature>
-  </features>
   <dataTypes>
     <enum name="CommissioningErrorEnum">
       <item value="0" name="OK" summary="No error">
@@ -246,9 +241,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
-      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
-        <mandatoryConform/>
-      </field>
     </command>
   </commands>
 </cluster>
