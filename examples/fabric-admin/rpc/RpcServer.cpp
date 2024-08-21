@@ -48,7 +48,7 @@ public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
         NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it             = mPendingCheckIn.find(nodeId);
+        auto it       = mPendingCheckIn.find(nodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
 
         KeepActiveDataForCheckIn checkInData = it->second;
@@ -59,8 +59,10 @@ public:
         auto timeNow = System::SystemClock().GetMonotonicTimestamp();
         if (timeNow > checkInData.mRequestExpiryTimestamp)
         {
-            ChipLogError(NotSpecified,
-                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped for Node ID: 0x%lx", nodeId);
+            ChipLogError(
+                NotSpecified,
+                "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped for Node ID: 0x%lx",
+                nodeId);
             return;
         }
 
