@@ -47,20 +47,32 @@ class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
-        chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
-        auto it             = mPendingKeepActiveTimesMs.find(nodeId);
-        VerifyOrReturn(it != mPendingKeepActiveTimesMs.end());
-        // TODO(#33221): We also need a mechanism here to drop KeepActive
-        // request if they were recieved over 60 mins ago.
-        uint32_t stayActiveDurationMs = it->second;
+        // Needs for accessing mPendingCheckIn
+        assertChipStackLockedByCurrentThread();
+        NodeId nodeId = clientInfo.peer_node.GetNodeId();
+        auto it       = mPendingCheckIn.find(nodeId);
+        VerifyOrReturn(it != mPendingCheckIn.end());
+
+        KeepActiveDataForCheckIn checkInData = it->second;
+        // Removed from pending map as check-in from this node has occured and we will handle the pending KeepActive
+        // request.
+        mPendingCheckIn.erase(nodeId);
+
+        auto timeNow = System::SystemClock().GetMonotonicTimestamp();
+        if (timeNow > checkInData.mRequestExpiryTimestamp)
+        {
+            ChipLogError(
+                NotSpecified,
+                "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped for Node ID: 0x%lx",
+                nodeId);
+            return;
+        }
 
         // TODO(#33221): If there is a failure in sending the message this request just gets dropped.
         // Work to see if there should be update to spec on whether some sort of failure later on
         // Should be indicated in some manner, or identify a better recovery mechanism here.
-        mPendingKeepActiveTimesMs.erase(nodeId);
-
         auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(nodeId, promisedActiveDuration); };
-        CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(stayActiveDurationMs, clientInfo.peer_node,
+        CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  chip::app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
         {
@@ -147,10 +159,24 @@ public:
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
-        mPendingKeepActiveTimesMs[nodeId] = stayActiveDurationMs;
+        // Needs for accessing mPendingCheckIn
+        assertChipStackLockedByCurrentThread();
+
+        auto timeNow = System::SystemClock().GetMonotonicTimestamp();
+        // Spec says we should expire the request 60 mins after we get it
+        System::Clock::Timestamp expiryTimestamp = timeNow + System::Clock::Seconds64(60 * 60);
+        KeepActiveDataForCheckIn checkInData     = { .mStayActiveDurationMs   = stayActiveDurationMs,
+                                                     .mRequestExpiryTimestamp = expiryTimestamp };
+        mPendingCheckIn[nodeId]                  = checkInData;
     }
 
 private:
+    struct KeepActiveDataForCheckIn
+    {
+        uint32_t mStayActiveDurationMs = 0;
+        System::Clock::Timestamp mRequestExpiryTimestamp;
+    };
+
     struct KeepActiveWorkData
     {
         KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs) :
@@ -169,8 +195,10 @@ private:
         chip::Platform::Delete(data);
     }
 
-    // Modifications to mPendingKeepActiveTimesMs should be done on the MatterEventLoop thread
-    std::map<chip::NodeId, uint32_t> mPendingKeepActiveTimesMs;
+    // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
+    // otherwise we would need a mutex protecting this data to prevent race as this
+    // data is accessible by both RPC thread and Matter eventloop.
+    std::unordered_map<NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
 };
 
 FabricAdmin fabric_admin_service;
