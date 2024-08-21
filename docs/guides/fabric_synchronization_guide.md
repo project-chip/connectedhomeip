@@ -110,9 +110,9 @@ Pair the Ecosystem 2 bridge to Ecosystem 1 with node ID 2:
 fabricsync add-bridge 2 <e2-fabric-bridge-ip>
 ```
 
-This command will initiate the reverse commissioning process. After a few seconds,
-you should see the following message, indicating that the local bridge of Ecosystem
-1 has successfully paired with Ecosystem 2 on Endpoint 2:
+This command will initiate the reverse commissioning process. After a few
+seconds, you should see the following message, indicating that the local bridge
+of Ecosystem 1 has successfully paired with Ecosystem 2 on Endpoint 2:
 
 ```
 >>> A new device is added on Endpoint 2.
