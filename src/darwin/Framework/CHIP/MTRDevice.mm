@@ -173,23 +173,6 @@ bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
     return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
 }
 
-NSString * InternalDeviceStateString(MTRInternalDeviceState state)
-{
-    switch (state) {
-    case MTRInternalDeviceStateUnsubscribed:
-        return @"Unsubscribed";
-    case MTRInternalDeviceStateSubscribing:
-        return @"Subscribing";
-    case MTRInternalDeviceStateInitialSubscriptionEstablished:
-        return @"InitialSubscriptionEstablished";
-    case MTRInternalDeviceStateResubscribing:
-        return @"Resubscribing";
-    case MTRInternalDeviceStateLaterSubscriptionEstablished:
-        return @"LaterSubscriptionEstablished";
-    default:
-        return @"Unknown";
-    }
-}
 } // anonymous namespace
 
 typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
@@ -491,6 +474,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _delegates = [NSMutableSet set];
+        _deviceController = controller;
+        _nodeID = nodeID;
     }
 
     return self;
@@ -544,62 +529,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
-}
-
-- (NSString *)description
-{
-    id _Nullable vid;
-    id _Nullable pid;
-    NSNumber * _Nullable networkFeatures;
-    MTRInternalDeviceState internalDeviceState;
-    uint32_t lastSubscriptionAttemptWait;
-    NSDate * _Nullable mostRecentReportTime;
-    NSDate * _Nullable lastSubscriptionFailureTime;
-    {
-        std::lock_guard lock(_descriptionLock);
-        vid = _vid;
-        pid = _pid;
-        networkFeatures = _allNetworkFeatures;
-        internalDeviceState = _internalDeviceStateForDescription;
-        lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
-        mostRecentReportTime = _mostRecentReportTimeForDescription;
-        lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
-    }
-
-    if (vid == nil) {
-        vid = @"Unknown";
-    }
-
-    if (pid == nil) {
-        pid = @"Unknown";
-    }
-
-    NSString * wifi;
-    NSString * thread;
-    if (networkFeatures == nil) {
-        wifi = @"NO";
-        thread = @"NO";
-    } else {
-        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
-        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
-    }
-
-    NSString * reportAge;
-    if (mostRecentReportTime) {
-        reportAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[mostRecentReportTime timeIntervalSinceNow]];
-    } else {
-        reportAge = @"";
-    }
-
-    NSString * subscriptionFailureAge;
-    if (lastSubscriptionFailureTime) {
-        subscriptionFailureAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[lastSubscriptionFailureTime timeIntervalSinceNow]];
-    } else {
-        subscriptionFailureAge = @"";
-    }
-
-    return [NSString
-        stringWithFormat:@"<MTRDevice: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
