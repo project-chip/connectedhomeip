@@ -77,7 +77,7 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
             mCurrentInput = index;
             // Sync the CurrentInput to attribute storage while reporting changes
             Status status = chip::app::Clusters::MediaInput::Attributes::CurrentInput::Set(mEndpoint, index);
-            if (Status::Success != status) { 
+            if (Status::Success != status) {
                 ChipLogError(Zcl, "CurrentInput is not stored successfully, err:0x%x", to_underlying(status));
             }
             return true;
@@ -125,8 +125,8 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate, endpoint=%x", endpoint);
 
-    gMediaInputManagerInstance[endpoint] = std::make_unique<MediaInputManager>(endpoint); 
-    
+    gMediaInputManagerInstance[endpoint] = std::make_unique<MediaInputManager>(endpoint);
+
     chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, gMediaInputManagerInstance[endpoint].get());
 
 }

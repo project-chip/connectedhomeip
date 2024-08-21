@@ -100,16 +100,16 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
         return CHIP_NO_ERROR;
     });
 }
-    
+
 CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
 {
     mCurrentState  = currentState;
 
     Status status = Attributes::CurrentState::Set(mEndpoint, currentState);
-    
+
     if (Status::Success != status) {
         ChipLogError(Zcl, "Unable to save CurrentState attribute, 0x%x", to_underlying(status));
-    }  
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -117,12 +117,12 @@ CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::Medi
 CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
 {
     mPlaybackSpeed = playbackSpeed;
-    
+
     Status status = Attributes::PlaybackSpeed::Set(mEndpoint, playbackSpeed);
-    
+
     if (Status::Success != status) {
         ChipLogError(Zcl, "Unable to set PlaybackSpeed attribute, 0x%x", to_underlying(status));
-    }  
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -374,7 +374,7 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate, endpoint=%x", endpoint);
 
-    gMediaPlaybackManagerInstance[endpoint] = std::make_unique<MediaPlaybackManager>(endpoint); 
+    gMediaPlaybackManagerInstance[endpoint] = std::make_unique<MediaPlaybackManager>(endpoint);
 
     chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, gMediaPlaybackManagerInstance[endpoint].get());
 }
