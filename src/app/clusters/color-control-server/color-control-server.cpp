@@ -1020,7 +1020,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     colorHueTransitionState->initialEnhancedHue = startHue;
 
-    if (direction == to_underlying(ColorLoopDirection::IncrementHue))
+    if (direction == to_underlying(ColorLoopDirectionEnum::kIncrement))
     {
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -1029,7 +1029,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::IncrementHue));
+    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirectionEnum::kIncrement));
     colorHueTransitionState->repeat = true;
 
     colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
@@ -1507,7 +1507,7 @@ exit:
  * @return false Failed
  */
 bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          uint16_t hue, HueDirection moveDirection, uint16_t transitionTime,
+                                          uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime,
                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride,
                                           bool isEnhanced)
 {
@@ -1516,7 +1516,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
 
     Status status       = Status::Success;
     uint16_t currentHue = 0;
-    HueDirection direction;
+    DirectionEnum direction;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
 
@@ -1545,33 +1545,33 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     // Convert the ShortestDistance/LongestDistance moveDirection values into Up/Down.
     switch (moveDirection)
     {
-    case HueDirection::kShortest:
+    case DirectionEnum::kShortest:
         if ((isEnhanced && (static_cast<uint16_t>(currentHue - hue) > HALF_MAX_UINT16T)) ||
             (!isEnhanced && (static_cast<uint8_t>(currentHue - hue) > HALF_MAX_UINT8T)))
         {
-            direction = HueDirection::kUp;
+            direction = DirectionEnum::kUp;
         }
         else
         {
-            direction = HueDirection::kDown;
+            direction = DirectionEnum::kDown;
         }
         break;
-    case HueDirection::kLongest:
+    case DirectionEnum::kLongest:
         if ((isEnhanced && (static_cast<uint16_t>(currentHue - hue) > HALF_MAX_UINT16T)) ||
             (!isEnhanced && (static_cast<uint8_t>(currentHue - hue) > HALF_MAX_UINT8T)))
         {
-            direction = HueDirection::kDown;
+            direction = DirectionEnum::kDown;
         }
         else
         {
-            direction = HueDirection::kUp;
+            direction = DirectionEnum::kUp;
         }
         break;
-    case HueDirection::kUp:
-    case HueDirection::kDown:
+    case DirectionEnum::kUp:
+    case DirectionEnum::kDown:
         direction = moveDirection;
         break;
-    case HueDirection::kUnknownEnumValue:
+    case DirectionEnum::kUnknownEnumValue:
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
         /* No default case, so if a new direction value gets added we will just fail
@@ -1614,7 +1614,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->transitionTime = transitionTime;
     colorHueTransitionState->endpoint       = endpoint;
-    colorHueTransitionState->up             = (direction == HueDirection::kUp);
+    colorHueTransitionState->up             = (direction == DirectionEnum::kUp);
     colorHueTransitionState->repeat         = false;
 
     SetHSVRemainingTime(endpoint);
@@ -1995,10 +1995,10 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->up                 = (direction == ColorLoopDirection::kIncrement);
+            colorHueTransitionState->up                 = (direction == ColorLoopDirectionEnum::kIncrement);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
-            if (direction == ColorLoopDirection::kIncrement)
+            if (direction == ColorLoopDirectionEnum::kIncrement)
             {
                 colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
