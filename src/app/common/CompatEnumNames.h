@@ -82,14 +82,43 @@ using LevelControlOptions = OptionsBitmap;
 
 namespace ColorControl {
 // https://github.com/project-chip/connectedhomeip/pull/33612 renamed this
-using ColorMode            = ColorModeEnum;
+enum class ColorMode : uint8_t
+{
+    kCurrentHueAndCurrentSaturation = ColorModeEnum::kCurrentHueAndCurrentSaturation
+    kCurrentXAndCurrentY            = ColorModeEnum::kCurrentXAndCurrentY
+    kColorTemperature               = ColorModeEnum::kColorTemperatureMireds
+    kUnknownEnumValue               = ColorModeEnum::kUnknownEnumValue
+};
+
+enum class HueDirection : uint8_t
+{
+    ShortestDistance   = DirectionEnum::kShortest
+    LongestDistance    = DirectionEnum::kLongest 
+    Up                 = DirectionEnum::kUp
+    Down               = DirectionEnum::kDown
+    kUnknownEnumValue  = DirectionEnum::kUnknownEnumValue
+};
+
+enum class ColorCapabilities : uint16_t
+{
+    ColorLoopSupported        = ColorCapabilitiesBitmap::kColorLoop
+    ColorTemperatureSupported = ColorCapabilitiesBitmap::kColorTemperature
+    EnhancedHueSupported      = ColorCapabilitiesBitmap::kEnhancedHue
+    HueSaturationSupported    = ColorCapabilitiesBitmap::kHueSaturation
+    XYAttributesSupported     = ColorCapabilitiesBitmap::kXy
+};
+
+enum class ColorLoopDirection : uint8_t
+{
+   DecrementHue      = ColorLoopDirectionEnum::kDecrement
+   IncrementHue      = ColorLoopDirectionEnum::kIncrement
+   kUnknownEnumValue = ColorLoopDirectionEnum::kUnknownEnumValue 
+};
+
 using EnhancedColorMode    = EnhancedColorModeEnum;
-using ColorCapabilities    = ColorCapabilitiesBitmap;
 using ColorLoopUpdateFlags = UpdateFlagsBitmap;
 using ColorLoopAction      = ColorLoopActionEnum;
-using ColorLoopDirection   = ColorLoopDirectionEnum;
 using HueMoveMode          = MoveModeEnum;
-using HueDirection         = DirectionEnum;
 using HueStepMode          = StepModeEnum;
 using SaturationMoveMode   = MoveModeEnum;
 using SaturationStepMode   = StepModeEnum;
