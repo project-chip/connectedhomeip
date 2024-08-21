@@ -256,9 +256,11 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     InterfaceId intId;
 
     // EndPoint
-    UDPEndPoint * testUDPEP  = nullptr;
+    UDPEndPoint * testUDPEP = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP1 = nullptr;
-    PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    PacketBufferHandle buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
 
     // init all the EndPoints
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
@@ -266,10 +268,12 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     ASSERT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     err = gTCP.NewEndPoint(&testTCPEP1);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
+    EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 1));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
 
@@ -323,6 +327,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     testUDPEP->Free();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // TcpEndPoint special cases to cover the error branch
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
@@ -362,6 +367,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     testTCPEP1->Free();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -369,7 +375,9 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
 TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 {
     UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -388,6 +396,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     const int udpHighWaterMark = udpCount;
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
@@ -402,6 +411,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     }
     const int tcpHighWaterMark = tcpCount;
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool

@@ -101,9 +101,6 @@ public:
     /**
      * @brief Validate a commission node command.
      *
-     * This command is sent by a client to request that the server begins commissioning a previously
-     * approved request.
-     *
      * The server SHALL return FAILURE if the CommissionNode command is not sent from the same
      * NodeId as the RequestCommissioningApproval or if the provided RequestId to CommissionNode
      * does not match the value provided to RequestCommissioningApproval.
@@ -128,19 +125,17 @@ public:
     virtual CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) = 0;
 
     /**
-     * @brief Reverse the commission node process.
+     * @brief Handle a commission node request.
      *
-     * When received within the timeout specified by CommissionNode, the client SHALL open a
-     * commissioning window on the node which the client called RequestCommissioningApproval to
-     * have commissioned.
+     * Commission a node specified by the previously approved request.
      *
      * @param params The parameters for the commissioning window.
      * @param ipAddress Optional IP address for the commissioning window.
      * @param port Optional port for the commissioning window.
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
-    virtual CHIP_ERROR ReverseCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                             const Optional<uint16_t> & port) = 0;
+    virtual CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
+                                            const Optional<uint16_t> & port) = 0;
 
     virtual ~Delegate() = default;
 };

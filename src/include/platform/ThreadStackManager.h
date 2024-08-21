@@ -105,6 +105,7 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR GetThreadVersion(uint16_t & version);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
@@ -442,6 +443,11 @@ inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
+}
+
+inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
