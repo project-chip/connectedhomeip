@@ -109,10 +109,12 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
                                            const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
     {
         areaDesc.locationInfo.SetNonNull();
-        // Copy the name
-        auto areaNameSpan = MutableCharSpan(mAreaNameBuffer, kAreaNameMaxSize);
-        CopyCharSpanToMutableCharSpan(locationName, areaNameSpan);
-        areaDesc.locationInfo.Value().locationName = CharSpan(areaNameSpan.data(), areaNameSpan.size());
+
+        // Copy the name. If the name is larger than kAreaNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kAreaNameMaxSize, locationName.size());
+        memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
+        areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
+
         areaDesc.locationInfo.Value().floorNumber  = floorNumber;
         areaDesc.locationInfo.Value().areaType     = areaType;
 
@@ -321,9 +323,10 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
         mapID            = aMapId;
-        auto mapNameSpan = MutableCharSpan(mMapNameBuffer, kMapNameMaxSize);
-        CopyCharSpanToMutableCharSpan(aMapName, mapNameSpan);
-        name = CharSpan(mapNameSpan.data(), mapNameSpan.size());
+        // Copy the name. If the name is larger than kMapNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kMapNameMaxSize, aMapName.size());
+        memcpy(mMapNameBuffer, aMapName.data(), sizeToCopy);
+        name = CharSpan(mMapNameBuffer, sizeToCopy);
     }
 
     /**
