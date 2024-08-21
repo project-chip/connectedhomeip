@@ -47,7 +47,7 @@ class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
-        chip::NodeId nodeId = clientInfo.peer_node.GetNodeId();
+        NodeId nodeId = clientInfo.peer_node.GetNodeId();
         auto it             = mPendingCheckIn.find(nodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
 
@@ -190,7 +190,7 @@ private:
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
     // otherwise we would need a mutex protecting this data to prevent race as this
     // data is accessible by both RPC thread and Matter eventloop.
-    std::unordered_map<chip::NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
+    std::unordered_map<NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
 };
 
 FabricAdmin fabric_admin_service;
