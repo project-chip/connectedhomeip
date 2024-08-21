@@ -80,8 +80,8 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         mDelegate->InitMessageReceived(this, event.transferInitData);
         break;
     case TransferSession::OutputEventType::kStatusReceived:
-        ChipLogError(BDX, "Received StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
-        EndSession(CHIP_ERROR_INTERNAL);
+        ChipLogError(BDX, "Received StatusReport %x", ::chip::to_underlying(event.statusData.statusCode));
+        EndSession(ChipError(ChipError::SdkPart::kIMClusterStatus, ::chip::to_underlying(event.statusData.statusCode)));
         break;
     case TransferSession::OutputEventType::kInternalError:
         EndSession(CHIP_ERROR_INTERNAL);
