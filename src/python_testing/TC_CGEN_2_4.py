@@ -38,6 +38,7 @@ import chip.FabricAdmin
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
+from chip.native import PyChipError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -78,7 +79,7 @@ class TC_CGEN_2_4(MatterBaseTest):
             await self.th2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        errcode = ctx.exception.chip_error
+        errcode = PyChipError.from_code(ctx.exception.err)
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
         asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()

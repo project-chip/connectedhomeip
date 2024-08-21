@@ -4386,7 +4386,7 @@ cluster ElectricalEnergyMeasurement = 145 {
 
 /** This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management. */
 provisional cluster WaterHeaterManagement = 148 {
-  revision 1;
+  revision 2;
 
   enum BoostStateEnum : enum8 {
     kInactive = 0;
@@ -4398,7 +4398,7 @@ provisional cluster WaterHeaterManagement = 148 {
     kTankPercent = 0x2;
   }
 
-  bitmap WaterHeaterDemandBitmap : bitmap8 {
+  bitmap WaterHeaterHeatSourceBitmap : bitmap8 {
     kImmersionElement1 = 0x1;
     kImmersionElement2 = 0x2;
     kHeatPump = 0x4;
@@ -4406,16 +4406,24 @@ provisional cluster WaterHeaterManagement = 148 {
     kOther = 0x10;
   }
 
-  bitmap WaterHeaterTypeBitmap : bitmap8 {
-    kImmersionElement1 = 0x1;
-    kImmersionElement2 = 0x2;
-    kHeatPump = 0x4;
-    kBoiler = 0x8;
-    kOther = 0x10;
+  struct WaterHeaterBoostInfoStruct {
+    elapsed_s duration = 0;
+    optional boolean oneShot = 1;
+    optional boolean emergencyBoost = 2;
+    optional temperature temporarySetpoint = 3;
+    optional percent targetPercentage = 4;
+    optional percent targetReheat = 5;
   }
 
-  readonly attribute WaterHeaterTypeBitmap heaterTypes = 0;
-  readonly attribute WaterHeaterDemandBitmap heatDemand = 1;
+  info event BoostStarted = 0 {
+    WaterHeaterBoostInfoStruct boostInfo = 0;
+  }
+
+  info event BoostEnded = 1 {
+  }
+
+  readonly attribute WaterHeaterHeatSourceBitmap heaterTypes = 0;
+  readonly attribute WaterHeaterHeatSourceBitmap heatDemand = 1;
   readonly attribute optional int16u tankVolume = 2;
   readonly attribute optional energy_mwh estimatedHeatRequired = 3;
   readonly attribute optional percent tankPercentage = 4;
@@ -4428,12 +4436,7 @@ provisional cluster WaterHeaterManagement = 148 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct BoostRequest {
-    elapsed_s duration = 0;
-    optional boolean oneShot = 1;
-    optional boolean emergencyBoost = 2;
-    optional temperature temporarySetpoint = 3;
-    optional percent targetPercentage = 4;
-    optional percent targetReheat = 5;
+    WaterHeaterBoostInfoStruct boostInfo = 0;
   }
 
   /** Allows a client to request that the water heater is put into a Boost state. */
@@ -9068,7 +9071,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0123;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;
