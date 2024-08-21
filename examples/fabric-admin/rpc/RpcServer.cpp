@@ -60,7 +60,7 @@ public:
         if (timeNow > checkInData.mRequestExpiryTimestamp)
         {
             ChipLogError(NotSpecified,
-                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped");
+                         "ICD check-in for device we have been waiting, came after KeepActive expiry. Reqeust dropped for Node ID: 0x%lx", nodeId);
             return;
         }
 
@@ -188,7 +188,9 @@ private:
     }
 
     // Modifications to mPendingCheckIn should be done on the MatterEventLoop thread
-    std::map<chip::NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
+    // otherwise we would need a mutex protecting this data to prevent race as this
+    // data is accessible by both RPC thread and Matter eventloop.
+    std::unordered_map<chip::NodeId, KeepActiveDataForCheckIn> mPendingCheckIn;
 };
 
 FabricAdmin fabric_admin_service;
