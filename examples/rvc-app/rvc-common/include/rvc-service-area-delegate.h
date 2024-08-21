@@ -21,7 +21,7 @@
 #include <app/clusters/service-area-server/service-area-server.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <utility>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -30,7 +30,7 @@ namespace Clusters {
 class RvcDevice;
 
 typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan & statusText);
-typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+typedef bool (RvcDevice::*HandleSkipAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
 
 namespace ServiceArea {
@@ -46,8 +46,8 @@ private:
 
     RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
     IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
-    RvcDevice * mHandleSkipCurrentAreaDeviceInstance;
-    HandleSkipCurrentAreaCallback mHandleSkipCurrentAreaCallback;
+    RvcDevice * mHandleSkipAreaDeviceInstance;
+    HandleSkipAreaCallback mHandleSkipAreaCallback;
     RvcDevice * mIsSupportedAreasChangeAllowedDeviceInstance;
     IsChangeAllowedSimpleCallback mIsSupportedAreasChangeAllowedCallback;
     RvcDevice * mIsSupportedMapChangeAllowedDeviceInstance;
@@ -63,6 +63,7 @@ private:
     const uint32_t supportedAreaID_C = 10050;
     const uint32_t supportedAreaID_D = 0x88888888;
 
+public:
     /**
      * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
      */
@@ -73,7 +74,6 @@ private:
      */
     void SetNoMapTopology();
 
-public:
     CHIP_ERROR Init() override;
 
     // command support
@@ -82,7 +82,7 @@ public:
     bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
                                ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan & statusText) override;
 
-    bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
+    bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
     //*************************************************************************
     // Supported Areas accessors
@@ -101,6 +101,18 @@ public:
 
     bool ClearSupportedAreas() override;
 
+    /**
+     * This is a more sophisticated way of ensuring that we all attributes are still valid when a supported area is removed.
+     * Rather than clearing all the attributes that depend on the supported aeras, we only remove the elements that point to
+     * the removed supported areas.
+     */
+    void HandleSupportedAreasUpdated() override;
+
+    /**
+     * Note: Call the HandleSupportedAreasUpdated() method when finished removing supported areas.
+     */
+    bool RemoveSupportedArea(uint32_t areaId);
+
     //*************************************************************************
     // Supported Maps accessors
 
@@ -117,6 +129,8 @@ public:
     bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
 
     bool ClearSupportedMaps() override;
+
+    bool RemoveSupportedMap(uint32_t mapId);
 
     //*************************************************************************
     // Selected Areas accessors
@@ -155,10 +169,10 @@ public:
         mIsSetSelectedAreasAllowedDeviceInstance = instance;
     }
 
-    void SetHandleSkipCurrentAreaCallback(HandleSkipCurrentAreaCallback callback, RvcDevice * instance)
+    void SetHandleSkipAreaCallback(HandleSkipAreaCallback callback, RvcDevice * instance)
     {
-        mHandleSkipCurrentAreaCallback       = callback;
-        mHandleSkipCurrentAreaDeviceInstance = instance;
+        mHandleSkipAreaCallback       = callback;
+        mHandleSkipAreaDeviceInstance = instance;
     }
 
     void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)

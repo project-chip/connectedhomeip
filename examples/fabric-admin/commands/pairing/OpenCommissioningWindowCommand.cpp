@@ -55,6 +55,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
                                                               .SetTimeout(mCommissioningWindowTimeout)
                                                               .SetIteration(mIteration)
                                                               .SetDiscriminator(mDiscriminator)
+                                                              .SetSetupPIN(mSetupPIN)
                                                               .SetSalt(mSalt)
                                                               .SetReadVIDPIDAttributes(true)
                                                               .SetCallback(&mOnOpenCommissioningWindowCallback),
