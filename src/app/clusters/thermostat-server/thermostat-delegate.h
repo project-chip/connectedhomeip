@@ -39,15 +39,12 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * @brief Get the maximum timeout for atomically writing to a set of attributes
+     * @brief Get the maximum timeout for atomically writing to an attribute
      *
-     * @param[in] attributeRequests The list of attributes to write to.
-     * @param[out] timeoutRequest The timeout proposed by the client.
-     * @return The maximum allowed timeout; zero if the request is invalid.
+     * @param[in] attributeId The attribute to write to.
+     * @return The maximum allowed timeout; nullopt if the request is invalid.
      */
-    virtual std::optional<System::Clock::Milliseconds16>
-    GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
-                          System::Clock::Milliseconds16 timeoutRequest) = 0;
+    virtual std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
 
     /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
@@ -130,7 +127,7 @@ public:
      * @return CHIP_ERROR if the updates to the presets attribute failed to commit for some reason.
      *
      */
-    virtual CHIP_ERROR ApplyPendingPresets() = 0;
+    virtual CHIP_ERROR CommitPendingPresets() = 0;
 
     /**
      * @brief Clears the pending presets list.
