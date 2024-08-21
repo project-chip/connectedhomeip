@@ -47,6 +47,8 @@ class FabricAdmin final : public rpc::FabricAdmin, public IcdManager::Delegate
 public:
     void OnCheckInCompleted(const chip::app::ICDClientInfo & clientInfo) override
     {
+        // Needs for accessing mPendingCheckIn
+        assertChipStackLockedByCurrentThread();
         NodeId nodeId = clientInfo.peer_node.GetNodeId();
         auto it       = mPendingCheckIn.find(nodeId);
         VerifyOrReturn(it != mPendingCheckIn.end());
@@ -155,6 +157,8 @@ public:
 
     void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
     {
+        // Needs for accessing mPendingCheckIn
+        assertChipStackLockedByCurrentThread();
 
         auto timeNow = System::SystemClock().GetMonotonicTimestamp();
         // Spec says we should expire the request 60 mins after we get it
