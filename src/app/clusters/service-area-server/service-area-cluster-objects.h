@@ -115,8 +115,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
         areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
 
-        areaDesc.locationInfo.Value().floorNumber  = floorNumber;
-        areaDesc.locationInfo.Value().areaType     = areaType;
+        areaDesc.locationInfo.Value().floorNumber = floorNumber;
+        areaDesc.locationInfo.Value().areaType    = areaType;
 
         return *this;
     }
@@ -322,7 +322,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      */
     void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
-        mapID            = aMapId;
+        mapID = aMapId;
         // Copy the name. If the name is larger than kMapNameMaxSize, truncate it to fit.
         auto sizeToCopy = std::min(kMapNameMaxSize, aMapName.size());
         memcpy(mMapNameBuffer, aMapName.data(), sizeToCopy);
