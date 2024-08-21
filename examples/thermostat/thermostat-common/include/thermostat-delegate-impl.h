@@ -44,9 +44,7 @@ class ThermostatDelegate : public Delegate
 public:
     static inline ThermostatDelegate & GetInstance() { return sInstance; }
 
-    std::optional<System::Clock::Milliseconds16>
-    GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                          System::Clock::Milliseconds16 timeoutRequest) override;
+    std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) override;
 
     CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
 
@@ -64,7 +62,7 @@ public:
 
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
 
-    CHIP_ERROR ApplyPendingPresets() override;
+    CHIP_ERROR CommitPendingPresets() override;
 
     void ClearPendingPresetList() override;
 
