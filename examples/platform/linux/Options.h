@@ -88,7 +88,8 @@ struct LinuxDeviceOptions
     int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> accessRestrictionEntries;
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

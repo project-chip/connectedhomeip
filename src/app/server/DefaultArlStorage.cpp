@@ -101,7 +101,7 @@ public:
         // first clear out any existing entries
         CHIP_ERROR err;
         size_t index = 0;
-        for (size_t index = 0; /**/; ++index)
+        for (index = 0; /**/; ++index)
         {
             err = mPersistentStorage->SyncDeleteKeyValue(
                 DefaultStorageKeyAllocator::AccessControlArlEntry(fabricIndex, index).KeyName());
@@ -114,6 +114,7 @@ public:
         const std::vector<Entry> * entries;
         SuccessOrExit(err = GetAccessControl().GetAccessRestrictionProvider()->GetEntries(fabricIndex, entries));
         VerifyOrExit(entries != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        index = 0;
         for (auto & entry : *entries)
         {
             uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
@@ -209,7 +210,7 @@ CHIP_ERROR DefaultArlStorage::Init(PersistentStorageDelegate & persistentStorage
             entries.push_back(decodableEntry.GetEntry());
             count++;
         }
-        GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabric, commissioningEntries);
+        GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabric, entries);
     }
 
     ChipLogProgress(DataManagement, "DefaultArlStorage: %u commissioning entries loaded, %u fabric entries loaded",

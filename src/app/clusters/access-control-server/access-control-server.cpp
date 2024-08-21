@@ -481,7 +481,7 @@ CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & 
 
         for (auto & entry : entries)
         {
-            ArlStorage::EncodableEntry encodableEntry(entry);
+            ArlStorage::CommissioningEncodableEntry encodableEntry(entry);
             ReturnErrorOnFailure(encoder.Encode(encodableEntry));
         }
         return CHIP_NO_ERROR;

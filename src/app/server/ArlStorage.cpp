@@ -74,6 +74,53 @@ CHIP_ERROR Convert(AccessRestrictionProvider::Type from, StagingRestrictionType 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ParseRestrictions(const chip::app::DataModel::DecodableList<Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType> & source,
+                             std::vector<AccessRestrictionProvider::Restriction> & destination)
+{
+    auto iterator = source.begin();
+    while (iterator.Next())
+    {
+        auto & tmp = iterator.GetValue();
+        AccessRestrictionProvider::Restriction restriction;
+        ReturnErrorOnFailure(Convert(tmp.type, restriction.restrictionType));
+
+        if (!tmp.id.IsNull())
+        {
+            restriction.id.SetValue(tmp.id.Value());
+        }
+
+        destination.push_back(restriction);
+    }
+    ReturnErrorOnFailure(iterator.GetStatus());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StageEntryRestrictions(const std::vector<AccessRestrictionProvider::Restriction> & source,
+                                  StagingRestriction destination[], size_t destinationCount)
+{
+    size_t count = source.size();
+    if (count > 0 && count <= destinationCount)
+    {
+        for (size_t i = 0; i < count; i++)
+        {
+            auto restriction = source[i];
+            ReturnErrorOnFailure(Convert(restriction.restrictionType, destination[i].type));
+
+            if (restriction.id.HasValue())
+            {
+                destination[i].id.SetNonNull(restriction.id.Value());
+            }
+        }
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 namespace chip {
@@ -86,23 +133,14 @@ CHIP_ERROR ArlStorage::DecodableEntry::Decode(TLV::TLVReader & reader)
     mEntry.fabricIndex    = mStagingEntry.GetFabricIndex();
     mEntry.endpointNumber = mStagingEntry.endpoint;
     mEntry.clusterId      = mStagingEntry.cluster;
+    ReturnErrorOnFailure(ParseRestrictions(mStagingEntry.restrictions, mEntry.restrictions));
+    return CHIP_NO_ERROR;
+}
 
-    auto iterator = mStagingEntry.restrictions.begin();
-    while (iterator.Next())
-    {
-        auto & tmp = iterator.GetValue();
-        AccessRestrictionProvider::Restriction restriction;
-        ReturnErrorOnFailure(Convert(tmp.type, restriction.restrictionType));
-
-        if (!tmp.id.IsNull())
-        {
-            restriction.id.SetValue(tmp.id.Value());
-        }
-
-        mEntry.restrictions.push_back(restriction);
-    }
-    ReturnErrorOnFailure(iterator.GetStatus());
-
+CHIP_ERROR ArlStorage::CommissioningEncodableEntry::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    ReturnErrorOnFailure(Stage());
+    ReturnErrorOnFailure(mStagingEntry.Encode(writer, tag));
     return CHIP_NO_ERROR;
 }
 
@@ -120,36 +158,23 @@ CHIP_ERROR ArlStorage::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, T
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ArlStorage::CommissioningEncodableEntry::Stage() const
+{
+    mStagingEntry.endpoint    = mEntry.endpointNumber;
+    mStagingEntry.cluster     = mEntry.clusterId;
+    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions, sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
+    mStagingEntry.restrictions = Span<StagingRestriction>(mStagingRestrictions, mEntry.restrictions.size());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ArlStorage::EncodableEntry::Stage() const
 {
     mStagingEntry.fabricIndex = mEntry.fabricIndex;
     mStagingEntry.endpoint    = mEntry.endpointNumber;
     mStagingEntry.cluster     = mEntry.clusterId;
-
-    {
-        size_t count = mEntry.restrictions.size();
-        if (count > 0 && count <= CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY)
-        {
-            for (size_t i = 0; i < count; i++)
-            {
-                auto restriction = mEntry.restrictions[i];
-                StagingRestriction tmp;
-                ReturnErrorOnFailure(Convert(restriction.restrictionType, tmp.type));
-
-                if (restriction.id.HasValue())
-                {
-                    tmp.id.SetNonNull(restriction.id.Value());
-                }
-
-                mStagingRestrictions[i] = tmp;
-            }
-            mStagingEntry.restrictions = Span<StagingRestriction>(mStagingRestrictions, count);
-        }
-        else
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
+    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions, sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
+    mStagingEntry.restrictions = Span<StagingRestriction>(mStagingRestrictions, mEntry.restrictions.size());
 
     return CHIP_NO_ERROR;
 }

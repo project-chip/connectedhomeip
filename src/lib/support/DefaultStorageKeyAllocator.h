@@ -132,7 +132,7 @@ public:
 
     static StorageKeyName AccessControlCommissioningArlEntry(size_t index)
     {
-        return StorageKeyName::Formatted("g/car/0/%x", static_cast<unsigned>(index));
+        return StorageKeyName::Formatted("g/car/%x", static_cast<unsigned>(index));
     }
 
     static StorageKeyName AccessControlArlEntry(FabricIndex fabric, size_t index)

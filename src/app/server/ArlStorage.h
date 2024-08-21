@@ -43,6 +43,41 @@ class ArlStorage
 {
 public:
     /**
+     * Used for decoding commissioning access restriction entries.
+     *
+     * Typically used temporarily on the stack to decode:
+     * - source: TLV
+     * - staging: generated cluster level code
+     * - destination: system level access restriction entry
+     */
+    class CommissioningDecodableEntry
+    {
+        using Entry        = Access::AccessRestrictionProvider::Entry;
+        using StagingEntry = Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::DecodableType;
+
+    public:
+        CommissioningDecodableEntry() = default;
+
+        /**
+         * Reader decodes into a staging entry, which is then unstaged
+         * into a member entry.
+         */
+        CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+        Entry & GetEntry() { return mEntry; }
+
+        const Entry & GetEntry() const { return mEntry; }
+
+    public:
+        static constexpr bool kIsFabricScoped = false;
+
+    private:
+        Entry mEntry;
+
+        StagingEntry mStagingEntry;
+    };
+
+    /**
      * Used for decoding access restriction entries.
      *
      * Typically used temporarily on the stack to decode:
@@ -77,6 +112,48 @@ public:
         Entry mEntry;
 
         StagingEntry mStagingEntry;
+    };
+
+    /**
+     * Used for encoding commissionable access restriction entries.
+     *
+     * Typically used temporarily on the stack to encode:
+     * - source: system level access restriction entry
+     * - staging: generated cluster level code
+     * - destination: TLV
+     */
+    class CommissioningEncodableEntry
+    {
+        using Entry              = Access::AccessRestrictionProvider::Entry;
+        using StagingEntry       = Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type;
+        using StagingRestriction = Clusters::AccessControl::Structs::AccessRestrictionStruct::Type;
+
+    public:
+        CommissioningEncodableEntry(const Entry & entry) : mEntry(entry) {}
+
+        /**
+         * Constructor-provided entry is staged into a staging entry,
+         * which is then encoded into a writer.
+         */
+        CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+        /**
+         * Constructor-provided entry is staged into a staging entry.
+         */
+        CHIP_ERROR Stage() const;
+
+        StagingEntry & GetStagingEntry() { return mStagingEntry; }
+
+        const StagingEntry & GetStagingEntry() const { return mStagingEntry; }
+
+    public:
+        static constexpr bool kIsFabricScoped = false;
+
+    private:
+        Entry mEntry;
+
+        mutable StagingEntry mStagingEntry;
+        mutable StagingRestriction mStagingRestrictions[CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY];
     };
 
     /**

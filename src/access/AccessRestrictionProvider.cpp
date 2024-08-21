@@ -85,11 +85,18 @@ CHIP_ERROR AccessRestrictionProvider::SetCommissioningEntries(const std::vector<
 
     mCommissioningEntries = entries;
 
+    for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+    {
+        listener->CommissioningRestrictionListChanged();
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, const std::vector<Entry> & entries)
 {
+    std::vector<Entry> updatedEntries;
+
     // check that the input entries are valid
     for (auto & entry : entries)
     {
@@ -98,7 +105,13 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
             ChipLogError(DataManagement, "AccessRestrictionProvider: invalid entry");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
+
+        Entry updatedEntry = entry;
+        updatedEntry.fabricIndex = fabricIndex;
+        updatedEntries.push_back(updatedEntry);
     }
+
+    mFabricEntries[fabricIndex] = std::move(updatedEntries);
 
     for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
     {

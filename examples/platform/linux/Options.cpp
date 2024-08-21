@@ -89,7 +89,8 @@ enum
     kDeviceOption_TraceLog,
     kDeviceOption_TraceDecode,
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    kDeviceOption_UseAccessRestrictions,
+    kDeviceOption_CommissioningArlEntries,
+    kDeviceOption_ArlEntries,
 #endif
     kOptionCSRResponseCSRIncorrectType,
     kOptionCSRResponseCSRNonceIncorrectType,
@@ -164,7 +165,8 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    { "enable-access-restrictions", kArgumentRequired, kDeviceOption_UseAccessRestrictions },
+    { "commissioning-arl-entries", kArgumentRequired, kDeviceOption_CommissioningArlEntries },
+    { "arl-entries", kArgumentRequired, kDeviceOption_ArlEntries },
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
     { "cert_error_csr_existing_keypair", kNoArgument, kOptionCSRResponseCSRExistingKeyPair },
@@ -293,9 +295,12 @@ const char * sDeviceOptionHelp =
     "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    "  --enable-access-restrictions <CommissioningARL JSON>\n"
-    "       Enable ACL cluster access restrictions with the provided JSON CommissioningARL. Example:\n"
-    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 2,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 3}]}]\"\n"
+    "  --commissioning-arl-entries <CommissioningARL JSON>\n"
+    "       Enable ACL cluster access restrictions used during commissioning with the provided JSON. Example:\n"
+    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 1105,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 0}]}]\"\n"
+    "  --arl-entries <ARL JSON>\n"
+    "       Enable ACL cluster access restrictions applied to fabric index 1 with the provided JSON. Example:\n"
+    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 1105,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 0}]}]\"\n"
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     "  --cert_error_csr_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSR type.\n"
@@ -580,12 +585,21 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    case kDeviceOption_UseAccessRestrictions: {
-        std::vector<AccessRestrictionProvider::Entry> accessRestrictionEntries;
-        retval = ParseAccessRestrictionEntriesFromJson(aValue, accessRestrictionEntries);
+    case kDeviceOption_CommissioningArlEntries: {
+        std::vector<AccessRestrictionProvider::Entry> entries;
+        retval = ParseAccessRestrictionEntriesFromJson(aValue, entries);
         if (retval)
         {
-            LinuxDeviceOptions::GetInstance().accessRestrictionEntries.SetValue(std::move(accessRestrictionEntries));
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.SetValue(std::move(entries));
+        }
+    }
+    break;
+    case kDeviceOption_ArlEntries: {
+        std::vector<AccessRestrictionProvider::Entry> entries;
+        retval = ParseAccessRestrictionEntriesFromJson(aValue, entries);
+        if (retval)
+        {
+            LinuxDeviceOptions::GetInstance().arlEntries.SetValue(std::move(entries));
         }
     }
     break;
