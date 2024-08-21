@@ -79,6 +79,8 @@
 
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
+        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {

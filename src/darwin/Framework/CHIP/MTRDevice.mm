@@ -491,6 +491,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _delegates = [NSMutableSet set];
+        _deviceController = controller;
+        _nodeID = nodeID;
     }
 
     return self;
