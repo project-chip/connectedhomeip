@@ -205,7 +205,8 @@ private:
     }
 
     static CHIP_ERROR LogAcceptedCommandId(const char * label, size_t indent,
-                                   const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
+                                           const chip::app::DataModel::DecodableList<chip::CommandId> & value,
+                                           chip::ClusterId cluster)
     {
         size_t count = 0;
         ReturnErrorOnFailure(value.ComputeSize(&count));
@@ -228,7 +229,8 @@ private:
     }
 
     static CHIP_ERROR LogGeneratedCommandId(const char * label, size_t indent,
-                                   const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
+                                            const chip::app::DataModel::DecodableList<chip::CommandId> & value,
+                                            chip::ClusterId cluster)
     {
         size_t count = 0;
         ReturnErrorOnFailure(value.ComputeSize(&count));
