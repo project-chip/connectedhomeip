@@ -204,7 +204,7 @@ private:
         return iter.GetStatus();
     }
 
-    static CHIP_ERROR LogCommandId(const char * label, size_t indent,
+    static CHIP_ERROR LogAcceptedCommandId(const char * label, size_t indent,
                                    const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
     {
         size_t count = 0;
@@ -217,7 +217,30 @@ private:
         {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
-            std::string item  = std::to_string(iter.GetValue()) + " (" + CommandIdToText(cluster, iter.GetValue()) + ")";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + AcceptedCommandIdToText(cluster, iter.GetValue()) + ")";
+            DataModelLogger::LogString(index, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
+    static CHIP_ERROR LogGeneratedCommandId(const char * label, size_t indent,
+                                   const chip::app::DataModel::DecodableList<chip::CommandId> & value, chip::ClusterId cluster)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string index = std::string("[") + std::to_string(i) + "]";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + GeneratedCommandIdToText(cluster, iter.GetValue()) + ")";
             DataModelLogger::LogString(index, indent + 1, item);
         }
         if (iter.GetStatus() != CHIP_NO_ERROR)

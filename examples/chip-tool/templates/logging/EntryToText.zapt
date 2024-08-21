@@ -8,4 +8,6 @@ char const * ClusterIdToText(chip::ClusterId id);
 
 char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id);
 
-char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id);
+char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id);
+
+char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId id);

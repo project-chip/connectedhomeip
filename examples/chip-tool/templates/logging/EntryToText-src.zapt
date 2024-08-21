@@ -37,7 +37,7 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id) {
 	}
 }
 
-char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
+char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
 	switch(cluster)
 	{
 {{#zcl_clusters}}
@@ -55,6 +55,29 @@ char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
 		}
 {{/last}}
 {{/zcl_commands_source_client}}
+{{/zcl_clusters}}
+		default: return "Unknown";
+	}
+}
+
+char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
+	switch(cluster)
+	{
+{{#zcl_clusters}}
+{{#zcl_commands_source_server}}
+{{#first}}
+		case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id:
+		{
+			switch(id)
+			{
+{{/first}}
+				case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id: return "{{asUpperCamelCase name}}";
+{{#last}}
+				default: return "Unknown";
+			}
+		}
+{{/last}}
+{{/zcl_commands_source_server}}
 {{/zcl_clusters}}
 		default: return "Unknown";
 	}
