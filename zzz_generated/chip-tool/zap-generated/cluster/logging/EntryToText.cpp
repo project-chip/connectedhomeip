@@ -5041,7 +5041,7 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     }
 }
 
-char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id)
+char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id)
 {
     switch (cluster)
     {
@@ -6193,6 +6193,503 @@ char const * CommandIdToText(chip::ClusterId cluster, chip::CommandId id)
             return "Ping";
         case chip::app::Clusters::SampleMei::Commands::AddArguments::Id:
             return "AddArguments";
+        default:
+            return "Unknown";
+        }
+    }
+    default:
+        return "Unknown";
+    }
+}
+
+char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId id)
+{
+    switch (cluster)
+    {
+    case chip::app::Clusters::Groups::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groups::Commands::AddGroupResponse::Id:
+            return "AddGroupResponse";
+        case chip::app::Clusters::Groups::Commands::ViewGroupResponse::Id:
+            return "ViewGroupResponse";
+        case chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::Id:
+            return "GetGroupMembershipResponse";
+        case chip::app::Clusters::Groups::Commands::RemoveGroupResponse::Id:
+            return "RemoveGroupResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AccessControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Id:
+            return "ReviewFabricRestrictionsResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::OtaSoftwareUpdateProvider::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id:
+            return "QueryImageResponse";
+        case chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id:
+            return "ApplyUpdateResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::GeneralCommissioning::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::Id:
+            return "ArmFailSafeResponse";
+        case chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::Id:
+            return "SetRegulatoryConfigResponse";
+        case chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::Id:
+            return "CommissioningCompleteResponse";
+        case chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::Id:
+            return "SetTCAcknowledgementsResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkCommissioning::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::Id:
+            return "ScanNetworksResponse";
+        case chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::Id:
+            return "NetworkConfigResponse";
+        case chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::Id:
+            return "ConnectNetworkResponse";
+        case chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::Id:
+            return "QueryIdentityResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DiagnosticLogs::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Id:
+            return "RetrieveLogsResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::GeneralDiagnostics::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::Id:
+            return "TimeSnapshotResponse";
+        case chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestResponse::Id:
+            return "PayloadTestResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TimeSynchronization::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::Id:
+            return "SetTimeZoneResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::OperationalCredentials::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::Id:
+            return "AttestationResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::Id:
+            return "CertificateChainResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::Id:
+            return "CSRResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
+            return "NOCResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::GroupKeyManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::Id:
+            return "KeySetReadResponse";
+        case chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id:
+            return "KeySetReadAllIndicesResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::IcdManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id:
+            return "RegisterClientResponse";
+        case chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::Id:
+            return "StayActiveResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::OvenCavityOperationalState::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::Id:
+            return "OperationalCommandResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::OvenMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LaundryWasherMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::RvcRunMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::RvcCleanMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DishwasherMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::OperationalState::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::Id:
+            return "OperationalCommandResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::RvcOperationalState::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::Id:
+            return "OperationalCommandResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ScenesManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::Id:
+            return "AddSceneResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::Id:
+            return "ViewSceneResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::Id:
+            return "RemoveSceneResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::Id:
+            return "RemoveAllScenesResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::Id:
+            return "StoreSceneResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::Id:
+            return "GetSceneMembershipResponse";
+        case chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::Id:
+            return "CopySceneResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::EnergyEvse::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::Id:
+            return "GetTargetsResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::EnergyEvseMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WaterHeaterMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DeviceEnergyManagementMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::DoorLock::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::Id:
+            return "GetWeekDayScheduleResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::Id:
+            return "GetYearDayScheduleResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::Id:
+            return "GetHolidayScheduleResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetUserResponse::Id:
+            return "GetUserResponse";
+        case chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::Id:
+            return "SetCredentialResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::Id:
+            return "GetCredentialStatusResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ServiceArea::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::Id:
+            return "SelectAreasResponse";
+        case chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::Id:
+            return "SkipAreaResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Thermostat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::Id:
+            return "GetWeeklyScheduleResponse";
+        case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:
+            return "AtomicResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::WiFiNetworkManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::Id:
+            return "NetworkPassphraseResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThreadBorderRouterManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThreadBorderRouterManagement::Commands::DatasetResponse::Id:
+            return "DatasetResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThreadNetworkDirectory::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::Id:
+            return "OperationalDatasetResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Channel::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Id:
+            return "ChangeChannelResponse";
+        case chip::app::Clusters::Channel::Commands::ProgramGuideResponse::Id:
+            return "ProgramGuideResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TargetNavigator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Id:
+            return "NavigateTargetResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaPlayback::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Id:
+            return "PlaybackResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::KeypadInput::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Id:
+            return "SendKeyResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ContentLauncher::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Id:
+            return "LauncherResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ApplicationLauncher::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Id:
+            return "LauncherResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AccountLogin::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id:
+            return "GetSetupPINResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ContentControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ContentControl::Commands::ResetPINResponse::Id:
+            return "ResetPINResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ContentAppObserver::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::Id:
+            return "ContentAppMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommissionerControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
+            return "ReverseOpenCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ElectricalMeasurement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::Id:
+            return "GetProfileInfoResponseCommand";
+        case chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::Id:
+            return "GetMeasurementProfileResponseCommand";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::UnitTesting::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::Id:
+            return "TestSpecificResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::Id:
+            return "TestAddArgumentsResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::Id:
+            return "TestSimpleArgumentResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Id:
+            return "TestStructArrayArgumentResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::Id:
+            return "TestListInt8UReverseResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::Id:
+            return "TestEnumsResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::Id:
+            return "TestNullableOptionalResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::Id:
+            return "TestComplexNullableOptionalResponse";
+        case chip::app::Clusters::UnitTesting::Commands::BooleanResponse::Id:
+            return "BooleanResponse";
+        case chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::Id:
+            return "SimpleStructResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::Id:
+            return "TestEmitTestEventResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::Id:
+            return "TestEmitTestFabricScopedEventResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::Id:
+            return "TestBatchHelperResponse";
+        case chip::app::Clusters::UnitTesting::Commands::StringEchoResponse::Id:
+            return "StringEchoResponse";
+        case chip::app::Clusters::UnitTesting::Commands::GlobalEchoResponse::Id:
+            return "GlobalEchoResponse";
+        case chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::Id:
+            return "TestDifferentVendorMeiResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::SampleMei::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::Id:
+            return "AddArgumentsResponse";
         default:
             return "Unknown";
         }
