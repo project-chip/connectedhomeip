@@ -14,6 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# === END CI TEST ARGUMENTS ===
 
 import itertools
 import xml.etree.ElementTree as ElementTree

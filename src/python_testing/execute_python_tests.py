@@ -84,7 +84,6 @@ def main(search_directory, env_file):
         "TC_SEAR_1_6.py",
         "TestCommissioningTimeSync.py",
         "TestConformanceSupport.py",
-        "TestChoiceConformanceSupport.py",
         "TC_DEMTestBase.py",
         "choice_conformance_support.py",
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
