@@ -1020,7 +1020,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     colorHueTransitionState->initialEnhancedHue = startHue;
 
-    if (direction == to_underlying(ColorLoopDirection::kIncrement))
+    if (direction == to_underlying(ColorLoopDirection::IncrementHue))
     {
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -1029,7 +1029,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::kIncrement));
+    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::IncrementHue));
     colorHueTransitionState->repeat = true;
 
     colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
