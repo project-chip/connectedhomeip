@@ -30,6 +30,8 @@ class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
     using Feature              = chip::app::Clusters::MediaPlayback::Feature;
 
 public:
+    MediaPlaybackManager(chip::EndpointId endpoint): mEndpoint(endpoint) { };
+
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
@@ -41,6 +43,9 @@ public:
     CHIP_ERROR HandleGetAvailableAudioTracks(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveTextTrack(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAvailableTextTracks(chip::app::AttributeValueEncoder & aEncoder) override;
+
+    CHIP_ERROR HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState);
+    CHIP_ERROR HandleSetPlaybackSpeed(float playbackSpeed);
 
     void HandlePlay(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandlePause(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
@@ -66,6 +71,7 @@ public:
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
+    chip::EndpointId mEndpoint;
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState =

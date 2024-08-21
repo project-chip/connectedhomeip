@@ -238,17 +238,6 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
-#ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
-#include "media-playback/MediaPlaybackManager.h"
-static MediaPlaybackManager mediaPlaybackManager;
-
-void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
-}
-#endif
-
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "target-navigator/TargetNavigatorManager.h"
 static TargetNavigatorManager targetNavigatorManager;
