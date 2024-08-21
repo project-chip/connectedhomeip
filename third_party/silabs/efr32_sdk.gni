@@ -485,6 +485,8 @@ template("efr32_sdk") {
         "RSI_LITTLE_ENDIAN=1",
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
+        "RSI_BLE_MAX_NBR_PERIPHERALS=1",
+        "RSI_BLE_MAX_NBR_CENTRALS=1",
       ]
     }
 

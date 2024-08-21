@@ -90,7 +90,7 @@ size_t RoundNearest(size_t n, size_t multiple)
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
     if (0 == sCredentialsOffset)
     {
         ReturnErrorOnFailure(ErasePage(base_addr));
@@ -120,7 +120,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
 CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t offset, uint32_t size, MutableByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
 
     uint8_t * address = (uint8_t *) (base_addr + offset);
     ByteSpan span(address, size);
@@ -167,12 +167,7 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
         setNvm3End(base_addr);
 #endif
     }
-    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr);
-}
-
-CHIP_ERROR Storage::GetBaseAddress(uint32_t & value)
-{
-    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, value);
+    return SetCredentialsBaseAddress(base_addr);
 }
 
 CHIP_ERROR Storage::Commit()
@@ -624,6 +619,16 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 //
 // Other
 //
+
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
 
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {
