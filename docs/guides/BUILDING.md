@@ -108,7 +108,7 @@ sudo apt-get install libsdl2-dev
 ### Installing prerequisites on macOS
 
 On macOS, install Xcode from the Mac App Store. After installing Xcode, install
-python3.11 using brew:
+python3.12 using brew:
 
 ```sh
     brew install python@3.12
