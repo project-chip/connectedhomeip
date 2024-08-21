@@ -81,7 +81,7 @@ constexpr uint16_t kRequiredEventField =
  *   Internal event buffer, built around the TLV::TLVCircularBuffer
  */
 
-class CircularEventBuffer : public TLV::TLVCircularBuffer
+class CircularEventBuffer final: public TLV::TLVCircularBuffer
 {
 public:
     /**

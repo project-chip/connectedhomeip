@@ -30,7 +30,6 @@ Checks: >
   -bugprone-switch-missing-default-case,
   -bugprone-undelegated-constructor,
   -bugprone-unused-return-value,
-  -bugprone-pointer-arithmetic-on-polymorphic-object,
   -bugprone-suspicious-stringview-data-usage,
   -clang-analyzer-core.CallAndMessage,
   -clang-analyzer-core.NonNullParamChecker,
