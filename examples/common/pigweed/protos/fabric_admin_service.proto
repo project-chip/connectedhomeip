@@ -19,7 +19,9 @@ message DeviceCommissioningInfo {
   uint32 discriminator = 1;
   uint32 iterations = 2;
   uint32 setup_pin = 3;
-  bytes salt = 4;
+  uint32 vendor_id = 4;
+  uint32 product_id = 5;  
+  bytes salt = 6;
 }
 
 message KeepActiveParameters {
