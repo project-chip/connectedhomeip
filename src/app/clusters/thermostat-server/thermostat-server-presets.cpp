@@ -320,8 +320,9 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     return false;
 }
 
-Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan presetHandle)
+Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle)
 {
+
     auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
@@ -331,12 +332,12 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, ByteSpan prese
     }
 
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!IsPresetHandlePresentInPresets(delegate, presetHandle))
+    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(delegate, presetHandle.Value()))
     {
         return Status::InvalidCommand;
     }
 
-    CHIP_ERROR err = delegate->SetActivePresetHandle(DataModel::MakeNullable(presetHandle));
+    CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -477,7 +478,8 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
     // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
     // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
-    MutableByteSpan activePresetHandle(buffer);
+    MutableByteSpan activePresetHandleSpan(buffer);
+    auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
     err = delegate->GetActivePresetHandle(activePresetHandle);
 
@@ -486,9 +488,9 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         return Status::InvalidInState;
     }
 
-    if (!activePresetHandle.empty())
+    if (!activePresetHandle.IsNull())
     {
-        uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle);
+        uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle.Value());
         if (count == 0)
         {
             return Status::InvalidInState;

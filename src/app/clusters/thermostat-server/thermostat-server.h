@@ -57,7 +57,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
 private:
-    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, ByteSpan presetHandle);
+    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle);
     CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
     Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
 

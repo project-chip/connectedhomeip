@@ -335,19 +335,13 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandle(buffer);
+        MutableByteSpan activePresetHandleSpan(buffer);
+        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
         CHIP_ERROR err = delegate->GetActivePresetHandle(activePresetHandle);
         ReturnErrorOnFailure(err);
 
-        if (activePresetHandle.empty())
-        {
-            ReturnErrorOnFailure(aEncoder.EncodeNull());
-        }
-        else
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
-        }
+        ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
     }
     break;
     case ScheduleTypes::Id: {
