@@ -420,7 +420,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                               attribute=Clusters.DoorLock.Attributes.FeatureMap)
             aliro_enabled = feature_map & Clusters.DoorLock.Bitmaps.Feature.kAliroProvisioning
         if (aliro_enabled):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=1,
+            credentials = cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
                                                            credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey)
             await self.clear_credentials_cmd(step=None, credential=credentials)
         else:
@@ -436,7 +436,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.step("14b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=1,
+            credentials = cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
                                                            credentialType=self.invalid_credential_type)
             try:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credentials),
@@ -536,9 +536,9 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C1b.Rsp")):
 
             credentiallist: list[cluster.Structs.CredentialStruct]
-            credentiallist = [cluster.Structs.CredentialStruct(credentialIndex=1,
+            credentiallist = [cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
                                                                credentialType=cluster.Enums.CredentialTypeEnum.kRfid),
-                              cluster.Structs.CredentialStruct(credentialIndex=1,
+                              cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
                                                                credentialType=cluster.Enums.CredentialTypeEnum.kPin)]
             await self.get_user(self.userIndex_1, self.user_name, self.user_unique_id1, credentiallist, Status.Success)
 
