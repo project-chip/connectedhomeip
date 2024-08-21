@@ -30149,7 +30149,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -30164,7 +30164,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
