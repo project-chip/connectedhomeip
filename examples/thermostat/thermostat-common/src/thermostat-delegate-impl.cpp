@@ -19,23 +19,13 @@
 #include <thermostat-delegate-impl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat;
-using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
 
 ThermostatDelegate ThermostatDelegate::sInstance;
 
@@ -113,7 +103,6 @@ uint8_t ThermostatDelegate::GetNumberOfPresets()
 
 CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
-
     if (index < mNextFreeIndexInPresetsList)
     {
         preset = mPresets[index];
@@ -153,6 +142,21 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
+std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetAtomicWriteTimeout(chip::AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case Attributes::Presets::Id:
+        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
+        return std::chrono::milliseconds(3000);
+    case Attributes::Schedules::Id:
+        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
+        return std::chrono::milliseconds(9000);
+    default:
+        return std::nullopt;
+    }
+}
+
 void ThermostatDelegate::InitializePendingPresets()
 {
     mNextFreeIndexInPendingPresetsList = 0;
@@ -171,8 +175,8 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
         if (preset.presetHandle.IsNull())
         {
             // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets
-            // of each type are supported.
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
             const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
             mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
@@ -192,7 +196,7 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
+CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
 {
     mNextFreeIndexInPresetsList = 0;
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
@@ -208,23 +212,3 @@ void ThermostatDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
 }
-
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetWriteTimeout(AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Presets::Id:
-        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
-        return std::chrono::milliseconds(3000);
-    case Schedules::Id:
-        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
-        return std::chrono::milliseconds(9000);
-    default:
-        return std::nullopt;
-    }
-}
-
-} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip

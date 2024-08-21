@@ -17,7 +17,6 @@
 
 #include "thermostat-server.h"
 #include "PresetStructWithOwnedMembers.h"
-#include "thermostat-server-setpoints.h"
 
 #include <app/util/attribute-storage.h>
 
@@ -31,7 +30,6 @@
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,7 +37,26 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace chip::Protocols::InteractionModel;
+using namespace Protocols::InteractionModel;
+
+constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultHeatingSetpoint         = 2000;
+constexpr int16_t kDefaultCoolingSetpoint         = 2600;
+constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
+
+// IMPORTANT NOTE:
+// No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
+// If a setpoint changes is required as a result of setpoint limit change
+// it does not happen here.  It is the responsibility of the device to adjust the setpoint(s)
+// as required in emberAfThermostatClusterServerPostAttributeChangedCallback
+// limit change validation assures that there is at least 1 setpoint that will be valid
 
 #define FEATURE_MAP_HEAT 0x01
 #define FEATURE_MAP_COOL 0x02
@@ -50,31 +67,165 @@ using namespace chip::Protocols::InteractionModel;
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
-namespace {
-
-ThermostatAttrAccess gThermostatAttrAccess;
-
-static constexpr size_t kThermostatEndpointCount =
-    MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
 static_assert(kThermostatEndpointCount <= kEmberInvalidEndpointIndex, "Thermostat Delegate table size error");
 
-Delegate * gDelegateTable[kThermostatEndpointCount]                     = { nullptr };
-AtomicWriteManager * gAtomicWriteManagerTable[kThermostatEndpointCount] = { nullptr };
+Delegate * gDelegateTable[kThermostatEndpointCount] = { nullptr };
 
-AtomicWriteManager * GetAtomicWriteManager(EndpointId endpoint)
+int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= ArraySize(gAtomicWriteManagerTable) ? nullptr : gAtomicWriteManagerTable[ep]);
+    // Optional Mfg supplied limits
+    int16_t AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+    int16_t AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+
+    // Optional User supplied limits
+    int16_t MinHeatSetpointLimit = kDefaultMinHeatSetpointLimit;
+    int16_t MaxHeatSetpointLimit = kDefaultMaxHeatSetpointLimit;
+
+    // Attempt to read the setpoint limits
+    // Absmin/max are manufacturer limits
+    // min/max are user imposed min/max
+
+    // Note that the limits are initialized above per the spec limits
+    // if they are not present Get() will not update the value so the defaults are used
+    Status status;
+
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
+    // behavior is not specified when Abs * values are not present and user values are present
+    // implemented behavior accepts the user values without regard to default Abs values.
+
+    // Per global matter data model policy
+    // if a attribute is not present then it's default shall be used.
+
+    status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Warning: AbsMinHeatSetpointLimit missing using default");
+    }
+
+    status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Warning: AbsMaxHeatSetpointLimit missing using default");
+    }
+    status = MinHeatSetpointLimit::Get(endpoint, &MinHeatSetpointLimit);
+    if (status != Status::Success)
+    {
+        MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
+    }
+
+    status = MaxHeatSetpointLimit::Get(endpoint, &MaxHeatSetpointLimit);
+    if (status != Status::Success)
+    {
+        MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
+    }
+
+    // Make sure the user imposed limits are within the manufacturer imposed limits
+
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
+    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
+    // This implementation clamps at the limit.
+
+    // resolution of 3725 is to clamp.
+
+    if (MinHeatSetpointLimit < AbsMinHeatSetpointLimit)
+        MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
+
+    if (MaxHeatSetpointLimit > AbsMaxHeatSetpointLimit)
+        MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
+
+    if (HeatingSetpoint < MinHeatSetpointLimit)
+        HeatingSetpoint = MinHeatSetpointLimit;
+
+    if (HeatingSetpoint > MaxHeatSetpointLimit)
+        HeatingSetpoint = MaxHeatSetpointLimit;
+
+    return HeatingSetpoint;
 }
 
-} // anonymous namespace
+int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint)
+{
+    // Optional Mfg supplied limits
+    int16_t AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+    int16_t AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+
+    // Optional User supplied limits
+    int16_t MinCoolSetpointLimit = kDefaultMinCoolSetpointLimit;
+    int16_t MaxCoolSetpointLimit = kDefaultMaxCoolSetpointLimit;
+
+    // Attempt to read the setpoint limits
+    // Absmin/max are manufacturer limits
+    // min/max are user imposed min/max
+
+    // Note that the limits are initialized above per the spec limits
+    // if they are not present Get() will not update the value so the defaults are used
+    Status status;
+
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
+    // behavior is not specified when Abs * values are not present and user values are present
+    // implemented behavior accepts the user values without regard to default Abs values.
+
+    // Per global matter data model policy
+    // if a attribute is not present then it's default shall be used.
+
+    status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Warning: AbsMinCoolSetpointLimit missing using default");
+    }
+
+    status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "Warning: AbsMaxCoolSetpointLimit missing using default");
+    }
+
+    status = MinCoolSetpointLimit::Get(endpoint, &MinCoolSetpointLimit);
+    if (status != Status::Success)
+    {
+        MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
+    }
+
+    status = MaxCoolSetpointLimit::Get(endpoint, &MaxCoolSetpointLimit);
+    if (status != Status::Success)
+    {
+        MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
+    }
+
+    // Make sure the user imposed limits are within the manufacture imposed limits
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
+    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
+    // This implementation clamps at the limit.
+
+    // resolution of 3725 is to clamp.
+
+    if (MinCoolSetpointLimit < AbsMinCoolSetpointLimit)
+        MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
+
+    if (MaxCoolSetpointLimit > AbsMaxCoolSetpointLimit)
+        MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
+
+    if (CoolingSetpoint < MinCoolSetpointLimit)
+        CoolingSetpoint = MinCoolSetpointLimit;
+
+    if (CoolingSetpoint > MaxCoolSetpointLimit)
+        CoolingSetpoint = MaxCoolSetpointLimit;
+
+    return CoolingSetpoint;
+}
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+ThermostatAttrAccess gThermostatAttrAccess;
+
+Delegate * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= ArraySize(gDelegateTable) ? nullptr : gDelegateTable[ep]);
+}
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
@@ -85,26 +236,6 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     {
         gDelegateTable[ep] = delegate;
     }
-}
-
-void SetDefaultAtomicWriteManager(EndpointId endpoint, AtomicWriteManager * atomicWriteManager)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found, add the delegate in the delegate table
-    if (ep < ArraySize(gAtomicWriteManagerTable))
-    {
-        gAtomicWriteManagerTable[ep] = atomicWriteManager;
-
-        atomicWriteManager->SetDelegate(&gThermostatAttrAccess);
-    }
-}
-
-Delegate * ThermostatAttrAccess::GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= ArraySize(gDelegateTable) ? nullptr : gDelegateTable[ep]);
 }
 
 CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -142,7 +273,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; ++i)
+            for (uint8_t i = 0; true; i++)
             {
                 PresetTypeStruct::Type presetType;
                 auto err = delegate->GetPresetTypeAtIndex(i, presetType);
@@ -167,14 +298,11 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        auto awm = GetAtomicWriteManager(aPath.mEndpointId);
-        VerifyOrReturnError(awm != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Atomic Write Manager is null"));
-
         auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
-        if (awm->InWrite(aPath.mAttributeId, subjectDescriptor, aPath.mEndpointId))
+        if (InAtomicWrite(subjectDescriptor, aPath.mEndpointId))
         {
             return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-                for (uint8_t i = 0; true; ++i)
+                for (uint8_t i = 0; true; i++)
                 {
                     PresetStructWithOwnedMembers preset;
                     auto err = delegate->GetPendingPresetAtIndex(i, preset);
@@ -188,7 +316,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; ++i)
+            for (uint8_t i = 0; true; i++)
             {
                 PresetStructWithOwnedMembers preset;
                 auto err = delegate->GetPresetAtIndex(i, preset);
@@ -249,23 +377,20 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     {
     case Presets::Id: {
 
-        auto awm = GetAtomicWriteManager(endpoint);
-        VerifyOrReturnError(awm != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Atomic Write Manager is null"));
+        auto delegate = GetDelegate(endpoint);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(awm->InWrite(aPath.mAttributeId, endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+        VerifyOrReturnError(InAtomicWrite(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
         // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
         // otherwise return BUSY.
-        if (!awm->InWrite(aPath.mAttributeId, subjectDescriptor, endpoint))
+        if (!InAtomicWrite(subjectDescriptor, endpoint))
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
             return CHIP_IM_GLOBAL_STATUS(Busy);
         }
-
-        auto delegate = GetDelegate(endpoint);
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // If the list operation is replace all, clear the existing pending list, iterate over the new presets list
         // and add to the pending presets list.
@@ -303,9 +428,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     }
 
     // This is not an atomic attribute, so check to make sure we don't have an atomic write going for this client
-    auto awm = GetAtomicWriteManager(endpoint);
-    VerifyOrReturnError(awm != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Atomic Write Manager is null"));
-    if (awm->InWrite(std::nullopt, subjectDescriptor, endpoint))
+    if (InAtomicWrite(subjectDescriptor, endpoint))
     {
         ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
         return CHIP_IM_GLOBAL_STATUS(InvalidInState);
@@ -341,12 +464,12 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 
 void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(gAtomicWriteManagerTable); ++i)
+    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
-        auto awm = gAtomicWriteManagerTable[i];
-        if (awm != nullptr)
+        auto atomicWriteState = mAtomicWriteSessions[i];
+        if (atomicWriteState.state == AtomicWriteState::Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
-            awm->ResetWrite(fabricIndex);
+            ResetAtomicWrite(atomicWriteState.endpointId);
         }
     }
 }
@@ -372,12 +495,6 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
-// IMPORTANT NOTE:
-// No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
-// If a setpoint changes is required as a result of setpoint limit change
-// it does not happen here.  It is the responsibility of the device to adjust the setpoint(s)
-// as required in emberAfThermostatClusterServerPostAttributeChangedCallback
-// limit change validation assures that there is at least 1 setpoint that will be valid
 Protocols::InteractionModel::Status
 MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
@@ -683,41 +800,6 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
     return false;
 }
 
-bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    commandObj->AddStatus(commandPath, gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle));
-    return true;
-}
-
-bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
-{
-
-    // If we've gotten this far, then the client has manage permission to call AtomicRequest, which is also the
-    // privilege necessary to write to the atomic attributes, so no need to check
-
-    auto * awm = GetAtomicWriteManager(commandPath.mEndpointId);
-    if (awm == nullptr)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return true;
-    }
-    auto & requestType = commandData.requestType;
-    switch (requestType)
-    {
-    case Globals::AtomicRequestTypeEnum::kBeginWrite:
-        return awm->BeginWrite(commandObj, commandPath, commandData);
-    case Globals::AtomicRequestTypeEnum::kCommitWrite:
-        return awm->CommitWrite(commandObj, commandPath, commandData);
-    case Globals::AtomicRequestTypeEnum::kRollbackWrite:
-        return awm->RollbackWrite(commandObj, commandPath, commandData);
-    default:
-        return false;
-    }
-}
-
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::SetpointRaiseLower::DecodableType & commandData)
@@ -767,13 +849,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {
@@ -958,14 +1040,4 @@ void MatterThermostatPluginServerInitCallback()
 {
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
     AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
-}
-
-void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
-    auto awm = GetAtomicWriteManager(endpoint);
-    if (awm != nullptr)
-    {
-        awm->ResetWrite(endpoint);
-    }
 }

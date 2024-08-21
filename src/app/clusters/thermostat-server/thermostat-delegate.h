@@ -19,10 +19,6 @@
 
 #include "PresetStructWithOwnedMembers.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/data-model/DecodableList.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -41,6 +37,14 @@ public:
     Delegate() = default;
 
     virtual ~Delegate() = default;
+
+    /**
+     * @brief Get the maximum timeout for atomically writing to an attribute
+     *
+     * @param[in] attributeId The attribute to write to.
+     * @return The maximum allowed timeout; nullopt if the request is invalid.
+     */
+    virtual std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
 
     /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
@@ -123,15 +127,13 @@ public:
      * @return CHIP_ERROR if the updates to the presets attribute failed to commit for some reason.
      *
      */
-    virtual CHIP_ERROR ApplyPendingPresets() = 0;
+    virtual CHIP_ERROR CommitPendingPresets() = 0;
 
     /**
      * @brief Clears the pending presets list.
      *
      */
     virtual void ClearPendingPresetList() = 0;
-
-    virtual std::optional<System::Clock::Milliseconds16> GetWriteTimeout(AttributeId attributeId) = 0;
 };
 
 } // namespace Thermostat

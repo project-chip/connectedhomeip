@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include "atomic-write.h"
 #include "thermostat-delegate.h"
 
+#include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 
@@ -35,40 +35,138 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+enum class AtomicWriteState
+{
+    Closed = 0,
+    Open,
+};
+
+static constexpr size_t kThermostatEndpointCount =
+    MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
-class ThermostatAttrAccess : public chip::app::AttributeAccessInterface,
-                             public chip::FabricTable::Delegate,
-                             public AtomicWriteDelegate
+class ThermostatAttrAccess : public chip::app::AttributeAccessInterface, public chip::FabricTable::Delegate
 {
+
 public:
     ThermostatAttrAccess() : AttributeAccessInterface(Optional<chip::EndpointId>::Missing(), Thermostat::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
-    // AtomicWriteDelegate
-    chip::Protocols::InteractionModel::Status OnBeginWrite(EndpointId endpoint, AttributeId attributeId) override;
-    chip::Protocols::InteractionModel::Status OnPreCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
-    chip::Protocols::InteractionModel::Status OnCommitWrite(EndpointId endpoint, AttributeId attributeId) override;
-    chip::Protocols::InteractionModel::Status OnRollbackWrite(EndpointId endpoint, AttributeId attributeId) override;
-    std::optional<System::Clock::Milliseconds16> GetWriteTimeout(EndpointId endpoint, chip::AttributeId attributeId) override;
-
-    chip::Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, ByteSpan newPresetHandle);
-
 private:
-    Thermostat::Delegate * GetDelegate(EndpointId endpoint);
-
+    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, ByteSpan presetHandle);
     CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
+    Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
 
-    chip::Protocols::InteractionModel::Status BeginPresets(EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status PreCommitPresets(EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status CommitPresets(EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status RollbackPresets(EndpointId endpoint);
-
-    // FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    /**
+     * @brief Gets the scoped node id of the originator that sent the last successful
+     *        AtomicRequest of type BeginWrite for the given endpoint.
+     *
+     * @param[in] endpoint The endpoint.
+     *
+     * @return the scoped node id for the given endpoint if set. Otherwise returns ScopedNodeId().
+     */
+    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
+
+    /**
+     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
+     *
+     * @param[in] endpoint The endpoint.
+     * @param[in] originatorNodeId The originator scoped node id.
+     * @param[in] state Whether or not an atomic write is open or closed.
+     */
+    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
+
+    /**
+     * @brief Resets the atomic write for a given endpoint
+     *
+     * @param endpoint The endpoint
+     */
+    void ResetAtomicWrite(EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] subjectDescriptor The subject descriptor.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] commandObj The command handler.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
+
+    /**
+     * @brief Handles an AtomicRequest of type BeginWrite
+     *
+     * @param commandObj The AtomicRequest command handler
+     * @param commandPath The path for the Atomic Request command
+     * @param commandData The payload data for the Atomic Request
+     */
+    void BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                          const Commands::AtomicRequest::DecodableType & commandData);
+
+    /**
+     * @brief Handles an AtomicRequest of type CommitWrite
+     *
+     * @param commandObj The AtomicRequest command handler
+     * @param commandPath The path for the Atomic Request command
+     * @param commandData The payload data for the Atomic Request
+     */
+    void CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                           const Commands::AtomicRequest::DecodableType & commandData);
+
+    /**
+     * @brief Handles an AtomicRequest of type RollbackWrite
+     *
+     * @param commandObj The AtomicRequest command handler
+     * @param commandPath The path for the Atomic Request command
+     * @param commandData The payload data for the Atomic Request
+     */
+    void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                             const Commands::AtomicRequest::DecodableType & commandData);
+
+    friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
+
+    friend void ::MatterThermostatClusterServerShutdownCallback(EndpointId endpoint);
+
+    friend bool ::emberAfThermostatClusterSetActivePresetRequestCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
+    friend bool ::emberAfThermostatClusterAtomicRequestCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
+
+    struct AtomicWriteSession
+    {
+        AtomicWriteState state = AtomicWriteState::Closed;
+        ScopedNodeId nodeId;
+        EndpointId endpointId = kInvalidEndpointId;
+    };
+
+    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 };
 
 /**
@@ -79,13 +177,7 @@ private:
  */
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-/**
- * @brief Sets the default atomic write manager for the specific thermostat endpoint.
- *
- * @param[in] endpoint The endpoint to set the default atomic write manager on.
- * @param[in] atomicWriteManager The default atomic write manager.
- */
-void SetDefaultAtomicWriteManager(EndpointId endpoint, AtomicWriteManager * atomicWriteManager);
+Delegate * GetDelegate(EndpointId endpoint);
 
 } // namespace Thermostat
 } // namespace Clusters

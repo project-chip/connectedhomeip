@@ -1,6 +1,5 @@
-//
 /**
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDevice.h> // for MTRDeviceState
+
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCClientProtocol_MTRDevice <NSObject>
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state;
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
@@ -25,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID;
 @end
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCClientProtocol_MTRDeviceController <NSObject>
 // Not Supported via XPC
 //- (oneway void)controller:(NSUUID *)controller statusUpdate:(MTRCommissioningStatus)status;
@@ -33,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 //- (oneway void)controller:(NSUUID *)controller readCommissioningInfo:(MTRProductIdentity *)info;
 @end
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCClientProtocol <NSObject, MTRXPCClientProtocol_MTRDevice, MTRXPCClientProtocol_MTRDeviceController>
 @end
 

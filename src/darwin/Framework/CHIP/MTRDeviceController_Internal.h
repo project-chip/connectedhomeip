@@ -29,6 +29,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#import <os/lock.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
@@ -62,6 +64,13 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
+
+@property (nonatomic, readwrite, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (readonly, assign) os_unfair_lock_t deviceMapLock;
+
+// queue used to serialize all work performed by the MTRDeviceController
+// (moved here so subclasses can initialize differently)
+@property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
 - (instancetype)initForSubclasses;
 
@@ -270,6 +279,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
 /**

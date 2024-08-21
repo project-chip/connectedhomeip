@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/clusters/thermostat-server/atomic-write.h>
 #include <app/clusters/thermostat-server/thermostat-delegate.h>
 
 namespace chip {
@@ -40,13 +39,12 @@ static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 // We will support only one preset of each preset type.
 static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 
-static constexpr size_t kThermostatEndpointCount =
-    MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
 class ThermostatDelegate : public Delegate
 {
 public:
     static inline ThermostatDelegate & GetInstance() { return sInstance; }
+
+    std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) override;
 
     CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
 
@@ -64,11 +62,9 @@ public:
 
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
 
-    CHIP_ERROR ApplyPendingPresets() override;
+    CHIP_ERROR CommitPendingPresets() override;
 
     void ClearPendingPresetList() override;
-
-    std::optional<System::Clock::Milliseconds16> GetWriteTimeout(chip::AttributeId attributeId) override;
 
 private:
     static ThermostatDelegate sInstance;
@@ -91,6 +87,7 @@ private:
 
     uint8_t mNumberOfPresets;
 
+    Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
     PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
     PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
 
@@ -99,15 +96,6 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
-
-    struct AtomicWriteState
-    {
-        bool inProgress;
-        ScopedNodeId nodeId;
-        EndpointId endpointId;
-    };
-
-    AtomicWriteState mAtomicWriteStates[kThermostatEndpointCount];
 };
 
 } // namespace Thermostat

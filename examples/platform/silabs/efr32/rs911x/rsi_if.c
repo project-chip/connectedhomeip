@@ -511,9 +511,9 @@ static void wfx_rsi_save_ap_info() // translation
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-    case SME_WPA3_TRANSITION:
+    case SME_WPA3_PERSONAL_TRANSITION:
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-    case SME_WPA3:
+    case SME_WPA3_PERSONAL:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
 #else
         wfx_rsi.sec.security = WFX_SEC_WPA2;
@@ -557,7 +557,7 @@ static void wfx_rsi_do_join(void)
             break;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3_TRANSITION;
+            connect_security_mode = RSI_WPA3_PERSONAL_TRANSITION;
             break;
 #endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_NONE:

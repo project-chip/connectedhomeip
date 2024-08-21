@@ -56,12 +56,12 @@ void DeviceManager::Init()
 NodeId DeviceManager::GetNextAvailableNodeId()
 {
     mLastUsedNodeId++;
-    VerifyOrDieWithMsg(mLastUsedNodeId < std::numeric_limits<chip::NodeId>::max(), NotSpecified, "No more available NodeIds.");
+    VerifyOrDieWithMsg(mLastUsedNodeId < std::numeric_limits<NodeId>::max(), NotSpecified, "No more available NodeIds.");
 
     return mLastUsedNodeId;
 }
 
-void DeviceManager::UpdateLastUsedNodeId(chip::NodeId nodeId)
+void DeviceManager::UpdateLastUsedNodeId(NodeId nodeId)
 {
     if (nodeId > mLastUsedNodeId)
     {
@@ -144,7 +144,6 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     commandBuilder.Add("pairing open-commissioning-window ");
     commandBuilder.AddFormat("%lu %d %d %d %d %d", mRemoteBridgeNodeId, remoteEndpointId, kEnhancedCommissioningMethod,
                              kWindowTimeout, kIteration, discriminator);
-    commandBuilder.Add(" --setup-pin 20202021");
 
     PushCommand(commandBuilder.c_str());
 }
@@ -159,7 +158,7 @@ void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, const char * deviceRem
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::PairRemoteDevice(chip::NodeId nodeId, const char * payload)
+void DeviceManager::PairRemoteDevice(NodeId nodeId, const char * payload)
 {
     StringBuilder<kMaxCommandSize> commandBuilder;
 
@@ -215,8 +214,8 @@ void DeviceManager::SubscribeRemoteFabricBridge()
 
     // Prepare and push the commissioner control subscribe command
     commandBuilder.Add("commissionercontrol subscribe-event commissioning-request-result ");
-    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true", kSubscribeMinInterval, kSubscribeMaxInterval, mRemoteBridgeNodeId,
-                             kRootEndpointId);
+    commandBuilder.AddFormat("%d %d %lu %d --is-urgent true --keepSubscriptions true", kSubscribeMinInterval, kSubscribeMaxInterval,
+                             mRemoteBridgeNodeId, kRootEndpointId);
     PushCommand(commandBuilder.c_str());
 }
 
@@ -238,7 +237,26 @@ void DeviceManager::ReadSupportedDeviceCategories()
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::StartReverseCommissioning()
+void DeviceManager::HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data)
+{
+    ChipLogProgress(NotSpecified, "Attribute SupportedDeviceCategories detected.");
+
+    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> value;
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
+
+    if (value.Has(CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization))
+    {
+        ChipLogProgress(NotSpecified, "Remote Fabric-Bridge supports Fabric Synchronization, start reverse commissioning.");
+        RequestCommissioningApproval();
+    }
+}
+
+void DeviceManager::RequestCommissioningApproval()
 {
     ChipLogProgress(NotSpecified, "Starting reverse commissioning for bridge device: NodeId: " ChipLogFormatX64,
                     ChipLogValueX64(mRemoteBridgeNodeId));
@@ -255,53 +273,41 @@ void DeviceManager::StartReverseCommissioning()
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds)
+void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
 {
-    ChipLogProgress(NotSpecified, "Request the Commissioner Control Server to begin commissioning a previously approved request.");
+    ChipLogProgress(NotSpecified, "CommissioningRequestResult event received.");
 
-    StringBuilder<kMaxCommandSize> commandBuilder;
-    commandBuilder.Add("commissionercontrol commission-node ");
-    commandBuilder.AddFormat("%lu %u %lu %d", requestId, responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
+    CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to decode event value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
 
-    PushCommand(commandBuilder.c_str());
+    if (value.requestId != mRequestId)
+    {
+        ChipLogError(NotSpecified, "The RequestId does not match the RequestId provided to RequestCommissioningApproval");
+        return;
+    }
+
+    if (value.statusCode != static_cast<uint8_t>(Protocols::InteractionModel::Status::Success))
+    {
+        ChipLogError(NotSpecified, "The server is not ready to begin commissioning the requested device");
+        return;
+    }
+
+    // The server is ready to begin commissioning the requested device, request the Commissioner Control Server to begin
+    // commissioning a previously approved request.
+    SendCommissionNodeRequest(value.requestId, kResponseTimeoutSeconds);
 }
 
-void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
+void DeviceManager::HandleAttributePartsListUpdate(chip::TLV::TLVReader & data)
 {
-    if (path.mClusterId == CommissionerControl::Id &&
-        path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
-    {
-        ChipLogProgress(NotSpecified, "Attribute SupportedDeviceCategories detected.");
-
-        BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> value;
-        CHIP_ERROR error = app::DataModel::Decode(*data, value);
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
-            return;
-        }
-
-        if (value.Has(CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization))
-        {
-            ChipLogProgress(NotSpecified, "Remote Fabric-Bridge supports Fabric Synchronization, start reverse commissioning.");
-            StartReverseCommissioning();
-        }
-
-        return;
-    }
-
-    if (path.mClusterId != Descriptor::Id || path.mAttributeId != Descriptor::Attributes::PartsList::Id)
-    {
-        return;
-    }
-
-    ChipLogProgress(NotSpecified, "Attribute change detected:");
-    ChipLogProgress(
-        NotSpecified, "Endpoint: %u, Cluster: " ChipLogFormatMEI ", Attribute: " ChipLogFormatMEI ", DataVersion: %" PRIu32,
-        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
+    ChipLogProgress(NotSpecified, "Attribute PartsList change detected:");
 
     app::DataModel::DecodableList<EndpointId> value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to decode attribute value. Error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -355,7 +361,7 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     for (const auto & endpoint : addedEndpoints)
     {
         // print to console
-        fprintf(stderr, "A new devie is added on Endpoint: %u\n", endpoint);
+        fprintf(stderr, "A new device is added on Endpoint: %u\n", endpoint);
 
         if (mAutoSyncEnabled)
         {
@@ -399,39 +405,80 @@ void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & p
     }
 }
 
-void DeviceManager::HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
+void DeviceManager::SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds)
 {
-    if (header.mPath.mClusterId != CommissionerControl::Id ||
-        header.mPath.mEventId != CommissionerControl::Events::CommissioningRequestResult::Id)
-    {
-        return;
-    }
+    ChipLogProgress(NotSpecified, "Request the Commissioner Control Server to begin commissioning a previously approved request.");
 
-    ChipLogProgress(NotSpecified, "CommissioningRequestResult event received.");
+    StringBuilder<kMaxCommandSize> commandBuilder;
+    commandBuilder.Add("commissionercontrol commission-node ");
+    commandBuilder.AddFormat("%lu %u %lu %d", requestId, responseTimeoutSeconds, mRemoteBridgeNodeId, kRootEndpointId);
 
-    CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
-    CHIP_ERROR error = app::DataModel::Decode(*data, value);
+    PushCommand(commandBuilder.c_str());
+}
+
+void DeviceManager::HandleReverseOpenCommissioningWindow(TLV::TLVReader & data)
+{
+    CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
+    CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to decode event value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(NotSpecified, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
-    if (value.requestId != mRequestId)
+    // Log all fields
+    ChipLogProgress(NotSpecified, "DecodableType fields:");
+    ChipLogProgress(NotSpecified, "  commissioningTimeout: %u", value.commissioningTimeout);
+    ChipLogProgress(NotSpecified, "  discriminator: %u", value.discriminator);
+    ChipLogProgress(NotSpecified, "  iterations: %u", value.iterations);
+
+    char verifierHex[Crypto::kSpake2p_VerifierSerialized_Length * 2 + 1];
+    Encoding::BytesToHex(value.PAKEPasscodeVerifier.data(), value.PAKEPasscodeVerifier.size(), verifierHex, sizeof(verifierHex),
+                         Encoding::HexFlags::kNullTerminate);
+    ChipLogProgress(NotSpecified, "  PAKEPasscodeVerifier: %s", verifierHex);
+
+    char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
+    Encoding::BytesToHex(value.salt.data(), value.salt.size(), saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+    ChipLogProgress(NotSpecified, "  salt: %s", saltHex);
+
+    OpenDeviceCommissioningWindow(mLocalBridgeNodeId, value.commissioningTimeout, value.iterations, value.discriminator, saltHex,
+                                  verifierHex);
+}
+
+void DeviceManager::HandleAttributeData(const app::ConcreteDataAttributePath & path, TLV::TLVReader & data)
+{
+    if (path.mClusterId == CommissionerControl::Id &&
+        path.mAttributeId == CommissionerControl::Attributes::SupportedDeviceCategories::Id)
     {
-        ChipLogError(NotSpecified, "The RequestId does not match the RequestId provided to RequestCommissioningApproval");
+        HandleReadSupportedDeviceCategories(data);
         return;
     }
 
-    if (value.statusCode != static_cast<uint8_t>(Protocols::InteractionModel::Status::Success))
+    if (path.mClusterId == Descriptor::Id && path.mAttributeId == Descriptor::Attributes::PartsList::Id)
     {
-        ChipLogError(NotSpecified, "The server is not ready to begin commissioning the requested device");
+        HandleAttributePartsListUpdate(data);
         return;
     }
+}
 
-    // The server is ready to begin commissioning the requested device, request the Commissioner Control Server to begin
-    // commissioning a previously approved request.
-    CommissionApprovedRequest(value.requestId, kResponseTimeoutSeconds);
+void DeviceManager::HandleEventData(const app::EventHeader & header, TLV::TLVReader & data)
+{
+    if (header.mPath.mClusterId == CommissionerControl::Id &&
+        header.mPath.mEventId == CommissionerControl::Events::CommissioningRequestResult::Id)
+    {
+        HandleCommissioningRequestResult(data);
+    }
+}
+
+void DeviceManager::HandleCommandResponse(const app::ConcreteCommandPath & path, TLV::TLVReader & data)
+{
+    ChipLogProgress(NotSpecified, "Command Response received.");
+
+    if (path.mClusterId == CommissionerControl::Id &&
+        path.mCommandId == CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id)
+    {
+        HandleReverseOpenCommissioningWindow(data);
+    }
 }
 
 void DeviceManager::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)

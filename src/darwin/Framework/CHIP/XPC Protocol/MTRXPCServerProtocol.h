@@ -1,6 +1,5 @@
-//
 /**
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +14,11 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDefines.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getStateWithReply:(void (^)(MTRDeviceState state))reply;
@@ -45,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 @end
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol_MTRDeviceController <NSObject>
 
 - (oneway void)deviceController:(NSUUID *)controller getIsRunningWithReply:(void (^)(BOOL response))reply;
@@ -65,10 +68,11 @@ NS_ASSUME_NONNULL_BEGIN
 //- (oneway void)deviceController:(NSUUID *)controller addServerEndpoint:(MTRServerEndpoint *)endpoint withReply:(void(^)(BOOL success))reply;
 //- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
-- (oneway void)shutdownDeviceController:(NSUUID *)controller;
+- (oneway void)deviceController:(NSUUID *)controller shutdownDeviceController:(NSUUID *)controller;
 
 @end
 
+MTR_NEWLY_AVAILABLE
 @protocol MTRXPCServerProtocol <NSObject, MTRXPCServerProtocol_MTRDevice, MTRXPCServerProtocol_MTRDeviceController>
 - (oneway void)deviceController:(NSUUID *)controller checkInWithContext:(NSDictionary *)context;
 @end

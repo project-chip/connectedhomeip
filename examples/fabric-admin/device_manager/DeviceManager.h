@@ -148,20 +148,30 @@ public:
 
     void SubscribeRemoteFabricBridge();
 
-    void StartReverseCommissioning();
-
     void ReadSupportedDeviceCategories();
 
-    void CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
-    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader & data);
 
-    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
+    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
 private:
     friend DeviceManager & DeviceMgr();
+
+    void RequestCommissioningApproval();
+
+    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
+
+    void HandleCommissioningRequestResult(chip::TLV::TLVReader & data);
+
+    void HandleAttributePartsListUpdate(chip::TLV::TLVReader & data);
+
+    void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+
+    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
 
     static DeviceManager sInstance;
 

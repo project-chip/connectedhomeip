@@ -32,8 +32,8 @@ public:
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) override;
     CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) override;
-    CHIP_ERROR ReverseCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                     const Optional<uint16_t> & port) override;
+    CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
+                                    const Optional<uint16_t> & port) override;
 
     ~CommissionerControlDelegate() = default;
 
@@ -46,6 +46,12 @@ private:
     uint16_t mProductId  = 0;
     char mLabelBuffer[kLabelBufferSize + 1];
     Optional<CharSpan> mLabel;
+
+    // Parameters needed for non-basic commissioning.
+    uint8_t mPBKDFSaltBuffer[Crypto::kSpake2p_Max_PBKDF_Salt_Length];
+    ByteSpan mPBKDFSalt;
+    Crypto::Spake2pVerifierSerialized mPAKEPasscodeVerifierBuffer;
+    ByteSpan mPAKEPasscodeVerifier;
 };
 
 } // namespace CommissionerControl
