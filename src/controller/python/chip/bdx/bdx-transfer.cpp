@@ -71,8 +71,6 @@ CHIP_ERROR BdxTransfer::Reject()
 
 void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
-    assertChipStackLockedByCurrentThread();
-
     ChipLogDetail(BDX, "Received event %s", event.ToString(event.EventType));
 
     switch (event.EventType)
@@ -124,6 +122,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         break;
     default:
         // Should never happen.
+        ChipLogError(BDX, "Unhandled BDX transfer session event type %d.", static_cast<int>(event.EventType));
         chipDie();
         break;
     }

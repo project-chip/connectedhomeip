@@ -86,7 +86,7 @@ class TestBdxTransfer(MatterBaseTest):
         data = await bdx_transfer.accept()
 
         self.step(6)
-        data_file = open(self.matter_test_config.global_test_params["end_user_support_log"], "rb")
+        data_file = open(self.user_params["end_user_support_log"], "rb")
         asserts.assert_equal(bytearray(data), data_file.read(), "Transferred data doesn't match")
 
         self.step(7)
