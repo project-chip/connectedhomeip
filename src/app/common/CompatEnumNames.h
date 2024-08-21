@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include <lib/support/TypeTraits.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
