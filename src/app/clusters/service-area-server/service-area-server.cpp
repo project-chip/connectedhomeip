@@ -241,23 +241,20 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     }
 
     uint32_t selectedAreasBuffer[kMaxNumSelectedAreas];
-    auto selectedAreasSpan = Span<uint32_t>(selectedAreasBuffer, kMaxNumSelectedAreas);
+    auto selectedAreasSpan         = Span<uint32_t>(selectedAreasBuffer, kMaxNumSelectedAreas);
     uint32_t numberOfSelectedAreas = 0;
 
     // Closure for checking if an area ID exists in the selectedAreasSpan
-    auto areaAlreadyExists = [&numberOfSelectedAreas, &selectedAreasSpan] (uint32_t areaId)
-    {
+    auto areaAlreadyExists = [&numberOfSelectedAreas, &selectedAreasSpan](uint32_t areaId) {
         for (uint32_t i = 0; i < numberOfSelectedAreas; i++)
         {
             if (areaId == selectedAreasSpan[i])
             {
                 return true;
             }
-
         }
         return false;
     };
-
 
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
     bool matchesCurrentSelectedAreas = (numberOfAreas == mDelegate->GetNumberOfSelectedAreas());
