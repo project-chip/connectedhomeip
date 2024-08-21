@@ -109,9 +109,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // queue used to serialize all work performed by the MTRDeviceController
-    dispatch_queue_t _chipWorkQueue;
-
     chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
