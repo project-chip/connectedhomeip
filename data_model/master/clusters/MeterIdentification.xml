@@ -54,66 +54,77 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0B06" name="Meter Identification Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
-    <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="1" summary="Initial version"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditions/>
-  <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
+  <clusterIds>
+    <clusterId id="0x0B06" name="Meter Identification"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="MTRID" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="MeterTypeEnum">
+      <item value="0x00" name="Utility" summary="Utility Meter">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Private" summary="Private Meter">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Generic" summary="Generic Meter">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PowerThresholdSourceEnum">
+      <item value="0x00" name="Contract" summary="The value comes from a signed contract">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Regulator" summary="The value comes from a legal regulator">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Equipment" summary="The value comes from a certified limits of the meter">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="MeterType" type="MeterTypeEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0004" name="Groups" side="server">
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="Active"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0102" name="Window Covering" side="server">
+    </attribute>
+    <attribute id="0x0001" name="UtilityName" type="string" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
-      <features>
-        <feature code="" name="AbsolutePosition">
-          <mandatoryConform>
-            <condition name="Zigbee"/>
-          </mandatoryConform>
-        </feature>
-      </features>
-      <commands>
-        <command id="" name="GoToLiftPercentage.LiftPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToLiftPercentage.LiftPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-      </commands>
-    </cluster>
-  </clusters>
-</deviceType>
+      <constraint type="maxLength" value="16"/>
+    </attribute>
+    <attribute id="0x0002" name="PointOfDelivery" type="string" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+      <constraint type="maxLength" value="16"/>
+    </attribute>
+    <attribute id="0x0003" name="PowerThreshold" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="PWRTHLD"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0004" name="PowerThresholdSource" type="PowerThresholdSourceEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="PWRTHLD"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+</cluster>

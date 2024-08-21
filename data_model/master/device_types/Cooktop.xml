@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="OFFONLY">
+        <feature code="" name="OffOnly">
           <mandatoryConform/>
         </feature>
       </features>

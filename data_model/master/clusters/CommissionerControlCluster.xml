@@ -111,8 +111,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x02" name="ReverseOpenCommissioningWindow" direction="commandToClient" response="Y">
-      <access invokePrivilege="manage"/>
+    <command id="0x02" name="ReverseOpenCommissioningWindow" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="CommissioningTimeout" type="uint16">
         <mandatoryConform/>
@@ -145,9 +144,9 @@ Davis, CA 95616, USA
       <field id="1" name="ClientNodeId" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="StatusCode" type="enum8">
+      <field id="2" name="StatusCode" type="status">
         <mandatoryConform/>
-        <constraint type="allowed" value="Status Codes"/>
+        <constraint type="desc"/>
       </field>
     </event>
   </events>

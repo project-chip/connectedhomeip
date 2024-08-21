@@ -136,6 +136,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="DefaultOTAProviders" type="list" default="[]">
       <entry type="ProviderLocation"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
