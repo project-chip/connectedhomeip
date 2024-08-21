@@ -1546,9 +1546,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
 
-    if args.commissioning_method is None:
-        return True
-
     if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")
         return False
@@ -1587,6 +1584,9 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     if len(config.discriminators) != len(set(config.discriminators)):
         print("error: Duplicate value in discriminator list")
         return False
+
+    if args.commissioning_method is None:
+        return True
 
     if config.commissioning_method == "ble-wifi":
         if args.wifi_ssid is None:
