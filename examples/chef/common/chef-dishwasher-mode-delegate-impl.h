@@ -23,6 +23,8 @@
 #include <cstring>
 #include <utility>
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace chip {
 namespace app {
 namespace Clusters {

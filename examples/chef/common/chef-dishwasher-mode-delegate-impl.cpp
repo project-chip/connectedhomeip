@@ -18,6 +18,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 
+using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
@@ -122,6 +124,9 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::E
                                                                      const EmberAfAttributeMetadata * attributeMetadata,
                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
+    VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
+    buffer[0] = gDishwasherModeInstance->GetCurrentMode();
+
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
 
@@ -148,7 +153,7 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 
     gDishwasherModeDelegate = std::make_unique<DishwasherModeDelegate>();
     gDishwasherModeInstance =
-        std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
+        std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
     gDishwasherModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
