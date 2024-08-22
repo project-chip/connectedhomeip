@@ -97,7 +97,6 @@ jobs:
                         --target tizen-arm-tests-no-ble-no-thread \
                         build
                     "
-                 "
 
     qemu-linux:
         name: ubuntu
