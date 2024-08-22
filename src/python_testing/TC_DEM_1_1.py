@@ -192,7 +192,7 @@ class TC_DEM_1_1(MatterBaseTest, DEMTestBase):
     def check_attribute_valid_and_remove_from_list(self, attribute_id, feature_map, attribute_list, required_features):
         if feature_map & required_features:
             asserts.assert_true(attribute_id in attribute_list,
-                                 f"Expected to find attribute {attribute_id} in attribute_list {attribute_list} given feature_map 0x{feature_map:x}")
+                                f"Expected to find attribute {attribute_id} in attribute_list {attribute_list} given feature_map 0x{feature_map:x}")
             attribute_list.remove(attribute_id)
 
         else:
@@ -208,6 +208,8 @@ class TC_DEM_1_1(MatterBaseTest, DEMTestBase):
         else:
             for command in expected_commands:
                 asserts.assert_false(command in accepted_command_list,
-                                    f"Did not expect command {command} to be in accepted_command_list {accepted_command_list} given required_features {required_features} in feature_map 0x{feature_map:x}")
+                                     f"Did not expect command {command} to be in accepted_command_list {accepted_command_list} given required_features {required_features} in feature_map 0x{feature_map:x}")
+
+
 if __name__ == "__main__":
     default_matter_test_main()
