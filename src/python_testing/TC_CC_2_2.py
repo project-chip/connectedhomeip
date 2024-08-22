@@ -139,14 +139,14 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(6)
         if supports_hs:
-            cmd = cc.Commands.MoveHue(moveMode=cc.Enums.HueMoveMode.kDown, rate=225)
+            cmd = cc.Commands.MoveHue(moveMode=cc.Enums.MoveModeEnum.kDown, rate=225)
             await self.send_single_cmd(cmd)
         else:
             self.mark_current_step_skipped()
 
         self.step(7)
         if supports_hs:
-            cmd = cc.Commands.MoveSaturation(moveMode=cc.Enums.SaturationMoveMode.kDown, rate=225)
+            cmd = cc.Commands.MoveSaturation(moveMode=cc.Enums.MoveModeEnum.kDown, rate=225)
             await self.send_single_cmd(cmd)
         else:
             self.mark_current_step_skipped()
@@ -175,7 +175,7 @@ class TC_CC_2_3(MatterBaseTest):
             self.skip_step(15)
         else:
             self.step(10)
-            cmd = cc.Commands.MoveToHue(hue=254, transitionTime=100, direction=cc.Enums.HueDirection.kShortestDistance)
+            cmd = cc.Commands.MoveToHue(hue=254, transitionTime=100, direction=cc.Enums.DirectionEnum.kShortest)
             await self.send_single_cmd(cmd)
 
             self.step(11)
@@ -230,7 +230,7 @@ class TC_CC_2_3(MatterBaseTest):
         else:
             self.step(23)
             cmd = cc.Commands.EnhancedMoveToHue(enhancedHue=0, transitionTime=100,
-                                                direction=cc.Enums.HueDirection.kShortestDistance)
+                                                direction=cc.Enums.DirectionEnum.kShortest)
             await self.send_single_cmd(cmd)
 
             self.step(24)
