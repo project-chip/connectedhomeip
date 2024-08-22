@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <Foundation/Foundation.h>
+#include <MTRDeviceController.h>
+#include <MTRUtilities.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerParameters.h>
 
@@ -129,6 +132,10 @@ using namespace chip::Tracing::DarwinFramework;
     std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
+
+    NSNumber * _fabricID;
+    NSNumber * _nodeID;
+    NSData * _rootPublicKey;
 }
 
 - (os_unfair_lock_t)deviceMapLock
@@ -304,6 +311,9 @@ using namespace chip::Tracing::DarwinFramework;
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
+        _nodeID = nil;
+        _fabricID = nil;
+        _rootPublicKey = nil;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
@@ -330,6 +340,26 @@ using namespace chip::Tracing::DarwinFramework;
     return assertionCount;
 }
 
+- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters
+{
+    if (!parameters.operationalCertificate || !parameters.rootCertificate) {
+        return FALSE;
+    }
+    NSNumber *nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
+    NSNumber *fabricID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
+    NSData *publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:parameters.rootCertificate];
+
+    __block BOOL matches = FALSE;
+    dispatch_sync(_chipWorkQueue, ^{
+        matches =  self.keepRunningAssertionCounter > 0 &&
+                   self.shutdownPending &&
+                   MTREqualObjects(nodeID, self->_nodeID) &&
+                   MTREqualObjects(fabricID, self->_fabricID) &&
+                   MTREqualObjects(publicKey, self->_rootPublicKey);
+    });
+    return matches;
+}
+
 - (void)addRunAssertion
 {
     dispatch_sync(_chipWorkQueue, ^{
@@ -354,6 +384,13 @@ using namespace chip::Tracing::DarwinFramework;
         MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
         [self finalShutdown];
     }
+}
+
+- (void)clearPendingShutdown
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        self.shutdownPending = FALSE;
+    });
 }
 
 - (void)shutdown
@@ -424,6 +461,9 @@ using namespace chip::Tracing::DarwinFramework;
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
+        _nodeID = nil;
+        _fabricID = nil;
+        _rootPublicKey = nil;
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
@@ -665,6 +705,14 @@ using namespace chip::Tracing::DarwinFramework;
 
         self->_storedFabricIndex = fabricIdx;
         self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
+
+        chip::Crypto::P256PublicKey rootPublicKey;
+        if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
+             self->_rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
+             self->_nodeID = @(_cppCommissioner->GetNodeId());
+             self->_fabricID = @(_cppCommissioner->GetFabricId());
+        }
+
         commissionerInitialized = YES;
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());

@@ -45,6 +45,7 @@
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
+@class MTRDeviceControllerParameters;
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
@@ -313,6 +314,16 @@ NS_ASSUME_NONNULL_BEGIN
  * until all assertions have been removed.
  */
 - (NSUInteger)shutdownPrecheck;
+
+/**
+ * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
+ */
+- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters;
+
+/**
+ * Clear any pending shutdown request.
+ */
+- (void)clearPendingShutdown;
 
 @end
 

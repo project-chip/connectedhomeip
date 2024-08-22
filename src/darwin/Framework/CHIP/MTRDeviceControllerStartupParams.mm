@@ -15,6 +15,8 @@
  */
 
 #import "MTRDeviceControllerStartupParams.h"
+#include <MTRDefines.h>
+#include <lib/core/CHIPError.h>
 #import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
@@ -304,6 +306,29 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 {
     _otaProviderDelegate = otaProviderDelegate;
     _otaProviderDelegateQueue = queue;
+}
+
++ (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber *nodeID = nil;
+    ExtractNodeIDFromNOC(noc, &nodeID);
+    return nodeID;
+}
+
++ (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber *fabricID = nil;
+    ExtractFabricIDFromNOC(noc, &fabricID);
+    return fabricID;
+}
+
++ (NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate
+{
+    Crypto::P256PublicKey pubKey;
+    if (ExtractPubkeyFromX509Cert(AsByteSpan(certificate), pubKey) != CHIP_NO_ERROR) {
+        return nil;
+    }
+    return [NSData dataWithBytes:pubKey.Bytes() length:pubKey.Length()];
 }
 
 @end
