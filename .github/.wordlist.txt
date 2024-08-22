@@ -572,6 +572,7 @@ fsync
 ftd
 fullclean
 fuzzer
+fuzzers
 fuzztest
 FW
 gbl
