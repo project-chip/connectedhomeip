@@ -269,7 +269,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command()
 
             # Write to the presets attribute after calling AtomicRequest command
-            await self.write_presets(endpoint=endpoint, presets=new_presets)
+            test_presets = copy.deepcopy(new_presets)
+            test_presets[0].builtIn = NullValue
+            await self.write_presets(endpoint=endpoint, presets=test_presets)
 
             # Send the AtomicRequest commit command
             await self.send_atomic_request_commit_command()
