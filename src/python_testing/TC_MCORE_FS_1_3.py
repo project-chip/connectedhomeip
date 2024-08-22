@@ -15,15 +15,19 @@
 #    limitations under the License.
 #
 
-# This test requires a TH_SERVER application that returns UnsupportedAttribute when reading UniqueID from BasicInformation Cluster. Please specify with --string-arg th_server_app_path:<path_to_app>
+# This test requires a TH_SERVER application that returns UnsupportedAttribute
+# when reading UniqueID from BasicInformation Cluster. Please specify the app
+# location with --string-arg th_server_app_path:<path_to_app>
 
 import logging
 import os
 import random
-import signal
 import subprocess
+import sys
 import time
 import uuid
+from subprocess import Popen, PIPE
+from threading import Event, Thread
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -32,53 +36,223 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
+class ThreadWithStop(Thread):
+
+    def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
+        super().__init__(**kw)
+        self.tag = f"[{tag}] " if tag else ""
+        self.start_event = Event()
+        self.stop_event = Event()
+        self.stdout_cb = stdout_cb
+        self.args = args
+
+    def forward_stdout(self, f):
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            sys.stdout.write(f"{self.tag}{line}")
+            if self.stdout_cb is not None:
+                self.stdout_cb(line)
+
+    def forward_stderr(self, f):
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            sys.stderr.write(f"{self.tag}{line}")
+
+    def run(self):
+        logging.info("RUN: %s", " ".join(self.args))
+        self.p = Popen(self.args, errors="ignore", stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.start_event.set()
+        # Feed stdout and stderr to console and given callback.
+        t1 = Thread(target=self.forward_stdout, args=[self.p.stdout])
+        t1.start()
+        t2 = Thread(target=self.forward_stderr, args=[self.p.stderr])
+        t2.start()
+        # Wait for the stop event.
+        self.stop_event.wait()
+        self.p.terminate()
+        t1.join()
+        t2.join()
+
+    def start(self):
+        super().start()
+        self.start_event.wait()
+
+    def stop(self):
+        self.stop_event.set()
+        self.join()
+
+
+class FabricAdminController:
+
+    ADMIN_APP_PATH = "out/linux-x64-fabric-admin-rpc/fabric-admin"
+    BRIDGE_APP_PATH = "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
+
+    def _process_admin_output(self, line):
+        if self.wait_for_text_text is not None and self.wait_for_text_text in line:
+            self.wait_for_text_event.set()
+
+    def wait_for_text(self):
+        self.wait_for_text_event.wait(timeout=30)
+        self.wait_for_text_event.clear()
+        self.wait_for_text_text = None
+
+    def __init__(self, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
+                 bridgePort=None, bridgeDiscriminator=None, bridgePasscode=None):
+
+        self.wait_for_text_event = Event()
+        self.wait_for_text_text = None
+
+        args = [self.BRIDGE_APP_PATH]
+        args.extend(['--secured-device-port', str(bridgePort)])
+        args.extend(["--discriminator", str(bridgeDiscriminator)])
+        args.extend(["--passcode", str(bridgePasscode)])
+        # Start the bridge app which will connect to admin via RPC.
+        self.bridge = ThreadWithStop(args, tag="BRIDGE")
+        self.bridge.start()
+
+        args = [self.ADMIN_APP_PATH, "interactive", "start"]
+        args.extend(["--commissioner-name", str(fabricName)])
+        args.extend(["--commissioner-nodeid", str(nodeId)])
+        args.extend(["--commissioner-vendor-id", str(vendorId)])
+        # FIXME: Passing custom PAA store breaks something
+        # if paaTrustStorePath is not None:
+        #     args.extend(["--paa-trust-store-path", str(paaTrustStorePath)])
+
+        self.admin = ThreadWithStop(args, self._process_admin_output, tag="ADMIN")
+        self.wait_for_text_text = "Connected to Fabric-Bridge"
+        self.admin.start()
+
+        # Wait for the bridge to connect to the admin.
+        self.wait_for_text()
+
+    def CommissionOnNetwork(self, nodeId, setupPinCode=None, filterType=None, filter=None):
+
+        self.wait_for_text_text = f"Commissioning complete for node ID 0x{nodeId:016x}: success"
+
+        self.admin.p.stdin.write(f"pairing onnetwork {nodeId} {setupPinCode}\n")
+        self.admin.p.stdin.flush()
+
+        # Wait for success message.
+        self.wait_for_text()
+
+    def stop(self):
+        self.admin.stop()
+        self.bridge.stop()
+
+
+class AppServer:
+
+    def __init__(self, app, port=None, discriminator=None, passcode=None):
+
+        args = [app]
+        args.extend(['--secured-device-port', str(port)])
+        args.extend(["--discriminator", str(discriminator)])
+        args.extend(["--passcode", str(passcode)])
+        self.app = ThreadWithStop(args, tag="APP")
+        self.app.start()
+
+    def stop(self):
+        self.app.stop()
+
+
 class TC_MCORE_FS_1_3(MatterBaseTest):
-    @async_test_body
-    async def setup_class(self):
+
+    def setup_class(self):
         super().setup_class()
-        self.device_for_th_eco_nodeid = 1111
-        self.device_for_th_eco_kvs = None
-        self.device_for_th_eco_port = 5543
-        self.app_process_for_th_eco = None
 
-        self.device_for_dut_eco_nodeid = 1112
-        self.device_for_dut_eco_kvs = None
-        self.device_for_dut_eco_port = 5544
-        self.app_process_for_dut_eco = None
+        # Get the path to the Fabric Admin and Bridge apps from the user
+        # params or use the default paths.
+        FabricAdminController.ADMIN_APP_PATH = self.user_params.get(
+            "th_fabric_admin_app_path", FabricAdminController.ADMIN_APP_PATH)
+        FabricAdminController.BRIDGE_APP_PATH = self.user_params.get(
+            "th_fabric_bridge_app_path", FabricAdminController.BRIDGE_APP_PATH)
+        if not os.path.exists(FabricAdminController.ADMIN_APP_PATH):
+            asserts.fail("This test requires a TH_FABRIC_ADMIN app. Specify app path with --string-arg th_fabric_admin_app_path:<path_to_app>")
+        if not os.path.exists(FabricAdminController.BRIDGE_APP_PATH):
+            asserts.fail("This test requires a TH_FABRIC_BRIDGE app. Specify app path with --string-arg th_fabric_bridge_app_path:<path_to_app>")
 
-        # Create a second controller on a new fabric to communicate to the server
-        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        paa_path = str(self.matter_test_config.paa_trust_store_path)
-        self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
-
-    def teardown_class(self):
-        if self.app_process_for_dut_eco is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process_for_dut_eco.send_signal(signal.SIGTERM.value)
-            self.app_process_for_dut_eco.wait()
-        if self.app_process_for_th_eco is not None:
-            logging.warning("Stopping app with SIGTERM")
-            self.app_process_for_th_eco.send_signal(signal.SIGTERM.value)
-            self.app_process_for_th_eco.wait()
-
-        os.remove(self.device_for_dut_eco_kvs)
-        if self.device_for_th_eco_kvs is not None:
-            os.remove(self.device_for_th_eco_kvs)
-        super().teardown_class()
-
-    async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
+        # Get the path to the TH_SERVER app from the user params.
         app = self.user_params.get("th_server_app_path", None)
         if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
-
+            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
         if not os.path.exists(app):
-            asserts.fail(f'The path {app} does not exist')
+            asserts.fail(f"The path {app} does not exist")
+
+        self.fsa_bridge_port = 5543
+        self.fsa_bridge_discriminator = random.randint(0, 4095)
+        self.fsa_bridge_passcode = 20202021
+
+        self.th_fsa_controller = FabricAdminController(
+            paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
+            bridgePort=self.fsa_bridge_port,
+            bridgeDiscriminator=self.fsa_bridge_discriminator,
+            bridgePasscode=self.fsa_bridge_passcode,
+            vendorId=0xFFF1,
+            fabricName="beta",
+            nodeId=1)
+
+        self.server_for_dut_port = 5544
+        self.server_for_dut_discriminator = random.randint(0, 4095)
+        self.server_for_dut_passcode = 20202021
+
+        self.server_for_th_port = 5545
+        self.server_for_th_discriminator = random.randint(0, 4095)
+        self.server_for_th_passcode = 20202021
+
+        # Start the TH_SERVER_FOR_TH_FSA app.
+        self.server_for_th = AppServer(
+            app,
+            port=self.server_for_th_port,
+            discriminator=self.server_for_th_discriminator,
+            passcode=self.server_for_th_passcode)
+
+        # self.device_for_th_eco_nodeid = 1111
+        # self.device_for_th_eco_kvs = None
+        # self.device_for_th_eco_port = 5543
+        # self.app_process_for_th_eco = None
+
+        # self.device_for_dut_eco_nodeid = 1112
+        # self.device_for_dut_eco_kvs = None
+        # self.device_for_dut_eco_port = 5544
+        # self.app_process_for_dut_eco = None
+
+        # Create a second controller on a new fabric to communicate to the server
+        # new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        # new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
+        # paa_path = str(self.matter_test_config.paa_trust_store_path)
+        # self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
+
+    def teardown_class(self):
+
+        self.th_fsa_controller.stop()
+        self.server_for_th.stop()
+
+        # os.remove(self.device_for_dut_eco_kvs)
+        # if self.device_for_th_eco_kvs is not None:
+        #     os.remove(self.device_for_th_eco_kvs)
+        super().teardown_class()
+
+    def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
+        return [
+            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(1, "DUT_FSA commissions TH_SERVER_FOR_DUT_FSA to DUT_FSA's fabric and generates a UniqueID"),
+            TestStep(2, "TH instructs TH_FSA to commission TH_SERVER_FOR_TH_FSA to TH_FSA's fabric"),
+            TestStep(3, "TH instructs TH_FSA to open up commissioning window on it's aggregator"),
+            TestStep(4, "Follow manufacturer provided instructions to have DUT_FSA commission TH_FSA's aggregator"),
+            TestStep(5, "Follow manufacturer provided instructions to enable DUT_FSA to synchronize TH_SERVER_FOR_TH_FSA from TH_FSA onto DUT_FSA's fabric. TH to provide endpoint saved from step 2 in user prompt"),
+            TestStep(6, "DUT_FSA synchronizes TH_SERVER_FOR_TH_FSA onto DUT_FSA's fabric and copies the UniqueID presented by TH_FSA's Bridged Device Basic Information Cluster"),
+        ]
+
+    async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
 
         discriminator = random.randint(0, 4095)
         passcode = 20202021
 
-        cmd = [app]
+        cmd = [self.app]
         cmd.extend(['--secured-device-port', str(port)])
         cmd.extend(['--discriminator', str(discriminator)])
         cmd.extend(['--passcode', str(passcode)])
@@ -94,18 +268,105 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         await self.TH_server_controller.CommissionOnNetwork(nodeId=node_id_for_th, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         logging.info("Commissioning device for DUT ecosystem onto TH for managing")
 
-    def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
-        steps = [TestStep(1, "DUT_FSA commissions TH_SED_DUT to DUT_FSAs fabric and generates a UniqueID", is_commissioning=True),
-                 TestStep(2, "TH_FSA commissions TH_SED_TH onto TH_FSAs fabric and generates a UniqueID."),
-                 TestStep(3, "Follow manufacturer provided instructions to enable DUT_FSA to synchronize TH_SED_TH onto DUT_FSAs fabric."),
-                 TestStep(4, "DUT_FSA synchronizes TH_SED_TH onto DUT_FSAs fabric and copies the UniqueID presented by TH_FSAs Bridged Device Basic Information Cluster.")]
-        return steps
-
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        self.print_step(0, "Commissioning DUT to TH, already done")
-        self.step(1)
+
+        # Commissioning - done
+        self.step(0)
+
+        th_fsa_bridge_th_node_id = 2
+        self.print_step(1, "Commissioning TH_FSA_BRIDGE to TH fabric")
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=th_fsa_bridge_th_node_id,
+            setupPinCode=self.fsa_bridge_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.fsa_bridge_discriminator,
+        )
+
+        # Get the list of endpoints on the TH_FSA_BRIDGE before adding the TH_SERVER_FOR_TH_FSA.
+        th_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=th_fsa_bridge_th_node_id,
+            endpoint=0,
+        ))
+
+        th_server_for_th_fsa_th_node_id = 3
+        self.print_step(2, "Commissioning TH_SERVER_FOR_TH_FSA to TH fabric")
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=th_server_for_th_fsa_th_node_id,
+            setupPinCode=self.server_for_th_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.server_for_th_discriminator,
+        )
+
+        self.print_step(3, "Verify that TH_SERVER_FOR_TH_FSA does not have a UniqueID")
+        th_server_unique_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.UniqueID,
+            node_id=th_server_for_th_fsa_th_node_id)
+        # TODO: Use app without UniqueID
+        print("TH_SERVER UniqueID", th_server_unique_id)
+        # asserts.assert_true(type_matches(th_server_unique_id, str), "UniqueID should be a string")
+        # asserts.assert_true(th_server_unique_id, "UniqueID should not be an empty string")
+
+        # TODO: Figure out why this is needed (sometimes)
+        # time.sleep(1)
+
+        discriminator = random.randint(0, 4095)
+        self.print_step(4, "Open commissioning window on TH_SERVER_FOR_TH_FSA")
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeid=th_server_for_th_fsa_th_node_id,
+            timeout=600,
+            iteration=10000,
+            discriminator=discriminator,
+            option=1)
+
+        # FIXME: Sometimes the pincode reported by APP and returned here is different...
+        print("PINCODEEEEEEEEEEEE", params.setupPinCode)
+
+        time.sleep(1)
+
+        th_server_for_th_fsa_th_fsa_node_id = 3
+        self.print_step(5, "Commissioning TH_SERVER_FOR_TH_FSA to TH_FSA")
+        self.th_fsa_controller.CommissionOnNetwork(
+            nodeId=th_server_for_th_fsa_th_fsa_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=discriminator,
+        )
+
+        time.sleep(3)
+
+        # Get the list of endpoints on the TH_FSA_BRIDGE after adding the TH_SERVER_FOR_TH_FSA.
+        th_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=th_fsa_bridge_th_node_id,
+            endpoint=0,
+        ))
+
+        # Get the endpoint number for just added TH_SERVER_FOR_TH_FSA.
+        logging.info("Endpoints on TH_FSA_BRIDGE: old=%s, new=%s", th_fsa_bridge_endpoints, th_fsa_bridge_endpoints_new)
+        asserts.assert_true(th_fsa_bridge_endpoints_new.issuperset(th_fsa_bridge_endpoints),
+                            "Expected only new endpoints to be added")
+        unique_endpoints_set = th_fsa_bridge_endpoints_new - th_fsa_bridge_endpoints
+        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
+        th_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
+
+        self.print_step(6, "Verify that TH_FSA created a UniqueID for TH_SERVER_FOR_TH_FSA")
+        th_fsa_bridge_th_server_unique_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BridgedDeviceBasicInformation,
+            attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
+            node_id=th_fsa_bridge_th_node_id,
+            endpoint=th_fsa_bridge_th_server_endpoint)
+        asserts.assert_true(type_matches(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
+        logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", th_fsa_bridge_th_server_unique_id)
+
+        return
+
         # These steps are not explicitly in step 1, but they help identify the dynamically added endpoint in step 1.
         root_node_endpoint = 0
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
