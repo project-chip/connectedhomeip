@@ -170,7 +170,7 @@ CHIP_ERROR WhmManufacturerShutdown()
 CHIP_ERROR WhmApplicationInit()
 {
     ReturnErrorOnFailure(WhmInit());
-    
+
     /* Do this last so that the instances for other clusters can be wrapped inside */
     ReturnErrorOnFailure(WhmManufacturerInit());
 
