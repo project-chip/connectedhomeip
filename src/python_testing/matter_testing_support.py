@@ -410,17 +410,22 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_reports[a] = []
         self._q = queue.Queue()
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool=True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=[(endpoint, self._expected_cluster)],
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
-            keepSubscriptions=True
+            keepSubscriptions=keepSubscriptions
         )
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
+
+    def cancel(self):
+        """This cancels a subscription."""
+        self._subscription.Shutdown()
+        self._subscription = None
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
