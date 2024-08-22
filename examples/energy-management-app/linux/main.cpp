@@ -117,18 +117,9 @@ void ApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
-    if (strcmp(spApp, kEvseApp) == 0)
-    {
-        EvseApplicationShutdown();
-    }
-    else if (strcmp(spApp, kWhmApp) == 0)
-    {
-        FullWhmApplicationShutdown();
-    }
-    else
-    {
-        ChipLogError(Support, "Unexpected application %s", spApp);
-    }
+    EvseApplicationShutdown();
+    FullWhmApplicationShutdown();
+    
 }
 
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,

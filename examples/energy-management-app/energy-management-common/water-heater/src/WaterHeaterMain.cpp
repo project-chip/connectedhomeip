@@ -73,7 +73,7 @@ void FullWhmApplicationInit()
 
 void FullWhmApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Energy Management App (WaterHeater): ApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     PowerTopologyShutdown();          /* Free the PowerTopology */
@@ -82,6 +82,7 @@ void FullWhmApplicationShutdown()
     WhmApplicationShutdown();
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::WaterHeaterMode::Shutdown();
 }
 
 } // namespace WaterHeaterManagement
