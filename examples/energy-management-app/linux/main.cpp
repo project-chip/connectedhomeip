@@ -119,7 +119,7 @@ void ApplicationShutdown()
 
     EvseApplicationShutdown();
     FullWhmApplicationShutdown();
-    
+
 }
 
 static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
