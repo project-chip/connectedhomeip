@@ -444,36 +444,6 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         }
     }
 
-    // For each preset in the presets attribute, check that the matching preset in the pending presets list does not
-    // violate any spec constraints.
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers preset;
-        err = delegate->GetPresetAtIndex(i, preset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl,
-                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
-                         "%" CHIP_ERROR_FORMAT,
-                         err.Format());
-            return Status::InvalidInState;
-        }
-
-        bool found = MatchingPendingPresetExists(delegate, preset);
-
-        // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
-        // CONSTRAINT_ERROR.
-        if (IsBuiltIn(preset) && !found)
-        {
-            return Status::ConstraintError;
-        }
-    }
-
     // If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
     // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
     // attribute set, continue with other checks.
