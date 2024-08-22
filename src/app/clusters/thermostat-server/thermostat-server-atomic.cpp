@@ -28,8 +28,6 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
 
-namespace {}
-
 namespace chip {
 namespace app {
 namespace Clusters {

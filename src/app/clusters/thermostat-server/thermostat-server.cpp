@@ -71,6 +71,13 @@ static_assert(kThermostatEndpointCount <= kEmberInvalidEndpointIndex, "Thermosta
 
 Delegate * gDelegateTable[kThermostatEndpointCount] = { nullptr };
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+ThermostatAttrAccess gThermostatAttrAccess;
+
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
     // Optional Mfg supplied limits
@@ -212,13 +219,6 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     return CoolingSetpoint;
 }
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-
-ThermostatAttrAccess gThermostatAttrAccess;
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

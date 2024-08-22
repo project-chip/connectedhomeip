@@ -28,15 +28,7 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
 
-extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
-extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-
-extern ThermostatAttrAccess gThermostatAttrAccess;
+namespace {
 
 /**
  * @brief Check if a preset is valid.
@@ -320,6 +312,17 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     return false;
 }
 
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+extern ThermostatAttrAccess gThermostatAttrAccess;
+extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
+extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
+
 Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle)
 {
 
@@ -528,9 +531,8 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
 } // namespace app
 } // namespace chip
 
-bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::SetActivePresetRequest::DecodableType & commandData)
+bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
 {
     auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
     commandObj->AddStatus(commandPath, status);
