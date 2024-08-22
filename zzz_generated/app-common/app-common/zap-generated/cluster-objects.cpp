@@ -20457,7 +20457,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kLandmarkTag), landmarkTag);
-    encoder.Encode(to_underlying(Fields::kPositionTag), positionTag);
+    encoder.Encode(to_underlying(Fields::kRelativePositionTag), relativePositionTag);
     return encoder.Finalize();
 }
 
@@ -20479,9 +20479,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, landmarkTag);
         }
-        else if (__context_tag == to_underlying(Fields::kPositionTag))
+        else if (__context_tag == to_underlying(Fields::kRelativePositionTag))
         {
-            err = DataModel::Decode(reader, positionTag);
+            err = DataModel::Decode(reader, relativePositionTag);
         }
         else
         {
@@ -20540,7 +20540,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kAreaID), areaID);
     encoder.Encode(to_underlying(Fields::kMapID), mapID);
-    encoder.Encode(to_underlying(Fields::kAreaDesc), areaDesc);
+    encoder.Encode(to_underlying(Fields::kAreaInfo), areaInfo);
     return encoder.Finalize();
 }
 
@@ -20566,9 +20566,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, mapID);
         }
-        else if (__context_tag == to_underlying(Fields::kAreaDesc))
+        else if (__context_tag == to_underlying(Fields::kAreaInfo))
         {
-            err = DataModel::Decode(reader, areaDesc);
+            err = DataModel::Decode(reader, areaInfo);
         }
         else
         {

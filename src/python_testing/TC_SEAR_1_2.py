@@ -80,7 +80,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
-        areadesc_s = set()
+        areainfo_s = set()
         for a in supported_areas:
             asserts.assert_true(a.areaID not in areaid_list, "SupportedAreas must have unique AreaID values!")
 
@@ -91,27 +91,27 @@ class TC_SEAR_1_2(MatterBaseTest):
                                       f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
                 asserts.assert_true(a.mapID in self.mapid_list,
                                     f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
-                k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s,
-                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"mapID:{a.mapID} areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s,
+                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
             else:
                 # empty SupportedMaps
                 asserts.assert_is(a.mapID, NullValue,
                                   f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
-                k = f"areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s, f"SupportedAreas must have unique AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
 
-            if a.areaDesc.locationInfo is NullValue and a.areaDesc.landmarkInfo is NullValue:
+            if a.areaInfo.locationInfo is NullValue and a.areaInfo.landmarkInfo is NullValue:
                 asserts.assert_true(
                     f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkInfo")
-            if a.areaDesc.landmarkInfo is not NullValue:
-                asserts.assert_true(a.areaDesc.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaDesc.landmarkInfo.landmarkTag})")
-                asserts.assert_true(a.areaDesc.landmarkInfo.positionTag is NullValue or a
-                                    .areaDesc.landmarkInfo.positionTag in range(0, self.MAX_RELPOS_ID),
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.areaDesc.landmarkInfo.positionTag})")
+            if a.areaInfo.landmarkInfo is not NullValue:
+                asserts.assert_true(a.areaInfo.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaInfo.landmarkInfo.landmarkTag})")
+                asserts.assert_true(a.areaInfo.landmarkInfo.relativePositionTag is NullValue or a
+                                    .areaInfo.landmarkInfo.relativePositionTag in range(0, self.MAX_RELPOS_ID),
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid RelativePositionTag({a.areaInfo.landmarkInfo.relativePositionTag})")
         # save so other methods can use this if needed
         self.areaid_list = areaid_list
 
