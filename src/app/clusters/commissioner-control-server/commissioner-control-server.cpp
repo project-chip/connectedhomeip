@@ -71,15 +71,15 @@ void RunDeferredCommissionNode(intptr_t commandArg)
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
+        CHIP_ERROR err = delegate->HandleCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ChipLogError(Zcl, "No delegate available for ReverseCommissionNode");
+        ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
     }
 
     delete info;
@@ -216,6 +216,14 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     auto sourceNodeId = GetNodeId(commandObj);
 
+    // Constraint on responseTimeoutSeconds is [30; 120] seconds
+    if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
+    {
+        ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
@@ -236,15 +244,15 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     // Set IP address and port in the CommissionNodeInfo struct
     commissionNodeInfo->port = commandData.port;
     err                      = commissionNodeInfo->ipAddress.SetIPAddress(commandData.ipAddress);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Validate the commission node command.
     err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
     err = delegate->GetCommissioningWindowParams(commissionNodeInfo->params);
-    SuccessOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err);
 
     // Add the response for the commissioning window.
     AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, commissionNodeInfo->params);

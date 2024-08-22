@@ -10355,6 +10355,15 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
+            // Cluster WaterHeaterManagement events
+        case MTREventIDTypeClusterWaterHeaterManagementEventBoostStartedID:
+            result = @"BoostStarted";
+            break;
+
+        case MTREventIDTypeClusterWaterHeaterManagementEventBoostEndedID:
+            result = @"BoostEnded";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
             break;

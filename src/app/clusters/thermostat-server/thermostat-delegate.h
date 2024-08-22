@@ -39,6 +39,17 @@ public:
     virtual ~Delegate() = default;
 
     /**
+     * @brief Get the maximum timeout for atomically writing to a set of attributes
+     *
+     * @param[in] attributeRequests The list of attributes to write to.
+     * @param[out] timeoutRequest The timeout proposed by the client.
+     * @return The maximum allowed timeout; zero if the request is invalid.
+     */
+    virtual std::optional<System::Clock::Milliseconds16>
+    GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                          System::Clock::Milliseconds16 timeoutRequest) = 0;
+
+    /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
      *
      * @param[in] index The index of the preset type in the list.
@@ -67,11 +78,10 @@ public:
     /**
      * @brief Get the ActivePresetHandle attribute value.
      *
-     * @param[out] activePresetHandle The MutableByteSpan to copy the active preset handle into. On success,
-     *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     * @param[out] activePresetHandle The nullable MutableByteSpan to copy the active preset handle into. On success,
+     *             the size of the activePresetHandle is updated to the length of the copied data.
      */
-    virtual CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) = 0;
+    virtual CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) = 0;
 
     /**
      * @brief Set the ActivePresetHandle attribute value.

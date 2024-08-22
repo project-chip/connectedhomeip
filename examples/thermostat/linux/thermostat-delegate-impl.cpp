@@ -117,9 +117,19 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
+CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
 {
-    return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
+    if (mActivePresetHandleDataSize != 0)
+    {
+        ReturnErrorOnFailure(
+            CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value()));
+        activePresetHandle.Value().reduce_size(mActivePresetHandleDataSize);
+    }
+    else
+    {
+        activePresetHandle.SetNull();
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
@@ -146,6 +156,47 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }
     return CHIP_NO_ERROR;
+}
+
+std::optional<System::Clock::Milliseconds16>
+ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
+                                          System::Clock::Milliseconds16 timeoutRequest)
+{
+    auto attributeIdsIter = attributeRequests.begin();
+    bool requestedPresets = false, requestedSchedules = false;
+    while (attributeIdsIter.Next())
+    {
+        auto & attributeId = attributeIdsIter.GetValue();
+
+        switch (attributeId)
+        {
+        case Attributes::Presets::Id:
+            requestedPresets = true;
+            break;
+        case Attributes::Schedules::Id:
+            requestedSchedules = true;
+            break;
+        default:
+            return System::Clock::Milliseconds16(0);
+        }
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return System::Clock::Milliseconds16(0);
+    }
+    auto timeout = System::Clock::Milliseconds16(0);
+    if (requestedPresets)
+    {
+        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
+        timeout += std::chrono::milliseconds(3000);
+    }
+    if (requestedSchedules)
+    {
+        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
+        timeout += std::chrono::milliseconds(9000);
+    }
+    // If the client requested an even smaller timeout, then use that one
+    return std::min(timeoutRequest, timeout);
 }
 
 void ThermostatDelegate::InitializePendingPresets()

@@ -18,10 +18,12 @@
 
 #include <AppMain.h>
 
+#include "BridgedAdministratorCommissioning.h"
 #include "BridgedDevice.h"
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
+#include "CommissionerControl.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -81,7 +83,7 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                CHIP_ERROR err = OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams()
+                CHIP_ERROR err = OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
                                                              .SetNodeId(0x1234)
                                                              .SetTimeout(300)
                                                              .SetDiscriminator(3840)
@@ -156,7 +158,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
-        OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams()
+        OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
                                     .SetNodeId(device->GetNodeId())
                                     .SetTimeout(commandData.commissioningTimeout)
                                     .SetDiscriminator(commandData.discriminator)
@@ -233,6 +235,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
@@ -257,11 +260,20 @@ void ApplicationInit()
     pollingThread.detach();
 
     BridgeDeviceMgr().Init();
+    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
+
+    VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner Control Server");
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
+
+    if (CommissionerControlShutdown() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to shutdown Commissioner Control Server");
+    }
 }
 
 int main(int argc, char * argv[])

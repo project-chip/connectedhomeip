@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 
 #include <string>
@@ -40,14 +41,24 @@ public:
         std::string softwareVersionString;
     };
 
+    struct AdminCommissioningAttributes
+    {
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum commissioningWindowStatus =
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
+        std::optional<chip::FabricIndex> openerFabricIndex = std::nullopt;
+        std::optional<chip::VendorId> openerVendorId       = std::nullopt;
+    };
+
     BridgedDevice(chip::NodeId nodeId);
     virtual ~BridgedDevice() = default;
 
+    [[nodiscard]] bool IsReachable() const { return mReachable; }
+    void SetReachable(bool reachable);
+
     void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
 
-    bool IsReachable();
-    bool IsIcd();
-    void SetReachable(bool reachable);
+    [[nodiscard]] bool IsIcd() const { return mIsIcd; }
+    void SetIcd(bool icd) { mIsIcd = icd; }
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
@@ -57,17 +68,21 @@ public:
 
     [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
     void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+    // TODO(#35077): Need to allow mAdminCommissioningAttributes to be set from fabric-admin.
+    const AdminCommissioningAttributes & GetAdminCommissioningAttributes() const { return mAdminCommissioningAttributes; }
 
     /// Convenience method to set just the unique id of a bridged device as it
     /// is one of the few attributes that is not always bulk-set
     void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
-    bool mReachable;
-    bool mIsIcd = false;
-    chip::NodeId mNodeId;
-    chip::EndpointId mEndpointId;
-    chip::EndpointId mParentEndpointId;
+    bool mReachable = false;
+    bool mIsIcd     = false;
+
+    chip::NodeId mNodeId               = 0;
+    chip::EndpointId mEndpointId       = 0;
+    chip::EndpointId mParentEndpointId = 0;
 
     BridgedAttributes mAttributes;
+    AdminCommissioningAttributes mAdminCommissioningAttributes;
 };

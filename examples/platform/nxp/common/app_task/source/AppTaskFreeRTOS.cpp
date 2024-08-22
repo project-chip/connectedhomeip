@@ -34,6 +34,14 @@
 #include "AppCLIBase.h"
 #endif
 
+#if CONFIG_ENABLE_FEEDBACK
+#include "UserInterfaceFeedback.h"
+#endif
+
+#if CONFIG_ENABLE_PW_RPC
+#include "AppRpc.h"
+#endif
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -45,12 +53,18 @@
 #ifndef APP_TASK_STACK_SIZE
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
 #endif
+
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
 #endif
-#define APP_EVENT_QUEUE_SIZE 10
 
-static QueueHandle_t sAppEventQueue;
+#ifndef APP_EVENT_QUEUE_SIZE
+#define APP_EVENT_QUEUE_SIZE 10
+#endif
+
+#ifndef APP_QUEUE_TICKS_TO_WAIT
+#define APP_QUEUE_TICKS_TO_WAIT portMAX_DELAY
+#endif
 
 using namespace chip;
 using namespace chip::TLV;
@@ -71,12 +85,18 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFre
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     /* Register Matter CLI cmds */
 #ifdef ENABLE_CHIP_SHELL
     err = chip::NXP::App::GetAppCLI().Init();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Error during CLI init"));
     AppMatter_RegisterCustomCliCommands();
 #endif
+
+#if CONFIG_ENABLE_FEEDBACK
+    FeedbackMgr().Init();
+#endif
+
     /* Register Matter buttons */
     err = AppMatterButton_registerButtons();
     if (err != CHIP_NO_ERROR)
@@ -92,14 +112,30 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
     CHIP_ERROR err = CHIP_NO_ERROR;
     TaskHandle_t taskHandle;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
-    if (sAppEventQueue == NULL)
+#if CONFIG_ENABLE_PW_RPC
+    chip::NXP::App::Rpc::Init();
+#endif
+
+    appEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    if (appEventQueue == NULL)
     {
         err = CHIP_ERROR_NO_MEMORY;
         ChipLogError(DeviceLayer, "Failed to allocate app event queue");
         assert(err == CHIP_NO_ERROR);
     }
 
+    ticksToWait = APP_QUEUE_TICKS_TO_WAIT;
+
+#if FSL_OSA_MAIN_FUNC_ENABLE
+    /* When OSA is used, this code will be called from within the startup_task
+     * and the scheduler will be started at this point. Just call AppTaskMain to
+     * start the main loop instead of creating a task, since we are already in it.
+     * Task parameters are configured through SDK flags:
+     *  - gMainThreadPriority_c
+     *  - gMainThreadStackSize_c
+     */
+    AppTaskFreeRTOS::AppTaskMain(this);
+#else
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
         pdPASS)
@@ -108,6 +144,7 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
         ChipLogError(DeviceLayer, "Failed to start app task");
         assert(err == CHIP_NO_ERROR);
     }
+#endif // FSL_OSA_TASK_ENABLE
 
     return err;
 }
@@ -122,31 +159,43 @@ void chip::NXP::App::AppTaskFreeRTOS::AppTaskMain(void * pvParameter)
 
     sAppTask->PreInitMatterStack();
     err = sAppTask->Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer, "AppTask.Init() failed");
     sAppTask->PostInitMatterStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "AppTask.Init() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        BaseType_t eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, sAppTask->ticksToWait);
         while (eventReceived == pdTRUE)
         {
             sAppTask->DispatchEvent(event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
+            eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, 0);
         }
+#if CONFIG_ENABLE_FEEDBACK
+        FeedbackMgr().DisplayInLoop();
+#endif
     }
 }
 
 void chip::NXP::App::AppTaskFreeRTOS::PostEvent(const AppEvent & event)
 {
-    if (sAppEventQueue != NULL)
+    if (appEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, &event, 0))
+        if (__get_IPSR())
         {
-            ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            portBASE_TYPE taskToWake = pdFALSE;
+            if (!xQueueSendToFrontFromISR(appEventQueue, &event, &taskToWake))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue from ISR");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(appEventQueue, &event, 0))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            }
         }
     }
 }

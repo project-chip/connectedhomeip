@@ -115,7 +115,7 @@ class TC_SwitchTests(MatterBaseTest):
     def _ask_for_multi_press_short_long(self, endpoint_id: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
             msg = f"""
-                Actuate the switch in the following sequence:
+                Actuate the switch in the following sequence (read full sequence first):
                 1. Operate switch (press briefly) associated with position {pressed_position} on the DUT then release switch from DUT
                 2. Operate switch (keep pressed for long time, e.g. 5 seconds) on the DUT immediately after the previous step
                 3. Release switch from the DUT
@@ -129,7 +129,7 @@ class TC_SwitchTests(MatterBaseTest):
     def _ask_for_multi_press_long_short(self, endpoint_id, pressed_position, feature_map: int):
         if not self._use_button_simulator():
             msg = f"""
-                  Actuate the switch in the following sequence:
+                  Actuate the switch in the following sequence (read full sequence first):
                   1. Operate switch (keep pressed for long time, e.g. 5 seconds) on the DUT
                   2. Releases switch from the DUT
                   3. Immediately after the previous step completes, operate switch (press briefly) associated with position {pressed_position} on the DUT then release switch from DUT
@@ -143,7 +143,7 @@ class TC_SwitchTests(MatterBaseTest):
     def _ask_for_multi_press(self, endpoint_id: int, number_of_presses: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
             self.wait_for_user_input(
-                f'Operate the switch (press briefly) associated with position {pressed_position} then release {number_of_presses} times')
+                f'Execute {number_of_presses} separate brief press/release cycles on position {pressed_position}.')
         else:
             self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses,
                                                       pressed_position, feature_map, multi_press_max)
@@ -158,7 +158,7 @@ class TC_SwitchTests(MatterBaseTest):
     def _ask_for_keep_pressed(self, endpoint_id: int, pressed_position: int, feature_map: int):
         if not self._use_button_simulator():
             self.wait_for_user_input(
-                prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, then release it.")
+                prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, keep it pressed, do NOT release it.")
         else:
             self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
 
@@ -677,7 +677,7 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on LongPress")
         event = event_listener.wait_for_event_report(cluster.Events.LongRelease)
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on LongRelease")
-        if self._use_button_simulator:
+        if self._use_button_simulator():
             # simulator can't sequence so we need to help it along here
             self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1,
                                                       pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
@@ -840,7 +840,7 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on LongPress")
         event = event_listener.wait_for_event_report(cluster.Events.LongRelease)
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on LongRelease")
-        if self._use_button_simulator:
+        if self._use_button_simulator():
             # simulator can't sequence so we need to help it along here
             self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1,
                                                       pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
