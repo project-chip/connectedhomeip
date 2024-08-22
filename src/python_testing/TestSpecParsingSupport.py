@@ -21,9 +21,10 @@ import xml.etree.ElementTree as ElementTree
 import chip.clusters as Clusters
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from matter_testing_support.spec_parsing import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+                                                 add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
+                                                 combine_derived_clusters_with_base)
 from mobly import asserts
-from matter_testing_support.spec_parsing import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster, add_cluster_data_from_xml,
-                                                 build_xml_clusters, check_clusters_for_unknown_commands, combine_derived_clusters_with_base)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
