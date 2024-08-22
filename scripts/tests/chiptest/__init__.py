@@ -157,7 +157,7 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "TestFabricSyncBridgedNode.yaml",    # [TODO] fabric-bridge-app lacks some feature so this test currently fails
+        "Test_TC_BR_5.yaml",                 # [TODO] Fabric Sync example app has not been integrated into CI yet.
     }
 
 

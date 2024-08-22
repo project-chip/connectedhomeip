@@ -137,7 +137,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
                               .SetTimeout(params.commissioningTimeout)
                               .SetDiscriminator(params.discriminator)
                               .SetIteration(params.iterations)
-                              .SetSalt(params.salt));
+                              .SetSalt(params.salt),
+                          mVendorId, mProductId);
 #else
     ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
     return CHIP_ERROR_NOT_IMPLEMENTED;
