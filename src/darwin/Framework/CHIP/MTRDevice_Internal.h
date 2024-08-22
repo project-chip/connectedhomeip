@@ -112,6 +112,14 @@ MTR_DIRECT_MEMBERS
     // Lock that protects overall device state, including delegate storage.
     os_unfair_lock _lock;
     NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+
+    // Our node ID, with the ivar declared explicitly so it's accessible to
+    // subclasses.
+    NSNumber * _nodeID;
+
+    // Our controller.  Declared nullable because our property is, though in
+    // practice it does not look like we ever set it to nil.
+    MTRDeviceController * _Nullable _deviceController;
 }
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;

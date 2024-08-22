@@ -504,7 +504,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun setActivePresetRequest(
-    presetHandle: ByteArray,
+    presetHandle: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
@@ -513,7 +513,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_PRESET_HANDLE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_PRESET_HANDLE_REQ), presetHandle)
+    presetHandle?.let { tlvWriter.put(ContextSpecificTag(TAG_PRESET_HANDLE_REQ), presetHandle) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
