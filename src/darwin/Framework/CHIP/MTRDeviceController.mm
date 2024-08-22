@@ -142,6 +142,10 @@ using namespace chip::Tracing::DarwinFramework;
         // nothing, as superclass of MTRDeviceController is NSObject
     }
     _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
+
+    // Setup assertion counters
+    _keepRunningAssertionCounter = 0;
+    _shutdownPending = FALSE;
     return self;
 }
 
@@ -178,6 +182,11 @@ using namespace chip::Tracing::DarwinFramework;
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
         _uniqueIdentifier = uniqueIdentifier;
+
+        // Setup assertion counters
+        _keepRunningAssertionCounter = 0;
+        _shutdownPending = FALSE;
+
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
                 MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
@@ -311,7 +320,53 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
+- (NSUInteger)shutdownPrecheck
+{
+    __block NSUInteger assertionCount = 0;
+    dispatch_sync(_chipWorkQueue, ^{
+        self.shutdownPending = TRUE;
+        assertionCount = self.keepRunningAssertionCounter;
+    });
+    return assertionCount;
+}
+
+- (void)addRunAssertion
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        ++self.keepRunningAssertionCounter;
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, self.keepRunningAssertionCounter);
+    });
+}
+
+- (void)removeRunAssertion;
+{
+    __block BOOL shouldShutdown = FALSE;
+    dispatch_sync(_chipWorkQueue, ^{
+        if (self.keepRunningAssertionCounter > 0) {
+            --self.keepRunningAssertionCounter;
+            MTR_LOG("%@ Removing keep running assertion, total %lu", self, self.keepRunningAssertionCounter);
+            if (self.keepRunningAssertionCounter == 0 && self.shutdownPending) {
+                shouldShutdown = TRUE;
+            }
+        }
+    });
+    if (shouldShutdown) {
+        MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
+        [self finalShutdown];
+    }
+}
+
 - (void)shutdown
+{
+    NSUInteger assertionCount = [self shutdownPrecheck];
+    if (assertionCount != 0) {
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, assertionCount);
+        return;
+    }
+    [self finalShutdown];
+}
+
+- (void)finalShutdown
 {
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
@@ -374,6 +429,7 @@ using namespace chip::Tracing::DarwinFramework;
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+    self.shutdownPending = FALSE;
 }
 
 - (void)deinitFromFactory

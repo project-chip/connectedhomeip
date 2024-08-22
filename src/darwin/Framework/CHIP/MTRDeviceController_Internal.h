@@ -72,6 +72,10 @@ NS_ASSUME_NONNULL_BEGIN
 // (moved here so subclasses can initialize differently)
 @property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
+// Counters to track assertion status
+@property (nonatomic, readwrite) NSUInteger keepRunningAssertionCounter;
+@property (nonatomic, readwrite) BOOL shutdownPending;
+
 - (instancetype)initForSubclasses;
 
 #pragma mark - MTRDeviceControllerFactory methods
@@ -288,6 +292,27 @@ NS_ASSUME_NONNULL_BEGIN
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
+ * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
+ * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release
+ * the assertion.
+ */
+- (void)addRunAssertion;
+
+/**
+ * Removes an assertion to allow the controller to shutdown once all assertions have been released.
+ * Invoking this method once all assertions have been released in a noop.
+ */
+- (void)removeRunAssertion;
+
+/**
+ * This methods marks a request to shutdown.
+ * Returns the number of run assertions currently being held. If the value returned is not zero, it implies shutdown has to be delayed
+ * until all assertions have been removed.
+ */
+- (NSUInteger)shutdownPrecheck;
 
 @end
 
