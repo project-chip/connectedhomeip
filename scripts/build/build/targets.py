@@ -550,6 +550,8 @@ def BuildNxpTarget():
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
+    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="frdm", board_variant="frdm").OnlyIfRe('rw61x')
 
     return target
 
