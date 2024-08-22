@@ -2522,7 +2522,7 @@ endpoint 1 {
 
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2578,7 +2578,7 @@ endpoint 1 {
   server cluster TargetNavigator {
     emits event TargetUpdated;
     callback attribute targetList;
-    ram      attribute currentTarget default = 0;
+    persist  attribute currentTarget default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2592,7 +2592,7 @@ endpoint 1 {
 
   server cluster MediaPlayback {
     emits event StateChanged;
-    ram      attribute currentState default = 0x00;
+    persist  attribute currentState default = 0x00;
     ram      attribute startTime default = 0x00;
     ram      attribute duration default = 0;
     callback attribute sampledPosition;
@@ -2622,7 +2622,7 @@ endpoint 1 {
 
   server cluster MediaInput {
     callback attribute inputList;
-    ram      attribute currentInput default = 0x00;
+    persist  attribute currentInput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2661,7 +2661,7 @@ endpoint 1 {
 
   server cluster AudioOutput {
     callback attribute outputList;
-    ram      attribute currentOutput default = 0x00;
+    persist  attribute currentOutput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2692,7 +2692,7 @@ endpoint 2 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2706,7 +2706,7 @@ endpoint 2 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel default = 0x00;
+    persist  attribute currentLevel default = 0x00;
     ram      attribute minLevel default = 0x00;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x00;
