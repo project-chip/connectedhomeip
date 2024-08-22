@@ -203,7 +203,7 @@ menu "Energy Management Example App Configuration"
 
     config CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
         bool "Enable DEM triggers"
-        default "y"
+        default "n"
         help
             Enable test triggers used by the Device Energy Management tests
 
