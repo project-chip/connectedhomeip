@@ -185,5 +185,5 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
-    'src/access/AccessRestriction.h': {'vector', 'map'},
+    'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
 }
