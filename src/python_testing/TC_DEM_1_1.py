@@ -109,7 +109,7 @@ class TC_DEM_1_1(MatterBaseTest, DEMTestBase):
             asserts.assert_true(mandatory_attribute in attribute_list,
                                 f"Expected to find mandatory attribute {mandatory_attribute} in attribute_list {attribute_list}")
 
-            # Remove the enrty from the list
+            # Remove the entry from the list
             attribute_list.remove(mandatory_attribute)
 
         # Now check feature dependant attributes
