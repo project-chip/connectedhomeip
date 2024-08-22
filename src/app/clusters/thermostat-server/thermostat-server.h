@@ -57,10 +57,38 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
 private:
+    /**
+     * @brief Set the Active Preset to a given preset handle, or null
+     *
+     * @param endpoint The endpoint
+     * @param presetHandle The handle of the preset to set active, or null to clear the active preset
+     * @return Success if the active preset was updated, an error code if not
+     */
     Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle);
+
+    /**
+     * @brief Apply a preset to the pending lists of presets during an atomic write
+     *
+     * @param delegate The current ThermostatDelegate
+     * @param preset The preset to append
+     * @return CHIP_NO_ERROR if successful, an error code if not
+     */
     CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
+
+    /**
+     * @brief Verifies if the pending presets for a given endpoint are valid
+     *
+     * @param endpoint The endpoint
+     * @return Success if the list of pending presets is valid, an error code if not
+     */
     Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
 
+    /**
+     * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
+     *
+     * @param fabricTable The fabric table
+     * @param fabricIndex The fabric index
+     */
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     /**
@@ -79,12 +107,18 @@ private:
      * @param[in] endpoint The endpoint.
      * @param[in] originatorNodeId The originator scoped node id.
      * @param[in] state Whether or not an atomic write is open or closed.
+     * @param attributeStatuses The set of attribute status structs the atomic write should be associated with
+     * @return true if it was able to update the atomic write state
+     * @return false if it was unable to update the atomic write state
      */
-
     bool
     SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
                    Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
+    /**
+     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
+     *
+     */
     /**
      * @brief Resets the atomic write for a given endpoint
      *
@@ -92,13 +126,50 @@ private:
      */
     void ResetAtomicWrite(EndpointId endpoint);
 
+    /**
+     * @brief Checks if a given endpoint has an atomic write open, optionally filtered by an attribute ID
+     *
+     * @param endpoint The endpoint
+     * @param attributeId The optional attribute ID to filter on
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
     bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
 
+    /**
+     * @brief Checks if a given endpoint has an atomic write open for a given subject descriptor, optionally filtered by an
+     * attribute ID
+     *
+     * @param endpoint The endpoint
+     * @param subjectDescriptor The subject descriptor for the client making a read or write request
+     * @param attributeId The optional attribute ID to filter on
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
     bool InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
                        Optional<AttributeId> attributeId = NullOptional);
 
+    /**
+     * @brief Checks if a given endpoint has an atomic write open for a given command invocation, optionally filtered by an
+     * attribute ID
+     *
+     * @param endpoint The endpoint
+     * @param commandObj The CommandHandler for the invoked command
+     * @param attributeId The optional attribute ID to filter on
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
     bool InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
 
+    /**
+     * @brief Checks if a given endpoint has an atomic write open for a given command invocation and a list of attributes
+     *
+     * @param endpoint The endpoint
+     * @param commandObj The CommandHandler for the invoked command
+     * @param attributeStatuses The list of attribute statuses whose attributeIds must match the open atomic write
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
     bool
     InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
