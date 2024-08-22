@@ -40637,16 +40637,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle) {
       setActivePresetRequest(callback, presetHandle, 0);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, int timedInvokeTimeoutMs) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long presetHandleFieldID = 0L;
-      BaseTLVType presetHandletlvValue = new ByteArrayType(presetHandle);
+      BaseTLVType presetHandletlvValue = presetHandle != null ? new ByteArrayType(presetHandle) : new NullType();
       elements.add(new StructElement(presetHandleFieldID, presetHandletlvValue));
 
       StructType commandArgs = new StructType(elements);
