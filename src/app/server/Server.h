@@ -31,9 +31,6 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
-#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-#include <app/server/ArlStorage.h>
-#endif
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
 #include <credentials/CertificateValidityPolicy.h>
@@ -171,9 +168,6 @@ struct ServerInitParams
     // Access Restriction implementation: MUST be injected if MNGD feature enabled. Used to enforce
     // access restrictions that are managed by the device.
     Access::AccessRestrictionProvider * accessRestrictionProvider = nullptr;
-    // ARL storage: MUST be injected if MNGD feature enabled. Used to store ACL entries in
-    // persistent storage. Must NOT be initialized before being provided.
-    app::ArlStorage * arlStorage = nullptr;
 #endif
 
     // Network native params can be injected depending on the
@@ -691,11 +685,6 @@ private:
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;
-
-#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    Access::AccessRestrictionProvider * mAccessRestrictionProvider;
-    app::ArlStorage * mArlStorage;
-#endif
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;

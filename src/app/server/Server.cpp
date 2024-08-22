@@ -177,19 +177,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
-    mAclStorage = initParams.aclStorage;
-    SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    if (initParams.accessRestrictionProvider != nullptr && initParams.arlStorage != nullptr)
+    if (initParams.accessRestrictionProvider != nullptr)
     {
-        mAccessRestrictionProvider = initParams.accessRestrictionProvider;
-        mArlStorage                = initParams.arlStorage;
-
-        mAccessControl.SetAccessRestrictionProvider(mAccessRestrictionProvider);
-        SuccessOrExit(err = mArlStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
+        mAccessControl.SetAccessRestrictionProvider(initParams.accessRestrictionProvider);
     }
 #endif
+
+    mAclStorage = initParams.aclStorage;
+    SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);

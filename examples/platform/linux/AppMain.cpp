@@ -105,7 +105,6 @@
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include "ExampleAccessRestrictionProvider.h"
-#include <app/server/DefaultArlStorage.h>
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -605,7 +604,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
-    initParams.arlStorage                = new app::DefaultArlStorage();
 #endif
 
     // Init ZCL Data Model and CHIP App Server

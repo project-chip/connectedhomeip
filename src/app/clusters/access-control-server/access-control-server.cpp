@@ -18,8 +18,8 @@
 #include <access/AccessControl.h>
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ArlEncoder.h"
 #include <access/AccessRestrictionProvider.h>
-#include <app/server/ArlStorage.h>
 #endif
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -481,7 +481,7 @@ CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & 
 
         for (auto & entry : entries)
         {
-            ArlStorage::CommissioningEncodableEntry encodableEntry(entry);
+            ArlEncoder::CommissioningEncodableEntry encodableEntry(entry);
             ReturnErrorOnFailure(encoder.Encode(encodableEntry));
         }
         return CHIP_NO_ERROR;
@@ -506,7 +506,7 @@ CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
             VerifyOrReturnError(entries != nullptr, CHIP_ERROR_INCORRECT_STATE);
             for (auto & entry : *entries)
             {
-                ArlStorage::EncodableEntry encodableEntry(entry);
+                ArlEncoder::EncodableEntry encodableEntry(entry);
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
         }
@@ -649,7 +649,12 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
         while (restrictionIter.Next())
         {
             AccessRestrictionProvider::Restriction restriction;
-            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>(restrictionIter.GetValue().type);
+            if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
+                return true;
+            }
+
             if (!restrictionIter.GetValue().id.IsNull())
             {
                 restriction.id.SetValue(restrictionIter.GetValue().id.Value());

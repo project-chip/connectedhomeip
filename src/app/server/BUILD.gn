@@ -80,13 +80,4 @@ static_library("server") {
           [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
     }
   }
-
-  if (chip_enable_access_restrictions) {
-    sources += [
-      "ArlStorage.cpp",
-      "ArlStorage.h",
-      "DefaultArlStorage.cpp",
-      "DefaultArlStorage.h",
-    ]
-  }
 }

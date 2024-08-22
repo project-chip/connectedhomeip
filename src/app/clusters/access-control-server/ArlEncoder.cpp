@@ -15,9 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/server/ArlStorage.h>
-
-#include <lib/support/DefaultStorageKeyAllocator.h>
+#include "ArlEncoder.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -30,7 +28,38 @@ using StagingRestriction     = Clusters::AccessControl::Structs::AccessRestricti
 
 namespace {
 
-CHIP_ERROR Convert(StagingRestrictionType from, AccessRestrictionProvider::Type & to)
+CHIP_ERROR StageEntryRestrictions(const std::vector<AccessRestrictionProvider::Restriction> & source,
+                                  StagingRestriction destination[], size_t destinationCount)
+{
+    size_t count = source.size();
+    if (count > 0 && count <= destinationCount)
+    {
+        for (size_t i = 0; i < count; i++)
+        {
+            auto restriction = source[i];
+            ReturnErrorOnFailure(ArlEncoder::Convert(restriction.restrictionType, destination[i].type));
+
+            if (restriction.id.HasValue())
+            {
+                destination[i].id.SetNonNull(restriction.id.Value());
+            }
+        }
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
+namespace chip {
+namespace app {
+
+CHIP_ERROR ArlEncoder::Convert(Clusters::AccessControl::AccessRestrictionTypeEnum from,
+                               Access::AccessRestrictionProvider::Type & to)
 {
     switch (from)
     {
@@ -52,7 +81,8 @@ CHIP_ERROR Convert(StagingRestrictionType from, AccessRestrictionProvider::Type 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Convert(AccessRestrictionProvider::Type from, StagingRestrictionType & to)
+CHIP_ERROR ArlEncoder::Convert(Access::AccessRestrictionProvider::Type from,
+                               Clusters::AccessControl::AccessRestrictionTypeEnum & to)
 {
     switch (from)
     {
@@ -74,106 +104,45 @@ CHIP_ERROR Convert(AccessRestrictionProvider::Type from, StagingRestrictionType 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseRestrictions(const chip::app::DataModel::DecodableList<Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType> & source,
-                             std::vector<AccessRestrictionProvider::Restriction> & destination)
-{
-    auto iterator = source.begin();
-    while (iterator.Next())
-    {
-        auto & tmp = iterator.GetValue();
-        AccessRestrictionProvider::Restriction restriction;
-        ReturnErrorOnFailure(Convert(tmp.type, restriction.restrictionType));
-
-        if (!tmp.id.IsNull())
-        {
-            restriction.id.SetValue(tmp.id.Value());
-        }
-
-        destination.push_back(restriction);
-    }
-    ReturnErrorOnFailure(iterator.GetStatus());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR StageEntryRestrictions(const std::vector<AccessRestrictionProvider::Restriction> & source,
-                                  StagingRestriction destination[], size_t destinationCount)
-{
-    size_t count = source.size();
-    if (count > 0 && count <= destinationCount)
-    {
-        for (size_t i = 0; i < count; i++)
-        {
-            auto restriction = source[i];
-            ReturnErrorOnFailure(Convert(restriction.restrictionType, destination[i].type));
-
-            if (restriction.id.HasValue())
-            {
-                destination[i].id.SetNonNull(restriction.id.Value());
-            }
-        }
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace
-
-namespace chip {
-namespace app {
-
-CHIP_ERROR ArlStorage::DecodableEntry::Decode(TLV::TLVReader & reader)
-{
-    ReturnErrorOnFailure(mStagingEntry.Decode(reader));
-
-    mEntry.fabricIndex    = mStagingEntry.GetFabricIndex();
-    mEntry.endpointNumber = mStagingEntry.endpoint;
-    mEntry.clusterId      = mStagingEntry.cluster;
-    ReturnErrorOnFailure(ParseRestrictions(mStagingEntry.restrictions, mEntry.restrictions));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ArlStorage::CommissioningEncodableEntry::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+CHIP_ERROR ArlEncoder::CommissioningEncodableEntry::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     ReturnErrorOnFailure(Stage());
     ReturnErrorOnFailure(mStagingEntry.Encode(writer, tag));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ArlStorage::EncodableEntry::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const
+CHIP_ERROR ArlEncoder::EncodableEntry::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const
 {
     ReturnErrorOnFailure(Stage());
     ReturnErrorOnFailure(mStagingEntry.EncodeForRead(writer, tag, fabric));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ArlStorage::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
+CHIP_ERROR ArlEncoder::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     ReturnErrorOnFailure(Stage());
     ReturnErrorOnFailure(mStagingEntry.EncodeForWrite(writer, tag));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ArlStorage::CommissioningEncodableEntry::Stage() const
+CHIP_ERROR ArlEncoder::CommissioningEncodableEntry::Stage() const
 {
-    mStagingEntry.endpoint    = mEntry.endpointNumber;
-    mStagingEntry.cluster     = mEntry.clusterId;
-    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions, sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
+    mStagingEntry.endpoint = mEntry.endpointNumber;
+    mStagingEntry.cluster  = mEntry.clusterId;
+    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions,
+                                                sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
     mStagingEntry.restrictions = Span<StagingRestriction>(mStagingRestrictions, mEntry.restrictions.size());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ArlStorage::EncodableEntry::Stage() const
+CHIP_ERROR ArlEncoder::EncodableEntry::Stage() const
 {
     mStagingEntry.fabricIndex = mEntry.fabricIndex;
     mStagingEntry.endpoint    = mEntry.endpointNumber;
     mStagingEntry.cluster     = mEntry.clusterId;
-    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions, sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
+    ReturnErrorOnFailure(StageEntryRestrictions(mEntry.restrictions, mStagingRestrictions,
+                                                sizeof(mStagingRestrictions) / sizeof(mStagingRestrictions[0])));
     mStagingEntry.restrictions = Span<StagingRestriction>(mStagingRestrictions, mEntry.restrictions.size());
 
     return CHIP_NO_ERROR;
