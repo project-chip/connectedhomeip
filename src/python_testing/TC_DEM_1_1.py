@@ -33,7 +33,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -151,7 +150,7 @@ class TC_DEM_1_1(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(len(attribute_list), 0)
 
         self.step("5")
-        logging.info(f"Not supported/skipped")
+        logging.info("Not supported/skipped")
 
         self.step("6")
         accepted_command_list = await self.read_dem_attribute_expect_success(attribute="AcceptedCommandList")

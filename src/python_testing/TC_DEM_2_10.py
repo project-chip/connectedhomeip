@@ -30,7 +30,6 @@
 """Define Matter test case TC_DEM_2_10."""
 
 
-import datetime
 import logging
 import time
 
