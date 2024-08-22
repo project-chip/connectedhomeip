@@ -183,7 +183,6 @@ CHIP_ERROR WhmApplicationShutdown()
     WhmManufacturerShutdown();
 
     return WhmShutdown();
-
 }
 
 } // namespace WaterHeaterManagement
