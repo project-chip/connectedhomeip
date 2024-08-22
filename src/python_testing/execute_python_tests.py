@@ -89,6 +89,8 @@ def main(search_directory, env_file):
         "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
+        "TestMatterTestingSupport.py",
+        "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",
         "drlk_2_x_common.py",
         "execute_python_tests.py",
