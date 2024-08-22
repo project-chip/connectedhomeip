@@ -24443,12 +24443,17 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo bridgedDeviceBasicInformationkeepActivestayActiveDurationCommandParameterInfo = new CommandParameterInfo("stayActiveDuration", Long.class, Long.class);
     bridgedDeviceBasicInformationkeepActiveCommandParams.put("stayActiveDuration",bridgedDeviceBasicInformationkeepActivestayActiveDurationCommandParameterInfo);
+
+    CommandParameterInfo bridgedDeviceBasicInformationkeepActivetimeoutMsCommandParameterInfo = new CommandParameterInfo("timeoutMs", Long.class, Long.class);
+    bridgedDeviceBasicInformationkeepActiveCommandParams.put("timeoutMs",bridgedDeviceBasicInformationkeepActivetimeoutMsCommandParameterInfo);
     InteractionInfo bridgedDeviceBasicInformationkeepActiveInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
         .keepActive((DefaultClusterCallback) callback
         , (Long)
         commandArguments.get("stayActiveDuration")
+        , (Long)
+        commandArguments.get("timeoutMs")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

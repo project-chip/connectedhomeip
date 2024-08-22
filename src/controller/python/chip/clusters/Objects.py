@@ -12168,9 +12168,11 @@ class BridgedDeviceBasicInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="stayActiveDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=1, Type=uint),
                     ])
 
             stayActiveDuration: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
     class Attributes:
         @dataclass

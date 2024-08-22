@@ -8227,6 +8227,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStayActiveDuration), stayActiveDuration);
+    encoder.Encode(to_underlying(Fields::kTimeoutMs), timeoutMs);
     return encoder.Finalize();
 }
 
@@ -8247,6 +8248,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kStayActiveDuration))
         {
             err = DataModel::Decode(reader, stayActiveDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kTimeoutMs))
+        {
+            err = DataModel::Decode(reader, timeoutMs);
         }
         else
         {
