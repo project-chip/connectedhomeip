@@ -41,9 +41,9 @@ DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
 # is heat-pump out? wasn't in 0.7
 # location-cluster - is this define gone now?
 # queuedpreset - is this define gone now?
-CURRENT_IN_PROGRESS_DEFINES = ['aliro', 'atomicwrites', 'atomicwrites', 'device-location', 'e2e', 'energy-calendar', 'energy-drlc',
-                               'energy-management', 'hrap-1', 'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
-                               'solar-power', 'tcp', 'water-heater', 'wifiSetup']
+CURRENT_IN_PROGRESS_DEFINES = ['aliro', 'atomicwrites', 'battery-storage', 'device-location', 'e2e-jf', 'energy-calendar', 'energy-drlc',
+                               'energy-management', 'heat-pump', 'hrap-1', 'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
+                               'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup']
 
 
 def get_xml_path(filename, output_dir):
