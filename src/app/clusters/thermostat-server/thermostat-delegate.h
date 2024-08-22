@@ -44,7 +44,7 @@ public:
      * @param[in] attributeId The attribute to write to.
      * @return The maximum allowed timeout; nullopt if the request is invalid.
      */
-    virtual std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
+    virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
 
     /**
      * @brief Get the preset type at a given index in the PresetTypes attribute

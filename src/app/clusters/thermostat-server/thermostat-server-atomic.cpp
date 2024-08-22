@@ -31,7 +31,6 @@ using namespace chip::Protocols::InteractionModel;
 namespace chip {
 namespace app {
 namespace Clusters {
-/// @brief
 namespace Thermostat {
 
 extern ThermostatAttrAccess gThermostatAttrAccess;
@@ -103,7 +102,7 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
  * @return true if the attribute list was counted
  * @return false if there was an error reading the list
  */
-bool countAttributeRequests(const DataModel::DecodableList<chip::AttributeId> attributeRequests, size_t & attributeRequestCount,
+bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> attributeRequests, size_t & attributeRequestCount,
                             bool & requestedPresets, bool & requestedSchedules)
 {
     attributeRequestCount = 0;
@@ -136,7 +135,7 @@ bool countAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
 /// @param requireAll Whether the caller requires all atomic attributes to be represented in attributeRequests
 /// @return Status::Success if the request is valid, an error status if it is not
-Status buildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
                               size_t & attributeStatusCount,
                               Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> & attributeStatuses, bool requireAll)
 {
@@ -145,7 +144,7 @@ Status buildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
     attributeStatusCount = 0;
     if (!countAttributeRequests(attributeRequests, attributeStatusCount, requestedPresets, requestedSchedules))
     {
-        // Either we errored reading the list, or one of the attributes is not supported on this server
+        // We errored reading the list
         return Status::InvalidCommand;
     }
     if (attributeStatusCount == 0)
@@ -156,6 +155,7 @@ Status buildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
     if (requestedPresets ^ requestedSchedules)
     {
         // Client requested presets or schedules, but not both, so we need an extra status
+        // because we will in fact treat the atomic request as applying to both.
         attributeStatusCount++;
     }
     attributeStatuses.Alloc(attributeStatusCount);
@@ -272,9 +272,9 @@ ScopedNodeId ThermostatAttrAccess::GetAtomicWriteOriginatorScopedNodeId(const En
     return originatorNodeId;
 }
 
-void sendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Status status,
+void SendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Status status,
                         const Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> & attributeStatuses,
-                        size_t & attributeRequestCount, Optional<uint16_t> timeout = NullOptional)
+                        size_t attributeRequestCount, Optional<uint16_t> timeout = NullOptional)
 {
     Commands::AtomicResponse::Type response;
     response.statusCode = to_underlying(status);

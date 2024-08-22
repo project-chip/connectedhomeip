@@ -560,9 +560,9 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
 
 bool emberAfThermostatClusterSetActivePresetRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+    const Commands::SetActivePresetRequest::DecodableType & commandData)
 {
-    auto status = Clusters::Thermostat::gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
+    auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
     commandObj->AddStatus(commandPath, status);
     return true;
 }
