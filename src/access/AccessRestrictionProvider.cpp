@@ -121,7 +121,16 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AccessRestrictionProvider::CheckForCommissioning(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath)
+{
+    return DoCheck(mCommissioningEntries, subjectDescriptor, requestPath);
+}
 CHIP_ERROR AccessRestrictionProvider::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath)
+{
+    return DoCheck(mFabricEntries[subjectDescriptor.fabricIndex], subjectDescriptor, requestPath);
+}
+
+CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath)
 {
     ChipLogProgress(DataManagement, "AccessRestrictionProvider: action %d", static_cast<int>(requestPath.requestType));
 

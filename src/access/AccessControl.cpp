@@ -356,28 +356,13 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    if (mAccessRestrictionProvider != nullptr)
-    {
-        CHIP_ERROR result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
-        if (result != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(DataManagement, "AccessControl: %s",
-                            (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
-            return result;
-        }
-    }
-#endif
-
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         if (result != CHIP_ERROR_NOT_IMPLEMENTED)
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR)                  ? "allowed"
-                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
-                                                                       : "error");
+                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
@@ -385,6 +370,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                                 (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
             }
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+            if (result == CHIP_NO_ERROR && mAccessRestrictionProvider != nullptr)
+            {
+                result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
+                if (result != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(DataManagement, "AccessControl: %s",
+                                    (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
+                    return result;
+                }
+            }
+#endif
             return result;
         }
     }
@@ -397,6 +395,18 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
         ChipLogProgress(DataManagement, "AccessControl: implicit admin (PASE)");
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        if (mAccessRestrictionProvider != nullptr)
+        {
+            CHIP_ERROR result = mAccessRestrictionProvider->CheckForCommissioning(subjectDescriptor, requestPath);
+            if (result != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(DataManagement, "AccessControl: %s",
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
+                return result;
+            }
+        }
+#endif
         return CHIP_NO_ERROR;
     }
 
@@ -505,6 +515,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
         ChipLogProgress(DataManagement, "AccessControl: allowed");
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        if (mAccessRestrictionProvider != nullptr)
+        {
+            CHIP_ERROR result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
+            if (result != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(DataManagement, "AccessControl: %s",
+                                (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
+                return result;
+            }
+        }
+#endif
 
         return CHIP_NO_ERROR;
     }

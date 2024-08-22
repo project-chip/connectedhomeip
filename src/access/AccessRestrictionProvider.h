@@ -149,6 +149,20 @@ public:
     void RemoveListener(Listener & listener);
 
     /**
+     * Check whether access by a subject descriptor to a request path should be restricted (denied) for the given action
+     * during commissioning by using the CommissioningEntries.
+     *
+     * These restrictions are are only a part of overall access evaluation.
+     *
+     * If access is not restricted, CHIP_NO_ERROR will be returned.
+     *
+     * @retval CHIP_ERROR_ACCESS_DENIED if access is denied.
+     * @retval other errors should also be treated as restricted/denied.
+     * @retval CHIP_NO_ERROR if access is not restricted/denied.
+     */
+    CHIP_ERROR CheckForCommissioning(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath);
+
+    /**
      * Check whether access by a subject descriptor to a request path should be restricted (denied) for the given action.
      * These restrictions are are only a part of overall access evaluation.
      *
@@ -214,6 +228,12 @@ protected:
 
 private:
     bool IsEntryValid(const Entry & entry) const;
+
+    /**
+     * Perform the access restriction check using the given entries.
+     */
+    CHIP_ERROR DoCheck(const std::vector<Entry> entries, const SubjectDescriptor & subjectDescriptor,
+                       const RequestPath & requestPath);
 
     uint64_t mNextToken   = 1;
     Listener * mListeners = nullptr;
