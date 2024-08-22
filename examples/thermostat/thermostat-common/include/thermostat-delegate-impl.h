@@ -44,7 +44,7 @@ class ThermostatDelegate : public Delegate
 public:
     static inline ThermostatDelegate & GetInstance() { return sInstance; }
 
-    std::optional<System::Clock::Milliseconds16> GetAtomicWriteTimeout(chip::AttributeId attributeId) override;
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
 
     CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
 

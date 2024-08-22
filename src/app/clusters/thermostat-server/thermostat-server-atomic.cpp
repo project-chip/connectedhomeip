@@ -142,7 +142,7 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
 
     bool requestedPresets = false, requestedSchedules = false;
     attributeStatusCount = 0;
-    if (!countAttributeRequests(attributeRequests, attributeStatusCount, requestedPresets, requestedSchedules))
+    if (!CountAttributeRequests(attributeRequests, attributeStatusCount, requestedPresets, requestedSchedules))
     {
         // We errored reading the list
         return Status::InvalidCommand;
@@ -300,7 +300,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
 
     size_t attributeStatusCount = 0;
     Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = buildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, false);
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, false);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
@@ -329,7 +329,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         {
         case Presets::Id:
         case Schedules::Id:
-            auto attributeTimeout = delegate->GetAtomicWriteTimeout(attributeId);
+            auto attributeTimeout = delegate->GetMaxAtomicWriteTimeout(attributeId);
 
             if (attributeTimeout.has_value())
             {
@@ -379,7 +379,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), AtomicWriteState::Open);
     }
 
-    sendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount, MakeOptional(timeout.count()));
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount, MakeOptional(timeout.count()));
 }
 
 void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -397,7 +397,7 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
 
     size_t attributeStatusCount = 0;
     Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = buildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
@@ -443,7 +443,7 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
     }
 
     ResetAtomicWrite(endpoint);
-    sendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
 }
 
 void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -462,7 +462,7 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
 
     size_t attributeStatusCount = 0;
     Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = buildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
@@ -493,7 +493,7 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
         }
     }
 
-    sendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
 }
 
 void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)

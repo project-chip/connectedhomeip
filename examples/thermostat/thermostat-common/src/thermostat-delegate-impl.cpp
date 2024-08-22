@@ -152,7 +152,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetAtomicWriteTimeout(chip::AttributeId attributeId)
+std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
 {
     switch (attributeId)
     {
