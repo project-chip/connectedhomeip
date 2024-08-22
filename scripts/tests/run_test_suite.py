@@ -406,7 +406,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 virt_wifi.stop()
                 virt_ble.stop()
                 dbus.stop()
-            chiptest.linux.ShutdownNamespaceForTestExecution(ble_wifi)
+            chiptest.linux.ShutdownNamespaceForTestExecution()
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i + 1))

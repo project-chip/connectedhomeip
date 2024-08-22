@@ -144,7 +144,7 @@ def CreateNamespacesForAppTest(ble_wifi: bool = False):
         logging.warn("Some addresses look to still be tentative")
 
 
-def RemoveNamespaceForAppTest(ble_wifi: bool = False):
+def RemoveNamespaceForAppTest():
     """
     Removes namespaces for a tool and app binaries previously created to simulate an
     isolated network. This tears down what was created in CreateNamespacesForAppTest.
@@ -165,13 +165,6 @@ def RemoveNamespaceForAppTest(ble_wifi: bool = False):
         "ip netns del app",
     ]
 
-    if not ble_wifi:
-        COMMANDS += [
-            "ip link set dev eth-app-direct down",
-            "ip link set dev eth-tool-direct down",
-            "ip link delete eth-tool-direct",
-        ]
-
     for command in COMMANDS:
         logging.debug("Executing '%s'" % command)
         if os.system(command) != 0:
@@ -189,8 +182,8 @@ def PrepareNamespacesForTestExecution(in_unshare: bool, ble_wifi: bool = False):
     CreateNamespacesForAppTest(ble_wifi)
 
 
-def ShutdownNamespaceForTestExecution(ble_wifi: bool = False):
-    RemoveNamespaceForAppTest(ble_wifi)
+def ShutdownNamespaceForTestExecution():
+    RemoveNamespaceForAppTest()
 
 
 class DbusTest:
