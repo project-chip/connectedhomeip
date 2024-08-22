@@ -510,8 +510,8 @@ class MatterTestConfig:
     app_pid: int = 0
 
     commissioning_method: Optional[str] = None
-    discriminators: Optional[List[int]] = None
-    setup_passcodes: Optional[List[int]] = None
+    discriminators: List[int] = field(default_factory=list)
+    setup_passcodes: List[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: Optional[str] = None
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
@@ -527,7 +527,7 @@ class MatterTestConfig:
     pics: dict[bool, str] = field(default_factory=dict)
 
     # Node ID for basic DUT
-    dut_node_ids: Optional[List[int]] = None
+    dut_node_ids: List[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
@@ -1545,16 +1545,8 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
 
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
-
-    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
-    config.discriminators = args.discriminators
-
-    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
-    config.setup_passcodes = args.passcodes
+    config.discriminators.extend(args.discriminators)
+    config.setup_passcodes.extend(args.passcodes)
 
     if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
@@ -1571,9 +1563,11 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         return False
 
     if len(config.dut_node_ids) < len(device_descriptors):
-        missing = len(device_descriptors) - len(config.dut_node_ids)
         # We generate new node IDs sequentially from the last one seen for all
         # missing NodeIDs when commissioning many nodes at once.
+        if not config.dut_node_ids:
+            config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
+        missing = len(device_descriptors) - len(config.dut_node_ids)
         for i in range(missing):
             config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
 
@@ -1587,6 +1581,14 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
 
     if args.commissioning_method is None:
         return True
+
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
+        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+        return False
+
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
+        print("error: Missing --passcode when no --qr-code/--manual-code present!")
+        return False
 
     if config.commissioning_method == "ble-wifi":
         if args.wifi_ssid is None:
@@ -1684,7 +1686,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              default=_DEFAULT_CONTROLLER_NODE_ID,
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
-                             metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
+                             metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
