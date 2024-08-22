@@ -108,15 +108,15 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper & SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
                                            const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
     {
-        areaDesc.locationInfo.SetNonNull();
+        areaInfo.locationInfo.SetNonNull();
 
         // Copy the name. If the name is larger than kAreaNameMaxSize, truncate it to fit.
         auto sizeToCopy = std::min(kAreaNameMaxSize, locationName.size());
         memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
-        areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
+        areaInfo.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
 
-        areaDesc.locationInfo.Value().floorNumber = floorNumber;
-        areaDesc.locationInfo.Value().areaType    = areaType;
+        areaInfo.locationInfo.Value().floorNumber = floorNumber;
+        areaInfo.locationInfo.Value().areaType    = areaType;
 
         return *this;
     }
