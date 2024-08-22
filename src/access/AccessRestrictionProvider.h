@@ -116,7 +116,7 @@ public:
     AccessRestrictionProvider()          = default;
     virtual ~AccessRestrictionProvider() = default;
 
-    AccessRestrictionProvider(const AccessRestrictionProvider &)             = delete;
+    AccessRestrictionProvider(const AccessRestrictionProvider &) = delete;
     AccessRestrictionProvider & operator=(const AccessRestrictionProvider &) = delete;
 
     /**
@@ -184,9 +184,9 @@ public:
      * Get the restriction entries for a fabric.
      *
      * @param [in]  fabricIndex the index of the fabric for which to get entries.
-     * @param [out] entries reference to a const vector to hold the entries.
+     * @param [out] entries vector to hold the entries.
      */
-    CHIP_ERROR GetEntries(const FabricIndex fabricIndex, const std::vector<Entry> *& entries) const
+    CHIP_ERROR GetEntries(const FabricIndex fabricIndex, std::vector<Entry> & entries) const
     {
         auto it = mFabricEntries.find(fabricIndex);
         if (it == mFabricEntries.end())
@@ -194,7 +194,7 @@ public:
             return CHIP_ERROR_NOT_FOUND;
         }
 
-        entries = &(it->second);
+        entries = (it->second);
 
         return CHIP_NO_ERROR;
     }

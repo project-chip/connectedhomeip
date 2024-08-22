@@ -501,10 +501,9 @@ CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
         {
             auto fabric = info.GetFabricIndex();
             // get entries for fabric
-            const std::vector<AccessRestrictionProvider::Entry> * entries = nullptr;
+            std::vector<AccessRestrictionProvider::Entry> entries;
             ReturnErrorOnFailure(accessRestrictionProvider->GetEntries(fabric, entries));
-            VerifyOrReturnError(entries != nullptr, CHIP_ERROR_INCORRECT_STATE);
-            for (auto & entry : *entries)
+            for (auto & entry : entries)
             {
                 ArlEncoder::EncodableEntry encodableEntry(entry);
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
