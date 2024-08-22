@@ -546,6 +546,14 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
     return Status::Success;
 }
 
+bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
+{
+    auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
@@ -554,7 +562,5 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
 bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                             const Commands::SetActivePresetRequest::DecodableType & commandData)
 {
-    auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    return Thermostat::emberAfThermostatClusterSetActivePresetRequestCallback(commandObj, commandPath, commandData);
 }

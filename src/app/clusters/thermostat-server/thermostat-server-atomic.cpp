@@ -594,10 +594,11 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
     SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
 }
 
-} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
+    gThermostatAttrAccess.ResetAtomicWrite(endpoint);
+}
 
 bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                    const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
@@ -626,8 +627,18 @@ bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, 
     return false;
 }
 
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+{
+    return Thermostat::emberAfThermostatClusterAtomicRequestCallback(commandObj, commandPath, commandData);
+}
+
 void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
-    gThermostatAttrAccess.ResetAtomicWrite(endpoint);
+    Thermostat::MatterThermostatClusterServerShutdownCallback(endpoint);
 }

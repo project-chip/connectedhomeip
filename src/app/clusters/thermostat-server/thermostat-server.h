@@ -206,14 +206,15 @@ private:
 
     friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
 
-    friend void ::MatterThermostatClusterServerShutdownCallback(EndpointId endpoint);
+    friend void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint);
 
-    friend bool ::emberAfThermostatClusterSetActivePresetRequestCallback(
+    friend bool emberAfThermostatClusterSetActivePresetRequestCallback(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
-    friend bool ::emberAfThermostatClusterAtomicRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
+
+    friend bool
+    emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                  const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
 
     struct AtomicWriteSession
     {
