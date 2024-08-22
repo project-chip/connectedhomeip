@@ -155,5 +155,6 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         self.step("10")
         await self.send_test_event_trigger_forecast_adjustment_clear()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
