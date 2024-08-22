@@ -21,8 +21,8 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/python/chip/bdx/bdx-transfer-manager.h>
 #include <controller/python/chip/bdx/bdx-transfer.h>
+#include <controller/python/chip/bdx/test-bdx-transfer-server.h>
 #include <controller/python/chip/native/PyChipError.h>
 
 using PyObject = void *;
@@ -162,14 +162,14 @@ private:
 
 TransferMap gTransfers;
 TransferDelegate gBdxTransferDelegate(&gTransfers);
-bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
+bdx::TestBdxTransferServer gBdxTransferServer(&gBdxTransferDelegate);
 
 void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer)
 {
     systemLayer->ScheduleWork(
         [](auto * theSystemLayer, auto * appState) -> void {
             auto * theTransfer = static_cast<bdx::BdxTransfer *>(appState);
-            gBdxTransferManager.Release(theTransfer);
+            gBdxTransferServer.Release(theTransfer);
         },
         transfer);
 }
@@ -192,7 +192,7 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     chip::System::Layer * systemLayer                   = factory.GetSystemState()->SystemLayer();
     gBdxTransferDelegate.Init(systemLayer);
-    gBdxTransferManager.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
+    gBdxTransferServer.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
 }
 
 // Prepares the BDX system to expect a new transfer.
@@ -201,7 +201,7 @@ PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
     TransferData * transferData = gTransfers.CreateUnassociatedTransferData();
     VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     transferData->OnTransferObtainedContext = transferObtainedContext;
-    gBdxTransferManager.ExpectATransfer();
+    gBdxTransferServer.ExpectATransfer();
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -210,7 +210,7 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
 {
     TransferData * transferData = gTransfers.TransferDataForTransferObtainedContext(transferObtainedContext);
     VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NOT_FOUND));
-    gBdxTransferManager.StopExpectingATransfer();
+    gBdxTransferServer.StopExpectingATransfer();
     gTransfers.RemoveTransferData(transferData);
     return ToPyChipError(CHIP_NO_ERROR);
 }

@@ -32,13 +32,13 @@ namespace bdx {
 // BdxTransfer objects if a transfer is expected.
 //
 // The controller must inform this manager when a transfer is expected:
-//   bdxTransferManager->ExpectATransfer();
+//   bdxTransferServer->ExpectATransfer();
 // At which point the next unsolicited BDX message will allocate a BdxTransfer object.
-class BdxTransferManager : public Messaging::UnsolicitedMessageHandler
+class TestBdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate);
-    ~BdxTransferManager() override;
+    TestBdxTransferServer(BdxTransfer::Delegate * bdxTransferDelegate);
+    ~TestBdxTransferServer() override;
 
     CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager);
     void Shutdown();

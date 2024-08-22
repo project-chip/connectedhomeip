@@ -15,19 +15,19 @@
  *    limitations under the License.
  */
 
-#include <controller/python/chip/bdx/bdx-transfer-manager.h>
+#include <controller/python/chip/bdx/test-bdx-transfer-server.h>
 
 namespace chip {
 namespace bdx {
 
-BdxTransferManager::BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate) {}
+TestBdxTransferServer::TestBdxTransferServer(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate) {}
 
-BdxTransferManager::~BdxTransferManager()
+TestBdxTransferServer::~TestBdxTransferServer()
 {
     mTransferPool.ReleaseAll();
 }
 
-CHIP_ERROR BdxTransferManager::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
+CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -38,19 +38,19 @@ CHIP_ERROR BdxTransferManager::Init(System::Layer * systemLayer, Messaging::Exch
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
-void BdxTransferManager::Shutdown()
+void TestBdxTransferServer::Shutdown()
 {
     VerifyOrReturn(mExchangeManager != nullptr);
     LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id));
     mExchangeManager = nullptr;
 }
 
-void BdxTransferManager::ExpectATransfer()
+void TestBdxTransferServer::ExpectATransfer()
 {
     ++mExpectedTransfers;
 }
 
-void BdxTransferManager::StopExpectingATransfer()
+void TestBdxTransferServer::StopExpectingATransfer()
 {
     if (mExpectedTransfers > 0)
     {
@@ -58,12 +58,12 @@ void BdxTransferManager::StopExpectingATransfer()
     }
 }
 
-void BdxTransferManager::Release(BdxTransfer * bdxTransfer) {
+void TestBdxTransferServer::Release(BdxTransfer * bdxTransfer) {
     mTransferPool.ReleaseObject(bdxTransfer);
 }
 
-CHIP_ERROR BdxTransferManager::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
-                                                            Messaging::ExchangeDelegate *& delegate)
+CHIP_ERROR TestBdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                                               Messaging::ExchangeDelegate *& delegate)
 {
     VerifyOrReturnValue(mExpectedTransfers != 0, CHIP_ERROR_HANDLER_NOT_SET);
 
@@ -81,7 +81,7 @@ CHIP_ERROR BdxTransferManager::OnUnsolicitedMessageReceived(const PayloadHeader 
     return CHIP_NO_ERROR;
 }
 
-void BdxTransferManager::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
+void TestBdxTransferServer::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
 {
     BdxTransfer * bdxTransfer = static_cast<BdxTransfer *>(delegate);
     mBdxTransferDelegate->TransferCompleted(bdxTransfer, CHIP_ERROR_CONNECTION_ABORTED);
