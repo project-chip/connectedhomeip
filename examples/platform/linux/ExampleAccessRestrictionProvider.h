@@ -42,7 +42,8 @@ protected:
         // this example simply removes all restrictions and will generate AccessRestrictionEntryChanged events
         Access::GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabricIndex, std::vector<Entry>{});
 
-        chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type event{ .token = token, .fabricIndex = fabricIndex };
+        chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type event{ .token       = token,
+                                                                                               .fabricIndex = fabricIndex };
         EventNumber eventNumber;
         ReturnErrorOnFailure(chip::app::LogEvent(event, 0, eventNumber));
 

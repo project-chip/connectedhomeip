@@ -618,7 +618,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     if (LinuxDeviceOptions::GetInstance().arlEntries.HasValue())
     {
-        //This example use of the ARL feature proactively installs the provided entries on fabric index 1
+        // This example use of the ARL feature proactively installs the provided entries on fabric index 1
         exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
     }
 #endif

@@ -116,7 +116,7 @@ public:
     AccessRestrictionProvider()          = default;
     virtual ~AccessRestrictionProvider() = default;
 
-    AccessRestrictionProvider(const AccessRestrictionProvider &) = delete;
+    AccessRestrictionProvider(const AccessRestrictionProvider &)             = delete;
     AccessRestrictionProvider & operator=(const AccessRestrictionProvider &) = delete;
 
     /**
