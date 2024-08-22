@@ -108,7 +108,7 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
                                                       const CharSpan & issuerNameBase64Str)
 {
     std::string certPEM;
-    const char * certType;
+    const char * certType __attribute__((unused));
 
     if (revokedSet.isMember("crl_signer_delegator"))
     {
