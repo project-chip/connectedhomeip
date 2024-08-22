@@ -246,7 +246,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
             asserts.fail("KeepActive with invalid TimeoutMs was expected to fail")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "DUT sent back an unexpected error, we were expecting ConstraintError")
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 "DUT sent back an unexpected error, we were expecting ConstraintError")
 
         self.step("4")
         keep_active_timeout_ms = 3600001
@@ -254,7 +255,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
             asserts.fail("KeepActive with invalid TimeoutMs was expected to fail")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "DUT sent back an unexpected error, we were expecting ConstraintError")
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 "DUT sent back an unexpected error, we were expecting ConstraintError")
 
         self.step("5")
         keep_active_timeout_ms = 30000
