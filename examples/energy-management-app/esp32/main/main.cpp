@@ -138,8 +138,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kS
                                           Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
                                           Feature::kConstraintBasedAdjustment);
 #else
-static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStartTimeAdjustment, Feature::kPausable,
-                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
 #endif
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
