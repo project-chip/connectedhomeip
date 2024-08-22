@@ -82,13 +82,34 @@
 
 @implementation MTRDevice_XPC
 
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    // TODO: Verify that this is a valid MTRDeviceController_XPC?
+
+    if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
+        // Nothing else to do, all set.
+    }
+
+    return self;
+}
+
+- (NSString *)description
+{
+    // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
+    // internalDeviceState (do we even have such a thing here?), last
+    // subscription attempt wait (does that apply to us?) queued work (do we
+    // have any?), last report, last subscription failure (does that apply to us?).
+    return [NSString
+        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
 }
@@ -96,7 +117,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
 }
@@ -104,7 +125,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
 }
@@ -113,7 +134,7 @@
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
         }
@@ -122,7 +143,7 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
         }
@@ -131,7 +152,7 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
         }

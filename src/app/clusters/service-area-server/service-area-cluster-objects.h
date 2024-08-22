@@ -109,12 +109,14 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
                                            const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
     {
         areaDesc.locationInfo.SetNonNull();
-        // Copy the name
-        auto sizeToCopy = std::min(sizeof(mAreaNameBuffer), locationName.size());
+
+        // Copy the name. If the name is larger than kAreaNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kAreaNameMaxSize, locationName.size());
         memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
         areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
-        areaDesc.locationInfo.Value().floorNumber  = floorNumber;
-        areaDesc.locationInfo.Value().areaType     = areaType;
+
+        areaDesc.locationInfo.Value().floorNumber = floorNumber;
+        areaDesc.locationInfo.Value().areaType    = areaType;
 
         return *this;
     }
@@ -321,23 +323,10 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
         mapID = aMapId;
-
-        if (aMapName.empty())
-        {
-            name = CharSpan(mMapNameBuffer, 0);
-        }
-        else if (aMapName.size() > sizeof(mMapNameBuffer))
-        {
-            // Save the truncated name that fits into available size.
-            memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
-            name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
-        }
-        else
-        {
-            // Save full name.
-            memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
-            name = CharSpan(mMapNameBuffer, aMapName.size());
-        }
+        // Copy the name. If the name is larger than kMapNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kMapNameMaxSize, aMapName.size());
+        memcpy(mMapNameBuffer, aMapName.data(), sizeToCopy);
+        name = CharSpan(mMapNameBuffer, sizeToCopy);
     }
 
     /**
