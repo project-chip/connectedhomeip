@@ -2441,7 +2441,7 @@ cluster Thermostat = 513 {
   }
 
   request struct SetActivePresetRequestRequest {
-    octet_string<16> presetHandle = 0;
+    nullable octet_string<16> presetHandle = 0;
   }
 
   response struct AtomicResponse = 253 {
