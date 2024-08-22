@@ -60,6 +60,8 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
+    "${silabs_platform_dir}/wifi/dhcp_client.cpp",
+    "${silabs_platform_dir}/wifi/dhcp_client.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../rs911x/BLEManagerImpl.cpp",

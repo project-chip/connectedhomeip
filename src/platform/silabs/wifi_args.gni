@@ -40,7 +40,7 @@ lwip_root = "${efr32_sdk_build_root}/silabs_lwip"
 #lwip_platform = "external"
 lwip_platform = "silabs"
 lwip_ipv6 = true
-lwip_ipv4 = false
+lwip_ipv4 = true
 lwip_api = true
 lwip_ethernet = true
 
