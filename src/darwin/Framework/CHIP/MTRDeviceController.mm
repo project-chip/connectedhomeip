@@ -334,7 +334,7 @@ using namespace chip::Tracing::DarwinFramework;
 {
     dispatch_sync(_chipWorkQueue, ^{
         ++self.keepRunningAssertionCounter;
-        MTR_LOG("%@ Adding keep running assertion, total %lu", self, self.keepRunningAssertionCounter);
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, (unsigned long) self.keepRunningAssertionCounter);
     });
 }
 
@@ -344,7 +344,7 @@ using namespace chip::Tracing::DarwinFramework;
     dispatch_sync(_chipWorkQueue, ^{
         if (self.keepRunningAssertionCounter > 0) {
             --self.keepRunningAssertionCounter;
-            MTR_LOG("%@ Removing keep running assertion, total %lu", self, self.keepRunningAssertionCounter);
+            MTR_LOG("%@ Removing keep running assertion, total %lu", self, (unsigned long) self.keepRunningAssertionCounter);
             if (self.keepRunningAssertionCounter == 0 && self.shutdownPending) {
                 shouldShutdown = TRUE;
             }
@@ -360,7 +360,7 @@ using namespace chip::Tracing::DarwinFramework;
 {
     NSUInteger assertionCount = [self shutdownPrecheck];
     if (assertionCount != 0) {
-        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, assertionCount);
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, (unsigned long) assertionCount);
         return;
     }
     [self finalShutdown];

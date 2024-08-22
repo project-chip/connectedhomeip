@@ -329,7 +329,7 @@ using namespace chip::Tracing::DarwinFramework;
 {
     NSUInteger assertionCount = [self shutdownPrecheck];
     if (assertionCount != 0) {
-        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, assertionCount);
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, (unsigned long) assertionCount);
         return;
     }
     [self finalShutdown];
