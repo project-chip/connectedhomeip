@@ -44,10 +44,7 @@ namespace WaterHeaterManagement {
 
 void FullWhmApplicationInit()
 {
-    if (WhmApplicationInit() != CHIP_NO_ERROR)
-    {
-        return;
-    }
+    ReturnOnFailure(WhmApplicationInit());
 
     if (DeviceEnergyManagementInit() != CHIP_NO_ERROR)
     {

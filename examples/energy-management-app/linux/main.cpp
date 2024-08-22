@@ -130,7 +130,7 @@ static bool EnergyAppOptionHandler(const char * aProgram, chip::ArgParser::Optio
     {
     case kOptionApplication:
         spApp = nullptr;
-        for (uint16_t idx = 0; idx < sizeof(kValidApps) / sizeof(kValidApps[0]); idx++)
+        for (size_t idx = 0; idx < (sizeof(kValidApps) / sizeof(kValidApps[0])); idx++)
         {
             if (strcmp(kValidApps[idx], aValue) == 0)
             {
