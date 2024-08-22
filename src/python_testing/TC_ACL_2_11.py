@@ -102,9 +102,9 @@ class TC_ACL_2_11(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Arl
         )
         self.step(4)
-        
+
         care_struct = None
-        
+
         for arl_entry in arl:
             E1 = arl_entry.endpoint
             C1 = arl_entry.cluster
@@ -113,7 +113,7 @@ class TC_ACL_2_11(MatterBaseTest):
             care_struct = Clusters.AccessControl.Structs.AccessRestrictionEntryStruct(E1, C1, R1)
 
             cluster = ALL_CLUSTERS[C1]
-            
+
             for restriction in R1:
                 restriction_type = restriction.type
                 ID1 = restriction.id
@@ -125,15 +125,17 @@ class TC_ACL_2_11(MatterBaseTest):
                     await self.read_single_attribute_expect_error(cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess, endpoint=E1)
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeWriteForbidden:
                     status = await self.write_single_attribute(attribute_value=attribute, endpoint_id=E1)
-                    asserts.assert_equal(status, Status.UnsupportedAccess, f"Failed to verify UNSUPPORTED_ACCESS when writing to Attribute {ID1} Cluster {C1} Endpoint {E1}")
+                    asserts.assert_equal(status, Status.UnsupportedAccess,
+                                         f"Failed to verify UNSUPPORTED_ACCESS when writing to Attribute {ID1} Cluster {C1} Endpoint {E1}")
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kCommandForbidden:
                     result = await self.send_single_cmd(cmd=command, endpoint=E1)
-                    asserts.assert_equal(result.status, Status.UnsupportedAccess, f"Failed to verify UNSUPPORTED_ACCESS when sending command {ID1} to Cluster {C1} Endpoint {E1}")
+                    asserts.assert_equal(result.status, Status.UnsupportedAccess,
+                                         f"Failed to verify UNSUPPORTED_ACCESS when sending command {ID1} to Cluster {C1} Endpoint {E1}")
 
         # Belongs to step 6, but needs to be subscribed before executing step 5: begin
         arru_queue = queue.Queue()
         arru_cb = EventChangeCallback(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, arru_queue)
-        
+
         urgent = 1
         subscription_arru = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, urgent)], reportInterval=(1, 5), keepSubscriptions=True, autoResubscribe=False)
         subscription_arru.SetEventUpdateCallback(callback=arru_cb)
@@ -142,7 +144,7 @@ class TC_ACL_2_11(MatterBaseTest):
         # Belongs to step 7, but needs to be subscribed before executing step 5: begin
         arec_queue = queue.Queue()
         arec_cb = EventChangeCallback(Clusters.AccessControl.Events.AccessRestrictionEntryChanged, arec_queue)
-        
+
         urgent = 1
         subscription_arec = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessRestrictionEntryChanged, urgent)], reportInterval=(1, 5), keepSubscriptions=True, autoResubscribe=False)
         subscription_arec.SetEventUpdateCallback(callback=arec_cb)
@@ -150,7 +152,8 @@ class TC_ACL_2_11(MatterBaseTest):
 
         self.step(5)
         response = await self.send_single_cmd(cmd=Clusters.AccessControl.Commands.ReviewFabricRestrictions([care_struct]), endpoint=0)
-        asserts.assert_true(isinstance(response, Clusters.AccessControl.Commands.ReviewFabricRestrictionsResponse), "Result is not of type ReviewFabricRestrictionsResponse")
+        asserts.assert_true(isinstance(response, Clusters.AccessControl.Commands.ReviewFabricRestrictionsResponse),
+                            "Result is not of type ReviewFabricRestrictionsResponse")
 
         self.step(6)
         WaitForEventReport(arru_queue, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
