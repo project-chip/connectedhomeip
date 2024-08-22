@@ -21449,6 +21449,39 @@ public:
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 namespace WaterHeaterManagement {
+namespace Structs {
+namespace WaterHeaterBoostInfoStruct {
+enum class Fields : uint8_t
+{
+    kDuration          = 0,
+    kOneShot           = 1,
+    kEmergencyBoost    = 2,
+    kTemporarySetpoint = 3,
+    kTargetPercentage  = 4,
+    kTargetReheat      = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace WaterHeaterBoostInfoStruct
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -21469,12 +21502,7 @@ namespace Commands {
 namespace Boost {
 enum class Fields : uint8_t
 {
-    kDuration          = 0,
-    kOneShot           = 1,
-    kEmergencyBoost    = 2,
-    kTemporarySetpoint = 3,
-    kTargetPercentage  = 4,
-    kTargetReheat      = 5,
+    kBoostInfo = 0,
 };
 
 struct Type
@@ -21484,12 +21512,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
 
-    uint32_t duration = static_cast<uint32_t>(0);
-    Optional<bool> oneShot;
-    Optional<bool> emergencyBoost;
-    Optional<int16_t> temporarySetpoint;
-    Optional<chip::Percent> targetPercentage;
-    Optional<chip::Percent> targetReheat;
+    Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21504,12 +21527,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
 
-    uint32_t duration = static_cast<uint32_t>(0);
-    Optional<bool> oneShot;
-    Optional<bool> emergencyBoost;
-    Optional<int16_t> temporarySetpoint;
-    Optional<chip::Percent> targetPercentage;
-    Optional<chip::Percent> targetReheat;
+    Structs::WaterHeaterBoostInfoStruct::DecodableType boostInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Boost
@@ -21548,9 +21566,9 @@ namespace Attributes {
 namespace HeaterTypes {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HeaterTypes::Id; }
@@ -21560,9 +21578,9 @@ struct TypeInfo
 namespace HeatDemand {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HeatDemand::Id; }
@@ -21663,9 +21681,9 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::HeaterTypes::TypeInfo::DecodableType heaterTypes =
-            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>(0);
         Attributes::HeatDemand::TypeInfo::DecodableType heatDemand =
-            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>(0);
         Attributes::TankVolume::TypeInfo::DecodableType tankVolume                       = static_cast<uint16_t>(0);
         Attributes::EstimatedHeatRequired::TypeInfo::DecodableType estimatedHeatRequired = static_cast<int64_t>(0);
         Attributes::TankPercentage::TypeInfo::DecodableType tankPercentage               = static_cast<chip::Percent>(0);
@@ -21680,6 +21698,69 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace BoostStarted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kBoostInfo = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    Structs::WaterHeaterBoostInfoStruct::DecodableType boostInfo;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BoostStarted
+namespace BoostEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BoostEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BoostEnded
+} // namespace Events
 } // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 namespace Structs {
@@ -30068,7 +30149,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -30083,7 +30164,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
@@ -31521,11 +31602,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t hue             = static_cast<uint8_t>(0);
-    HueDirection direction  = static_cast<HueDirection>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t hue                                  = static_cast<uint8_t>(0);
+    DirectionEnum direction                      = static_cast<DirectionEnum>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31540,11 +31621,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t hue             = static_cast<uint8_t>(0);
-    HueDirection direction  = static_cast<HueDirection>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t hue                                  = static_cast<uint8_t>(0);
+    DirectionEnum direction                      = static_cast<DirectionEnum>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToHue
@@ -31564,10 +31645,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode    = static_cast<HueMoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint8_t rate                                 = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31582,10 +31663,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode    = static_cast<HueMoveMode>(0);
-    uint8_t rate            = static_cast<uint8_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint8_t rate                                 = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveHue
@@ -31606,11 +31687,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode    = static_cast<HueStepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint8_t transitionTime  = static_cast<uint8_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint8_t stepSize                             = static_cast<uint8_t>(0);
+    uint8_t transitionTime                       = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31625,11 +31706,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode    = static_cast<HueStepMode>(0);
-    uint8_t stepSize        = static_cast<uint8_t>(0);
-    uint8_t transitionTime  = static_cast<uint8_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint8_t stepSize                             = static_cast<uint8_t>(0);
+    uint8_t transitionTime                       = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepHue
@@ -31649,10 +31730,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31667,10 +31748,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToSaturation
@@ -31690,10 +31771,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    SaturationMoveMode moveMode = static_cast<SaturationMoveMode>(0);
-    uint8_t rate                = static_cast<uint8_t>(0);
-    uint8_t optionsMask         = static_cast<uint8_t>(0);
-    uint8_t optionsOverride     = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint8_t rate                                 = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31708,10 +31789,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    SaturationMoveMode moveMode = static_cast<SaturationMoveMode>(0);
-    uint8_t rate                = static_cast<uint8_t>(0);
-    uint8_t optionsMask         = static_cast<uint8_t>(0);
-    uint8_t optionsOverride     = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint8_t rate                                 = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveSaturation
@@ -31732,11 +31813,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    SaturationStepMode stepMode = static_cast<SaturationStepMode>(0);
-    uint8_t stepSize            = static_cast<uint8_t>(0);
-    uint8_t transitionTime      = static_cast<uint8_t>(0);
-    uint8_t optionsMask         = static_cast<uint8_t>(0);
-    uint8_t optionsOverride     = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint8_t stepSize                             = static_cast<uint8_t>(0);
+    uint8_t transitionTime                       = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31751,11 +31832,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    SaturationStepMode stepMode = static_cast<SaturationStepMode>(0);
-    uint8_t stepSize            = static_cast<uint8_t>(0);
-    uint8_t transitionTime      = static_cast<uint8_t>(0);
-    uint8_t optionsMask         = static_cast<uint8_t>(0);
-    uint8_t optionsOverride     = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint8_t stepSize                             = static_cast<uint8_t>(0);
+    uint8_t transitionTime                       = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepSaturation
@@ -31776,11 +31857,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t hue             = static_cast<uint8_t>(0);
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t hue                                  = static_cast<uint8_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31795,11 +31876,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t hue             = static_cast<uint8_t>(0);
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint8_t hue                                  = static_cast<uint8_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToHueAndSaturation
@@ -31820,11 +31901,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorX         = static_cast<uint16_t>(0);
-    uint16_t colorY         = static_cast<uint16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t colorX                              = static_cast<uint16_t>(0);
+    uint16_t colorY                              = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31839,11 +31920,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorX         = static_cast<uint16_t>(0);
-    uint16_t colorY         = static_cast<uint16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t colorX                              = static_cast<uint16_t>(0);
+    uint16_t colorY                              = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToColor
@@ -31863,10 +31944,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    int16_t rateX           = static_cast<int16_t>(0);
-    int16_t rateY           = static_cast<int16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    int16_t rateX                                = static_cast<int16_t>(0);
+    int16_t rateY                                = static_cast<int16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31881,10 +31962,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    int16_t rateX           = static_cast<int16_t>(0);
-    int16_t rateY           = static_cast<int16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    int16_t rateX                                = static_cast<int16_t>(0);
+    int16_t rateY                                = static_cast<int16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveColor
@@ -31905,11 +31986,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    int16_t stepX           = static_cast<int16_t>(0);
-    int16_t stepY           = static_cast<int16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    int16_t stepX                                = static_cast<int16_t>(0);
+    int16_t stepY                                = static_cast<int16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31924,11 +32005,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    int16_t stepX           = static_cast<int16_t>(0);
-    int16_t stepY           = static_cast<int16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    int16_t stepX                                = static_cast<int16_t>(0);
+    int16_t stepY                                = static_cast<int16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepColor
@@ -31948,10 +32029,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorTemperatureMireds = static_cast<uint16_t>(0);
-    uint16_t transitionTime         = static_cast<uint16_t>(0);
-    uint8_t optionsMask             = static_cast<uint8_t>(0);
-    uint8_t optionsOverride         = static_cast<uint8_t>(0);
+    uint16_t colorTemperatureMireds              = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31966,10 +32047,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t colorTemperatureMireds = static_cast<uint16_t>(0);
-    uint16_t transitionTime         = static_cast<uint16_t>(0);
-    uint8_t optionsMask             = static_cast<uint8_t>(0);
-    uint8_t optionsOverride         = static_cast<uint8_t>(0);
+    uint16_t colorTemperatureMireds              = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToColorTemperature
@@ -31990,11 +32071,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t enhancedHue    = static_cast<uint16_t>(0);
-    HueDirection direction  = static_cast<HueDirection>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t enhancedHue                         = static_cast<uint16_t>(0);
+    DirectionEnum direction                      = static_cast<DirectionEnum>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32009,11 +32090,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t enhancedHue    = static_cast<uint16_t>(0);
-    HueDirection direction  = static_cast<HueDirection>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t enhancedHue                         = static_cast<uint16_t>(0);
+    DirectionEnum direction                      = static_cast<DirectionEnum>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedMoveToHue
@@ -32033,10 +32114,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode    = static_cast<HueMoveMode>(0);
-    uint16_t rate           = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint16_t rate                                = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32051,10 +32132,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode    = static_cast<HueMoveMode>(0);
-    uint16_t rate           = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint16_t rate                                = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedMoveHue
@@ -32075,11 +32156,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedStepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode    = static_cast<HueStepMode>(0);
-    uint16_t stepSize       = static_cast<uint16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint16_t stepSize                            = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32094,11 +32175,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedStepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode    = static_cast<HueStepMode>(0);
-    uint16_t stepSize       = static_cast<uint16_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint16_t stepSize                            = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedStepHue
@@ -32119,11 +32200,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t enhancedHue    = static_cast<uint16_t>(0);
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t enhancedHue                         = static_cast<uint16_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32138,11 +32219,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint16_t enhancedHue    = static_cast<uint16_t>(0);
-    uint8_t saturation      = static_cast<uint8_t>(0);
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    uint16_t enhancedHue                         = static_cast<uint16_t>(0);
+    uint8_t saturation                           = static_cast<uint8_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedMoveToHueAndSaturation
@@ -32165,13 +32246,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    chip::BitMask<ColorLoopUpdateFlags> updateFlags = static_cast<chip::BitMask<ColorLoopUpdateFlags>>(0);
-    ColorLoopAction action                          = static_cast<ColorLoopAction>(0);
-    ColorLoopDirection direction                    = static_cast<ColorLoopDirection>(0);
-    uint16_t time                                   = static_cast<uint16_t>(0);
-    uint16_t startHue                               = static_cast<uint16_t>(0);
-    uint8_t optionsMask                             = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                         = static_cast<uint8_t>(0);
+    chip::BitMask<UpdateFlagsBitmap> updateFlags = static_cast<chip::BitMask<UpdateFlagsBitmap>>(0);
+    ColorLoopActionEnum action                   = static_cast<ColorLoopActionEnum>(0);
+    ColorLoopDirectionEnum direction             = static_cast<ColorLoopDirectionEnum>(0);
+    uint16_t time                                = static_cast<uint16_t>(0);
+    uint16_t startHue                            = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32186,13 +32267,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    chip::BitMask<ColorLoopUpdateFlags> updateFlags = static_cast<chip::BitMask<ColorLoopUpdateFlags>>(0);
-    ColorLoopAction action                          = static_cast<ColorLoopAction>(0);
-    ColorLoopDirection direction                    = static_cast<ColorLoopDirection>(0);
-    uint16_t time                                   = static_cast<uint16_t>(0);
-    uint16_t startHue                               = static_cast<uint16_t>(0);
-    uint8_t optionsMask                             = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                         = static_cast<uint8_t>(0);
+    chip::BitMask<UpdateFlagsBitmap> updateFlags = static_cast<chip::BitMask<UpdateFlagsBitmap>>(0);
+    ColorLoopActionEnum action                   = static_cast<ColorLoopActionEnum>(0);
+    ColorLoopDirectionEnum direction             = static_cast<ColorLoopDirectionEnum>(0);
+    uint16_t time                                = static_cast<uint16_t>(0);
+    uint16_t startHue                            = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ColorLoopSet
@@ -32210,8 +32291,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopMoveStep::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32226,8 +32307,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopMoveStep::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    uint8_t optionsMask     = static_cast<uint8_t>(0);
-    uint8_t optionsOverride = static_cast<uint8_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopMoveStep
@@ -32249,12 +32330,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode                   = static_cast<HueMoveMode>(0);
-    uint16_t rate                          = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
-    uint8_t optionsMask                    = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint16_t rate                                = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds       = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds       = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32269,12 +32350,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueMoveMode moveMode                   = static_cast<HueMoveMode>(0);
-    uint16_t rate                          = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
-    uint8_t optionsMask                    = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                = static_cast<uint8_t>(0);
+    MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
+    uint16_t rate                                = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds       = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds       = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveColorTemperature
@@ -32297,13 +32378,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode                   = static_cast<HueStepMode>(0);
-    uint16_t stepSize                      = static_cast<uint16_t>(0);
-    uint16_t transitionTime                = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
-    uint8_t optionsMask                    = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint16_t stepSize                            = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds       = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds       = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32318,13 +32399,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
-    HueStepMode stepMode                   = static_cast<HueStepMode>(0);
-    uint16_t stepSize                      = static_cast<uint16_t>(0);
-    uint16_t transitionTime                = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMinimumMireds = static_cast<uint16_t>(0);
-    uint16_t colorTemperatureMaximumMireds = static_cast<uint16_t>(0);
-    uint8_t optionsMask                    = static_cast<uint8_t>(0);
-    uint8_t optionsOverride                = static_cast<uint8_t>(0);
+    StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
+    uint16_t stepSize                            = static_cast<uint16_t>(0);
+    uint16_t transitionTime                      = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMinimumMireds       = static_cast<uint16_t>(0);
+    uint16_t colorTemperatureMaximumMireds       = static_cast<uint16_t>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepColorTemperature
@@ -32395,9 +32476,9 @@ struct TypeInfo
 namespace DriftCompensation {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::DriftCompensationEnum;
+    using DecodableType    = chip::app::Clusters::ColorControl::DriftCompensationEnum;
+    using DecodableArgType = chip::app::Clusters::ColorControl::DriftCompensationEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
@@ -32432,9 +32513,9 @@ struct TypeInfo
 namespace ColorMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::ColorModeEnum;
+    using DecodableType    = chip::app::Clusters::ColorControl::ColorModeEnum;
+    using DecodableArgType = chip::app::Clusters::ColorControl::ColorModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
@@ -32444,9 +32525,9 @@ struct TypeInfo
 namespace Options {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -32828,9 +32909,9 @@ struct TypeInfo
 namespace EnhancedColorMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::EnhancedColorModeEnum;
+    using DecodableType    = chip::app::Clusters::ColorControl::EnhancedColorModeEnum;
+    using DecodableArgType = chip::app::Clusters::ColorControl::EnhancedColorModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
@@ -32900,9 +32981,9 @@ struct TypeInfo
 namespace ColorCapabilities {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
@@ -33007,11 +33088,13 @@ struct TypeInfo
         Attributes::RemainingTime::TypeInfo::DecodableType remainingTime         = static_cast<uint16_t>(0);
         Attributes::CurrentX::TypeInfo::DecodableType currentX                   = static_cast<uint16_t>(0);
         Attributes::CurrentY::TypeInfo::DecodableType currentY                   = static_cast<uint16_t>(0);
-        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation = static_cast<uint8_t>(0);
+        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation =
+            static_cast<chip::app::Clusters::ColorControl::DriftCompensationEnum>(0);
         Attributes::CompensationText::TypeInfo::DecodableType compensationText;
         Attributes::ColorTemperatureMireds::TypeInfo::DecodableType colorTemperatureMireds = static_cast<uint16_t>(0);
-        Attributes::ColorMode::TypeInfo::DecodableType colorMode                           = static_cast<uint8_t>(0);
-        Attributes::Options::TypeInfo::DecodableType options                               = static_cast<uint8_t>(0);
+        Attributes::ColorMode::TypeInfo::DecodableType colorMode = static_cast<chip::app::Clusters::ColorControl::ColorModeEnum>(0);
+        Attributes::Options::TypeInfo::DecodableType options =
+            static_cast<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>(0);
         Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries;
         Attributes::Primary1X::TypeInfo::DecodableType primary1X = static_cast<uint16_t>(0);
         Attributes::Primary1Y::TypeInfo::DecodableType primary1Y = static_cast<uint16_t>(0);
@@ -33042,14 +33125,16 @@ struct TypeInfo
         Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX = static_cast<uint16_t>(0);
         Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY = static_cast<uint16_t>(0);
         Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity;
-        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue                 = static_cast<uint16_t>(0);
-        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode                   = static_cast<uint8_t>(0);
+        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue = static_cast<uint16_t>(0);
+        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode =
+            static_cast<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>(0);
         Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive                       = static_cast<uint8_t>(0);
         Attributes::ColorLoopDirection::TypeInfo::DecodableType colorLoopDirection                 = static_cast<uint8_t>(0);
         Attributes::ColorLoopTime::TypeInfo::DecodableType colorLoopTime                           = static_cast<uint16_t>(0);
         Attributes::ColorLoopStartEnhancedHue::TypeInfo::DecodableType colorLoopStartEnhancedHue   = static_cast<uint16_t>(0);
         Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableType colorLoopStoredEnhancedHue = static_cast<uint16_t>(0);
-        Attributes::ColorCapabilities::TypeInfo::DecodableType colorCapabilities                   = static_cast<uint16_t>(0);
+        Attributes::ColorCapabilities::TypeInfo::DecodableType colorCapabilities =
+            static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>(0);
         Attributes::ColorTempPhysicalMinMireds::TypeInfo::DecodableType colorTempPhysicalMinMireds = static_cast<uint16_t>(0);
         Attributes::ColorTempPhysicalMaxMireds::TypeInfo::DecodableType colorTempPhysicalMaxMireds = static_cast<uint16_t>(0);
         Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableType coupleColorTempToLevelMinMireds =

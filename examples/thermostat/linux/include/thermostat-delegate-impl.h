@@ -44,13 +44,17 @@ class ThermostatDelegate : public Delegate
 public:
     static inline ThermostatDelegate & GetInstance() { return sInstance; }
 
+    std::optional<System::Clock::Milliseconds16>
+    GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                          System::Clock::Milliseconds16 timeoutRequest) override;
+
     CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
 
     uint8_t GetNumberOfPresets() override;
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
 
-    CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) override;
+    CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) override;
 
     CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
 
