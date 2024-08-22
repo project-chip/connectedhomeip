@@ -91,7 +91,7 @@ public:
      * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
-    virtual bool IsValidSelectAreasSet(const Span<uint32_t> & selectedAreas, SelectAreasStatus & locationStatus,
+    virtual bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & locationStatus,
                                        MutableCharSpan & statusText) = 0;
 
     /**

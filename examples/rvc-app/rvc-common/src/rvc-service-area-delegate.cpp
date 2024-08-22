@@ -113,7 +113,7 @@ bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan & statusT
     return (mIsSetSelectedAreasAllowedDeviceInstance->*mIsSetSelectedAreasAllowedCallback)(statusText);
 };
 
-bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<uint32_t> & selectedAreas, SelectAreasStatus & areaStatus,
+bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & areaStatus,
                                                    MutableCharSpan & statusText)
 {
     if (selectedAreas.empty())
