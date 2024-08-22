@@ -298,7 +298,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         try:
             crl_signer_authority_key_id = crl_signer_certificate.extensions.get_extension_for_oid(
                 x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-        except:
+        except Exception:
             logging.warning("CRL Signer AKID not found, continue...")
             continue
 
