@@ -43,8 +43,10 @@ static constexpr uint16_t TRANSITION_STEPS_PER_1S                              =
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
-static constexpr uint16_t MIN_TEMPERATURE_VALUE = 0;
-static constexpr uint16_t MAX_TEMPERATURE_VALUE = 0xfeff;
+// Logically relevant color temperatures are between 1000K and 9000K at the very most (and this is still
+// not frequent). Our implementation can default to those reasonable maxima to avoid issues related to range.
+static constexpr uint16_t MIN_TEMPERATURE_VALUE = 111u; // 111 mireds == 9000K
+static constexpr uint16_t MAX_TEMPERATURE_VALUE = 1000u; // 1000 mireds == 1000K
 
 static constexpr uint8_t MIN_HUE_VALUE = 0;
 static constexpr uint8_t MAX_HUE_VALUE = 254;
