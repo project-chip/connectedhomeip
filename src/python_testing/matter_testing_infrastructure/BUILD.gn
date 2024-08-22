@@ -40,5 +40,5 @@ pw_python_package("matter_testing_support") {
     "matter_testing_support/taglist_and_topology_test.py",
   ]
 
-  tests = [ "metadata_parser/test_metadata.py" ]
+  tests = [ "matter_testing_support/test_metadata.py" ]
 }
