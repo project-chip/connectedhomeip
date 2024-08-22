@@ -422,10 +422,15 @@ class ClusterAttributeChangeAccumulator:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    def cancel(self):
+    async def cancel(self):
         """This cancels a subscription."""
-        self._subscription.Shutdown()
-        self._subscription = None
+        # Wait for the asyncio.CancelledError to be called before returning
+        try:
+            self._subscription.Shutdown()
+            await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            pass
+
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.

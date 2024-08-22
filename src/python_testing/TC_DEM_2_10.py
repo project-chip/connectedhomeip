@@ -150,7 +150,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         asserts.assert_less_equal(count, 10, "More than 10 reports received")
 
         self.step("9")
-        sub_handler.cancel()
+        await sub_handler.cancel()
 
         self.step("10")
         await self.send_test_event_trigger_forecast_adjustment_clear()
