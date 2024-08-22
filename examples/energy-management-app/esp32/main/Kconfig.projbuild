@@ -219,6 +219,12 @@ menu "Energy Management Example App Configuration"
         help
             Enable test triggers used by the Water Heater Management tests
 
+    config CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+        bool "Enable Electrical Power & Energy Measurement triggers"
+        default "n"
+        help
+            Enable test triggers used by the Energy Reporting (EEM / EPM) tests       
+
     config DEM_SUPPORT_STATE_FORECAST_REPORTING
         bool "State forecast reporting is supported"
         default "n"
