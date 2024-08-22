@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    Copyright 2023 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,11 @@ public:
     CHIP_ERROR Init(void);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
+    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
+
+    CHIP_ERROR SetAes256Key(const uint8_t * keyAes256);
+    CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
 
 private:
     struct Header
@@ -58,11 +62,15 @@ private:
     static constexpr uint32_t kLengthOffset = 1;
     static constexpr uint32_t kValueOffset  = 3;
 
-    CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
-    CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
-    CHIP_ERROR ELS_ConvertDacKey();
+    CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen);
+    CHIP_ERROR ELS_SaveAesKeyBlob();
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
+    CHIP_ERROR DecryptAndCheckFactoryData(void);
+    CHIP_ERROR ELS_ImportWrappedKeyAndDecrypt(MutableByteSpan & key, uint8_t * encrypt, uint16_t size, uint8_t * decrypt);
+
+    const uint8_t * pAesKey    = nullptr;
+    EncryptionMode encryptMode = encrypt_ecb;
 };
 
 inline FactoryDataProvider & FactoryDataPrvd()

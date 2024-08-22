@@ -21,10 +21,10 @@
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/nxp/k32w1/OTAFirmwareProcessor.h>
+#include <platform/nxp/mcxw71_k32w1/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 #include <platform/nxp/common/legacy/OTAFactoryDataProcessor.h>
-#include <platform/nxp/k32w1/FactoryDataProviderImpl.h>
+#include <platform/nxp/mcxw71_k32w1/FactoryDataProviderImpl.h>
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 #include "OtaSupport.h"

@@ -19,26 +19,17 @@ import("//build_overrides/openthread.gni")
 declare_args() {
   chip_with_ot_cli = 0
   chip_with_low_power = 0
-  sdk_release = false
-  k32w1_sdk_root = ""
 
   # The key storage solution. Developers can select between "littlefs", "nvs"
   # and the older "fwk_nvm".
   chip_key_storage = "nvs"
 
   chip_use_plain_dac_key = false
-
-  k32w1_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
-if (sdk_release || getenv("NXP_SDK_ROOT") != "") {
-  k32w1_sdk_root = getenv("NXP_SDK_ROOT")
-}
-
-openthread_root =
-    "//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
-nxp_platform = "k32w1"
-nxp_sdk_name = "k32w1_sdk"
+openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
+nxp_platform = "mcxw71_k32w1"
+nxp_sdk_name = "mcxw71_k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
 nxp_use_lwip = false
 

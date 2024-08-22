@@ -25,7 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/k32w1/K32W1Config.h>
+#include <platform/nxp/mcxw71_k32w1/K32W1Config.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>

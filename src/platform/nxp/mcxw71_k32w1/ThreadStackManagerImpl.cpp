@@ -35,7 +35,7 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #if defined(USE_SMU2_DYNAMIC)
-#include <src/platform/nxp/k32w1/SMU2Manager.h>
+#include <src/platform/nxp/mcxw71_k32w1/SMU2Manager.h>
 #endif
 #include <lib/support/CHIPPlatformMemory.h>
 
