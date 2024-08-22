@@ -529,10 +529,11 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
         {
             auto & attributeStatus = attributeStatuses[i];
             auto statusCode        = Status::Success;
+            CHIP_ERROR err;
             switch (attributeStatus.attributeID)
             {
             case Presets::Id:
-                CHIP_ERROR err = delegate->CommitPendingPresets();
+                err = delegate->CommitPendingPresets();
                 if (err != CHIP_NO_ERROR)
                 {
                     statusCode = Status::InvalidInState;
