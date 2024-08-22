@@ -124,7 +124,7 @@ private:
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      * @param[in] req the command parameters.
      */
-    void HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
+    void HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
 
     //*************************************************************************
     // attribute notifications

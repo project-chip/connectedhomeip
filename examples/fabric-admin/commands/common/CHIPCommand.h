@@ -168,7 +168,6 @@ protected:
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
-    static chip::app::DefaultCheckInDelegate sCheckInDelegate;
     static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
