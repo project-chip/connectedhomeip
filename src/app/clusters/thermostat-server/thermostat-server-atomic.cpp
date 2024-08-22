@@ -417,7 +417,6 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
                 // Add to the maximum timeout
                 maximumTimeout += attributeTimeout.value();
             }
-
             break;
         }
     }
@@ -509,14 +508,6 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
         {
         case Presets::Id:
             statusCode = PrecommitPresets(endpoint);
-            if (statusCode == Status::Success)
-            {
-                CHIP_ERROR err = delegate->CommitPendingPresets();
-                if (err != CHIP_NO_ERROR)
-                {
-                    statusCode = Status::InvalidInState;
-                }
-            }
             break;
         case Schedules::Id:
             statusCode = Status::Success;
@@ -529,6 +520,35 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
         if (statusCode != Status::Success)
         {
             status = Status::Failure;
+        }
+    }
+
+    if (status == Status::Success)
+    {
+        for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+        {
+            auto & attributeStatus = attributeStatuses[i];
+            auto statusCode        = Status::Success;
+            switch (attributeStatus.attributeID)
+            {
+            case Presets::Id:
+                CHIP_ERROR err = delegate->CommitPendingPresets();
+                if (err != CHIP_NO_ERROR)
+                {
+                    statusCode = Status::InvalidInState;
+                }
+                break;
+            case Schedules::Id:
+                break;
+            default:
+                commandObj->AddStatus(commandPath, Status::InvalidInState);
+                return;
+            }
+            attributeStatus.statusCode = to_underlying(statusCode);
+            if (statusCode != Status::Success)
+            {
+                status = Status::Failure;
+            }
         }
     }
 
