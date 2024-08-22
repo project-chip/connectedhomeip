@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BasicInformationClusterProductAppearanceStruct(
-  val finish: UByte,
-  val primaryColor: UByte?
-) {
+class BasicInformationClusterProductAppearanceStruct(val finish: UByte, val primaryColor: UByte?) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterProductAppearanceStruct {\n")
     append("\tfinish : $finish\n")
@@ -55,13 +50,14 @@ class BasicInformationClusterProductAppearanceStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tlvTag)
       val finish = tlvReader.getUByte(ContextSpecificTag(TAG_FINISH))
-      val primaryColor = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_PRIMARY_COLOR))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
-      null
-    }
-      
+      val primaryColor =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_PRIMARY_COLOR))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return BasicInformationClusterProductAppearanceStruct(finish, primaryColor)

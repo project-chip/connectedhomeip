@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterLandmarkInfoStruct(
-  val landmarkTag: UByte,
-  val positionTag: UByte?
-) {
+class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UByte, val positionTag: UByte?) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLandmarkInfoStruct {\n")
     append("\tlandmarkTag : $landmarkTag\n")
@@ -55,13 +50,14 @@ class ServiceAreaClusterLandmarkInfoStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLandmarkInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val landmarkTag = tlvReader.getUByte(ContextSpecificTag(TAG_LANDMARK_TAG))
-      val positionTag = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_POSITION_TAG))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
-      null
-    }
-      
+      val positionTag =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_POSITION_TAG))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ServiceAreaClusterLandmarkInfoStruct(landmarkTag, positionTag)

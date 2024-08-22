@@ -16,16 +16,15 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class WaterHeaterManagementClusterBoostStartedEvent(
-  val boostInfo: matter.controller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct
+  val boostInfo:
+    matter.controller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct
 ) {
   override fun toString(): String = buildString {
     append("WaterHeaterManagementClusterBoostStartedEvent {\n")
@@ -44,10 +43,12 @@ class WaterHeaterManagementClusterBoostStartedEvent(
   companion object {
     private const val TAG_BOOST_INFO = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WaterHeaterManagementClusterBoostStartedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WaterHeaterManagementClusterBoostStartedEvent {
       tlvReader.enterStructure(tlvTag)
-      val boostInfo = matter.controller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct.fromTlv(ContextSpecificTag(TAG_BOOST_INFO), tlvReader)
-      
+      val boostInfo =
+        matter.controller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct
+          .fromTlv(ContextSpecificTag(TAG_BOOST_INFO), tlvReader)
+
       tlvReader.exitContainer()
 
       return WaterHeaterManagementClusterBoostStartedEvent(boostInfo)

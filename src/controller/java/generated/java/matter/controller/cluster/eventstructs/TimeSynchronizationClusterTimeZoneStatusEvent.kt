@@ -18,16 +18,12 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TimeSynchronizationClusterTimeZoneStatusEvent(
-  val offset: Int,
-  val name: Optional<String>
-) {
+class TimeSynchronizationClusterTimeZoneStatusEvent(val offset: Int, val name: Optional<String>) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTimeZoneStatusEvent {\n")
     append("\toffset : $offset\n")
@@ -51,15 +47,16 @@ class TimeSynchronizationClusterTimeZoneStatusEvent(
     private const val TAG_OFFSET = 0
     private const val TAG_NAME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStatusEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getInt(ContextSpecificTag(TAG_OFFSET))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-        Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-      } else {
-        Optional.empty()
-      }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTimeZoneStatusEvent(offset, name)
