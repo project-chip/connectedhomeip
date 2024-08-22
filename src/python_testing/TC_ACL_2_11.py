@@ -29,13 +29,11 @@
 
 import logging
 import queue
-import typing
 
 import chip.clusters as Clusters
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
-from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
