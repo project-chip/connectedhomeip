@@ -37,7 +37,7 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
-cluster = Clusters.DoorLock
+drlkcluster = Clusters.DoorLock
 
 
 class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
@@ -148,7 +148,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     async def send_clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=user_index),
+            await self.send_single_cmd(cmd=drlkcluster.Commands.ClearUser(userIndex=user_index),
                                        endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
             asserts.assert_equal(expected_status, Status.Success)
@@ -157,10 +157,10 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     async def get_user(self, userindex, username, useruniqueid, credentiallist, expected_status: Status = Status.Success):
         try:
-            response = await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.GetUser(userIndex=userindex),
+            response = await self.send_single_cmd(cmd=drlkcluster.Commands.GetUser(userIndex=userindex),
                                                   endpoint=self.app_cluster_endpoint,
                                                   timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetUserResponse),
+            asserts.assert_true(type_matches(response, drlkcluster.Commands.GetUserResponse),
                                 "Unexpected return type for GetUserResponse")
             asserts.assert_true(response.userIndex == userindex,
                                 "Error when executing GetUserResponse command, credentialExists={}".format(
@@ -179,17 +179,17 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
+    async def get_credentials_status(self, credentialIndex: int, credentialType: drlkcluster.Enums.CredentialTypeEnum,
                                      step, userIndex, credential_exists):
         if step:
             self.step(step)
         try:
-            credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
-                                                                  credentialType=credentialType)
+            credentials_struct = drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
+                                                                      credentialType=credentialType)
             response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
-                                                  cmd=cluster.Commands.GetCredentialStatus(
+                                                  cmd=drlkcluster.Commands.GetCredentialStatus(
                                                       credential=credentials_struct))
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
+            asserts.assert_true(type_matches(response, drlkcluster.Commands.GetCredentialStatusResponse),
                                 "Unexpected return type for GetCredentialStatus")
             asserts.assert_true(response.credentialExists == credential_exists,
                                 "Error when executing GetCredentialStatus command, credentialExists={}".format(
@@ -203,18 +203,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             logging.error(e)
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
-    async def set_credential_cmd(self, credential_enum: Clusters.Objects.DoorLock.Enums.CredentialTypeEnum, statuscode, credentialIndex,
+    async def set_credential_cmd(self, credential_enum: drlkcluster.Enums.CredentialTypeEnum, statuscode, credentialIndex,
                                  operationType, userIndex, credentialData, userStatus, userType):
         custom_stautus_code = 149
 
-        credentials = cluster.Structs.CredentialStruct(
+        credentials = drlkcluster.Structs.CredentialStruct(
             credentialType=credential_enum,
             credentialIndex=credentialIndex)
         try:
             logging.info("maxpincodelength value is %s" % (self.maxpincodelength))
             logging.info("maxrfidcodelength value is %s" % (self.maxrfidcodelength))
             logging.info("Credential Data is %s" % (credentialData))
-            response = await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetCredential(
+            response = await self.send_single_cmd(cmd=drlkcluster.Commands.SetCredential(
                 operationType=operationType,
                 credential=credentials,
                 credentialData=credentialData,
@@ -223,7 +223,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 userIndex=userIndex),
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
+            asserts.assert_true(type_matches(response, drlkcluster.Commands.SetCredentialResponse),
                                 "Unexpected return type for SetCredential")
 
             if (statuscode != custom_stautus_code):
@@ -239,7 +239,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
     async def clear_credentials_cmd(self, credential, step=None, expected_status: Status = Status.Success):
         try:
 
-            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credential),
+            await self.send_single_cmd(cmd=drlkcluster.Commands.ClearCredential(credential=credential),
                                        endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
@@ -260,7 +260,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.credentialIndex_1 = 1
         self.credentialIndex_2 = 2
         self.credentialIndex_3 = 3
-        self.operationType = cluster.Enums.DataOperationTypeEnum.kAdd
+        self.operationType = drlkcluster.Enums.DataOperationTypeEnum.kAdd
         self.userIndex_1 = 1
         self.userIndex_2 = 2
         self.invalid_user_status = 5
@@ -284,19 +284,19 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A0011")):
             self.numberoftotaluserssupported = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                                   cluster=Clusters.Objects.DoorLock,
-                                                                                   attribute=Clusters.DoorLock.Attributes.NumberOfTotalUsersSupported)
+                                                                                   cluster=drlkcluster,
+                                                                                   attribute=drlkcluster.Attributes.NumberOfTotalUsersSupported)
         self.step("2a")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
-                    operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                await self.send_single_cmd(cmd=drlkcluster.Commands.SetUser(
+                    operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                     userIndex=1,
                     userName=self.user_name,
                     userUniqueID=self.user_unique_id1,
-                    userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
-                    userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
-                    credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                    userStatus=drlkcluster.Enums.UserStatusEnum.kOccupiedEnabled,
+                    userType=drlkcluster.Enums.UserTypeEnum.kUnrestrictedUser,
+                    credentialRule=drlkcluster.Enums.CredentialRuleEnum.kSingle),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
@@ -305,78 +305,78 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("2b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.F00")):
             self.minpincodelength = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                        cluster=Clusters.Objects.DoorLock,
-                                                                        attribute=Clusters.DoorLock.Attributes.MinPINCodeLength)
+                                                                        cluster=drlkcluster,
+                                                                        attribute=drlkcluster.Attributes.MinPINCodeLength)
         self.step("2c")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.F00")):
             self.maxpincodelength = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                        cluster=Clusters.Objects.DoorLock,
-                                                                        attribute=Clusters.DoorLock.Attributes.MaxPINCodeLength)
+                                                                        cluster=drlkcluster,
+                                                                        attribute=drlkcluster.Attributes.MaxPINCodeLength)
         self.step("2d")
         if self.pics_guard(self.check_pics("DRLK.S.F01")):
             self.minrfidcodelength = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                         cluster=Clusters.Objects.DoorLock,
-                                                                         attribute=Clusters.DoorLock.Attributes.MinRFIDCodeLength)
+                                                                         cluster=drlkcluster,
+                                                                         attribute=drlkcluster.Attributes.MinRFIDCodeLength)
         self.step("2e")
         if self.pics_guard(self.check_pics("DRLK.S.F01")):
             self.maxrfidcodelength = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                         cluster=Clusters.Objects.DoorLock,
-                                                                         attribute=Clusters.DoorLock.Attributes.MaxRFIDCodeLength)
+                                                                         cluster=drlkcluster,
+                                                                         attribute=drlkcluster.Attributes.MaxRFIDCodeLength)
         self.step("2f")
         await self.generate_code()
         if self.pics_send_setcredential_pin_cmd:
 
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
         self.step("3")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
                            and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics("DRLK.S.C25.Tx")):
             await self.get_credentials_status(credentialIndex=self.credentialIndex_1,
-                                              credentialType=cluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=True)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=True)
         self.step("4")
         if self.pics_send_setcredential_pin_cmd:
 
             await self.set_credential_cmd(credentialData=self.inavlid_pincode,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_2, userIndex=self.userIndex_1, userStatus=self.invalid_user_status, userType=self.invalid_user_type, statuscode=Status.InvalidCommand)
         self.step("5")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_2, userIndex=NullValue, userStatus=NullValue, userType=NullValue, statuscode=2)
 
         self.step("6a")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=NullValue, userStatus=NullValue, userType=NullValue, statuscode=149)
         self.step("6b")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code1,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=NullValue, userStatus=NullValue, userType=NullValue, statuscode=149)
         self.step("7")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code2,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kModify,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kModify,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_3, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.InvalidCommand)
         self.step("8")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=1,
-                                                           credentialType=cluster.Enums.CredentialTypeEnum.kPin)
+            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=1,
+                                                               credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)
             await self.clear_credentials_cmd(step=None, credential=credentials)
 
         self.step("9a")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C24.Rsp")):
             await self.get_credentials_status(credentialIndex=self.credentialIndex_1,
-                                              credentialType=cluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=False)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=False)
         self.step("9b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
             await self.send_clear_user_cmd(user_index=1)
@@ -384,14 +384,14 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("10")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
-                    operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                await self.send_single_cmd(cmd=drlkcluster.Commands.SetUser(
+                    operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                     userIndex=self.userIndex_2,
                     userName=self.user_name,
                     userUniqueID=self.user_unique_id2,
-                    userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
-                    userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
-                    credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                    userStatus=drlkcluster.Enums.UserStatusEnum.kOccupiedEnabled,
+                    userType=drlkcluster.Enums.UserTypeEnum.kUnrestrictedUser,
+                    credentialRule=drlkcluster.Enums.CredentialRuleEnum.kSingle),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
@@ -400,32 +400,32 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("11")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=self.userIndex_2, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
         self.step("12a")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=0xFFFE,
-                                                           credentialType=cluster.Enums.CredentialTypeEnum.kPin)
+            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=0xFFFE,
+                                                               credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)
             await self.clear_credentials_cmd(step=None, credential=credentials)
 
         self.step("13")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C24.Rsp") and self.check_pics("DRLK.S.C25.Tx")):
             await self.get_credentials_status(credentialIndex=self.credentialIndex_1,
-                                              credentialType=cluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=False)
+                                              credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin, step=None, userIndex=1, credential_exists=False)
         self.step("14a")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
             feature_map = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                              cluster=Clusters.Objects.DoorLock,
-                                                              attribute=Clusters.DoorLock.Attributes.FeatureMap)
-            aliro_enabled = feature_map & Clusters.DoorLock.Bitmaps.Feature.kAliroProvisioning
+                                                              cluster=drlkcluster,
+                                                              attribute=drlkcluster.Attributes.FeatureMap)
+            aliro_enabled = feature_map & drlkcluster.Bitmaps.Feature.kAliroProvisioning
         if (aliro_enabled):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
-                                                           credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey)
+            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
+                                                               credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey)
             await self.clear_credentials_cmd(step=None, credential=credentials)
         else:
             try:
-                await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credentials),
+                await self.send_single_cmd(cmd=drlkcluster.Commands.ClearCredential(credential=credentials),
                                            endpoint=self.app_cluster_endpoint,
                                            timedRequestTimeoutMs=1000)
                 asserts.fail("Unexpected success in sending ClearCredential Command  with invalid CredentialTpe")
@@ -436,10 +436,10 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.step("14b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
-                                                           credentialType=self.invalid_credential_type)
+            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
+                                                               credentialType=self.invalid_credential_type)
             try:
-                await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=credentials),
+                await self.send_single_cmd(cmd=drlkcluster.Commands.ClearCredential(credential=credentials),
                                            endpoint=self.app_cluster_endpoint,
                                            timedRequestTimeoutMs=1000)
                 asserts.fail("Unexpected success in sending ClearCredential Command  with invalid CredentialTpe")
@@ -455,19 +455,19 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A001c")):
 
             numberofcredentialsupportedperuser = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
-                                                                                     cluster=Clusters.Objects.DoorLock,
-                                                                                     attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
+                                                                                     cluster=drlkcluster,
+                                                                                     attribute=drlkcluster.Attributes.NumberOfCredentialsSupportedPerUser)
         self.step("15b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
-                    operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                await self.send_single_cmd(cmd=drlkcluster.Commands.SetUser(
+                    operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                     userIndex=self.userIndex_1,
                     userName=self.user_name,
                     userUniqueID=self.user_unique_id1,
-                    userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
-                    userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
-                    credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                    userStatus=drlkcluster.Enums.UserStatusEnum.kOccupiedEnabled,
+                    userType=drlkcluster.Enums.UserTypeEnum.kUnrestrictedUser,
+                    credentialRule=drlkcluster.Enums.CredentialRuleEnum.kSingle),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
@@ -483,8 +483,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 logging.info("Credential Data value is %s" % (uniquePincode))
                 if start_credential_index <= (numberofcredentialsupportedperuser):
                     await self.set_credential_cmd(credentialData=uniquePincode,
-                                                  operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                                  credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                                  operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                                  credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                                   credentialIndex=start_credential_index, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
                     start_credential_index += 1
                     logging.info(f"The updated value of start_credential_index is {start_credential_index}")
@@ -493,26 +493,26 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.step("15d")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=start_credential_index, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.ResourceExhausted)
         self.step("15e")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
-            credentials = cluster.Structs.CredentialStruct(credentialIndex=0xFFFE,
-                                                           credentialType=cluster.Enums.CredentialTypeEnum.kPin)
+            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=0xFFFE,
+                                                               credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)
             await self.clear_credentials_cmd(step=None, credential=credentials)
 
         self.step("16")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
-                    operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                await self.send_single_cmd(cmd=drlkcluster.Commands.SetUser(
+                    operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                     userIndex=self.userIndex_1,
                     userName=self.user_name,
                     userUniqueID=self.user_unique_id1,
-                    userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
-                    userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
-                    credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                    userStatus=drlkcluster.Enums.UserStatusEnum.kOccupiedEnabled,
+                    userType=drlkcluster.Enums.UserTypeEnum.kUnrestrictedUser,
+                    credentialRule=drlkcluster.Enums.CredentialRuleEnum.kSingle),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
@@ -522,31 +522,31 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         if self.pics_send_setcredential_rfid_cmd:
 
             await self.set_credential_cmd(credentialData=self.rfid_tag,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kRfid,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kRfid,
                                           credentialIndex=self.credentialIndex_1, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
         self.step("18")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
 
         self.step("19")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C1b.Rsp")):
 
-            credentiallist: list[cluster.Structs.CredentialStruct]
-            credentiallist = [cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
-                                                               credentialType=cluster.Enums.CredentialTypeEnum.kRfid),
-                              cluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
-                                                               credentialType=cluster.Enums.CredentialTypeEnum.kPin)]
+            credentiallist: list[drlkcluster.Structs.CredentialStruct]
+            credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kRfid),
+                              drlkcluster.Structs.CredentialStruct(credentialIndex=self.credentialIndex_1,
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)]
             await self.get_user(self.userIndex_1, self.user_name, self.user_unique_id1, credentiallist, Status.Success)
 
         self.step("20")
         if self.pics_send_setcredential_pin_cmd:
             await self.set_credential_cmd(credentialData=self.pin_code1,
-                                          operationType=cluster.Enums.DataOperationTypeEnum.kModify,
-                                          credential_enum=Clusters.Objects.DoorLock.Enums.CredentialTypeEnum.kPin,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kModify,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=self.credentialIndex_1, userIndex=self.userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
 
         self.step("21")
