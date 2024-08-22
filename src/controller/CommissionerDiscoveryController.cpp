@@ -155,6 +155,12 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         return;
     }
 
+    if (state.GetProductId() == 0 && state.GetVendorId() == 0) {
+        // this is an invalid request and should be ignored
+        ChipLogDetail(Controller, "Ignoring the request as it's invalid. product and vendor id cannot be 0");
+        return;
+    }
+
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
@@ -163,7 +169,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
                                                          sizeof(rotatingIdString));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
+        ChipLogError(Controller, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
     }
 
