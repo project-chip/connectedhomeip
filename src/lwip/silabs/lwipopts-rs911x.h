@@ -95,9 +95,9 @@
 #define MEMP_NUM_NETCONN (0)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-#define LWIP_IPV4   1
+#define LWIP_IPV4 1
 #else
-#define LWIP_IPV4   0
+#define LWIP_IPV4 0
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 
 #ifndef LWIP_ARP
