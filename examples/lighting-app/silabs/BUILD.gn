@@ -97,6 +97,7 @@ if (wifi_soc) {
 
     include_dirs = [
       "${chip_root}/src/platform/silabs/efr32",
+      "${chip_root}/src/platform/silabs/wifi",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
