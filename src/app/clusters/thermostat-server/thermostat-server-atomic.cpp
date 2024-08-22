@@ -588,17 +588,7 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
 
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
-        auto & attributeStatus = attributeStatuses[i];
-        switch (attributeStatus.attributeID)
-        {
-        case Presets::Id:
-        case Schedules::Id:
-            attributeStatus.statusCode = to_underlying(Status::Success);
-            break;
-        default:
-            commandObj->AddStatus(commandPath, Status::InvalidInState);
-            return;
-        }
+        attributeStatuses[i].statusCode = to_underlying(Status::Success);
     }
 
     SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
