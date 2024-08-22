@@ -138,7 +138,8 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
 
         self.step("7")
-        slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(slotIndex=0, duration=forecast.slots[0].minDurationAdjustment)]
+        slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
+            slotIndex=0, duration=forecast.slots[0].minDurationAdjustment)]
         await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Success)
 
         self.step("8")
