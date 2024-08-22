@@ -28,6 +28,8 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
 
+namespace {}
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -133,15 +135,13 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 /// @param attributeRequests The list of requested attributes
 /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
-/// @param requireAll Whether the caller requires all atomic attributes to be represented in attributeRequests
 /// @return Status::Success if the request is valid, an error status if it is not
 Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                              size_t & attributeStatusCount,
-                              Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> & attributeStatuses, bool requireAll)
+                              Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
 
     bool requestedPresets = false, requestedSchedules = false;
-    attributeStatusCount = 0;
+    size_t attributeStatusCount = 0;
     if (!CountAttributeRequests(attributeRequests, attributeStatusCount, requestedPresets, requestedSchedules))
     {
         // We errored reading the list
@@ -151,12 +151,6 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
     {
         // List can't be empty
         return Status::InvalidCommand;
-    }
-    if (requestedPresets ^ requestedSchedules)
-    {
-        // Client requested presets or schedules, but not both, so we need an extra status
-        // because we will in fact treat the atomic request as applying to both.
-        attributeStatusCount++;
     }
     attributeStatuses.Alloc(attributeStatusCount);
     for (size_t i = 0; i < attributeStatusCount; ++i)
@@ -199,20 +193,130 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
             return Status::InvalidCommand;
         }
     }
-    if (requireAll)
+    return Status::Success;
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId)
+{
+
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (ep >= ArraySize(mAtomicWriteSessions))
     {
-        if (!requestedPresets || !requestedSchedules)
+        return false;
+    }
+    auto & atomicWriteSession = mAtomicWriteSessions[ep];
+    if (atomicWriteSession.state != AtomicWriteState::Open)
+    {
+        return false;
+    }
+    if (!attributeId.HasValue())
+    {
+        return true;
+    }
+    for (size_t i = 0; i < atomicWriteSession.attributeIds.AllocatedSize(); ++i)
+    {
+        if (atomicWriteSession.attributeIds[i] == attributeId.Value())
         {
-            return Status::InvalidInState;
+            return true;
         }
     }
-    else if (requestedPresets ^ requestedSchedules)
+    return false;
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
+                                         Optional<AttributeId> attributeId)
+{
+    if (!InAtomicWrite(endpoint, attributeId))
     {
-        // Client requested presets or schedules, but not both, so we add the extra status
-        attributeStatuses[index].attributeID = requestedSchedules ? Presets::Id : Schedules::Id;
-        attributeStatuses[index].statusCode  = to_underlying(Status::Success);
+        return false;
     }
-    return Status::Success;
+    return subjectDescriptor.authMode == Access::AuthMode::kCase &&
+        GetAtomicWriteOriginatorScopedNodeId(endpoint) == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId)
+{
+    if (!InAtomicWrite(endpoint, attributeId))
+    {
+        return false;
+    }
+    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
+    return GetAtomicWriteOriginatorScopedNodeId(endpoint) == sourceNodeId;
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(
+    EndpointId endpoint, CommandHandler * commandObj,
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (ep >= ArraySize(mAtomicWriteSessions))
+    {
+        return false;
+    }
+    auto & atomicWriteSession = mAtomicWriteSessions[ep];
+    if (atomicWriteSession.state != AtomicWriteState::Open)
+    {
+        return false;
+    }
+    if (atomicWriteSession.attributeIds.AllocatedSize() == 0 ||
+        atomicWriteSession.attributeIds.AllocatedSize() != attributeStatuses.AllocatedSize())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < atomicWriteSession.attributeIds.AllocatedSize(); ++i)
+    {
+        bool hasAttribute = false;
+        auto attributeId  = atomicWriteSession.attributeIds[i];
+        for (size_t j = 0; j < attributeStatuses.AllocatedSize(); ++j)
+        {
+            auto & attributeStatus = attributeStatuses[j];
+            if (attributeStatus.attributeID == attributeId)
+            {
+                hasAttribute = true;
+                break;
+            }
+        }
+        if (!hasAttribute)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ThermostatAttrAccess::SetAtomicWrite(
+    EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (ep >= ArraySize(mAtomicWriteSessions))
+    {
+        return false;
+    }
+
+    auto & atomicWriteSession     = mAtomicWriteSessions[ep];
+    atomicWriteSession.endpointId = endpoint;
+    if (!atomicWriteSession.attributeIds.Alloc(attributeStatuses.AllocatedSize()))
+    {
+        atomicWriteSession.state  = AtomicWriteState::Closed;
+        atomicWriteSession.nodeId = ScopedNodeId();
+        return false;
+    }
+
+    atomicWriteSession.state  = state;
+    atomicWriteSession.nodeId = originatorNodeId;
+
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+    {
+        atomicWriteSession.attributeIds[i] = attributeStatuses[i].attributeID;
+    }
+    return true;
 }
 
 void ThermostatAttrAccess::ResetAtomicWrite(EndpointId endpoint)
@@ -223,40 +327,18 @@ void ThermostatAttrAccess::ResetAtomicWrite(EndpointId endpoint)
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    SetAtomicWrite(endpoint, ScopedNodeId(), AtomicWriteState::Closed);
-}
-
-bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
-{
-
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteSessions))
+    if (ep >= ArraySize(mAtomicWriteSessions))
     {
-        return mAtomicWriteSessions[ep].state == AtomicWriteState::Open;
+        return;
     }
-    return false;
-}
-
-bool ThermostatAttrAccess::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint)
-{
-    if (!InAtomicWrite(endpoint))
-    {
-        return false;
-    }
-    return subjectDescriptor.authMode == Access::AuthMode::kCase &&
-        GetAtomicWriteOriginatorScopedNodeId(endpoint) == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
-}
-
-bool ThermostatAttrAccess::InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint)
-{
-    if (!InAtomicWrite(endpoint))
-    {
-        return false;
-    }
-    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
-    return GetAtomicWriteOriginatorScopedNodeId(endpoint) == sourceNodeId;
+    auto & atomicWriteSession     = mAtomicWriteSessions[ep];
+    atomicWriteSession.state      = AtomicWriteState::Closed;
+    atomicWriteSession.endpointId = endpoint;
+    atomicWriteSession.nodeId     = ScopedNodeId();
+    atomicWriteSession.attributeIds.Alloc(0);
 }
 
 ScopedNodeId ThermostatAttrAccess::GetAtomicWriteOriginatorScopedNodeId(const EndpointId endpoint)
@@ -273,13 +355,13 @@ ScopedNodeId ThermostatAttrAccess::GetAtomicWriteOriginatorScopedNodeId(const En
 }
 
 void SendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Status status,
-                        const Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> & attributeStatuses,
-                        size_t attributeRequestCount, Optional<uint16_t> timeout = NullOptional)
+                        const Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses,
+                        Optional<uint16_t> timeout = NullOptional)
 {
     Commands::AtomicResponse::Type response;
     response.statusCode = to_underlying(status);
     response.attributeStatus =
-        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.Get(), attributeRequestCount);
+        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.Get(), attributeStatuses.AllocatedSize());
     response.timeout = timeout;
     commandObj->AddResponse(commandPath, response);
 }
@@ -298,16 +380,15 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         return;
     }
 
-    size_t attributeStatusCount = 0;
-    Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, false);
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
         return;
     }
 
-    if (gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint))
+    if (InAtomicWrite(endpoint, commandObj))
     {
         // This client already has an open atomic write
         commandObj->AddStatus(commandPath, Status::InvalidInState);
@@ -342,7 +423,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
     }
 
     status = Status::Success;
-    for (size_t i = 0; i < attributeStatusCount; ++i)
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
         auto statusCode        = Status::Success;
@@ -350,7 +431,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         {
         case Presets::Id:
         case Schedules::Id:
-            statusCode = gThermostatAttrAccess.InAtomicWrite(endpoint) ? Status::Busy : Status::Success;
+            statusCode = InAtomicWrite(endpoint, MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
             break;
         default:
             statusCode = Status::InvalidCommand;
@@ -372,14 +453,24 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
 
     if (status == Status::Success)
     {
-        // This is a valid request to open an atomic write. Tell the delegate it
-        // needs to keep track of a pending preset list now.
-        delegate->InitializePendingPresets();
-        ScheduleTimer(endpoint, timeout);
-        SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), AtomicWriteState::Open);
+        if (!SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), AtomicWriteState::Open, attributeStatuses))
+        {
+            for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+            {
+                attributeStatuses[i].statusCode = to_underlying(Status::ResourceExhausted);
+            }
+            status = Status::Failure;
+        }
+        else
+        {
+            // This is a valid request to open an atomic write. Tell the delegate it
+            // needs to keep track of a pending preset list now.
+            delegate->InitializePendingPresets();
+            ScheduleTimer(endpoint, timeout);
+        }
     }
 
-    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount, MakeOptional(timeout.count()));
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, MakeOptional(timeout.count()));
 }
 
 void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -395,23 +486,22 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
         return;
     }
 
-    size_t attributeStatusCount = 0;
-    Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
         return;
     }
 
-    if (!gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint))
+    if (!InAtomicWrite(endpoint, commandObj, attributeStatuses))
     {
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return;
     }
 
     status = Status::Success;
-    for (size_t i = 0; i < attributeStatusCount; ++i)
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
         auto statusCode        = Status::Success;
@@ -443,7 +533,7 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
     }
 
     ResetAtomicWrite(endpoint);
-    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
 }
 
 void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
@@ -460,16 +550,15 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
         return;
     }
 
-    size_t attributeStatusCount = 0;
-    Platform::ScopedMemoryBuffer<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatusCount, attributeStatuses, true);
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
+    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
         return;
     }
 
-    if (!gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint))
+    if (!InAtomicWrite(endpoint, commandObj, attributeStatuses))
     {
         // There's no open atomic write
         commandObj->AddStatus(commandPath, Status::InvalidInState);
@@ -478,7 +567,7 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
 
     ResetAtomicWrite(endpoint);
 
-    for (size_t i = 0; i < attributeStatusCount; ++i)
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
         switch (attributeStatus.attributeID)
@@ -493,20 +582,7 @@ void ThermostatAttrAccess::RollbackAtomicWrite(CommandHandler * commandObj, cons
         }
     }
 
-    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, attributeStatusCount);
-}
-
-void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    if (ep < ArraySize(mAtomicWriteSessions))
-    {
-        mAtomicWriteSessions[ep].state      = state;
-        mAtomicWriteSessions[ep].endpointId = endpoint;
-        mAtomicWriteSessions[ep].nodeId     = originatorNodeId;
-    }
+    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
 }
 
 } // namespace Thermostat

@@ -62,7 +62,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
                               expected_preset_status: Status = Status.Success,
-                              expected_schedules_status: Status = Status.Success,
+                              expected_schedules_status: Status = None,
                               expected_timeout: int = None):
         asserts.assert_equal(expected_status, Status.Success, "We expected we had a valid response")
         asserts.assert_equal(response.statusCode, expected_overall_status, "Response should have the right overall status")
@@ -81,7 +81,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(response.timeout, expected_timeout,
                                  "Timeout should have the right value")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
-        asserts.assert_true(found_schedules_status, "Schedules attribute should have a status")
+        if expected_schedules_status is not None:
+            asserts.assert_true(found_schedules_status, "Schedules attribute should have a status")
+            asserts.assert_equal(attrStatus.statusCode, expected_schedules_status,
+                                 "Schedules attribute should have the right status")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
 
     async def write_presets(self,
@@ -103,7 +106,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                 expected_status: Status = Status.Success,
                                                 expected_overall_status: Status = Status.Success,
                                                 expected_preset_status: Status = Status.Success,
-                                                expected_schedules_status: Status = Status.Success,
+                                                expected_schedules_status: Status = None,
                                                 expected_timeout: int = None):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
@@ -124,10 +127,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                  expected_status: Status = Status.Success,
                                                  expected_overall_status: Status = Status.Success,
                                                  expected_preset_status: Status = Status.Success,
-                                                 expected_schedules_status: Status = Status.Success):
+                                                 expected_schedules_status: Status = None):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
-                                                                                     attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
+                                                                                     attributeRequests=[cluster.Attributes.Presets.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
             self.check_atomic_response(response, expected_status, expected_overall_status,
@@ -141,10 +144,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                                    expected_status: Status = Status.Success,
                                                    expected_overall_status: Status = Status.Success,
                                                    expected_preset_status: Status = Status.Success,
-                                                   expected_schedules_status: Status = Status.Success):
+                                                   expected_schedules_status: Status = None):
         try:
             response = await self.send_single_cmd(cmd=cluster.Commands.AtomicRequest(requestType=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
-                                                                                     attributeRequests=[cluster.Attributes.Presets.attribute_id, cluster.Attributes.Schedules.attribute_id]),
+                                                                                     attributeRequests=[cluster.Attributes.Presets.attribute_id]),
                                                   dev_ctrl=dev_ctrl,
                                                   endpoint=endpoint)
             self.check_atomic_response(response, expected_status, expected_overall_status,
@@ -428,7 +431,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             await self.send_atomic_request_begin_command()
             # Send the AtomicRequest begin command from separate controller, which should receive busy
-            status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy, expected_schedules_status=Status.Busy)
+            status = await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller, expected_overall_status=Status.Failure, expected_preset_status=Status.Busy)
 
             # Roll back
             await self.send_atomic_request_rollback_command()

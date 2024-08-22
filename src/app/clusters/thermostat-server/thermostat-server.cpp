@@ -299,7 +299,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
-        if (InAtomicWrite(subjectDescriptor, aPath.mEndpointId))
+        if (InAtomicWrite(aPath.mEndpointId, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
         {
             return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -375,12 +375,12 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(InAtomicWrite(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+        VerifyOrReturnError(InAtomicWrite(endpoint, MakeOptional(aPath.mAttributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
         // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
         // otherwise return BUSY.
-        if (!InAtomicWrite(subjectDescriptor, endpoint))
+        if (!InAtomicWrite(endpoint, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
             return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -422,7 +422,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     }
 
     // This is not an atomic attribute, so check to make sure we don't have an atomic write going for this client
-    if (InAtomicWrite(subjectDescriptor, endpoint))
+    if (InAtomicWrite(endpoint, subjectDescriptor))
     {
         ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
         return CHIP_IM_GLOBAL_STATUS(InvalidInState);
@@ -460,7 +460,7 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
 {
     for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
     {
-        auto atomicWriteState = mAtomicWriteSessions[i];
+        auto & atomicWriteState = mAtomicWriteSessions[i];
         if (atomicWriteState.state == AtomicWriteState::Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             ResetAtomicWrite(atomicWriteState.endpointId);

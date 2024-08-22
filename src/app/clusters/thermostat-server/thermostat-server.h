@@ -80,7 +80,10 @@ private:
      * @param[in] originatorNodeId The originator scoped node id.
      * @param[in] state Whether or not an atomic write is open or closed.
      */
-    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state);
+
+    bool
+    SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
+                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
     /**
      * @brief Resets the atomic write for a given endpoint
@@ -89,34 +92,16 @@ private:
      */
     void ResetAtomicWrite(EndpointId endpoint);
 
-    /**
-     * @brief Gets whether an atomic write is in progress for the given endpoint
-     *
-     * @param[in] endpoint The endpoint.
-     *
-     * @return Whether an atomic write is in progress for the given endpoint
-     */
-    bool InAtomicWrite(EndpointId endpoint);
+    bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
 
-    /**
-     * @brief Gets whether an atomic write is in progress for the given endpoint
-     *
-     * @param[in] subjectDescriptor The subject descriptor.
-     * @param[in] endpoint The endpoint.
-     *
-     * @return Whether an atomic write is in progress for the given endpoint
-     */
-    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint);
+    bool InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
+                       Optional<AttributeId> attributeId = NullOptional);
 
-    /**
-     * @brief Gets whether an atomic write is in progress for the given endpoint
-     *
-     * @param[in] commandObj The command handler.
-     * @param[in] endpoint The endpoint.
-     *
-     * @return Whether an atomic write is in progress for the given endpoint
-     */
-    bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
+    bool InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
+
+    bool
+    InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
+                  Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
     /**
      * @brief Handles an AtomicRequest of type BeginWrite
@@ -162,6 +147,7 @@ private:
     struct AtomicWriteSession
     {
         AtomicWriteState state = AtomicWriteState::Closed;
+        Platform::ScopedMemoryBufferWithSize<AttributeId> attributeIds;
         ScopedNodeId nodeId;
         EndpointId endpointId = kInvalidEndpointId;
     };
