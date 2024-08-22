@@ -70,8 +70,6 @@ public:
                                  chip::System::PacketBufferHandle && payload) override;
 
 private:
-    friend class TestBdxTransferServer;
-
     void EndSession(CHIP_ERROR result);
     CHIP_ERROR SendMessage(TransferSession::OutputEvent & event);
     CHIP_ERROR SendBlock();

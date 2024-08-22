@@ -18,37 +18,40 @@
 #pragma once
 
 #include <lib/support/Pool.h>
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <transport/raw/MessageHeader.h>
 
-#include <controller/python/chip/bdx/bdx-transfer-pool.h>
 #include <controller/python/chip/bdx/bdx-transfer.h>
 
 namespace chip {
 namespace bdx {
 
-// This class implements the pool interface used to allocate BdxTransfer objects. It keeps track of the number of expected
-// transfers, and will only allocate BdxTransfer objects if a transfer is expected.
+// This class handles unsolicited BDX messages. It keeps track of the number of expect transfers, and will only allocate
+// BdxTransfer objects if a transfer is expected.
 //
 // The controller must inform this manager when a transfer is expected:
 //   bdxTransferManager->ExpectATransfer();
-// At which point the BDX unsolicited message handler can use this (as a BdxTransferPool) to allocate a BdxTransfer object.
-//   bdxTransferPool->Allocate();
-class BdxTransferManager : public BdxTransferPool
+// At which point the next unsolicited BDX message will allocate a BdxTransfer object.
+class BdxTransferManager : public Messaging::UnsolicitedMessageHandler
 {
 public:
     BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate);
     ~BdxTransferManager() override;
 
-    CHIP_ERROR Init(System::Layer * systemLayer);
+    CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeManager);
+    void Shutdown();
 
     // These keep track of the number of expected transfers. A transfer must be expected before this will allocate a
     // BdxTransfer object.
     void ExpectATransfer();
     void StopExpectingATransfer();
 
-    // This will only allocate a BdxTransfer object if a transfer is expected.
-    BdxTransfer * Allocate() override;
-    void Release(BdxTransfer * bdxTransfer) override;
+    void Release(BdxTransfer * bdxTransfer);
+
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, Messaging::ExchangeDelegate *& delegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
     // The maximum number of transfers to support at once. This number was chosen because it should be sufficient for
@@ -56,9 +59,10 @@ private:
     static constexpr size_t kTransferPoolSize = 2;
 
     ObjectPool<BdxTransfer, kTransferPoolSize> mTransferPool;
-    System::Layer * mSystemLayer                 = nullptr;
-    BdxTransfer::Delegate * mBdxTransferDelegate = nullptr;
-    size_t mExpectedTransfers                    = 0;
+    System::Layer * mSystemLayer                  = nullptr;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
+    BdxTransfer::Delegate * mBdxTransferDelegate  = nullptr;
+    size_t mExpectedTransfers                     = 0;
 };
 
 } // namespace bdx

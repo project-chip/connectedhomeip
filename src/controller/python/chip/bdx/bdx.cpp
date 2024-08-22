@@ -22,7 +22,6 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/python/chip/bdx/bdx-transfer-manager.h>
-#include <controller/python/chip/bdx/bdx-transfer-server.h>
 #include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/native/PyChipError.h>
 
@@ -164,7 +163,6 @@ private:
 TransferMap gTransfers;
 TransferDelegate gBdxTransferDelegate(&gTransfers);
 bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
-bdx::TestBdxTransferServer gBdxTransferServer(gBdxTransferManager);
 
 void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer)
 {
@@ -194,8 +192,7 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     chip::System::Layer * systemLayer                   = factory.GetSystemState()->SystemLayer();
     gBdxTransferDelegate.Init(systemLayer);
-    gBdxTransferManager.Init(systemLayer);
-    gBdxTransferServer.Init(factory.GetSystemState()->ExchangeMgr());
+    gBdxTransferManager.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
 }
 
 // Prepares the BDX system to expect a new transfer.
