@@ -86,7 +86,9 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("8", "TH counts all report transactions with an attribute report for the Forecast attribute over the next Forecast.Slots[0].MinDurationAdjustment}",
                      "TH verifies that numberOfReportsReceived <= 2 + Forecast.Slots[0].MinDurationAdjustment}"),
-            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.DEM.TESTEVENTTRIGGER for Forecast Adjustment Test Event Clear",
+            TestStep("9", "Cancel the subscription to the Forecast attribute",
+                     "The subscription is cancelled successfully"),
+            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.DEM.TESTEVENTTRIGGER for Forecast Adjustment Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
@@ -123,7 +125,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.DeviceEnergyManagement)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint, keepSubscriptions=False)
         sub_handler.reset()
 
         self.step("6")
@@ -143,11 +145,14 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
         time.sleep(forecast.slots[0].minDurationAdjustment)
 
         count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
+        logging.info(f"Number of Forecast updates {count}")
         asserts.assert_less_equal(count, 10, "More than 10 reports received")
 
         self.step("9")
-        await self.send_test_event_trigger_forecast_adjustment_clear()
+        sub_handler.cancel()
 
+        self.step("10")
+        await self.send_test_event_trigger_forecast_adjustment_clear()
 
 if __name__ == "__main__":
     default_matter_test_main()
