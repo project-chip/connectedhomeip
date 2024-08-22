@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2023 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +13,24 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
+ *
  */
-
-package com.matter.casting.support;
+package com.chip.casting;
 
 import android.util.Log;
 
-public interface DataProvider<T> {
-  String TAG = DataProvider.class.getSimpleName();
+/** @deprecated Use the APIs described in /examples/tv-casting-app/APIs.md instead. */
+@Deprecated
+public abstract class SuccessCallback<R> {
+  private static final String TAG = SuccessCallback.class.getSimpleName();
 
-  default T _get() {
-    T val = null;
+  public abstract void handle(R response);
+
+  protected final void handleInternal(R response) {
     try {
-      val = get();
+      handle(response);
     } catch (Throwable t) {
-      Log.e(TAG, "DataProvider::_get() Caught an unhandled Throwable from the client: " + t);
+      Log.e(TAG, "SuccessCallback::Caught an unhandled Throwable from the client: " + t);
     }
-    return val;
   }
-
-  T get();
 }
