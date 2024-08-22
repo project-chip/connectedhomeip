@@ -23,7 +23,7 @@
 # test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x7f
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x7b
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
@@ -90,11 +90,10 @@ class TC_DEM_1_1(MatterBaseTest, DEMTestBase):
         await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kForecastAdjustment,
                                          Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting,
                                          Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment,
-                                         Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting,
                                          Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStartTimeAdjustment,
                                          Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPausable,
                                          Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment],
-                                        [])
+                                        [Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting])
 
         self.step("4")
         attribute_list = await self.read_dem_attribute_expect_success(attribute="AttributeList")
