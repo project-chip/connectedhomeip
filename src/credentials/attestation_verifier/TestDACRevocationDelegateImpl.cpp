@@ -21,6 +21,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <algorithm>
 #include <fstream>
 #include <json/json.h>
 
@@ -29,9 +30,10 @@ using namespace chip::Crypto;
 namespace chip {
 namespace Credentials {
 
+namespace {
+
 static constexpr uint32_t kMaxIssuerBase64Len = BASE64_ENCODED_LEN(kMaxCertificateDistinguishedNameLength);
 
-namespace {
 CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, MutableCharSpan & outHexStr)
 {
     Encoding::HexFlags flags = Encoding::HexFlags::kUppercase;
@@ -287,8 +289,6 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan
 // @param isPAI true if the certificate being tested is a PAI, false otherwise
 bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer, bool isPAI)
 {
-    static constexpr uint32_t kMaxIssuerBase64Len = BASE64_ENCODED_LEN(kMaxCertificateDistinguishedNameLength);
-
     char issuerNameBuffer[kMaxIssuerBase64Len]                           = { 0 };
     char serialNumberHexStrBuffer[2 * kMaxCertificateSerialNumberLength] = { 0 };
     char akidHexStrBuffer[2 * kAuthorityKeyIdentifierLength]             = { 0 };
