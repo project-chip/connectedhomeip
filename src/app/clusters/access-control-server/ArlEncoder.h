@@ -58,26 +58,16 @@ public:
         CommissioningEncodableEntry(const Entry & entry) : mEntry(entry) {}
 
         /**
-         * Constructor-provided entry is staged into a staging entry,
-         * which is then encoded into a writer.
+         * Encode the constructor-provided entry into the TLV writer.
          */
         CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-        /**
-         * Constructor-provided entry is staged into a staging entry.
-         */
-        CHIP_ERROR Stage() const;
-
-        StagingEntry & GetStagingEntry() { return mStagingEntry; }
-
-        const StagingEntry & GetStagingEntry() const { return mStagingEntry; }
-
-    public:
         static constexpr bool kIsFabricScoped = false;
 
     private:
-        Entry mEntry;
+        CHIP_ERROR Stage() const;
 
+        Entry mEntry;
         mutable StagingEntry mStagingEntry;
         mutable StagingRestriction mStagingRestrictions[CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY];
     };
@@ -99,34 +89,26 @@ public:
         EncodableEntry(const Entry & entry) : mEntry(entry) {}
 
         /**
-         * Constructor-provided entry is staged into a staging entry,
-         * which is then encoded into a writer.
+         * Encode the constructor-provided entry into the TLV writer.
          */
         CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const;
 
         /**
-         * Constructor-provided entry is staged into a staging entry,
-         * which is then encoded into a writer.
+         * Encode the constructor-provided entry into the TLV writer.
          */
         CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
+        FabricIndex GetFabricIndex() const { return mEntry.fabricIndex; }
+
+        static constexpr bool kIsFabricScoped = true;
+
+    private:
         /**
          * Constructor-provided entry is staged into a staging entry.
          */
         CHIP_ERROR Stage() const;
 
-        StagingEntry & GetStagingEntry() { return mStagingEntry; }
-
-        const StagingEntry & GetStagingEntry() const { return mStagingEntry; }
-
-    public:
-        static constexpr bool kIsFabricScoped = true;
-
-        FabricIndex GetFabricIndex() const { return mEntry.fabricIndex; }
-
-    private:
         Entry mEntry;
-
         mutable StagingEntry mStagingEntry;
         mutable StagingRestriction mStagingRestrictions[CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY];
     };

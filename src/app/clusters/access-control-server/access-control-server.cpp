@@ -676,9 +676,8 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     }
     else
     {
-        ChipLogError(DataManagement, "AccessControlCluster: restriction check failed: %" CHIP_ERROR_FORMAT, err.Format());
-
-        // return error to client?
+        ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
     }
 
     return true;
