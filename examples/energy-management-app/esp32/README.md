@@ -46,7 +46,7 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/
         ENABLE_EXAMPLE_EVSE_DEVICE
 
 -   Test Event Trigger support: By default the EVSE, Water Heater, Device Energy
-    Management (DEM), Enegry Reporting test event triggers are enabled in the
+    Management (DEM), Energy Reporting test event triggers are enabled in the
     build. To turn these off run `idf.py menuconfig` and search for the
     following config entries:
 
