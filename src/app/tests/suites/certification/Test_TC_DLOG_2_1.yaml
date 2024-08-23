@@ -36,11 +36,11 @@ tests:
           To send a message that mismatches the current transfer mode
           1. Execute the below commands in the interactive mode:
            ./chip-tool interactive start
-          2. Before running the below steps ensure that  \tmp folder on the system does not contain the below files. 
+          2. Before running the below steps ensure that  \tmp folder on the system does not contain the below files.
              If they are present please delete these files:
                TH_LOG_OK_NORMAL : "Length_1234567.txt"
                TH_LOG_OK_FULL_LENGTH : "Length_123456789123456789123.txt"
-          3. Use the below command in the all-cluster-app for setting up the diagonistics logs. 
+          3. Use the below command in the all-cluster-app for setting up the diagonistics logs.
            ./chip-all-clusters-app --trace_decode 1 --end_user_support_log ~/tmp/end_user_support_log.txt --network_diagnostics_log ~/tmp/nw_log.txt --crash_log ~/tmp/crash_log.txt
           The log file content can be set such that the file size can be as follows to obtain different status code from DUT:
           1. end_user_support_log  > 1024 bytes
@@ -320,18 +320,18 @@ tests:
           "diagnosticlogs retrieve-logs-request 3 0 1 0 --TransferFileDesignator Length_1234567.txt
 
           On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
-                                       
+
           [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
           [1707901794.468560][36124:36127] CHIP:DMG:                                 {
           [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
           [1707901794.468576][36124:36127] CHIP:DMG:                                 },
-          [1707901794.468584][36124:36127] CHIP:DMG:                                 
+          [1707901794.468584][36124:36127] CHIP:DMG:
           [1707901794.468591][36124:36127] CHIP:DMG:                         },
 
-          Repeat this step by setting RequestedProtocol as ResponsePayload :  
+          Repeat this step by setting RequestedProtocol as ResponsePayload :
 
           diagnosticlogs retrieve-logs-request 3 1 1 0 --TransferFileDesignator Length_1234567.txt
-          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)                            
+          On TH(chip-tool), Verify that the DUT responds with INVALID_COMMAND for the RetrieveLogsRequest that was sent invalid Intent(3)
           [1707901794.468552][36124:36127] CHIP:DMG:                                 StatusIB =
           [1707901794.468560][36124:36127] CHIP:DMG:                                 {
           [1707901794.468569][36124:36127] CHIP:DMG:                                         status = 0x85 (INVALID_COMMAND),
@@ -389,7 +389,7 @@ tests:
            On TH(chip-tool), Verify that DUT sends RetrieveLogsResponse command to TH with Denied(4) status code.
           [1719990173.360981][8053:8056] CHIP:TOO:   RetrieveLogsResponse: {
           [1719990173.361009][8053:8056] CHIP:TOO:     status: 4
-          [1719990173.361021][8053:8056] CHIP:TOO:     logContent: 
+          [1719990173.361021][8053:8056] CHIP:TOO:     logContent:
           [1719990173.361030][8053:8056] CHIP:TOO:    }
       disabled: true
 
