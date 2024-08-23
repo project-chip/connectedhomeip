@@ -402,6 +402,28 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    // Before adding this preset to the pending presets, if the expected length of the pending presets' list
+    // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
+
+    // Increment number of pending presets by 1 to account for this preset.
+    uint8_t totalExpectedCount = CountNumberOfPendingPresets(delegate) + 1;
+
+    uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
+
+    if (numberOfPresetsSupported == 0)
+    {
+        ChipLogError(Zcl, "AppendPendingPreset: Failed to get NumberOfPresets");
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
+    if (numberOfPresetsSupported > 0 && totalExpectedCount > numberOfPresetsSupported)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    // TODO #34556 : Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
+    // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
+
     return delegate->AppendToPendingPresetList(preset);
 }
 
@@ -504,25 +526,6 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         }
     }
 
-    uint8_t totalCount = CountNumberOfPendingPresets(delegate);
-
-    uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
-
-    if (numberOfPresetsSupported == 0)
-    {
-        ChipLogError(Zcl, "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: Failed to get NumberOfPresets");
-        return Status::InvalidInState;
-    }
-
-    // If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
-    // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
-    if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
-    {
-        return Status::ResourceExhausted;
-    }
-
-    // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
-    // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
     return Status::Success;
 }
 
