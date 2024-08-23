@@ -40,16 +40,6 @@ private:
     std::vector<uint32_t> mSelectedAreas;
     std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
 
-    // hardcoded values for SUPPORTED MAPS.
-    const uint32_t supportedMapId_XX = 3;
-    const uint32_t supportedMapId_YY = 245;
-
-    // hardcoded values for SUPPORTED AREAS.
-    const uint32_t supportedAreaID_A = 7;
-    const uint32_t supportedAreaID_B = 1234567;
-    const uint32_t supportedAreaID_C = 10050;
-    const uint32_t supportedAreaID_D = 0x88888888;
-
 public:
     //*************************************************************************
     // Supported Areas accessors
@@ -115,6 +105,7 @@ public:
     bool ClearProgressRaw() override;
 
     bool RemoveProgressElementRaw(uint32_t areaId) override;
+
 };
 
 } // namespace ServiceArea
