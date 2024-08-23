@@ -33,7 +33,7 @@ import time
 import chip.clusters as Clusters
 import test_plan_support
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, run_for_each_matching_endpoint)
+                                    has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -84,7 +84,7 @@ class TC_LVL_2_3(MatterBaseTest):
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
 
-    @run_for_each_matching_endpoint(has_cluster(Clusters.LevelControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
     async def test_TC_LVL_2_3(self):
         # Commissioning - already done
         self.step(1)
