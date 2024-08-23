@@ -203,6 +203,12 @@ public:
      */
     virtual bool ClearSelectedAreas() = 0;
 
+    /**
+     * @param areaId the area ID to be removed from the SelectedAreas attribute.
+     * @return ture if this ID was removed, false otherwise.
+     */
+    virtual bool RemoveSelectedAreas(uint32_t areaId) = 0;
+
     //*************************************************************************
     // Progress accessors and manipulators
 
@@ -260,6 +266,12 @@ public:
      * @return true if progress list was not already null, false otherwise.
      */
     virtual bool ClearProgress() = 0;
+
+    /**
+     * @param areaId the area ID of the progress element to be removed.
+     * @return ture if the progress element was removed, false otherwise.
+     */
+    virtual bool RemoveProgressElement(uint32_t areaId) = 0;
 
 };
 

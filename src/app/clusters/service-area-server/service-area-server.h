@@ -305,6 +305,12 @@ public:
      */
     bool ClearSelectedAreas();
 
+    /**
+     * @param areaId the area ID to be removed from the SelectedAreas attribute.
+     * @return ture if this ID was removed, false otherwise.
+     */
+    bool RemoveSelectedAreas(uint32_t areaId);
+
     //*************************************************************************
     // Current Area accessors and manipulators
 
@@ -394,6 +400,12 @@ public:
      * @return true if the progress list was not already null, false otherwise.
      */
     bool ClearProgress();
+
+    /**
+     * @param areaId the area ID of the progress element to be removed.
+     * @return ture if the progress element was removed, false otherwise.
+     */
+    bool RemoveProgressElement(uint32_t areaId);
 
     //*************************************************************************
     // Feature Map attribute

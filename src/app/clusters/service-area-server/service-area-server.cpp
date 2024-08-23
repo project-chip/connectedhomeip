@@ -958,6 +958,17 @@ bool Instance::ClearSelectedAreas()
     return false;
 }
 
+bool Instance::RemoveSelectedAreas(uint32_t areaId)
+{
+    if (mMemoryDelegate->RemoveSelectedAreas(areaId))
+    {
+        NotifySelectedAreasChanged();
+        return true;
+    }
+
+    return false;
+}
+
 //*************************************************************************
 // Current Area manipulators
 
@@ -1190,6 +1201,17 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
 bool Instance::ClearProgress()
 {
     if (mMemoryDelegate->ClearProgress())
+    {
+        NotifyProgressChanged();
+        return true;
+    }
+
+    return false;
+}
+
+bool Instance::RemoveProgressElement(uint32_t areaId)
+{
+    if (mMemoryDelegate->RemoveProgressElement(areaId))
     {
         NotifyProgressChanged();
         return true;
