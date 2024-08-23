@@ -79,8 +79,8 @@ public:
     // command support
     bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
 
-    bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
-                               ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan & statusText) override;
+    bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, ServiceArea::SelectAreasStatus & areaStatus,
+                               MutableCharSpan & statusText) override;
 
     bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
