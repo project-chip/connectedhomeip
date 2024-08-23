@@ -37,7 +37,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-constexpr uint16_t kClusterRevision = 1;
+constexpr uint16_t kClusterRevision = 2;
 
 /***************************************************************************
  *
