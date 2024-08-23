@@ -1807,9 +1807,9 @@ def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
 
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
 
-        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
+        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
         the specified cluster. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1818,13 +1818,12 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
         EP3, cluster E
 
         And the following test specification:
-        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
+        @run_if_endpoint_matches(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
-        The test would be run on endpoint 1 and on endpoint 2.
-
-        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_cluster, cluster=cluster)
@@ -1840,9 +1839,9 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
 
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
 
-        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
+        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
         the specified attribute. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1851,13 +1850,12 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         EP3, cluster D without attribute d
 
         And the following test specification:
-        @run_for_each_matching_endpoint(has_attribute(Clusters.D.Attributes.d))
+        @run_if_endpoint_matches(has_attribute(Clusters.D.Attributes.d))
         test_mytest(self):
             ...
 
-        The test would be run on endpoint 1 and on endpoint 2.
-
-        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_attribute, attribute=attribute)
@@ -1872,9 +1870,9 @@ def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescri
 
 
 def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_if_endpoint_matches decorator.
 
-        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
+        Use this function with the run_if_endpoint_matches decorator to run this test on all endpoints with
         the specified feature. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1883,20 +1881,19 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
         EP3, cluster D without feature F0
 
         And the following test specification:
-        @run_for_each_matching_endpoint(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        @run_if_endpoint_matches(has_feature(Clusters.D.Bitmaps.Feature.F0))
         test_mytest(self):
             ...
 
-        The test would be run on endpoint 1 and on endpoint 2.
-
-        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the run_if_endpoint_matches decorator will call the on_skip function to
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
 async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Helper function for the run_for_each_matching_endpoint decorator.
+    """ Helper function for the run_if_endpoint_matches decorator.
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
@@ -1942,10 +1939,9 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
     def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name),
-                                 "pics_ method supplied for run_for_each_matching_endpoint.")
+                                 "pics_ method supplied for run_if_endpoint_matches.")
             runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=30)
             should_run_test = asyncio.run(runner_with_timeout)
-            print(f'-----------------{should_run_test}')
             if not should_run_test:
                 logging.info("Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
