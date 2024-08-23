@@ -526,8 +526,7 @@ CHIP_ERROR AccessControl::CheckARL(const SubjectDescriptor & subjectDescriptor, 
         return CHIP_NO_ERROR;
     }
 
-    // If we are in PASE or if there is a pending fabric, we need to check against the CommissioningARL
-    if (subjectDescriptor.authMode == AuthMode::kPase)
+    if (subjectDescriptor.isCommissioning)
     {
         result = mAccessRestrictionProvider->CheckForCommissioning(subjectDescriptor, requestPath);
     }

@@ -360,7 +360,7 @@ bool ParseAccessRestrictionEntriesFromJson(const char * jsonString, std::vector<
         for (Json::Value::const_iterator rIt = restrictions.begin(); rIt != restrictions.end(); rIt++)
         {
             AccessRestrictionProvider::Restriction restriction;
-            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>((*rIt)["type"].asInt());
+            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>((*rIt)["type"].asUInt());
             if ((*rIt).isMember("id"))
             {
                 restriction.id.SetValue((*rIt)["id"].asUInt());
