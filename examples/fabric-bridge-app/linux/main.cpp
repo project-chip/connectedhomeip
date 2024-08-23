@@ -208,8 +208,8 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
-    const uint32_t kMinTimeoutMs = 30*1000;
-    const uint32_t kMaxTimeoutMs = 60*60*1000;
+    const uint32_t kMinTimeoutMs = 30 * 1000;
+    const uint32_t kMaxTimeoutMs = 60 * 60 * 1000;
     if (commandData.timeoutMs < kMinTimeoutMs || commandData.timeoutMs > kMaxTimeoutMs)
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::ConstraintError);
