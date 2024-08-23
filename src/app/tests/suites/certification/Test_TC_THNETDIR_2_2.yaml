@@ -116,18 +116,18 @@ tests:
       response:
           constraints:
               type: list
-              #   python: |
-              #       # Split the list into test (our TestNetwork) and rest (everything else)
-              #       test = next((n for n in value if n['ExtendedPanID'] == TestNetworkExtendedPanId), None)
-              #       rest = [n for n in value if n != test]
-              #       # Check test has the expected values and rest == initialNetworks (ignoring order)
-              #       return (test is not None and
-              #               test['NetworkName'] == TestNetworkName and
-              #               test['Channel'] == TestNetworkChannel and
-              #               test['ActiveTimestamp'] == TestNetworkActiveTimestamp and
-              #               len(value) == len(initialNetworks) + 1 and
-              #               len(rest) == len(initialNetworks) and
-              #               all(n in initialNetworks for n in rest))
+              python: |
+                  # Split the list into test (our TestNetwork) and rest (everything else)
+                  test = next((n for n in value if n['ExtendedPanID'] == TestNetworkExtendedPanId), None)
+                  rest = [n for n in value if n != test]
+                  # Check test has the expected values and rest == initialNetworks (ignoring order)
+                  return (test is not None and
+                          test['NetworkName'] == TestNetworkName and
+                          test['Channel'] == TestNetworkChannel and
+                          test['ActiveTimestamp'] == TestNetworkActiveTimestamp and
+                          len(value) == len(initialNetworks) + 1 and
+                          len(rest) == len(initialNetworks) and
+                          all(n in initialNetworks for n in rest))
 
     - label:
           "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
@@ -212,10 +212,10 @@ tests:
       response:
           constraints:
               type: list
-              #   python: |
-              #       # value == initialNetworks (ignoring order)
-              #       return (len(value) == len(initialNetworks) and
-              #               all(n in initialNetworks for n in value))
+              python: |
+                  # value == initialNetworks (ignoring order)
+                  return (len(value) == len(initialNetworks) and
+                          all(n in initialNetworks for n in value))
 
     - label:
           "TH writes PreferredExtendedPanID to DUT, restoring the initial value"
