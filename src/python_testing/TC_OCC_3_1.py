@@ -155,7 +155,5 @@ class TC_OCC_3_1(MatterBaseTest):
             logging.info("HoldTime attribute not supported. Skip this return to 0 timing test procedure.")
             self.skip_step(5)
 
-
 if __name__ == "__main__":
     default_matter_test_main()
-    
