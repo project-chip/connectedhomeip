@@ -235,5 +235,6 @@ class TC_OCC_3_2(MatterBaseTest):
             await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[
                                       diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
