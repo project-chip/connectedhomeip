@@ -52,10 +52,10 @@ void CommissionerControlDelegate::ResetDelegateState()
     mNextStep = Step::kAcceptCommissioningApproval;
 
     // Reset identifiers and product information
-    mRequestId = 0;
+    mRequestId    = 0;
     mClientNodeId = kUndefinedNodeId;
-    mVendorId = VendorId::Unspecified;
-    mProductId = 0;
+    mVendorId     = VendorId::Unspecified;
+    mProductId    = 0;
 
     // Clear the label buffer and optional label
     memset(mLabelBuffer, 0, sizeof(mLabelBuffer));
