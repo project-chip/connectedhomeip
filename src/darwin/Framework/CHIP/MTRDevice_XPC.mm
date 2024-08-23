@@ -93,6 +93,16 @@
     return self;
 }
 
+- (NSString *)description
+{
+    // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
+    // internalDeviceState (do we even have such a thing here?), last
+    // subscription attempt wait (does that apply to us?) queued work (do we
+    // have any?), last report, last subscription failure (does that apply to us?).
+    return [NSString
+        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
@@ -184,18 +194,20 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
+    // TODO: use asynchronous XPC and register a block with controller to call for this transaction
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
@@ -207,6 +219,7 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueInterval
                  timedInvokeTimeout:timeout
+        serverSideProcessingTimeout:serverSideProcessingTimeout
                          completion:completion];
 }
 

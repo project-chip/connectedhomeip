@@ -18,8 +18,8 @@
 
 #include "CastingApp-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/Converters-JNI.h"
+#include "../support/JNIDACProvider.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 
 // from tv-casting-common
@@ -29,6 +29,7 @@
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
+#include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -36,6 +37,16 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_casting_core_CastingApp_##METHOD_NAME
+
+jint JNI_OnLoad(JavaVM * jvm, void * reserved)
+{
+    return AndroidAppServerJNI_OnLoad(jvm, reserved);
+}
+
+void JNI_OnUnload(JavaVM * jvm, void * reserved)
+{
+    return AndroidAppServerJNI_OnUnload(jvm, reserved);
+}
 
 namespace matter {
 namespace casting {
@@ -73,7 +84,7 @@ JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParamet
     VerifyOrReturnValue(jDACProvider != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
 
     // set the DACProvider
-    JNIDACProvider * dacProvider = new JNIDACProvider(jDACProvider);
+    support::JNIDACProvider * dacProvider = new support::JNIDACProvider(jDACProvider);
     chip::Credentials::SetDeviceAttestationCredentialsProvider(dacProvider);
 
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
