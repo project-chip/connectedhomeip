@@ -265,6 +265,7 @@ exit:
     {
         ChipLogError(Zcl, "emberAfCommissionerControlClusterCommissionNodeCallback error: %" CHIP_ERROR_FORMAT, err.Format());
         commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
+        delegate->ResetDelegateState();
     }
 
     return true;

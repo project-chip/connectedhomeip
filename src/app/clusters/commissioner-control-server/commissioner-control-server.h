@@ -137,6 +137,15 @@ public:
     virtual CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
                                             const Optional<uint16_t> & port) = 0;
 
+    /**
+     * @brief Reset the state of the delegate.
+     *
+     * This method is used to reset the internal state of the delegate to its initial state.
+     * It should be called whenever the delegate needs to be reinitialized or cleaned up
+     * before handling a new commissioning sequence.
+     */
+    virtual void ResetDelegateState() = 0;
+
     virtual ~Delegate() = default;
 };
 

@@ -46,8 +46,33 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
+void CommissionerControlDelegate::ResetDelegateState()
+{
+    // Reset the step to the initial state
+    mNextStep = Step::kAcceptCommissioningApproval;
+
+    // Reset identifiers and product information
+    mRequestId = 0;
+    mClientNodeId = kUndefinedNodeId;
+    mVendorId = VendorId::Unspecified;
+    mProductId = 0;
+
+    // Clear the label buffer and optional label
+    memset(mLabelBuffer, 0, sizeof(mLabelBuffer));
+    mLabel.ClearValue();
+
+    // Reset PBKDF salt and PAKE passcode verifier buffers
+    mPBKDFSalt = ByteSpan();
+    memset(mPBKDFSaltBuffer, 0, sizeof(mPBKDFSaltBuffer));
+
+    mPAKEPasscodeVerifier = ByteSpan();
+    memset(mPAKEPasscodeVerifierBuffer, 0, sizeof(mPAKEPasscodeVerifierBuffer));
+}
+
 CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request)
 {
+    VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningApproval, CHIP_ERROR_BUSY);
+
     CommissionerControl::Events::CommissioningRequestResult::Type result;
     result.requestId    = request.requestId;
     result.clientNodeId = request.clientNodeId;
@@ -86,18 +111,26 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    return CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
+    CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
+
+    mNextStep = (err == CHIP_NO_ERROR) ? Step::kWaitCommissionNodeRequest : Step::kAcceptCommissioningApproval;
+
+    return err;
 }
 
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrReturnError(mNextStep == Step::kWaitCommissionNodeRequest, CHIP_ERROR_INCORRECT_STATE);
+
     // Verify if the CommissionNode command is sent from the same NodeId as the RequestCommissioningApproval.
     VerifyOrExit(mClientNodeId == clientNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
 
     // Verify if the provided RequestId matches the value provided to the RequestCommissioningApproval.
     VerifyOrExit(mRequestId == requestId, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mNextStep = Step::kStartCommissionNode;
 
 exit:
     return err;
@@ -130,6 +163,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
                                                              const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
 {
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
+
+    VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);    
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     return CommissionNode(Controller::CommissioningWindowPasscodeParams()

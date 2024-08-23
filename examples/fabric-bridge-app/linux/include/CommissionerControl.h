@@ -29,6 +29,7 @@ namespace CommissionerControl {
 class CommissionerControlDelegate : public Delegate
 {
 public:
+    void ResetDelegateState() override;
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) override;
     CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) override;
@@ -38,8 +39,19 @@ public:
     ~CommissionerControlDelegate() = default;
 
 private:
+    enum class Step : uint8_t
+    {
+        // Ready to start reverse commissioning.
+        kAcceptCommissioningApproval,
+        // Wait for the commission node command.
+        kWaitCommissionNodeRequest,
+        // Need to commission node.
+        kStartCommissionNode,
+    };
+
     static constexpr size_t kLabelBufferSize = 64;
 
+    Step mNextStep       = Step::kAcceptCommissioningApproval;
     uint64_t mRequestId  = 0;
     NodeId mClientNodeId = kUndefinedNodeId;
     VendorId mVendorId   = VendorId::Unspecified;
