@@ -69,7 +69,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep("8", "Validate previous command results in ActiveChanged event shortly after ICD device checks-in"),
             TestStep("9", "Send multiple KeepActive commands during window where ICD device will not check in"),
             TestStep("10", "Validate previous command results in single ActiveChanged event shortly after ICD device checks-in"),
-            TestStep("11", "Validate we recieved no additional ActiveChanged event after subsequent ICD check in"),
+            TestStep("11", "Validate we received no additional ActiveChanged event after subsequent ICD check in"),
             TestStep("12", "Send KeepActive command with shortest TimeoutMs value while TH_ICD is prevented from sending check-ins"),
             TestStep("13", "TH allows TH_ICD to resume sending check-ins after timeout should have expired"),
             TestStep("14", "Wait for TH_ICD to check into TH twice, then confirm we have had no new ActiveChanged events reported from DUT"),
