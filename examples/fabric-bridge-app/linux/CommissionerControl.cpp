@@ -164,7 +164,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
 {
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
 
-    VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);    
+    VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     return CommissionNode(Controller::CommissioningWindowPasscodeParams()
