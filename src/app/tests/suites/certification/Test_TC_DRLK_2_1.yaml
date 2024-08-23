@@ -68,61 +68,65 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-            - name: "OperationType"
-              value: 0
-            - name: "UserIndex"
-              value: 1
-            - name: "UserName"
-              value: "xxx"
-            - name: "UserUniqueID"
-              value: 6452
-            - name: "UserStatus"
-              value: 1
-            - name: "UserType"
-              value: 0
-            - name: "CredentialRule"
-              value: 0
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
 
-    - label: "Step 1e: TH reads MinPINCodeLength attribute and saves the value as min_pin_code_length"
+    - label:
+          "Step 1e: TH reads MinPINCodeLength attribute and saves the value as
+          min_pin_code_length"
       PICS: DRLK.S.F08 && DRLK.S.F00
       command: "readAttribute"
       attribute: "MinPINCodeLength"
       response:
-        saveAs: min_pin_code_length
-        constraints:
-          type: int8u
-          minValue: 0
-          maxValue: 255
+          saveAs: min_pin_code_length
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
-    - label: "Step 1f: TH reads MaxPINCodeLength attribute and saves the value as max_pin_code_length"
+    - label:
+          "Step 1f: TH reads MaxPINCodeLength attribute and saves the value as
+          max_pin_code_length"
       PICS: DRLK.S.F08 && DRLK.S.F00
       command: "readAttribute"
       attribute: "MaxPINCodeLength"
       response:
-        saveAs: max_pin_code_length
-        constraints:
-          type: int8u
-          minValue: 0
-          maxValue: 255
+          saveAs: max_pin_code_length
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "Step 1g: TH sends SetCredential Command"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
-        values:
-          - name: "OperationType"
-            value: 0
-          - name: "Credential"
-            value: { CredentialType: 1, CredentialIndex: 1 }
-          - name: "CredentialData"
-            value: "123456"
-          - name: "UserIndex"
-            value: 1
-          - name: "UserStatus"
-            value: null
-          - name: "UserType"
-            value: null
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
 
     - label:
           "Step 1h: TH sends a Lock Door command to the DUT. If DRLK.S.F00(PIN)
@@ -135,7 +139,8 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Step 1h: TH sends a Lock Door command to the DUT without pin_code."
+    - label:
+          "Step 1h: TH sends a Lock Door command to the DUT without pin_code."
       PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
@@ -146,15 +151,16 @@ tests:
       command: "WaitForMs"
       arguments:
           values:
-            - name: "ms"
-              value: WaitAfterLockAandUnlockDoor
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
     - label: "Step 1h: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
       attribute: "LockState"
       response:
           value: 1
-    - label: "Step 1i: TH sends a Unlock Door command to the DUT. If
+    - label:
+          "Step 1i: TH sends a Unlock Door command to the DUT. If
           DRLK.S.F00(PIN) & DRLK.S.F07(COTA), include a Valid PINCode in the
           Unlock Door command"
       PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
@@ -165,7 +171,8 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Step 1i: TH sends a Unlock Door command to the DUT without pincode."
+    - label:
+          "Step 1i: TH sends a Unlock Door command to the DUT without pincode."
       PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
