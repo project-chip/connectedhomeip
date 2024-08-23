@@ -133,7 +133,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
-
 /**
  * Init a newly created controller.
  *

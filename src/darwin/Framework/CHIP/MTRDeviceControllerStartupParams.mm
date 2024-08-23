@@ -308,14 +308,14 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 
 + (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc
 {
-    NSNumber *nodeID = nil;
+    NSNumber * nodeID = nil;
     ExtractNodeIDFromNOC(noc, &nodeID);
     return nodeID;
 }
 
 + (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc
 {
-    NSNumber *fabricID = nil;
+    NSNumber * fabricID = nil;
     ExtractFabricIDFromNOC(noc, &fabricID);
     return fabricID;
 }
