@@ -27,7 +27,8 @@ declare_args() {
   chip_use_plain_dac_key = false
 }
 
-openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
+openthread_root =
+    "//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread"
 nxp_platform = "mcxw71_k32w1"
 nxp_sdk_name = "mcxw71_k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"

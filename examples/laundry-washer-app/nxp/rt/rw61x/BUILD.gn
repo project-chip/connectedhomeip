@@ -85,12 +85,11 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
 
-  if(board_version == "frdm"){
+  if (board_version == "frdm") {
     include_dirs += [ "${example_platform_dir}/board/frdmrw612/" ]
     sources += [ "${example_platform_dir}/board/frdmrw612/clock_config.c" ]
     sources += [ "${example_platform_dir}/board/frdmrw612/board.c" ]
-  }
-  else{
+  } else {
     include_dirs += [ "${example_platform_dir}/board/rdrw612bga/" ]
     sources += [ "${example_platform_dir}/board/rdrw612bga/clock_config.c" ]
     sources += [ "${example_platform_dir}/board/rdrw612bga/board.c" ]

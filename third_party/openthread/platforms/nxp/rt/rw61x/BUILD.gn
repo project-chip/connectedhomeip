@@ -58,10 +58,9 @@ config("openthread_rw61x_config") {
       "OT_APP_BR_LWIP_HOOKS_EN=1",
     ]
   }
+
   # ot cli configs
-  defines += [
-    "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1"
-  ]
+  defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
@@ -74,20 +73,20 @@ source_set("libopenthread-rw61x") {
   deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
-    "${openthread_nxp_root}/src/common/logging.c",
     "${openthread_nxp_root}/src/common/diag.c",
-    "${openthread_nxp_root}/src/common/entropy.c"
+    "${openthread_nxp_root}/src/common/entropy.c",
+    "${openthread_nxp_root}/src/common/logging.c",
   ]
 
   if (chip_enable_wifi && chip_enable_openthread) {
     sources += [
-      "${openthread_nxp_root}/src/common/br/infra_if.c",
-      "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/border_agent.c",
       "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/infra_if.c",
       "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
       "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
       "${openthread_nxp_root}/src/common/br/mdns_socket.c",
+      "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
     ]
     deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
@@ -115,8 +114,7 @@ source_set("libopenthread-rw61x") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
   } else if (nxp_nvm_component == "key_storage") {
     sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
-  }
-  else if (nxp_nvm_component == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 

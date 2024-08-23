@@ -65,7 +65,8 @@ rt_sdk("sdk") {
   defines = []
 
   # To be moved, temporary mbedtls config fix to build app with factory data
-  if (chip_enable_secure_dac_private_key_storage || chip_enable_secure_whole_factory_data)  {
+  if (chip_enable_secure_dac_private_key_storage ||
+      chip_enable_secure_whole_factory_data) {
     defines += [
       "MBEDTLS_NIST_KW_C",
       "MBEDTLS_PSA_CRYPTO_CLIENT",
@@ -84,17 +85,15 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
 
-  if(board_version == "frdm"){
+  if (board_version == "frdm") {
     include_dirs += [ "${example_platform_dir}/board/frdmrw612/" ]
     sources += [ "${example_platform_dir}/board/frdmrw612/clock_config.c" ]
     sources += [ "${example_platform_dir}/board/frdmrw612/board.c" ]
-  }
-  else{
+  } else {
     include_dirs += [ "${example_platform_dir}/board/rdrw612bga/" ]
     sources += [ "${example_platform_dir}/board/rdrw612bga/clock_config.c" ]
     sources += [ "${example_platform_dir}/board/rdrw612bga/board.c" ]
-  }  
-
+  }
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
@@ -151,11 +150,12 @@ rt_executable("all_cluster_app") {
     "../../common/main/main.cpp",
   ]
 
-  if (chip_enable_secure_dac_private_key_storage || chip_enable_secure_whole_factory_data) {
+  if (chip_enable_secure_dac_private_key_storage ||
+      chip_enable_secure_whole_factory_data) {
     sources += [
       "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
     ]
-    if(chip_enable_secure_whole_factory_data) {
+    if (chip_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
     }
   } else {

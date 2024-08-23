@@ -54,7 +54,7 @@ declare_args() {
   no_mcuboot = true
 }
 
-# By default nxp_nvm_component is set to "littlefs" in nxp_sdk.gni, 
+# By default nxp_nvm_component is set to "littlefs" in nxp_sdk.gni,
 # here we override it to set it to "nvs" for RW61x platform
 nxp_nvm_component = "nvs"
 

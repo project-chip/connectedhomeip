@@ -50,13 +50,15 @@ config("nxp_platform_config") {
     ]
 
     if (chip_enable_secure_dac_private_key_storage) {
-        assert(chip_enable_secure_dac_private_key_storage && !chip_enable_secure_whole_factory_data, 
-            "please select only one protection solution")
-        defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
+      assert(chip_enable_secure_dac_private_key_storage &&
+                 !chip_enable_secure_whole_factory_data,
+             "please select only one protection solution")
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     } else if (chip_enable_secure_whole_factory_data) {
-        assert(chip_enable_secure_whole_factory_data && !chip_enable_secure_dac_private_key_storage, 
-            "please select only one protection solution")
-        defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
+      assert(chip_enable_secure_whole_factory_data &&
+                 !chip_enable_secure_dac_private_key_storage,
+             "please select only one protection solution")
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
     } else {
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
     }
@@ -103,8 +105,7 @@ static_library("nxp_platform") {
     ]
   } else if (nxp_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
-  }
-  else if(nxp_nvm_component == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     sources += [ "../../common/NXPConfigNVS.cpp" ]
   }
 
@@ -120,9 +121,9 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  deps += [ 
-    "${chip_root}/src/platform/logging:headers",
+  deps += [
     "${chip_root}/src/lib/dnssd:constants",
+    "${chip_root}/src/platform/logging:headers",
   ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
@@ -187,9 +188,9 @@ static_library("nxp_platform") {
       ]
     } else if (chip_enable_secure_whole_factory_data) {
       sources += [
-          "FactoryDataProviderEncImpl.cpp",
-          "FactoryDataProviderEncImpl.h",
-        ]
+        "FactoryDataProviderEncImpl.cpp",
+        "FactoryDataProviderEncImpl.h",
+      ]
     } else {
       sources += [
         "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
