@@ -28,9 +28,9 @@
 #define WFX_RESET_PIN PIN(A, 6)
 #define WFX_INTERRUPT_PIN PIN(A, 7)
 #ifdef EXP_BOARD
-#define WFX_SLEEP_CONFIRM_PIN PIN(D, 2) /* Exp hdr 7 */
+#define WFX_SLEEP_CONFIRM_PIN PIN(D, 2) /* Expansion header pin7 */
 #else
-#define WFX_SLEEP_CONFIRM_PIN PIN(A, 5) /* Exp hdr 7 */
+#define WFX_SLEEP_CONFIRM_PIN PIN(A, 5)
 #endif                                  /* EXP_BOARD */
 #define SL_WFX_HOST_PINOUT_SPI_IRQ 5
 
@@ -46,7 +46,7 @@
 
 #define SL_WFX_HOST_PINOUT_RESET_PORT gpioPortA
 #define SL_WFX_HOST_PINOUT_RESET_PIN 5
-#define SL_WFX_HOST_PINOUT_SPI_WIRQ_PORT gpioPortA /* SPI IRQ port*/
+#define SL_WFX_HOST_PINOUT_SPI_WIRQ_PORT gpioPortA /* SPI IRQ port */
 #define SL_WFX_HOST_PINOUT_SPI_WIRQ_PIN 8          /* SPI IRQ pin */
 #define SL_WFX_HOST_PINOUT_WUP_PORT gpioPortB
 #define SL_WFX_HOST_PINOUT_WUP_PIN 5
