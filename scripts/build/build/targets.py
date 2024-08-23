@@ -688,6 +688,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('wifi', enable_wifi=True)
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('easyflash', enable_easyflash=True)
+    target.AppendModifier('littlefs', enable_littlefs=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
