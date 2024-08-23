@@ -1438,9 +1438,8 @@ provisional cluster ServiceArea = 336 {
   enum SelectAreasStatus : enum8 {
     kSuccess = 0;
     kUnsupportedArea = 1;
-    kDuplicatedAreas = 2;
-    kInvalidInMode = 3;
-    kInvalidSet = 4;
+    kInvalidInMode = 2;
+    kInvalidSet = 3;
   }
 
   enum SkipAreaStatus : enum8 {

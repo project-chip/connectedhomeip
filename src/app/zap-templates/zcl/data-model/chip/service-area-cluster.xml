@@ -63,9 +63,8 @@ limitations under the License.
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
     <item value="0x01" name="UnsupportedArea"/>
-    <item value="0x02" name="DuplicatedAreas"/>
-    <item value="0x03" name="InvalidInMode"/>
-    <item value="0x04" name="InvalidSet"/>
+    <item value="0x02" name="InvalidInMode"/>
+    <item value="0x03" name="InvalidSet"/>
   </enum>
 
   <enum name="SkipAreaStatus" type="enum8">
