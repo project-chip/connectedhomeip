@@ -336,7 +336,7 @@ void ThermostatAttrAccess::ResetAtomicWrite(EndpointId endpoint)
     atomicWriteSession.state      = AtomicWriteState::Closed;
     atomicWriteSession.endpointId = endpoint;
     atomicWriteSession.nodeId     = ScopedNodeId();
-    atomicWriteSession.attributeIds.Alloc(0);
+    atomicWriteSession.attributeIds.Free();
 }
 
 ScopedNodeId ThermostatAttrAccess::GetAtomicWriteOriginatorScopedNodeId(const EndpointId endpoint)
@@ -540,8 +540,8 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
             case Schedules::Id:
                 break;
             default:
-                commandObj->AddStatus(commandPath, Status::InvalidInState);
-                return;
+                // Not reachable, since we returned in this situation above.
+                break;
             }
             attributeStatus.statusCode = to_underlying(statusCode);
             if (statusCode != Status::Success)
