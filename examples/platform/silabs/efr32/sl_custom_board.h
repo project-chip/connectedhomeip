@@ -31,7 +31,7 @@
 #define WFX_SLEEP_CONFIRM_PIN PIN(D, 2) /* Expansion header pin7 */
 #else
 #define WFX_SLEEP_CONFIRM_PIN PIN(A, 5)
-#endif                                  /* EXP_BOARD */
+#endif /* EXP_BOARD */
 #define SL_WFX_HOST_PINOUT_SPI_IRQ 5
 
 #else /* WF200 */
