@@ -305,13 +305,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeRunAssertion;
 
 /**
- * This methods marks a request to shutdown.
- * Returns the number of run assertions currently being held. If the value returned is not zero, it implies shutdown has to be delayed
- * until all assertions have been removed.
- */
-- (NSUInteger)shutdownPrecheck;
-
-/**
  * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
  */
 - (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters;

@@ -346,15 +346,13 @@ using namespace chip::Tracing::DarwinFramework;
     NSNumber *fabricID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
     NSData *publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:parameters.rootCertificate];
 
-    __block BOOL matches = FALSE;
-    dispatch_sync(_chipWorkQueue, ^{
-        matches =  _keepRunningAssertionCounter > 0 &&
-                   _shutdownPending &&
-                   MTREqualObjects(nodeID, self->_nodeID) &&
-                   MTREqualObjects(fabricID, self->_fabricID) &&
-                   MTREqualObjects(publicKey, self->_rootPublicKey);
-    });
-    return matches;
+    std::lock_guard lock(_assertionLock);
+
+    return  _keepRunningAssertionCounter > 0 &&
+            _shutdownPending &&
+            MTREqualObjects(nodeID, self->_nodeID) &&
+            MTREqualObjects(fabricID, self->_fabricID) &&
+            MTREqualObjects(publicKey, self->_rootPublicKey);
 }
 
 - (void)addRunAssertion
