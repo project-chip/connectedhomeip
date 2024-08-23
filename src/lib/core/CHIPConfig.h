@@ -1391,6 +1391,28 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
 #endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
 
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+ *
+ * @brief Default minimum lookup time to wait during address resolve for
+ *        additional DNSSD queries even if a reply has already been received, or
+ *        to allow for additional heuristics regarding node choice to succeed, in
+ *        milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS 200
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+ *
+ * @brief Default maximum lookup time to wait during address resolve before
+ *        a TIMEOUT error, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS 45000
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *

@@ -11197,37 +11197,37 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 } else {
                     newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID.Value()];
                 }
-                newElement_0.areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
-                if (entry_0.areaDesc.locationInfo.IsNull()) {
-                    newElement_0.areaDesc.locationInfo = nil;
+                newElement_0.areaInfo = [MTRServiceAreaClusterAreaInfoStruct new];
+                if (entry_0.areaInfo.locationInfo.IsNull()) {
+                    newElement_0.areaInfo.locationInfo = nil;
                 } else {
-                    newElement_0.areaDesc.locationInfo = [MTRDataTypeLocationDescriptorStruct new];
-                    newElement_0.areaDesc.locationInfo.locationName = AsString(entry_0.areaDesc.locationInfo.Value().locationName);
-                    if (newElement_0.areaDesc.locationInfo.locationName == nil) {
+                    newElement_0.areaInfo.locationInfo = [MTRDataTypeLocationDescriptorStruct new];
+                    newElement_0.areaInfo.locationInfo.locationName = AsString(entry_0.areaInfo.locationInfo.Value().locationName);
+                    if (newElement_0.areaInfo.locationInfo.locationName == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         *aError = err;
                         return nil;
                     }
-                    if (entry_0.areaDesc.locationInfo.Value().floorNumber.IsNull()) {
-                        newElement_0.areaDesc.locationInfo.floorNumber = nil;
+                    if (entry_0.areaInfo.locationInfo.Value().floorNumber.IsNull()) {
+                        newElement_0.areaInfo.locationInfo.floorNumber = nil;
                     } else {
-                        newElement_0.areaDesc.locationInfo.floorNumber = [NSNumber numberWithShort:entry_0.areaDesc.locationInfo.Value().floorNumber.Value()];
+                        newElement_0.areaInfo.locationInfo.floorNumber = [NSNumber numberWithShort:entry_0.areaInfo.locationInfo.Value().floorNumber.Value()];
                     }
-                    if (entry_0.areaDesc.locationInfo.Value().areaType.IsNull()) {
-                        newElement_0.areaDesc.locationInfo.areaType = nil;
+                    if (entry_0.areaInfo.locationInfo.Value().areaType.IsNull()) {
+                        newElement_0.areaInfo.locationInfo.areaType = nil;
                     } else {
-                        newElement_0.areaDesc.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.locationInfo.Value().areaType.Value())];
+                        newElement_0.areaInfo.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.locationInfo.Value().areaType.Value())];
                     }
                 }
-                if (entry_0.areaDesc.landmarkInfo.IsNull()) {
-                    newElement_0.areaDesc.landmarkInfo = nil;
+                if (entry_0.areaInfo.landmarkInfo.IsNull()) {
+                    newElement_0.areaInfo.landmarkInfo = nil;
                 } else {
-                    newElement_0.areaDesc.landmarkInfo = [MTRServiceAreaClusterLandmarkInfoStruct new];
-                    newElement_0.areaDesc.landmarkInfo.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkInfo.Value().landmarkTag)];
-                    if (entry_0.areaDesc.landmarkInfo.Value().positionTag.IsNull()) {
-                        newElement_0.areaDesc.landmarkInfo.positionTag = nil;
+                    newElement_0.areaInfo.landmarkInfo = [MTRServiceAreaClusterLandmarkInfoStruct new];
+                    newElement_0.areaInfo.landmarkInfo.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.landmarkInfo.Value().landmarkTag)];
+                    if (entry_0.areaInfo.landmarkInfo.Value().relativePositionTag.IsNull()) {
+                        newElement_0.areaInfo.landmarkInfo.relativePositionTag = nil;
                     } else {
-                        newElement_0.areaDesc.landmarkInfo.positionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkInfo.Value().positionTag.Value())];
+                        newElement_0.areaInfo.landmarkInfo.relativePositionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.landmarkInfo.Value().relativePositionTag.Value())];
                     }
                 }
                 [array_0 addObject:newElement_0];

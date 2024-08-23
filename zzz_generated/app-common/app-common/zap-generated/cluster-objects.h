@@ -28428,15 +28428,15 @@ namespace Structs {
 namespace LandmarkInfoStruct {
 enum class Fields : uint8_t
 {
-    kLandmarkTag = 0,
-    kPositionTag = 1,
+    kLandmarkTag         = 0,
+    kRelativePositionTag = 1,
 };
 
 struct Type
 {
 public:
     Globals::LandmarkTag landmarkTag = static_cast<Globals::LandmarkTag>(0);
-    DataModel::Nullable<Globals::RelativePositionTag> positionTag;
+    DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -28476,7 +28476,7 @@ enum class Fields : uint8_t
 {
     kAreaID   = 0,
     kMapID    = 1,
-    kAreaDesc = 2,
+    kAreaInfo = 2,
 };
 
 struct Type
@@ -28484,7 +28484,7 @@ struct Type
 public:
     uint32_t areaID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> mapID;
-    Structs::AreaInfoStruct::Type areaDesc;
+    Structs::AreaInfoStruct::Type areaInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -30149,7 +30149,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -30164,7 +30164,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
