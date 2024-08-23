@@ -31,7 +31,6 @@
 #define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/
 #define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
 #define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
-#define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
 // TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
 #define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
