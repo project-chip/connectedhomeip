@@ -6,9 +6,10 @@ on devices for the purposes of testing.
 When using any of these utilities it is important to inject the errors at the
 point where they are running through the MOST code that they can.
 
-If the cluster uses the [ClusterLogic](./unit_testing_clusters.md) pattern, this
-means injecting errors as close as possible to the driver layer, rather than
-catching errors in the server.
+If the cluster uses the
+[ClusterLogic](../cluster_and_device_type_dev/unit_testing_clusters.md) pattern,
+this means injecting errors as close as possible to the driver layer, rather
+than catching errors in the server.
 
 ## TestEventTriggers
 
