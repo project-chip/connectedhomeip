@@ -1831,11 +1831,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                                             attributeID:(NSNumber *)attributeID
                                                                  params:(MTRReadParams * _Nullable)params
 {
-#define ErrorStr "MTRDevice readAttributeWithEndpointID:clusterID:attributeID:params: must be handled by subclasses"
-    MTR_LOG_ERROR(ErrorStr);
+#define MTRDeviceErrorStr "MTRDevice readAttributeWithEndpointID:clusterID:attributeID:params: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
 #ifdef DEBUG
-    NSAssert(NO, @ErrorStr);
+    NSAssert(NO, @MTRDeviceErrorStr);
 #endif // DEBUG
+#undef MTRDeviceErrorStr
     return nil;
 }
 
@@ -1846,120 +1847,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    if (timeout) {
-        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
-    }
-    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
-                                                                           clusterID:clusterID
-
-                                                                         attributeID:attributeID];
-
-    __block BOOL useValueAsExpectedValue = YES;
+#define MTRDeviceErrorStr "MTRDevice writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
 #ifdef DEBUG
-    os_unfair_lock_lock(&self->_lock);
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id delegate) {
-        if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
-            useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
-        }
-    }];
-    os_unfair_lock_unlock(&self->_lock);
-#endif
-
-    uint64_t expectedValueID = 0;
-    if (useValueAsExpectedValue) {
-        // Commit change into expected value cache
-        NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
-        [self setExpectedValues:@[ newExpectedValueDictionary ]
-            expectedValueInterval:expectedValueInterval
-                  expectedValueID:&expectedValueID];
-    }
-
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-    uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
-    NSNumber * nodeID = _nodeID;
-
-    // Write request data is an array of items (for now always length 1).  Each
-    // item is an array containing:
-    //
-    //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
-    //
-    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
-    auto * writeData = @[ attributePath, [value copy], timeout ?: [NSNull null], @(expectedValueID) ];
-
-    NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
-
-    [workItem setBatchingID:MTRDeviceWorkItemBatchingWriteID data:writeRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
-        mtr_hide(self); // don't capture self accidentally
-        NSMutableArray<NSArray *> * writeRequestsCurrent = opaqueDataCurrent;
-        NSMutableArray<NSArray *> * writeRequestsNext = opaqueDataNext;
-
-        if (writeRequestsCurrent.count != 1) {
-            // Very unexpected!
-            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %lu", workItemID, static_cast<unsigned long>(writeRequestsCurrent.count));
-            return MTRNotBatched;
-        }
-
-        MTRBatchingOutcome outcome = MTRNotBatched;
-        while (writeRequestsNext.count) {
-            // If paths don't match, we cannot replace the earlier write
-            // with the later one.
-            if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
-                    isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
-                MTR_LOG("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
-                return outcome;
-            }
-
-            // Replace our one request with the first one from the next item.
-            auto writeItem = writeRequestsNext.firstObject;
-            [writeRequestsNext removeObjectAtIndex:0];
-            [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
-            MTR_LOG("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
-                workItemID, writeItem, nodeID.unsignedLongLongValue);
-            outcome = MTRBatchedPartially;
-        }
-        NSCAssert(writeRequestsNext.count == 0, @"should have batched everything or returned early");
-        return MTRBatchedFully;
-    }];
-    // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
-    // change values, only read requests after this should be considered for duplicate requests.
-    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
-        *isDuplicate = NO;
-        *stop = YES;
-    }];
-    [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        MTRBaseDevice * baseDevice = [self newBaseDevice];
-        // Make sure to use writeRequests here, because that's what our batching
-        // handler will modify as needed.
-        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long>(writeRequests.count));
-
-        auto * request = writeRequests[0];
-        MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
-
-        id timedWriteTimeout = request[MTRDeviceWriteRequestFieldTimeoutIndex];
-        if (timedWriteTimeout == [NSNull null]) {
-            timedWriteTimeout = nil;
-        }
-
-        [baseDevice
-            writeAttributeWithEndpointID:path.endpoint
-                               clusterID:path.cluster
-                             attributeID:path.attribute
-                                   value:request[MTRDeviceWriteRequestFieldValueIndex]
-                       timedWriteTimeout:timedWriteTimeout
-                                   queue:self.queue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (error) {
-                                      MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
-                                      if (useValueAsExpectedValue) {
-                                          NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
-                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
-                                      }
-                                  }
-                                  completion(MTRAsyncWorkComplete);
-                              }];
-    }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -2796,11 +2689,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values expectedValueInterval:(NSNumber *)expectedValueInterval
-{
-    [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
-}
-
 // expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
@@ -2831,12 +2719,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
     }
-}
-
-- (void)removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
-{
-    std::lock_guard lock(_lock);
-    [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
 }
 
 - (void)_removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
