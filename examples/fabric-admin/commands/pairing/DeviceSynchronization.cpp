@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <device_manager/DeviceManager.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -120,7 +121,10 @@ void DeviceSynchronizer::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
 #if defined(PW_RPC_ENABLED)
-    AddSynchronizedDevice(mCurrentDeviceData);
+    if (!DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
+    {
+        AddSynchronizedDevice(mCurrentDeviceData);
+    }
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
 #endif

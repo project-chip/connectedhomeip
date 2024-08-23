@@ -40,8 +40,7 @@ from mobly import asserts
 class TC_OCC_3_1(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        #endpoint = self.matter_test_config.endpoint
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.matter_test_config.endpoint
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
@@ -92,14 +91,16 @@ class TC_OCC_3_1(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        self.step(1)  # commissioning and getting cluster attribute list
+        self.step(1)  # Commissioning already done
+
+        self.step(2)
+
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
 
         has_hold_time = attributes.HoldTime.attribute_id in attribute_list
 
-        self.step(2)
         if has_hold_time:
             # write 10 as a HoldTime attribute
             await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))

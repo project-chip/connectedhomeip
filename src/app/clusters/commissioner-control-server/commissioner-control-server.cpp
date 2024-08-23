@@ -71,15 +71,15 @@ void RunDeferredCommissionNode(intptr_t commandArg)
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
+        CHIP_ERROR err = delegate->HandleCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ChipLogError(Zcl, "No delegate available for ReverseCommissionNode");
+        ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
     }
 
     delete info;
@@ -215,6 +215,14 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     ChipLogProgress(Zcl, "Received command to commission node");
 
     auto sourceNodeId = GetNodeId(commandObj);
+
+    // Constraint on responseTimeoutSeconds is [30; 120] seconds
+    if ((commandData.responseTimeoutSeconds < 30) || (commandData.responseTimeoutSeconds > 120))
+    {
+        ChipLogError(Zcl, "Invalid responseTimeoutSeconds for CommissionNode.");
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)

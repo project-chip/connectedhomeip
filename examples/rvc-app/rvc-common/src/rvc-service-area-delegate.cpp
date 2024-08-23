@@ -23,20 +23,12 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ServiceArea;
 
-CHIP_ERROR RvcServiceAreaDelegate::Init()
+void RvcServiceAreaDelegate::SetMapTopology()
 {
-    // hardcoded fill of SUPPORTED MAPS for prototyping
-    uint32_t supportedMapId_XX = 3;
-    uint32_t supportedMapId_YY = 245;
+    GetInstance()->ClearSupportedMaps();
 
     GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
     GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
-
-    // hardcoded fill of SUPPORTED AREAS for prototyping
-    uint32_t supportedAreaID_A = 7;
-    uint32_t supportedAreaID_B = 1234567;
-    uint32_t supportedAreaID_C = 10050;
-    uint32_t supportedAreaID_D = 0x88888888;
 
     // Area A has name, floor number, uses map XX
     auto areaA =
@@ -47,7 +39,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
     // Area B has name, uses map XX
     auto areaB = AreaStructureWrapper{}
-                     .SetMapId(supportedAreaID_B)
+                     .SetAreaId(supportedAreaID_B)
                      .SetMapId(supportedMapId_XX)
                      .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
@@ -69,6 +61,45 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     GetInstance()->AddSupportedArea(areaB);
     GetInstance()->AddSupportedArea(areaC);
     GetInstance()->AddSupportedArea(areaD);
+}
+
+void RvcServiceAreaDelegate::SetNoMapTopology()
+{
+    GetInstance()->ClearSupportedMaps();
+
+    // Area A has name, floor number.
+    auto areaA =
+        AreaStructureWrapper{}
+            .SetAreaId(supportedAreaID_A)
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+
+    // Area B has name.
+    auto areaB = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_B)
+                     .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
+
+    // Area C has full SemData, no name.
+    auto areaC = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_C)
+                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+
+    // Area D has null values for all landmark fields.
+    auto areaD = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_D)
+                     .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+
+    GetInstance()->AddSupportedArea(areaA);
+    GetInstance()->AddSupportedArea(areaB);
+    GetInstance()->AddSupportedArea(areaC);
+    GetInstance()->AddSupportedArea(areaD);
+}
+
+CHIP_ERROR RvcServiceAreaDelegate::Init()
+{
+    SetMapTopology();
+
     GetInstance()->SetCurrentArea(supportedAreaID_C);
 
     return CHIP_NO_ERROR;
@@ -77,23 +108,62 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 //*************************************************************************
 // command support
 
-bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan & statusText)
 {
-    // TODO IMPLEMENT
+    return (mIsSetSelectedAreasAllowedDeviceInstance->*mIsSetSelectedAreasAllowedCallback)(statusText);
+};
+
+bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & areaStatus,
+                                                   MutableCharSpan & statusText)
+{
+    if (selectedAreas.empty())
+    {
+        return true;
+    }
+
+    // If there is 1 or 0 supported maps, any combination of areas is valid.
+    if (!GetInstance()->HasFeature(Feature::kMaps) || GetNumberOfSupportedMaps() <= 1)
+    {
+        return true;
+    }
+
+    // Check that all the requested areas are in the same map.
+    {
+        AreaStructureWrapper tempArea;
+        uint32_t ignoredIndex;
+        if (!GetSupportedAreaById(selectedAreas[0], ignoredIndex, tempArea))
+        {
+            areaStatus = SelectAreasStatus::kUnsupportedArea;
+            CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+            return false;
+        }
+
+        auto mapId = tempArea.mapID.Value(); // It is safe to call `.Value()` as we confirmed that there are at least 2 maps.
+
+        for (const auto & areaId : selectedAreas.SubSpan(1))
+        {
+            if (!GetSupportedAreaById(areaId, ignoredIndex, tempArea))
+            {
+                areaStatus = SelectAreasStatus::kUnsupportedArea;
+                CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+                return false;
+            }
+
+            if (tempArea.mapID.Value() != mapId)
+            {
+                areaStatus = SelectAreasStatus::kInvalidSet;
+                CopyCharSpanToMutableCharSpan("all selected areas must be in the same map"_span, statusText);
+                return false;
+            }
+        }
+    }
+
     return true;
 };
 
-bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & areaStatus,
-                                                   MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
-    // TODO IMPLEMENT
-    return true;
-};
-
-bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
-{
-    // TODO IMPLEMENT
-    return true;
+    return (mHandleSkipAreaDeviceInstance->*mHandleSkipAreaCallback)(skippedArea, skipStatusText);
 };
 
 //*************************************************************************
@@ -101,8 +171,7 @@ bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, Mutable
 
 bool RvcServiceAreaDelegate::IsSupportedAreasChangeAllowed()
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsSupportedAreasChangeAllowedDeviceInstance->*mIsSupportedAreasChangeAllowedCallback)();
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
@@ -191,13 +260,26 @@ bool RvcServiceAreaDelegate::ClearSupportedAreas()
     return false;
 }
 
+bool RvcServiceAreaDelegate::RemoveSupportedArea(uint32_t areaId)
+{
+    for (auto it = mSupportedAreas.begin(); it != mSupportedAreas.end(); ++it)
+    {
+        if (it->areaID == areaId)
+        {
+            mSupportedAreas.erase(it);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //*************************************************************************
 // Supported Maps accessors
 
 bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsSupportedMapChangeAllowedDeviceInstance->*mIsSupportedMapChangeAllowedCallback)();
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
@@ -283,6 +365,114 @@ bool RvcServiceAreaDelegate::ClearSupportedMaps()
     }
 
     return false;
+}
+
+void RvcServiceAreaDelegate::HandleSupportedAreasUpdated()
+{
+    // Get a list of supported area IDs as `supportedAreaIDs`
+    std::vector<uint32_t> supportedAreaIDs;
+    for (const auto & supportedArea : mSupportedAreas)
+    {
+        supportedAreaIDs.push_back(supportedArea.areaID);
+    }
+
+    if (supportedAreaIDs.empty())
+    {
+        // Clear all selected areas, current area, and progress if there are no supported areas.
+        GetInstance()->ClearSelectedAreas();
+        GetInstance()->SetCurrentArea(DataModel::NullNullable);
+        GetInstance()->ClearProgress();
+        return;
+    }
+
+    // Remove mSelectedArea elements that do not exist is `supportedAreaIDs`
+    {
+        for (auto it = mSelectedAreas.begin(); it != mSelectedAreas.end();)
+        {
+            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), *it) == supportedAreaIDs.end())
+            {
+                it = mSelectedAreas.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    // Set current Area to null if current area is not in `supportedAreaIDs`
+    {
+        auto currentAreaId = GetInstance()->GetCurrentArea();
+        if (!currentAreaId.IsNull() &&
+            std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), currentAreaId.Value()) == supportedAreaIDs.end())
+        {
+            GetInstance()->SetCurrentArea(DataModel::NullNullable);
+        }
+    }
+
+    // Remove mProgress elements that do not exist is `supportedAreaIDs`
+    {
+        for (auto it = mProgressList.begin(); it != mProgressList.end();)
+        {
+            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), it->areaID) == supportedAreaIDs.end())
+            {
+                it = mProgressList.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+}
+
+bool RvcServiceAreaDelegate::RemoveSupportedMap(uint32_t mapId)
+{
+    bool removedEntry = false;
+    for (auto it = mSupportedMaps.begin(); it != mSupportedMaps.end(); ++it)
+    {
+        if (it->mapID == mapId)
+        {
+            mSupportedMaps.erase(it);
+            removedEntry = true;
+        }
+    }
+
+    if (!removedEntry)
+    {
+        return false;
+    }
+
+    // If there are no supported maps left, none of the supported areas are vaild and their MapID needs to be null.
+    if (GetNumberOfSupportedMaps() == 0)
+    {
+        ClearSupportedAreas();
+        return true;
+    }
+
+    // Get the supported area IDs where the map ID matches the removed map ID
+    std::vector<uint32_t> supportedAreaIds;
+    {
+        for (const auto & supportedArea : mSupportedAreas)
+        {
+            if (supportedArea.mapID == mapId)
+            {
+                supportedAreaIds.push_back(supportedArea.areaID);
+            }
+        }
+    }
+
+    // Remove the supported areas with the matching map ID
+    if (!supportedAreaIds.empty())
+    {
+        for (const auto & supportedAreaId : supportedAreaIds)
+        {
+            RemoveSupportedArea(supportedAreaId);
+        }
+        HandleSupportedAreasUpdated();
+    }
+
+    return true;
 }
 
 //*************************************************************************
@@ -397,8 +587,15 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
 bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex,
                                                    const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
-    // TODO IMPLEMENT
-    return false;
+    if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
+    {
+        ChipLogError(Zcl, "ModifyProgressElement - areaID's do not match, new areaID %u, existing areaID %u",
+                     modifiedProgressElement.areaID, mProgressList[listIndex].areaID);
+        return false;
+    }
+
+    mProgressList[listIndex] = modifiedProgressElement;
+    return true;
 }
 
 bool RvcServiceAreaDelegate::ClearProgress()
@@ -410,4 +607,126 @@ bool RvcServiceAreaDelegate::ClearProgress()
     }
 
     return false;
+}
+
+void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
+{
+    if (GetNumberOfSupportedAreas() == 0)
+    {
+        return;
+    }
+
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        AreaStructureWrapper firstArea;
+        GetSupportedAreaByIndex(0, firstArea);
+
+        GetInstance()->SetCurrentArea(firstArea.areaID);
+
+        if (GetInstance()->HasFeature(Feature::kProgressReporting))
+        {
+            GetInstance()->AddPendingProgressElement(firstArea.areaID);
+            GetInstance()->SetProgressStatus(firstArea.areaID, OperationalStatusEnum::kOperating);
+        }
+    }
+    else
+    {
+        uint32_t areaId;
+        GetSelectedAreaByIndex(0, areaId);
+
+        GetInstance()->SetCurrentArea(areaId);
+
+        if (GetInstance()->HasFeature(Feature::kProgressReporting))
+        {
+            GetInstance()->AddPendingProgressElement(areaId);
+            GetInstance()->SetProgressStatus(areaId, OperationalStatusEnum::kOperating);
+
+            uint32_t i = 1;
+            while (GetSelectedAreaByIndex(i, areaId))
+            {
+                GetInstance()->AddPendingProgressElement(areaId);
+                i++;
+            }
+        }
+    }
+}
+
+void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished)
+{
+    AreaStructureWrapper currentArea;
+    auto currentAreaIdN = GetInstance()->GetCurrentArea();
+
+    if (currentAreaIdN.IsNull())
+    {
+        ChipLogError(Zcl, "GoToNextArea: Cannot go to the next area when the current area is null.");
+        return;
+    }
+
+    if (currentAreaOpState != OperationalStatusEnum::kCompleted && currentAreaOpState != OperationalStatusEnum::kSkipped)
+    {
+        ChipLogError(Zcl, "GoToNextArea: currentAreaOpState must be either completed or skipped.");
+        return;
+    }
+
+    auto currentAreaId = currentAreaIdN.Value();
+    uint32_t currentAreaIndex;
+    GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
+    auto currentAreaMapId = currentArea.mapID;
+    finished              = true;
+
+    if (GetInstance()->HasFeature(Feature::kProgressReporting))
+    {
+        GetInstance()->SetProgressStatus(currentAreaId, currentAreaOpState);
+    }
+
+    if (GetNumberOfSelectedAreas() == 0)
+    {
+        AreaStructureWrapper nextArea;
+        uint32_t nextIndex = currentAreaIndex + 1;
+        while (GetSupportedAreaByIndex(nextIndex, nextArea))
+        {
+            if (!currentAreaMapId.IsNull() && nextArea.mapID == currentAreaMapId.Value())
+            {
+                GetInstance()->SetCurrentArea(nextArea.areaID);
+
+                if (GetInstance()->HasFeature(Feature::kProgressReporting))
+                {
+                    GetInstance()->SetProgressStatus(nextArea.areaID, OperationalStatusEnum::kOperating);
+                }
+
+                finished = false;
+                return;
+            }
+
+            ++nextIndex;
+        }
+    }
+    else
+    {
+        uint32_t selectedAreaId;
+        uint32_t selectedAreaIndex = 0;
+        while (GetSelectedAreaByIndex(selectedAreaIndex, selectedAreaId))
+        {
+            if (selectedAreaId == currentAreaId)
+            {
+                break;
+            }
+            ++selectedAreaIndex;
+        }
+
+        uint32_t nextSelectedAreaId;
+        uint32_t nextSelectedAreaIndex = selectedAreaIndex + 1;
+        if (GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
+        {
+            GetInstance()->SetCurrentArea(nextSelectedAreaId);
+
+            if (GetInstance()->HasFeature(Feature::kProgressReporting))
+            {
+                GetInstance()->SetProgressStatus(nextSelectedAreaId, OperationalStatusEnum::kOperating);
+            }
+
+            finished = false;
+            return;
+        }
+    }
 }

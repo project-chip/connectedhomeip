@@ -29,10 +29,15 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#import <os/lock.h>
+
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerDelegate.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
+
+#import <Matter/MTRP256KeypairBridge.h>
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
@@ -40,10 +45,14 @@
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
+@class MTRDeviceControllerParameters;
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
 @class MTRAsyncWorkQueue;
+@protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
+@class MTRDevice_Concrete;
 
 namespace chip {
 class FabricTable;
@@ -56,6 +65,15 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
+
+@property (nonatomic, readwrite, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (readonly, assign) os_unfair_lock_t deviceMapLock;
+
+// queue used to serialize all work performed by the MTRDeviceController
+// (moved here so subclasses can initialize differently)
+@property (readwrite, retain) dispatch_queue_t chipWorkQueue;
+
+- (instancetype)initForSubclasses;
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -99,6 +117,21 @@ NS_ASSUME_NONNULL_BEGIN
  * subscription at the same time.
  */
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
+ * Fabric ID tied to controller
+ */
+@property (nonatomic, retain, nullable) NSNumber * fabricID;
+
+/**
+ * Node ID tied to controller
+ */
+@property (nonatomic, retain, nullable) NSNumber * nodeID;
+
+/**
+ * Root Public Key tied to controller
+ */
+@property (nonatomic, retain, nullable) NSData * rootPublicKey;
 
 /**
  * Init a newly created controller.
@@ -262,6 +295,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
 /**
@@ -271,6 +305,60 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
+/**
+ * Takes an assertion to keep the controller running. If `-[MTRDeviceController shutdown]` is called while an assertion
+ * is held, the shutdown will be honored only after all assertions are released. Invoking this method multiple times increases
+ * the number of assertions and needs to be matched with equal amount of '-[MTRDeviceController removeRunAssertion]` to release
+ * the assertion.
+ */
+- (void)addRunAssertion;
+
+/**
+ * Removes an assertion to allow the controller to shutdown once all assertions have been released.
+ * Invoking this method once all assertions have been released in a noop.
+ */
+- (void)removeRunAssertion;
+
+/**
+ * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
+ */
+- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters;
+
+/**
+ * Clear any pending shutdown request.
+ */
+- (void)clearPendingShutdown;
+
 @end
+
+/**
+ * Shim to allow us to treat an MTRDevicePairingDelegate as an
+ * MTRDeviceControllerDelegate.
+ */
+@interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
+- (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
+@end
+
+static NSString * const kDeviceControllerErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kDeviceControllerErrorIPKInit = @"Init failure while initializing IPK";
+static NSString * const kDeviceControllerErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
+static NSString * const kDeviceControllerErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
+static NSString * const kDeviceControllerErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
+static NSString * const kDeviceControllerErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kDeviceControllerErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
+static NSString * const kDeviceControllerErrorPairDevice = @"Failure while pairing the device";
+static NSString * const kDeviceControllerErrorStopPairing = @"Failure while trying to stop the pairing process";
+static NSString * const kDeviceControllerErrorOpenPairingWindow = @"Open Pairing Window failed";
+static NSString * const kDeviceControllerErrorNotRunning = @"Controller is not running. Call startup first.";
+static NSString * const kDeviceControllerErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
+static NSString * const kDeviceControllerErrorGenerateNOC = @"Generating operational certificate failed";
+static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new operational key failed";
+static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
+static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
+static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
 NS_ASSUME_NONNULL_END

@@ -59,7 +59,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         self.print_step(step, "Read SupportedMaps attribute")
         supported_maps = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedMaps)
-        logging.info("SupportedMaps: %s" % (supported_maps))
+        logging.info("SupportedMaps: %s" % supported_maps)
         asserts.assert_less_equal(len(supported_maps), 255,
                                   "SupportedMaps should have max 255 entries")
 
@@ -69,18 +69,18 @@ class TC_SEAR_1_2(MatterBaseTest):
         name_list = [m.name for m in supported_maps]
         asserts.assert_true(len(set(name_list)) == len(name_list), "SupportedMaps must have unique Name values!")
 
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.mapid_list = mapid_list
 
     async def read_and_validate_supported_areas(self, step):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        logging.info("SupportedAreas: %s" % (supported_areas))
+        logging.info("SupportedAreas: %s" % supported_areas)
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
-        areadesc_s = set()
+        areainfo_s = set()
         for a in supported_areas:
             asserts.assert_true(a.areaID not in areaid_list, "SupportedAreas must have unique AreaID values!")
 
@@ -91,27 +91,28 @@ class TC_SEAR_1_2(MatterBaseTest):
                                       f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
                 asserts.assert_true(a.mapID in self.mapid_list,
                                     f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
-                k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s,
-                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"mapID:{a.mapID} areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s,
+                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
             else:
                 # empty SupportedMaps
                 asserts.assert_is(a.mapID, NullValue,
                                   f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
-                k = f"areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s, f"SupportedAreas must have unique AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
 
-            if a.locationInfo is NullValue and a.landmarkTag is NullValue:
+            if a.areaInfo.locationInfo is NullValue and a.areaInfo.landmarkInfo is NullValue:
                 asserts.assert_true(
-                    f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
-            if a.landmarkTag is not NullValue:
-                asserts.assert_true(a.landmarkTag <= self.MAX_LANDMARK_ID,
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.landmarkTag})")
-                asserts.assert_true(a.positionTag is NullValue or a.positionTag in range(0, self.MAX_RELPOS_ID),
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.positionTag})")
-        # save so other methods can use this if neeeded
+                    f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkInfo")
+            if a.areaInfo.landmarkInfo is not NullValue:
+                asserts.assert_true(a.areaInfo.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaInfo.landmarkInfo.landmarkTag})")
+                asserts.assert_true(a.areaInfo.landmarkInfo.relativePositionTag is NullValue or a
+                                    .areaInfo.landmarkInfo.relativePositionTag in range(0, self.MAX_RELPOS_ID),
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid RelativePositionTag({a.areaInfo.landmarkInfo.relativePositionTag})")
+        # save so other methods can use this if needed
         self.areaid_list = areaid_list
 
     async def read_and_validate_selected_areas(self, step):
@@ -130,7 +131,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         for a in selected_areas:
             asserts.assert_true(a in self.areaid_list,
                                 f"SelectedAreas entry {a} has invalid value")
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.selareaid_list = selected_areas
 
     async def read_and_validate_current_area(self, step):
@@ -143,7 +144,7 @@ class TC_SEAR_1_2(MatterBaseTest):
                             or
                             current_area in self.selareaid_list,
                             f"CurrentArea {current_area} is invalid. SelectedAreas is {self.selareaid_list}.")
-        # save so other methods can use this if neeeded
+        # save so other methods can use this if needed
         self.current_area = current_area
 
     async def read_and_validate_estimated_end_time(self, step):
@@ -244,7 +245,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=11)
@@ -277,7 +280,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_maps(step=15)
@@ -310,7 +315,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "RemoveArea", "AreaId": 10050}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=19)
@@ -342,7 +349,9 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
-            if not self.is_ci:
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"}')
+            else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
             await self.read_and_validate_supported_areas(step=23)

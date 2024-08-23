@@ -72,7 +72,7 @@ public:
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
      */
-    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) = 0;
+    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) = 0;
 
     /**
      * Given a set of locations to be set to the SelectedAreas attribute, this method should check that
@@ -80,10 +80,10 @@ public:
      * If the set of locations is invalid, the locationStatus should be set to InvalidSet and
      * the statusText SHALL include a vendor-defined error description.
      *
-     * The caller of this method will ensure that there are no duplicates is the list
+     * The caller of this method will ensure that there are no duplicates in the list
      * and that all the locations in the set are valid supported locations.
      *
-     * @param[in] req List of new selected locations.
+     * @param[in] selectedAreas List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText.
      * @return true if success.
@@ -91,8 +91,8 @@ public:
      * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
-    virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & locationStatus,
-                                       MutableCharSpan statusText) = 0;
+    virtual bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & locationStatus,
+                                       MutableCharSpan & statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedAreas and CurrentArea attributes are not null before
@@ -104,24 +104,23 @@ public:
      *
      * @note skipStatusText must be filled out by the function on failure.
      *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 1:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the remaining locations on the SelectedAreas attribute list, starting with
-     * the next entry. If the end of the SelectedAreas attribute list is reached, the server SHALL stop operating.
-     *
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 0:
-     *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the locations on the SelectedAreas attribute list where operating has not
-     * been completed, using a vendor defined order. If the server has completed operating at all locations on the SelectedAreas
-     * attribute list, the server SHALL stop operating.
+     * @note If the device accepts the request:
+     * - If the device is currently operating at the area identified by SkippedArea, as indicated by either the CurrentArea or
+     *     the Progress attributes, if implemented, the device SHALL stop operating at that area.
+     * - If the Progress attribute is implemented, the entry corresponding to SkippedArea SHALL be updated to indicate that the
+     *     area was skipped.
+     * - The server SHALL attempt to operate only at the areas in the SelectedAreas attribute list where operating has not been
+     *     skipped or completed, using a vendor defined order.
+     * - If the server has either skipped or completed operating at all areas on the SelectedAreas attribute list, the server
+     *     SHALL stop operating.
      *
      * @note If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
      *       If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined
-     * error description which can be used to explain the error to the user. For example, if the Status field is set to
-     * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
-     * which may involve other clusters.
+     *       error description which can be used to explain the error to the user. For example, if the Status field is set to
+     *       InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the
+     *       device, which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+    virtual bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
         // device support of this command is optional
         CopyCharSpanToMutableCharSpan("Skip Current Area command not supported by device"_span, skipStatusText);
@@ -262,7 +261,7 @@ public:
     /**
      * This method is called by the server instance to modify an existing map in the list.
      * The server instance will ensure that the modifiedMap is a valid, unique map.
-     * @param[in] listIndexThe index of the map being modified.
+     * @param[in] listIndex The index of the map being modified.
      * @param[in] modifiedMapA map with the modified contents.
      * @return true if successful, false otherwise.
      *
