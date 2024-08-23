@@ -105,7 +105,6 @@ public:
     bool ClearProgressRaw() override;
 
     bool RemoveProgressElementRaw(uint32_t areaId) override;
-
 };
 
 } // namespace ServiceArea
