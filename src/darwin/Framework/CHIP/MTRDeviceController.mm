@@ -136,6 +136,11 @@ using namespace chip::Tracing::DarwinFramework;
     NSNumber * _fabricID;
     NSNumber * _nodeID;
     NSData * _rootPublicKey;
+
+    // Counters to track assertion status and access controlled by the _assertionLock
+    NSUInteger _keepRunningAssertionCounter;
+    BOOL _shutdownPending;
+    os_unfair_lock _assertionLock;
 }
 
 - (os_unfair_lock_t)deviceMapLock
@@ -150,9 +155,10 @@ using namespace chip::Tracing::DarwinFramework;
     }
     _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
 
-    // Setup assertion counters
+    // Setup assertion variables
     _keepRunningAssertionCounter = 0;
-    _shutdownPending = FALSE;
+    _shutdownPending = NO;
+    _assertionLock = OS_UNFAIR_LOCK_INIT;
     return self;
 }
 
@@ -190,9 +196,10 @@ using namespace chip::Tracing::DarwinFramework;
         // before we start doing anything else with the controller.
         _uniqueIdentifier = uniqueIdentifier;
 
-        // Setup assertion counters
+        // Setup assertion variables
         _keepRunningAssertionCounter = 0;
-        _shutdownPending = FALSE;
+        _shutdownPending = NO;
+        _assertionLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -330,16 +337,6 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
-- (NSUInteger)shutdownPrecheck
-{
-    __block NSUInteger assertionCount = 0;
-    dispatch_sync(_chipWorkQueue, ^{
-        self.shutdownPending = TRUE;
-        assertionCount = self.keepRunningAssertionCounter;
-    });
-    return assertionCount;
-}
-
 - (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters
 {
     if (!parameters.operationalCertificate || !parameters.rootCertificate) {
@@ -351,8 +348,8 @@ using namespace chip::Tracing::DarwinFramework;
 
     __block BOOL matches = FALSE;
     dispatch_sync(_chipWorkQueue, ^{
-        matches =  self.keepRunningAssertionCounter > 0 &&
-                   self.shutdownPending &&
+        matches =  _keepRunningAssertionCounter > 0 &&
+                   _shutdownPending &&
                    MTREqualObjects(nodeID, self->_nodeID) &&
                    MTREqualObjects(fabricID, self->_fabricID) &&
                    MTREqualObjects(publicKey, self->_rootPublicKey);
@@ -362,42 +359,42 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)addRunAssertion
 {
-    dispatch_sync(_chipWorkQueue, ^{
-        ++self.keepRunningAssertionCounter;
-        MTR_LOG("%@ Adding keep running assertion, total %lu", self, (unsigned long) self.keepRunningAssertionCounter);
-    });
+    std::lock_guard lock(_assertionLock);
+
+    // Only take an assertion if running
+    if ([self isRunning]) {
+        ++_keepRunningAssertionCounter;
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, (unsigned long) _keepRunningAssertionCounter);
+    }
 }
 
 - (void)removeRunAssertion;
 {
-    __block BOOL shouldShutdown = FALSE;
-    dispatch_sync(_chipWorkQueue, ^{
-        if (self.keepRunningAssertionCounter > 0) {
-            --self.keepRunningAssertionCounter;
-            MTR_LOG("%@ Removing keep running assertion, total %lu", self, (unsigned long) self.keepRunningAssertionCounter);
-            if (self.keepRunningAssertionCounter == 0 && self.shutdownPending) {
-                shouldShutdown = TRUE;
-            }
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        --_keepRunningAssertionCounter;
+        MTR_LOG("%@ Removing keep running assertion, total %lu", self, (unsigned long) _keepRunningAssertionCounter);
+
+        if ([self isRunning] && _keepRunningAssertionCounter == 0 && _shutdownPending) {
+            MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
+            [self finalShutdown];
         }
-    });
-    if (shouldShutdown) {
-        MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
-        [self finalShutdown];
     }
 }
 
 - (void)clearPendingShutdown
 {
-    dispatch_sync(_chipWorkQueue, ^{
-        self.shutdownPending = FALSE;
-    });
+    std::lock_guard lock(_assertionLock);
+    _shutdownPending = NO;
 }
 
 - (void)shutdown
 {
-    NSUInteger assertionCount = [self shutdownPrecheck];
-    if (assertionCount != 0) {
-        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, (unsigned long) assertionCount);
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, (unsigned long) _keepRunningAssertionCounter);
         return;
     }
     [self finalShutdown];
@@ -405,6 +402,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)finalShutdown
 {
+    os_unfair_lock_assert_owner(&_assertionLock);
+
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
         // Already shut down.
@@ -469,7 +468,7 @@ using namespace chip::Tracing::DarwinFramework;
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
-    self.shutdownPending = FALSE;
+    _shutdownPending = NO;
 }
 
 - (void)deinitFromFactory

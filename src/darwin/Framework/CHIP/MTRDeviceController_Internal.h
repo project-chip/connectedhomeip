@@ -73,10 +73,6 @@ NS_ASSUME_NONNULL_BEGIN
 // (moved here so subclasses can initialize differently)
 @property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
-// Counters to track assertion status
-@property (nonatomic, readwrite) NSUInteger keepRunningAssertionCounter;
-@property (nonatomic, readwrite) BOOL shutdownPending;
-
 - (instancetype)initForSubclasses;
 
 #pragma mark - MTRDeviceControllerFactory methods
