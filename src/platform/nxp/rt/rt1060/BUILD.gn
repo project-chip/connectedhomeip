@@ -116,8 +116,6 @@ static_library("nxp_platform") {
       "../../common/OTAImageProcessorImpl.cpp",
       "../../common/OTAImageProcessorImpl.h",
     ]
-    include_dirs =
-        [ "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/" ]
   }
 
   if (chip_enable_openthread) {
