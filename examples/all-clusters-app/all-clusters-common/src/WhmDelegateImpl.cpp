@@ -356,7 +356,7 @@ void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, 
 {
     // First calculate the new average water temperature
     mWaterTemperature =
-        static_cast<uint16_t>(mWaterTemperature * (100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100;
+        static_cast<uint16_t>((mWaterTemperature * (100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100);
 
     // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
     // Only supported if the kTankPercent feature is supported.
