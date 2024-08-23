@@ -60,7 +60,3 @@ ti/ti_matter_overview
 
 -   [Open Thread - Hardware suggestions](./openthread_rcp_nrf_dongle.md)
 -   [Open Thread - Setting up a Raspberry Pi as a Border Router](./openthread_border_router_pi.md)
-
-## Troubleshooting Guides
-
--   [Avahi - Troubleshooting](./troubleshooting_avahi.md)
