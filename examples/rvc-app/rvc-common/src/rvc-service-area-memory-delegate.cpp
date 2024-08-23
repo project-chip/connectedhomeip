@@ -63,7 +63,7 @@ bool RvcServiceAreaMemoryDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex)
+bool RvcServiceAreaMemoryDelegate::AddSupportedAreaRaw(const AreaStructureWrapper & newArea, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -77,13 +77,13 @@ bool RvcServiceAreaMemoryDelegate::AddSupportedArea(const AreaStructureWrapper &
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedArea %u - supported areas list is already at maximum size %u", newArea.areaID,
+    ChipLogError(Zcl, "AddSupportedAreaRaw %u - supported areas list is already at maximum size %u", newArea.areaID,
                  static_cast<uint32_t>(kMaxNumSupportedAreas));
 
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea)
+bool RvcServiceAreaMemoryDelegate::ModifySupportedAreaRaw(uint32_t listIndex, const AreaStructureWrapper & modifiedArea)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -91,7 +91,7 @@ bool RvcServiceAreaMemoryDelegate::ModifySupportedArea(uint32_t listIndex, const
     // Double-check that areaID's match.
     if (modifiedArea.areaID != mSupportedAreas[listIndex].areaID)
     {
-        ChipLogError(Zcl, "ModifySupportedArea - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID,
+        ChipLogError(Zcl, "ModifySupportedAreaRaw - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID,
                      mSupportedAreas[listIndex].areaID);
         return false;
     }
@@ -101,7 +101,7 @@ bool RvcServiceAreaMemoryDelegate::ModifySupportedArea(uint32_t listIndex, const
     return true;
 }
 
-bool RvcServiceAreaMemoryDelegate::ClearSupportedAreas()
+bool RvcServiceAreaMemoryDelegate::ClearSupportedAreasRaw()
 {
     if (!mSupportedAreas.empty())
     {
@@ -112,7 +112,7 @@ bool RvcServiceAreaMemoryDelegate::ClearSupportedAreas()
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::RemoveSupportedArea(uint32_t areaId)
+bool RvcServiceAreaMemoryDelegate::RemoveSupportedAreaRaw(uint32_t areaId)
 {
     for (auto it = mSupportedAreas.begin(); it != mSupportedAreas.end(); ++it)
     {
@@ -166,7 +166,7 @@ bool RvcServiceAreaMemoryDelegate::GetSupportedMapById(uint32_t aMapId, uint32_t
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
+bool RvcServiceAreaMemoryDelegate::AddSupportedMapRaw(const MapStructureWrapper & newMap, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -179,13 +179,13 @@ bool RvcServiceAreaMemoryDelegate::AddSupportedMap(const MapStructureWrapper & n
         listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddSupportedMap %u - supported maps list is already at maximum size %u", newMap.mapID,
+    ChipLogError(Zcl, "AddSupportedMapRaw %u - supported maps list is already at maximum size %u", newMap.mapID,
                  static_cast<uint32_t>(kMaxNumSupportedMaps));
 
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
+bool RvcServiceAreaMemoryDelegate::ModifySupportedMapRaw(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -193,7 +193,7 @@ bool RvcServiceAreaMemoryDelegate::ModifySupportedMap(uint32_t listIndex, const 
     // Double-check that mapID's match.
     if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID)
     {
-        ChipLogError(Zcl, "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
+        ChipLogError(Zcl, "ModifySupportedMapRaw - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
                      mSupportedMaps[listIndex].mapID);
         return false;
     }
@@ -203,7 +203,7 @@ bool RvcServiceAreaMemoryDelegate::ModifySupportedMap(uint32_t listIndex, const 
     return true;
 }
 
-bool RvcServiceAreaMemoryDelegate::ClearSupportedMaps()
+bool RvcServiceAreaMemoryDelegate::ClearSupportedMapsRaw()
 {
     if (!mSupportedMaps.empty())
     {
@@ -214,7 +214,7 @@ bool RvcServiceAreaMemoryDelegate::ClearSupportedMaps()
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::RemoveSupportedMap(uint32_t mapId)
+bool RvcServiceAreaMemoryDelegate::RemoveSupportedMapRaw(uint32_t mapId)
 {
     for (auto it = mSupportedMaps.begin(); it != mSupportedMaps.end(); ++it)
     {
@@ -247,7 +247,7 @@ bool RvcServiceAreaMemoryDelegate::GetSelectedAreaByIndex(uint32_t listIndex, ui
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::AddSelectedArea(uint32_t aAreaID, uint32_t & listIndex)
+bool RvcServiceAreaMemoryDelegate::AddSelectedAreaRaw(uint32_t aAreaID, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -260,13 +260,13 @@ bool RvcServiceAreaMemoryDelegate::AddSelectedArea(uint32_t aAreaID, uint32_t & 
         listIndex = static_cast<uint32_t>(mSelectedAreas.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddSelectedArea %u - selected areas list is already at maximum size %u", aAreaID,
+    ChipLogError(Zcl, "AddSelectedAreaRaw %u - selected areas list is already at maximum size %u", aAreaID,
                  static_cast<uint32_t>(kMaxNumSelectedAreas));
 
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::ClearSelectedAreas()
+bool RvcServiceAreaMemoryDelegate::ClearSelectedAreasRaw()
 {
     if (!mSelectedAreas.empty())
     {
@@ -277,7 +277,7 @@ bool RvcServiceAreaMemoryDelegate::ClearSelectedAreas()
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::RemoveSelectedAreas(uint32_t areaId)
+bool RvcServiceAreaMemoryDelegate::RemoveSelectedAreasRaw(uint32_t areaId)
 {
     for (auto it = mSelectedAreas.begin(); it != mSelectedAreas.end(); ++it)
     {
@@ -333,7 +333,7 @@ bool RvcServiceAreaMemoryDelegate::GetProgressElementById(uint32_t aAreaID, uint
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
+bool RvcServiceAreaMemoryDelegate::AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -346,18 +346,18 @@ bool RvcServiceAreaMemoryDelegate::AddProgressElement(const Structs::ProgressStr
         listIndex = static_cast<uint32_t>(mProgressList.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.areaID,
+    ChipLogError(Zcl, "AddProgressElementRaw %u -progress list is already at maximum size %u", newProgressElement.areaID,
                  static_cast<uint32_t>(kMaxNumProgressElements));
 
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::ModifyProgressElement(uint32_t listIndex,
-                                                   const Structs::ProgressStruct::Type & modifiedProgressElement)
+bool RvcServiceAreaMemoryDelegate::ModifyProgressElementRaw(uint32_t listIndex,
+                                                            const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {
-        ChipLogError(Zcl, "ModifyProgressElement - areaID's do not match, new areaID %u, existing areaID %u",
+        ChipLogError(Zcl, "ModifyProgressElementRaw - areaID's do not match, new areaID %u, existing areaID %u",
                      modifiedProgressElement.areaID, mProgressList[listIndex].areaID);
         return false;
     }
@@ -366,7 +366,7 @@ bool RvcServiceAreaMemoryDelegate::ModifyProgressElement(uint32_t listIndex,
     return true;
 }
 
-bool RvcServiceAreaMemoryDelegate::ClearProgress()
+bool RvcServiceAreaMemoryDelegate::ClearProgressRaw()
 {
     if (!mProgressList.empty())
     {
@@ -377,7 +377,7 @@ bool RvcServiceAreaMemoryDelegate::ClearProgress()
     return false;
 }
 
-bool RvcServiceAreaMemoryDelegate::RemoveProgressElement(uint32_t areaId)
+bool RvcServiceAreaMemoryDelegate::RemoveProgressElementRaw(uint32_t areaId)
 {
     for (auto it = mProgressList.begin(); it != mProgressList.end(); ++it)
     {

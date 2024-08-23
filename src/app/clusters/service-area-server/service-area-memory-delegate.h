@@ -80,7 +80,7 @@ public:
 
      * @note this method SHOULD double check that the added area won't exceed the maximum list size.
      */
-    virtual bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) = 0;
+    virtual bool AddSupportedAreaRaw(const AreaStructureWrapper & newArea, uint32_t & listIndex) = 0;
 
     /**
      * This method is called by the server instance to modify an existing area in the list.
@@ -91,18 +91,18 @@ public:
      *
      * @note this function SHOULD double check that newArea's areaID matches the object at listIndex.
      */
-    virtual bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) = 0;
+    virtual bool ModifySupportedAreaRaw(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) = 0;
 
     /**
      * @return true if supported locations was not already null, false otherwise.
      */
-    virtual bool ClearSupportedAreas() = 0;
+    virtual bool ClearSupportedAreasRaw() = 0;
 
     /**
      * @param areaId the ID af the area to be removed.
      * @return true if the area was removed, false otherwise.
      */
-    virtual bool RemoveSupportedArea(uint32_t areaId);
+    virtual bool RemoveSupportedAreaRaw(uint32_t areaId);
 
     //*************************************************************************
     // Supported Maps accessors and manipulators
@@ -142,7 +142,7 @@ public:
      *
      * @note this function SHOULD double check that the added map won't exceed the maximum list size
      */
-    virtual bool AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex) = 0;
+    virtual bool AddSupportedMapRaw(const MapStructureWrapper & newMap, uint32_t & listIndex) = 0;
 
     /**
      * This method is called by the server instance to modify an existing map in the list.
@@ -153,18 +153,18 @@ public:
      *
      * @note this function SHOULD double check that modifiedMap's mapID matches the object at listIndex.
      */
-    virtual bool ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap) = 0;
+    virtual bool ModifySupportedMapRaw(uint32_t listIndex, const MapStructureWrapper & modifiedMap) = 0;
 
     /**
      * @return true if supported maps was not already null, false otherwise.
      */
-    virtual bool ClearSupportedMaps() = 0;
+    virtual bool ClearSupportedMapsRaw() = 0;
 
     /**
      * @param mapId the ID of the map to be removed.
      * @return true if a map is removed. False otherwise.
      */
-    virtual bool RemoveSupportedMap(uint32_t mapId);
+    virtual bool RemoveSupportedMapRaw(uint32_t mapId);
 
     //*************************************************************************
     // Selected Areas accessors and manipulators
@@ -196,18 +196,18 @@ public:
      *
      * @note this function SHOULD double check that the added area won't exceed the maximum list size.
      */
-    virtual bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) = 0;
+    virtual bool AddSelectedAreaRaw(uint32_t aAreaId, uint32_t & listIndex) = 0;
 
     /**
      * @return true if selected locations was not already null, false otherwise.
      */
-    virtual bool ClearSelectedAreas() = 0;
+    virtual bool ClearSelectedAreasRaw() = 0;
 
     /**
      * @param areaId the area ID to be removed from the SelectedAreas attribute.
      * @return ture if this ID was removed, false otherwise.
      */
-    virtual bool RemoveSelectedAreas(uint32_t areaId) = 0;
+    virtual bool RemoveSelectedAreasRaw(uint32_t areaId) = 0;
 
     //*************************************************************************
     // Progress accessors and manipulators
@@ -249,7 +249,7 @@ public:
      *
      * @note this function SHOULD double check that the added element won't exceed the maximum list size.
      */
-    virtual bool AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) = 0;
+    virtual bool AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) = 0;
 
     /**
      * This method is called by the server instance to modify an existing progress element in the list.
@@ -260,18 +260,18 @@ public:
      *
      * @note this function SHOULD double check that modifiedProgressElement's areaID matches the object at listIndex
      */
-    virtual bool ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) = 0;
+    virtual bool ModifyProgressElementRaw(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) = 0;
 
     /**
      * @return true if progress list was not already null, false otherwise.
      */
-    virtual bool ClearProgress() = 0;
+    virtual bool ClearProgressRaw() = 0;
 
     /**
      * @param areaId the area ID of the progress element to be removed.
      * @return ture if the progress element was removed, false otherwise.
      */
-    virtual bool RemoveProgressElement(uint32_t areaId) = 0;
+    virtual bool RemoveProgressElementRaw(uint32_t areaId) = 0;
 
 };
 

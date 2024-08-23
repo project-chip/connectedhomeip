@@ -28,7 +28,7 @@ bool MemoryDelegate::IsSupportedArea(uint32_t aAreaId)
     return GetSupportedAreaById(aAreaId, ignoredIndex, ignoredArea);
 }
 
-bool MemoryDelegate::RemoveSupportedArea(uint32_t areaId)
+bool MemoryDelegate::RemoveSupportedAreaRaw(uint32_t areaId)
 {
     return false;
 }
@@ -58,7 +58,7 @@ bool MemoryDelegate::IsSupportedMap(uint32_t aMapId)
     return GetSupportedMapById(aMapId, ignoredIndex, ignoredMap);
 }
 
-bool MemoryDelegate::RemoveSupportedMap(uint32_t mapId)
+bool MemoryDelegate::RemoveSupportedMapRaw(uint32_t mapId)
 {
     return false;
 }

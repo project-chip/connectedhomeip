@@ -60,13 +60,13 @@ public:
 
     bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & supportedArea) override;
 
-    bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) override;
+    bool AddSupportedAreaRaw(const AreaStructureWrapper & newArea, uint32_t & listIndex) override;
 
-    bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) override;
+    bool ModifySupportedAreaRaw(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) override;
 
-    bool ClearSupportedAreas() override;
+    bool ClearSupportedAreasRaw() override;
 
-    bool RemoveSupportedArea(uint32_t areaId) override;
+    bool RemoveSupportedAreaRaw(uint32_t areaId) override;
 
     //*************************************************************************
     // Supported Maps accessors
@@ -77,13 +77,13 @@ public:
 
     bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
-    bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
+    bool AddSupportedMapRaw(const MapStructureWrapper & newMap, uint32_t & listIndex) override;
 
-    bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
+    bool ModifySupportedMapRaw(uint32_t listIndex, const MapStructureWrapper & newMap) override;
 
-    bool ClearSupportedMaps() override;
+    bool ClearSupportedMapsRaw() override;
 
-    bool RemoveSupportedMap(uint32_t mapId) override;
+    bool RemoveSupportedMapRaw(uint32_t mapId) override;
 
     //*************************************************************************
     // Selected Areas accessors
@@ -92,11 +92,11 @@ public:
 
     bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea) override;
 
-    bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) override;
+    bool AddSelectedAreaRaw(uint32_t aAreaId, uint32_t & listIndex) override;
 
-    bool ClearSelectedAreas() override;
+    bool ClearSelectedAreasRaw() override;
 
-    bool RemoveSelectedAreas(uint32_t areaId) override;
+    bool RemoveSelectedAreasRaw(uint32_t areaId) override;
 
     //*************************************************************************
     // Progress accessors
@@ -108,14 +108,13 @@ public:
     bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
                                 ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
 
-    bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
+    bool AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
 
-    bool ModifyProgressElement(uint32_t listIndex,
-                               const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
+    bool ModifyProgressElementRaw(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) override;
 
-    bool ClearProgress() override;
+    bool ClearProgressRaw() override;
 
-    bool RemoveProgressElement(uint32_t areaId) override;
+    bool RemoveProgressElementRaw(uint32_t areaId) override;
 
 };
 
