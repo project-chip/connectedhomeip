@@ -70,7 +70,7 @@ public:
      * @return true if an area with the aAreaId ID exists in the supported areas attribute. False otherwise.
      */
     virtual bool IsSupportedArea(uint32_t aAreaId);
-    
+
     /**
      * This method is called by the server instance to add a new area to the list.
      * The server instance will ensure that the newArea is a valid, unique area.
