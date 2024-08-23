@@ -35,11 +35,19 @@ chip_build_tests = false
 #This enables the EventList global attribute
 enable_eventlist_attribute = true
 
-mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
-
+# TODO : Enable the OTA Requestor by default.
+# This requires the mcuboot bootloader to be used, which reserves the first 256 kB of the flash.
+# If mcuboot is not used, "no_mcuboot" must be set to true in the gn gen build command
+# in order for the application to be linked at the base of the flash.
+#chip_enable_ota_requestor = true
 declare_args() {
+  # TODO : set no_mcuboot to false by default when enabling ota requestor by default
+  no_mcuboot = true
+
   chip_enable_secondary_nwk_if = false
 }
+
+mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 
 openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file = "OpenThreadConfig.h"
