@@ -405,8 +405,10 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     // Before adding this preset to the pending presets, if the expected length of the pending presets' list
     // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
 
+    uint8_t numberOfPendingPresets = CountNumberOfPendingPresets(delegate);
+
     // Increment number of pending presets by 1 to account for this preset.
-    uint8_t totalExpectedCount = CountNumberOfPendingPresets(delegate) + 1;
+    uint8_t totalExpectedCount = numberOfPendingPresets + 1;
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 
