@@ -1796,20 +1796,6 @@ def async_test_body(body):
     return async_runner
 
 
-def run_once_for_node(body):
-    """ Decorator to be used for PICS-free tests that apply to the entire node.
-
-    Use this decorator when your script needs to be run once to validate the whole node.
-    To use this decorator, the test must NOT have an associated pics_ method.
-    """
-
-    def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
-        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for run_once_for_node.")
-        return _async_runner(body, self, *args, **kwargs)
-
-    return whole_node_runner
-
-
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
@@ -1909,46 +1895,28 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Helper function for the run_for_each_matching_endpoint decorator.
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
 
-    if self.matter_test_config.endpoint is not None:
+    if self.matter_test_config.endpoint is None:
         msg = """
-              The --endpoint flag is disallowed for tests that run on all matching endpoints.
-              To enable running against a single endpoint for development purposes, use
-              --int-arg force_endpoint:1 (where "1" can be replaced with the desired endpoint)
-              Note that using force_endpoint is disallowed at certification and should be used
-              ONLY FOR DEVELOPMENT.
+              The --endpoint flag is required for this test.
               """
         asserts.fail(msg)
 
     wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
-    forced_endpoint = self.user_params.get('force_endpoint', None)
-    if forced_endpoint is None:
-        return matching
 
-    asserts.assert_in(forced_endpoint, matching, "Force endpoint does not match test requirements")
-
-    warning = """
-    --------------------------------------------------------------------------------
-    | Warning: Using a forced single endpoint on a test that is intended to be run |
-    |          on each matching endpoint. This is a development-only option.       |
-    |                                                                              |
-    | Use of this option is disallowed at certification                            |
-    --------------------------------------------------------------------------------
-    """
-    logging.warn(warning)
-    return [forced_endpoint]
+    return self.matter_test_config.endpoint in matching
 
 
-def run_for_each_matching_endpoint(accept_function: EndpointCheckFunction):
-    """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
+def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
+    """ Test decorator for a test that needs to be run only if the endpoint that meets the accept_function criteria.
 
-        Place this decorator above the test_ method to have the test framework run this test once per endpoint.
+        Place this decorator above the test_ method to have the test framework run this test only if the endpoint matches.
         This decorator takes an EndpointCheckFunction to assess whether a test needs to be run on a particular
         endpoint.
 
@@ -1960,52 +1928,32 @@ def run_for_each_matching_endpoint(accept_function: EndpointCheckFunction):
         EP3, cluster E
 
         And the following test specification:
-        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
+        @run_if_endpoint_matches(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
-        The test would be run on endpoint 1 and on endpoint 2.
-
-        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        If you run this test with --endpoint 1 or --endpoint 2, the test will be run. If you run this test
+        with any other --endpoint the decorator will call the on_skip function to
         notify the test harness that the test is not applicable to this node and the test will not be run.
-
-        The decorator works by setting the self.matter_test_config.endpoint value and running the test function.
-        Therefore, tests that make use of this decorator should call controller functions against that endpoint.
-        Support functions in this file default to this endpoint.
 
         Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
         PICS values internally.
     """
-    def run_for_each_matching_endpoint_internal(body):
+    def run_if_endpoint_matches_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name),
                                  "pics_ method supplied for run_for_each_matching_endpoint.")
-            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
-            endpoints = asyncio.run(runner_with_timeout)
-            if not endpoints:
-                logging.info("No matching endpoints found - skipping test")
-                asserts.skip('No endpoints match requirements')
+            runner_with_timeout = asyncio.wait_for(should_run_test_on_endpoint(self, accept_function), timeout=30)
+            should_run_test = asyncio.run(runner_with_timeout)
+            print(f'-----------------{should_run_test}')
+            if not should_run_test:
+                logging.info("Test is not applicable to this endpoint - skipping test")
+                asserts.skip('Endpoint does not match test requirements')
                 return
-            logging.info(f"Running test on the following endpoints: {endpoints}")
-            # setup_class is meant to be called once, but setup_test is expected to be run before
-            # each iteration. Mobly will run it for us the first time, but since we're running this
-            # more than one time, we want to make sure we reset everything as expected.
-            # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hook that
-            # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
-            # on failure.
-            for e in endpoints:
-                logging.info(f'Running test on endpoint {e}')
-                if e != endpoints[0]:
-                    self.setup_test()
-                self.matter_test_config.endpoint = e
-                _async_runner(body, self, *args, **kwargs)
-                if e != endpoints[-1] and not self.failed:
-                    self.teardown_test()
-                    test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
-                    self.runner_hook.test_stop(exception=None, duration=test_duration)
-            self.matter_test_config.endpoint = None
+            logging.info(f'Running test on endpoint {self.matter_test_config.endpoint}')
+            _async_runner(body, self, *args, **kwargs)
         return per_endpoint_runner
-    return run_for_each_matching_endpoint_internal
+    return run_if_endpoint_matches_internal
 
 
 class CommissionDeviceTest(MatterBaseTest):
