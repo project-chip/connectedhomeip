@@ -92,6 +92,12 @@ public:
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
+
+        if (ec->HasSessionHandle() && ec->GetSessionHolder()->IsSecureSession())
+        {
+            mLastSubjectDescriptor = ec->GetSessionHolder()->AsSecureSession()->GetSubjectDescriptor();
+        }
+
         if (payloadHeader.IsAckMsg())
         {
             mReceivedPiggybackAck = true;
@@ -125,8 +131,6 @@ public:
 
         EXPECT_EQ(buffer->TotalLength(), sizeof(PAYLOAD));
         EXPECT_EQ(memcmp(buffer->Start(), PAYLOAD, buffer->TotalLength()), 0);
-
-        mLastSubjectDescriptor = ec->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
 
         return CHIP_NO_ERROR;
     }

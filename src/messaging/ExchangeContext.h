@@ -163,7 +163,7 @@ public:
         return std::move(sessionHandle.Value());
     }
 
-    bool HasSessionHandle() const { return mSession; }
+    bool HasSessionHandle() const { return (bool)mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
