@@ -412,13 +412,7 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 
-    if (numberOfPresetsSupported == 0)
-    {
-        ChipLogError(Zcl, "AppendPendingPreset: Failed to get NumberOfPresets");
-        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
-    }
-
-    if (numberOfPresetsSupported > 0 && totalExpectedCount > numberOfPresetsSupported)
+    if (totalExpectedCount > numberOfPresetsSupported)
     {
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
