@@ -102,7 +102,7 @@ class DRLK_COMMON:
             timedRequestTimeoutMs=1000
         )
 
-    async def read_and_verify_pincode_length(self,attribute,failure_message: str, min_range=0, max_range=255):
+    async def read_and_verify_pincode_length(self, attribute, failure_message: str, min_range=0, max_range=255):
         pin_code_length = await self.read_drlk_attribute_expect_success(attribute=attribute)
         verify_pin_code_length = True if min_range <= pin_code_length <= max_range else False
         asserts.assert_true(verify_pin_code_length, f"{failure_message}, got value {pin_code_length}")
@@ -173,35 +173,35 @@ class DRLK_COMMON:
                 self.print_step("4a", "TH writes the RequirePINforRemoteOperation attribute value as true on the DUT")
                 await self.set_user_command()
         if self.check_pics("DRLK.S.F00"):
-                self.print_step("4b", "TH reads MinPINCodeLength attribute and saves the value")
-                min_pin_code_length = await self.read_and_verify_pincode_length(
-                    attribute=Clusters.DoorLock.Attributes.MinPINCodeLength,
-                    failure_message="MinPINCodeLength attribute must be between 0 to 255"
-                )
-                self.print_step("4c", "TH reads MaxPINCodeLength attribute and saves the value")
-                max_pin_code_length = await self.read_and_verify_pincode_length(
-                    attribute=Clusters.DoorLock.Attributes.MaxPINCodeLength,
-                    failure_message=f"MinPINCodeLength attribute must be between 0 to 255"
-                )
-                self.print_step("4d", "Generate credential data and store as pin_code,Th sends SetCredential command"
-                                      "using pin_code")
-                credential_data_generated = await self.generate_pincode(max_pin_code_length, min_pin_code_length)
-                pin_code = bytes(credential_data_generated, "ascii")
-                if self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx"):
-                    set_cred_response = await self.send_set_credential_cmd(userIndex=1,
-                                                                           operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
-                                                                           credential=credential,
-                                                                           credentialData=pin_code,
-                                                                           userStatus=NullValue,
-                                                                           userType=NullValue
-                                                                           )
-                    asserts.assert_true(
-                        type_matches(set_cred_response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
-                        "Unexpected return type for SetCredential")
-                self.print_step("4e", f"TH sends {lockUnlockText} Command to the DUT with PINCode as pin_code.")
-                if self.check_pics(lockUnlockCmdRspPICS):
-                    command = lockUnlockCommand(PINCode=pin_code)
-                    await self.send_drlk_cmd_expect_success(command=command)
+            self.print_step("4b", "TH reads MinPINCodeLength attribute and saves the value")
+            min_pin_code_length = await self.read_and_verify_pincode_length(
+                attribute=Clusters.DoorLock.Attributes.MinPINCodeLength,
+                failure_message="MinPINCodeLength attribute must be between 0 to 255"
+            )
+            self.print_step("4c", "TH reads MaxPINCodeLength attribute and saves the value")
+            max_pin_code_length = await self.read_and_verify_pincode_length(
+                attribute=Clusters.DoorLock.Attributes.MaxPINCodeLength,
+                failure_message=f"MinPINCodeLength attribute must be between 0 to 255"
+            )
+            self.print_step("4d", "Generate credential data and store as pin_code,Th sends SetCredential command"
+                                  "using pin_code")
+            credential_data_generated = await self.generate_pincode(max_pin_code_length, min_pin_code_length)
+            pin_code = bytes(credential_data_generated, "ascii")
+            if self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx"):
+                set_cred_response = await self.send_set_credential_cmd(userIndex=1,
+                                                                       operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                                                                       credential=credential,
+                                                                       credentialData=pin_code,
+                                                                       userStatus=NullValue,
+                                                                       userType=NullValue
+                                                                       )
+                asserts.assert_true(
+                    type_matches(set_cred_response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
+                    "Unexpected return type for SetCredential")
+            self.print_step("4e", f"TH sends {lockUnlockText} Command to the DUT with PINCode as pin_code.")
+            if self.check_pics(lockUnlockCmdRspPICS):
+                command = lockUnlockCommand(PINCode=pin_code)
+                await self.send_drlk_cmd_expect_success(command=command)
 
         if self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F07"):
             self.print_step("5", "TH writes the RequirePINforRemoteOperation attribute value as true on the DUT")
@@ -286,14 +286,12 @@ class DRLK_COMMON:
             if not doAutoRelockTest:
                 self.print_step("15", "Send %s with valid Pincode and verify success" % lockUnlockText)
                 credentials = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
-                                                              credentialType=Clusters.DoorLock.Enums.CredentialTypeEnum.kPin)
+                                                               credentialType=Clusters.DoorLock.Enums.CredentialTypeEnum.kPin)
                 command = lockUnlockCommand(PINCode=pin_code)
                 await self.send_drlk_cmd_expect_success(command=command)
 
                 await self.cleanup_users_and_credentials(user_clear_step="17", clear_credential_step="16",
                                                          credentials=credentials, userIndex=1)
-
-
 
         if doAutoRelockTest:
             if self.check_pics("DRLK.S.A0023"):
