@@ -210,6 +210,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
                      "Verify that the write request is rejected"),
             TestStep("16", "TH starts an atomic write, and before it's complete, TH2 removes TH's fabric; TH2 then opens an atomic write",
                      "Verify that the atomic request is successful"),
+            TestStep("17", "TH writes to the Presets attribute with a preset that has a presetScenario not present in PresetTypes attribute",
+                     "Verify that the write request returned CONSTRAINT_ERROR (0x87)."),
+            TestStep("18", "TH writes to the Presets attribute such that the total number of presets is greater than the number of presets supported",
+                     "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
         ]
 
         return steps
@@ -461,7 +465,41 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Roll back
             await self.send_atomic_request_rollback_command()
 
-        # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
+        self.step("17")
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+            test_presets = new_presets_with_handle.copy()
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=9,
+                                                             name="Wake", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+
+            # Send the AtomicRequest begin command
+            await self.send_atomic_request_begin_command()
+
+            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+            # Clear state for next test.
+            await self.send_atomic_request_rollback_command()
+
+        self.step("18")
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+
+            # Read the active preset handle attribute and verify it was updated to preset handle
+            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
+            logger.info(f"Rx'd PresetTypes: {presetTypes}")
+
+            test_presets = copy.deepcopy(new_presets_with_handle)
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+                                                             name="Wake", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kVacation,
+                                                             name="Vacation", coolingSetpoint=2400, heatingSetpoint=1800, builtIn=False))
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kGoingToSleep,
+                                                             name="GoingToSleep", coolingSetpoint=2300, heatingSetpoint=1900, builtIn=False))
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kUserDefined,
+                                                             name="UserDefined", coolingSetpoint=2300, heatingSetpoint=1900, builtIn=False))
+
+            # Send the AtomicRequest begin command
+            await self.send_atomic_request_begin_command()
+
+            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
 
 
 if __name__ == "__main__":
