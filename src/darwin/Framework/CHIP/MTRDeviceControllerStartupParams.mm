@@ -320,7 +320,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
     return fabricID;
 }
 
-+ (NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate
++ (nullable NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate
 {
     Crypto::P256PublicKey pubKey;
     if (ExtractPubkeyFromX509Cert(AsByteSpan(certificate), pubKey) != CHIP_NO_ERROR) {

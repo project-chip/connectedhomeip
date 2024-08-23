@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc;
 + (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc;
-+ (NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate;
++ (nullable NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate;
 
 @end
 

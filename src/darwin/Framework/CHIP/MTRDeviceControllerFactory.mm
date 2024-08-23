@@ -1133,7 +1133,7 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (nullable MTRDeviceController *)_findControllerMatchingParams:(MTRDeviceControllerParameters *)parameters
+- (nullable MTRDeviceController *)_findControllerWithPendingShutdownMatchingParams:(MTRDeviceControllerParameters *)parameters
 {
     std::lock_guard lock(_controllersLock);
     for (MTRDeviceController * controller in _controllers) {
@@ -1152,7 +1152,7 @@ MTR_DIRECT_MEMBERS
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    // If there is a controller already running with matching parameters, re-use it
+    // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
     MTRDeviceController * existingController = [self _findControllerMatchingParams:parameters];
     if (existingController) {
         return existingController;

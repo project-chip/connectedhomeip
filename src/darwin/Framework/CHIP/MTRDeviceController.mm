@@ -352,7 +352,7 @@ using namespace chip::Tracing::DarwinFramework;
     // Only take an assertion if running
     if ([self isRunning]) {
         ++_keepRunningAssertionCounter;
-        MTR_LOG("%@ Adding keep running assertion, total %lu", self, (unsigned long) _keepRunningAssertionCounter);
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
     }
 }
 
@@ -362,7 +362,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     if (_keepRunningAssertionCounter > 0) {
         --_keepRunningAssertionCounter;
-        MTR_LOG("%@ Removing keep running assertion, total %lu", self, (unsigned long) _keepRunningAssertionCounter);
+        MTR_LOG("%@ Removing keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
 
         if ([self isRunning] && _keepRunningAssertionCounter == 0 && _shutdownPending) {
             MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
@@ -382,7 +382,7 @@ using namespace chip::Tracing::DarwinFramework;
     std::lock_guard lock(_assertionLock);
 
     if (_keepRunningAssertionCounter > 0) {
-        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, (unsigned long) _keepRunningAssertionCounter);
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
         _shutdownPending = YES;
         return;
     }
