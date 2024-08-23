@@ -336,17 +336,13 @@ using namespace chip::Tracing::DarwinFramework;
     if (!parameters.operationalCertificate || !parameters.rootCertificate) {
         return FALSE;
     }
-    NSNumber *nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
-    NSNumber *fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:parameters.operationalCertificate];
-    NSData *publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:parameters.rootCertificate];
+    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
+    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:parameters.operationalCertificate];
+    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:parameters.rootCertificate];
 
     std::lock_guard lock(_assertionLock);
 
-    return  _keepRunningAssertionCounter > 0 &&
-            _shutdownPending &&
-            MTREqualObjects(nodeID, self.nodeID) &&
-            MTREqualObjects(fabricID, self.fabricID) &&
-            MTREqualObjects(publicKey, self.rootPublicKey);
+    return _keepRunningAssertionCounter > 0 && _shutdownPending && MTREqualObjects(nodeID, self.nodeID) && MTREqualObjects(fabricID, self.fabricID) && MTREqualObjects(publicKey, self.rootPublicKey);
 }
 
 - (void)addRunAssertion
@@ -701,9 +697,9 @@ using namespace chip::Tracing::DarwinFramework;
 
         chip::Crypto::P256PublicKey rootPublicKey;
         if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
-             self.rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
-             self.nodeID = @(_cppCommissioner->GetNodeId());
-             self.fabricID = @(_cppCommissioner->GetFabricId());
+            self.rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
+            self.nodeID = @(_cppCommissioner->GetNodeId());
+            self.fabricID = @(_cppCommissioner->GetFabricId());
         }
 
         commissionerInitialized = YES;
