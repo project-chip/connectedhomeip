@@ -17,6 +17,7 @@
 
 #include "thermostat-server.h"
 
+#include <app/GlobalAttributes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -46,6 +47,8 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
     gThermostatAttrAccess.ResetAtomicWrite(endpoint);
 }
+
+namespace {
 
 /**
  * @brief Schedules a timer for the given timeout in milliseconds.
@@ -185,14 +188,24 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
         const EmberAfAttributeMetadata * metadata =
             emberAfLocateAttributeMetadata(endpoint, Thermostat::Id, attributeStatus.attributeID);
 
-        if (metadata == nullptr)
+        if (metadata != nullptr)
         {
-            // This is not a valid attribute on the Thermostat cluster on the supplied endpoint
-            return Status::InvalidCommand;
+            // This is definitely an attribute we know about.
+            continue;
         }
+
+        if (IsSupportedGlobalAttributeNotInMetadata(attributeStatus.attributeID))
+        {
+            continue;
+        }
+
+        // This is not a valid attribute on the Thermostat cluster on the supplied endpoint
+        return Status::InvalidCommand;
     }
     return Status::Success;
 }
+
+} // anonymous namespace
 
 bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId)
 {
@@ -422,6 +435,10 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
     status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
+        // If we've gotten this far, then the client has manage permission to call AtomicRequest,
+        // which is also the privilege necessary to write to the atomic attributes, so no need to do
+        // the "If the client does not have sufficient privilege to write to the attribute" check
+        // from the spec.
         auto & attributeStatus = attributeStatuses[i];
         auto statusCode        = Status::Success;
         switch (attributeStatus.attributeID)
@@ -442,11 +459,6 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
     }
 
     auto timeout = std::min(System::Clock::Milliseconds16(commandData.timeout.Value()), maximumTimeout);
-    if (timeout.count() == 0)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return;
-    }
 
     if (status == Status::Success)
     {
@@ -604,9 +616,6 @@ bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, 
                                                    const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     auto & requestType = commandData.requestType;
-
-    // If we've gotten this far, then the client has manage permission to call AtomicRequest, which is also the
-    // privilege necessary to write to the atomic attributes, so no need to check
 
     switch (requestType)
     {
