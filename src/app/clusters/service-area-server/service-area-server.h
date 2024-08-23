@@ -19,6 +19,7 @@
 #pragma once
 
 #include "service-area-cluster-objects.h"
+#include "service-area-memory-delegate.h"
 #include "service-area-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -56,7 +57,7 @@ public:
      *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
+    Instance(MemoryDelegate * memoryDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
 
     ~Instance() override;
 
@@ -68,12 +69,15 @@ public:
 
     /**
      * @brief Initialise the Service Area server instance.
-     * @return an error if the given endpoint and cluster Id have not been enabled in zap or if the
-     *         CommandHandler or AttributeHandler registration fails, else CHIP_NO_ERROR.
+     * @return CHIP_NO_ERROR if there are on errors. Returns an error if
+     *   - the given endpoint and cluster ID have not been enabled in zap
+     *   - if the CommandHandler or AttributeHandler registration fails
+     *   - if the MemoryDelegate or Delegate initialisation fails.
      */
     CHIP_ERROR Init();
 
 private:
+    MemoryDelegate * mMemoryDelegate;
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
@@ -137,12 +141,7 @@ private:
     void NotifyProgressChanged();
 
     //*************************************************************************
-    // Supported Areas manipulators
-
-    /**
-     * @return true if an area with the aAreaId ID exists in the supported areas attribute. False otherwise.
-     */
-    bool IsSupportedArea(uint32_t aAreaId);
+    // Supported Areas helpers
 
     /**
      * @brief Check if the given area adheres to the restrictions required by the supported areas attribute.
@@ -168,6 +167,28 @@ private:
     bool ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
 public:
+    //*************************************************************************
+    // Supported Areas accessors and manipulators
+
+    uint32_t GetNumberOfSupportedAreas();
+
+    /**
+     * @brief Get a supported area using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
+     */
+    bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea);
+
+    /**
+     * @brief Get a supported area that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
+     * @param[out] listIndex the area's index in the list, if found.
+     * @param[out] aSupportedArea a copy of the area contents, if found.
+     * @return true if an area is found, false otherwise.
+     */
+    bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea);
+
     /**
      * @brief Add new location to the supported locations list.
      * @param[in] aNewArea The area to add.
@@ -196,12 +217,26 @@ public:
     bool ClearSupportedAreas();
 
     //*************************************************************************
-    // Supported Maps manipulators
+    // Supported Maps accessors and manipulators
+
+    uint32_t GetNumberOfSupportedMaps();
 
     /**
-     * @return true if a map with the aMapId ID exists in the supported maps attribute. False otherwise.
+     * @brief Get a supported map using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aSupportedMap  copy of the map contents, if found.
+     * @return true if a supported map is found, false otherwise.
      */
-    bool IsSupportedMap(uint32_t aMapId);
+    bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap);
+
+    /**
+     * @brief Get a supported map that matches a mapID.
+     * @param[in] aMapId the mapID to search for.
+     * @param[out] listIndex the map's index in the list, if found.
+     * @param[out] aSupportedMap copy of the location contents, if found.
+     * @return true if a supported map is found, false otherwise.
+     */
+    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
 
     /**
      * @brief Add a new map to the supported maps list.
@@ -229,7 +264,17 @@ public:
     bool ClearSupportedMaps();
 
     //*************************************************************************
-    // Selected Areas manipulators
+    // Selected Areas accessors and manipulators
+
+    uint32_t GetNumberOfSelectedAreas();
+
+    /**
+     * @brief Get a selected area using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] selectedArea the selected area value, if found.
+     * @return true if a selected area is found, false otherwise.
+     */
+    bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea);
 
     /**
      * @brief Add a selected area.
@@ -244,7 +289,7 @@ public:
     bool ClearSelectedAreas();
 
     //*************************************************************************
-    // Current Area manipulators
+    // Current Area accessors and manipulators
 
     DataModel::Nullable<uint32_t> GetCurrentArea();
 
@@ -258,7 +303,7 @@ public:
     bool SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea);
 
     //*************************************************************************
-    // Estimated End Time manipulators
+    // Estimated End Time accessors and manipulators
 
     /**
      * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentArea attribute will be
@@ -274,7 +319,26 @@ public:
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
     //*************************************************************************
-    // Progress list manipulators
+    // Progress list accessors and manipulators
+
+    uint32_t GetNumberOfProgressElements();
+
+    /**
+     * @brief Get a progress element using the position in the list.
+     * @param[in] listIndex the position in the list.
+     * @param[out] aProgressElement  copy of the progress element contents, if found.
+     * @return true if a progress element is found, false otherwise.
+     */
+    bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement);
+
+    /**
+     * @brief Get a progress element that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
+     * @param[out] listIndex the location's index in the list, if found.
+     * @param[out] aProgressElement  copy of the progress element contents, if found.
+     * @return true if a progress element is found, false otherwise.
+     */
+    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement);
 
     /**
      * @brief Add a progress element in a pending status to the progress list.
