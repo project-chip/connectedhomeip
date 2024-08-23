@@ -156,6 +156,8 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
+    bool IsCommissioningSession() const override;
+
     bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
@@ -243,6 +245,12 @@ public:
         {
             MoveToState(State::kActive);
         }
+    }
+
+    void SetCaseCommissioningSessionStatus(bool isCaseCommissioningSession)
+    {
+        VerifyOrDie(GetSecureSessionType() == Type::kCASE);
+        mIsCaseCommissioningSession = isCaseCommissioningSession;
     }
 
     bool IsPeerActive() const
@@ -340,6 +348,8 @@ private:
     SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
+
+    bool mIsCaseCommissioningSession = false;
 };
 
 } // namespace Transport

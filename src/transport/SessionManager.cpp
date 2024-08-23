@@ -1024,6 +1024,13 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kSecureUnicast, &payloadHeader, &packetHeader,
                                     secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
+
+        // Always recompute whether a message is for a commissioning session based on the latest knowledge of
+        // the fabric table.
+        if (secureSession->IsCASESession())
+        {
+            secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() == mFabricTable->GetPendingNewFabricIndex());
+        }
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }
     else
