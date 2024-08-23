@@ -225,6 +225,7 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     if (filterType == Dnssd::DiscoveryFilterType::kCompressedFabricId)
     {
         VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code, 16), false);
+        VerifyOrReturnValue(code != 0, false);
     }
     else
     {
