@@ -76,7 +76,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep("15", "Send KeepActive command with shortest TimeoutMs value while TH_ICD is prevented from sending check-ins"),
             TestStep("16", "Wait 15 seconds then send second KeepActive command with double the TimeoutMs value of the previous step"),
             TestStep("17", "TH allows TH_ICD to resume sending check-ins after timeout from step 15 expired but before second timeout from step 16 still valid"),
-            TestStep("18", "Wait for TH_ICD to check into TH, then confirm we have recieved new event from DUT")]
+            TestStep("18", "Wait for TH_ICD to check into TH, then confirm we have received new event from DUT")]
         return steps
 
     def _ask_for_vendor_commissioniong_ux_operation(self, discriminator, setupPinCode, setupManualCode, setupQRCode):
