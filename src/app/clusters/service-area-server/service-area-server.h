@@ -166,6 +166,15 @@ private:
      */
     bool ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
+    /**
+     * This method will ensure that the values in the Selected Areas, Current Area and Progress attributes correspond to areas in
+     * the Supported Areas attribute.
+     * Any invalid area IDs in the Selected Areas attribute will be removed.
+     * If the Current Area is not in the Selected Areas attribute, it will be set to null.
+     * Any progres elements with area IDs not in the Selected Areas attribute will be removed.
+     */
+    virtual void HandleSupportedAreasUpdated();
+
 public:
     //*************************************************************************
     // Supported Areas accessors and manipulators

@@ -561,6 +561,83 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
+void Instance::HandleSupportedAreasUpdated()
+{
+    // If there are no more Supported Areas, clear all selected areas, current area, and progress.
+    if (GetNumberOfSupportedAreas() == 0)
+    {
+        ClearSelectedAreas();
+        SetCurrentArea(DataModel::NullNullable);
+        ClearProgress();
+        return;
+    }
+
+    // Remove Selected Areas elements that do not exist is the Supported Areas attribute.
+    {
+        uint32_t i = 0;
+        uint32_t areaId = 0;
+        uint32_t areasToRemoveIndex = 0;
+        uint32_t areasToRemoveBuffer[kMaxNumSelectedAreas];
+        Span<uint32_t> areasToRemoveSpan(areasToRemoveBuffer);
+
+        while (GetSelectedAreaByIndex(i, areaId))
+        {
+            if (!mMemoryDelegate->IsSupportedArea(areaId))
+            {
+                areasToRemoveSpan[areasToRemoveIndex] = areaId;
+                areasToRemoveIndex++;
+            }
+            i++;
+        }
+        areasToRemoveSpan.reduce_size(areasToRemoveIndex);
+
+        for (auto id : areasToRemoveSpan)
+        {
+            if (!RemoveSelectedAreas(id))
+            {
+                ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove area %" PRIu32 " from selected areas", id);
+            }
+        }
+    }
+
+    // Set current Area to null if current area is not in the supported areas attribute.
+    {
+        auto currentAreaId = GetCurrentArea();
+        if (!currentAreaId.IsNull() && !mMemoryDelegate->IsSupportedArea(currentAreaId.Value()))
+        {
+            SetCurrentArea(DataModel::NullNullable);
+        }
+    }
+
+    // Remove Progress elements associated with areas that do not exist is the Supported Areas attribute.
+    {
+        uint32_t i = 0;
+        Structs::ProgressStruct::Type tempProgressElement;
+        uint32_t progressToRemoveIndex = 0;
+        uint32_t progressToRemoveBuffer[kMaxNumProgressElements];
+        Span<uint32_t> progressToRemoveSpan(progressToRemoveBuffer);
+
+        while(mMemoryDelegate->GetProgressElementByIndex(i, tempProgressElement))
+        {
+            if (mMemoryDelegate->IsSupportedArea(tempProgressElement.areaID))
+            {
+                progressToRemoveSpan[progressToRemoveIndex] = tempProgressElement.areaID;
+                progressToRemoveIndex++;
+            }
+            i++;
+        }
+        progressToRemoveSpan.reduce_size(progressToRemoveIndex);
+
+        for (auto areaId : progressToRemoveSpan)
+        {
+            if (!mMemoryDelegate->RemoveProgressElement(areaId))
+            {
+                ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove progress element with area ID %" PRIu32 "", areaId);
+            }
+        }
+    }
+}
+
 uint32_t Instance::GetNumberOfSupportedAreas()
 {
     return mMemoryDelegate->GetNumberOfSupportedAreas();
@@ -669,7 +746,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
 
     if (mapIDChanged)
     {
-        mDelegate->HandleSupportedAreasUpdated();
+        HandleSupportedAreasUpdated();
     }
 
     NotifySupportedAreasChanged();
@@ -686,7 +763,7 @@ bool Instance::ClearSupportedAreas()
 
     if (mMemoryDelegate->ClearSupportedAreas())
     {
-        mDelegate->HandleSupportedAreasUpdated();
+        HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
         return true;
     }
@@ -698,7 +775,7 @@ bool Instance::RemoveSupportedArea(uint32_t areaId)
 {
     if (mMemoryDelegate-> RemoveSupportedArea(areaId))
     {
-        mDelegate->HandleSupportedAreasUpdated();
+        HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
         return true;
     }
@@ -889,7 +966,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
         {
             mMemoryDelegate->RemoveSupportedArea(supportedAreaId);
         }
-        mDelegate->HandleSupportedAreasUpdated();
+        HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
     }
 

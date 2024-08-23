@@ -129,23 +129,6 @@ public:
     virtual bool IsSupportedAreasChangeAllowed() = 0;
 
     /**
-     * @brief Ensure that when the Supported locations is modified, the required restrictions for the SelectedAreas,
-     * CurrentArea, and Progress attributes are maintained.
-     *
-     * This method will be called by the SDK whenever the adherence to the restrictions for these attributes cannot be guaranteed.
-     * For example, if there are deletions in the SupportedMops or SupportedAreas attributes, or if there are changes to their
-     * IDs. This method will no be called if the changes made to the SupportedMops or SupportedAreas attributes, ensure that the
-     * restrictions are adhered. For example, if there are additions or the modifications do not involve changing IDs in the
-     * SupportedMops or SupportedAreas attributes.
-     *
-     * The default implementation will set the SelectedAreas, CurrentArea, and Progress attributes to null.
-     *
-     * The user is free the redefine this method as their device may have more information on what has changed and may be able to
-     * maintain the restrictions on these attributes by selectively editing them.
-     */
-    virtual void HandleSupportedAreasUpdated();
-
-    /**
      * @return true if the current device state allows the SupportedMaps attribute to be updated.
      *
      * @note The SupportedMaps attribute list changes (adding or deleting entries,
