@@ -181,7 +181,7 @@ class DRLK_COMMON:
             self.print_step("4c", "TH reads MaxPINCodeLength attribute and saves the value")
             max_pin_code_length = await self.read_and_verify_pincode_length(
                 attribute=Clusters.DoorLock.Attributes.MaxPINCodeLength,
-                failure_message=f"MinPINCodeLength attribute must be between 0 to 255"
+                failure_message="MinPINCodeLength attribute must be between 0 to 255"
             )
             self.print_step("4d", "Generate credential data and store as pin_code,Th sends SetCredential command"
                                   "using pin_code")
