@@ -342,6 +342,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     std::lock_guard lock(_assertionLock);
 
+    // If any of the local above are nil, the return will be false since MTREqualObjects handles them correctly
     return _keepRunningAssertionCounter > 0 && _shutdownPending && MTREqualObjects(nodeID, self.nodeID) && MTREqualObjects(fabricID, self.fabricID) && MTREqualObjects(publicKey, self.rootPublicKey);
 }
 

@@ -1153,7 +1153,7 @@ MTR_DIRECT_MEMBERS
     [self _assertCurrentQueueIsNotMatterQueue];
 
     // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
-    MTRDeviceController * existingController = [self _findControllerMatchingParams:parameters];
+    MTRDeviceController * existingController = [self _findControllerWithPendingShutdownMatchingParams:parameters];
     if (existingController) {
         return existingController;
     }
