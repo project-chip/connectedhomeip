@@ -15,8 +15,6 @@
  */
 
 #import "MTRDeviceControllerStartupParams.h"
-#include <MTRDefines.h>
-#include <lib/core/CHIPError.h>
 #import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"

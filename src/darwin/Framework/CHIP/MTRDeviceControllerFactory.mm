@@ -15,7 +15,6 @@
  */
 
 #import "MTRDeviceControllerFactory.h"
-#include <MTRDeviceController_Concrete.h>
 #import "MTRDeviceControllerFactory_Internal.h"
 
 #import <Matter/MTRDefines.h>
