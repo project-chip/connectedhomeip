@@ -50,20 +50,19 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
-            TestStep("2", "TH reads HeaterTypes attribute.",
-                     "DUT as Server replies with a WaterHeaterHeatSourceBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
-            TestStep("3", "TH reads HeatDemand attribute.",
-                     "DUT as Server replies with a WaterHeaterHeatSourceBitmap (enum8)."),
-            TestStep("4", "TH reads TankVolume attribute.",
-                     "DUT as Server replies with a uint16 value."),
-            TestStep("5", "TH reads EstimatedHeatRequired attribute.",
-                     "DUT as Server replies with an energy-mWh value."),
-            TestStep("6", "TH reads TankPercentage attribute.",
-                     "DUT as Server replies with a percent value."),
-            TestStep("7", "TH reads BoostState attribute.",
-                     "DUT as Server replies with a BoostStateEnum (enum8) value."),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
+            TestStep("2", "TH reads from the DUT the HeaterTypes attribute.",
+                     "Verify that the DUT response contains a WaterHeaterTypeBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)"),
+            TestStep("3", "TH reads from the DUT the HeatDemand attribute.",
+                     "Verify that the DUT response contains a WaterHeaterDemandBitmap (enum8)."),
+            TestStep("4", "TH reads from the DUT the TankVolume attribute.",
+                     "Verify that the DUT response contains a uint16 value."),
+            TestStep("5", "TH reads from the DUT the EstimatedHeatRequired attribute.",
+                     "Verify that the DUT response contains an energy-mWh value."),
+            TestStep("6", "TH reads from the DUT the TankPercentage attribute.",
+                     "Verify that the DUT response contains a percent value."),
+            TestStep("7", "TH reads from the DUT the BoostState attribute.",
+                     "Verify that the DUT response contains a BoostStateEnum (enum8) value."),
         ]
 
         return steps
