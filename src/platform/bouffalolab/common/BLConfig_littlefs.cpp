@@ -20,8 +20,8 @@ extern "C" {
 #include <lfs_port.h>
 }
 
-#include <platform/bouffalolab/common/BLConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/bouffalolab/common/BLConfig.h>
 
 #ifndef BLCONFIG_LFS_NAMESPACE
 #define BLCONFIG_LFS_NAMESPACE "/_blcfg_"
