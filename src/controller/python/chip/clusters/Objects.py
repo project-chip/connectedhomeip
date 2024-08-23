@@ -31358,14 +31358,13 @@ class ServiceArea(Cluster):
         class SelectAreasStatus(MatterIntEnum):
             kSuccess = 0x00
             kUnsupportedArea = 0x01
-            kDuplicatedAreas = 0x02
-            kInvalidInMode = 0x03
-            kInvalidSet = 0x04
+            kInvalidInMode = 0x02
+            kInvalidSet = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 4,
 
         class SkipAreaStatus(MatterIntEnum):
             kSuccess = 0x00

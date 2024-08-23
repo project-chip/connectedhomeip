@@ -240,63 +240,71 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         }
     }
 
+    uint32_t selectedAreasBuffer[kMaxNumSelectedAreas];
+    auto selectedAreasSpan         = Span<uint32_t>(selectedAreasBuffer, kMaxNumSelectedAreas);
+    uint32_t numberOfSelectedAreas = 0;
+
+    // Closure for checking if an area ID exists in the selectedAreasSpan
+    auto areaAlreadyExists = [&numberOfSelectedAreas, &selectedAreasSpan](uint32_t areaId) {
+        for (uint32_t i = 0; i < numberOfSelectedAreas; i++)
+        {
+            if (areaId == selectedAreasSpan[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
     bool matchesCurrentSelectedAreas = (numberOfAreas == mDelegate->GetNumberOfSelectedAreas());
 
+    // do as much parameter validation as we can
     if (numberOfAreas != 0)
     {
-        // do as much parameter validation as we can
+        uint32_t ignoredIndex = 0;
+        uint32_t oldSelectedArea;
+        auto iAreaIter = req.newAreas.begin();
+        while (iAreaIter.Next())
         {
-            uint32_t ignoredIndex = 0;
-            uint32_t oldSelectedArea;
-            uint32_t i     = 0;
-            auto iAreaIter = req.newAreas.begin();
-            while (iAreaIter.Next())
+            uint32_t selectedArea = iAreaIter.GetValue();
+
+            // If aSelectedArea is already in selectedAreasSpan skip
+            if (areaAlreadyExists(selectedArea))
             {
-                uint32_t aSelectedArea = iAreaIter.GetValue();
-
-                // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
-                // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
-                if (!IsSupportedArea(aSelectedArea))
-                {
-                    exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
-                    return;
-                }
-
-                // Checking for duplicate locations.
-                uint32_t j     = 0;
-                auto jAreaIter = req.newAreas.begin();
-                while (j < i)
-                {
-                    jAreaIter.Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
-                    if (jAreaIter.GetValue() == aSelectedArea)
-                    {
-                        exitResponse(SelectAreasStatus::kDuplicatedAreas, ""_span);
-                        return;
-                    }
-                    j += 1;
-                }
-
-                // check to see if parameter list and attribute still match
-                if (matchesCurrentSelectedAreas)
-                {
-                    if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) || (aSelectedArea != oldSelectedArea))
-                    {
-                        matchesCurrentSelectedAreas = false;
-                    }
-                }
-
-                i += 1;
+                continue;
             }
 
-            // after iterating with Next through DecodableType - check for failure
-            if (CHIP_NO_ERROR != iAreaIter.GetStatus())
+            // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
+            // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
+            if (!IsSupportedArea(selectedArea))
             {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
                 return;
             }
+
+            // check to see if parameter list and attribute still match
+            if (matchesCurrentSelectedAreas)
+            {
+                if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) || (selectedArea != oldSelectedArea))
+                {
+                    matchesCurrentSelectedAreas = false;
+                }
+            }
+
+            selectedAreasSpan[numberOfSelectedAreas] = selectedArea;
+            numberOfSelectedAreas += 1;
+        }
+
+        // after iterating with Next through DecodableType - check for failure
+        if (CHIP_NO_ERROR != iAreaIter.GetStatus())
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
         }
     }
+
+    selectedAreasSpan.reduce_size(numberOfSelectedAreas);
 
     // If the newAreas field is the same as the value of the SelectedAreas attribute
     // the SelectAreasResponse command SHALL have the Status field set to Success and
@@ -327,7 +335,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // ask the device to handle SelectAreas Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
     auto locationStatus = SelectAreasStatus::kSuccess;
-    if (!mDelegate->IsValidSelectAreasSet(req, locationStatus, delegateStatusText))
+    if (!mDelegate->IsValidSelectAreasSet(selectedAreasSpan, locationStatus, delegateStatusText))
     {
         exitResponse(locationStatus, delegateStatusText);
         return;
@@ -342,11 +350,10 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
         if (numberOfAreas != 0)
         {
-            auto locationIter = req.newAreas.begin();
             uint32_t ignored;
-            while (locationIter.Next())
+            for (uint32_t areaId : selectedAreasSpan)
             {
-                mDelegate->AddSelectedArea(locationIter.GetValue(), ignored);
+                mDelegate->AddSelectedArea(areaId, ignored);
             }
         }
 
