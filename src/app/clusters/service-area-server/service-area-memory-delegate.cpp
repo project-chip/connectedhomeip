@@ -81,7 +81,8 @@ bool MemoryDelegate::IsSelectedArea(uint32_t aAreaId)
     return false;
 }
 
-bool MemoryDelegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool MemoryDelegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
+                                            Structs::ProgressStruct::Type & aProgressElement)
 {
     listIndex = 0;
 

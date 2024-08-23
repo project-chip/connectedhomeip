@@ -19,8 +19,8 @@
 #pragma once
 
 #include "service-area-cluster-objects.h"
-#include "service-area-memory-delegate.h"
 #include "service-area-delegate.h"
+#include "service-area-memory-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/AttributeAccessInterface.h>

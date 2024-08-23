@@ -574,8 +574,8 @@ void Instance::HandleSupportedAreasUpdated()
 
     // Remove Selected Areas elements that do not exist is the Supported Areas attribute.
     {
-        uint32_t i = 0;
-        uint32_t areaId = 0;
+        uint32_t i                  = 0;
+        uint32_t areaId             = 0;
         uint32_t areasToRemoveIndex = 0;
         uint32_t areasToRemoveBuffer[kMaxNumSelectedAreas];
         Span<uint32_t> areasToRemoveSpan(areasToRemoveBuffer);
@@ -617,7 +617,7 @@ void Instance::HandleSupportedAreasUpdated()
         uint32_t progressToRemoveBuffer[kMaxNumProgressElements];
         Span<uint32_t> progressToRemoveSpan(progressToRemoveBuffer);
 
-        while(mMemoryDelegate->GetProgressElementByIndex(i, tempProgressElement))
+        while (mMemoryDelegate->GetProgressElementByIndex(i, tempProgressElement))
         {
             if (mMemoryDelegate->IsSupportedArea(tempProgressElement.areaID))
             {
@@ -632,7 +632,8 @@ void Instance::HandleSupportedAreasUpdated()
         {
             if (!mMemoryDelegate->RemoveProgressElementRaw(areaId))
             {
-                ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove progress element with area ID %" PRIu32 "", areaId);
+                ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove progress element with area ID %" PRIu32 "",
+                             areaId);
             }
         }
     }
@@ -945,7 +946,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
     Span<uint32_t> supportedAreaIdsSpan(supportedAreaIdsBuffer);
     {
         uint32_t supportedAreaIdsSize = 0;
-        uint32_t supportedAreasIndex = 0;
+        uint32_t supportedAreasIndex  = 0;
         AreaStructureWrapper tempSupportedArea;
         while (mMemoryDelegate->GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
         {

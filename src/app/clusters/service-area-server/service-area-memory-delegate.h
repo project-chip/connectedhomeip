@@ -272,7 +272,6 @@ public:
      * @return ture if the progress element was removed, false otherwise.
      */
     virtual bool RemoveProgressElementRaw(uint32_t areaId) = 0;
-
 };
 
 } // namespace ServiceArea

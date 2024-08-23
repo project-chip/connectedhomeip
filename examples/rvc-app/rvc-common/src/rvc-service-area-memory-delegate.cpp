@@ -42,7 +42,8 @@ bool RvcServiceAreaMemoryDelegate::GetSupportedAreaByIndex(uint32_t listIndex, A
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex, AreaStructureWrapper & supportedArea)
+bool RvcServiceAreaMemoryDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex,
+                                                        AreaStructureWrapper & supportedArea)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -289,7 +290,6 @@ bool RvcServiceAreaMemoryDelegate::RemoveSelectedAreasRaw(uint32_t areaId)
     }
 
     return false;
-
 }
 
 //*************************************************************************
@@ -312,7 +312,7 @@ bool RvcServiceAreaMemoryDelegate::GetProgressElementByIndex(uint32_t listIndex,
 };
 
 bool RvcServiceAreaMemoryDelegate::GetProgressElementById(uint32_t aAreaID, uint32_t & listIndex,
-                                                    Structs::ProgressStruct::Type & aProgressElement)
+                                                          Structs::ProgressStruct::Type & aProgressElement)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -333,7 +333,8 @@ bool RvcServiceAreaMemoryDelegate::GetProgressElementById(uint32_t aAreaID, uint
     return false;
 };
 
-bool RvcServiceAreaMemoryDelegate::AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
+bool RvcServiceAreaMemoryDelegate::AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement,
+                                                         uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.

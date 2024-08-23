@@ -2,8 +2,8 @@
 
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
-#include "rvc-service-area-memory-delegate.h"
 #include "rvc-service-area-delegate.h"
+#include "rvc-service-area-memory-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
