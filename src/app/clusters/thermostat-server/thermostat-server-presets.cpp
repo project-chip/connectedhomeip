@@ -408,7 +408,7 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     uint8_t numberOfPendingPresets = CountNumberOfPendingPresets(delegate);
 
     // We will be adding one more preset, so reject if the length is already at max.
-    if (numberOfPendingPresets >= numberOfPresetsSupported)
+    if (numberOfPendingPresets >= delegate->GetNumberOfPresets())
     {
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
