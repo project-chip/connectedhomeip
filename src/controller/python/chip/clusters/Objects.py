@@ -31392,11 +31392,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.LandmarkTag),
-                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
+                        ClusterObjectFieldDescriptor(Label="relativePositionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
                     ])
 
             landmarkTag: 'Globals.Enums.LandmarkTag' = 0
-            positionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
+            relativePositionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
 
         @dataclass
         class AreaInfoStruct(ClusterObject):
@@ -31419,12 +31419,12 @@ class ServiceArea(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mapID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="areaDesc", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
+                        ClusterObjectFieldDescriptor(Label="areaInfo", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
                     ])
 
             areaID: 'uint' = 0
             mapID: 'typing.Union[Nullable, uint]' = NullValue
-            areaDesc: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
+            areaInfo: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
 
         @dataclass
         class MapStruct(ClusterObject):

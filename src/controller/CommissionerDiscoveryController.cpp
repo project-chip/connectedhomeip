@@ -173,6 +173,11 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         ChipLogError(Controller, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
     }
+    else
+    {
+        // Store rotating ID string. Don't include null terminator character.
+        mRotatingId = std::string{ rotatingIdString, state.GetRotatingIdLength() * 2 };
+    }
 
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
@@ -462,6 +467,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
+
             client->SetCachedCommissionerPasscode(passcode);
             client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
@@ -637,10 +643,13 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mVendorId  = vendorId;
     mProductId = productId;
     mNodeId    = nodeId;
+
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        auto rotatingIdSpan = CharSpan{ mRotatingId.data(), mRotatingId.size() };
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, rotatingIdSpan, mPasscode, exchangeMgr,
+                                                           sessionHandle);
     }
     else
     {
