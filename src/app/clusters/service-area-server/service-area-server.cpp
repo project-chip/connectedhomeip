@@ -694,6 +694,17 @@ bool Instance::ClearSupportedAreas()
     return false;
 }
 
+bool Instance::RemoveSupportedArea(uint32_t areaId)
+{
+    if (mMemoryDelegate-> RemoveSupportedArea(areaId))
+    {
+        mDelegate->HandleSupportedAreasUpdated();
+        NotifySupportedAreasChanged();
+        return true;
+    }
+    return false;
+}
+
 //*************************************************************************
 // Supported Maps manipulators
 
@@ -834,6 +845,55 @@ bool Instance::ClearSupportedMaps()
     }
 
     return false;
+}
+
+bool Instance::RemoveSupportedMap(uint32_t mapId)
+{
+    if (!mMemoryDelegate->RemoveSupportedMap(mapId))
+    {
+        return false;
+    }
+
+    NotifySupportedMapsChanged();
+
+    // If there are no supported maps left, none of the supported areas are vaild and their MapID needs to be null.
+    if (GetNumberOfSupportedMaps() == 0)
+    {
+        ClearSupportedAreas();
+        return true;
+    }
+
+    // Get the supported area IDs where the map ID matches the removed map ID.
+    uint32_t supportedAreaIdsBuffer[kMaxNumSupportedAreas];
+    Span<uint32_t> supportedAreaIdsSpan(supportedAreaIdsBuffer);
+    {
+        uint32_t supportedAreaIdsSize = 0;
+        uint32_t supportedAreasIndex = 0;
+        AreaStructureWrapper tempSupportedArea;
+        while (mMemoryDelegate->GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
+        {
+            if (tempSupportedArea.mapID == mapId)
+            {
+                supportedAreaIdsSpan[supportedAreasIndex] = tempSupportedArea.areaID;
+                supportedAreaIdsSize++;
+            }
+            supportedAreasIndex++;
+        }
+
+        supportedAreaIdsSpan.reduce_size(supportedAreaIdsSize);
+    }
+
+    if (!supportedAreaIdsSpan.empty())
+    {
+        for (uint32_t supportedAreaId : supportedAreaIdsSpan)
+        {
+            mMemoryDelegate->RemoveSupportedArea(supportedAreaId);
+        }
+        mDelegate->HandleSupportedAreasUpdated();
+        NotifySupportedAreasChanged();
+    }
+
+    return true;
 }
 
 //*************************************************************************

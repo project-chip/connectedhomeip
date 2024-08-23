@@ -216,6 +216,15 @@ public:
      */
     bool ClearSupportedAreas();
 
+    /**
+     * Removes the supported area with areaId.
+     * If a supported area is removed, the Delegate's HandleSupportedAreasUpdated method is called to ensure that the
+     * SelectedAreas, CurrentArea, and Progress attributes remain valid.
+     * @param areaId The ID of the area to be removed.
+     * @return true if an area with the areaId was removed. False otherwise.
+     */
+    bool RemoveSupportedArea(uint32_t areaId);
+
     //*************************************************************************
     // Supported Maps accessors and manipulators
 
@@ -262,6 +271,14 @@ public:
      * @note if SupportedMaps is cleared, the delegate's HandleSupportedAreasUpdated method is called.
      */
     bool ClearSupportedMaps();
+
+    /**
+     * Removes the supported map with mapId.
+     * If a supported map is removed, any supported areas that are no longer valid will also be removed.
+     * @param mapId the ID of the map to be removed.
+     * @return true if a map is removed. False otherwise.
+     */
+    bool RemoveSupportedMap(uint32_t mapId);
 
     //*************************************************************************
     // Selected Areas accessors and manipulators

@@ -98,6 +98,12 @@ public:
      */
     virtual bool ClearSupportedAreas() = 0;
 
+    /**
+     * @param areaId the ID af the area to be removed.
+     * @return true if the area was removed, false otherwise.
+     */
+    virtual bool RemoveSupportedArea(uint32_t areaId);
+
     //*************************************************************************
     // Supported Maps accessors and manipulators
 
@@ -153,6 +159,12 @@ public:
      * @return true if supported maps was not already null, false otherwise.
      */
     virtual bool ClearSupportedMaps() = 0;
+
+    /**
+     * @param mapId the ID of the map to be removed.
+     * @return true if a map is removed. False otherwise.
+     */
+    virtual bool RemoveSupportedMap(uint32_t mapId);
 
     //*************************************************************************
     // Selected Areas accessors and manipulators
