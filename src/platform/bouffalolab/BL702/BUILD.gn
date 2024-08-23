@@ -65,11 +65,10 @@ static_library("BL702") {
       "../common/FactoryDataProvider.h",
     ]
   }
-  
+
   if (bouffalo_sdk_component_easyflash_enabled) {
     sources += [ "../common/BLConfig.cpp" ]
-  }
-  else {
+  } else {
     sources += [ "../common/BLConfig_littlefs.cpp" ]
   }
 
