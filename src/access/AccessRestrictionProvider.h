@@ -20,6 +20,7 @@
 
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
+#include "Privilege.h"
 #include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cstdint>
@@ -74,6 +75,42 @@ public:
         EndpointId endpointNumber;
         ClusterId clusterId;
         std::vector<Restriction> restrictions;
+    };
+
+    /**
+     * Defines the interface for a checker for access restriction exceptions.
+     */
+    class AccessRestrictionExceptionChecker
+    {
+        public:
+            virtual ~AccessRestrictionExceptionChecker() = default;
+
+            /**
+             * Check if any restrictions are allowed to be applied to the given request.
+             *
+             * @retval true if restrictions may NOT be applied
+             */
+            virtual bool AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
+                                                   const RequestPath & requestPath) = 0;
+    };
+
+    /**
+     * Define a standard implementation of the AccessRestrictionExceptionChecker interface
+     * which is the default implementation used by AccessResrictionProvider.
+     */
+    class StandardAccessRestrictionExceptionChecker : public AccessRestrictionExceptionChecker
+    {
+        public:
+            StandardAccessRestrictionExceptionChecker() = default;
+            ~StandardAccessRestrictionExceptionChecker() = default;
+
+            /**
+             * Check if any restrictions are allowed to be applied to the given request.
+             *
+             * @retval true if restrictions may NOT be applied
+             */
+            bool AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
+                                           const RequestPath & requestPath) override;
     };
 
     /**
@@ -237,6 +274,7 @@ private:
 
     uint64_t mNextToken   = 1;
     Listener * mListeners = nullptr;
+    StandardAccessRestrictionExceptionChecker mExceptionChecker;
     std::vector<Entry> mCommissioningEntries;
     std::map<FabricIndex, std::vector<Entry>> mFabricEntries;
 };

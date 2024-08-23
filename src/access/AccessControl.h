@@ -674,6 +674,19 @@ private:
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
 
+    /**
+     * Check ACL for whether access (by a subject descriptor, to a request path,
+     * requiring a privilege) should be allowed or denied.
+     */
+    CHIP_ERROR CheckACL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+
+    /**
+     * Check CommissioningARL or ARL (as appropriate) for whether access (by a
+     * subject descriptor, to a request path, requiring a privilege) should
+     * be allowed or denied.
+     */
+    CHIP_ERROR CheckARL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+
 private:
     Delegate * mDelegate = nullptr;
 

@@ -121,11 +121,30 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
     return CHIP_NO_ERROR;
 }
 
+bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
+                                                                         const RequestPath & requestPath)
+{
+    if (requestPath.endpoint == 0 ||
+        requestPath.cluster == app::Clusters::NetworkCommissioning::Id ||
+        requestPath.cluster == app::Clusters::Descriptor::Id)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 CHIP_ERROR AccessRestrictionProvider::CheckForCommissioning(const SubjectDescriptor & subjectDescriptor,
                                                             const RequestPath & requestPath)
 {
+    if (mExceptionChecker.AreRestrictionsDisallowed(subjectDescriptor, requestPath))
+    {
+        return CHIP_NO_ERROR;
+    }
+
     return DoCheck(mCommissioningEntries, subjectDescriptor, requestPath);
 }
+
 CHIP_ERROR AccessRestrictionProvider::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath)
 {
     return DoCheck(mFabricEntries[subjectDescriptor.fabricIndex], subjectDescriptor, requestPath);
@@ -179,25 +198,41 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
                 if (requestPath.requestType == RequestType::kAttributeReadRequest ||
                     requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
+#if 0
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+#else
                     return CHIP_ERROR_ACCESS_DENIED;
+#endif
                 }
                 break;
             case Type::kAttributeWriteForbidden:
                 if (requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
+#if 0
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+#else
                     return CHIP_ERROR_ACCESS_DENIED;
+#endif
                 }
                 break;
             case Type::kCommandForbidden:
                 if (requestPath.requestType == RequestType::kCommandInvokeRequest)
                 {
+#if 0
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+#else
                     return CHIP_ERROR_ACCESS_DENIED;
+#endif
                 }
                 break;
             case Type::kEventForbidden:
                 if (requestPath.requestType == RequestType::kEventReadOrSubscribeRequest)
                 {
+#if 0
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+#else
                     return CHIP_ERROR_ACCESS_DENIED;
+#endif
                 }
                 break;
             }
