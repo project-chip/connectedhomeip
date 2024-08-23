@@ -76,6 +76,15 @@ public:
     void RemoveSyncedDevice(chip::NodeId nodeId);
 
     /**
+     * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
+     *
+     * @param nodeId            The ID of the node being checked.
+     *
+     * @return true if the nodeId matches either the local or remote bridge device; otherwise, false.
+     */
+    bool IsCurrentBridgeDevice(chip::NodeId nodeId) const { return nodeId == mLocalBridgeNodeId || nodeId == mRemoteBridgeNodeId; }
+
+    /**
      * @brief Open the commissioning window for a specific device within its own fabric.
      *
      * This function initiates the process to open the commissioning window for a device identified by the given node ID.
@@ -156,10 +165,10 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
-
 private:
     friend DeviceManager & DeviceMgr();
+
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void RequestCommissioningApproval();
 

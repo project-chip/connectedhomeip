@@ -18,7 +18,6 @@
 
 #include "MatterCastingPlayer-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/Converters-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 #include "core/CastingApp.h"                       // from tv-casting-common
