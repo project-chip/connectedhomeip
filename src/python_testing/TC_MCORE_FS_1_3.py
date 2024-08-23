@@ -19,6 +19,7 @@
 # when reading UniqueID from BasicInformation Cluster. Please specify the app
 # location with --string-arg th_server_app_path:<path_to_app>
 
+import asyncio
 import logging
 import os
 import random
@@ -26,7 +27,6 @@ import subprocess
 import sys
 import tempfile
 import threading
-import time
 import uuid
 
 import chip.clusters as Clusters
@@ -288,8 +288,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         # FIXME: Sometimes the commissioning does not work with the error:
         # > Failed to verify peer's MAC. This can happen when setup code is incorrect.
         # However, the setup code is correct... so we need to investigate why this is happening.
-        # The sleep(1) seems to help, though.
-        time.sleep(1)
+        # The sleep(2) seems to help, though.
+        await asyncio.sleep(2)
 
         th_server_for_th_fsa_th_fsa_node_id = 3
         self.print_step(5, "Commissioning TH_SERVER_FOR_TH_FSA to TH_FSA")
@@ -299,6 +299,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=discriminator,
         )
+
+        # Wait some time, so the dynamic endpoint will appear on the TH_FSA_BRIDGE.
+        await asyncio.sleep(2)
 
         # Get the list of endpoints on the TH_FSA_BRIDGE after adding the TH_SERVER_FOR_TH_FSA.
         th_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
@@ -325,6 +328,17 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_true(type_matches(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", th_fsa_bridge_th_server_unique_id)
+
+        discriminator = random.randint(0, 4095)
+        self.print_step(7, "Open commissioning window on TH_FSA_BRIDGE")
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeid=th_fsa_bridge_th_node_id,
+            timeout=600,
+            iteration=10000,
+            discriminator=discriminator,
+            option=1)
+
+        await asyncio.sleep(10000)
 
         return
 
