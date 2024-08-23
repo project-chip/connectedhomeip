@@ -164,12 +164,12 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
-    
+
     - label: "Step 1i: TH sends a Unlock Door command to the DUT without pincode."
       PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
-      
+
     - label: "Wait after Unlock Door"
       PICS: DRLK.S.C00.Rsp
       cluster: "DelayCommands"
