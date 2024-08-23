@@ -119,6 +119,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 
 /**
+ * Fabric ID tied to controller
+ */
+@property (nonatomic, retain, nullable) NSNumber * fabricID;
+
+/**
+ * Node ID tied to controller
+ */
+@property (nonatomic, retain, nullable) NSNumber * nodeID;
+
+/**
+ * Root Public Key tied to controller
+ */
+@property (nonatomic, retain, nullable) NSData * rootPublicKey;
+
+
+/**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
