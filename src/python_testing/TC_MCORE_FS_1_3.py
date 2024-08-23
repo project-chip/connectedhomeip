@@ -24,10 +24,10 @@ import os
 import random
 import subprocess
 import sys
+import tempfile
+import threading
 import time
 import uuid
-from subprocess import Popen, PIPE
-from threading import Event, Thread
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -36,13 +36,13 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class ThreadWithStop(Thread):
+class ThreadWithStop(threading.Thread):
 
     def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
         super().__init__(**kw)
         self.tag = f"[{tag}] " if tag else ""
-        self.start_event = Event()
-        self.stop_event = Event()
+        self.start_event = threading.Event()
+        self.stop_event = threading.Event()
         self.stdout_cb = stdout_cb
         self.args = args
 
@@ -64,12 +64,13 @@ class ThreadWithStop(Thread):
 
     def run(self):
         logging.info("RUN: %s", " ".join(self.args))
-        self.p = Popen(self.args, errors="ignore", stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.p = subprocess.Popen(self.args, errors="ignore", stdin=subprocess.PIPE,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.start_event.set()
         # Feed stdout and stderr to console and given callback.
-        t1 = Thread(target=self.forward_stdout, args=[self.p.stdout])
+        t1 = threading.Thread(target=self.forward_stdout, args=[self.p.stdout])
         t1.start()
-        t2 = Thread(target=self.forward_stderr, args=[self.p.stderr])
+        t2 = threading.Thread(target=self.forward_stderr, args=[self.p.stderr])
         t2.start()
         # Wait for the stop event.
         self.stop_event.wait()
@@ -95,18 +96,20 @@ class FabricAdminController:
         if self.wait_for_text_text is not None and self.wait_for_text_text in line:
             self.wait_for_text_event.set()
 
-    def wait_for_text(self):
-        self.wait_for_text_event.wait(timeout=30)
+    def wait_for_text(self, timeout=30):
+        if not self.wait_for_text_event.wait(timeout=timeout):
+            raise Exception(f"Timeout waiting for text: {self.wait_for_text_text}")
         self.wait_for_text_event.clear()
         self.wait_for_text_text = None
 
-    def __init__(self, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
+    def __init__(self, storageDir, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
                  bridgePort=None, bridgeDiscriminator=None, bridgePasscode=None):
 
-        self.wait_for_text_event = Event()
+        self.wait_for_text_event = threading.Event()
         self.wait_for_text_text = None
 
         args = [self.BRIDGE_APP_PATH]
+        args.extend(["--KVS", tempfile.mkstemp(dir=storageDir, prefix="kvs-bridge-")[1]])
         args.extend(['--secured-device-port', str(bridgePort)])
         args.extend(["--discriminator", str(bridgeDiscriminator)])
         args.extend(["--passcode", str(bridgePasscode)])
@@ -115,6 +118,7 @@ class FabricAdminController:
         self.bridge.start()
 
         args = [self.ADMIN_APP_PATH, "interactive", "start"]
+        args.extend(["--storage-directory", storageDir])
         args.extend(["--commissioner-name", str(fabricName)])
         args.extend(["--commissioner-nodeid", str(nodeId)])
         args.extend(["--commissioner-vendor-id", str(vendorId)])
@@ -130,12 +134,10 @@ class FabricAdminController:
         self.wait_for_text()
 
     def CommissionOnNetwork(self, nodeId, setupPinCode=None, filterType=None, filter=None):
-
         self.wait_for_text_text = f"Commissioning complete for node ID 0x{nodeId:016x}: success"
-
+        # Send the commissioning command to the admin.
         self.admin.p.stdin.write(f"pairing onnetwork {nodeId} {setupPinCode}\n")
         self.admin.p.stdin.flush()
-
         # Wait for success message.
         self.wait_for_text()
 
@@ -146,9 +148,10 @@ class FabricAdminController:
 
 class AppServer:
 
-    def __init__(self, app, port=None, discriminator=None, passcode=None):
+    def __init__(self, app, storageDir, port=None, discriminator=None, passcode=None):
 
         args = [app]
+        args.extend(["--KVS", tempfile.mkstemp(dir=storageDir, prefix="kvs-app-")[1]])
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
@@ -182,11 +185,16 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         if not os.path.exists(app):
             asserts.fail(f"The path {app} does not exist")
 
+        # Create a temporary storage directory for keeping KVS files.
+        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
+        logging.info("Temporary storage directory: %s", self.storage.name)
+
         self.fsa_bridge_port = 5543
         self.fsa_bridge_discriminator = random.randint(0, 4095)
         self.fsa_bridge_passcode = 20202021
 
         self.th_fsa_controller = FabricAdminController(
+            storageDir=self.storage.name,
             paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
             bridgePort=self.fsa_bridge_port,
             bridgeDiscriminator=self.fsa_bridge_discriminator,
@@ -206,34 +214,15 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         # Start the TH_SERVER_FOR_TH_FSA app.
         self.server_for_th = AppServer(
             app,
+            storageDir=self.storage.name,
             port=self.server_for_th_port,
             discriminator=self.server_for_th_discriminator,
             passcode=self.server_for_th_passcode)
 
-        # self.device_for_th_eco_nodeid = 1111
-        # self.device_for_th_eco_kvs = None
-        # self.device_for_th_eco_port = 5543
-        # self.app_process_for_th_eco = None
-
-        # self.device_for_dut_eco_nodeid = 1112
-        # self.device_for_dut_eco_kvs = None
-        # self.device_for_dut_eco_port = 5544
-        # self.app_process_for_dut_eco = None
-
-        # Create a second controller on a new fabric to communicate to the server
-        # new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        # new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        # paa_path = str(self.matter_test_config.paa_trust_store_path)
-        # self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
-
     def teardown_class(self):
-
         self.th_fsa_controller.stop()
         self.server_for_th.stop()
-
-        # os.remove(self.device_for_dut_eco_kvs)
-        # if self.device_for_th_eco_kvs is not None:
-        #     os.remove(self.device_for_th_eco_kvs)
+        self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:
@@ -246,27 +235,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             TestStep(5, "Follow manufacturer provided instructions to enable DUT_FSA to synchronize TH_SERVER_FOR_TH_FSA from TH_FSA onto DUT_FSA's fabric. TH to provide endpoint saved from step 2 in user prompt"),
             TestStep(6, "DUT_FSA synchronizes TH_SERVER_FOR_TH_FSA onto DUT_FSA's fabric and copies the UniqueID presented by TH_FSA's Bridged Device Basic Information Cluster"),
         ]
-
-    async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
-
-        discriminator = random.randint(0, 4095)
-        passcode = 20202021
-
-        cmd = [self.app]
-        cmd.extend(['--secured-device-port', str(port)])
-        cmd.extend(['--discriminator', str(discriminator)])
-        cmd.extend(['--passcode', str(passcode)])
-        cmd.extend(['--KVS', kvs])
-
-        # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info(f"Starting TH device for {device_info}")
-        self.app_process_for_dut_eco = subprocess.Popen(cmd)
-        logging.info(f"Started TH device for {device_info}")
-        time.sleep(3)
-
-        logging.info("Commissioning from separate fabric")
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=node_id_for_th, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning device for DUT ecosystem onto TH for managing")
 
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
@@ -302,17 +270,11 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         )
 
         self.print_step(3, "Verify that TH_SERVER_FOR_TH_FSA does not have a UniqueID")
-        th_server_unique_id = await self.read_single_attribute_check_success(
+        await self.read_single_attribute_expect_error(
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.UniqueID,
-            node_id=th_server_for_th_fsa_th_node_id)
-        # TODO: Use app without UniqueID
-        print("TH_SERVER UniqueID", th_server_unique_id)
-        # asserts.assert_true(type_matches(th_server_unique_id, str), "UniqueID should be a string")
-        # asserts.assert_true(th_server_unique_id, "UniqueID should not be an empty string")
-
-        # TODO: Figure out why this is needed (sometimes)
-        # time.sleep(1)
+            node_id=th_server_for_th_fsa_th_node_id,
+            error=Status.UnsupportedAttribute)
 
         discriminator = random.randint(0, 4095)
         self.print_step(4, "Open commissioning window on TH_SERVER_FOR_TH_FSA")
@@ -323,9 +285,10 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             discriminator=discriminator,
             option=1)
 
-        # FIXME: Sometimes the pincode reported by APP and returned here is different...
-        print("PINCODEEEEEEEEEEEE", params.setupPinCode)
-
+        # FIXME: Sometimes the commissioning does not work with the error:
+        # > Failed to verify peer's MAC. This can happen when setup code is incorrect.
+        # However, the setup code is correct... so we need to investigate why this is happening.
+        # The sleep(1) seems to help, though.
         time.sleep(1)
 
         th_server_for_th_fsa_th_fsa_node_id = 3
@@ -336,8 +299,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=discriminator,
         )
-
-        time.sleep(3)
 
         # Get the list of endpoints on the TH_FSA_BRIDGE after adding the TH_SERVER_FOR_TH_FSA.
         th_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
