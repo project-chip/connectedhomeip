@@ -17,7 +17,6 @@
  */
 
 #include <thermostat-delegate-impl.h>
-#include <thermostat-manager.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/Span.h>
@@ -36,32 +35,10 @@ ThermostatDelegate::ThermostatDelegate()
     mNextFreeIndexInPresetsList        = 0;
     mNextFreeIndexInPendingPresetsList = 0;
 
-    InitializePresetTypes();
     InitializePresets();
 
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
-}
-
-void ThermostatDelegate::InitializePresetTypes()
-{
-    PresetScenarioEnum presetScenarioEnumArray[kMaxNumberOfPresetTypes] = {
-        PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied, PresetScenarioEnum::kSleep,
-        PresetScenarioEnum::kWake,     PresetScenarioEnum::kVacation,   PresetScenarioEnum::kGoingToSleep
-    };
-    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresetTypes));
-
-    uint8_t index = 0;
-    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
-    {
-        mPresetTypes[index].presetScenario  = presetScenario;
-        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetsOfEachType;
-        mPresetTypes[index].presetTypeFeatures =
-            (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied)
-            ? PresetTypeFeaturesBitmap::kAutomatic
-            : PresetTypeFeaturesBitmap::kSupportsNames;
-        index++;
-    }
 }
 
 void ThermostatDelegate::InitializePresets()
@@ -94,9 +71,26 @@ void ThermostatDelegate::InitializePresets()
 
 CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
 {
-    if (index < ArraySize(mPresetTypes))
+    static PresetTypeStruct::Type presetTypes[] = {
+        { .presetScenario     = PresetScenarioEnum::kOccupied,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
+        { .presetScenario     = PresetScenarioEnum::kUnoccupied,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
+        { .presetScenario     = PresetScenarioEnum::kSleep,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kWake,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kVacation,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+    };
+    if (index < ArraySize(presetTypes))
     {
-        presetType = mPresetTypes[index];
+        presetType = presetTypes[index];
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -158,45 +152,19 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
-std::optional<System::Clock::Milliseconds16>
-ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
-                                          System::Clock::Milliseconds16 timeoutRequest)
+std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
 {
-    auto attributeIdsIter = attributeRequests.begin();
-    bool requestedPresets = false, requestedSchedules = false;
-    while (attributeIdsIter.Next())
+    switch (attributeId)
     {
-        auto & attributeId = attributeIdsIter.GetValue();
-
-        switch (attributeId)
-        {
-        case Attributes::Presets::Id:
-            requestedPresets = true;
-            break;
-        case Attributes::Schedules::Id:
-            requestedSchedules = true;
-            break;
-        default:
-            return System::Clock::Milliseconds16(0);
-        }
-    }
-    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return System::Clock::Milliseconds16(0);
-    }
-    auto timeout = System::Clock::Milliseconds16(0);
-    if (requestedPresets)
-    {
+    case Attributes::Presets::Id:
         // If the client expects to edit the presets, then we'll give it 3 seconds to do so
-        timeout += std::chrono::milliseconds(3000);
-    }
-    if (requestedSchedules)
-    {
+        return std::chrono::milliseconds(3000);
+    case Attributes::Schedules::Id:
         // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
-        timeout += std::chrono::milliseconds(9000);
+        return std::chrono::milliseconds(9000);
+    default:
+        return std::nullopt;
     }
-    // If the client requested an even smaller timeout, then use that one
-    return std::min(timeoutRequest, timeout);
 }
 
 void ThermostatDelegate::InitializePendingPresets()
@@ -238,7 +206,7 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
+CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
 {
     mNextFreeIndexInPresetsList = 0;
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
