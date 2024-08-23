@@ -250,29 +250,55 @@ Supported platforms:
 -   RW61X
 
 there are three implementations for factory data protection
--   whole factory data protection with AES encryption ( chip_with_factory_data=1 chip_enable_secure_whole_factory_data=true )
+
+-   whole factory data protection with AES encryption ( chip_with_factory_data=1
+    chip_enable_secure_whole_factory_data=true )
     `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`\
     `src/platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.cpp`
 
--   only dac private key protection ( chip_with_factory_data=1 chip_enable_secure_dac_private_key_storage=true )  
-    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp` \
+-   only dac private key protection ( chip_with_factory_data=1
+    chip_enable_secure_dac_private_key_storage=true )  
+    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
+    \
     `src/platform/nxp/rt/rw61x/FactoryDataProviderImpl.cpp`
 
--   whole factory data protection with hard-coded AES key ( chip_with_factory_data=1 )
-    `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp` \
+-   whole factory data protection with hard-coded AES key (
+    chip_with_factory_data=1 )
+    `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp`
+    \
     `src/platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.cpp`
 
-for the first one, the whole factory data is encrypted by an AES-256 key, the AES key can be passed through serial link when in factory production mode, and will be provisoned into Edge Lock, and the returned AES Key blob (wrapped key) can be stored in the end of factory data region in TLV format. for the decryption process, the blob is retrieved and provisoned into Edge Lock and the whole factory data can be decrypted using the returned key index in Edge Lock. Compared with only dac private key protection solution, this solution can avoid tampering with the original factory data.
+for the first one, the whole factory data is encrypted by an AES-256 key, the
+AES key can be passed through serial link when in factory production mode, and
+will be provisoned into Edge Lock, and the returned AES Key blob (wrapped key)
+can be stored in the end of factory data region in TLV format. for the
+decryption process, the blob is retrieved and provisoned into Edge Lock and the
+whole factory data can be decrypted using the returned key index in Edge Lock.
+Compared with only dac private key protection solution, this solution can avoid
+tampering with the original factory data.
 
-the factory data should be encrypted by an AES-256 key using "--aes256_key" option in "generate.py" script file.
+the factory data should be encrypted by an AES-256 key using "--aes256_key"
+option in "generate.py" script file.
 
-it will check whether there is AES key blob in factory data region when in each initialization, if not, the default AES key is converted and the result is stored into flash, it run only once.
+it will check whether there is AES key blob in factory data region when in each
+initialization, if not, the default AES key is converted and the result is
+stored into flash, it run only once.
 
-for the second one, it only protect the dac private key inside the factory data, the dac private key is retrieved and provisioned into Edge Lock, the returned key bolb replace the previous dac private key, and also update the overall size and hash, and re-write the factory data. when device is doing matter commissioning, the blob is retrieved and provisoned into Edge Lock and the signing can be done using the returned key index in Edge Lock.
+for the second one, it only protect the dac private key inside the factory data,
+the dac private key is retrieved and provisioned into Edge Lock, the returned
+key bolb replace the previous dac private key, and also update the overall size
+and hash, and re-write the factory data. when device is doing matter
+commissioning, the blob is retrieved and provisoned into Edge Lock and the
+signing can be done using the returned key index in Edge Lock.
 
-the factory data should be plain text for the first programming. it will check whether there is dac private key blob (base on the size of blob, should be 48) in factory data when in each initialization, if not, the dac private key is converted and the result is stored into flash, it run only once.
+the factory data should be plain text for the first programming. it will check
+whether there is dac private key blob (base on the size of blob, should be 48)
+in factory data when in each initialization, if not, the dac private key is
+converted and the result is stored into flash, it run only once.
 
-for the third one, it is a little similar to the first one, the whole factory data is encrypted by an AES key, but there are two differences:
+for the third one, it is a little similar to the first one, the whole factory
+data is encrypted by an AES key, but there are two differences:
 
--  the AES key is hard-coded and not provisoned into Edge Lock
--  the factory data should be encrypted by AES-128 key using "--aes128_key" option in "generate.py" script file.
+-   the AES key is hard-coded and not provisoned into Edge Lock
+-   the factory data should be encrypted by AES-128 key using "--aes128_key"
+    option in "generate.py" script file.

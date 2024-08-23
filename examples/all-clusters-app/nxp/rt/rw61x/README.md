@@ -38,26 +38,34 @@ The example supports:
 For Matter over Thread configuration :
 
 -   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1)
--   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over WiFi configuration :
 
--   For [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board: BLE antenna (to plug in Ant1) + Wi-Fi antenna (to plug in Ant2)
--   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
+-   For [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board: BLE antenna (to plug
+    in Ant1) + Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 For Matter over Wi-Fi with OpenThread Border Router :
 
--   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1) + Wi-Fi antenna (to plug in Ant2)
--   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1) + Wi-Fi
+    antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB
+    antenna)
 
 <a name="building"></a>
 
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -65,11 +73,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```
 
 -   Step 1: checkout NXP specific submodules only
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 ```
 
--   Step 2: activate local environment 
+-   Step 2: activate local environment
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
 ```
@@ -86,7 +96,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
 ```
-Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
@@ -134,8 +146,9 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch to `NXP FRDM-RW612` board revision, the argument
-    `board_version=\"frdm\"` must be added to the _gn gen_ command.
+-   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch
+    to `NXP FRDM-RW612` board revision, the argument `board_version=\"frdm\"`
+    must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
@@ -322,8 +335,10 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 
 3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running
    the server. To view raw UART output, a pin should be plugged to an USB to
-   UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and `J5 pin 4` (mikroBUS: TX) for [`NXP FRDM-RW612`] board), then start a terminal emulator like
-   PuTTY and connect to the used COM port with the following UART settings:
+   UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and
+   `J5 pin 4` (mikroBUS: TX) for [`NXP FRDM-RW612`] board), then start a
+   terminal emulator like PuTTY and connect to the used COM port with the
+   following UART settings:
 
     - Baud rate: 115200
     - 8 data bits
