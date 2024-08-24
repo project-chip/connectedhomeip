@@ -27,6 +27,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <setup_payload/SetupPayload.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -39,6 +40,27 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+
+namespace {
+
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
+{
+    bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -564,8 +586,16 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
 chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
 {
-    // We don't need to set additional failsafe timeout as we don't ask the final user if he wants to continue
+    // No manual input, so do not need to extend.
     return chip::Optional<uint16_t>();
+}
+
+bool PairingCommand::ShouldWaitAfterDeviceAttestation()
+{
+    // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
+    SetupPayload payload;
+    CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
+    return err == CHIP_NO_ERROR && payload.vendorID != 0 && payload.productID != 0;
 }
 
 void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
@@ -573,6 +603,30 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
                                                   const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                                   chip::Credentials::AttestationVerificationResult attestationResult)
 {
+
+    SetupPayload payload;
+    CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
+    if (parse_error == CHIP_NO_ERROR &&
+        payload.vendorID != 0 && payload.productID != 0) {
+        if (payload.vendorID != info.BasicInformationVendorId() ||
+            payload.productID  != info.BasicInformationProductId()) {
+            ChipLogProgress(NotSpecified, "Failed validation of vendorID or productID."
+                                        "Requested VID: %u, Requested PID: %u,"
+                                        "Detected VID: %u, Detected PID %u.",
+                                        payload.vendorID, payload.productID,
+                                        info.BasicInformationVendorId(),
+                                        info.BasicInformationProductId());
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device, payload.vendorID == info.BasicInformationVendorId() ?
+                        chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
+                      : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
+        }
+
+        deviceCommissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+        return;
+    }
+
+
     // Bypass attestation verification, continue with success
     auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
         device, chip::Credentials::AttestationVerificationResult::kSuccess);
