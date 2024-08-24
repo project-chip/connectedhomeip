@@ -27,10 +27,10 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
-#include <setup_payload/SetupPayload.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
 
 #include <string>
 
@@ -606,26 +606,25 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
 
     SetupPayload payload;
     CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
-    if (parse_error == CHIP_NO_ERROR &&
-        payload.vendorID != 0 && payload.productID != 0) {
-        if (payload.vendorID != info.BasicInformationVendorId() ||
-            payload.productID  != info.BasicInformationProductId()) {
-            ChipLogProgress(NotSpecified, "Failed validation of vendorID or productID."
-                                        "Requested VID: %u, Requested PID: %u,"
-                                        "Detected VID: %u, Detected PID %u.",
-                                        payload.vendorID, payload.productID,
-                                        info.BasicInformationVendorId(),
-                                        info.BasicInformationProductId());
+    if (parse_error == CHIP_NO_ERROR && payload.vendorID != 0 && payload.productID != 0)
+    {
+        if (payload.vendorID != info.BasicInformationVendorId() || payload.productID != info.BasicInformationProductId())
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation of vendorID or productID."
+                            "Requested VID: %u, Requested PID: %u,"
+                            "Detected VID: %u, Detected PID %u.",
+                            payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
             deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-                device, payload.vendorID == info.BasicInformationVendorId() ?
-                        chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
-                      : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
+                device,
+                payload.vendorID == info.BasicInformationVendorId()
+                    ? chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
+                    : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
         }
 
         deviceCommissioner->CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
-
 
     // Bypass attestation verification, continue with success
     auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
