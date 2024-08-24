@@ -125,10 +125,6 @@ MTR_DIRECT_MEMBERS
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
-// Called from MTRClusters for writes and commands
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
-
 // called by controller to clean up and shutdown
 - (void)invalidate;
 

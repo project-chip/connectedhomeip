@@ -368,17 +368,18 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     }
     else
     {
+        auto & presetHandle = preset.GetPresetHandle().Value();
 
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
+        if (!GetMatchingPresetInPresets(delegate, presetHandle, matchingPreset))
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
         // (b) There is no existing pending preset with this handle.
-        if (CountPresetsInPendingListWithPresetHandle(delegate, preset.GetPresetHandle().Value()) > 0)
+        if (CountPresetsInPendingListWithPresetHandle(delegate, presetHandle) > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
