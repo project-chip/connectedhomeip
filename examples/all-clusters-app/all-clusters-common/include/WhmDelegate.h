@@ -121,7 +121,7 @@ public:
     BitMask<WaterHeaterHeatSourceBitmap> GetHeaterTypes() override;
     BitMask<WaterHeaterHeatSourceBitmap> GetHeatDemand() override;
     uint16_t GetTankVolume() override;
-    int64_t GetEstimatedHeatRequired() override;
+    Energy_mWh GetEstimatedHeatRequired() override;
     Percent GetTankPercentage() override;
     BoostStateEnum GetBoostState() override;
 
@@ -130,7 +130,7 @@ public:
     void SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap> heaterTypes);
     void SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap> heatDemand);
     void SetTankVolume(uint16_t tankVolume);
-    void SetEstimatedHeatRequired(int64_t estimatedHeatRequired);
+    void SetEstimatedHeatRequired(Energy_mWh estimatedHeatRequired);
     void SetTankPercentage(Percent tankPercentage);
     void SetBoostState(BoostStateEnum boostState);
 
@@ -327,7 +327,7 @@ private:
     // taking the specific heat capacity of water (4182 J/kg °C) and by knowing
     // the current temperature of the water, the tank volume and target
     // temperature.
-    int64_t mEstimatedHeatRequired;
+    Energy_mWh mEstimatedHeatRequired;
 
     // This attribute SHALL indicate an approximate level of hot water stored in
     // the tank, which may help consumers understand the amount of hot water

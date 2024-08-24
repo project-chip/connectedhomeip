@@ -67,7 +67,7 @@ uint16_t WaterHeaterManagementDelegate::GetTankVolume()
     return mTankVolume;
 }
 
-int64_t WaterHeaterManagementDelegate::GetEstimatedHeatRequired()
+Energy_mWh WaterHeaterManagementDelegate::GetEstimatedHeatRequired()
 {
     return mEstimatedHeatRequired;
 }
@@ -112,7 +112,7 @@ void WaterHeaterManagementDelegate::SetTankVolume(uint16_t tankVolume)
     }
 }
 
-void WaterHeaterManagementDelegate::SetEstimatedHeatRequired(int64_t estimatedHeatRequired)
+void WaterHeaterManagementDelegate::SetEstimatedHeatRequired(Energy_mWh estimatedHeatRequired)
 {
     if (mEstimatedHeatRequired != estimatedHeatRequired)
     {

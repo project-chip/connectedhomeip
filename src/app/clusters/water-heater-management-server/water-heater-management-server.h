@@ -108,7 +108,7 @@ public:
     virtual BitMask<WaterHeaterHeatSourceBitmap> GetHeaterTypes() = 0;
     virtual BitMask<WaterHeaterHeatSourceBitmap> GetHeatDemand()  = 0;
     virtual uint16_t GetTankVolume()                              = 0;
-    virtual int64_t GetEstimatedHeatRequired()                    = 0;
+    virtual Energy_mWh GetEstimatedHeatRequired()                 = 0;
     virtual Percent GetTankPercentage()                           = 0;
     virtual BoostStateEnum GetBoostState()                        = 0;
 
