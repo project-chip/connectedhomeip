@@ -163,9 +163,25 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
                      "Value has to be 0x00 (no demand on any source)"),
             TestStep("21b", "TH reads from the DUT the BoostState",
                      "Value has to be 0 (Inactive)"),
-            TestStep("22", "TH sends command CancelBoost",
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EWATERHTR.TESTEVENTTRIGGER for Water Temperature 20C Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("22a", "TH reads from the DUT the HeatDemand",
+                     "Value has to be 0x00 (no demand on any source)"),
+            TestStep("23", "TH sends command Boost with Duration=200s,EmergencyBoost=True",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=200, EmergencyBoost=True and TemporarySetpoint=None"),
+            TestStep("23a", "TH reads from the DUT the HeatDemand",
+                     "Value has to be 0x00 (no demand on any source)"),
+            TestStep("23b", "TH reads from the DUT the BoostState",
+                     "Value has to be 0 (Inactive)"),
+            TestStep("24", "TH sends command CancelBoost",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostEnded) sent"),
+            TestStep("24a", "TH reads from the DUT the HeatDemand",
+                     "Value has to be 0x00 (no demand on any source)"),
+            TestStep("24b", "TH reads from the DUT the BoostState",
+                     "Value has to be 0 (Inactive)"),
+            TestStep("25", "TH sends command CancelBoost",
                      "Verify DUT responds w/ status SUCCESS(0x00) and no event sent"),
-            TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EWATERHTR.TESTEVENTTRIGGER for Basic installation Test Event Clear",
+            TestStep("26", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EWATERHTR.TESTEVENTTRIGGER for Basic installation Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
@@ -238,10 +254,6 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
         asserts.assert_equal(event_data.boostInfo.duration, 5)
         asserts.assert_equal(event_data.boostInfo.oneShot, True)
-        asserts.assert_true(event_data.boostInfo.emergencyBoost is None, "emergencyBoost should be None")
-        asserts.assert_true(event_data.boostInfo.temporarySetpoint is None, "temporarySetpoint should be None")
-        asserts.assert_true(event_data.boostInfo.targetPercentage is None, "targetPercentage should be None")
-        asserts.assert_true(event_data.boostInfo.targetReheat is None, "targetReheat should be None")
 
         self.step("8a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
@@ -410,11 +422,46 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("22")
+        await self.send_test_event_trigger_water_temperature20C_test_event()
+
+        self.step("22a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("23")
+        await self.send_boost_command(duration=200, emergency_boost=True)
+
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostStarted)
+        asserts.assert_equal(event_data.boostInfo.duration, 200)
+        asserts.assert_equal(event_data.boostInfo.emergencyBoost, True)
+        asserts.assert_is_none(event_data.boostInfo.temporarySetpoint)
+
+        self.step("23a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_greater(heatDemand, 0)
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
+
+        self.step("23b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("24")
+        await self.send_cancel_boost_command()
+
+        event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
+
+        self.step("24a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("24b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("25")
         await self.send_cancel_boost_command()
 
         event_data = events_callback.wait_for_event_expect_no_report()
 
-        self.step("23")
+        self.step("26")
         await self.send_test_event_trigger_basic_installation_test_event_clear()
 
 

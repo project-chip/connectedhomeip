@@ -159,7 +159,11 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
     // Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode
     dg->SetTankVolume(100);
     dg->SetTargetWaterTemperature(6000);
-    dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
+
+    // kImmersionElement2 will be used in addition to kImmersionElement1 when emergencyBoost is specified
+    // in the BoostStarted command.
+    dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1,
+                                                            WaterHeaterHeatSourceBitmap::kImmersionElement2));
     dg->DrawOffHotWater(100, 2000);
 }
 
