@@ -1029,7 +1029,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         // the fabric table.
         if (secureSession->IsCASESession())
         {
-            secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() == mFabricTable->GetPendingNewFabricIndex());
+            secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() ==
+                                                             mFabricTable->GetPendingNewFabricIndex());
         }
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }

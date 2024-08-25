@@ -333,7 +333,7 @@ bool AccessControl::IsAccessRestrictionListSupported() const
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                                   Privilege requestPrivilege)
+                                Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 

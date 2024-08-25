@@ -48,7 +48,7 @@ using EntryListener  = AccessControl::EntryListener;
 using ExtensionEvent = Clusters::AccessControl::Events::AccessControlExtensionChanged::Type;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-using ArlReviewEvent  = Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type;
+using ArlReviewEvent = Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type;
 #endif
 
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
@@ -507,7 +507,8 @@ CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
 }
 void AccessControlAttribute::MarkCommissioningRestrictionListChanged()
 {
-    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id, AccessControlCluster::Attributes::CommissioningARL::Id);
+    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id,
+                                           AccessControlCluster::Attributes::CommissioningARL::Id);
 }
 
 void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
@@ -515,8 +516,8 @@ void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
     MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id, AccessControlCluster::Attributes::Arl::Id);
 }
 
-void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
-                                                            Optional<CharSpan> redirectUrl)
+void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
+                                                             Optional<CharSpan> instruction, Optional<CharSpan> redirectUrl)
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };

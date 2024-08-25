@@ -332,9 +332,9 @@ private:
     State mState;
     const Type mSecureSessionType;
     bool mIsCaseCommissioningSession = false;
-    NodeId mLocalNodeId = kUndefinedNodeId;
-    NodeId mPeerNodeId  = kUndefinedNodeId;
-    CATValues mPeerCATs = CATValues{};
+    NodeId mLocalNodeId              = kUndefinedNodeId;
+    NodeId mPeerNodeId               = kUndefinedNodeId;
+    CATValues mPeerCATs              = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
 

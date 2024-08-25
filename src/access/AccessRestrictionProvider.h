@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
-#include "Privilege.h"
 #include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cstdint>
@@ -82,16 +82,16 @@ public:
      */
     class AccessRestrictionExceptionChecker
     {
-        public:
-            virtual ~AccessRestrictionExceptionChecker() = default;
+    public:
+        virtual ~AccessRestrictionExceptionChecker() = default;
 
-            /**
-             * Check if any restrictions are allowed to be applied on the given endpoint and cluster
-             * because of constraints against their use in ARLs.
-             *
-             * @retval true if ARL checks are allowed to be applied to the cluster on the endpoint, false otherwise
-             */
-            virtual bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) = 0;
+        /**
+         * Check if any restrictions are allowed to be applied on the given endpoint and cluster
+         * because of constraints against their use in ARLs.
+         *
+         * @retval true if ARL checks are allowed to be applied to the cluster on the endpoint, false otherwise
+         */
+        virtual bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) = 0;
     };
 
     /**
@@ -100,11 +100,11 @@ public:
      */
     class StandardAccessRestrictionExceptionChecker : public AccessRestrictionExceptionChecker
     {
-        public:
-            StandardAccessRestrictionExceptionChecker() = default;
-            ~StandardAccessRestrictionExceptionChecker() = default;
+    public:
+        StandardAccessRestrictionExceptionChecker()  = default;
+        ~StandardAccessRestrictionExceptionChecker() = default;
 
-            bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) override;
+        bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) override;
     };
 
     /**

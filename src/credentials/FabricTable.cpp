@@ -71,8 +71,9 @@ constexpr size_t IndexInfoTLVMaxSize()
     return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
 }
 
-CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                            const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, const ByteSpan & rootCert,
+                                       const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+                                       FabricIndex * outFabricIndex)
 {
     VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -93,8 +94,9 @@ CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePend
     }
 
     SuccessOrExit(err = fabricTable.AddNewPendingTrustedRootCert(rootCert));
-    SuccessOrExit(err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
-                                                             /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
+    SuccessOrExit(err =
+                      fabricTable.AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
+                                                                       /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
     if (!leavePending)
     {
         SuccessOrExit(err = fabricTable.CommitPendingFabricData());
@@ -731,13 +733,14 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
 CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                             const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
 {
-    return AddNewFabricForTestInternal(*this, /*leavePending=*/ false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
+    return AddNewFabricForTestInternal(*this, /*leavePending=*/false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
-CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                                       const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert,
+                                                       const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+                                                       FabricIndex * outFabricIndex)
 {
-    return AddNewFabricForTestInternal(*this, /*leavePending=*/ true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
+    return AddNewFabricForTestInternal(*this, /*leavePending=*/true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
 /*

@@ -119,11 +119,11 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
     return CHIP_NO_ERROR;
 }
 
-bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster)
+bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsAllowed(EndpointId endpoint,
+                                                                                                  ClusterId cluster)
 {
     if (endpoint != 0 &&
-        (cluster == app::Clusters::WiFiNetworkManagement::Id ||
-         cluster == app::Clusters::ThreadBorderRouterManagement::Id ||
+        (cluster == app::Clusters::WiFiNetworkManagement::Id || cluster == app::Clusters::ThreadBorderRouterManagement::Id ||
          cluster == app::Clusters::ThreadNetworkDirectory::Id))
     {
         return true;

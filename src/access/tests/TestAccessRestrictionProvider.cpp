@@ -249,12 +249,9 @@ constexpr CheckData accessAttributeRestrictionTestData[] = {
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster     = kOnOffCluster,
-                             .endpoint    = 1,
-                             .requestType = RequestType::kEventReadRequest,
-                             .entityId    = 1 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = true },
+      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
 };
 
 TEST_F(TestAccessRestriction, AccessAttributeRestrictionTest)
@@ -293,12 +290,9 @@ constexpr CheckData writeAttributeRestrictionTestData[] = {
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster     = kOnOffCluster,
-                             .endpoint    = 1,
-                             .requestType = RequestType::kEventReadRequest,
-                             .entityId    = 1 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = true },
+      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
 };
 
 TEST_F(TestAccessRestriction, WriteAttributeRestrictionTest)
@@ -337,12 +331,9 @@ constexpr CheckData commandAttributeRestrictionTestData[] = {
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster     = kOnOffCluster,
-                             .endpoint    = 1,
-                             .requestType = RequestType::kEventReadRequest,
-                             .entityId    = 1 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = true },
+      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
 };
 
 TEST_F(TestAccessRestriction, CommandRestrictionTest)
@@ -381,12 +372,9 @@ constexpr CheckData eventAttributeRestrictionTestData[] = {
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster     = kOnOffCluster,
-                             .endpoint    = 1,
-                             .requestType = RequestType::kEventReadRequest,
-                             .entityId    = 1 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = false },
+      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = false },
 };
 
 TEST_F(TestAccessRestriction, EventRestrictionTest)
@@ -437,12 +425,9 @@ constexpr CheckData combinedRestrictionTestData[] = {
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster     = kOnOffCluster,
-                             .endpoint    = 1,
-                             .requestType = RequestType::kEventReadRequest,
-                             .entityId    = 5 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = true },
+      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 5 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId2 },
       .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
