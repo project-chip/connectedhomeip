@@ -585,6 +585,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // TODO(#35189): change to use a path to JSON files instead
     case kDeviceOption_CommissioningArlEntries: {
         std::vector<AccessRestrictionProvider::Entry> entries;
         retval = ParseAccessRestrictionEntriesFromJson(aValue, entries);

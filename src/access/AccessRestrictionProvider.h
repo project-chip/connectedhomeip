@@ -86,12 +86,12 @@ public:
             virtual ~AccessRestrictionExceptionChecker() = default;
 
             /**
-             * Check if any restrictions are allowed to be applied to the given request.
+             * Check if any restrictions are allowed to be applied on the given endpoint and cluster
+             * because of constraints against their use in ARLs.
              *
-             * @retval true if restrictions may NOT be applied
+             * @retval true if ARL checks are allowed to be applied to the cluster on the endpoint, false otherwise
              */
-            virtual bool AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
-                                                   const RequestPath & requestPath) = 0;
+            virtual bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) = 0;
     };
 
     /**
@@ -104,13 +104,7 @@ public:
             StandardAccessRestrictionExceptionChecker() = default;
             ~StandardAccessRestrictionExceptionChecker() = default;
 
-            /**
-             * Check if any restrictions are allowed to be applied to the given request.
-             *
-             * @retval true if restrictions may NOT be applied
-             */
-            bool AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
-                                           const RequestPath & requestPath) override;
+            bool AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster) override;
     };
 
     /**
@@ -124,25 +118,25 @@ public:
         /**
          * Notifies of a change in the commissioning access restriction list.
          */
-        virtual void CommissioningRestrictionListChanged() = 0;
+        virtual void MarkCommissioningRestrictionListChanged() = 0;
 
         /**
          * Notifies of a change in the access restriction list.
          *
          * @param [in] fabricIndex  The index of the fabric in which the list has changed.
          */
-        virtual void RestrictionListChanged(FabricIndex fabricIndex) = 0;
+        virtual void MarkRestrictionListChanged(FabricIndex fabricIndex) = 0;
 
         /**
          * Notifies of an update to an active review with instructions and an optional redirect URL.
          *
          * @param [in] fabricIndex  The index of the fabric in which the entry has changed.
          * @param [in] token        The token of the review being updated (obtained from ReviewFabricRestrictionsResponse)
-         * @param [in] instruction  The instructions to be displayed to the user.
-         * @param [in] redirectUrl  An optional URL to redirect the user to for more information.  May be null.
+         * @param [in] instruction  Optional instructions to be displayed to the user.
+         * @param [in] redirectUrl  An optional URL to redirect the user to for more information.
          */
-        virtual void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
-                                                     const char * redirectUrl) = 0;
+        virtual void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                                     Optional<CharSpan> redirectUrl) = 0;
 
     private:
         Listener * mNext = nullptr;
@@ -220,7 +214,7 @@ public:
      */
     CHIP_ERROR RequestFabricRestrictionReview(FabricIndex fabricIndex, const std::vector<Entry> & arl, uint64_t & token)
     {
-        token = ++mNextToken;
+        token = mNextToken++;
         return DoRequestFabricRestrictionReview(fabricIndex, token, arl);
     }
 
@@ -264,12 +258,10 @@ protected:
                                                         const std::vector<Entry> & arl) = 0;
 
 private:
-    bool IsEntryValid(const Entry & entry) const;
-
     /**
      * Perform the access restriction check using the given entries.
      */
-    CHIP_ERROR DoCheck(const std::vector<Entry> entries, const SubjectDescriptor & subjectDescriptor,
+    CHIP_ERROR DoCheck(const std::vector<Entry> & entries, const SubjectDescriptor & subjectDescriptor,
                        const RequestPath & requestPath);
 
     uint64_t mNextToken   = 1;

@@ -331,6 +331,7 @@ private:
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
+    bool mIsCaseCommissioningSession = false;
     NodeId mLocalNodeId = kUndefinedNodeId;
     NodeId mPeerNodeId  = kUndefinedNodeId;
     CATValues mPeerCATs = CATValues{};
@@ -348,8 +349,6 @@ private:
     SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
-
-    bool mIsCaseCommissioningSession = false;
 };
 
 } // namespace Transport

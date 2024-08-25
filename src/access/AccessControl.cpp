@@ -181,7 +181,7 @@ char GetRequestTypeStringForLogging(RequestType requestType)
         return 'w';
     case RequestType::kCommandInvokeRequest:
         return 'i';
-    case RequestType::kEventReadOrSubscribeRequest:
+    case RequestType::kEventReadRequest:
         return 'e';
     default:
         return '?';
@@ -539,7 +539,7 @@ CHIP_ERROR AccessControl::CheckARL(const SubjectDescriptor & subjectDescriptor, 
     {
         ChipLogProgress(DataManagement, "AccessControl: %s",
 #if 0
-                        //TODO: new error code coming with issue #35177
+                        // TODO(#35177): new error code coming when access check plumbing are fixed in callers
                         (result == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL) ? "denied (restricted)" : "denied (restriction error)");
 #else
                         (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");

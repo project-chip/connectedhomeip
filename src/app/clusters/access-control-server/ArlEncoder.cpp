@@ -36,7 +36,7 @@ CHIP_ERROR StageEntryRestrictions(const std::vector<AccessRestrictionProvider::R
     {
         for (size_t i = 0; i < count; i++)
         {
-            auto restriction = source[i];
+            const auto & restriction = source[i];
             ReturnErrorOnFailure(ArlEncoder::Convert(restriction.restrictionType, destination[i].type));
 
             if (restriction.id.HasValue())
@@ -115,13 +115,6 @@ CHIP_ERROR ArlEncoder::EncodableEntry::EncodeForRead(TLV::TLVWriter & writer, TL
 {
     ReturnErrorOnFailure(Stage());
     ReturnErrorOnFailure(mStagingEntry.EncodeForRead(writer, tag, fabric));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ArlEncoder::EncodableEntry::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    ReturnErrorOnFailure(Stage());
-    ReturnErrorOnFailure(mStagingEntry.EncodeForWrite(writer, tag));
     return CHIP_NO_ERROR;
 }
 

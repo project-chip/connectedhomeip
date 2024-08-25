@@ -73,10 +73,9 @@ void AccessRestrictionProvider::RemoveListener(Listener & listener)
 
 CHIP_ERROR AccessRestrictionProvider::SetCommissioningEntries(const std::vector<Entry> & entries)
 {
-    // check that the input entries are valid
     for (auto & entry : entries)
     {
-        if (!IsEntryValid(entry))
+        if (!mExceptionChecker.AreRestrictionsAllowed(entry.endpointNumber, entry.clusterId))
         {
             ChipLogError(DataManagement, "AccessRestrictionProvider: invalid entry");
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -87,7 +86,7 @@ CHIP_ERROR AccessRestrictionProvider::SetCommissioningEntries(const std::vector<
 
     for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
     {
-        listener->CommissioningRestrictionListChanged();
+        listener->MarkCommissioningRestrictionListChanged();
     }
 
     return CHIP_NO_ERROR;
@@ -97,10 +96,9 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
 {
     std::vector<Entry> updatedEntries;
 
-    // check that the input entries are valid
     for (auto & entry : entries)
     {
-        if (!IsEntryValid(entry))
+        if (!mExceptionChecker.AreRestrictionsAllowed(entry.endpointNumber, entry.clusterId))
         {
             ChipLogError(DataManagement, "AccessRestrictionProvider: invalid entry");
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -115,18 +113,18 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
 
     for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
     {
-        listener->RestrictionListChanged(fabricIndex);
+        listener->MarkRestrictionListChanged(fabricIndex);
     }
 
     return CHIP_NO_ERROR;
 }
 
-bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsDisallowed(const SubjectDescriptor & subjectDescriptor,
-                                                                         const RequestPath & requestPath)
+bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsAllowed(EndpointId endpoint, ClusterId cluster)
 {
-    if (requestPath.endpoint == 0 ||
-        requestPath.cluster == app::Clusters::NetworkCommissioning::Id ||
-        requestPath.cluster == app::Clusters::Descriptor::Id)
+    if (endpoint != 0 &&
+        (cluster == app::Clusters::WiFiNetworkManagement::Id ||
+         cluster == app::Clusters::ThreadBorderRouterManagement::Id ||
+         cluster == app::Clusters::ThreadNetworkDirectory::Id))
     {
         return true;
     }
@@ -137,11 +135,6 @@ bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRe
 CHIP_ERROR AccessRestrictionProvider::CheckForCommissioning(const SubjectDescriptor & subjectDescriptor,
                                                             const RequestPath & requestPath)
 {
-    if (mExceptionChecker.AreRestrictionsDisallowed(subjectDescriptor, requestPath))
-    {
-        return CHIP_NO_ERROR;
-    }
-
     return DoCheck(mCommissioningEntries, subjectDescriptor, requestPath);
 }
 
@@ -150,10 +143,16 @@ CHIP_ERROR AccessRestrictionProvider::Check(const SubjectDescriptor & subjectDes
     return DoCheck(mFabricEntries[subjectDescriptor.fabricIndex], subjectDescriptor, requestPath);
 }
 
-CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, const SubjectDescriptor & subjectDescriptor,
+CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> & entries, const SubjectDescriptor & subjectDescriptor,
                                               const RequestPath & requestPath)
 {
-    ChipLogProgress(DataManagement, "AccessRestrictionProvider: action %d", static_cast<int>(requestPath.requestType));
+    if (!mExceptionChecker.AreRestrictionsAllowed(requestPath.endpoint, requestPath.cluster))
+    {
+        ChipLogProgress(DataManagement, "AccessRestrictionProvider: skipping checks for unrestrictable request path");
+        return CHIP_NO_ERROR;
+    }
+
+    ChipLogProgress(DataManagement, "AccessRestrictionProvider: action %d", to_underlying(requestPath.requestType));
 
     if (requestPath.requestType == RequestType::kRequestTypeUnknown)
     {
@@ -166,7 +165,7 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
     // event id). All other requests require an entity id
     if (!requestPath.entityId.has_value())
     {
-        if (requestPath.requestType == RequestType::kEventReadOrSubscribeRequest)
+        if (requestPath.requestType == RequestType::kEventReadRequest)
         {
             return CHIP_NO_ERROR;
         }
@@ -176,7 +175,7 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
         }
     }
 
-    for (auto & entry : mFabricEntries[subjectDescriptor.fabricIndex])
+    for (auto & entry : entries)
     {
         if (entry.endpointNumber != requestPath.endpoint || entry.clusterId != requestPath.cluster)
         {
@@ -185,7 +184,7 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
 
         for (auto & restriction : entry.restrictions)
         {
-            // a missing id is a wildcard
+            // A missing id is a wildcard
             bool idMatch = !restriction.id.HasValue() || restriction.id.Value() == requestPath.entityId.value();
             if (!idMatch)
             {
@@ -199,7 +198,8 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
                     requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
 #if 0
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+                    // TODO(#35177): use new ARL error code when access checks are fixed
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
 #else
                     return CHIP_ERROR_ACCESS_DENIED;
 #endif
@@ -209,7 +209,8 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
                 if (requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
 #if 0
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+                    // TODO(#35177): use new ARL error code when access checks are fixed
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
 #else
                     return CHIP_ERROR_ACCESS_DENIED;
 #endif
@@ -219,17 +220,19 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
                 if (requestPath.requestType == RequestType::kCommandInvokeRequest)
                 {
 #if 0
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+                    // TODO(#35177): use new ARL error code when access checks are fixed
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
 #else
                     return CHIP_ERROR_ACCESS_DENIED;
 #endif
                 }
                 break;
             case Type::kEventForbidden:
-                if (requestPath.requestType == RequestType::kEventReadOrSubscribeRequest)
+                if (requestPath.requestType == RequestType::kEventReadRequest)
                 {
 #if 0
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL; //TODO: new error code coming with issue #35177
+                    // TODO(#35177): use new ARL error code when access checks are fixed
+                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
 #else
                     return CHIP_ERROR_ACCESS_DENIED;
 #endif
@@ -240,12 +243,6 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> entries, 
     }
 
     return CHIP_NO_ERROR;
-}
-
-bool AccessRestrictionProvider::IsEntryValid(const Entry & entry) const
-{
-    return entry.endpointNumber != 0 && entry.clusterId != app::Clusters::NetworkCommissioning::Id &&
-        entry.clusterId != app::Clusters::Descriptor::Id;
 }
 
 } // namespace Access

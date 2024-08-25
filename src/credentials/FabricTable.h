@@ -737,7 +737,7 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
-     * @brief If a newly-added fabric is pending, this returns its index, or kUndefinedFabricIndex in none are pending.
+     * @brief If a newly-added fabric is pending, this returns its index, or kUndefinedFabricIndex if none are pending.
      *
      * A newly-added fabric is pending if AddNOC has been previously called successfully but the
      * fabric is not yet fully committed by CommissioningComplete.

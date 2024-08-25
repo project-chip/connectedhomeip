@@ -48,12 +48,7 @@ using EntryListener  = AccessControl::EntryListener;
 using ExtensionEvent = Clusters::AccessControl::Events::AccessControlExtensionChanged::Type;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-using ArlChangedEvent = Clusters::AccessControl::Events::AccessRestrictionEntryChanged::Type;
 using ArlReviewEvent  = Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type;
-
-constexpr uint16_t kMaxInstructionStringLength = 512;
-
-constexpr uint16_t kMaxRedirectUrlStringLength = 256;
 #endif
 
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
@@ -88,12 +83,12 @@ public:
                         const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType) override;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    void CommissioningRestrictionListChanged() override;
+    void MarkCommissioningRestrictionListChanged() override;
 
-    void RestrictionListChanged(FabricIndex fabricIndex) override;
+    void MarkRestrictionListChanged(FabricIndex fabricIndex) override;
 
-    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
-                                         const char * redirectUrl) override;
+    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                         Optional<CharSpan> redirectUrl) override;
 #endif
 
 private:
@@ -147,8 +142,8 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     TLV::TLVReader reader;
     reader.Init(data);
 
-    auto containerType = chip::TLV::kTLVType_List;
-    err                = reader.Next(containerType, chip::TLV::AnonymousTag());
+    auto containerType = TLV::kTLVType_List;
+    err                = reader.Next(containerType, TLV::AnonymousTag());
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     err = reader.EnterContainer(containerType);
@@ -156,7 +151,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
 
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(chip::TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -471,18 +466,17 @@ exit:
 CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & aEncoder)
 {
     auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
-    if (accessRestrictionProvider == nullptr)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        auto entries = accessRestrictionProvider->GetCommissioningEntries();
-
-        for (auto & entry : entries)
+        if (accessRestrictionProvider != nullptr)
         {
-            ArlEncoder::CommissioningEncodableEntry encodableEntry(entry);
-            ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+            auto entries = accessRestrictionProvider->GetCommissioningEntries();
+
+            for (auto & entry : entries)
+            {
+                ArlEncoder::CommissioningEncodableEntry encodableEntry(entry);
+                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+            }
         }
         return CHIP_NO_ERROR;
     });
@@ -491,72 +485,59 @@ CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & 
 CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
 {
     auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
-    if (accessRestrictionProvider == nullptr)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto & info : Server::GetInstance().GetFabricTable())
+        if (accessRestrictionProvider != nullptr)
         {
-            auto fabric = info.GetFabricIndex();
-            // get entries for fabric
-            std::vector<AccessRestrictionProvider::Entry> entries;
-            ReturnErrorOnFailure(accessRestrictionProvider->GetEntries(fabric, entries));
-            for (auto & entry : entries)
+            for (const auto & info : Server::GetInstance().GetFabricTable())
             {
-                ArlEncoder::EncodableEntry encodableEntry(entry);
-                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+                auto fabric = info.GetFabricIndex();
+                // get entries for fabric
+                std::vector<AccessRestrictionProvider::Entry> entries;
+                ReturnErrorOnFailure(accessRestrictionProvider->GetEntries(fabric, entries));
+                for (const auto & entry : entries)
+                {
+                    ArlEncoder::EncodableEntry encodableEntry(entry);
+                    ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+                }
             }
         }
         return CHIP_NO_ERROR;
     });
 }
-void AccessControlAttribute::CommissioningRestrictionListChanged()
+void AccessControlAttribute::MarkCommissioningRestrictionListChanged()
 {
-    MatterReportingAttributeChangeCallback(0, AccessControlCluster::Id, AccessControlCluster::Attributes::CommissioningARL::Id);
+    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id, AccessControlCluster::Attributes::CommissioningARL::Id);
 }
 
-void AccessControlAttribute::RestrictionListChanged(FabricIndex fabricIndex)
+void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
 {
-    CHIP_ERROR err;
-
-    MatterReportingAttributeChangeCallback(0, AccessControlCluster::Id, AccessControlCluster::Attributes::Arl::Id);
-
-    ArlChangedEvent event{ .fabricIndex = fabricIndex };
-
-    EventNumber eventNumber;
-    SuccessOrExit(err = LogEvent(event, 0, eventNumber));
-
-    return;
-
-exit:
-    ChipLogError(DataManagement, "AccessControlCluster: restriction event failed %" CHIP_ERROR_FORMAT, err.Format());
+    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id, AccessControlCluster::Attributes::Arl::Id);
 }
 
-void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
-                                                             const char * redirectUrl)
+void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                                            Optional<CharSpan> redirectUrl)
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
 
-    if (instruction != nullptr)
+    if (instruction.HasValue())
     {
-        event.instruction.SetNonNull(chip::CharSpan(instruction, strnlen(instruction, kMaxInstructionStringLength)));
+        event.instruction.SetNonNull(instruction.Value());
     }
 
-    if (redirectUrl != nullptr)
+    if (redirectUrl.HasValue())
     {
-        event.redirectURL.SetNonNull(chip::CharSpan(redirectUrl, strnlen(redirectUrl, kMaxRedirectUrlStringLength)));
+        event.redirectURL.SetNonNull(redirectUrl.Value());
     }
 
     EventNumber eventNumber;
-    SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+    SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
 
     return;
 
 exit:
-    ChipLogError(DataManagement, "AccessControlCluster: review event failed %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 #endif
 
@@ -628,9 +609,10 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
 {
-    if (commandPath.mEndpointId != 0)
+    if (commandPath.mEndpointId != kRootEndpointId)
     {
         ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
         return true;
     }
 
@@ -651,6 +633,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
             if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
+                commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
                 return true;
             }
 
@@ -662,6 +645,13 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
         }
 
         entries.push_back(entry);
+    }
+
+    if (entryIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+        return true;
     }
 
     CHIP_ERROR err = GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
@@ -676,7 +666,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     else
     {
         ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
     }
 
     return true;

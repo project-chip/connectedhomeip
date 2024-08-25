@@ -93,11 +93,6 @@ public:
          */
         CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex fabric) const;
 
-        /**
-         * Encode the constructor-provided entry into the TLV writer.
-         */
-        CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
         FabricIndex GetFabricIndex() const { return mEntry.fabricIndex; }
 
         static constexpr bool kIsFabricScoped = true;

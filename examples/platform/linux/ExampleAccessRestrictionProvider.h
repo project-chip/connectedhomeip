@@ -45,7 +45,7 @@ protected:
         chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type event{ .token       = token,
                                                                                                .fabricIndex = fabricIndex };
         EventNumber eventNumber;
-        ReturnErrorOnFailure(chip::app::LogEvent(event, 0, eventNumber));
+        ReturnErrorOnFailure(chip::app::LogEvent(event, kRootEndpointId, eventNumber));
 
         return CHIP_NO_ERROR;
     }
