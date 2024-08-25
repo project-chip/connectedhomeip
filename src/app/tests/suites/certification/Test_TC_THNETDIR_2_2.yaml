@@ -25,13 +25,16 @@ config:
     # Note: TestNetwork* values need to match what's encoded in TestNetworkDataset
     TestNetworkDataset:
         type: octet_string
-        defaultValue: "hex:0e080000000000000001000300000f350407fff800020839758ec8144b07fb0708fdf1f1add0797dc00510f366cec7a446bab978d90d27abe38f23030f4f70656e5468726561642d353933380102593804103ca67c969efb0d0c74a4d8ee923b576c0c0402a0f7f8"
+        defaultValue: "hex:0e0800000000000c0001000300000f350407fff800020839758ec8144b07fb0708fdf1f1add0797dc00510f366cec7a446bab978d90d27abe38f23030f4f70656e5468726561642d353933380102593804103ca67c969efb0d0c74a4d8ee923b576c0c0402a0f7f8"
     TestNetworkExtendedPanId:
         type: octet_string
         defaultValue: "hex:39758ec8144b07fb"
     TestNetworkName: "OpenThread-5938"
     TestNetworkChannel: 15
-    TestNetworkActiveTimestamp: 1
+    TestNetworkActiveTimestamp: 0xc0001
+    TestNetworkUpdatedDataset:
+        type: octet_string
+        defaultValue: "hex:0e0800000000000d0001000300000f350407fff800020839758ec8144b07fb0708fdf1f1add0797dc00510f366cec7a446bab978d90d27abe38f23030f4f70656e5468726561642d353933380102593804103ca67c969efb0d0c74a4d8ee923b576c0c0402a0f7f8"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -141,6 +144,78 @@ tests:
           values:
               - name: OperationalDataset
                 value: TestNetworkDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with TestNetwork dataset matching
+          existing Active Timestamp"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with updated TestNetwork dataset
+          with larger Active Timestamp"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with original TestNetwork dataset"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
 
     - label:
           "TH writes ExtendedPanID from TestNetwork to PreferredExtendedPanID on
