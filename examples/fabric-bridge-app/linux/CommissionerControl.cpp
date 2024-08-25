@@ -49,7 +49,7 @@ namespace CommissionerControl {
 void CommissionerControlDelegate::ResetDelegateState()
 {
     // Reset the step to the initial state
-    mNextStep = Step::kAcceptCommissioningApproval;
+    mNextStep = Step::kIdle;
 
     // Reset identifiers and product information
     mRequestId    = 0;
@@ -71,7 +71,7 @@ void CommissionerControlDelegate::ResetDelegateState()
 
 CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request)
 {
-    VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningApproval, CHIP_ERROR_BUSY);
+    VerifyOrReturnError(mNextStep == Step::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
     CommissionerControl::Events::CommissioningRequestResult::Type result;
     result.requestId    = request.requestId;
@@ -113,7 +113,14 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
 
     CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
 
-    mNextStep = (err == CHIP_NO_ERROR) ? Step::kWaitCommissionNodeRequest : Step::kAcceptCommissioningApproval;
+    if (err == CHIP_NO_ERROR)
+    {
+        mNextStep = Step::kWaitCommissionNodeRequest;
+    }
+    else
+    {
+        ResetDelegateState();
+    }
 
     return err;
 }
@@ -162,22 +169,29 @@ CHIP_ERROR CommissionerControlDelegate::GetCommissioningWindowParams(Commissioni
 CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params,
                                                              const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
 
     VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    return CommissionNode(Controller::CommissioningWindowPasscodeParams()
-                              .SetSetupPIN(kSetupPinCode)
-                              .SetTimeout(params.commissioningTimeout)
-                              .SetDiscriminator(params.discriminator)
-                              .SetIteration(params.iterations)
-                              .SetSalt(params.salt),
-                          mVendorId, mProductId);
+    err = CommissionNode(Controller::CommissioningWindowPasscodeParams()
+                             .SetSetupPIN(kSetupPinCode)
+                             .SetTimeout(params.commissioningTimeout)
+                             .SetDiscriminator(params.discriminator)
+                             .SetIteration(params.iterations)
+                             .SetSalt(params.salt),
+                         mVendorId, mProductId);
 #else
     ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    // Reset the delegate's state to prepare for a new commissioning sequence.
+    ResetDelegateState();
+
+    return err;
 }
 
 } // namespace CommissionerControl
