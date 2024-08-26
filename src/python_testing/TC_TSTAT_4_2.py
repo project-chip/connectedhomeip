@@ -501,6 +501,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
 
+            # Clear state for next test.
+            await self.send_atomic_request_rollback_command()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
