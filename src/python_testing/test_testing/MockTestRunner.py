@@ -23,6 +23,7 @@ from unittest.mock import MagicMock
 
 from chip.clusters import Attribute
 from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
+
 # try:
 # from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 # except ImportError:
