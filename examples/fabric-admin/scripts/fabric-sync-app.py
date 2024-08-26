@@ -28,12 +28,16 @@ async def run(tag, program, *args, stdin=None):
     return p
 
 
-async def run_admin(program, storage_dir=None, paa_trust_store_path=None,
-                    commissioner_name=None, commissioner_node_id=None,
-                    commissioner_vendor_id=None):
+async def run_admin(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_port=None,
+                    paa_trust_store_path=None, commissioner_name=None,
+                    commissioner_node_id=None, commissioner_vendor_id=None):
     args = []
     if storage_dir is not None:
         args.extend(["--storage-directory", storage_dir])
+    if rpc_admin_port is not None:
+        args.extend(["--local-server-port", str(rpc_admin_port)])
+    if rpc_bridge_port is not None:
+        args.extend(["--fabric-bridge-server-port", str(rpc_bridge_port)])
     if paa_trust_store_path is not None:
         args.extend(["--paa-trust-store-path", paa_trust_store_path])
     if commissioner_name is not None:
@@ -46,18 +50,22 @@ async def run_admin(program, storage_dir=None, paa_trust_store_path=None,
     await p.wait()
 
 
-async def run_bridge(program, storage_dir=None, discriminator=None,
-                     passcode=None, secured_device_port=None):
+async def run_bridge(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_port=None,
+                     discriminator=None, passcode=None, secured_device_port=None):
     args = []
     if storage_dir is not None:
         args.extend(["--KVS",
                      os.path.join(storage_dir, "chip_fabric_bridge_kvs")])
+    if rpc_admin_port is not None:
+        args.extend(["--fabric-admin-server-port", str(rpc_admin_port)])
+    if rpc_bridge_port is not None:
+        args.extend(["--local-server-port", str(rpc_bridge_port)])
     if discriminator is not None:
         args.extend(["--discriminator", discriminator])
     if passcode is not None:
         args.extend(["--passcode", passcode])
     if secured_device_port is not None:
-        args.extend(["--secured-device-port", secured_device_port])
+        args.extend(["--secured-device-port", str(secured_device_port)])
     p = await run("[BRIDGE]", program, *args, stdin=asyncio.subprocess.DEVNULL)
     await p.wait()
 
@@ -67,6 +75,8 @@ async def main(args):
         run_admin(
             args.app_admin,
             storage_dir=args.storage_dir,
+            rpc_admin_port=args.app_admin_rpc_port,
+            rpc_bridge_port=args.app_bridge_rpc_port,
             paa_trust_store_path=args.paa_trust_store_path,
             commissioner_name=args.commissioner_name,
             commissioner_node_id=args.commissioner_nodeid,
@@ -75,6 +85,8 @@ async def main(args):
         run_bridge(
             args.app_bridge,
             storage_dir=args.storage_dir,
+            rpc_admin_port=args.app_admin_rpc_port,
+            rpc_bridge_port=args.app_bridge_rpc_port,
             secured_device_port=args.secured_device_port,
             discriminator=args.discriminator,
             passcode=args.passcode,
@@ -89,6 +101,10 @@ if __name__ == "__main__":
     parser.add_argument("--app-bridge", metavar="PATH",
                         default="out/linux-x64-fabric-bridge-rpc/fabric-bridge-app",
                         help="path to the fabric-bridge executable; default=%(default)s")
+    parser.add_argument("--app-admin-rpc-port", metavar="PORT", type=int,
+                        help="fabric-admin RPC server port")
+    parser.add_argument("--app-bridge-rpc-port", metavar="PORT", type=int,
+                        help="fabric-bridge RPC server port")
     parser.add_argument("--storage-dir", metavar="PATH",
                         help="directory to place storage files in")
     parser.add_argument("--paa-trust-store-path", metavar="PATH",
@@ -99,7 +115,7 @@ if __name__ == "__main__":
                         help="commissioner node ID to use for the admin")
     parser.add_argument("--commissioner-vendor-id", metavar="NUM",
                         help="commissioner vendor ID to use for the admin")
-    parser.add_argument("--secured-device-port", metavar="NUM",
+    parser.add_argument("--secured-device-port", metavar="NUM", type=int,
                         help="secure messages listen port to use for the bridge")
     parser.add_argument("--discriminator", metavar="NUM",
                         help="discriminator to use for the bridge")
