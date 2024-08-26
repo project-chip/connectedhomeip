@@ -22,7 +22,6 @@ import logging as log
 import os
 import random
 import secrets
-import ssl
 import subprocess
 import sys
 from datetime import datetime, timedelta

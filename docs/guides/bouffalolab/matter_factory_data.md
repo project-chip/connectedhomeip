@@ -95,7 +95,7 @@ repo.
 
     If not specified, script will use PAI certificate and key specified
     by`--pai_cert` and `--pai-key` to generate DAC certificate and private key
-    for development and test prupose.
+    for development and test purpose.
 
 -   `--discriminator`, discriminator ID
 
@@ -116,6 +116,7 @@ Please reference to `--help` for more detail.
 -   Run following command to generate all plain text factory data
 
     Please create output folder first. Here takes `out/test-cert` as example.
+
     ```shell
     ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert
     ```
@@ -181,7 +182,7 @@ user should know it has limit to work with real ecosystem.
     ./out/linux-x64-chip-cert/chip-cert gen-att-cert --type i --subject-cn "${TEST_CERT_CN} PAI 01" --subject-vid ${TEST_CERT_VENDOR_ID} --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --ca-cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --out-key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem --out out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem
     ```
 
--   Generate MFD in plain text data
+-   Generate `MFD` in plain text data
 
     ```shell
     ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --paa_cert out/test-cert/Chip-PAA-Cert-${TEST_CERT_VENDOR_ID}.pem --paa_key out/test-cert/Chip-PAA-Key-${TEST_CERT_VENDOR_ID}.pem --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --pai_key out/test-cert/Chip-PAI-Key-${TEST_CERT_VENDOR_ID}.pem
@@ -212,7 +213,7 @@ user should know it has limit to work with real ecosystem.
     > **Note**, `--valid-from` and `--lifetime` should be in `--valid-from` and
     > `--lifetime` of PAI certificate.
 
--   Generate MFD in plain text data
+-   Generate `MFD` in plain text data
 
     ```shell
     ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert --pai_cert out/test-cert/Chip-PAI-Cert-${TEST_CERT_VENDOR_ID}.pem --dac_cert out/test-cert/Chip-DAC-Cert-${TEST_CERT_VENDOR_ID}-${TEST_CERT_PRODUCT_ID}.pem --dac_key out/test-cert/Chip-DAC-Key-${TEST_CERT_VENDOR_ID}-${TEST_CERT_PRODUCT_ID}.pem
@@ -234,12 +235,12 @@ key.
 /out/bouffalolab-bl616dk-light-wifi-mfd/chip-bl616-lighting-example.flash.py --port <serial port>  --mfd out/test-cert/<mfd bin file>
 ```
 
-> If mfd file has cipher text data, please append
+> If `MFD` file has cipher text data, please append
 > `--key <hex string of 16 bytes>` option to program to this key to efuse.
 
 -   Limits on BL IOT SDK
 
-    If developer would like to program MFD with all plain text data, option
+    If developer would like to program `MFD` with all plain text data, option
     `--key <hex string of 16 bytes>` needs pass to script, otherwise, flash tool
     will raise an error. And SoC BL602, BL702 and BL702L use BL IOT SDK for
     Matter Application.

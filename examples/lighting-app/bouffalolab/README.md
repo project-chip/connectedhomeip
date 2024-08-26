@@ -1,4 +1,4 @@
-# `Bouffalo Lab`
+# Matter `Bouffalo Lab` Lighting Example
 
 This example functions as a light bulb device type, with on/off and level
 capabilities and uses a test Vendor ID (VID) and a Product ID (PID)

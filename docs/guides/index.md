@@ -9,6 +9,7 @@ and features.
 :hidden:
 
 *
+bouffalolab/matter_factory_data
 esp32/README
 nxp/README
 ti/ti_matter_overview
