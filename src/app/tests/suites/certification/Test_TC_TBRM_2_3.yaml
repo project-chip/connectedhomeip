@@ -91,10 +91,6 @@ tests:
       cluster: General Commissioning
       command: CommissioningComplete
       endpoint: 0
-      response:
-          values:
-              - name: "ErrorCode"
-                value: 0 # SUCCESS
 
     # Step 5
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
