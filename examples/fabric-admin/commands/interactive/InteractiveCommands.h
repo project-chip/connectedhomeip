@@ -31,7 +31,8 @@ class InteractiveCommand : public CHIPCommand
 public:
     InteractiveCommand(const char * name, Commands * commandsHandler, const char * helpText,
                        CredentialIssuerCommands * credsIssuerConfig) :
-        CHIPCommand(name, credsIssuerConfig, helpText), mHandler(commandsHandler)
+        CHIPCommand(name, credsIssuerConfig, helpText),
+        mHandler(commandsHandler)
     {
         AddArgument("advertise-operational", 0, 1, &mAdvertiseOperational,
                     "Advertise operational node over DNS-SD and accept incoming CASE sessions.");
