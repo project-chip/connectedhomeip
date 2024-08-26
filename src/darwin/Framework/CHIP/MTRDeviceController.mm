@@ -331,14 +331,14 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
-- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
 {
-    if (!parameters.operationalCertificate || !parameters.rootCertificate) {
+    if (!operationalCertificate || !rootCertificate) {
         return FALSE;
     }
-    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:parameters.operationalCertificate];
-    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:parameters.operationalCertificate];
-    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:parameters.rootCertificate];
+    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:operationalCertificate];
+    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:operationalCertificate];
+    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:rootCertificate];
 
     std::lock_guard lock(_assertionLock);
 
