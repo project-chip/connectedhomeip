@@ -174,7 +174,7 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
     return true;
 }
 
-bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+bool RvcDevice::SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
     if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
     {

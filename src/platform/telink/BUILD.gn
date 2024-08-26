@@ -93,6 +93,7 @@ static_library("telink") {
 
   if (chip_enable_wifi) {
     sources += [
+      "OTAImageProcessorImplWiFi.h",
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
       "wifi/TelinkWiFiDriver.cpp",

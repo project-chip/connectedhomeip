@@ -481,7 +481,7 @@ limitations under the License.
 
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>ID</description>
-      <arg id="0" name="PresetHandle" type="octet_string" length="16"/>
+      <arg id="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
     </command>
 
     <!-- Server Commands/Responses -->

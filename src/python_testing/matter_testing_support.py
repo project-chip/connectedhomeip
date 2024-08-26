@@ -27,6 +27,7 @@ import queue
 import random
 import re
 import sys
+import textwrap
 import time
 import typing
 import uuid
@@ -333,6 +334,15 @@ class AttributeChangeCallback:
             asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
+def clear_queue(report_queue: queue.Queue):
+    """Flush all contents of a report queue. Useful to get back to empty point."""
+    while not report_queue.empty():
+        try:
+            report_queue.get(block=False)
+        except queue.Empty:
+            break
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -342,6 +352,9 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
       - attribute: attribute to match for reports to check.
       - sequence: list of attribute values in order that are expected.
       - timeout_sec: number of seconds to wait for.
+
+    *** WARNING: The queue contains every report since the sub was established. Use
+        clear_queue to make it empty. ***
 
     This will fail current Mobly test with assertion failure if the data is not as expected in order.
 
@@ -444,6 +457,20 @@ class ClusterAttributeChangeAccumulator:
     @property
     def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
         return self._attribute_reports
+
+    def get_last_report(self) -> Optional[Any]:
+        """Flush entire queue, returning last (newest) report only."""
+        last_report: Optional[Any] = None
+        while True:
+            try:
+                last_report = self._q.get(block=False)
+            except queue.Empty:
+                return last_report
+
+    def flush_reports(self) -> None:
+        """Flush entire queue, returning nothing."""
+        _ = self.get_last_report()
+        return
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -1123,11 +1150,59 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
-            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+
+            try:
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                # If we failed during setup, these may not be populated
+                step_duration = 0
+            try:
+                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            except AttributeError:
+                test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+            def extract_error_text() -> tuple[str, str]:
+                no_stack_trace = ("Stack Trace Unavailable", "")
+                if not record.termination_signal.stacktrace:
+                    return no_stack_trace
+                trace = record.termination_signal.stacktrace.splitlines()
+                if not trace:
+                    return no_stack_trace
+
+                if isinstance(exception, signals.TestError):
+                    # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
+                    if not assert_candidates:
+                        return "Unknown error, please see stack trace above", ""
+                    assert_candidate_idx = assert_candidates[-1]
+                else:
+                    # Normal assert is on the Last line
+                    assert_candidate_idx = -1
+                probable_error = trace[assert_candidate_idx]
+
+                # Find the file marker immediately above the probable error
+                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
+                if not file_candidates:
+                    return probable_error, "Unknown file"
+                return probable_error.strip(), trace[file_candidates[-1]].strip()
+
+            probable_error, probable_file = extract_error_text()
+            logging.error(textwrap.dedent(f"""
+
+                                          ******************************************************************
+                                          *
+                                          * Test {self.current_test_info.name} failed for the following reason:
+                                          * {exception}
+                                          *
+                                          * {probable_file}
+                                          * {probable_error}
+                                          *
+                                          *******************************************************************
+
+                                          """))
 
     def on_pass(self, record):
         ''' Called by Mobly on test pass
@@ -1763,6 +1838,14 @@ def per_node_test(body):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+
+
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
     try:
         return cluster in wildcard.attributes[endpoint]
@@ -1795,7 +1878,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
 
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
         return attribute.attribute_id in attr_list
