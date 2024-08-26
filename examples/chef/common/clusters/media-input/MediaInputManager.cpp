@@ -54,7 +54,7 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
     uint8_t currentInput = 1;
-    Status status = Attributes::CurrentInput::Get(mEndpoint, &currentInput);
+    Status status        = Attributes::CurrentInput::Get(mEndpoint, &currentInput);
     if (Status::Success != status)
     {
         ChipLogError(Zcl, "Unable to save CurrentInput attribute, err:0x%x", to_underlying(status));

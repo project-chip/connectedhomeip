@@ -30,7 +30,7 @@ class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
     using Feature              = chip::app::Clusters::MediaPlayback::Feature;
 
 public:
-    MediaPlaybackManager(chip::EndpointId endpoint):mEndpoint(endpoint) {};
+    MediaPlaybackManager(chip::EndpointId endpoint) : mEndpoint(endpoint){};
 
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
@@ -105,7 +105,7 @@ protected:
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };
-    uint64_t mStartTime  = 0;
+    uint64_t mStartTime = 0;
     // Magic number for testing.
     uint64_t mDuration      = 80000;
     bool mAudioAdvanceMuted = false;
