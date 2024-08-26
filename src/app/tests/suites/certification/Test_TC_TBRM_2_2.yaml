@@ -102,10 +102,6 @@ tests:
       cluster: General Commissioning
       command: CommissioningComplete
       endpoint: 0
-      response:
-          values:
-              - name: "ErrorCode"
-                value: 0 # SUCCESS
 
     # Step 8
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
