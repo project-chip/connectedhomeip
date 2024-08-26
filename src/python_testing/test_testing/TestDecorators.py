@@ -107,9 +107,6 @@ class DecoratorTestRunnerHooks:
 
 
 class TestDecorators(MatterBaseTest):
-    def teardown_test(self):
-        self.matter_test_config.endpoint = None
-
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)
@@ -341,14 +338,14 @@ def main():
         return ok, hooks
 
     def expect_success_dynamic(test_name: str, cluster_list: list[int]):
-        ok, hooks = run_singleton_dynamic(test_name, [0])
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
         if not ok:
             failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
         if hooks.skipped:
             failures.append(f'Unexpected skip call on {test_name} with cluster list {cluster_list}')
 
     def expect_failure_dynamic(test_name: str, cluster_list: list[int]):
-        ok = run_singleton_dynamic(test_name, [0])
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
         if ok:
             failures.append(f"Unexpected success on {test_name} with cluster list {cluster_list}")
         if hooks.skipped:
@@ -356,7 +353,7 @@ def main():
             failures.append(f'Skip called for {test_name} with cluster list {cluster_list}')
 
     def expect_skip_dynamic(test_name: str, cluster_list: list[int]):
-        ok = run_singleton_dynamic(test_name, [0])
+        ok, hooks = run_singleton_dynamic(test_name, cluster_list)
         if not ok:
             failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
         if not hooks.skipped:
@@ -375,10 +372,10 @@ def main():
     expect_failure_dynamic(test_name, [0, 1])
 
     test_name = 'test_no_run_on_singleton_matching_endpoint'
-    # no failure, expect skips on single endpoints, expect asserts on multiple matching
+    # no failure, no matches, expect skips on all endpoints
     expect_skip_dynamic(test_name, [0])
     expect_skip_dynamic(test_name, [1])
-    expect_failure_dynamic(test_name, [0, 1])
+    expect_skip_dynamic(test_name, [0, 1])
 
     test_runner.Shutdown()
     print(
