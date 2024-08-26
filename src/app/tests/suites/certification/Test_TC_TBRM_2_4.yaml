@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: "[TC-TBRM-2.4] Verify that getting Active or Pending Dataset in the PASE session results in unsupported access"
+name:
+    "[TC-TBRM-2.4] Verify that getting Active or Pending Dataset in the PASE
+    session results in unsupported access"
 
 PICS:
     - TBRM.S
@@ -33,7 +35,8 @@ tests:
               - name: payload
                 value: payload
 
-    - label: "TH send GetActiveDatasetRequest command to the DUT in PASE session"
+    - label:
+          "TH send GetActiveDatasetRequest command to the DUT in PASE session"
       cluster: Thread Border Router Management
       endpoint: 1
       command: GetActiveDatasetRequest
