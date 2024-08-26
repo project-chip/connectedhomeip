@@ -52,6 +52,17 @@ constexpr NodeId kOperationalNodeId1 = 0x1111111111111111;
 constexpr NodeId kOperationalNodeId2 = 0x2222222222222222;
 constexpr NodeId kOperationalNodeId3 = 0x3333333333333333;
 
+bool operator==(const AccessRestrictionProvider::Restriction & lhs, const AccessRestrictionProvider::Restriction & rhs)
+{
+    return lhs.restrictionType == rhs.restrictionType && lhs.id == rhs.id;
+}
+
+bool operator==(const AccessRestrictionProvider::Entry & lhs, const AccessRestrictionProvider::Entry & rhs)
+{
+    return lhs.fabricIndex == rhs.fabricIndex && lhs.endpointNumber == rhs.endpointNumber && lhs.clusterId == rhs.clusterId &&
+        lhs.restrictions == rhs.restrictions;
+}
+
 struct AclEntryData
 {
     FabricIndex fabricIndex = kUndefinedFabricIndex;
@@ -275,7 +286,7 @@ TEST_F(TestAccessRestriction, ValidRestrictionsOnEndpointOneTest)
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
 
-    // also test a cluster on endpoint 0 that isnt in the special allowed list
+    // also test a cluster on endpoint 1 that isnt in the special allowed list
     entries.clear();
     entry.clusterId = kOnOffCluster;
     entries.push_back(entry);
@@ -629,12 +640,11 @@ TEST_F(TestAccessRestriction, AttributeStorageSeperationTest)
     auto commissioningEntriesFetched = accessRestrictionProvider.GetCommissioningEntries();
     std::vector<AccessRestrictionProvider::Entry> arlEntriesFetched;
     EXPECT_EQ(accessRestrictionProvider.GetEntries(2, arlEntriesFetched), CHIP_NO_ERROR);
-
-    EXPECT_NE(commissioningEntriesFetched[0].fabricIndex, arlEntriesFetched[0].fabricIndex);
-    EXPECT_NE(commissioningEntriesFetched[0].endpointNumber, arlEntriesFetched[0].endpointNumber);
-    EXPECT_NE(commissioningEntriesFetched[0].clusterId, arlEntriesFetched[0].clusterId);
-    EXPECT_NE(commissioningEntriesFetched[0].restrictions[0].restrictionType, arlEntriesFetched[0].restrictions[0].restrictionType);
-    EXPECT_NE(commissioningEntriesFetched[0].restrictions[0].id, arlEntriesFetched[0].restrictions[0].id);
+    EXPECT_EQ(commissioningEntriesFetched[0], entry1);
+    EXPECT_EQ(commissioningEntriesFetched.size(), static_cast<size_t>(1));
+    EXPECT_EQ(arlEntriesFetched[0], entry2);
+    EXPECT_EQ(arlEntriesFetched.size(), static_cast<size_t>(1));
+    EXPECT_FALSE(commissioningEntriesFetched[0] == arlEntriesFetched[0]);
 }
 
 constexpr CheckData listSelectionDuringCommissioningData[] = {
