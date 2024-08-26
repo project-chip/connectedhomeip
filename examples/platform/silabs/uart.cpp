@@ -138,7 +138,12 @@ constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
                                            .cb_size    = osThreadCbSize,
                                            .stack_mem  = uartStack,
                                            .stack_size = kUartTaskSize,
-                                           .priority   = osPriorityRealtime };
+#if SLI_SI91X_MCU_INTERFACE
+                                           .priority   = osPriorityNormal 
+#else
+                                           .priority   = osPriorityRealtime 
+#endif // SLI_SI91X_MCU_INTERFACE
+};
 
 typedef struct
 {
