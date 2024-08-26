@@ -53,7 +53,7 @@ def main(search_directory, env_file):
     # Define the base command to run tests
     base_command = os.path.join(chip_root, "scripts/tests/run_python_test.py")
 
-    # Define the files and patterns to exclude
+    # Define the test python script files and patterns to exclude
     excluded_patterns = {
         "MinimalRepresentation.py",
         "TC_CNET_4_4.py",
