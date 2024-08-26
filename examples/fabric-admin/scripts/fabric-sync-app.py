@@ -71,6 +71,8 @@ async def run_bridge(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_
 
 
 async def main(args):
+    if args.storage_dir is not None:
+        os.makedirs(args.storage_dir, exist_ok=True)
     await asyncio.gather(
         run_admin(
             args.app_admin,
