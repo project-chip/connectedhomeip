@@ -94,13 +94,23 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
         self.step("2")
         esa_type = await self.read_dem_attribute_expect_success(attribute="ESAType")
-        logger.info(f"ESAType is {esa_type} [CHECK THIS IS EXPECTED VALUE]")
         asserts.assert_is_instance(esa_type, Clusters.DeviceEnergyManagement.Enums.ESATypeEnum, "Invalid type for ESAType")
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"Detected ESAType is {esa_type.name}:{esa_type} - is this correct? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
 
         self.step("3")
         esa_can_generate = await self.read_dem_attribute_expect_success(attribute="ESACanGenerate")
-        logger.info(f"ESACanGenerate is: {esa_can_generate} [CHECK THIS IS EXPECTED VALUE]")
         asserts.assert_is_instance(esa_can_generate, bool)
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"Detected ESACanGenerate is: {esa_can_generate} - is this correct? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
 
         self.step("4")
         esa_state = await self.read_dem_attribute_expect_success(attribute="ESAState")
@@ -109,17 +119,28 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         abs_min_power = await self.read_dem_attribute_expect_success(attribute="AbsMinPower")
-        logger.info(f"AbsMinPower is {abs_min_power/1000000.0} W [CHECK THIS IS EXPECTED VALUE]")
         asserts.assert_is_instance(abs_min_power, int)
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMinPower is {abs_min_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
+
         if not esa_can_generate:
             # ESA's that can't generate must have positive values
             asserts.assert_greater_equal(abs_min_power, 0)
 
         self.step("6")
         abs_max_power = await self.read_dem_attribute_expect_success(attribute="AbsMaxPower")
-        logger.info(f"AbsMaxPower is {abs_max_power/1000000.0} W [CHECK THIS IS EXPECTED VALUE]")
         asserts.assert_is_instance(abs_max_power, int)
         asserts.assert_greater_equal(abs_max_power, abs_min_power)
+
+        if not self.is_ci:
+            user_response = self.wait_for_user_input(prompt_msg=f"AbsMaxPower is {abs_max_power/1000000.0} W - is this correct? Enter 'y' or 'n'",
+                                                     prompt_msg_placeholder="y",
+                                                     default_value="y")
+            asserts.assert_equal(user_response.lower(), "y")
 
         self.step("7")
         if Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment & feature_map:
