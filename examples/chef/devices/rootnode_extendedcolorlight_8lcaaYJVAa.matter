@@ -2471,7 +2471,7 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds default = 0x0000;
-    ram      attribute startUpColorTemperatureMireds default = 0;
+    ram      attribute startUpColorTemperatureMireds default = 0xFFFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
