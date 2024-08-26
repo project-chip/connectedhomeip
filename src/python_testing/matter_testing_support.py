@@ -1892,22 +1892,52 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Returns a list of endpoints matching the accept condition. """
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+    return matching
+
+
+async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> bool:
     """ Helper function for the run_if_endpoint_matches decorator.
 
-        Returns a list of endpoints on which the test should be run given the accept_function for the test.
+        Returns True if self.matter_test_config.endpoint matches the accept function.
     """
-
     if self.matter_test_config.endpoint is None:
         msg = """
               The --endpoint flag is required for this test.
               """
         asserts.fail(msg)
-
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
-    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
-
+    matching = await (_get_all_matching_endpoints(self, accept_function))
     return self.matter_test_config.endpoint in matching
+
+
+def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
+    """ Test decorator for a test that needs to be run on the endpoint that matches the given accept function.
+
+        This decorator should be used for tests where the endpoint is not known a-priori (dynamic endpoints).
+        Note that currently this test is limited to devices with a SINGLE matching endpoint.
+    """
+    def run_on_singleton_matching_endpoint_internal(body):
+        def matching_runner(self: MatterBaseTest, *args, **kwargs):
+            runner_with_timeout = asyncio.wait_for(_get_all_matching_endpoints(self, accept_function), timeout=30)
+            matching = asyncio.run(runner_with_timeout)
+            asserts.assert_less_equal(len(matching), 1, "More than one matching endpoint found for singleton test.")
+            if not matching:
+                logging.info("Test is not applicable to any endpoint - skipping test")
+                asserts.skip('No endpoint matches test requirements')
+                return
+            # Exceptions should flow through, hence no except block
+            try:
+                old_endpoint = self.matter_test_config.endpoint
+                self.matter_test_config.endpoint = matching[0]
+                logging.info(f'Running test on endpoint {self.matter_test_config.endpoint}')
+                _async_runner(body, self, *args, **kwargs)
+            finally:
+                self.matter_test_config.endpoint = old_endpoint
+        return matching_runner
+    return run_on_singleton_matching_endpoint_internal
 
 
 def run_if_endpoint_matches(accept_function: EndpointCheckFunction):

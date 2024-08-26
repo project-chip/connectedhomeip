@@ -33,11 +33,13 @@ from chip.clusters import Attribute
 
 try:
     from matter_testing_support import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute,
-                                        has_cluster, has_feature, run_if_endpoint_matches, should_run_test_on_endpoint)
+                                        has_cluster, has_feature, run_if_endpoint_matches, run_on_singleton_matching_endpoint,
+                                        should_run_test_on_endpoint)
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from matter_testing_support import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute,
-                                        has_cluster, has_feature, run_if_endpoint_matches, should_run_test_on_endpoint)
+                                        has_cluster, has_feature, run_if_endpoint_matches, run_on_singleton_matching_endpoint,
+                                        should_run_test_on_endpoint)
 
 from typing import Optional
 
@@ -222,6 +224,18 @@ class TestDecorators(MatterBaseTest):
         if self.matter_test_config.endpoint == 1:
             asserts.fail("Expected failure")
 
+    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    async def test_run_on_singleton_matching_endpoint(self):
+        pass
+
+    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    async def test_run_on_singleton_matching_endpoint_failure(self):
+        asserts.fail("Expected failure")
+
+    @run_on_singleton_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    async def test_no_run_on_singleton_matching_endpoint(self):
+        pass
+
 
 def main():
     failures = []
@@ -307,6 +321,64 @@ def main():
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if ok:
         failures.append(f"Did not get expected test assertion on {test_name}")
+
+    def run_singleton_dynamic(test_name: str, cluster_list: list[int]) -> tuple[bool, DecoratorTestRunnerHooks]:
+        nonlocal failures
+        read_resp = get_clusters(cluster_list)
+        test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+        test_runner.set_test_config(MatterTestConfig(endpoint=2))
+        hooks = DecoratorTestRunnerHooks()
+        ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+        # for all tests, we need to ensure the endpoint was set back to the prior values
+        if test_runner.config.endpoint != 2:
+            failures.append(f"Dynamic tests {test_name} with clusters {cluster_list} did not set endpoint back to prior")
+        # All tests should have a start and a stop
+        started_ok = len(hooks.started) == 1
+        stopped_ok = hooks.stopped == 1
+        if not started_ok or not stopped_ok:
+            failures.append(
+                f'Hooks failure on {test_name}, Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
+        return ok, hooks
+
+    def expect_success_dynamic(test_name: str, cluster_list: list[int]):
+        ok, hooks = run_singleton_dynamic(test_name, [0])
+        if not ok:
+            failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
+        if hooks.skipped:
+            failures.append(f'Unexpected skip call on {test_name} with cluster list {cluster_list}')
+
+    def expect_failure_dynamic(test_name: str, cluster_list: list[int]):
+        ok = run_singleton_dynamic(test_name, [0])
+        if ok:
+            failures.append(f"Unexpected success on {test_name} with cluster list {cluster_list}")
+        if hooks.skipped:
+            # We don't expect a skip call because the test actually failed.
+            failures.append(f'Skip called for {test_name} with cluster list {cluster_list}')
+
+    def expect_skip_dynamic(test_name: str, cluster_list: list[int]):
+        ok = run_singleton_dynamic(test_name, [0])
+        if not ok:
+            failures.append(f"Unexpected failure on {test_name} with cluster list {cluster_list}")
+        if not hooks.skipped:
+            # We don't expect a skip call because the test actually failed.
+            failures.append(f'Skip not called for {test_name} with cluster list {cluster_list}')
+
+    test_name = 'test_run_on_singleton_matching_endpoint'
+    expect_success_dynamic(test_name, [0])
+    expect_success_dynamic(test_name, [1])
+    # expect failure because there is more than 1 endpoint
+    expect_failure_dynamic(test_name, [0, 1])
+
+    test_name = 'test_run_on_singleton_matching_endpoint_failure'
+    expect_failure_dynamic(test_name, [0])
+    expect_failure_dynamic(test_name, [1])
+    expect_failure_dynamic(test_name, [0, 1])
+
+    test_name = 'test_no_run_on_singleton_matching_endpoint'
+    # no failure, expect skips on single endpoints, expect asserts on multiple matching
+    expect_skip_dynamic(test_name, [0])
+    expect_skip_dynamic(test_name, [1])
+    expect_failure_dynamic(test_name, [0, 1])
 
     test_runner.Shutdown()
     print(
