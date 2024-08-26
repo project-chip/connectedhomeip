@@ -38,15 +38,6 @@ MediaInputManager::MediaInputManager(chip::EndpointId endpoint) : mEndpoint(endp
     struct InputData inputData3(3, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 3",
                                 "High-Definition Multimedia Interface");
     mInputs.push_back(inputData3);
-
-    // Sync the attributes from attribute storage
-    Status status = Attributes::CurrentInput::Get(endpoint, &mCurrentInput);
-
-    if (Status::Success != status)
-    {
-        ChipLogError(Zcl, "Unable to save CurrentInput attribute, err:0x%x", to_underlying(status));
-        mCurrentInput = 1;
-    }
 }
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
@@ -62,12 +53,18 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
-    return mCurrentInput;
+    uint8_t currentInput = 1;
+    Status status = Attributes::CurrentInput::Get(mEndpoint, &currentInput);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "Unable to save CurrentInput attribute, err:0x%x", to_underlying(status));
+    }
+    return currentInput;
 }
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
-    if (mCurrentInput == index)
+    if (HandleGetCurrentInput() == index)
     {
         ChipLogProgress(Zcl, "CurrentInput is same as new value: %u", index);
         return true;
@@ -76,7 +73,6 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
     {
         if (inputData.index == index)
         {
-            mCurrentInput = index;
             // Sync the CurrentInput to attribute storage while reporting changes
             Status status = chip::app::Clusters::MediaInput::Attributes::CurrentInput::Set(mEndpoint, index);
             if (Status::Success != status)
@@ -92,11 +88,12 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
 
 bool MediaInputManager::HandleShowInputStatus()
 {
+    uint8_t currentInput = HandleGetCurrentInput();
     ChipLogProgress(Zcl, " MediaInputManager::HandleShowInputStatus()");
     for (auto const & inputData : mInputs)
     {
         ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputData.index,
-                        static_cast<uint16_t>(inputData.inputType), (mCurrentInput == inputData.index ? 1 : 0),
+                        static_cast<uint16_t>(inputData.inputType), (currentInput == inputData.index ? 1 : 0),
                         inputData.name.c_str(), inputData.description.c_str());
     }
     return true;

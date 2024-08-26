@@ -33,27 +33,16 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using chip::Protocols::InteractionModel::Status;
 
-MediaPlaybackManager::MediaPlaybackManager(chip::EndpointId endpoint) : mEndpoint(endpoint)
+PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
-    // Sync the attributes from attribute storage
-    Status status = Attributes::CurrentState::Get(endpoint, &mCurrentState);
+    PlaybackStateEnum currentState = PlaybackStateEnum::kPlaying;
+
+    Status status = Attributes::CurrentState::Get(mEndpoint, &currentState);
     if (Status::Success != status)
     {
         ChipLogError(Zcl, "Unable to save CurrentStage attribute, err:0x%x", to_underlying(status));
-        mCurrentState = chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying;
     }
-
-    status = Attributes::PlaybackSpeed::Get(endpoint, &mPlaybackSpeed);
-    if (Status::Success != status)
-    {
-        ChipLogError(Zcl, "Unable to save PlaybackSpeed attribute, err:0x%x", to_underlying(status));
-        mPlaybackSpeed = 1.0;
-    }
-};
-
-PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
-{
-    return mCurrentState;
+    return currentState;
 }
 
 uint64_t MediaPlaybackManager::HandleGetStartTime()
@@ -73,7 +62,14 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
-    return mPlaybackSpeed;
+    float playbackSpeed = 1.0;
+
+    Status status = Attributes::PlaybackSpeed::Get(mEndpoint, &playbackSpeed);
+    if (Status::Success != status)
+    {
+        ChipLogError(Zcl, "Unable to save PlaybackSpeed attribute, err:0x%x", to_underlying(status));
+    }
+    return playbackSpeed;
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
@@ -120,8 +116,6 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
 
 CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
 {
-    mCurrentState = currentState;
-
     Status status = Attributes::CurrentState::Set(mEndpoint, currentState);
 
     if (Status::Success != status)
@@ -134,8 +128,6 @@ CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::Medi
 
 CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
 {
-    mPlaybackSpeed = playbackSpeed;
-
     Status status = Attributes::PlaybackSpeed::Set(mEndpoint, playbackSpeed);
 
     if (Status::Success != status)
@@ -183,7 +175,9 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
+    float playbackSpeed = HandleGetPlaybackSpeed();
+
+    if (playbackSpeed == kPlaybackMaxForwardSpeed)
     {
         // if already at max speed, return error
         Commands::PlaybackResponse::Type response;
@@ -194,10 +188,10 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
     }
 
     HandleSetCurrentState(PlaybackStateEnum::kPlaying);
-    float playbackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
+    // Normalize to correct range
+    playbackSpeed = (playbackSpeed <= 0 ? 1 : playbackSpeed * 2);
     if (playbackSpeed > kPlaybackMaxForwardSpeed)
     {
-        // don't exceed max speed
         playbackSpeed = kPlaybackMaxForwardSpeed;
     }
     HandleSetPlaybackSpeed(playbackSpeed);
@@ -223,7 +217,9 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                         const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
+    float playbackSpeed = HandleGetPlaybackSpeed();
+
+    if (playbackSpeed == kPlaybackMaxRewindSpeed)
     {
         // if already at max speed in reverse, return error
         Commands::PlaybackResponse::Type response;
@@ -234,10 +230,10 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
     }
 
     HandleSetCurrentState(PlaybackStateEnum::kPlaying);
-    float playbackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
+    // Normalize to correct range
+    playbackSpeed = (playbackSpeed >= 0 ? -1 : playbackSpeed * 2);
     if (playbackSpeed < kPlaybackMaxRewindSpeed)
     {
-        // don't exceed max rewind speed
         playbackSpeed = kPlaybackMaxRewindSpeed;
     }
     HandleSetPlaybackSpeed(playbackSpeed);

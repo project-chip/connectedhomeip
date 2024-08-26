@@ -64,7 +64,6 @@ public:
 
 protected:
     chip::EndpointId mEndpoint;
-    uint8_t mCurrentInput;
     std::vector<InputData> mInputs;
 
 private:
