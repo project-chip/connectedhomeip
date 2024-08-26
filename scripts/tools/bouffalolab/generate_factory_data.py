@@ -146,8 +146,6 @@ def gen_test_certs(chip_cert: str,
         if not os.path.isfile(cert):
             return None, None, None, None, None
 
-        ctx = ssl.create_default_context()
-
         with open(cert, 'rb') as cert_file:
             cert = x509.load_pem_x509_certificate(cert_file.read(), default_backend())
 
@@ -178,7 +176,7 @@ def gen_test_certs(chip_cert: str,
 
         try:
             pai_public_key.verify(cert.signature, cert.tbs_certificate_bytes, ec.ECDSA(hashes.SHA256()))
-        except Exception as e:
+        except Exception:
             raise Exception("Failed to verify DAC signature with PAI certificate.")
 
         if (pai_cert != TEST_PAI_CERT and paa_cert != TEST_PAA_CERT) or (pai_cert == TEST_PAI_CERT and paa_cert == TEST_PAA_CERT):
@@ -329,7 +327,7 @@ def gen_mfd_partition(args, mfd_output):
         elif data is None:
             return bytes([])
         else:
-            raise Exception("Data {} is invalid type: {}".format(name, type(data)))
+            raise Exception("Data is invalid type: {}".format(type(data)))
 
     def gen_tlvs(mfdDict, need_sec):
         MFD_ID_RAW_MASK = 0x8000
@@ -409,7 +407,7 @@ def gen_onboarding_data(args, onboard_txt, onboard_png, rendez=6):
         try:
             import qrcode
             from SetupPayload import CommissioningFlow, SetupPayload
-        except Exception as e:
+        except Exception:
             raise Exception("Please make sure qrcode has been installed.")
     else:
         raise Exception("Please make sure qrcode has been installed.")
@@ -434,7 +432,7 @@ def main():
     def check_arg(args):
 
         if not isinstance(args.output, str) or not os.path.exists(args.output):
-            raise Exception("output path is not specified.")
+            raise Exception("output path is not specified or not existed.")
         log.info("output path: {}".format(args.output))
 
         if not isinstance(args.chip_cert, str) or not os.path.exists(args.chip_cert):

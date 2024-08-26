@@ -114,18 +114,18 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 -   `-wifi`, specifies to use Wi-Fi for Matter application.
 
-    -   BL602 uses Wi-Fi by defualt. `-wifi` could be elided.
+    -   BL602 uses Wi-Fi by default. `-wifi` could be elided.
     -   BL702 needs it to specify to use BL706 + BL602 for Wi-Fi.
 
 -   `-thread`, specifies to use Thread for Matter application.
 
-    -   BL70X uses Thread by defualt. `-thread` could be elided.
+    -   BL70X uses Thread by default. `-thread` could be elided.
 
 -   `-ethernet`, specifies to use Ethernet for Matter application.
 
     -   BL706 needs it to specify to use Ethernet.
 
--   `-littlefs`, specifies to use littlefs for flash access.
+-   `-littlefs`, specifies to use `littlefs` for flash access.
 -   `-easyflash`, specifies to use `easyflash` for flash access.
     -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash`
         and `-littlefs`.

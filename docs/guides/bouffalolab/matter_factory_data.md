@@ -22,10 +22,10 @@ size0 = 0x1000
 ```
 
 To enable matter factory data feature, please append `-mfd` option at end of
-target name. Take BL616 Wi-Fi Matter Light as example.
+target name. Take BL602 Wi-Fi Matter Light as example.
 
 ```
-./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi-mfd build
+./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-littlefs-mfd build
 ```
 
 ## Factory data
@@ -115,6 +115,7 @@ Please reference to `--help` for more detail.
 
 -   Run following command to generate all plain text factory data
 
+    Please create output folder first. Here takes `out/test-cert` as example.
     ```shell
     ./scripts/tools/bouffalolab/generate_factory_data.py --output out/test-cert
     ```
