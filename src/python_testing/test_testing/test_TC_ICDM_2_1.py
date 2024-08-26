@@ -16,13 +16,16 @@
 #    limitations under the License.
 #
 
+from MockTestRunner import MockTestRunner
 import string
 import sys
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
+
+# Add the parent directory to sys.path to allow importing
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 c = Clusters.IcdManagement
 attr = c.Attributes

@@ -19,17 +19,10 @@ import importlib
 import os
 from pathlib import Path
 from unittest.mock import MagicMock
+import sys
 
 from chip.clusters import Attribute
 from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
-
-# import sys
-# try:
-# from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
-# except ImportError:
-# sys.path.append(os.path.abspath(
-# os.path.join(os.path.dirname(__file__), '..')))
-# from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 
 
 class AsyncMock(MagicMock):
@@ -56,7 +49,15 @@ class MockTestRunner():
     def set_test(self, filename: str, classname: str, test: str):
         self.test = test
         self.set_test_config()
-        module = importlib.import_module(Path(os.path.basename(filename)).stem)
+
+        module_name = Path(os.path.basename(filename)).stem
+
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            module = importlib.import_module(module_name)
+
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: MatterTestConfig = MatterTestConfig()):
@@ -73,7 +74,7 @@ class MockTestRunner():
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
+    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
