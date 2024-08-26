@@ -228,15 +228,128 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             TestStep(6, "DUT_FSA synchronizes TH_SERVER_FOR_TH_FSA onto DUT_FSA's fabric and copies the UniqueID presented by TH_FSA's Bridged Device Basic Information Cluster"),
         ]
 
+    async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int):
+        """Commission device_node_id to controller_node_id using CommissionerControl cluster."""
+
+        request_id = random.randint(0, 0xFFFFFFFFFFFFFFFF)
+
+        vendor_id = await self.read_single_attribute_check_success(
+            node_id=device_node_id,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+        )
+
+        product_id = await self.read_single_attribute_check_success(
+            node_id=device_node_id,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.ProductID,
+        )
+
+        await self.send_single_cmd(
+            node_id=controller_node_id,
+            cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
+                requestId=request_id,
+                vendorId=vendor_id,
+                productId=product_id,
+            ),
+        )
+
+        if not self.is_ci:
+            self.wait_for_user_input("Approve Commissioning Approval Request on DUT using manufacturer specified mechanism")
+
+        resp = await self.send_single_cmd(
+            node_id=controller_node_id,
+            cmd=Clusters.CommissionerControl.Commands.CommissionNode(
+                requestId=request_id,
+                responseTimeoutSeconds=30,
+            ),
+        )
+
+        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
+                             "Incorrect response type")
+
+        await self.send_single_cmd(
+            node_id=device_node_id,
+            cmd=Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
+                commissioningTimeout=3*60,
+                PAKEPasscodeVerifier=resp.PAKEPasscodeVerifier,
+                discriminator=resp.discriminator,
+                iterations=resp.iterations,
+                salt=resp.salt,
+            ),
+            timedRequestTimeoutMs=5000,
+        )
+
+        if not self.is_ci:
+            await asyncio.sleep(30)
+
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
+        self.is_ci = True
 
         # Commissioning - done
         self.step(0)
 
+        th_server_for_th_fsa_th_node_id = 1
+        self.print_step(1, "Commissioning TH_SERVER_FOR_TH_FSA to TH fabric")
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=th_server_for_th_fsa_th_node_id,
+            setupPinCode=self.server_for_th_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.server_for_th_discriminator,
+        )
+
+        self.print_step(2, "Verify that TH_SERVER_FOR_TH_FSA does not have a UniqueID")
+        await self.read_single_attribute_expect_error(
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.UniqueID,
+            node_id=th_server_for_th_fsa_th_node_id,
+            error=Status.UnsupportedAttribute,
+        )
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_FOR_TH_FSA.
+        dut_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=0,
+        ))
+
+        self.print_step(3, "Commissioning TH_SERVER_FOR_TH_FSA to DUT_FSA fabric")
+        await self.commission_via_commissioner_control(
+            controller_node_id=self.dut_node_id,
+            device_node_id=th_server_for_th_fsa_th_node_id)
+
+        # Wait for the device to appear on the DUT_FSA_BRIDGE.
+        await asyncio.sleep(2)
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE after adding the TH_SERVER_FOR_TH_FSA.
+        dut_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=0,
+        ))
+
+        # Get the endpoint number for just added TH_SERVER_FOR_TH_FSA.
+        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
+                            "Expected only new endpoints to be added")
+        unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
+        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint on DUT_FSA")
+        dut_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
+        dut_fsa_bridge_endpoints = dut_fsa_bridge_endpoints_new
+
+        self.print_step(4, "Verify that DUT_FSA created a UniqueID for TH_SERVER_FOR_TH_FSA")
+        dut_fsa_bridge_th_server_unique_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BridgedDeviceBasicInformation,
+            attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
+            endpoint=dut_fsa_bridge_th_server_endpoint)
+        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
+        logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", dut_fsa_bridge_th_server_unique_id)
+
         th_fsa_bridge_th_node_id = 2
-        self.print_step(1, "Commissioning TH_FSA_BRIDGE to TH fabric")
+        self.print_step(5, "Commissioning TH_FSA_BRIDGE to TH fabric")
         await self.default_controller.CommissionOnNetwork(
             nodeId=th_fsa_bridge_th_node_id,
             setupPinCode=self.fsa_bridge_passcode,
@@ -252,24 +365,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             endpoint=0,
         ))
 
-        th_server_for_th_fsa_th_node_id = 3
-        self.print_step(2, "Commissioning TH_SERVER_FOR_TH_FSA to TH fabric")
-        await self.default_controller.CommissionOnNetwork(
-            nodeId=th_server_for_th_fsa_th_node_id,
-            setupPinCode=self.server_for_th_passcode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.server_for_th_discriminator,
-        )
-
-        self.print_step(3, "Verify that TH_SERVER_FOR_TH_FSA does not have a UniqueID")
-        await self.read_single_attribute_expect_error(
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.UniqueID,
-            node_id=th_server_for_th_fsa_th_node_id,
-            error=Status.UnsupportedAttribute)
-
         discriminator = random.randint(0, 4095)
-        self.print_step(4, "Open commissioning window on TH_SERVER_FOR_TH_FSA")
+        self.print_step(6, "Open commissioning window on TH_SERVER_FOR_TH_FSA")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeid=th_server_for_th_fsa_th_node_id,
             timeout=600,
@@ -284,7 +381,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         await asyncio.sleep(2)
 
         th_server_for_th_fsa_th_fsa_node_id = 3
-        self.print_step(5, "Commissioning TH_SERVER_FOR_TH_FSA to TH_FSA")
+        self.print_step(7, "Commissioning TH_SERVER_FOR_TH_FSA to TH_FSA")
         self.th_fsa_controller.CommissionOnNetwork(
             nodeId=th_server_for_th_fsa_th_fsa_node_id,
             setupPinCode=params.setupPinCode,
@@ -311,7 +408,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
         th_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
 
-        self.print_step(6, "Verify that TH_FSA created a UniqueID for TH_SERVER_FOR_TH_FSA")
+        self.print_step(8, "Verify that TH_FSA created a UniqueID for TH_SERVER_FOR_TH_FSA")
         th_fsa_bridge_th_server_unique_id = await self.read_single_attribute_check_success(
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
@@ -321,14 +418,14 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", th_fsa_bridge_th_server_unique_id)
 
-        discriminator = random.randint(0, 4095)
-        self.print_step(7, "Open commissioning window on TH_FSA_BRIDGE")
-        params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=th_fsa_bridge_th_node_id,
-            timeout=600,
-            iteration=10000,
-            discriminator=discriminator,
-            option=1)
+        # Make sure that the UniqueID on the TH_FSA_BRIDGE is different from the one on the DUT_FSA_BRIDGE.
+        asserts.assert_not_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,
+                                 "UniqueID on DUT_FSA_BRIDGE and TH_FSA_BRIDGE should be different")
+
+        self.print_step(9, "Commissioning TH_FSA_BRIDGE to DUT_FSA fabric")
+        await self.commission_via_commissioner_control(
+            controller_node_id=self.dut_node_id,
+            device_node_id=th_fsa_bridge_th_node_id)
 
         await asyncio.sleep(10000)
 
