@@ -182,7 +182,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-all-clusters-minimal-ipv6only \
     --target linux-x64-bridge-ipv6only \
     --target linux-x64-tv-app-ipv6only \
-    --target linux-x64-tv-casting-app-ipv6only \  
+    --target linux-x64-tv-casting-app-ipv6only \
     --target linux-x64-light-ipv6only \
     --target linux-x64-thermostat-ipv6only \
     --target linux-x64-ota-provider-ipv6only \
@@ -319,7 +319,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requir
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 # PIP requires MASON package compilation, which seems to require a JDK
-# RUN apt-get update
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
 
 RUN pip install --break-system-packages --no-cache-dir python_lib/controller/python/chip*.whl
