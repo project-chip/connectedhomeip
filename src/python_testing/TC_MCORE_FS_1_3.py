@@ -87,10 +87,9 @@ class ThreadWithStop(threading.Thread):
         self.join()
 
 
-class FabricAdminController:
+class FabricSyncApp:
 
-    ADMIN_APP_PATH = "out/linux-x64-fabric-admin-rpc/fabric-admin"
-    BRIDGE_APP_PATH = "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
+    APP_PATH = "examples/fabric-admin/scripts/fabric-sync-app.py"
 
     def _process_admin_output(self, line):
         if self.wait_for_text_text is not None and self.wait_for_text_text in line:
@@ -108,25 +107,24 @@ class FabricAdminController:
         self.wait_for_text_event = threading.Event()
         self.wait_for_text_text = None
 
-        args = [self.BRIDGE_APP_PATH]
-        args.extend(["--KVS", tempfile.mkstemp(dir=storageDir, prefix="kvs-bridge-")[1]])
-        args.extend(['--secured-device-port', str(bridgePort)])
-        args.extend(["--discriminator", str(bridgeDiscriminator)])
-        args.extend(["--passcode", str(bridgePasscode)])
-        # Start the bridge app which will connect to admin via RPC.
-        self.bridge = ThreadWithStop(args, tag="BRIDGE")
-        self.bridge.start()
-
-        args = [self.ADMIN_APP_PATH, "interactive", "start"]
-        args.extend(["--storage-directory", storageDir])
-        args.extend(["--commissioner-name", str(fabricName)])
-        args.extend(["--commissioner-nodeid", str(nodeId)])
-        args.extend(["--commissioner-vendor-id", str(vendorId)])
+        args = [self.APP_PATH]
+        # Override default ports, so it will be possible to run
+        # our TH_FSA alongside the DUT_FSA during CI testing.
+        args.append("--app-admin-rpc-port=44000")
+        args.append("--app-bridge-rpc-port=44001")
+        # Keep the storage directory in a temporary location.
+        args.append(f"--storage-dir={storageDir}")
         # FIXME: Passing custom PAA store breaks something
         # if paaTrustStorePath is not None:
-        #     args.extend(["--paa-trust-store-path", str(paaTrustStorePath)])
+        #     args.append(f"--paa-trust-store-path={paaTrustStorePath}")
+        args.append(f"--commissioner-name={fabricName}")
+        args.append(f"--commissioner-node-id={nodeId}")
+        args.append(f"--commissioner-vendor-id={vendorId}")
+        args.append(f"--secured-device-port={bridgePort}")
+        args.append(f"--discriminator={bridgeDiscriminator}")
+        args.append(f"--passcode={bridgePasscode}")
 
-        self.admin = ThreadWithStop(args, self._process_admin_output, tag="ADMIN")
+        self.admin = ThreadWithStop(args, self._process_admin_output)
         self.wait_for_text_text = "Connected to Fabric-Bridge"
         self.admin.start()
 
@@ -143,7 +141,6 @@ class FabricAdminController:
 
     def stop(self):
         self.admin.stop()
-        self.bridge.stop()
 
 
 class AppServer:
@@ -167,23 +164,18 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
-        # Get the path to the Fabric Admin and Bridge apps from the user
-        # params or use the default paths.
-        FabricAdminController.ADMIN_APP_PATH = self.user_params.get(
-            "th_fabric_admin_app_path", FabricAdminController.ADMIN_APP_PATH)
-        FabricAdminController.BRIDGE_APP_PATH = self.user_params.get(
-            "th_fabric_bridge_app_path", FabricAdminController.BRIDGE_APP_PATH)
-        if not os.path.exists(FabricAdminController.ADMIN_APP_PATH):
-            asserts.fail("This test requires a TH_FABRIC_ADMIN app. Specify app path with --string-arg th_fabric_admin_app_path:<path_to_app>")
-        if not os.path.exists(FabricAdminController.BRIDGE_APP_PATH):
-            asserts.fail("This test requires a TH_FABRIC_BRIDGE app. Specify app path with --string-arg th_fabric_bridge_app_path:<path_to_app>")
+        # Get the path to the TH_FSA (fabric-admin and fabric-bridge) app from
+        # the user params or use the default path.
+        FabricSyncApp.APP_PATH = self.user_params.get("th_fabric_sync_app_path", FabricSyncApp.APP_PATH)
+        if not os.path.exists(FabricSyncApp.APP_PATH):
+            asserts.fail("This test requires a TH_FSA app. Specify app path with --string-arg th_fabric_sync_app_path:<path_to_app>")
 
         # Get the path to the TH_SERVER app from the user params.
-        app = self.user_params.get("th_server_app_path", None)
-        if not app:
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        if not th_server_app:
             asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>")
-        if not os.path.exists(app):
-            asserts.fail(f"The path {app} does not exist")
+        if not os.path.exists(th_server_app):
+            asserts.fail(f"The path {th_server_app} does not exist")
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
@@ -193,7 +185,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.fsa_bridge_discriminator = random.randint(0, 4095)
         self.fsa_bridge_passcode = 20202021
 
-        self.th_fsa_controller = FabricAdminController(
+        self.th_fsa_controller = FabricSyncApp(
             storageDir=self.storage.name,
             paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
             bridgePort=self.fsa_bridge_port,
@@ -213,7 +205,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         # Start the TH_SERVER_FOR_TH_FSA app.
         self.server_for_th = AppServer(
-            app,
+            th_server_app,
             storageDir=self.storage.name,
             port=self.server_for_th_port,
             discriminator=self.server_for_th_discriminator,

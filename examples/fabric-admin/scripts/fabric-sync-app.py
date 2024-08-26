@@ -15,6 +15,7 @@ async def forwarder(f_in, f_out, prefix: str):
             break
         f_out.buffer.write(prefix.encode())
         f_out.buffer.write(line)
+        f_out.flush()
 
 
 async def run(tag, program, *args, stdin=None):
@@ -46,7 +47,7 @@ async def run_admin(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_p
         args.extend(["--commissioner-nodeid", commissioner_node_id])
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", commissioner_vendor_id])
-    p = await run("[ADMIN]", program, "interactive", "start", *args)
+    p = await run("[FS-ADMIN]", program, "interactive", "start", *args)
     await p.wait()
 
 
@@ -66,7 +67,7 @@ async def run_bridge(program, storage_dir=None, rpc_admin_port=None, rpc_bridge_
         args.extend(["--passcode", passcode])
     if secured_device_port is not None:
         args.extend(["--secured-device-port", str(secured_device_port)])
-    p = await run("[BRIDGE]", program, *args, stdin=asyncio.subprocess.DEVNULL)
+    p = await run("[FS-BRIDGE]", program, *args, stdin=asyncio.subprocess.DEVNULL)
     await p.wait()
 
 
@@ -81,7 +82,7 @@ async def main(args):
             rpc_bridge_port=args.app_bridge_rpc_port,
             paa_trust_store_path=args.paa_trust_store_path,
             commissioner_name=args.commissioner_name,
-            commissioner_node_id=args.commissioner_nodeid,
+            commissioner_node_id=args.commissioner_node_id,
             commissioner_vendor_id=args.commissioner_vendor_id,
         ),
         run_bridge(
@@ -113,7 +114,7 @@ if __name__ == "__main__":
                         help="path to directory holding PAA certificates")
     parser.add_argument("--commissioner-name", metavar="NAME",
                         help="commissioner name to use for the admin")
-    parser.add_argument("--commissioner-nodeid", metavar="NUM",
+    parser.add_argument("--commissioner-node-id", metavar="NUM",
                         help="commissioner node ID to use for the admin")
     parser.add_argument("--commissioner-vendor-id", metavar="NUM",
                         help="commissioner vendor ID to use for the admin")
