@@ -49,11 +49,12 @@ an `.sb3` file:
 ```
 
 A note regarding OTA image header version (`-vn` option). An application binary
-has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`,
-which can be overwritten). In order to have a correct OTA process, the OTA header
-version should be the same as the binary embedded software version. A user can set
-a custom software version in the gn build args by setting `nxp_software_version`
-to the wanted version.
+has its own software version (given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). In
+order to have a correct OTA process, the OTA header version should be the same
+as the binary embedded software version. A user can set a custom software
+version in the gn build args by setting `nxp_software_version` to the wanted
+version.
 
 ### OTA factory data
 
@@ -98,9 +99,9 @@ using CSA official instructions from
 proposed. Also, CSA official instructions document point to the OS/Docker images
 that should be used on the RPis. For compatibility reasons, we recommand
 compiling chip-tool and OTA Provider applications with the same commit id that
-was used for compiling the reference application. Also, please note that
-there is a single controller (chip-tool) running on Computer #1 which is used
-for commissioning both the device and the OTA Provider Application. If needed,
+was used for compiling the reference application. Also, please note that there
+is a single controller (chip-tool) running on Computer #1 which is used for
+commissioning both the device and the OTA Provider Application. If needed,
 [these instructions](https://itsfoss.com/connect-wifi-terminal-ubuntu/) could be
 used for connecting the RPis to WiFi.
 
@@ -151,8 +152,9 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupd
     execute `ot-ctl server disable` followed by `ot-ctl server enable`. After
     this step, the commissioning process of the device can start;
 -   Due to some MDNS issues, the commissioning of the OTA Provider Application
-    may fail. Please make sure that the SRP cache is disabled (`ot-ctl srp server disable`)
-    on the openthread border router while commissioning the OTA Provider Application;
+    may fail. Please make sure that the SRP cache is disabled
+    (`ot-ctl srp server disable`) on the openthread border router while
+    commissioning the OTA Provider Application;
 -   No other Docker image should be running (e.g.: Docker image needed by Test
     Harness) except the OTBR one. A docker image can be killed using the
     command:
