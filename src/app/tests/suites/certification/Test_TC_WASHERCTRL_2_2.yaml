@@ -27,7 +27,7 @@ config:
         defaultValue: 1
     unsupportedNumberOfRinsesValue:
         type: enum8
-        defaultValue: 5
+        defaultValue: 4
 
 tests:
     - label: "Step 1: Commission DUT to TH"
