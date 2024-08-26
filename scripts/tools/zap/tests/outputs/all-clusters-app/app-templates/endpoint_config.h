@@ -322,15 +322,15 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* ScheduleProgrammingVisibility */                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Color Control (server) */                                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* WhitePointX */                                            \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* WhitePointY */                                            \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointRX */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointRY */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointGX */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointGY */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointBX */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },    /* ColorPointBY */                                           \
-            { (uint16_t) 0xFFFF, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                          \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointX */                                              \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointY */                                              \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRX */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRY */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGX */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGY */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBX */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBY */                                             \
+            { (uint16_t) 0xFA, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                            \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Ballast Configuration (server) */                                                             \
             { (uint16_t) 0x1, (uint16_t) 0x1, (uint16_t) 0xFE },     /* MinLevel */                                                \

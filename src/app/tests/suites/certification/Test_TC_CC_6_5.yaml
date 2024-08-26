@@ -87,8 +87,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: 0
-              maxValue: 65279
+              python: (value is None) or ((value >= 1) and (value <= 65279))
 
     - label:
           "Step 2a: TH writes to StartUpColorTemperatureMireds attribute with
@@ -141,8 +140,7 @@ tests:
           saveAs: StartUpColorTemperatureMiredsValue
           constraints:
               type: int16u
-              minValue: 1
-              maxValue: 65279
+              python: (value is None) or ((value >= 1) and (value <= 65279))
 
     - label:
           "Step 2b: Verify that the DUT response contains
