@@ -649,21 +649,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return outputArray;
 }
 
-#pragma mark Subscription and delegate handling
-
-// subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (10 * 60) // 10 minutes (for now)
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
-
-- (BOOL)_subscriptionsAllowed
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    // TODO: XPC: This function and all its callsites should go away from this class.
-
-    // We should not allow a subscription for device controllers over XPC.
-    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
-}
+#pragma mark Delegate handling
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -755,41 +741,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     MTR_LOG("%@ saw new operational advertisement", self);
-}
-
-// Return YES if we are in a state where, apart from communication issues with
-// the device, we will be able to get reports via our subscription.
-- (BOOL)_subscriptionAbleToReport
-{
-    std::lock_guard lock(_lock);
-    if (![self _delegateExists]) {
-        // No delegate definitely means no subscription.
-        return NO;
-    }
-
-    // For unit testing only, matching logic in setDelegate
-#ifdef DEBUG
-    __block BOOL useTestDelegateOverride = NO;
-    __block BOOL testDelegateShouldSetUpSubscriptionForDevice = NO;
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
-            useTestDelegateOverride = YES;
-            testDelegateShouldSetUpSubscriptionForDevice = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
-        }
-    }];
-    if (useTestDelegateOverride && !testDelegateShouldSetUpSubscriptionForDevice) {
-        return NO;
-    }
-
-#endif
-
-    // Subscriptions are not able to report if they are not allowed.
-    return [self _subscriptionsAllowed];
-}
-
-// Notification that read-through was skipped for an attribute read.
-- (void)_readThroughSkipped
-{
 }
 
 - (BOOL)_delegateExists
@@ -1880,147 +1831,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                                             attributeID:(NSNumber *)attributeID
                                                                  params:(MTRReadParams * _Nullable)params
 {
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
-                                                                           clusterID:clusterID
-                                                                         attributeID:attributeID];
-
-    BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
-    BOOL hasChangesOmittedQuality;
-    if (attributeIsSpecified) {
-        hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
-    } else {
-        if (params == nil) {
-            hasChangesOmittedQuality = NO;
-        } else {
-            hasChangesOmittedQuality = !params.assumeUnknownAttributesReportable;
-        }
-    }
-
-    // Return current known / expected value right away
-    NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
-
-    // Send read request to device if any of the following are true:
-    // 1. Subscription not in a state we can expect reports
-    // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
-    // 3. The attribute is not in the spec, and the read params asks to assume
-    //    an unknown attribute has the Changes Omitted quality.
-    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
-        // Read requests container will be a mutable array of items, each being an array containing:
-        //   [attribute request path, params]
-        // Batching handler should only coalesce when params are equal.
-
-        // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
-        MTRAttributeRequestPath * readRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:endpointID
-                                                                                             clusterID:clusterID
-                                                                                           attributeID:attributeID];
-        NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
-
-        // But first, check if a duplicate read request is already queued and return
-        if ([_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
-            return attributeValueToReturn;
-        }
-
-        NSMutableArray<NSArray *> * readRequests = [NSMutableArray arrayWithObject:readRequestData];
-
-        // Create work item, set ready handler to perform task, then enqueue the work
-        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-        uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
-        NSNumber * nodeID = [self nodeID];
-
-        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
-            mtr_hide(self); // don't capture self accidentally
-            NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
-            NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
-
-            MTRBatchingOutcome outcome = MTRNotBatched;
-            while (readRequestsNext.count) {
-                // Can only read up to 9 paths at a time, per spec
-                if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                    return outcome;
-                }
-
-                // if params don't match then they cannot be merged
-                if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
-                        isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                    return outcome;
-                }
-
-                // merge the next item's first request into the current item's list
-                auto readItem = readRequestsNext.firstObject;
-                [readRequestsNext removeObjectAtIndex:0];
-                [readRequestsCurrent addObject:readItem];
-                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %lu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
-                    workItemID, readItem, static_cast<unsigned long>(readRequestsCurrent.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                outcome = MTRBatchedPartially;
-            }
-            NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
-            return MTRBatchedFully;
-        }];
-        [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
-            mtr_hide(self); // don't capture self accidentally
-            for (NSArray * readItem in readRequests) {
-                if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG("Read attribute work item [%llu] report duplicate %@ [0x%016llX:%@:0x%llx:0x%llx]", workItemID, readItem, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                    *isDuplicate = YES;
-                    *stop = YES;
-                    return;
-                }
-            }
-            *stop = NO;
-        }];
-        [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-            // Sanity check
-            if (readRequests.count == 0) {
-                MTR_LOG_ERROR("Read attribute work item [%llu] contained no read requests", workItemID);
-                completion(MTRAsyncWorkComplete);
-                return;
-            }
-
-            // Build the attribute paths from the read requests
-            NSMutableArray<MTRAttributeRequestPath *> * attributePaths = [NSMutableArray array];
-            for (NSArray * readItem in readRequests) {
-                NSAssert(readItem.count == 2, @"invalid read attribute item");
-                [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
-            }
-            // If param is the NSNull stand-in, then just use nil
-            id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
-            MTRReadParams * readParams = (![readParamObject isEqual:[NSNull null]]) ? readParamObject : nil;
-
-            MTRBaseDevice * baseDevice = [self newBaseDevice];
-            [baseDevice
-                readAttributePaths:attributePaths
-                        eventPaths:nil
-                            params:readParams
-                includeDataVersion:YES
-                             queue:self.queue
-                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                            if (values) {
-                                // Since the format is the same data-value dictionary, this looks like an
-                                // attribute report
-                                MTR_LOG("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values fromSubscription:NO];
-                            }
-
-                            // TODO: better retry logic
-                            if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                completion(MTRAsyncWorkNeedsRetry);
-                            } else {
-                                if (error) {
-                                    MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                }
-                                completion(MTRAsyncWorkComplete);
-                            }
-                        }];
-        }];
-        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
-    } else {
-        [self _readThroughSkipped];
-    }
-
-    return attributeValueToReturn;
+#define MTRDeviceErrorStr "MTRDevice readAttributeWithEndpointID:clusterID:attributeID:params: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return nil;
 }
 
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -2030,120 +1847,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    if (timeout) {
-        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
-    }
-    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
-                                                                           clusterID:clusterID
-
-                                                                         attributeID:attributeID];
-
-    __block BOOL useValueAsExpectedValue = YES;
+#define MTRDeviceErrorStr "MTRDevice writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
 #ifdef DEBUG
-    os_unfair_lock_lock(&self->_lock);
-    [self _callFirstDelegateSynchronouslyWithBlock:^(id delegate) {
-        if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
-            useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
-        }
-    }];
-    os_unfair_lock_unlock(&self->_lock);
-#endif
-
-    uint64_t expectedValueID = 0;
-    if (useValueAsExpectedValue) {
-        // Commit change into expected value cache
-        NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
-        [self setExpectedValues:@[ newExpectedValueDictionary ]
-            expectedValueInterval:expectedValueInterval
-                  expectedValueID:&expectedValueID];
-    }
-
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-    uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
-    NSNumber * nodeID = _nodeID;
-
-    // Write request data is an array of items (for now always length 1).  Each
-    // item is an array containing:
-    //
-    //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
-    //
-    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
-    auto * writeData = @[ attributePath, [value copy], timeout ?: [NSNull null], @(expectedValueID) ];
-
-    NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
-
-    [workItem setBatchingID:MTRDeviceWorkItemBatchingWriteID data:writeRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
-        mtr_hide(self); // don't capture self accidentally
-        NSMutableArray<NSArray *> * writeRequestsCurrent = opaqueDataCurrent;
-        NSMutableArray<NSArray *> * writeRequestsNext = opaqueDataNext;
-
-        if (writeRequestsCurrent.count != 1) {
-            // Very unexpected!
-            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %lu", workItemID, static_cast<unsigned long>(writeRequestsCurrent.count));
-            return MTRNotBatched;
-        }
-
-        MTRBatchingOutcome outcome = MTRNotBatched;
-        while (writeRequestsNext.count) {
-            // If paths don't match, we cannot replace the earlier write
-            // with the later one.
-            if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
-                    isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
-                MTR_LOG("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
-                return outcome;
-            }
-
-            // Replace our one request with the first one from the next item.
-            auto writeItem = writeRequestsNext.firstObject;
-            [writeRequestsNext removeObjectAtIndex:0];
-            [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
-            MTR_LOG("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
-                workItemID, writeItem, nodeID.unsignedLongLongValue);
-            outcome = MTRBatchedPartially;
-        }
-        NSCAssert(writeRequestsNext.count == 0, @"should have batched everything or returned early");
-        return MTRBatchedFully;
-    }];
-    // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
-    // change values, only read requests after this should be considered for duplicate requests.
-    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
-        *isDuplicate = NO;
-        *stop = YES;
-    }];
-    [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        MTRBaseDevice * baseDevice = [self newBaseDevice];
-        // Make sure to use writeRequests here, because that's what our batching
-        // handler will modify as needed.
-        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long>(writeRequests.count));
-
-        auto * request = writeRequests[0];
-        MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
-
-        id timedWriteTimeout = request[MTRDeviceWriteRequestFieldTimeoutIndex];
-        if (timedWriteTimeout == [NSNull null]) {
-            timedWriteTimeout = nil;
-        }
-
-        [baseDevice
-            writeAttributeWithEndpointID:path.endpoint
-                               clusterID:path.cluster
-                             attributeID:path.attribute
-                                   value:request[MTRDeviceWriteRequestFieldValueIndex]
-                       timedWriteTimeout:timedWriteTimeout
-                                   queue:self.queue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (error) {
-                                      MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
-                                      if (useValueAsExpectedValue) {
-                                          NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
-                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
-                                      }
-                                  }
-                                  completion(MTRAsyncWorkComplete);
-                              }];
-    }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -2454,37 +2163,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     self.expirationCheckScheduled = NO;
     [self _checkExpiredExpectedValues];
-}
-
-// Get attribute value dictionary for an attribute path from the right cache
-- (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
-{
-    std::lock_guard lock(_lock);
-
-    // First check expected value cache
-    NSArray * expectedValue = _expectedValueCache[attributePath];
-    if (expectedValue) {
-        NSDate * now = [NSDate date];
-        if ([now compare:expectedValue[MTRDeviceExpectedValueFieldExpirationTimeIndex]] == NSOrderedDescending) {
-            // expired - purge and fall through
-            _expectedValueCache[attributePath] = nil;
-        } else {
-            // not yet expired - return result
-            return expectedValue[MTRDeviceExpectedValueFieldValueIndex];
-        }
-    }
-
-    // Then check read cache
-    NSDictionary<NSString *, id> * cachedAttributeValue = [self _cachedAttributeValueForPath:attributePath];
-    if (cachedAttributeValue) {
-        return cachedAttributeValue;
-    } else {
-        // TODO: when not found in cache, generated default values should be used
-        MTR_LOG("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
-            attributePath);
-    }
-
-    return nil;
 }
 
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
@@ -3011,11 +2689,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values expectedValueInterval:(NSNumber *)expectedValueInterval
-{
-    [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
-}
-
 // expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
@@ -3046,12 +2719,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
     }
-}
-
-- (void)removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
-{
-    std::lock_guard lock(_lock);
-    [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
 }
 
 - (void)_removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID

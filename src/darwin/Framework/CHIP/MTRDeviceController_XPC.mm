@@ -52,7 +52,7 @@
     ]];
 
     [interface setClasses:allowedClasses
-              forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:completion:)
+              forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
     return interface;
@@ -76,6 +76,11 @@
             argumentIndex:1
                   ofReply:NO];
     return interface;
+}
+
+- (id<NSCopying>)controllerXPCID
+{
+    return [self.uniqueIdentifier UUIDString];
 }
 
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
