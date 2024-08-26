@@ -131,7 +131,9 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
         and `-littlefs`.
 -   `-mfd`, enable Matter factory data feature, which load factory data from
     `MFD` partition
-    -   Please refer to [Bouffalo Lab Matter factory data guide](../../../docs/guides/bouffalolab/matter_factory_data.md) or contact to `Bouffalo Lab` for support.
+    -   Please refer to
+        [Bouffalo Lab Matter factory data guide](../../../docs/guides/bouffalolab/matter_factory_data.md)
+        or contact to `Bouffalo Lab` for support.
 -   `-shell`, enable command line
 -   `-rpc`, enable Pigweed RPC feature
 -   `-115200`, set UART baudrate to 115200 for log and command line
