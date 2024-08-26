@@ -17,9 +17,9 @@
 
 import importlib
 import os
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock
-import sys
 
 from chip.clusters import Attribute
 from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
