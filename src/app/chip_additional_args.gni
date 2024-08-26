@@ -1,4 +1,3 @@
-
 declare_args() {
   chip_disable_unique_id = false
 }

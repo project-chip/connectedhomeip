@@ -15,10 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/src/app/chip_additional_args.gni")
 import("${chip_root}/src/app/codegen-data-model-provider/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/python.gni")
-import("${chip_root}/src/app/chip_additional_args.gni")
 
 _app_root = get_path_info(".", "abspath")
 
@@ -463,11 +463,10 @@ template("chip_data_model") {
     ]
     public_deps += codegen_data_model_PUBLIC_DEPS
 
-    if(chip_disable_unique_id==true) {
-        defines = ["CHIP_DISABLE_UNIQUE_ID=1"]
-    }
-    else {
-        defines = ["CHIP_DISABLE_UNIQUE_ID=0"]
+    if (chip_disable_unique_id == true) {
+      defines = [ "CHIP_DISABLE_UNIQUE_ID=1" ]
+    } else {
+      defines = [ "CHIP_DISABLE_UNIQUE_ID=0" ]
     }
 
     if (is_server) {
