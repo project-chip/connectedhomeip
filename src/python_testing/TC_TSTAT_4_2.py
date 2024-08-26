@@ -482,27 +482,29 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Read the active preset handle attribute and verify it was updated to preset handle
+            # Read the numberOfPresets supported to get the maximum number of presets supported.
+            numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
+            logger.info(f"Rx'd NumberOfPresets: {numberOfPresetsSupported}")
+
+            # Read the presetTypes supported to get the preset types supported
             presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
             logger.info(f"Rx'd PresetTypes: {presetTypes}")
 
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
-                                                             name="Wake", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kVacation,
-                                                             name="Vacation", coolingSetpoint=2400, heatingSetpoint=1800, builtIn=False))
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kGoingToSleep,
-                                                             name="GoingToSleep", coolingSetpoint=2300, heatingSetpoint=1900, builtIn=False))
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kUserDefined,
-                                                             name="UserDefined", coolingSetpoint=2300, heatingSetpoint=1900, builtIn=False))
+            # Since we currently support one preset of each type, run the test only if we have enough preset types to exceed maximum number of presets supported.
+            if sizeof(presetTypes) > numberOfPresetsSupported:
+                for preset in presetTypes:
+                    scenario = presetType.presetScenario
+                    isBuiltIn = (scenario == cluster.Enums.PresetScenarioEnum.kOccupied or scenario == cluster.Enums.PresetScenarioEnum.kUnoccupied)
+                    test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetType.presetScenario,
+                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=isBuiltIn))
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
 
 
 if __name__ == "__main__":
