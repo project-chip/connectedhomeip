@@ -14,17 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1
-# === END CI TEST ARGUMENTS ===
 
 #  TODO: There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
@@ -60,15 +49,15 @@ class TC_OCC_3_2(MatterBaseTest):
             TestStep("4b", "TH reads DUT HoldTime attribute and saves the initial value as initial"),
             TestStep("4c", "TH writes a different value to DUT HoldTime attribute."),
             TestStep("4d", "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute."),
-            TestStep("5a", "Check if DUT supports DUT feature flag PIR or OTHER, If not supported, then stop and skip to 6a."),
+            TestStep("5a", "Check if DUT supports DUT feature flag PIR or (!PIR & !US & !PHY) and has the PIROccupiedToUnoccupiedDelay attribute, If not supported, then skip 5b, 5c, 5d."),
             TestStep("5b", "TH reads DUT PIROccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
             TestStep("5c", "TH writes a different value to DUT PIROccupiedToUnoccupiedDelay attribute."),
             TestStep("5d", "TH awaits a ReportDataMessage containing an attribute report for DUT PIROccupiedToUnoccupiedDelay attribute."),
-            TestStep("6a", "Check if DUT supports DUT feature flag US, If not supported, then stop and skip to 7a."),
+            TestStep("6a", "Check if DUT supports DUT feature flag US and has the UltrasonicOccupiedToUnoccupiedDelay attribute. If not supported, then skip 6b, 6c, 6d."),
             TestStep("6b", "TH reads DUT UltrasonicOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
             TestStep("6c", "TH writes a different value to DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
             TestStep("6d", "TH awaits a ReportDataMessage containing an attribute report for DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
-            TestStep("7a", "Check if DUT supports DUT feature flag PHY, If not supported, terminate this test case."),
+            TestStep("7a", "Check if DUT supports DUT feature flag PHY and has the PhysicalContactOccupiedToUnoccupiedDelay attribute. If not supported, skip 7b, 7c, 7d."),
             TestStep("7b", "TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
             TestStep("7c", "TH writes a different value to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute."),
             TestStep("7d", "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")
@@ -91,21 +80,26 @@ class TC_OCC_3_2(MatterBaseTest):
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
-        self.step(1)
+        self.step(1)  # Commissioning already done
 
-        occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(attribute=attributes.OccupancySensorTypeBitmap)
-        has_type_pir = ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPir) != 0) or \
-                       ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic) != 0)
-        has_type_ultrasonic = ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kUltrasonic) != 0) or \
-                              ((occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic) != 0)
-        has_type_contact = (occupancy_sensor_type_bitmap_dut & cluster.Enums.OccupancySensorTypeEnum.kPhysicalContact) != 0
+        self.step(2)
+        feature_map = await self.read_occ_attribute_expect_success(attribute=attributes.FeatureMap)
+        has_feature_pir = (feature_map & cluster.Bitmaps.Feature.kPassiveInfrared) != 0
+        has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
+        has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
+
+        logging.info(
+            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
+        logging.info(f"Attribute list: {attribute_list}")
+        logging.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
+        logging.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
+        logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
-        self.step(2)
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
@@ -126,7 +120,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("3d")
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-                                  0, 1], timeout_sec=post_prompt_settle_delay_seconds)
+                                  1], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
@@ -143,15 +137,13 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4d")
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[
-                                  initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+                                  diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("5a")
-        if not has_type_pir or not has_pir_timing_attrib:
-            logging.info("No PIR timing attribute support. Skip this steps 5b, 5c, 5d")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-        else:
+
+        has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
+
+        if has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features):
             self.step("5b")
             initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
 
@@ -162,11 +154,16 @@ class TC_OCC_3_2(MatterBaseTest):
 
             self.step("5d")
             await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
-                                      initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+                                      diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+        else:
+            logging.info("No PIR timing attribute support. Skipping steps 5b, 5c, 5d")
+            self.skip_step("5b")
+            self.skip_step("5c")
+            self.skip_step("5d")
 
         self.step("6a")
-        if not has_type_ultrasonic or not has_ultrasonic_timing_attrib:
-            logging.info("No Ultrasonic timing attribute supports. Skip steps 6b, 6c, 6d")
+        if not has_feature_ultrasonic or not has_ultrasonic_timing_attrib:
+            logging.info("No Ultrasonic timing attribute supports. Skipping steps 6b, 6c, 6d")
             self.skip_step("6b")
             self.skip_step("6c")
             self.skip_step("6d")
@@ -181,11 +178,11 @@ class TC_OCC_3_2(MatterBaseTest):
 
             self.step("6d")
             await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
-                                      initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+                                      diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("7a")
-        if not has_type_contact or not has_contact_timing_attrib:
-            logging.info("No Physical contact timing attribute supports. Skip this test case")
+        if not has_feature_contact or not has_contact_timing_attrib:
+            logging.info("No Physical contact timing attribute supports. Skipping steps 7b, 7c, 7d")
             self.skip_step("7b")
             self.skip_step("7c")
             self.skip_step("7d")
@@ -200,7 +197,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
             self.step("7d")
             await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[
-                                      initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+                                      diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":
