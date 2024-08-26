@@ -165,7 +165,6 @@ def BuildHostTarget():
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
-    target.AppendModifier("no-unique-id", disable_unique_id=True)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
@@ -192,6 +191,7 @@ def BuildHostTarget():
     target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
+    target.AppendModifier("data-model-no-unique-id", disable_unique_id=True)
 
     return target
 
