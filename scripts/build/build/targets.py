@@ -165,6 +165,7 @@ def BuildHostTarget():
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
+    target.AppendModifier("no-unique-id", disable_unique_id=True)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
