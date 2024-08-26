@@ -322,7 +322,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
  */
-- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters;
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
 
 /**
  * Clear any pending shutdown request.
