@@ -61,7 +61,7 @@ public:
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
 
         mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
-        mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
+        mServiceAreaDelegate.SetHandleSkipAreaCallback(&RvcDevice::SaHandleSkipArea, this);
         mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
         mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
     }
@@ -104,7 +104,7 @@ public:
 
     bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
 
-    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+    bool SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 
     bool SaIsSupportedAreasChangeAllowed();
 
@@ -126,6 +126,14 @@ public:
     void HandleActivityCompleteEvent();
 
     void HandleAreaCompletedEvent();
+
+    void HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName);
+
+    void HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area);
+
+    void HandleRemoveServiceAreaMap(uint32_t mapId);
+
+    void HandleRemoveServiceAreaArea(uint32_t areaId);
 
     /**
      * Sets the device to an error state with the error state ID matching the error name given.

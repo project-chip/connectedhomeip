@@ -80,10 +80,10 @@ public:
      * If the set of locations is invalid, the locationStatus should be set to InvalidSet and
      * the statusText SHALL include a vendor-defined error description.
      *
-     * The caller of this method will ensure that there are no duplicates is the list
+     * The caller of this method will ensure that there are no duplicates in the list
      * and that all the locations in the set are valid supported locations.
      *
-     * @param[in] req List of new selected locations.
+     * @param[in] selectedAreas List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText.
      * @return true if success.
@@ -91,7 +91,7 @@ public:
      * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
-    virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & locationStatus,
+    virtual bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & locationStatus,
                                        MutableCharSpan & statusText) = 0;
 
     /**
@@ -120,7 +120,7 @@ public:
      *       InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the
      *       device, which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+    virtual bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
     {
         // device support of this command is optional
         CopyCharSpanToMutableCharSpan("Skip Current Area command not supported by device"_span, skipStatusText);

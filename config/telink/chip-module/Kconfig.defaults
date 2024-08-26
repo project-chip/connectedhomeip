@@ -219,12 +219,7 @@ config NVS_LOOKUP_CACHE_SIZE
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
 
-# Set sector counter of NVS
-config SETTINGS_NVS_SECTOR_COUNT
-    default 12
-
 # Enable OpenThread
-
 config NET_L2_OPENTHREAD
     default y if !WIFI
 
@@ -304,9 +299,6 @@ config CHIP_WIFI
 	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
 	select NET_IPV6_NBR_CACHE
 	select NET_STATISTICS_USER_API
-#	select NET_IPV4 # TODO: remove IPv4 when IPv6 will be ready (see CHIP_IPV4)
-#	select NET_CONFIG_NEED_IPV4
-#	select NET_DHCPV4
 
 if CHIP_WIFI
 

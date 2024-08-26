@@ -306,6 +306,29 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
     _otaProviderDelegateQueue = queue;
 }
 
++ (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber * nodeID = nil;
+    ExtractNodeIDFromNOC(noc, &nodeID);
+    return nodeID;
+}
+
++ (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber * fabricID = nil;
+    ExtractFabricIDFromNOC(noc, &fabricID);
+    return fabricID;
+}
+
++ (nullable NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate
+{
+    Crypto::P256PublicKey pubKey;
+    if (ExtractPubkeyFromX509Cert(AsByteSpan(certificate), pubKey) != CHIP_NO_ERROR) {
+        return nil;
+    }
+    return [NSData dataWithBytes:pubKey.Bytes() length:pubKey.Length()];
+}
+
 @end
 
 @implementation MTRDeviceControllerExternalCertificateParameters
@@ -328,6 +351,23 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
                    operationalCertificate:operationalCertificate
                   intermediateCertificate:intermediateCertificate
                           rootCertificate:rootCertificate];
+}
+@end
+
+@implementation MTRXPCDeviceControllerParameters
+
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+@synthesize xpcConnectionBlock = _xpcConnectionBlock;
+
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
+    if (self = [super _initInternal]) {
+        _xpcConnectionBlock = [xpcConnectionBlock copy];
+        _uniqueIdentifier = [uniqueIdentifier copy];
+    }
+
+    return self;
 }
 @end
 
