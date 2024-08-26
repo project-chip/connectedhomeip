@@ -2596,7 +2596,7 @@ endpoint 1 {
     ram      attribute startTime default = 0x00;
     ram      attribute duration default = 0;
     callback attribute sampledPosition;
-    ram      attribute playbackSpeed default = 1.0;
+    ram      attribute playbackSpeed default = 1;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
