@@ -37,7 +37,7 @@ tests:
     - label: "DUT send GetActiveDatasetRequest to TH"
       PICS: TBRM.C.C00.Tx
       wait: "GetActiveDatasetRequest"
-    
+
     # Step 4
     - label: "DUT send GetPendingDatasetRequest to TH"
       PICS: TBRM.C.C01.Tx
