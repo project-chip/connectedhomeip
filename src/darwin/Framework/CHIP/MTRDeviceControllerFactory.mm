@@ -1133,11 +1133,30 @@ MTR_DIRECT_MEMBERS
     }
 }
 
+- (nullable MTRDeviceController *)_findControllerWithPendingShutdownMatchingParams:(MTRDeviceControllerParameters *)parameters
+{
+    std::lock_guard lock(_controllersLock);
+    for (MTRDeviceController * controller in _controllers) {
+        if ([controller matchesPendingShutdownWithParams:parameters]) {
+            MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
+            [controller clearPendingShutdown];
+            return controller;
+        }
+    }
+    return nil;
+}
+
 - (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
                                         withParameters:(MTRDeviceControllerParameters *)parameters
                                                  error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
+    MTRDeviceController * existingController = [self _findControllerWithPendingShutdownMatchingParams:parameters];
+    if (existingController) {
+        return existingController;
+    }
 
     return [self _startDeviceController:controller
                           startupParams:parameters
