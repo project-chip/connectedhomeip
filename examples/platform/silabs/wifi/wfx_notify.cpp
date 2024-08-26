@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+#include "AppConfig.h"
+#include "BaseApplication.h"
+#include <app/icd/server/ICDServerConfig.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,32 +32,33 @@
 #include "wfx_rsi.h"
 #endif
 
-#if SL_ICD_ENABLED
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-#endif // SL_ICD_ENABLED
-
 #include <platform/CHIPDeviceLayer.h>
-// #include <app/server/Mdns.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-#include <lib/support/logging/CHIPLogging.h>
-
-extern uint32_t retryInterval;
+namespace {
+constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
+constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
+constexpr uint8_t kWlanRetryIntervalInSec     = 5;
+uint8_t retryInterval                         = kWlanMinRetryIntervalsInSec;
+osTimerId_t sRetryTimer;
+} // namespace
 /*
  * Notifications to the upper-layer
  * All done in the context of the RSI/WiFi task (rsi_if.c)
  */
 
+static void RetryConnectionTimerHandler(void * arg)
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
+    wfx_rsi_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
+    if (wfx_connect_to_ap() != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+    }
+}
 /***********************************************************************************
  * @fn  wfx_started_notify()
  * @brief
@@ -66,6 +70,10 @@ void wfx_started_notify()
 {
     sl_wfx_startup_ind_t evt;
     sl_wfx_mac_address_t mac;
+
+    // Creating a timer which will be used to retry connection with AP
+    sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
+    VerifyOrReturn(sRetryTimer != NULL);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_STARTUP_IND_ID;
@@ -90,13 +98,7 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 
-    if (status != SUCCESS_STATUS)
-    {
-        ChipLogProgress(DeviceLayer, "%s: error: failed status: %ld.", __func__, status);
-        return;
-    }
-
-    ChipLogProgress(DeviceLayer, "%s: connected.", __func__);
+    VerifyOrReturn(status != SUCCESS_STATUS);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
@@ -143,16 +145,6 @@ void wfx_ipv6_notify(int got_ip)
     eventData.header.id     = got_ip ? IP_EVENT_GOT_IP6 : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
     PlatformMgrImpl().HandleWFXSystemEvent(IP_EVENT, &eventData);
-
-    /* So the other threads can run and have the connectivity OK */
-    if (got_ip)
-    {
-        /* Should remember this */
-        vTaskDelay(1);
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        chip::app::DnssdServer::Instance().StartServer(/*Dnssd::CommissioningMode::kEnabledBasic*/);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
 }
 
 /**************************************************************************************
@@ -170,67 +162,67 @@ void wfx_ip_changed_notify(int got_ip)
     eventData.header.id     = got_ip ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
     PlatformMgrImpl().HandleWFXSystemEvent(IP_EVENT, &eventData);
-
-    /* So the other threads can run and have the connectivity OK */
-    if (got_ip)
-    {
-        /* Should remember this */
-        vTaskDelay(1);
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        chip::app::DnssdServer::Instance().StartServer(/*Dnssd::CommissioningMode::kEnabledBasic*/);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
 }
 
 /**************************************************************************************
- * @fn  void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
+ * @fn  void wfx_retry_connection(uint16_t retryAttempt)
  * @brief
- *      Based on condition will delay for a certain period of time.
- * @param[in]  is_wifi_disconnection_event, retryJoin
+ *      During commissioning, we retry to join the network MAX_JOIN_RETRIES_COUNT times.
+ *      If DUT is disconnected from the AP or device is power cycled, then retry connection
+ *      with AP continously after a certain time interval.
+ * @param[in]  retryAttempt
  * @return None
  ********************************************************************************************/
-void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
+void wfx_retry_connection(uint16_t retryAttempt)
 {
-    if (!is_wifi_disconnection_event)
+    // During commissioning, we retry to join the network MAX_JOIN_RETRIES_COUNT
+    if (BaseApplication::sAppDelegate.isCommissioningInProgress())
     {
-        /* After the reboot or a commissioning time device failed to connect with AP.
-         * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
-         */
-        if (retryJoin < MAX_JOIN_RETRIES_COUNT)
+        if (retryAttempt < MAX_JOIN_RETRIES_COUNT)
         {
-            ChipLogProgress(DeviceLayer, "wfx_retry_interval_handler : Next attempt after %d Seconds",
-                            CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
-#if SL_ICD_ENABLED
-            // TODO: cleanup the retry logic MATTER-1921
-            if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+            ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", kWlanRetryIntervalInSec);
+            if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(kWlanRetryIntervalInSec))) != osOK)
             {
-                wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
+                ChipLogProgress(DeviceLayer, "Failed to start retry timer");
+                // Sending the join command if retry timer failed to start
+                if (wfx_connect_to_ap() != SL_STATUS_OK)
+                {
+                    ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+                }
+                return;
             }
-#endif // SL_ICD_ENABLED
-            vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "Connect failed after max %d tries", retryJoin);
+            ChipLogProgress(DeviceLayer, "Connect failed after max %d tries", retryAttempt);
         }
     }
     else
     {
-        /* After disconnection
+        /* After disconnection or power cycle the DUT
          * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS intervals
          * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
          * WLAN_MAX_RETRY_TIMER_MS intervals.
          */
-        if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
+        if (retryInterval > kWlanMaxRetryIntervalsInSec)
         {
-            retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+            retryInterval = kWlanMaxRetryIntervalsInSec;
         }
-        ChipLogProgress(DeviceLayer, "wfx_retry_interval_handler : Next attempt after %ld Seconds",
-                        CONVERT_MS_TO_SEC(retryInterval));
-#if SL_ICD_ENABLED
+        if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(retryInterval))) != osOK)
+        {
+            ChipLogProgress(DeviceLayer, "Failed to start retry timer");
+            // Sending the join command if retry timer failed to start
+            if (wfx_connect_to_ap() != SL_STATUS_OK)
+            {
+                ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+            }
+            return;
+        }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
         wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-#endif // SL_ICD_ENABLED
-        vTaskDelay(pdMS_TO_TICKS(retryInterval));
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
+        ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
         retryInterval += retryInterval;
+        return;
     }
 }
