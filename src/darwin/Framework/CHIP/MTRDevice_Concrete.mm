@@ -58,8 +58,6 @@
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
 
-@property (nonatomic, readwrite, copy) NSNumber * nodeID;
-@property (nonatomic, readwrite, nullable) MTRDeviceController * deviceController;
 @property (nonatomic, readwrite) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @property (nonatomic, readwrite) MTRDeviceState state;
 @property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
@@ -356,8 +354,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // synthesize superclass property readwrite accessors
-@synthesize nodeID = _nodeID;
-@synthesize deviceController = _deviceController;
 @synthesize queue = _queue;
 @synthesize asyncWorkQueue = _asyncWorkQueue;
 @synthesize state = _state;
@@ -372,9 +368,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
-        _deviceController = controller;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
@@ -467,7 +461,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
+        stringWithFormat:@"<MTRDevice: %p, XPC: NO, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -2841,59 +2835,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
 }
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    if (commandFields == nil) {
-        commandFields = @{
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        };
-    }
-
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:nil
-                                queue:queue
-                           completion:completion];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    // We don't have a way to communicate a non-default invoke timeout
-    // here for now.
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:nil
-                                 queue:queue
-                            completion:completion];
-}
-
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
@@ -2989,58 +2930,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               }];
     }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue];
-}
-
-- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID
-                           commandPayload:(id)commandPayload
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
-              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
-                            responseClass:(Class _Nullable)responseClass
-                                    queue:(dispatch_queue_t)queue
-                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
-{
-    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
-        dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-        });
-        return;
-    }
-
-    NSError * encodingError;
-    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
-    if (commandFields == nil) {
-        dispatch_async(queue, ^{
-            completion(nil, encodingError);
-        });
-        return;
-    }
-
-    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        id _Nullable response = nil;
-        if (error == nil) {
-            if (values.count != 1) {
-                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
-            } else if (responseClass != nil) {
-                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
-            }
-        }
-        completion(response, error);
-    };
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:serverSideProcessingTimeout
-                                 queue:queue
-                            completion:responseHandler];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -3755,11 +3644,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values expectedValueInterval:(NSNumber *)expectedValueInterval
-{
-    [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
-}
-
 // expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
@@ -4076,27 +3960,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 + (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:timeout
-                                queue:queue
-                           completion:completion];
 }
 
 @end

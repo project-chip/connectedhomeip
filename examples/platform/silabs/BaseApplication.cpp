@@ -190,6 +190,9 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (BaseApplication::GetProvisionStatus())
     {
+        // After the device is provisioned and the commissioning passed
+        // resetting the isCommissioningStarted to false
+        isComissioningStarted = false;
 #ifdef DISPLAY_ENABLED
 #ifdef QR_CODE_ENABLED
         SilabsLCD::Screen_e screen;
