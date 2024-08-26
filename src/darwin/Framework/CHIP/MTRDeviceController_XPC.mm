@@ -78,6 +78,11 @@
     return interface;
 }
 
+- (id<NSCopying>)controllerXPCID
+{
+    return [self.uniqueIdentifier UUIDString];
+}
+
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
 {
     if (self = [super initForSubclasses]) {
