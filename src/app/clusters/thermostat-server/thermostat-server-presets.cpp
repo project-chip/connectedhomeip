@@ -392,10 +392,7 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
                 // This really shouldn't happen; internal presets should alway have built-in set
                 return CHIP_IM_GLOBAL_STATUS(InvalidInState);
             }
-            else
-            {
-                preset.SetBuiltIn(matchingPresetBuiltIn.Value());
-            }
+            preset.SetBuiltIn(matchingPresetBuiltIn.Value());
         }
         else
         {
