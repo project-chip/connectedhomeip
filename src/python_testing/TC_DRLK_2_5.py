@@ -97,9 +97,9 @@ class TC_DRLK_2_5(MatterBaseTest):
 
     async def clear_week_day_schedule_cmd(self, week_day_index, user_index, expected_status):
         try:
-            response = await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearWeekDaySchedule(weekDayIndex=week_day_index, userIndex=user_index),
-                                                  endpoint=self.app_cluster_endpoint,
-                                                  timedRequestTimeoutMs=1000)
+            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearWeekDaySchedule(weekDayIndex=week_day_index, userIndex=user_index),
+                                       endpoint=self.app_cluster_endpoint,
+                                       timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
@@ -147,7 +147,7 @@ class TC_DRLK_2_5(MatterBaseTest):
     async def set_week_days_schedule_cmd(self, week_day_index, user_index, day_mask_map_index, start_Hour, start_Minute, end_Hour, end_Minute, expected_status):
         try:
 
-            response = await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetWeekDaySchedule(
+            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetWeekDaySchedule(
                 weekDayIndex=week_day_index,
                 userIndex=user_index,
                 daysMask=day_mask_map_index,
@@ -242,7 +242,7 @@ class TC_DRLK_2_5(MatterBaseTest):
 
         self.step("3")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0c.Rsp") and self.check_pics("DRLK.S.C0c.Tx")):
-            days_Mask = 127
+            day_mask_map_index = 127
             await self.get_weekday_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -255,7 +255,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("4")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             week_day_index = 0
-            days_Mask = 2
+            day_mask_map_index = 2
             await self.set_week_days_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -268,7 +268,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("5")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             week_day_index = 0  # invalid value
-            days_Mask = 2  # valid value
+            day_mask_map_index = 2  # valid value
             await self.set_week_days_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -281,7 +281,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("6")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             week_day_index = 1  # valid value
-            days_Mask = 0  # invalid value
+            day_mask_map_index = 0  # invalid value
             await self.set_week_days_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -295,7 +295,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("7")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             week_day_index = 1  # valid value
-            days_Mask = 1  # valid value
+            day_mask_map_index = 1  # valid value
             start_Hour = 18  # inavlid value > end hour
             await self.set_week_days_schedule_cmd(
                 week_day_index,
@@ -310,6 +310,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("8")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0c.Rsp") and self.check_pics("DRLK.S.C0c.Tx")):
             week_day_index = 0
+            user_index = 1
             await self.get_weekday_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -321,6 +322,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                 Status.InvalidCommand)
         self.step("9")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0c.Rsp") and self.check_pics("DRLK.S.C0c.Tx")):
+            week_day_index = 1
             user_index = 2  # invalid value as it does not exist
             await self.get_weekday_schedule_cmd(
                 week_day_index,
