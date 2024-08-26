@@ -613,7 +613,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     if (commandPath.mEndpointId != kRootEndpointId)
     {
         ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
         return true;
     }
 
@@ -634,7 +634,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
             if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
-                commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+                commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
                 return true;
             }
 

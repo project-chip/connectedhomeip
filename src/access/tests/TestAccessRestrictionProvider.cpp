@@ -22,9 +22,9 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
-
 namespace chip {
 namespace Access {
 
@@ -39,9 +39,14 @@ class TestAccessRestrictionProvider : public AccessRestrictionProvider
 AccessControl accessControl;
 TestAccessRestrictionProvider accessRestrictionProvider;
 
-constexpr ClusterId kNetworkCommissioningCluster = 0x0000'0031; // must not be blocked by access restrictions on any endpoint
-constexpr ClusterId kDescriptorCluster           = 0x0000'001d; // must not be blocked by access restrictions on any endpoint
-constexpr ClusterId kOnOffCluster                = 0x0000'0006;
+constexpr ClusterId kNetworkCommissioningCluster = app::Clusters::NetworkCommissioning::Id;
+constexpr ClusterId kDescriptorCluster           = app::Clusters::Descriptor::Id;
+constexpr ClusterId kOnOffCluster                = app::Clusters::OnOff::Id;
+
+// Clusters allowed to have restrictions
+constexpr ClusterId kWiFiNetworkManagementCluster  = app::Clusters::WiFiNetworkManagement::Id;
+constexpr ClusterId kThreadBorderRouterMgmtCluster = app::Clusters::ThreadBorderRouterManagement::Id;
+constexpr ClusterId kThreadNetworkDirectoryCluster = app::Clusters::ThreadNetworkDirectory::Id;
 
 constexpr NodeId kOperationalNodeId1 = 0x1111111111111111;
 constexpr NodeId kOperationalNodeId2 = 0x2222222222222222;
@@ -207,49 +212,103 @@ TEST_F(TestAccessRestriction, MetaTest)
     }
 }
 
-// ensure adding restrictons on endpoint 0 (any cluster) or for network commissioning and descriptor clusters fail
-TEST_F(TestAccessRestriction, InvalidRestrictionsTest)
+// ensure failure when adding restrictons on endpoint 0 (any cluster, including those allowed on other endpoints)
+TEST_F(TestAccessRestriction, InvalidRestrictionsOnEndpointZeroTest)
 {
     std::vector<AccessRestrictionProvider::Entry> entries;
     AccessRestrictionProvider::Entry entry;
-    entry.fabricIndex = 1;
-    entry.clusterId   = kOnOffCluster;
+    entry.endpointNumber = 0;
+    entry.fabricIndex    = 1;
     entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
 
-    // must not restrict endpoint 0
-    entry.endpointNumber = 0;
-    entries.push_back(entry);
-    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // must not restrict network commissioning cluster
-    entries.clear();
-    entry.endpointNumber = 1;
-    entry.clusterId      = kNetworkCommissioningCluster;
-    entries.push_back(entry);
-    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // must not restrict descriptor cluster
-    entries.clear();
     entry.clusterId = kDescriptorCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+
+    entries.clear();
+    entry.clusterId = kNetworkCommissioningCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+
+    entries.clear();
+    entry.clusterId = kWiFiNetworkManagementCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+
+    entries.clear();
+    entry.clusterId = kThreadBorderRouterMgmtCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+
+    entries.clear();
+    entry.clusterId = kThreadNetworkDirectoryCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // also test a cluster on endpoint 0 that isnt in the special allowed list
+    entries.clear();
+    entry.clusterId = kOnOffCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// ensure no failure adding restrictions on endpoint 1 for allowed clusters only:
+// wifi network management, thread border router, thread network directory
+TEST_F(TestAccessRestriction, ValidRestrictionsOnEndpointOneTest)
+{
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
+    entry.endpointNumber = 1;
+    entry.fabricIndex    = 1;
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
+
+    entry.clusterId = kWiFiNetworkManagementCluster;
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
+
+    entries.clear();
+    entry.clusterId = kThreadBorderRouterMgmtCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
+
+    entries.clear();
+    entry.clusterId = kThreadNetworkDirectoryCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
+
+    // also test a cluster on endpoint 0 that isnt in the special allowed list
+    entries.clear();
+    entry.clusterId = kOnOffCluster;
+    entries.push_back(entry);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestAccessRestriction, InvalidRestrictionsOnEndpointOneTest)
+{
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry;
+    entry.endpointNumber = 1;
+    entry.fabricIndex    = 1;
+    entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
+    entry.clusterId = kOnOffCluster;
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 constexpr CheckData accessAttributeRestrictionTestData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
 };
@@ -260,7 +319,7 @@ TEST_F(TestAccessRestriction, AccessAttributeRestrictionTest)
     AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
-    entry.clusterId      = kOnOffCluster;
+    entry.clusterId      = kWiFiNetworkManagementCluster;
     entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
 
     // test wildcarded entity id
@@ -278,19 +337,19 @@ TEST_F(TestAccessRestriction, AccessAttributeRestrictionTest)
 
 constexpr CheckData writeAttributeRestrictionTestData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
 };
@@ -301,7 +360,7 @@ TEST_F(TestAccessRestriction, WriteAttributeRestrictionTest)
     AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
-    entry.clusterId      = kOnOffCluster;
+    entry.clusterId      = kWiFiNetworkManagementCluster;
     entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
 
     // test wildcarded entity id
@@ -319,19 +378,19 @@ TEST_F(TestAccessRestriction, WriteAttributeRestrictionTest)
 
 constexpr CheckData commandAttributeRestrictionTestData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
 };
@@ -342,7 +401,7 @@ TEST_F(TestAccessRestriction, CommandRestrictionTest)
     AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
-    entry.clusterId      = kOnOffCluster;
+    entry.clusterId      = kWiFiNetworkManagementCluster;
     entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
 
     // test wildcarded entity id
@@ -360,19 +419,19 @@ TEST_F(TestAccessRestriction, CommandRestrictionTest)
 
 constexpr CheckData eventAttributeRestrictionTestData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
 };
@@ -383,7 +442,7 @@ TEST_F(TestAccessRestriction, EventRestrictionTest)
     AccessRestrictionProvider::Entry entry;
     entry.fabricIndex    = 1;
     entry.endpointNumber = 1;
-    entry.clusterId      = kOnOffCluster;
+    entry.clusterId      = kWiFiNetworkManagementCluster;
     entry.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kEventForbidden });
 
     // test wildcarded entity id
@@ -401,39 +460,39 @@ TEST_F(TestAccessRestriction, EventRestrictionTest)
 
 constexpr CheckData combinedRestrictionTestData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 2 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 2 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 3 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 3 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 4 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 4 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 3 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 3 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 4 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 4 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 5 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kEventReadRequest, .entityId = 5 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId2 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kCommandInvokeRequest, .entityId = 1 },
       .privilege   = Privilege::kAdminister,
       .allow       = false },
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId2 },
-      .requestPath = { .cluster = kOnOffCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 2 },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeWriteRequest, .entityId = 2 },
       .privilege   = Privilege::kAdminister,
       .allow       = true },
 };
@@ -445,7 +504,7 @@ TEST_F(TestAccessRestriction, CombinedRestrictionTest)
     AccessRestrictionProvider::Entry entry1;
     entry1.fabricIndex    = 1;
     entry1.endpointNumber = 1;
-    entry1.clusterId      = kOnOffCluster;
+    entry1.clusterId      = kWiFiNetworkManagementCluster;
     entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
     entry1.restrictions[0].id.SetValue(1);
     entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
@@ -459,7 +518,7 @@ TEST_F(TestAccessRestriction, CombinedRestrictionTest)
     AccessRestrictionProvider::Entry entry2;
     entry2.fabricIndex    = 2;
     entry2.endpointNumber = 1;
-    entry2.clusterId      = kOnOffCluster;
+    entry2.clusterId      = kWiFiNetworkManagementCluster;
     entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
     entry2.restrictions[0].id.SetValue(1);
     entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
@@ -468,6 +527,86 @@ TEST_F(TestAccessRestriction, CombinedRestrictionTest)
     EXPECT_EQ(accessRestrictionProvider.SetEntries(2, entries2), CHIP_NO_ERROR);
 
     RunChecks(combinedRestrictionTestData, ArraySize(combinedRestrictionTestData));
+}
+
+TEST_F(TestAccessRestriction, AttributeStorageSeperationTest)
+{
+    std::vector<AccessRestrictionProvider::Entry> commissioningEntries;
+    AccessRestrictionProvider::Entry entry1;
+    entry1.fabricIndex    = 1;
+    entry1.endpointNumber = 1;
+    entry1.clusterId      = kWiFiNetworkManagementCluster;
+    entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeWriteForbidden });
+    entry1.restrictions[0].id.SetValue(1);
+    commissioningEntries.push_back(entry1);
+    EXPECT_EQ(accessRestrictionProvider.SetCommissioningEntries(commissioningEntries), CHIP_NO_ERROR);
+
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry2;
+    entry2.fabricIndex    = 2;
+    entry2.endpointNumber = 2;
+    entry2.clusterId      = kThreadBorderRouterMgmtCluster;
+    entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
+    entry2.restrictions[0].id.SetValue(2);
+    entries.push_back(entry2);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(2, entries), CHIP_NO_ERROR);
+
+    auto commissioningEntriesFetched = accessRestrictionProvider.GetCommissioningEntries();
+    std::vector<AccessRestrictionProvider::Entry> arlEntriesFetched;
+    EXPECT_EQ(accessRestrictionProvider.GetEntries(2, arlEntriesFetched), CHIP_NO_ERROR);
+
+    EXPECT_NE(commissioningEntriesFetched[0].fabricIndex, arlEntriesFetched[0].fabricIndex);
+    EXPECT_NE(commissioningEntriesFetched[0].endpointNumber, arlEntriesFetched[0].endpointNumber);
+    EXPECT_NE(commissioningEntriesFetched[0].clusterId, arlEntriesFetched[0].clusterId);
+    EXPECT_NE(commissioningEntriesFetched[0].restrictions[0].restrictionType, arlEntriesFetched[0].restrictions[0].restrictionType);
+    EXPECT_NE(commissioningEntriesFetched[0].restrictions[0].id, arlEntriesFetched[0].restrictions[0].id);
+}
+
+constexpr CheckData listSelectionDuringCommissioningData[] = {
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1, .isCommissioning = true },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1, .isCommissioning = true },
+      .requestPath = { .cluster = kThreadBorderRouterMgmtCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1, .isCommissioning = false },
+      .requestPath = { .cluster = kWiFiNetworkManagementCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1, .isCommissioning = false },
+      .requestPath = { .cluster = kThreadBorderRouterMgmtCluster, .endpoint = 1, .requestType = RequestType::kAttributeReadRequest, .entityId = 1 },
+      .privilege   = Privilege::kAdminister,
+      .allow       = true },
+};
+
+TEST_F(TestAccessRestriction, ListSelectiondDuringCommissioningTest)
+{
+    // during commissioning, read is allowed on WifiNetworkManagement and disallowed on ThreadBorderRouterMgmt
+    // after commissioning, read is disallowed on WifiNetworkManagement and allowed on ThreadBorderRouterMgmt
+
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    AccessRestrictionProvider::Entry entry1;
+    entry1.fabricIndex    = 1;
+    entry1.endpointNumber = 1;
+    entry1.clusterId      = kThreadBorderRouterMgmtCluster;
+    entry1.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
+    entry1.restrictions[0].id.SetValue(1);
+    entries.push_back(entry1);
+    EXPECT_EQ(accessRestrictionProvider.SetCommissioningEntries(entries), CHIP_NO_ERROR);
+
+    entries.clear();
+    AccessRestrictionProvider::Entry entry2;
+    entry2.fabricIndex    = 1;
+    entry2.endpointNumber = 1;
+    entry2.clusterId      = kWiFiNetworkManagementCluster;
+    entry2.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kAttributeAccessForbidden });
+    entry2.restrictions[0].id.SetValue(1);
+    entries.push_back(entry2);
+    EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
+
+    RunChecks(listSelectionDuringCommissioningData, ArraySize(listSelectionDuringCommissioningData));
 }
 
 } // namespace Access
