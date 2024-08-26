@@ -274,7 +274,7 @@ def main():
         stopped_ok = hooks.stopped == num_endpoints
         if not ok or not started_ok or not skipped_ok or not stopped_ok:
             failures.append(
-                f'Expected {expected_runs} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
+                f'Expected {num_endpoints} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
 
     def check_once_per_endpoint(test_name: str):
         run_check(test_name, get_clusters([0, 1]), False)
