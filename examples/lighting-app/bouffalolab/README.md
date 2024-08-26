@@ -99,6 +99,7 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi build
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
     ```
@@ -113,23 +114,23 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 ### Build options with build_examples.py
 
--   `-wifi`, to specify that connectivity Wi-Fi is enabled for Matter
+-   `-wifi`, specifies to use Wi-Fi for Matter application.
+
+    -   BL602 uses Wi-Fi by defualt. `-wifi` could be elided.
+    -   BL702 needs it to specify to use BL706 + BL602 for Wi-Fi.
+
+-   `-thread`, specifies to use Thread for Matter
     application.
 
-    -   BL602 uses `-wifi` by default
-    -   BL702 needs specify to use BL706 + BL602 for Wi-Fi connectivity.
+    -   BL70X uses Thread by defualt. `-thread` could be elided.
 
--   `-thread`, to specify that connectivity Thread is enabled for Matter
-    application.
+-   `-ethernet`, specifies to use Ethernet for Matter application.
 
-    -   BL70X uses `-thread` by default.
+    -   BL706 needs it to specify to use Ethernet.
 
--   `-ethernet`, to specify that connectivity Ethernet is enabled for Matte
-    application.
-
-    -   BL706 needs specify to use Ethernet connectivity.
-
--   `-easyflash`, to specify that `easyflash` is used for flash storage access.
+-   `-littlefs`, specifies to use littlefs for flash access.
+-   `-easyflash`, specifies to use `easyflash` for flash access.
+    -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash` and `-littlefs`.
 -   `-mfd`, enable Matter factory data feature, which load factory data from
     `MFD` partition
 -   `-shell`, enable command line
@@ -175,9 +176,10 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 
             ```shell
-            ./out/bouffalolab-bl602dk-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl706dk-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
+          ./out/bouffalolab-bl602dk-light-littlefs/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
+          ./out/bouffalolab-bl616dk-light-wifi/chip-bl616dk-lighting-example.flash.py --port /dev/ttyACM0
+          ./out/bouffalolab-bl704ldk-light-littlefs/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
+          ./out/bouffalolab-bl706dk-light-littlefs/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   To wipe out flash and download image, please append `--erase`
