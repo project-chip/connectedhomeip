@@ -86,7 +86,7 @@ J-Link > exec EnableEraseAllFlashBanks
 J-Link > erase 0x8000000, 0x88a0000
 ```
 
--   MCUBoot application can be built with SDK installed, using intructions
+-   MCUBoot application can be built with SDK installed, using instructions
     below.
 -   Retrieve the mcuboot directory with :
 
@@ -215,7 +215,7 @@ To generate the OTA update image the same procedure can be followed from the
 [Generating and flashing the signed application image](#generating-and-flashing-the-signed-application-image)
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 (recent version of the update), without arguments "--pad" "--confirm" when
-running imgtool script during OTA Update Image generation.
+running `imgtool` script during OTA Update Image generation.
 
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be

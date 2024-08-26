@@ -336,7 +336,7 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running
    the server. To view raw UART output, a pin should be plugged to an USB to
    UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and
-   `J5 pin 4` (mikroBUS: TX) for [`NXP FRDM-RW612`] board), then start a
+   `J5 pin 4` (`mikroBUS`: TX) for [`NXP FRDM-RW612`] board), then start a
    terminal emulator like PuTTY and connect to the used COM port with the
    following UART settings:
 

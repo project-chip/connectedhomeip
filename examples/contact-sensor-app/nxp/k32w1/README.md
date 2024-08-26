@@ -3,15 +3,15 @@
 For generic information related to contact sensor application, please see the
 [common README](../README.md).
 
--   [Matter K32W1 Contact Sensor Example Application](#matter-k32w1-contact-sensor-example-application)
-    -   [Introduction](#introduction)
-    -   [Device UI](#device-ui)
-    -   [Building](#building)
-    -   [Flashing](#flashing)
-        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
-        -   [Flashing the host image](#flashing-the-host-image)
-    -   [Debugging](#debugging)
-    -   [OTA](#ota)
+- [Matter K32W1 Contact Sensor Example Application](#matter-k32w1-contact-sensor-example-application)
+  - [Introduction](#introduction)
+  - [Device UI](#device-ui)
+  - [Building](#building)
+  - [Flashing](#flashing)
+    - [Flashing the `NBU` image](#flashing-the-nbu-image)
+    - [Flashing the host image](#flashing-the-host-image)
+  - [Debugging](#debugging)
+  - [OTA](#ota)
 
 ## Introduction
 
@@ -39,7 +39,7 @@ wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
 the OTA image is stored in external memory, `LED2` operations will affect OTA
 operation by corrupting packages and OTA will not work.
 
-The user actions are summarised below:
+The user actions are summarized below:
 
 | button | action      | state                        | output                                                                                                                                 |
 | ------ | ----------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |

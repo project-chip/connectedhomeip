@@ -270,9 +270,9 @@ there are three implementations for factory data protection
 
 for the first one, the whole factory data is encrypted by an AES-256 key, the
 AES key can be passed through serial link when in factory production mode, and
-will be provisoned into Edge Lock, and the returned AES Key blob (wrapped key)
+will be provisioned into Edge Lock, and the returned AES Key blob (wrapped key)
 can be stored in the end of factory data region in TLV format. for the
-decryption process, the blob is retrieved and provisoned into Edge Lock and the
+decryption process, the blob is retrieved and provisioned into Edge Lock and the
 whole factory data can be decrypted using the returned key index in Edge Lock.
 Compared with only dac private key protection solution, this solution can avoid
 tampering with the original factory data.
@@ -286,9 +286,9 @@ stored into flash, it run only once.
 
 for the second one, it only protect the dac private key inside the factory data,
 the dac private key is retrieved and provisioned into Edge Lock, the returned
-key bolb replace the previous dac private key, and also update the overall size
+key blob replace the previous dac private key, and also update the overall size
 and hash, and re-write the factory data. when device is doing matter
-commissioning, the blob is retrieved and provisoned into Edge Lock and the
+commissioning, the blob is retrieved and provisioned into Edge Lock and the
 signing can be done using the returned key index in Edge Lock.
 
 the factory data should be plain text for the first programming. it will check
@@ -299,6 +299,6 @@ converted and the result is stored into flash, it run only once.
 for the third one, it is a little similar to the first one, the whole factory
 data is encrypted by an AES key, but there are two differences:
 
--   the AES key is hard-coded and not provisoned into Edge Lock
+-   the AES key is hard-coded and not provisioned into Edge Lock
 -   the factory data should be encrypted by AES-128 key using "--aes128_key"
     option in "generate.py" script file.
