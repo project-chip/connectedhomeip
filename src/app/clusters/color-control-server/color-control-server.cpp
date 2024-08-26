@@ -2678,11 +2678,11 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     // EnhancedColorMode attributes SHALL be set to 0x02 (color temperature). The values of
     // the StartUpColorTemperatureMireds attribute are listed in the table below.
     // Value                Action on power up
-    // 0x0000-0xffef        Set the ColorTemperatureMireds attribute to this value.
+    // 0x0001-0xffef        Set the ColorTemperatureMireds attribute to this value.
     // null                 Set the ColorTemperatureMireds attribute to its previous value.
 
     // Initialize startUpColorTempMireds to "maintain previous value" value null
-    app::DataModel::Nullable<uint16_t> startUpColorTemp;
+    app::DataModel::Nullable<uint16_t> startUpColorTemp = DataModel::NullNullable;
     Status status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
 
     if (status == Status::Success && !startUpColorTemp.IsNull())
