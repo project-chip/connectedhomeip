@@ -39,6 +39,8 @@ static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 // We will support only one preset of each preset type.
 static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 
+static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+
 class ThermostatDelegate : public Delegate
 {
 public:
