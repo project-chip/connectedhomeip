@@ -365,6 +365,8 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
+        // Force to be false, if passed as null
+        preset.SetBuiltIn(false);
     }
     else
     {
