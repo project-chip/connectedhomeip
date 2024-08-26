@@ -31,8 +31,7 @@ class InteractiveCommand : public CHIPCommand
 public:
     InteractiveCommand(const char * name, Commands * commandsHandler, const char * helpText,
                        CredentialIssuerCommands * credsIssuerConfig) :
-        CHIPCommand(name, credsIssuerConfig, helpText),
-        mHandler(commandsHandler)
+        CHIPCommand(name, credsIssuerConfig, helpText), mHandler(commandsHandler)
     {
         AddArgument("advertise-operational", 0, 1, &mAdvertiseOperational,
                     "Advertise operational node over DNS-SD and accept incoming CASE sessions.");
@@ -55,7 +54,14 @@ public:
     InteractiveStartCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
         InteractiveCommand("start", commandsHandler, "Start an interactive shell that can then run other commands.",
                            credsIssuerConfig)
-    {}
+    {
+#if defined(PW_RPC_ENABLED)
+        AddArgument("fabric-bridge-server-port", 0, UINT16_MAX, &mFabricBridgeServerPort,
+                    "The fabric-bridge RPC port number to connect to (default: 33002).");
+        AddArgument("local-server-port", 0, UINT16_MAX, &mLocalServerPort,
+                    "The port number for local RPC server (default: 33001).");
+#endif
+    }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
@@ -63,6 +69,11 @@ public:
 private:
     char * GetCommand(char * command);
     std::string GetHistoryFilePath() const;
+
+#if defined(PW_RPC_ENABLED)
+    chip::Optional<uint16_t> mFabricBridgeServerPort{ 33002 };
+    chip::Optional<uint16_t> mLocalServerPort{ 33001 };
+#endif
 };
 
 void PushCommand(const std::string & command);

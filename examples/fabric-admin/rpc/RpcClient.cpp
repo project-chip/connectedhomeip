@@ -117,9 +117,13 @@ void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Statu
 
 } // namespace
 
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
+void SetRpcClientPort(uint16_t port)
 {
-    rpc::client::SetRpcServerPort(rpcServerPort);
+    rpc::client::SetRpcServerPort(port);
+}
+
+CHIP_ERROR StartRpcClient()
+{
     return rpc::client::StartPacketProcessing();
 }
 
