@@ -595,7 +595,7 @@ bool PairingCommand::ShouldWaitAfterDeviceAttestation()
     // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
     SetupPayload payload;
     CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
-    return err == CHIP_NO_ERROR && payload.vendorID != 0 && payload.productID != 0;
+    return err == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0);
 }
 
 void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
@@ -603,11 +603,21 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
                                                   const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                                   chip::Credentials::AttestationVerificationResult attestationResult)
 {
-
     SetupPayload payload;
     CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
-    if (parse_error == CHIP_NO_ERROR && payload.vendorID != 0 && payload.productID != 0)
+    if (parse_error == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0))
     {
+        if (payload.vendorID == 0 || payload.productID == 0)
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation of vendorID or productID must not be 0."
+                            "Requested VID: %u, Requested PID: %u.",
+                            payload.vendorID, payload.productID);
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device, chip::Credentials::AttestationVerificationResult::kInvalidArgument);
+            return;
+        }
+
         if (payload.vendorID != info.BasicInformationVendorId() || payload.productID != info.BasicInformationProductId())
         {
             ChipLogProgress(NotSpecified,
@@ -620,6 +630,7 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
                 payload.vendorID == info.BasicInformationVendorId()
                     ? chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
                     : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
+            return;
         }
 
         deviceCommissioner->CommissioningStageComplete(CHIP_NO_ERROR);
