@@ -21,6 +21,7 @@ extern "C" {
 }
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/bouffalolab/common/BLConfig.h>
 
 #ifndef BLCONFIG_LFS_NAMESPACE
