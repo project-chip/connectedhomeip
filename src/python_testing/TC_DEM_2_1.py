@@ -157,13 +157,13 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                 asserts.assert_is_instance(power_adjustment_capability,
                                            Clusters.DeviceEnergyManagement.Structs.PowerAdjustCapabilityStruct)
 
-                power_adjustment_list = power_adjustment_capability.PowerAdjustCapability
+                power_adjustment_list = power_adjustment_capability.powerAdjustCapability
                 if power_adjustment_list is not NullValue:
                     asserts.assert_is_instance(power_adjustment_list, list)
                     for entry in power_adjustment_list:
                         asserts.assert_is_instance(entry, Clusters.DeviceEnergyManagement.Structs.PowerAdjustStruct)
 
-                power_adjustment_cause = power_adjustment_capability.Cause
+                power_adjustment_cause = power_adjustment_capability.cause
                 asserts.assert_is_instance(power_adjustment_cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum)
 
         self.step("9")
