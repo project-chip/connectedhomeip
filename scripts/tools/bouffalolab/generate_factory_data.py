@@ -17,27 +17,24 @@
 
 import argparse
 import base64
+import binascii
 import logging as log
 import os
+import random
 import secrets
+import ssl
 import subprocess
 import sys
-import random
-import ssl
-import binascii
-
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+
 from Crypto.Cipher import AES
-
 from cryptography import x509
-from cryptography.x509.oid import ObjectIdentifier
-
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_der_private_key
-
+from cryptography.x509.oid import ObjectIdentifier
 
 MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/bouffalolab")]
 
@@ -48,13 +45,13 @@ TEST_PAA_KEY = MATTER_ROOT + "/credentials/test/attestation/Chip-Test-PAA-FFF1-K
 TEST_PAI_CERT = MATTER_ROOT + "/credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Cert.pem"
 TEST_PAI_KEY = MATTER_ROOT + "/credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Key.pem"
 TEST_CHIP_CERT = MATTER_ROOT + "/out/linux-x64-chip-cert/chip-cert"
-TEST_CD_TYPE = 1 # 0 - development, 1 - provisional, 2 - official
+TEST_CD_TYPE = 1  # 0 - development, 1 - provisional, 2 - official
 
 
 def gen_test_passcode(passcode):
 
     INVALID_PASSCODES = [0, 11111111, 22222222, 33333333, 44444444,
-                         55555555, 66666666, 77777777, 88888888, 99999999, 
+                         55555555, 66666666, 77777777, 88888888, 99999999,
                          12345678, 87654321]
 
     def check_passcode(passcode):
@@ -95,7 +92,7 @@ def gen_test_unique_id(unique_id):
     return unique_id
 
 
-def gen_test_spake2(passcode, spake2p_it, spake2p_salt, spake2p_verifier = None):
+def gen_test_spake2(passcode, spake2p_it, spake2p_salt, spake2p_verifier=None):
 
     sys.path.insert(0, os.path.join(MATTER_ROOT, 'scripts', 'tools', 'spake2p'))
     from spake2p import generate_verifier
@@ -150,7 +147,7 @@ def gen_test_certs(chip_cert: str,
             return None, None, None, None, None
 
         ctx = ssl.create_default_context()
-        
+
         with open(cert, 'rb') as cert_file:
             cert = x509.load_pem_x509_certificate(cert_file.read(), default_backend())
 
@@ -184,14 +181,13 @@ def gen_test_certs(chip_cert: str,
         except Exception as e:
             raise Exception("Failed to verify DAC signature with PAI certificate.")
 
-
         if (pai_cert != TEST_PAI_CERT and paa_cert != TEST_PAA_CERT) or (pai_cert == TEST_PAI_CERT and paa_cert == TEST_PAA_CERT):
             if os.path.isfile(paa_cert):
-                cmd = [chip_cert, "validate-att-cert", 
+                cmd = [chip_cert, "validate-att-cert",
                        "--dac", dac_cert,
                        "--pai", pai_cert,
                        "--paa", paa_cert,
-                      ]
+                       ]
                 log.info("Verify Certificate Chain: {}".format(" ".join(cmd)))
                 subprocess.run(cmd)
 
@@ -210,7 +206,7 @@ def gen_test_certs(chip_cert: str,
 
             valid_from, lifetime = gen_valid_times(pai_issue_date, pai_expire_date)
             cmd = [chip_cert, "gen-att-cert",
-                   "--type", "d", # device attestation certificate
+                   "--type", "d",  # device attestation certificate
                    "--subject-cn", device_name + " Test DAC 0",
                    "--subject-vid", hex(vendor_id),
                    "--subject-pid", hex(product_id),
@@ -259,18 +255,18 @@ def gen_test_certs(chip_cert: str,
         if dac_vendor_id != vendor_id or dac_product_id != product_id:
             cmd += ["--dac-origin-vendor-id", hex(dac_vendor_id),
                     "--dac-origin-product-id", hex(dac_product_id),
-                   ]
+                    ]
 
         log.info("Generate CD: {}".format(" ".join(cmd)))
         subprocess.run(cmd)
-
 
     pai_vendor_id, pai_product_id, pai_issue_date, pai_expire_date = parse_cert_file(pai_cert)
 
     dac_vendor_id = pai_vendor_id if pai_vendor_id else vendor_id
     dac_product_id = pai_product_id if pai_product_id else product_id
-    gen_dac_certificate(chip_cert, device_name, dac_vendor_id, dac_product_id, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date)
-    
+    gen_dac_certificate(chip_cert, device_name, dac_vendor_id, dac_product_id, pai_cert,
+                        pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date)
+
     dac_cert_der = convert_pem_to_der(chip_cert, "convert-cert", dac_cert)
     dac_key_der = convert_pem_to_der(chip_cert, "convert-key", dac_key)
     pai_cert_der = convert_pem_to_der(chip_cert, "convert-cert", pai_cert)
@@ -306,7 +302,7 @@ def gen_mfd_partition(args, mfd_output):
 
     def read_file(rfile):
         with open(rfile, 'rb') as _f:
-           return _f.read()
+            return _f.read()
 
     def get_private_key(der):
         with open(der, 'rb') as file:
@@ -316,7 +312,7 @@ def gen_mfd_partition(args, mfd_output):
             return private_key
 
     def encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
-        data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16) ))
+        data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
         cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
         ciphertext = cryptor.encrypt(data_bytearray)
         return ciphertext
@@ -403,7 +399,7 @@ def gen_mfd_partition(args, mfd_output):
         fp.write(output)
 
 
-def gen_onboarding_data(args, onboard_txt, onboard_png, rendez = 6):
+def gen_onboarding_data(args, onboard_txt, onboard_png, rendez=6):
 
     try:
         import qrcode
@@ -465,7 +461,7 @@ def main():
     parser.add_argument("--unique_id", type=base64.b64decode, help="Rotating Unique ID in hex string, optional.")
     parser.add_argument("--spake2p_it", type=int, default=None, help="Spake2+ iteration count, optional.")
     parser.add_argument("--spake2p_salt", type=base64.b64decode, help="Spake2+ salt in hex string, optional.")
-    
+
     parser.add_argument("--vendor_id", type=int, default=0x130D, help="Vendor Identification, mandatory.")
     parser.add_argument("--vendor_name", type=str, default="Bouffalo Lab", help="Vendor Name string, optional.")
     parser.add_argument("--product_id", type=int, default=0x1001, help="Product Identification, mandatory.")
@@ -504,12 +500,12 @@ def main():
     vp_disc_info = "{}_{}_{}".format(hex(args.vendor_id), hex(args.product_id), discriminator)
     if args.dac_cert is None:
         args.dac_cert = os.path.join(args.output, "out_{}_dac_cert.pem".format(vp_disc_info))
-        args.dac_key =  os.path.join(args.output, "out_{}_dac_key.pem".format(vp_disc_info))
+        args.dac_key = os.path.join(args.output, "out_{}_dac_key.pem".format(vp_disc_info))
 
     if args.cd is None:
-        args.cd =  os.path.join(args.output, "out_{}_cd.der".format(vp_info))
+        args.cd = os.path.join(args.output, "out_{}_cd.der".format(vp_info))
 
-    cd, pai_cert_der, dac_cert_der, dac_key_der = gen_test_certs(args.chip_cert, 
+    cd, pai_cert_der, dac_cert_der, dac_key_der = gen_test_certs(args.chip_cert,
                                                                  args.output,
                                                                  args.vendor_id,
                                                                  args.product_id,
@@ -524,7 +520,7 @@ def main():
                                                                  args.dac_cert,
                                                                  args.dac_key)
 
-    mfd_output =  os.path.join(args.output, "out_{}_mfd.bin".format(vp_disc_info))
+    mfd_output = os.path.join(args.output, "out_{}_mfd.bin".format(vp_disc_info))
     args.dac_cert = dac_cert_der
     args.dac_key = dac_key_der
     args.passcode = passcode
@@ -538,8 +534,8 @@ def main():
     args.key = to_bytes(args.key)
     gen_mfd_partition(args, mfd_output)
 
-    onboard_txt =  os.path.join(args.output, "out_{}_onboard.txt".format(vp_disc_info))
-    onboard_png =  os.path.join(args.output, "out_{}_onboard.png".format(vp_disc_info))
+    onboard_txt = os.path.join(args.output, "out_{}_onboard.txt".format(vp_disc_info))
+    onboard_png = os.path.join(args.output, "out_{}_onboard.png".format(vp_disc_info))
     manualcode, qrcode = gen_onboarding_data(args, onboard_txt, onboard_png, args.rendezvous)
 
     log.info("")
@@ -557,6 +553,7 @@ def main():
     log.info("")
     log.info("MFD partition file: {}".format(mfd_output))
     log.info("QR code PNG file: {}".format(onboard_png))
+
 
 if __name__ == "__main__":
     main()

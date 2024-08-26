@@ -17,8 +17,6 @@ Legacy supported boards:
 -   `BL602-NIGHT-LIGHT`
 -   `XT-ZB6-DevKit`
 -   `BL706-NIGHT-LIGHT`
--   `BL706DK`
--   `BL704LDK`
 
 > Warning: Changing the VID/PID may cause compilation problems, we recommend
 > leaving it as the default while using this example.
@@ -119,8 +117,7 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
     -   BL602 uses Wi-Fi by defualt. `-wifi` could be elided.
     -   BL702 needs it to specify to use BL706 + BL602 for Wi-Fi.
 
--   `-thread`, specifies to use Thread for Matter
-    application.
+-   `-thread`, specifies to use Thread for Matter application.
 
     -   BL70X uses Thread by defualt. `-thread` could be elided.
 
@@ -130,9 +127,11 @@ The following steps take examples for `BL602DK`, `BL704LDK` and `BL706DK`.
 
 -   `-littlefs`, specifies to use littlefs for flash access.
 -   `-easyflash`, specifies to use `easyflash` for flash access.
-    -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash` and `-littlefs`.
+    -   for platform BL602/BL70X, it is necessary to specify one of `-easyflash`
+        and `-littlefs`.
 -   `-mfd`, enable Matter factory data feature, which load factory data from
     `MFD` partition
+    -   Please refer to [Bouffalo Lab Matter factory data guide](../../../docs/guides/bouffalolab/matter_factory_data.md) or contact to `Bouffalo Lab` for support.
 -   `-shell`, enable command line
 -   `-rpc`, enable Pigweed RPC feature
 -   `-115200`, set UART baudrate to 115200 for log and command line
