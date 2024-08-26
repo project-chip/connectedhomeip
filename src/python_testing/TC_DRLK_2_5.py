@@ -84,15 +84,6 @@ class TC_DRLK_2_5(MatterBaseTest):
             logging.error(e)
             logging.info("Error reading attributes,%s" % (attribute))
 
-    async def clear_user_cmd(self, user_index, expected_status: Status = Status.Success):
-        try:
-            await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearUser(userIndex=user_index),
-                                       endpoint=self.app_cluster_endpoint,
-                                       timedRequestTimeoutMs=1000)
-            asserts.assert_equal(expected_status, Status.Success)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
-
     def pics_TC_DRLK_2_5(self) -> list[str]:
         return ["DRLK.S", "DRLK.S.F04"]
 
