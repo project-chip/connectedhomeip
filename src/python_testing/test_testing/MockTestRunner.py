@@ -17,13 +17,13 @@
 
 import importlib
 import os
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
 from chip.clusters import Attribute
 from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 
+# import sys
 # try:
 # from matter_testing_support.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
 # except ImportError:
