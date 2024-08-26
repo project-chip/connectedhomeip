@@ -144,9 +144,9 @@ tests:
       verification: |
           No applicable TH logs.
 
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
-          OR 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           2. After DUT has been advertising for 2min59sec (right before the minimum 3min mark), check that the DUT is still advertising over BLE
       disabled: true
@@ -158,9 +158,9 @@ tests:
       verification: |
           No applicable TH logs.
 
-          1. Discover commissionables over BLE using a BLE discovery tool of choice. 
-          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop) 
-          OR 
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           2.  After DUT has been advertising for 15min(T0+ 15 minutes), check that the DUT has not stopped the advertising over BLE
 

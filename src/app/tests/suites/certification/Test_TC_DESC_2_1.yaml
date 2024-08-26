@@ -41,7 +41,7 @@ tests:
           for Endpoint 0"
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0. 
+          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
           Make a note of all the items(Endpoint id’s) in the list. In the below example there are 4 endpoint id's listed [1, 2, 3, 4]
 
           ./chip-tool descriptor read  parts-list 1 0
@@ -63,7 +63,7 @@ tests:
           - Verify that the DeviceTypeList contains one Root Node Device Type and may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type. (here DeviceType: 17 is power source )
           - Read each element from the DeviceTypeList and check for the following:
           DeviceType should be one of the DeviceTypes listed in the PIXIT.DESC.DeviceTypeConformanceList.
-          - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [[1692617243.785786][31325:31327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1437984882
           [1692617243.785840][31325:31327] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -82,7 +82,7 @@ tests:
           for each Endpoint supported by DUT (except Endpoint 0)."
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
-          For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json 
+          For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer, convert to hex before comparing.
 
           ./chip-tool descriptor read  parts-list 1 1
@@ -99,7 +99,7 @@ tests:
           - Verify the DeviceTypeList does not contain the Root Node Device Type.
           - Read each element from the DeviceTypeList and check for the following:
           DeviceType should match to the DeviceType listed in the PIXIT.DESC.DeviceTypeConformanceList.
-          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552599.264189][21135:21137] CHIP:DMG: }
           [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
@@ -127,7 +127,7 @@ tests:
           - Verify the DeviceTypeList does not contain the Root Node Device Type.
           - Read each element from the DeviceTypeList and check for the following:
           DeviceType should match to the DeviceType listed in the PIXIT.DESC.DeviceTypeConformanceList.
-          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1692618454.794870][31669:31671] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1103199808
           [1692618454.794946][31669:31671] CHIP:TOO:   DeviceTypeList: 2 entries
@@ -156,7 +156,7 @@ tests:
           - Verify the DeviceTypeList does not contain the Root Node Device Type.
           - Read each element from the DeviceTypeList and check for the following:
           DeviceType should match to the DeviceType listed in the PIXIT.DESC.DeviceTypeConformanceList.
-          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1724250131.542] [2998254:2998256] [DMG] }
           [1724250131.542] [2998254:2998256] [TOO] Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 816387248
@@ -181,7 +181,7 @@ tests:
           - Verify the DeviceTypeList does not contain the Root Node Device Type.
           - Read each element from the DeviceTypeList and check for the following:
           DeviceType should match to the DeviceType listed in the PIXIT.DESC.DeviceTypeConformanceList.
-          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform 
+          - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1724250191.099] [2998617:2998619] [DMG] }
           [1724250191.099] [2998617:2998619] [TOO] Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 3394934309
@@ -195,13 +195,13 @@ tests:
     - label: "Step 2: TH reads 'ServerList' attribute."
       PICS: DESC.S.A0001
       verification: |
-          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output. 
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
 
           The cluster ID's listed in the below log is from the All-Cluster-app. Please run the below command in all the Reference apps (bridge-app, tv-app, microwave-oven-app, Lock-app, Energy-Management-app and Thermostat-app).
 
           ./chip-tool descriptor read server-list 1 1
 
-          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, 
+          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform,
 
           1724250318.422] [2999432:2999434] [TOO] Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 753901911
           [1724250318.422] [2999432:2999434] [TOO]   ServerList: 75 entries
@@ -299,7 +299,7 @@ tests:
 
           ./chip-tool descriptor read server-list 1 3
 
-          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, 
+          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform,
 
           [1724250405.960] [2999967:2999969] [DMG] }
           [1724250405.960] [2999967:2999969] [TOO] Endpoint: 3 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 816387248
@@ -310,7 +310,7 @@ tests:
 
           ./chip-tool descriptor read server-list 1 4
 
-          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, 
+          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform,
 
           [1724250445.115] [3000229:3000231] [DMG] }
           [1724250445.116] [3000229:3000231] [TOO] Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 3394934309
@@ -342,7 +342,7 @@ tests:
 
           [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
           [1660146160.390211][46818:46823] CHIP:TOO:   ClientList: 0 entries
-          
+
           ./chip-tool descriptor read client-list 1 3
 
           Verify client list entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, Here ClientList entries are 0.
@@ -366,7 +366,7 @@ tests:
           ./chip-tool descriptor read  parts-list 1 0
 
            Verify PartsList response  greater than 0 and  Endpoint is in the range of 1 to 65534 on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
-        
+
            [1724250727.129] [3001992:3001994] [DMG] }
            [1724250727.130] [3001992:3001994] [TOO] Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 444270524
            [1724250727.130] [3001992:3001994] [TOO]   PartsList: 4 entries
@@ -374,7 +374,7 @@ tests:
            [1724250727.130] [3001992:3001994] [TOO]     [2]: 2
            [1724250727.130] [3001992:3001994] [TOO]     [3]: 3
            [1724250727.130] [3001992:3001994] [TOO]     [4]: 4
-        
+
            Repeat Steps 1b to 4 in a recursive manner for the Endpoints read in this step (i.e. recursively walk all the Endpoints encountered in all PartsLists)
       disabled: true
 
