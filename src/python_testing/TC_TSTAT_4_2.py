@@ -482,30 +482,45 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Read the numberOfPresets supported to get the maximum number of presets supported.
+            # Read the numberOfPresets supported.
             numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
-            logger.info(f"Rx'd NumberOfPresets: {numberOfPresetsSupported}")
 
-            # Read the presetTypes supported to get the preset types supported
+            # Read the PresetTypes to get the preset scenarios to build the Presets list.
             presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
-            logger.info(f"Rx'd PresetTypes: {presetTypes}")
 
-            # Since we currently support one preset of each type, run the test only if we have enough preset types to exceed maximum number of presets supported.
-            if sizeof(presetTypes) > numberOfPresetsSupported:
-                for preset in presetTypes:
+            # Read the Presets to copy the existing presets into our testPresets list below.
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+
+            # Since we currently support one preset of each type, run the test only if we have enough preset types to create a preset list whose length exceeds the
+            # maximum number of presets supported.
+            if len(presetTypes) > numberOfPresetsSupported:
+                didCopyPreset = False
+                testPresets = []
+                for presetType in presetTypes:
                     scenario = presetType.presetScenario
-                    isBuiltIn = (scenario == cluster.Enums.PresetScenarioEnum.kOccupied or scenario == cluster.Enums.PresetScenarioEnum.kUnoccupied)
-                    test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetType.presetScenario,
-                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=isBuiltIn))
+
+                    # For each scenario, check if there is a preset in the Presets attribute matching the scenario. iif so, copy the preset into testPresets.
+                    # Otherwide, add a new entry.
+                    for preset in presets:
+                        if scenario == preset.presetScenario:
+                            testPresets.append(preset)
+                            didCopyPreset = True
+                            break
+                        else:
+                            didCopyPreset = False
+                    if not didCopyPreset:
+                        testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetType.presetScenario,
+                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
 
-                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
+                await self.write_presets(endpoint=endpoint, presets=testPresets, expected_status=Status.ResourceExhausted)
 
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
-
+            else:
+                logger.info(f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported");
 
 if __name__ == "__main__":
     default_matter_test_main()
