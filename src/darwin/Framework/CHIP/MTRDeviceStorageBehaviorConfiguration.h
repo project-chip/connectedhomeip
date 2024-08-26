@@ -20,10 +20,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Class that configures how MTRDevice objects persist its attributes to storage, so as to not
+ * Class that configures how MTRDevice objects persist their attributes to storage, so as to not
  * overwhelm the underlying storage system.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceStorageBehaviorConfiguration : NSObject <NSCopying>
 
 /**
@@ -79,7 +79,7 @@ MTR_NEWLY_AVAILABLE
  * be used to replace all of them:
  *
  * reportToPersistenceDelayTimeDefault (15)
- * reportToPersistenceDelayTimeMaxDefault (20 * kReportToPersistenceDelayTimeDefault)
+ * reportToPersistenceDelayTimeMaxDefault (20 * 15)
  * recentReportTimesMaxCountDefault (12)
  * timeBetweenReportsTooShortThresholdDefault (15)
  * timeBetweenReportsTooShortMinThresholdDefault (5)

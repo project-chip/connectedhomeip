@@ -118,7 +118,11 @@ chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
 if(CONFIG_DISABLE_IPV4)
-    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    if(NOT CONFIG_LWIP_IPV4)
+        chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    else()
+	message(FATAL_ERROR "Please also disable config option CONFIG_LWIP_IPV4")
+    endif()
 endif()
 
 if(CONFIG_DISABLE_READ_CLIENT)
@@ -220,6 +224,9 @@ endif()
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+    if (CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER)
+        chip_gn_arg_append("chip_device_config_thread_network_endpoint_id" ${CONFIG_THREAD_NETWORK_ENDPOINT_ID})
+    endif()
 else()
     chip_gn_arg_append("chip_enable_openthread"                 "false")
 endif()
@@ -228,6 +235,12 @@ if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
 else()
     chip_gn_arg_append("chip_openthread_ftd"                    "false")
+endif()
+
+if (CONFIG_OPENTHREAD_BORDER_ROUTER)
+    chip_gn_arg_append("chip_openthread_border_router"       "true")
+else()
+    chip_gn_arg_append("chip_openthread_border_router"       "false")
 endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
@@ -454,12 +467,29 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     endif()
 endif()
 
+if(CONFIG_OPENTHREAD_BORDER_ROUTER)
+    idf_component_get_property(rcp_update_lib espressif__esp_rcp_update COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${rcp_update_lib}>)
+    idf_component_get_property(serial_flasher_lib espressif__esp-serial-flasher COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${serial_flasher_lib}>)
+endif()
+
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
     idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
 endif()
 
-idf_component_get_property(main_lib main COMPONENT_LIB)
+# Let user set EXECUTABLE_COMPONENT_NAME and defaults to main if not specified
+if (NOT EXECUTABLE_COMPONENT_NAME)
+  set(EXECUTABLE_COMPONENT_NAME "main")
+endif()
+
+if (CONFIG_ENABLE_DELTA_OTA)
+    idf_component_get_property(esp_delta_ota_lib espressif__esp_delta_ota COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_delta_ota_lib}>)
+endif()
+
+idf_component_get_property(main_lib ${EXECUTABLE_COMPONENT_NAME} COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
@@ -468,7 +498,15 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    # esp_insights can be used as an independent component or through component manager so,
+    # We should check and add the right component.
+    if("espressif__esp_insights" IN_LIST build_components)
+        idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    elseif("esp_insights" IN_LIST build_components)
+        idf_component_get_property(esp_insights_lib esp_insights COMPONENT_LIB)
+    endif()
+
     list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
 endif()
 

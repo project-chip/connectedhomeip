@@ -28,7 +28,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
   val state: UByte,
   val sessionDuration: UInt,
   val sessionEnergyCharged: Long,
-  val sessionEnergyDischarged: Optional<Long>
+  val sessionEnergyDischarged: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEVNotDetectedEvent {\n")
@@ -43,7 +43,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_SESSION_I_D), sessionID)
+      put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_SESSION_DURATION), sessionDuration)
       put(ContextSpecificTag(TAG_SESSION_ENERGY_CHARGED), sessionEnergyCharged)
@@ -56,7 +56,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
   }
 
   companion object {
-    private const val TAG_SESSION_I_D = 0
+    private const val TAG_SESSION_ID = 0
     private const val TAG_STATE = 1
     private const val TAG_SESSION_DURATION = 2
     private const val TAG_SESSION_ENERGY_CHARGED = 3
@@ -64,7 +64,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEVNotDetectedEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
+      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val sessionDuration = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_DURATION))
       val sessionEnergyCharged = tlvReader.getLong(ContextSpecificTag(TAG_SESSION_ENERGY_CHARGED))
@@ -82,7 +82,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
         state,
         sessionDuration,
         sessionEnergyCharged,
-        sessionEnergyDischarged
+        sessionEnergyDischarged,
       )
     }
   }

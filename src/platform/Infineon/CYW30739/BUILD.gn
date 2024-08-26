@@ -38,6 +38,7 @@ static_library("CYW30739") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "OTAImageProcessorImpl.h",
+    "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
     "cyw30739-chip-mbedtls-config.h",
@@ -87,4 +88,12 @@ static_library("CYW30739") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

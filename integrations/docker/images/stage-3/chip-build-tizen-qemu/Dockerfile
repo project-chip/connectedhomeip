@@ -19,7 +19,9 @@ RUN set -x \
     genisoimage \
     libgmp-dev \
     libmpc-dev \
+    patch \
     qemu-system-arm \
+    xz-utils \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
@@ -58,7 +60,7 @@ RUN set -x \
     && ./scripts/config -e OVERLAY_FS -e ISO9660_FS \
     && ./scripts/config -e SECURITY_SMACK_PERMISSIVE_MODE \
     && make olddefconfig \
-    && make zImage \
+    && make -j$(nproc) zImage \
     && mv arch/arm/boot/zImage $TIZEN_IOT_QEMU_KERNEL \
     # Cleanup
     && rm -rf /tmp/workdir \
@@ -194,5 +196,5 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Switch back to the non-root user
-USER $USER_NAME
-WORKDIR $USER_HOME
+USER ubuntu
+WORKDIR /home/ubuntu

@@ -126,6 +126,11 @@
         MTRValueKey : @(5),
     };
 
+    __auto_type * signedIntValue = @{
+        MTRTypeKey : MTRSignedIntegerValueType,
+        MTRValueKey : @(5),
+    };
+
     __auto_type * listOfStringsValue = @{
         MTRTypeKey : MTRArrayValueType,
         MTRValueKey : @[
@@ -191,6 +196,36 @@
         NSNumber * invalidID = @(0xFFFF0000);
         __auto_type * attr = [[MTRServerAttribute alloc] initReadonlyAttributeWithID:invalidID initialValue:unsignedIntValue requiredPrivilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNil(attr);
+    }
+
+    // Valid FeatureMap attribute
+    {
+        __auto_type * attr = [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID) initialValue:unsignedIntValue requiredPrivilege:MTRAccessControlEntryPrivilegeView];
+        XCTAssertNotNil(attr);
+        XCTAssertEqualObjects(attr.attributeID, @(MTRAttributeIDTypeGlobalAttributeFeatureMapID));
+        XCTAssertEqualObjects(attr.value, unsignedIntValue);
+        XCTAssertEqual(attr.writable, NO);
+    }
+
+    // FeatureMap attribute with wrong value type
+    {
+        __auto_type * attr = [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID) initialValue:signedIntValue requiredPrivilege:MTRAccessControlEntryPrivilegeView];
+        XCTAssertNil(attr);
+    }
+
+    // FeatureMap attribute with wrong permissions
+    {
+        __auto_type * attr = [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID) initialValue:unsignedIntValue requiredPrivilege:MTRAccessControlEntryPrivilegeOperate];
+        XCTAssertNil(attr);
+    }
+
+    // FeatureMap attribute via factory
+    {
+        __auto_type * attr = [MTRServerAttribute newFeatureMapAttributeWithInitialValue:@(5)];
+        XCTAssertNotNil(attr);
+        XCTAssertEqualObjects(attr.attributeID, @(MTRAttributeIDTypeGlobalAttributeFeatureMapID));
+        XCTAssertEqualObjects(attr.value, unsignedIntValue);
+        XCTAssertEqual(attr.writable, NO);
     }
 }
 

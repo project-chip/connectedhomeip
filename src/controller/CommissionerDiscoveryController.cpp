@@ -166,6 +166,11 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
     }
+    else
+    {
+        // Store rotating ID string. Don't include null terminator character.
+        mRotatingId = std::string{ rotatingIdString, state.GetRotatingIdLength() * 2 };
+    }
 
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
@@ -229,22 +234,6 @@ void CommissionerDiscoveryController::InternalOk()
     if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId()))
     {
         ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
-
-        // notify client that app will be installed
-        CommissionerDeclaration cd;
-        cd.SetErrorCode(CommissionerDeclaration::CdError::kAppInstallConsentPending);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
-
-        // dialog
-        ChipLogDetail(Controller, "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
-                      client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
-
-        if (mUserPrompter != nullptr)
-        {
-            mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
-        }
-        ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
-        return;
     }
 
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
@@ -471,6 +460,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
+
             client->SetCachedCommissionerPasscode(passcode);
             client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
@@ -605,12 +595,36 @@ void CommissionerDiscoveryController::Cancel()
         return;
     }
     UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
-    if (client == nullptr || client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
+
+    if (client == nullptr)
     {
-        ChipLogError(AppServer, "UX Cancel: invalid state for cancel");
+        ChipLogError(AppServer, "UX Cancel: client not found");
         return;
     }
+
+    auto state = client->GetUDCClientProcessingState();
+
+    bool isCancelableState =
+        (state == UDCClientProcessingState::kPromptingUser || state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+
+    if (!isCancelableState)
+    {
+        ChipLogError(AppServer, "UX Cancel: invalid state for cancel, state: %hhu", static_cast<uint8_t>(state));
+        return;
+    }
+
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
+
+    if (state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+        state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+    {
+        ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetCancelPasscode(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+
     mPendingConsent = false;
     ResetState();
 }
@@ -622,10 +636,13 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mVendorId  = vendorId;
     mProductId = productId;
     mNodeId    = nodeId;
+
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        auto rotatingIdSpan = CharSpan{ mRotatingId.data(), mRotatingId.size() };
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, rotatingIdSpan, mPasscode, exchangeMgr,
+                                                           sessionHandle);
     }
     else
     {

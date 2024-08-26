@@ -145,18 +145,20 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
+        // Only enable auto resubscribe if the subscription is established successfully.
+        mAutoResubscribeNeeded = mAutoResubscribe;
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
         }
         gOnResubscriptionAttemptedCallback(mAppContext, ToPyChipError(aTerminationCause),
                                            apReadClient->ComputeTimeTillNextSubscription());
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             return CHIP_NO_ERROR;
         }
@@ -242,7 +244,8 @@ private:
     PyObject * mAppContext;
 
     std::unique_ptr<ReadClient> mReadClient;
-    bool mAutoResubscribe = true;
+    bool mAutoResubscribe       = true;
+    bool mAutoResubscribeNeeded = false;
 };
 
 extern "C" {
@@ -462,6 +465,12 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
 {
     VerifyOrDie(pReadClient != nullptr);
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
+}
+
+void pychip_ReadClient_TriggerResubscribeIfScheduled(ReadClient * pReadClient, const char * reason)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->TriggerResubscribeIfScheduled(reason);
 }
 
 PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)

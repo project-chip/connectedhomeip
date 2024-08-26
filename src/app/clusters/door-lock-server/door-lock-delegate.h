@@ -125,6 +125,24 @@ public:
      * @return The max number of Aliro endpoint keys supported.
      */
     virtual uint16_t GetNumberOfAliroEndpointKeysSupported() = 0;
+
+    /**
+     * Set the Aliro reader configuration for the lock.  The various arguments
+     * have already been checked for constraints and consistency with the
+     * FeatureMap.
+     *
+     * @param[in] signingKey Signing key component of the Reader's key pair.
+     * @param[in] verificationKey Verification key component of the Reader's key pair.
+     * @param[in] groupIdentifier Reader group identifier for the lock.
+     * @param[in] groupResolvingKey Group resolving key for the lock if Aliro BLE UWB feature is supported
+     */
+    virtual CHIP_ERROR SetAliroReaderConfig(const ByteSpan & signingKey, const ByteSpan & verificationKey,
+                                            const ByteSpan & groupIdentifier, const Optional<ByteSpan> & groupResolvingKey) = 0;
+
+    /**
+     * Clear the Aliro reader configuration for the lock.
+     */
+    virtual CHIP_ERROR ClearAliroReaderConfig() = 0;
 };
 
 } // namespace DoorLock

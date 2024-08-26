@@ -250,8 +250,6 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data);
-    void CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark all browse-type scheduled attemptes as a success, removing them

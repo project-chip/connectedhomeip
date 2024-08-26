@@ -136,7 +136,7 @@ public:
      * @param[in] icdNodeId    The node id of the ICD.
      * @param[in] icdCounter   The ICD Counter received from the device.
      */
-    virtual void OnICDRegistrationComplete(NodeId icdNodeId, uint32_t icdCounter) {}
+    virtual void OnICDRegistrationComplete(ScopedNodeId icdNodeId, uint32_t icdCounter) {}
 
     /**
      * @brief
@@ -147,7 +147,7 @@ public:
      * @param[in] promisedActiveDurationMsec   The actual duration that the ICD server can stay active
      *            from the time it receives the StayActiveRequest command.
      */
-    virtual void OnICDStayActiveComplete(NodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
+    virtual void OnICDStayActiveComplete(ScopedNodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
 };
 
 } // namespace Controller

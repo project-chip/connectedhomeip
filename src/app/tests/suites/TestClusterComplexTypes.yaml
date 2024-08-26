@@ -70,7 +70,7 @@ tests:
       # expires.
       busyWaitMs: 100
       response:
-          error: UNSUPPORTED_ACCESS
+          error: TIMEOUT
 
     - label:
           "Send command that does not need timed invoke with a long timeout
@@ -88,7 +88,7 @@ tests:
       # expires.
       busyWaitMs: 100
       response:
-          error: UNSUPPORTED_ACCESS
+          error: TIMEOUT
 
     # The timed write tests are not in TestCluster.yaml for now because Darwin
     # SDK APIs have not been updated to do timed invoke properly yet.
@@ -125,7 +125,7 @@ tests:
       # expires.
       busyWaitMs: 100
       response:
-          error: UNSUPPORTED_ACCESS
+          error: TIMEOUT
 
     - label: "Read attribute that needs timed write state unchanged 2"
       command: "readAttribute"
@@ -173,7 +173,7 @@ tests:
       # expires.
       busyWaitMs: 100
       response:
-          error: UNSUPPORTED_ACCESS
+          error: TIMEOUT
 
     - label: "Read attribute that does not need timed write unchanged value"
       command: "readAttribute"

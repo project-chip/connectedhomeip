@@ -207,7 +207,7 @@ if _submodules_need_updating; then
   echo "For a clean checkout, consider running:"
   echo "   ./scripts/checkout_submodules.py --shallow --platform <your-platform>"
   echo "OR for a full checkout:"
-  echo "   git submodules update -f --init --recursive"
+  echo "   git submodule update -f --init --recursive"
 
   # reset output
   if which tput >/dev/null; then tput sgr0; fi

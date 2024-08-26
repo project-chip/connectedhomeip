@@ -24,9 +24,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                    get_wait_seconds_from_set_time, parse_pics, parse_pics_xml, type_matches,
-                                    utc_time_in_matter_epoch)
+                                    get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
+from pics_support import parse_pics, parse_pics_xml
 from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
@@ -625,7 +625,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         self.pics_assert('BINFO.S.A0010', True)
         self.pics_assert('BINFO.S.A0011', False)
         self.pics_assert('BINFO.S.A0012', True)
-        self.pics_assert('BINFO.S.A0013', True)
+        self.pics_assert('BINFO.S.A0013', False)
         self.pics_assert('BINFO.S.A0014', False)
         self.pics_assert('PICSDOESNOTEXIST', False)
 

@@ -18,7 +18,8 @@ SupportTests
 UserDirectedCommissioningTests
 SecureChannelTests
 ICDServerTests
-DataModelTests
+ControllerDataModelTests
+AppDataModelTests
 InetLayerTests
 AppTests
 MessagingLayerTests

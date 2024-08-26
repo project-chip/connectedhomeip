@@ -64,15 +64,6 @@ namespace chip {
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_TCP_PAYLOAD_SIZE_BYTES
- *
- * @brief Maximum payload size of a message over a TCP connection
- */
-#ifndef CHIP_CONFIG_MAX_TCP_PAYLOAD_SIZE_BYTES
-#define CHIP_CONFIG_MAX_TCP_PAYLOAD_SIZE_BYTES 1000000
-#endif
-
-/**
  *  @def CHIP_CONFIG_TCP_CONNECT_TIMEOUT_MSECS
  *
  *  @brief

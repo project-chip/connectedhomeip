@@ -27,9 +27,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <lib/core/ReferenceCounted.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/ReferenceCounted.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 

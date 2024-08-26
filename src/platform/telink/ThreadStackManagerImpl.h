@@ -39,7 +39,7 @@ class ThreadStackManager;
 class ThreadStackManagerImpl;
 
 /**
- * Concrete implementation of the ThreadStackManager singleton object for nRF Connect platforms.
+ * Concrete implementation of the ThreadStackManager singleton object for Telink platforms.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
                                      public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
@@ -118,7 +118,7 @@ inline ThreadStackManager & ThreadStackMgr(void)
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
  * chip applications can use this to gain access to features of the ThreadStackManager
- * that are specific to nRF Connect platforms.
+ * that are specific to Telink platforms.
  */
 inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {

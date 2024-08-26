@@ -169,7 +169,7 @@ class TLVList:
     def __iter__(self) -> """TLVList.Iterator""":
         return TLVList.Iterator(iter(self._data))
 
-    def __eq__(self, rhs: "TLVList") -> bool:
+    def __eq__(self, rhs: object) -> bool:
         if not isinstance(rhs, TLVList):
             return False
         return self._data == rhs._data

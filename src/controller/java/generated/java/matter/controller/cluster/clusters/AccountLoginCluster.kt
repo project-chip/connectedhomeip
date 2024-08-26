@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class AccountLoginCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class GetSetupPINResponse(val setupPIN: String)
 
@@ -87,7 +87,7 @@ class AccountLoginCluster(
 
   suspend fun getSetupPIN(
     tempAccountIdentifier: String,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ): GetSetupPINResponse {
     val commandId: UInt = 0u
 
@@ -102,7 +102,7 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -110,13 +110,13 @@ class AccountLoginCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_SETUP_P_I_N: Int = 0
+    val TAG_SETUP_PIN: Int = 0
     var setupPIN_decoded: String? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_SETUP_P_I_N)) {
+      if (tag == ContextSpecificTag(TAG_SETUP_PIN)) {
         setupPIN_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -136,7 +136,7 @@ class AccountLoginCluster(
     tempAccountIdentifier: String,
     setupPIN: String,
     node: ULong?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 2u
 
@@ -146,8 +146,8 @@ class AccountLoginCluster(
     val TAG_TEMP_ACCOUNT_IDENTIFIER_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_TEMP_ACCOUNT_IDENTIFIER_REQ), tempAccountIdentifier)
 
-    val TAG_SETUP_P_I_N_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SETUP_P_I_N_REQ), setupPIN)
+    val TAG_SETUP_PIN_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SETUP_PIN_REQ), setupPIN)
 
     val TAG_NODE_REQ: Int = 2
     node?.let { tlvWriter.put(ContextSpecificTag(TAG_NODE_REQ), node) }
@@ -157,7 +157,7 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -178,7 +178,7 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -225,7 +225,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -238,7 +238,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -322,7 +322,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -335,7 +335,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -419,7 +419,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -432,7 +432,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -514,7 +514,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -527,7 +527,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -602,7 +602,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -615,7 +615,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -683,7 +683,7 @@ class AccountLoginCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -696,7 +696,7 @@ class AccountLoginCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

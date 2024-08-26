@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class GroupKeyManagementClusterGroupKeyMapStruct(
   val groupId: UInt,
   val groupKeySetID: UInt,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
@@ -39,7 +39,7 @@ class GroupKeyManagementClusterGroupKeyMapStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_GROUP_ID), groupId)
-      put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
+      put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID), groupKeySetID)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -47,13 +47,13 @@ class GroupKeyManagementClusterGroupKeyMapStruct(
 
   companion object {
     private const val TAG_GROUP_ID = 1
-    private const val TAG_GROUP_KEY_SET_I_D = 2
+    private const val TAG_GROUP_KEY_SET_ID = 2
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeyMapStruct {
       tlvReader.enterStructure(tlvTag)
       val groupId = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID))
-      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()

@@ -14,12 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <gtest/gtest.h>
+
 #include <lib/support/BitMask.h>
 
 #include <algorithm>
 #include <cstring>
 #include <initializer_list>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 

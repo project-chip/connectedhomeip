@@ -47,7 +47,6 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app/util/af-types.h>
@@ -114,12 +113,17 @@ const MockNodeConfig & GetMockNodeConfig()
     return (mockConfig != nullptr) ? *mockConfig : DefaultMockNodeConfig();
 }
 
-uint16_t mockClusterRevision = 1;
-uint32_t mockFeatureMap      = 0x1234;
-bool mockAttribute1          = true;
-int16_t mockAttribute2       = 42;
-uint64_t mockAttribute3      = 0xdeadbeef0000cafe;
-uint8_t mockAttribute4[256]  = {
+} // namespace
+
+namespace chip {
+namespace Test {
+
+const uint16_t mockClusterRevision = 1;
+const uint32_t mockFeatureMap      = 0x1234;
+const bool mockAttribute1          = true;
+const int16_t mockAttribute2       = 42;
+const uint64_t mockAttribute3      = 0xdeadbeef0000cafe;
+const uint8_t mockAttribute4[256]  = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
@@ -130,7 +134,8 @@ uint8_t mockAttribute4[256]  = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
-} // namespace
+} // namespace Test
+} // namespace chip
 
 uint16_t emberAfEndpointCount()
 {

@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/core/GroupedCallbackList.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -309,9 +310,8 @@ private:
 
     SessionHolder mSecureSession;
 
-    Callback::CallbackDeque mConnectionSuccess;
-    Callback::CallbackDeque mConnectionFailure;
-    Callback::CallbackDeque mSetupFailure;
+    typedef Callback::GroupedCallbackList<OnDeviceConnected, OnDeviceConnectionFailure, OnSetupFailure> SuccessFailureCallbackList;
+    SuccessFailureCallbackList mCallbacks;
 
     OperationalSessionReleaseDelegate * mReleaseDelegate;
 
@@ -347,7 +347,7 @@ private:
 
     void MoveToState(State aTargetState);
 
-    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
+    CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
@@ -402,10 +402,8 @@ private:
      * notifications. This happens after the object has been released, if it's
      * being released.
      */
-    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & setupFailureReady,
-                                          Callback::Cancelable & successReady, CHIP_ERROR error, SessionEstablishmentStage stage,
-                                          const ScopedNodeId & peerId, bool performingAddressUpdate,
-                                          Messaging::ExchangeManager * exchangeMgr,
+    static void NotifyConnectionCallbacks(SuccessFailureCallbackList & ready, CHIP_ERROR error, SessionEstablishmentStage stage,
+                                          const ScopedNodeId & peerId, Messaging::ExchangeManager * exchangeMgr,
                                           const Optional<SessionHandle> & optionalSessionHandle,
                                           // requestedBusyDelay will be 0 if not
                                           // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP,
@@ -421,7 +419,7 @@ private:
     /**
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
-    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+    void UpdateDeviceData(const AddressResolve::ResolveResult & result);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**

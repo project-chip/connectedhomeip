@@ -33,6 +33,7 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/PendingResponseTrackerImpl.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -99,8 +100,8 @@ public:
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
+         *   status response from the server.  In that case, constructing
+         *   a StatusIB from the error can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          */
         CHIP_ERROR error;
@@ -135,7 +136,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] commandSender   The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
@@ -148,7 +149,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param commandSender   The CommandSender object that initiated the transaction.
          * @param aNoResponseData Details about the request without a response.
          */
         virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}
@@ -214,6 +215,12 @@ public:
         AddRequestDataParameters() {}
 
         AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+
+        AddRequestDataParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
 
         // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
         // invoke. CommandSender will use the minimum of all provided timeouts for execution.
@@ -307,18 +314,19 @@ public:
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -376,6 +384,22 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
+     * API for adding request data using DataModel::EncodableToTLV.
+     *
+     * @param [in] aCommandPath The path of the command being requested.
+     * @param [in] aEncodable The request data to encode into the
+     *             `CommandFields` member of `CommandDataIB`.
+     * @param [in] aAddRequestDataParams parameters associated with building the
+     *             InvokeRequestMessage that are associated with this request.
+     *
+     * This API will not fail if this is an untimed invoke but the command provided requires a timed
+     * invoke interaction. If the caller wants that to fail before sending the command, they should call
+     * the templated version of AddRequestData.
+     */
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
+                              AddRequestDataParameters & aAddRequestDataParams);
+
+    /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -391,15 +415,18 @@ public:
         return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    template <typename CommandDataT>
+    template <typename CommandDataT,
+              typename std::enable_if_t<!std::is_base_of_v<DataModel::EncodableToTLV, CommandDataT>, int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
                             CHIP_ERROR_INVALID_ARGUMENT);
 
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
+
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
@@ -426,7 +453,8 @@ public:
     CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
@@ -448,19 +476,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      AddRequestDataParameters & aAddRequestDataParams)
-    {
-        PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-        return FinishCommand(finishCommandParams);
-    }
-
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 
 public:
@@ -501,6 +516,34 @@ private:
         AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    /**
+     * Class to help backup CommandSender's buffer containing InvokeRequestMessage when adding InvokeRequest
+     * in case there is a failure to add InvokeRequest. Intended usage is as follows:
+     *  - Allocate RollbackInvokeRequest on the stack.
+     *  - Attempt adding InvokeRequest into InvokeRequestMessage buffer.
+     *  - If modification is added successfully, call DisableAutomaticRollback() to prevent destructor from
+     *    rolling back InvokeReqestMessage.
+     *  - If there is an issue adding InvokeRequest, destructor will take care of rolling back
+     *    InvokeRequestMessage to previously saved state.
+     */
+    class RollbackInvokeRequest
+    {
+    public:
+        explicit RollbackInvokeRequest(CommandSender & aCommandSender);
+        ~RollbackInvokeRequest();
+
+        /**
+         * Disables rolling back to previously saved state for InvokeRequestMessage.
+         */
+        void DisableAutomaticRollback();
+
+    private:
+        CommandSender & mCommandSender;
+        TLV::TLVWriter mBackupWriter;
+        State mBackupState;
+        bool mRollbackInDestructor = false;
     };
 
     union CallbackHandle
@@ -628,6 +671,7 @@ private:
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
+    bool mAllowLargePayload     = false;
 };
 
 } // namespace app

@@ -889,11 +889,10 @@ MTR_DIRECT_MEMBERS
     // If we're not advertising, then there's no need to reset anything.
     VerifyOrReturn(_advertiseOperational);
 
-    // If there are no running controllers there will be no advertisements to reset.
-    {
-        std::lock_guard lock(_controllersLock);
-        VerifyOrReturn(_controllers.count > 0);
-    }
+    // Ensure the stack is running. We can't look at _controllers to determine this
+    // reliably because it gets updated early during controller startup from off-queue.
+    auto systemState = _controllerFactory->GetSystemState();
+    VerifyOrReturn(systemState != nullptr && !systemState->IsShutDown());
 
     // StartServer() is the only API we have for resetting DNS-SD advertising.
     // It sure would be nice if there were a "restart" that was a no-op if the
@@ -1134,11 +1133,30 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (MTRDeviceController * _Nullable)initializeController:(MTRDeviceController *)controller
-                                         withParameters:(MTRDeviceControllerParameters *)parameters
-                                                  error:(NSError * __autoreleasing *)error
+- (nullable MTRDeviceController *)_findControllerWithPendingShutdownMatchingParams:(MTRDeviceControllerParameters *)parameters
+{
+    std::lock_guard lock(_controllersLock);
+    for (MTRDeviceController * controller in _controllers) {
+        if ([controller matchesPendingShutdownWithParams:parameters]) {
+            MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
+            [controller clearPendingShutdown];
+            return controller;
+        }
+    }
+    return nil;
+}
+
+- (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
+                                        withParameters:(MTRDeviceControllerParameters *)parameters
+                                                 error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
+    MTRDeviceController * existingController = [self _findControllerWithPendingShutdownMatchingParams:parameters];
+    if (existingController) {
+        return existingController;
+    }
 
     return [self _startDeviceController:controller
                           startupParams:parameters

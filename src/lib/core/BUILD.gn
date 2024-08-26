@@ -157,6 +157,7 @@ static_library("core") {
     "CHIPKeyIds.h",
     "CHIPPersistentStorageDelegate.h",
     "ClusterEnums.h",
+    "GroupedCallbackList.h",
     "OTAImageHeader.cpp",
     "OTAImageHeader.h",
     "PeerId.h",

@@ -16,19 +16,19 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
-#include <lib/core/TLVVectorWriter.h>
-
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVCommon.h>
 #include <lib/core/TLVTags.h>
+#include <lib/core/TLVVectorWriter.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestUtils.h>
 

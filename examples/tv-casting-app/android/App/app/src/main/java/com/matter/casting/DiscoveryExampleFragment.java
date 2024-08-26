@@ -45,7 +45,7 @@ public class DiscoveryExampleFragment extends Fragment {
   private static final Long DISCOVERY_TARGET_DEVICE_TYPE = 35L;
   private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;
-  private TextView matterDiscoveryErrorMessageTextView;
+  public static TextView matterDiscoveryErrorMessageTextView;
   private static final List<CastingPlayer> castingPlayerList = new ArrayList<>();
   private static ArrayAdapter<CastingPlayer> arrayAdapter;
 
@@ -67,7 +67,8 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onAdded(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+                  "DiscoveryExampleFragment onAdded() Discovered CastingPlayer deviceId: "
+                      + castingPlayer.getDeviceId());
               // Display CastingPlayer info on the screen
               new Handler(Looper.getMainLooper())
                   .post(
@@ -80,7 +81,7 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onChanged(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onChanged() Discovered changes to CastingPlayer with deviceId: "
+                  "DiscoveryExampleFragment onChanged() Discovered changes to CastingPlayer with deviceId: "
                       + castingPlayer.getDeviceId());
               // Update the CastingPlayer on the screen
               new Handler(Looper.getMainLooper())
@@ -107,7 +108,7 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onRemoved(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onRemoved() Removed CastingPlayer with deviceId: "
+                  "DiscoveryExampleFragment onRemoved() Removed CastingPlayer with deviceId: "
                       + castingPlayer.getDeviceId());
               // Remove CastingPlayer from the screen
               new Handler(Looper.getMainLooper())
@@ -215,14 +216,17 @@ public class DiscoveryExampleFragment extends Fragment {
   @Override
   public void onPause() {
     super.onPause();
-    Log.i(TAG, "onPause() called");
+    Log.i(TAG, "DiscoveryExampleFragment onPause() called, calling stopDiscovery()");
+    // Stop discovery when leaving the fragment, for example, while displaying the
+    // ConnectionExampleFragment.
+    stopDiscovery();
   }
 
   /** Interface for notifying the host. */
   public interface Callback {
     /** Notifies listener of Connection Button click. */
-    // TODO: In following PRs. Implement CastingPlayer connection
-    void handleConnectionButtonClicked(CastingPlayer castingPlayer);
+    void handleConnectionButtonClicked(
+        CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode);
   }
 
   private boolean startDiscovery() {
@@ -261,7 +265,7 @@ public class DiscoveryExampleFragment extends Fragment {
   }
 
   private void stopDiscovery() {
-    Log.i(TAG, "stopDiscovery() called");
+    Log.i(TAG, "DiscoveryExampleFragment stopDiscovery() called");
     matterDiscoveryErrorMessageTextView.setText(
         getString(R.string.matter_discovery_error_message_initial));
 
@@ -320,6 +324,8 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
     Button playerDescription = view.findViewById(R.id.commissionable_player_description);
     playerDescription.setText(buttonText);
 
+    // OnClickListener for the CastingPLayer button, to be used for the Commissionee-Generated
+    // passcode commissioning flow.
     View.OnClickListener clickListener =
         v -> {
           CastingPlayer castingPlayer = playerList.get(i);
@@ -329,9 +335,37 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
                   + castingPlayer.getDeviceId());
           DiscoveryExampleFragment.Callback onClickCallback =
               (DiscoveryExampleFragment.Callback) context;
-          onClickCallback.handleConnectionButtonClicked(castingPlayer);
+          onClickCallback.handleConnectionButtonClicked(castingPlayer, false);
         };
     playerDescription.setOnClickListener(clickListener);
+
+    // OnLongClickListener for the CastingPLayer button, to be used for the Commissioner-Generated
+    // passcode commissioning flow.
+    View.OnLongClickListener longClickListener =
+        v -> {
+          CastingPlayer castingPlayer = playerList.get(i);
+          if (!castingPlayer.getSupportsCommissionerGeneratedPasscode()) {
+            Log.e(
+                TAG,
+                "OnLongClickListener.onLongClick() called for CastingPlayer with deviceId "
+                    + castingPlayer.getDeviceId()
+                    + ". This CastingPlayer does not support Commissioner-Generated passcode commissioning.");
+
+            DiscoveryExampleFragment.matterDiscoveryErrorMessageTextView.setText(
+                "The selected Casting Player does not support Commissioner-Generated passcode commissioning");
+            return true;
+          }
+          Log.d(
+              TAG,
+              "OnLongClickListener.onLongClick() called for CastingPlayer with deviceId "
+                  + castingPlayer.getDeviceId()
+                  + ", attempting the Commissioner-Generated passcode commissioning flow.");
+          DiscoveryExampleFragment.Callback onClickCallback =
+              (DiscoveryExampleFragment.Callback) context;
+          onClickCallback.handleConnectionButtonClicked(castingPlayer, true);
+          return true;
+        };
+    playerDescription.setOnLongClickListener(longClickListener);
     return view;
   }
 
@@ -353,7 +387,7 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
     aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP?: " + (player.getIpAddresses().size() > 0);
     aux +=
         (aux.isEmpty() ? "" : ", ")
-            + "Supports Commissioner Generated Passcode: "
+            + "Supports Commissioner-Generated Passcode: "
             + (player.getSupportsCommissionerGeneratedPasscode());
 
     aux = aux.isEmpty() ? aux : "\n" + aux;

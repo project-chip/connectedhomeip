@@ -36,7 +36,7 @@
 
 // shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config
 // Do not instantiate the NETWORK_COMMISSIONING thread driver
-#define _NO_NETWORK_COMMISSIONING_DRIVER_
+#define _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 
 // For convenience, enable Chip Security Test Mode and disable the requirement for
 // authentication in various protocols.

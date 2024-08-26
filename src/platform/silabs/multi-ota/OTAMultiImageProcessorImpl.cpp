@@ -32,7 +32,7 @@ static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 extern "C" {
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#include "sl_core.h"
 #if SL_WIFI
 #include "spi_multiplex.h"
 #endif // SL_WIFI
@@ -419,9 +419,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
-
-    // TODO: check where to put this
-    // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)

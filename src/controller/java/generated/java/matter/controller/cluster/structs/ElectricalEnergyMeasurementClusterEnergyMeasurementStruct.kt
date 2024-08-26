@@ -28,7 +28,7 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
   val startTimestamp: Optional<UInt>,
   val endTimestamp: Optional<UInt>,
   val startSystime: Optional<ULong>,
-  val endSystime: Optional<ULong>
+  val endSystime: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {\n")
@@ -73,7 +73,7 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val energy = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY))
@@ -109,7 +109,7 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
         startTimestamp,
         endTimestamp,
         startSystime,
-        endSystime
+        endSystime,
       )
     }
   }

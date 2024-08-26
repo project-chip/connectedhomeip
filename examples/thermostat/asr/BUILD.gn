@@ -78,6 +78,7 @@ asr_executable("thermostat") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/examples/thermostat/thermostat-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

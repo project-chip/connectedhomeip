@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <event_groups.h>
 #include <wfx_host_events.h>
 
@@ -30,7 +31,6 @@
 #define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/
 #define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
 #define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
-#define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
 // TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
 #define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
@@ -61,7 +61,6 @@ typedef enum
     WFX_RSI_ST_STA_READY       = (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE),
     WFX_RSI_ST_STARTED         = (1 << 9),  /* RSI task started			*/
     WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
-    WFX_RSI_ST_SLEEP_READY     = (1 << 11)  /* Notify the M4 to go to sleep*/
 } WfxStateType_e;
 
 typedef struct WfxEvent_s
@@ -112,8 +111,10 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
-#if SL_ICD_ENABLED
-void sl_wfx_host_si91x_sleep_wakeup();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if SLI_SI91X_MCU_INTERFACE
+void sl_si91x_invoke_btn_press_event();
+#endif // SLI_SI91X_MCU_INTERFACE
 #if SLI_SI917
 int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
 #else

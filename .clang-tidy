@@ -12,6 +12,7 @@ Checks: >
   readability-redundant-string-init,
   -bugprone-assignment-in-if-condition,
   -bugprone-branch-clone,
+  -bugprone-casting-through-void, #TODO remove this after fixing issues in source code, issue 34008
   -bugprone-copy-constructor-init,
   -bugprone-easily-swappable-parameters,
   -bugprone-forward-declaration-namespace,

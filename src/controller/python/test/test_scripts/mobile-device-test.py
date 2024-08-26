@@ -19,6 +19,18 @@
 
 # Commissioning test.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import asyncio
 import os
 
@@ -57,9 +69,9 @@ TEST_DEVICE_NODE_ID = 1
 ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
-def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
+async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
-    device = test.TestDiscovery(discriminator=discriminator)
+    device = await test.TestDiscovery(discriminator=discriminator)
     FailIfNot(device, "Failed to discover any devices.")
 
     address = device.addresses[0]
@@ -71,27 +83,27 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
         address = address_override
 
     logger.info("Testing commissioning")
-    FailIfNot(test.TestCommissioning(ip=address,
-                                     setuppin=setup_pin,
-                                     nodeid=device_nodeid),
+    FailIfNot(await test.TestCommissioning(ip=address,
+                                           setuppin=setup_pin,
+                                           nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     logger.info("Testing multi-controller setup on the same fabric")
-    FailIfNot(asyncio.run(test.TestMultiControllerFabric(nodeid=device_nodeid)), "Failed the multi-controller test")
+    FailIfNot(await test.TestMultiControllerFabric(nodeid=device_nodeid), "Failed the multi-controller test")
 
     logger.info("Testing CATs used on controllers")
-    FailIfNot(asyncio.run(test.TestControllerCATValues(nodeid=device_nodeid)), "Failed the controller CAT test")
+    FailIfNot(await test.TestControllerCATValues(nodeid=device_nodeid), "Failed the controller CAT test")
 
-    ok = asyncio.run(test.TestMultiFabric(ip=address,
-                                          setuppin=20202021,
-                                          nodeid=1))
+    ok = await test.TestMultiFabric(ip=address,
+                                    setuppin=20202021,
+                                    nodeid=1)
     FailIfNot(ok, "Failed to commission multi-fabric")
 
-    FailIfNot(asyncio.run(test.TestAddUpdateRemoveFabric(nodeid=device_nodeid)),
+    FailIfNot(await test.TestAddUpdateRemoveFabric(nodeid=device_nodeid),
               "Failed AddUpdateRemoveFabric test")
 
     logger.info("Testing CASE Eviction")
-    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
+    FailIfNot(await test.TestCaseEviction(device_nodeid), "Failed TestCaseEviction")
 
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
@@ -163,8 +175,8 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 
     chip.logging.RedirectToPythonLogging()
 
-    ethernet_commissioning(test, discriminator, setup_pin, address,
-                           device_nodeid)
+    asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, address,
+                                       device_nodeid))
 
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=device_nodeid),

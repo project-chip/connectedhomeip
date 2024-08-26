@@ -16,6 +16,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <tracing/metric_event.h>
+#include <tracing/metric_keys.h>
 
 namespace chip {
 namespace Tracing {
@@ -60,14 +61,20 @@ constexpr Tracing::MetricKey kMetricDeviceBeingCommissioned = "dwnfw_dev_being_c
 // Tracks the request to generate PASE verifier for a given setup code
 constexpr Tracing::MetricKey kMetricPASEVerifierForSetupCode = "dwnfw_pase_verifier_for_code";
 
+// Tracks the request to get attestation challenge for a device
+constexpr Tracing::MetricKey kMetricAttestationChallengeForDevice = "dwnfw_attestation_challenge_for_device";
+
 // Marks the request to open pairing window
-constexpr Tracing::MetricKey kMetricOpenPairingWindow = "dwnfw_pase_verifier_for_code";
+constexpr Tracing::MetricKey kMetricOpenPairingWindow = "dwnfw_open_pairing_window";
 
 // Device Vendor ID
 constexpr Tracing::MetricKey kMetricDeviceVendorID = "dwnfw_device_vendor_id";
 
 // Device Product ID
 constexpr Tracing::MetricKey kMetricDeviceProductID = "dwnfw_device_product_id";
+
+// Device Uses Thread
+constexpr Tracing::MetricKey kMetricDeviceUsesThread = "dwnfw_device_uses_thread_bool";
 
 // Counter of number of devices discovered on the network during setup
 constexpr Tracing::MetricKey kMetricOnNetworkDevicesAdded = "dwnfw_onnet_devices_added";
@@ -80,6 +87,12 @@ constexpr Tracing::MetricKey kMetricBLEDevicesAdded = "dwnfw_ble_devices_added";
 
 // Counter of number of BLE devices removed during setup
 constexpr Tracing::MetricKey kMetricBLEDevicesRemoved = "dwnfw_ble_devices_removed";
+
+// Unexpected C quality attribute update outside of priming
+constexpr Tracing::MetricKey kMetricUnexpectedCQualityUpdate = "dwnpm_bad_c_attr_update";
+
+// Setup from darwin MTRDevice for initial subscription to a device
+constexpr Tracing::MetricKey kMetricMTRDeviceInitialSubscriptionSetup = "dwnpm_dev_initial_subscription_setup";
 
 } // namespace DarwinFramework
 } // namespace Tracing

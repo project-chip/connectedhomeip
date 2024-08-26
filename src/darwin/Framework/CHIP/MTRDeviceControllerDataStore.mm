@@ -479,7 +479,7 @@ static NSString * sAttributeCacheClusterIndexKeyPrefix = @"attrCacheClusterIndex
 
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
 {
-    return [sAttributeCacheClusterIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:%0x04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue];
+    return [sAttributeCacheClusterIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue];
 }
 
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
@@ -1011,6 +1011,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         BOOL endpointIndexModified = NO;
         NSMutableArray<NSNumber *> * endpointIndexToStore;
         if (endpointIndex) {
+            MTR_LOG("No entry found for endpointIndex @ node 0x%016llX - creating", nodeID.unsignedLongLongValue);
             endpointIndexToStore = [endpointIndex mutableCopy];
         } else {
             endpointIndexToStore = [NSMutableArray array];
@@ -1029,6 +1030,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             BOOL clusterIndexModified = NO;
             NSMutableArray<NSNumber *> * clusterIndexToStore;
             if (clusterIndex) {
+                MTR_LOG("No entry found for clusterIndex @ node 0x%016llX endpoint %u - creating", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
                 clusterIndexToStore = [clusterIndex mutableCopy];
             } else {
                 clusterIndexToStore = [NSMutableArray array];
@@ -1074,6 +1076,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         NSArray<NSNumber *> * nodeIndexToStore = nil;
         if (!nodeIndex) {
             // Ensure node index exists
+            MTR_LOG("No entry found for for nodeIndex - creating for node 0x%016llX", nodeID.unsignedLongLongValue);
             nodeIndexToStore = [NSArray arrayWithObject:nodeID];
         } else if (![nodeIndex containsObject:nodeID]) {
             nodeIndexToStore = [nodeIndex arrayByAddingObject:nodeID];

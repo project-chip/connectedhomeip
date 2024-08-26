@@ -14,10 +14,18 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+
+pw_source_set("pw-test-macros") {
+  output_dir = "${root_out_dir}/lib"
+  public_deps = [
+    "$dir_pw_log:impl",
+    "$dir_pw_unit_test",
+  ]
+  sources = [ "ExtraPwTestMacros.h" ]
+}
 
 chip_test_suite("tests") {
   output_name = "libSupportTests"
@@ -80,6 +88,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:static-support",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support/jsontlv",

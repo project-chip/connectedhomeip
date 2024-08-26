@@ -20,6 +20,9 @@
 
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
@@ -28,8 +31,6 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/ScopedBuffer.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -308,7 +309,8 @@ TEST(TestIncrementalResolve, TestParseOperational)
     EXPECT_FALSE(nodeData.operationalData.hasZeroTTL);
     EXPECT_EQ(nodeData.resolutionData.numIPs, 1u);
     EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
-    EXPECT_FALSE(nodeData.resolutionData.supportsTcp);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
     EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
     EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(chip::System::Clock::Milliseconds32(23)));
 
@@ -396,7 +398,8 @@ TEST(TestIncrementalResolve, TestParseCommissionable)
     // validate data as it was passed in
     EXPECT_EQ(nodeData.numIPs, 2u);
     EXPECT_EQ(nodeData.port, 0x1234);
-    EXPECT_FALSE(nodeData.supportsTcp);
+    EXPECT_FALSE(nodeData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.supportsTcpServer);
     EXPECT_EQ(nodeData.GetMrpRetryIntervalActive(), std::make_optional(chip::System::Clock::Milliseconds32(321)));
     EXPECT_FALSE(nodeData.GetMrpRetryIntervalIdle().has_value());
 

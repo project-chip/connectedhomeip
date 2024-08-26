@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ThermostatClusterWeeklyScheduleTransitionStruct(
   val transitionTime: UShort,
   val heatSetpoint: Short?,
-  val coolSetpoint: Short?
+  val coolSetpoint: Short?,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterWeeklyScheduleTransitionStruct {\n")
@@ -60,7 +60,7 @@ class ThermostatClusterWeeklyScheduleTransitionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ThermostatClusterWeeklyScheduleTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
@@ -84,7 +84,7 @@ class ThermostatClusterWeeklyScheduleTransitionStruct(
       return ThermostatClusterWeeklyScheduleTransitionStruct(
         transitionTime,
         heatSetpoint,
-        coolSetpoint
+        coolSetpoint,
       )
     }
   }

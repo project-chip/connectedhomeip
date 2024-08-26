@@ -49,8 +49,8 @@ To test the DFU over Matter, you need to complete the following steps:
 
 4.  Run OTA Provider application with _matter.ota_ replaced with the path to the
     Matter OTA image which you wish to provide to the Matter device. Note that
-    the Matter OTA image is, by default, generated at _zephyr/matter.ota_ in the
-    example's build directory:
+    the Matter OTA image is, by default, generated in the example's build
+    directory:
 
     ```
     $ out/provider/chip-ota-provider-app -f matter.ota
@@ -180,10 +180,11 @@ Complete the following steps to perform DFU using mcumgr:
     that the Bluetooth LE advertising has started. See the user interface
     section in the example documentation to check the LED number.
 4.  Upload the application firmware image to the device by running the following
-    command in your example directory:
+    command in your example directory with the <application_name> replaced by
+    your application name, for example `lock`:
 
     ```
-    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0 -w 1
+    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/<application_name>/zephyr/zephyr.signed.bin -n 0 -w 1
     ```
 
     The operation can take a few minutes. Wait until the progress bar reaches
@@ -246,10 +247,11 @@ Complete the following steps to perform DFU using mcumgr:
     go straight to the step 8.
 
     a. Upload the network core firmware image to the device by running the
-    following command in your example directory:
+    following command in your example directory with the <network_image_name>
+    replaced by your network image name, for example `ipc_radio`:
 
     ```
-    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
+    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/signed_by_mcuboot_and_b0_<network_image_name>.bin -n 1 -w 1
     ```
 
     The operation can take a few minutes. Wait until the progress bar reaches

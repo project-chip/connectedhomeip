@@ -41,6 +41,7 @@ import chip.native
 from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
+from chip.exceptions import ChipStackException
 from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
 from ecdsa import NIST256p
@@ -183,7 +184,7 @@ class BaseTestHelper:
                  keypair: p256keypair.P256Keypair = None):
         chip.native.Init()
 
-        self.chipStack = ChipStack('/tmp/repl_storage.json')
+        self.chipStack = ChipStack('/tmp/repl_storage.json', enableServerInteractions=True)
         self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
@@ -209,10 +210,10 @@ class BaseTestHelper:
             return None
         return ctypes.string_at(addrStrStorage).decode("utf-8")
 
-    def TestDiscovery(self, discriminator: int):
+    async def TestDiscovery(self, discriminator: int):
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
-        res = self.devCtrl.DiscoverCommissionableNodes(
+        res = await self.devCtrl.DiscoverCommissionableNodes(
             chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
@@ -233,7 +234,7 @@ class BaseTestHelper:
     async def TestRevokeCommissioningWindow(self, ip: str, setuppin: int, nodeid: int):
         await self.devCtrl.SendCommand(
             nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
-        if not self.TestPaseOnly(ip=ip, setuppin=setuppin, nodeid=nodeid, devCtrl=self.devCtrl2):
+        if not await self.TestPaseOnly(ip=ip, setuppin=setuppin, nodeid=nodeid, devCtrl=self.devCtrl2):
             return False
 
         await self.devCtrl2.SendCommand(
@@ -247,17 +248,18 @@ class BaseTestHelper:
             nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=10000)
         return True
 
-    def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
-        params = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
-        return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=params.setupPinCode, devCtrl=self.devCtrl2)
+    async def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
+        params = await self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
+        return await self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=params.setupPinCode, devCtrl=self.devCtrl2)
 
-    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
+    async def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
         if devCtrl is None:
             devCtrl = self.devCtrl
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
-        if devCtrl.EstablishPASESessionIP(
-                ip, setuppin, nodeid) is not None:
+        try:
+            await devCtrl.EstablishPASESessionIP(ip, setuppin, nodeid)
+        except ChipStackException:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
@@ -265,10 +267,12 @@ class BaseTestHelper:
             "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         return True
 
-    def TestCommissionOnly(self, nodeid: int):
+    async def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))
-        if not self.devCtrl.Commission(nodeid):
+        try:
+            await self.devCtrl.Commission(nodeid)
+        except ChipStackException:
             self.logger.info(
                 "Failed to commission device with id {}".format(str(nodeid)))
             return False
@@ -276,17 +280,17 @@ class BaseTestHelper:
             "Successfully commissioned device with id {}".format(str(nodeid)))
         return True
 
-    def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
+    async def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
             "Conducting key exchange with device {}".format(discriminator))
-        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
+        if not await self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(discriminator))
             return False
         self.logger.info("Device finished key exchange.")
         return True
 
-    def TestCommissionFailure(self, nodeid: int, failAfter: int):
+    async def TestCommissionFailure(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnStage(failAfter)
         if not a:
@@ -295,10 +299,10 @@ class BaseTestHelper:
 
         self.logger.info(
             "Commissioning device, expecting failure after stage {}".format(failAfter))
-        self.devCtrl.Commission(nodeid)
+        await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
+    async def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnReport(failAfter)
         if not a:
@@ -306,30 +310,34 @@ class BaseTestHelper:
             return True
         self.logger.info(
             "Commissioning device, expecting failure on report for stage {}".format(failAfter))
-        self.devCtrl.Commission(nodeid)
+        await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
+    async def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
-            self.logger.info(
+        try:
+            await self.devCtrl.CommissionIP(ip, setuppin, nodeid)
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish commissioning device {}".format(ip))
             return False
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
+    async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
-        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType)):
-            self.logger.info(
+        try:
+            await self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType))
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
         self.logger.info("Testing discovery")
-        device = self.TestDiscovery(discriminator=discriminator)
+        device = await self.TestDiscovery(discriminator=discriminator)
         if not device:
             self.logger.info("Failed to discover any devices.")
             return False
@@ -337,7 +345,7 @@ class BaseTestHelper:
         if ip_override:
             address = ip_override
         self.logger.info("Testing commissioning")
-        if not self.TestCommissioning(address, setuppin, nodeid):
+        if not await self.TestCommissioning(address, setuppin, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
@@ -783,8 +791,10 @@ class BaseTestHelper:
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
-            self.logger.info(
+        try:
+            await self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
 
@@ -1148,6 +1158,24 @@ class BaseTestHelper:
             self.logger.exception("Failed to resolve. {}".format(ex))
             return False
 
+    async def TestTriggerTestEventHandler(self, nodeid, enable_key, event_trigger):
+        self.logger.info("Test trigger test event handler for device = %08x", nodeid)
+        try:
+            await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
+            return True
+        except Exception as ex:
+            self.logger.exception("Failed to trigger test event handler {}".format(ex))
+            return False
+
+    async def TestWaitForActive(self, nodeid):
+        self.logger.info("Test wait for device = %08x", nodeid)
+        try:
+            await self.devCtrl.WaitForActive(nodeid)
+            return True
+        except Exception as ex:
+            self.logger.exception("Failed to wait for active. {}".format(ex))
+            return False
+
     async def TestReadBasicAttributes(self, nodeid: int, endpoint: int):
         attrs = Clusters.BasicInformation.Attributes
         basic_cluster_attrs = {
@@ -1303,15 +1331,15 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestFabricScopedCommandDuringPase(self, nodeid: int):
+    async def TestFabricScopedCommandDuringPase(self, nodeid: int):
         '''Validates that fabric-scoped commands fail during PASE with UNSUPPORTED_ACCESS
 
         The nodeid is the PASE pseudo-node-ID used during PASE establishment
         '''
         status = None
         try:
-            asyncio.run(self.devCtrl.SendCommand(
-                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto")))
+            await self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto"))
         except IM.InteractionModelError as ex:
             status = ex.status
 

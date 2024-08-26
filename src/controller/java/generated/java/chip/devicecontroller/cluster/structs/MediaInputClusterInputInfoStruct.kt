@@ -26,7 +26,7 @@ class MediaInputClusterInputInfoStruct(
   val index: UInt,
   val inputType: UInt,
   val name: String,
-  val description: String
+  val description: String,
 ) {
   override fun toString(): String = buildString {
     append("MediaInputClusterInputInfoStruct {\n")

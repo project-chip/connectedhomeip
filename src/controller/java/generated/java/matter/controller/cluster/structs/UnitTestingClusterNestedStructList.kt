@@ -30,7 +30,7 @@ class UnitTestingClusterNestedStructList(
   val d: List<UnitTestingClusterSimpleStruct>,
   val e: List<UInt>,
   val f: List<ByteArray>,
-  val g: List<UByte>
+  val g: List<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNestedStructList {\n")

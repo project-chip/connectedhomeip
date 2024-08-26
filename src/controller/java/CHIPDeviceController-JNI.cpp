@@ -610,7 +610,8 @@ exit:
 }
 
 JNI_METHOD(void, commissionDevice)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -624,6 +625,10 @@ JNI_METHOD(void, commissionDevice)
         err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
+
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
@@ -839,6 +844,31 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
             .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
     err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), rendezvousParams);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to establish PASE connection.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, establishPaseConnectionByCode)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring setUpCode, jboolean useOnlyOnNetworkDiscovery)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    auto discoveryType = DiscoveryType::kAll;
+    if (useOnlyOnNetworkDiscovery)
+    {
+        discoveryType = DiscoveryType::kDiscoveryNetworkOnly;
+    }
+
+    JniUtfString setUpCodeJniString(env, setUpCode);
+
+    err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(),
+                                                         discoveryType);
 
     if (err != CHIP_NO_ERROR)
     {

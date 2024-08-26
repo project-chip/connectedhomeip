@@ -46,7 +46,7 @@ import matter.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class DefaultOTAProvidersAttribute(
     val value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
@@ -117,18 +117,18 @@ class OtaSoftwareUpdateRequestorCluster(
     announcementReason: UByte,
     metadataForNode: ByteArray?,
     endpoint: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_PROVIDER_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D_REQ), providerNodeID)
+    val TAG_PROVIDER_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_ID_REQ), providerNodeID)
 
-    val TAG_VENDOR_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_I_D_REQ), vendorID)
+    val TAG_VENDOR_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
     val TAG_ANNOUNCEMENT_REASON_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_ANNOUNCEMENT_REASON_REQ), announcementReason)
@@ -146,7 +146,7 @@ class OtaSoftwareUpdateRequestorCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -193,7 +193,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun writeDefaultOTAProvidersAttribute(
     value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -211,10 +211,10 @@ class OtaSoftwareUpdateRequestorCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -240,7 +240,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeDefaultOTAProvidersAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<DefaultOTAProvidersAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -253,7 +253,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -332,7 +332,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeUpdatePossibleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -345,7 +345,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -415,7 +415,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeUpdateStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -428,7 +428,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -502,7 +502,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeUpdateStateProgressAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UpdateStateProgressAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -515,7 +515,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -598,7 +598,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -611,7 +611,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -695,7 +695,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -708,7 +708,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -792,7 +792,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -805,7 +805,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -887,7 +887,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -900,7 +900,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -975,7 +975,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -988,7 +988,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1056,7 +1056,7 @@ class OtaSoftwareUpdateRequestorCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1069,7 +1069,7 @@ class OtaSoftwareUpdateRequestorCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

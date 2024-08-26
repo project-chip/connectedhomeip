@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 from datetime import timedelta
 
 import chip.clusters as Clusters
@@ -38,7 +50,10 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         # Time sync is required to be on endpoint 0 if it is present
         endpoint = 0
 
-        time_cluster = Clusters.Objects.TimeSynchronization
+        time_cluster = Clusters.TimeSynchronization
+        timesync_attr_list = time_cluster.Attributes.AttributeList
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=time_cluster, attribute=timesync_attr_list)
+        timesource_attr_id = time_cluster.Attributes.TimeSource.attribute_id
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
@@ -78,7 +93,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
-        if self.check_pics("TIMESYNC.S.A0002"):
+        if timesource_attr_id in attribute_list:
             source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
             if utc_dut_initial is NullValue:
                 asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)

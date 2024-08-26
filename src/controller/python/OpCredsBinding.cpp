@@ -26,6 +26,7 @@
 #include "controller/python/chip/crypto/p256keypair.h"
 #include "controller/python/chip/interaction_model/Delegate.h"
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -104,6 +105,7 @@ private:
 
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+extern chip::app::DefaultICDClientStorage sICDClientStorage;
 
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
@@ -257,6 +259,7 @@ public:
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
         mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
         mNeedsDST               = false;
+        mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -568,6 +571,9 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     err =
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
     *outPairingDelegate = pairingDelegate.release();

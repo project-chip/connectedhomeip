@@ -53,6 +53,7 @@ mt793x_executable("shell_app") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${mt793x_ex_plat_dir}:genio-matter-shell",
   ]
 

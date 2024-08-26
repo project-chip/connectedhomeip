@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 
+#include <chrono>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
@@ -38,6 +39,12 @@ AsNumber(chip::Optional<T> optional)
 inline NSDate * MatterEpochSecondsAsDate(uint32_t matterEpochSeconds)
 {
     return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) matterEpochSeconds)];
+}
+
+template <typename Rep, typename Period>
+inline NSTimeInterval DurationToTimeInterval(std::chrono::duration<Rep, Period> duration)
+{
+    return std::chrono::duration<NSTimeInterval>(duration).count();
 }
 
 /**

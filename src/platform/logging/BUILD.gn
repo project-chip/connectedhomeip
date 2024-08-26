@@ -4,65 +4,121 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/shell/shell_device.gni")
 import("${chip_root}/src/platform/device.gni")
+
+group("default") {
+  if (chip_logging_backend == "platform") {
+    deps = []
+
+    if (chip_use_pw_logging) {
+      deps += [ "$dir_pw_log" ]
+    }
+
+    if (chip_device_platform == "cyw30739") {
+      deps += [ "${chip_root}/src/platform/Infineon/CYW30739:logging" ]
+    } else if (chip_device_platform == "psoc6") {
+      deps += [ "${chip_root}/src/platform/Infineon/PSOC6:logging" ]
+    } else if (chip_device_platform == "cc32xx") {
+      deps += [ "${chip_root}/src/platform/cc32xx:logging" ]
+    } else if (chip_device_platform == "esp32") {
+      deps += [ "${chip_root}/src/platform/ESP32:logging" ]
+    } else if (chip_device_platform == "openiotsdk") {
+      deps += [ "${chip_root}/src/platform/openiotsdk:logging" ]
+    } else if (chip_device_platform == "mbed") {
+      deps += [ "${chip_root}/src/platform/mbed:logging" ]
+    } else if (chip_device_platform == "bl602" ||
+               chip_device_platform == "bl702" ||
+               chip_device_platform == "bl702l") {
+      deps += [ "${chip_root}/src/platform/bouffalolab/common:logging" ]
+    } else if (chip_device_platform == "mt793x") {
+      deps += [ "${chip_root}/src/platform/mt793x:logging" ]
+    } else if (chip_device_platform == "cc13x2_26x2") {
+      deps += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x2:logging" ]
+    } else if (chip_device_platform == "cc13x4_26x4") {
+      deps += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4:logging" ]
+    } else if (chip_device_platform == "ameba") {
+      deps += [ "${chip_root}/src/platform/Ameba:logging" ]
+    } else if (chip_device_platform == "asr") {
+      deps += [ "${chip_root}/src/platform/ASR:logging" ]
+    } else if (chip_device_platform == "webos") {
+      deps += [ "${chip_root}/src/platform/webos:logging" ]
+    } else if (chip_device_platform == "zephyr") {
+      deps += [ "${chip_root}/src/platform/Zephyr:logging" ]
+    } else if (chip_device_platform == "nxp_zephyr") {
+      deps += [ "${chip_root}/src/platform/nxp/zephyr:logging" ]
+    } else if (chip_device_platform == "nrfconnect") {
+      deps += [ "${chip_root}/src/platform/nrfconnect:logging" ]
+    } else if (chip_device_platform == "telink") {
+      deps += [ "${chip_root}/src/platform/telink:logging" ]
+    } else if (chip_device_platform == "efr32") {
+      deps += [ "${chip_root}/src/platform/silabs/efr32:logging" ]
+    } else if (chip_device_platform == "SiWx917") {
+      deps += [ "${chip_root}/src/platform/silabs/SiWx917:logging" ]
+    } else if (chip_device_platform == "linux") {
+      deps += [ "${chip_root}/src/platform/Linux:logging" ]
+    } else if (chip_device_platform == "tizen") {
+      deps += [ "${chip_root}/src/platform/Tizen:logging" ]
+    } else if (chip_device_platform == "qpg") {
+      deps += [ "${chip_root}/src/platform/qpg:logging" ]
+    } else if (chip_device_platform == "darwin") {
+      deps += [ ":stdio" ]  # For tools / examples. The framework uses "none".
+    } else if (chip_device_platform == "mw320") {
+      deps += [ "${chip_root}/src/platform/nxp/mw320:logging" ]
+    } else if (chip_device_platform == "k32w0" ||
+               chip_device_platform == "k32w1" ||
+               chip_device_platform == "nxp") {
+      deps += [ "${chip_root}/src/platform/nxp:logging" ]
+    } else if (chip_device_platform == "beken") {
+      deps += [ "${chip_root}/src/platform/Beken:logging" ]
+    } else if (chip_device_platform == "stm32") {
+      deps += [ ":stdio" ]
+    } else if (chip_device_platform == "nuttx") {
+      deps += [ "${chip_root}/src/platform/NuttX:logging" ]
+    } else if (chip_device_platform == "android") {
+      deps += [ "${chip_root}/src/platform/android:logging" ]
+    } else {
+      assert(chip_device_platform == "fake" ||
+             chip_device_platform == "external" || chip_device_platform == "none")
+    }
+  } else if (chip_logging_backend == "none" ||
+             chip_logging_backend == "stdio" ||
+             chip_logging_backend == "syslog") {
+    deps = [ ":${chip_logging_backend}" ]
+  } else {
+    assert(chip_logging_backend == "external")
+  }
+}
 
 source_set("headers") {
   public = [ "LogV.h" ]
-}
-
-if (current_os == "android") {
-  static_library("android") {
-    sources = [ "impl/android/Logging.cpp" ]
-    deps = [
-      ":headers",
-      "${chip_root}/src/lib/core:chip_config_header",
-      "${chip_root}/src/lib/support:attributes",
-      "${chip_root}/src/lib/support:logging_constants",
-      "${chip_root}/src/platform:platform_config_header",
-      "${chip_root}/src/platform/logging:headers",
-    ]
-
-    libs = [ "log" ]
-  }
-}
-
-# We need to reference the output file of ":stdio" at build time,
-# but get_target_outputs() does not work for binary targets. As a
-# workaround, define a reasonable path and make the target use it.
-stdio_archive = "$root_out_dir/liblogging-stdio.a"
-
-static_library("stdio") {
-  if (chip_device_platform == "darwin") {
-    sources = [ "impl/stdio/darwin/Logging.cpp" ]
-  } else {
-    sources = [ "impl/stdio/Logging.cpp" ]
-  }
-
-  deps = [
-    ":headers",
-    "${chip_root}/src/lib/core:chip_config_header",
+  public_deps = [
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
-    "${chip_root}/src/platform:platform_config_header",
-    "${chip_root}/src/platform/logging:headers",
   ]
-
-  # Ensure we end up with the expected output file name
-  output_dir = get_path_info(stdio_archive, "dir")
-  output_name = get_path_info(stdio_archive, "name")
-  output_extension = get_path_info(stdio_archive, "extension")
-  output_prefix_override = true
 }
 
-# Depending on this target (via public_deps) pulls in the stdio
-# logger and ensures it takes precendce over the platform backend.
-group("force_stdio") {
-  deps = [ ":stdio" ]
-  public_configs = [ ":force_stdio_config" ]
+source_set("none") {
+  sources = [ "impl/None.cpp" ]
+  deps = [
+    ":headers",
+    "${chip_root}/src/platform:platform_base",
+  ]
 }
 
-config("force_stdio_config") {
-  # Ensure the linker sees the stdio implementation first. This
-  # works because ldflags come before inputs on the command line.
-  ldflags = [ rebase_path(stdio_archive, root_build_dir) ]
+source_set("stdio") {
+  sources = [ "impl/Stdio.cpp" ]
+  deps = [
+    ":headers",
+    "${chip_root}/src/platform:platform_base",
+  ]
+}
+
+source_set("syslog") {
+  sources = [ "impl/Syslog.cpp" ]
+  deps = [
+    ":headers",
+    "${chip_root}/src/platform:platform_base",
+  ]
 }

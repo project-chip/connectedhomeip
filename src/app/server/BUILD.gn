@@ -53,6 +53,7 @@ static_library("server") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/app/icd/server:check-in-back-off",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
@@ -72,5 +73,10 @@ static_library("server") {
 
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+
+    if (chip_enable_icd_checkin) {
+      public_deps +=
+          [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
+    }
   }
 }

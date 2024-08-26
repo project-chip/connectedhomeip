@@ -85,6 +85,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 
     mName      = name;
     mDirectory = directory;
+    mConfig.clear();
     mConfig.parse(ifs);
     ifs.close();
 

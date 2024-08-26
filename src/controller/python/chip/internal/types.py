@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_size_t, c_uint32, c_void_p
+from ctypes import CFUNCTYPE, Structure, c_size_t, c_uint32, c_uint64, c_void_p
 
 # General callback of 'network credentials requested. No python-data
 # is available as the underlying callback is used internally
@@ -26,3 +26,7 @@ OperationalCredentialsRequested = CFUNCTYPE(None, c_void_p, c_size_t)
 
 # Notification that pairing has been coompleted
 PairingComplete = CFUNCTYPE(None, c_uint32)
+
+
+class ScopedNodeId(Structure):
+    _fields_ = [("node_id", c_uint64), ("fabric_index", "c_uint8")]

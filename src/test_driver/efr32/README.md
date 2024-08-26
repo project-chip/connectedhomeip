@@ -40,22 +40,6 @@ test runner.
 
 -   Supported hardware:
 
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
     MG24 boards :
 
     -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
@@ -71,7 +55,7 @@ OR use GN/Ninja directly
           cd ~/connectedhomeip/src/test_driver/efr32/
           git submodule update --init
           source third_party/connectedhomeip/scripts/activate.sh
-          export SILABS_BOARD=BRD4161A
+          export SILABS_BOARD=BRD4187C
           gn gen out/debug
           ninja -C out/debug
           ```

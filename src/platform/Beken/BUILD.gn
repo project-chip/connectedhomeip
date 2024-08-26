@@ -39,7 +39,6 @@ static_library("Beken") {
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "LwIPCoreLock.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
@@ -60,4 +59,12 @@ static_library("Beken") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

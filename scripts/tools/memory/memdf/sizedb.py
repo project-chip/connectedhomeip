@@ -109,13 +109,6 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     'size': i['size'],
                     'kind': frame
                 })
-        # Add segment sizes.
-        for i in r['frames'].get('wr', []):
-            r['sizes'].append({
-                'name': ('(read only)', '(read/write)')[int(i['wr'])],
-                'size': i['size'],
-                'kind': 'wr'
-            })
         self.add_sizes(**r)
 
     def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):
@@ -182,6 +175,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             pb.id AS parent_build,
             cb.id AS commit_build,
             t.platform, t.config, t.target,
+            cs.kind AS kind,
             cs.name AS name,
             ps.size AS parent_size,
             cs.size AS commit_size,
@@ -196,7 +190,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                      cs.name, cb.time DESC, pb.time DESC
         ''', (commit, parent))
 
-        keep = ('platform', 'target', 'config', 'name', 'parent_size',
+        keep = ('platform', 'target', 'config', 'kind', 'name', 'parent_size',
                 'commit_size')
         things: set[int] = set()
         artifacts: set[int] = set()
@@ -229,7 +223,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 artifacts.add(row['artifact'])
                 builds.add(row['commit_build'])
 
-        return ChangeInfo(('platform', 'target', 'config', 'section',
+        return ChangeInfo(('platform', 'target', 'config', 'kind', 'section',
                            parent[:8], commit[:8], 'change', '% change'), rows,
                           things, builds, stale_builds, artifacts,
                           stale_artifacts)

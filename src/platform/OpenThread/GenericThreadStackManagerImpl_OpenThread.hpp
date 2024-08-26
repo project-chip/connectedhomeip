@@ -27,6 +27,7 @@
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
 #include <cassert>
+#include <limits>
 
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
@@ -59,7 +60,6 @@
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <limits>
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -74,14 +74,15 @@ static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
 // Network commissioning
 namespace {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+app::Clusters::NetworkCommissioning::Instance
+    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
-void initNetworkCommissioningThreadDriver(void)
+void initNetworkCommissioningThreadDriver()
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
@@ -142,7 +143,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ProcessThreadActivity(void)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ProcessThreadActivity()
 {
     otTaskletsProcess(mOTInst);
     otSysProcessDrivers(mOTInst);
@@ -255,7 +256,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadEnabled(void)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadEnabled()
 {
     VerifyOrReturnValue(mOTInst, false);
     otDeviceRole curRole;
@@ -329,7 +330,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(void)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned()
 {
     VerifyOrReturnValue(mOTInst, false);
     bool provisioned;
@@ -362,7 +363,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached()
 {
     VerifyOrReturnValue(mOTInst, false);
     otDeviceRole curRole;
@@ -524,7 +525,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 }
 
 template <class ImplClass>
-ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType(void)
+ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType()
 {
     VerifyOrReturnValue(mOTInst, ConnectivityManager::kThreadDeviceType_NotSupported);
     ConnectivityManager::ThreadDeviceType deviceType;
@@ -650,7 +651,7 @@ exit:
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(void)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity()
 {
     VerifyOrReturnValue(mOTInst, false);
     bool res;
@@ -699,7 +700,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadStatsCounters(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadStatsCounters()
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -794,7 +795,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal()
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1071,7 +1072,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadVersion(uint16_t & version)
+{
+    version = otThreadGetVersion();
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
     // Based on the spec, only OverrunCount should be resetted.
     mOverrunCount = 0;
@@ -1087,28 +1095,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Helper that sets callbacks for OpenThread state changes and configures the Thread stack.
+ * Assigns mOTInst to an instance, and configures the OT stack on a device by setting state change callbacks enabling features
+ * for IPv6 address configuration, enabling the Thread network if necessary, and handling SRP if enabled.
+ * Allows for the configuration of the Thread stack on a device where the instance and the otCLI are already initialised.
+ *
+ * @param otInst Pointer to the OT instance
+ * @return CHIP_ERROR OpenThread error mapped to CHIP_ERROR
+ */
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr  = OT_ERROR_NONE;
-
-    // Arrange for OpenThread errors to be translated to text.
-    RegisterOpenThreadErrorFormatter();
-
-    mOTInst = NULL;
-
-    // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
-    // create or acquire a singleton instance of OpenThread.
-    if (otInst == NULL)
-    {
-        otInst = otInstanceInitSingle();
-        VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
-    }
-
-#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-    otAppCliInit(otInst);
-#endif
 
     mOTInst = otInst;
 
@@ -1130,6 +1130,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
     {
@@ -1142,8 +1143,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
-
-    initNetworkCommissioningThreadDriver();
+#endif
 
 exit:
 
@@ -1152,14 +1152,44 @@ exit:
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Arrange for OpenThread errors to be translated to text.
+    RegisterOpenThreadErrorFormatter();
+
+    mOTInst = NULL;
+
+    // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
+    // create or acquire a singleton instance of OpenThread.
+    if (otInst == NULL)
+    {
+        otInst = otInstanceInitSingle();
+        VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
+    }
+
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    otAppCliInit(otInst);
+#endif
+
+    err = ConfigureThreadStack(otInst);
+
+    initNetworkCommissioningThreadDriver();
+
+exit:
+    return err;
+}
+
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock()
 {
     otDeviceRole curRole = otThreadGetDeviceRole(mOTInst);
     return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock(void)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock()
 {
     return otIp6IsEnabled(mOTInst);
 }
@@ -1219,7 +1249,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
 {
     VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");

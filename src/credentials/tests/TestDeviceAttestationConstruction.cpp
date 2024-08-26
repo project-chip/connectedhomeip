@@ -15,16 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <cstdio>
+
+#include <pw_unit_test/framework.h>
+
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-
-#include <cstdio>
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Credentials;

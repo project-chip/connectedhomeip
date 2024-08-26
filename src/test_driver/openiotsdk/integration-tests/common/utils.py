@@ -92,13 +92,10 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     try:
-        res = devCtrl.CommissionOnNetwork(
+        devCtrl.CommissionOnNetwork(
             nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
     except exceptions.ChipStackError as ex:
         log.error("Commission discovered device failed {}".format(str(ex)))
-        return None
-    if not res:
-        log.info("Commission discovered device failed: %r" % res)
         return None
     return nodeId
 

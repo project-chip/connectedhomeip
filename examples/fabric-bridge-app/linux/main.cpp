@@ -18,25 +18,48 @@
 
 #include <AppMain.h>
 
+#include "BridgedAdministratorCommissioning.h"
+#include "BridgedDevice.h"
+#include "BridgedDeviceBasicInformationImpl.h"
+#include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
-#include "Device.h"
-#include "DeviceManager.h"
+#include "CommissionerControl.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <lib/support/ZclString.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 
-#include <string>
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+#include "RpcClient.h"
+#include "RpcServer.h"
+#endif
+
 #include <sys/ioctl.h>
 #include <thread>
 
-using namespace chip;
+// This is declared here and not in a header because zap/embr assumes all clusters
+// are defined in a static endpoint in the .zap file. From there, the codegen will
+// automatically use PluginApplicationCallbacksHeader.jinja to declare and call
+// the respective Init callbacks. However, because EcosystemInformation cluster is only
+// ever on a dynamic endpoint, this doesn't get declared and called for us, so we
+// need to declare and call it ourselves where the application is initialized.
+void MatterEcosystemInformationPluginServerInitCallback();
 
-#define POLL_INTERVAL_MS (100)
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
+
+constexpr uint16_t kPollIntervalMs = 100;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+constexpr uint16_t kRetryIntervalS = 3;
+#endif
+
+BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 
 bool KeyboardHit()
 {
@@ -57,26 +80,201 @@ void BridgePollingThread()
                 ChipLogProgress(NotSpecified, "Exiting.....");
                 exit(0);
             }
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+            else if (ch == 'o')
+            {
+                CHIP_ERROR err = OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                             .SetNodeId(0x1234)
+                                                             .SetTimeout(300)
+                                                             .SetDiscriminator(3840)
+                                                             .SetIteration(1000));
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+            }
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             continue;
         }
 
         // Sleep to avoid tight loop reading commands
-        usleep(POLL_INTERVAL_MS * 1000);
+        usleep(kPollIntervalMs * 1000);
     }
 }
 
-DeviceManager gDeviceManager;
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
+{
+    if (InitRpcClient(kFabricAdminServerPort) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Connected to Fabric-Admin");
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to connect to Fabric-Admin, retry in %d seconds....", kRetryIntervalS);
+        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+    }
+}
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the AdministratorCommissioning cluster on all endpoints.
+    AdministratorCommissioningCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoint: %d", endpointId);
+
+    if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
+        endpointId == kRootEndpointId)
+    {
+        // Proceed with default handling in Administrator Commissioning Server
+        return;
+    }
+
+    handlerContext.SetCommandHandled();
+
+    AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType commandData;
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    Status status = Status::Failure;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+
+    // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
+    if (device != nullptr &&
+        OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                    .SetNodeId(device->GetNodeId())
+                                    .SetTimeout(commandData.commissioningTimeout)
+                                    .SetDiscriminator(commandData.discriminator)
+                                    .SetIteration(commandData.iterations)
+                                    .SetSalt(commandData.salt)
+                                    .SetVerifier(commandData.PAKEPasscodeVerifier)) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Commissioning window is now open");
+        status = Status::Success;
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Commissioning window is failed to open");
+    }
+#else
+    ChipLogProgress(NotSpecified, "Commissioning window failed to open: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
+class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the BridgedDeviceBasicInformation cluster on all endpoints.
+    BridgedDeviceInformationCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), BridgedDeviceBasicInformation::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+    VerifyOrReturn(handlerContext.mRequestPath.mCommandId == BridgedDeviceBasicInformation::Commands::KeepActive::Id);
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
+
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+
+    handlerContext.SetCommandHandled();
+
+    if (device == nullptr || !device->IsIcd())
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
+        return;
+    }
+
+    BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType commandData;
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    Status status = Status::Failure;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "KeepActive successfully processed");
+        status = Status::Success;
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "KeepActive failed to process");
+    }
+#else
+    ChipLogProgress(NotSpecified, "Unable to properly call KeepActive: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
+BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
+AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
+BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
 } // namespace
 
 void ApplicationInit()
 {
+    ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
+
+    MatterEcosystemInformationPluginServerInitCallback();
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    InitRpcServer(kFabricBridgeServerPort);
+    AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
+#endif
+
     // Start a thread for bridge polling
     std::thread pollingThread(BridgePollingThread);
     pollingThread.detach();
+
+    BridgeDeviceMgr().Init();
+    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
+
+    VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner Control Server");
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
+
+    if (CommissionerControlShutdown() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to shutdown Commissioner Control Server");
+    }
+}
 
 int main(int argc, char * argv[])
 {
@@ -88,66 +286,4 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
 
     return 0;
-}
-
-// External attribute read callback function
-Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                         const EmberAfAttributeMetadata * attributeMetadata,
-                                                                         uint8_t * buffer, uint16_t maxReadLength)
-{
-    uint16_t endpointIndex  = emberAfGetDynamicIndexFromEndpoint(endpoint);
-    AttributeId attributeId = attributeMetadata->attributeId;
-
-    Device * dev = gDeviceManager.GetDevice(endpointIndex);
-    if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
-    {
-        using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
-        ChipLogProgress(NotSpecified, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId,
-                        maxReadLength);
-
-        if ((attributeId == Reachable::Id) && (maxReadLength == 1))
-        {
-            *buffer = dev->IsReachable() ? 1 : 0;
-        }
-        else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
-        {
-            MutableByteSpan zclNameSpan(buffer, maxReadLength);
-            MakeZclCharString(zclNameSpan, dev->GetName());
-        }
-        else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-        {
-            uint16_t rev = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
-            memcpy(buffer, &rev, sizeof(rev));
-        }
-        else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-        {
-            uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
-            memcpy(buffer, &featureMap, sizeof(featureMap));
-        }
-        else
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    return Protocols::InteractionModel::Status::Failure;
-}
-
-// External attribute write callback function
-Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                          const EmberAfAttributeMetadata * attributeMetadata,
-                                                                          uint8_t * buffer)
-{
-    uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
-
-    Device * dev = gDeviceManager.GetDevice(endpointIndex);
-    if (dev != nullptr && dev->IsReachable())
-    {
-        ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);
-        ret = Protocols::InteractionModel::Status::Success;
-    }
-
-    return ret;
 }

@@ -48,9 +48,9 @@ class SecondClusterFabricDescriptorStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY), rootPublicKey)
-      put(ContextSpecificTag(TAG_VENDOR_I_D), vendorID)
-      put(ContextSpecificTag(TAG_FABRIC_I_D), fabricID)
-      put(ContextSpecificTag(TAG_NODE_I_D), nodeID)
+      put(ContextSpecificTag(TAG_VENDOR_ID), vendorID)
+      put(ContextSpecificTag(TAG_FABRIC_ID), fabricID)
+      put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -59,18 +59,18 @@ class SecondClusterFabricDescriptorStruct (
 
   companion object {
     private const val TAG_ROOT_PUBLIC_KEY = 1
-    private const val TAG_VENDOR_I_D = 2
-    private const val TAG_FABRIC_I_D = 3
-    private const val TAG_NODE_I_D = 4
+    private const val TAG_VENDOR_ID = 2
+    private const val TAG_FABRIC_ID = 3
+    private const val TAG_NODE_ID = 4
     private const val TAG_LABEL = 5
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SecondClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
-      val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_I_D))
-      val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_I_D))
-      val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))
+      val vendorID = tlvReader.getUInt(ContextSpecificTag(TAG_VENDOR_ID))
+      val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_ID))
+      val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
       
