@@ -112,6 +112,8 @@ class TC_SEAR_1_5(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
+        attribute_list = await self.read_sear_attribute_expect_success(
+            endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
@@ -163,8 +165,8 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         if not self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP"):
             return
-
-        if self.check_pics("SEAR.S.A0005"):
+        
+        if Clusters.ServiceArea.Attributes.Progress.attribute_id in attribute_list:
             old_progress_list = await self.read_progress(step=9)
             asserts.assert_true(len(old_progress_list) > 0, f"len of Progress({len(old_progress_list)}) should not be zero)")
 
@@ -172,7 +174,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         asserts.assert_true(len(selected_areas) > 0, "SelectedAreas is empty")
 
         old_current_area = NullValue
-        if self.check_pics("SEAR.S.A0003"):
+        if Clusters.ServiceArea.Attributes.CurrentArea.attribute_id in attribute_list:
             old_current_area = await self.read_current_area(step=11)
 
             self.print_step("12", "")
@@ -186,7 +188,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     if not self.is_ci:
                         self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-                if self.check_pics("SEAR.S.A0005"):
+                if Clusters.ServiceArea.Attributes.Progress.attribute_id in attribute_list:
                     new_progress_list = await self.read_progress(step=15)
                     asserts.assert_true(len(new_progress_list) > 0,
                                         f"len of Progress({len(new_progress_list)}) should not be zero)")
@@ -227,7 +229,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     self.print_step("17", "")
                     return
 
-        if not self.check_pics("SEAR.S.A0005"):
+        if Clusters.ServiceArea.Attributes.Progress.attribute_id not in attribute_list:
             return
 
         if self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
