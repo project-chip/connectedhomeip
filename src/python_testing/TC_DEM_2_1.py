@@ -61,7 +61,7 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT FeatureMap attribute.",
-                     "Save this for later."),
+                     "Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT ESAType attribute.",
                      "Verify that the DUT response contains an a ESATypeEnum (enum8) value to match the DUT type."),
             TestStep("4", "TH reads from the DUT the ESACanGenerate attribute.",
@@ -74,9 +74,9 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                      "Verify that the DUT response contains a power-mW value to match the DUT capability, and greater than or equal to the AbsMinPower read in step 6."),
             TestStep("8", "TH reads from the DUT the PowerAdjustmentCapability attribute.",
                      "Verify that the DUT response contains either a null value or a PowerAdjustCapabilityStruct value which contains a list of PowerAdjustStruct values and a valid Cause PowerAdjustReasonEnum (enum8) value."),
-            TestStep("9", "If FeatureMap from step 2 indicates support for PFR or SFR feature, TH reads from the DUT the Forecast attribute.",
+            TestStep("9", "If PFR or SFR feature is supported on the cluster, TH reads from the DUT the Forecast attribute.",
                      "Verify that the DUT response contains either a null value or a valid ForecastStruct value."),
-            TestStep("10", "If FeatureMap from step 2 indicates support for PA, STA, PAU, FA, CON features, TH reads from the DUT the OptOutState attribute.",
+            TestStep("10", "If PA, STA, PAU, FA or CON feature is supported on the cluster, TH reads from the DUT the OptOutState attribute.",
                      "Verify that the DUT response contains an OptOutStateEnum (enum8) value."),
         ]
 
