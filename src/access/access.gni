@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
-
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include_dirs = [
-  "//include",
-  "${chip_root}/config/standalone",
-]
-
-chip_config_network_layer_ble = false
-
-# This enables AccessRestrictionList (ARL) support used by the NIM sample app
-chip_enable_access_restrictions = true
+declare_args() {
+  # Enable ARL features of Access Control
+  chip_enable_access_restrictions = false
+}
