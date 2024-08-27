@@ -630,7 +630,12 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
             return;
         }
 
-        deviceCommissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+        // NOTE: This will log errors even if the attestion was successful.
+        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+        if (CHIP_NO_ERROR != err)
+        {
+            SetCommandExitStatus(err);
+        }
         return;
     }
 
