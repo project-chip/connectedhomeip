@@ -20,7 +20,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1 --bool-arg simulate_occupancy:true
 # === END CI TEST ARGUMENTS ===
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
@@ -33,7 +33,7 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -57,11 +57,11 @@ class TC_OCC_3_1(MatterBaseTest):
 
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH and obtain DUT attribute list.", is_commissioning=True),
-            TestStep(2, "Change DUT HoldTime attribute value to 10 seconds."),
-            TestStep(3, "Do not trigger DUT occupancy sensing for the period of HoldTime. TH reads Occupancy attribute from DUT."),
-            TestStep(4, "Trigger DUT occupancy sensing to change the occupancy state and start a timer."),
-            TestStep(5, "After 10 seconds, TH reads Occupancy attribute from DUT.")
+            TestStep(1, "Commission DUT to TH.", is_commissioning=True),
+            TestStep(2, "Change DUT HoldTime attribute value to HoldTimeMin that is 10 sec. If HoldTime is not supported, then skip this test step."),
+            TestStep(3, "Set DUT Occupancy attribute to Unoccupied state. Set up Occupancy attribute subscription and event callback."),
+            TestStep(4, "Operate on DUT to change the occupancy status and start a timer if HoldTime is supported."),
+            TestStep(5, "After a timer passed HoldTime, TH reads Occupancy attribute from DUT.")
         ]
         return steps
 
@@ -78,18 +78,19 @@ class TC_OCC_3_1(MatterBaseTest):
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
 
+    # CI app pipe id creation
+    self.app_pipe = "/tmp/chip_all_clusters_fifo_"
+    #self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+    self.is_ci = self.matter_test_config.global_test_params['simulate_occupancy']
+    if self.is_ci:
+        app_pid = self.matter_test_config.app_pid
+        if app_pid == 0:
+            asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+        self.app_pipe = self.app_pipe + str(app_pid) 
+    
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10  # 10 seconds for occupancy state hold time
-
-        # CI app pipe id creation
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.step(1)  # Commissioning already done
 
@@ -102,8 +103,14 @@ class TC_OCC_3_1(MatterBaseTest):
         has_hold_time = attributes.HoldTime.attribute_id in attribute_list
 
         if has_hold_time:
+            # write HoldTimeLimits HoldtimeMin to be 10 sec.
+            await self.write_single_attribute(cluster.Attributes.HoldTimeLimits.HoldTimeMin(hold_time))
             # write 10 as a HoldTime attribute
+            #asynch write_hold_time(hold_time)
             await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))
+            # read HoldTime to check
+            holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+            asserts.assert_equal(holdtime_dut, holdtime, "HoldTime is not written to HoldTimeMin")
         else:
             logging.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality")
 
@@ -111,7 +118,7 @@ class TC_OCC_3_1(MatterBaseTest):
         # check if Occupancy attribute is 0
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
 
-        # if occupancy is on, then wait until the sensor occupancy state is 0.
+        # if occupancy is on, here try to set sensor occupancy state to 0.
         if occupancy_dut == 1:
             # Don't trigger occupancy sensor to render occupancy attribute to 0
             if has_hold_time:
@@ -128,6 +135,18 @@ class TC_OCC_3_1(MatterBaseTest):
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is still 1.")
 
+        # setup Occupancy attribute subscription here
+        endpoint_id = self.matter_test_config.endpoint
+        node_id = self.dut_node_id
+        dev_ctrl = self.default_controller
+        attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
+        post_prompt_settle_delay_seconds = 30
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=post_prompt_settle_delay_seconds)
+
+        # setup event
+        events_callback = EventChangeCallback(Clusters.OccupancySensing)
+        await events_callback.start(self.default_controller, node_id, endpoint_id)
+
         self.step(4)
         # CI call to trigger on
         if self.is_ci:
@@ -139,6 +158,10 @@ class TC_OCC_3_1(MatterBaseTest):
         # And then check if Occupancy attribute has changed.
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 1, "Occupancy state is not changed to 1")
+
+        # subscription verification
+        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
+                          1], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step(5)
         # check if Occupancy attribute is back to 0 after HoldTime attribute period
