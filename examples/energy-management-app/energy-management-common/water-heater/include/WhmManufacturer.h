@@ -20,6 +20,7 @@
 
 #include <WhmDelegate.h>
 #include <WhmInstance.h>
+#include <DEMManufacturerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -32,7 +33,7 @@ namespace WaterHeaterManagement {
  * Helps with handling the test triggers.
  */
 
-class WhmManufacturer
+class WhmManufacturer: public DeviceEnergyManagement::DEMManufacturerDelegate
 {
 public:
     WhmManufacturer(WaterHeaterManagementInstance * whmInstance) { mWhmInstance = whmInstance; }
@@ -138,6 +139,13 @@ public:
      * @brief Called when a boost command has completed.
      */
     void BoostCommandFinished();
+
+    /* Implement the DEMManufacturerDelegate interface */
+
+    /**
+     * @brief The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+     */
+    int64_t GetApproxEnergyDuringSession() override;
 
 private:
     WaterHeaterManagementInstance * mWhmInstance;

@@ -18,6 +18,7 @@
 
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <EVSEManufacturerImpl.h>
+#include <DEMDelegate.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 
 #include <EnergyTimeUtils.h>
@@ -40,16 +41,6 @@ static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::
 static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
 static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
     sPowerAdjustmentCapability;
-
-DeviceEnergyManagementDelegate * GetDEMDelegate()
-{
-    EVSEManufacturer * mn = GetEvseManufacturer();
-    VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
-    DeviceEnergyManagementDelegate * dg = mn->GetDEMDelegate();
-    VerifyOrDieWithMsg(dg != nullptr, AppServer, "DEM Delegate is null");
-
-    return dg;
-}
 
 CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {
@@ -134,10 +125,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, numSlots);
 
-    EVSEManufacturer * mn = GetEvseManufacturer();
-    mn->GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
-    mn->GetDEMDelegate()->SetAbsMinPower(1000);
-    mn->GetDEMDelegate()->SetAbsMaxPower(256 * 2000 * 1000);
+    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    GetDEMDelegate()->SetAbsMinPower(1000);
+    GetDEMDelegate()->SetAbsMaxPower(256 * 2000 * 1000);
 
     return CHIP_NO_ERROR;
 }

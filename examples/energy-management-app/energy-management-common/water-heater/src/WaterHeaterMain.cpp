@@ -19,10 +19,12 @@
 #include "EnergyManagementAppCmdLineOptions.h"
 
 #include <DeviceEnergyManagementManager.h>
+#include <DeviceEnergyManagementDelegateImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <PowerTopologyDelegate.h>
 #include <device-energy-management-modes.h>
 #include <water-heater-mode.h>
+#include <WhmManufacturer.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,6 +38,7 @@
 
 #include <EnergyEvseMain.h>
 #include <WhmMain.h>
+#include <DEMDelegate.h>
 
 namespace chip {
 namespace app {
@@ -66,6 +69,11 @@ void FullWhmApplicationInit()
         WhmApplicationShutdown();
         return;
     }
+
+    /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
+
+    GetDEMDelegate()->SetESAState(ESAStateEnum::kOnline);
+    GetDEMDelegate()->SetDEMManufacturerDelegate(*GetWhmManufacturer());
 }
 
 void FullWhmApplicationShutdown()
