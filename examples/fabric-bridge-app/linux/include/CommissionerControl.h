@@ -38,8 +38,21 @@ public:
     ~CommissionerControlDelegate() = default;
 
 private:
+    enum class Step : uint8_t
+    {
+        // Ready to start reverse commissioning.
+        kIdle,
+        // Wait for the commission node command.
+        kWaitCommissionNodeRequest,
+        // Need to commission node.
+        kStartCommissionNode,
+    };
+
+    void ResetDelegateState();
+
     static constexpr size_t kLabelBufferSize = 64;
 
+    Step mNextStep       = Step::kIdle;
     uint64_t mRequestId  = 0;
     NodeId mClientNodeId = kUndefinedNodeId;
     VendorId mVendorId   = VendorId::Unspecified;

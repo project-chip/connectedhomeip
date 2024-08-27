@@ -3586,10 +3586,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("PositionTag", indent + 1, value.positionTag);
+        CHIP_ERROR err = LogValue("RelativePositionTag", indent + 1, value.relativePositionTag);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PositionTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RelativePositionTag'");
             return err;
         }
     }
@@ -3644,10 +3644,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("AreaDesc", indent + 1, value.areaDesc);
+        CHIP_ERROR err = LogValue("AreaInfo", indent + 1, value.areaInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaDesc'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaInfo'");
             return err;
         }
     }
@@ -7751,6 +7751,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OccupancySensing::Events::OccupancyChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Occupancy", indent + 1, value.occupancy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Occupancy'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -20952,6 +20968,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
+        }
+        }
+        break;
+    }
+    case OccupancySensing::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case OccupancySensing::Events::OccupancyChanged::Id: {
+            chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupancyChanged", 1, value);
         }
         }
         break;

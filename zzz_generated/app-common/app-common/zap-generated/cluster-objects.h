@@ -11089,6 +11089,7 @@ namespace KeepActive {
 enum class Fields : uint8_t
 {
     kStayActiveDuration = 0,
+    kTimeoutMs          = 1,
 };
 
 struct Type
@@ -11099,6 +11100,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -11114,6 +11116,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeepActive
@@ -28428,15 +28431,15 @@ namespace Structs {
 namespace LandmarkInfoStruct {
 enum class Fields : uint8_t
 {
-    kLandmarkTag = 0,
-    kPositionTag = 1,
+    kLandmarkTag         = 0,
+    kRelativePositionTag = 1,
 };
 
 struct Type
 {
 public:
     Globals::LandmarkTag landmarkTag = static_cast<Globals::LandmarkTag>(0);
-    DataModel::Nullable<Globals::RelativePositionTag> positionTag;
+    DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -28476,7 +28479,7 @@ enum class Fields : uint8_t
 {
     kAreaID   = 0,
     kMapID    = 1,
-    kAreaDesc = 2,
+    kAreaInfo = 2,
 };
 
 struct Type
@@ -28484,7 +28487,7 @@ struct Type
 public:
     uint32_t areaID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> mapID;
-    Structs::AreaInfoStruct::Type areaDesc;
+    Structs::AreaInfoStruct::Type areaInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -34306,6 +34309,41 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace OccupancyChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kOccupancy = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OccupancyChanged
+} // namespace Events
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
 
