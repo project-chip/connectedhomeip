@@ -96,7 +96,7 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
 CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     wifi_config_t stationConfig;
-    if (esp_wifi_get_config(WIFI_IF_STA, &stationConfig) == ERR_OK && stationConfig.sta.ssid[0] != 0)
+    if (esp_wifi_get_config(WIFI_IF_STA, &stationConfig) == ESP_OK && stationConfig.sta.ssid[0] != 0)
     {
         uint8_t ssidLen = static_cast<uint8_t>(
             strnlen(reinterpret_cast<const char *>(stationConfig.sta.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength));
