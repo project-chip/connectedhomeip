@@ -33,7 +33,7 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep, async_test_body, await_sequence_of_reports, default_matter_test_main
 from mobly import asserts
 
 
@@ -73,20 +73,20 @@ class TC_OCC_3_1(MatterBaseTest):
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
+        # CI app pipe id creation
+        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
+        #self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        self.is_ci = self.matter_test_config.global_test_params['simulate_occupancy']
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid == 0:
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+            self.app_pipe = self.app_pipe + str(app_pid)
+
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
-
-    # CI app pipe id creation
-    self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-    #self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-    self.is_ci = self.matter_test_config.global_test_params['simulate_occupancy']
-    if self.is_ci:
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-        self.app_pipe = self.app_pipe + str(app_pid)
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
@@ -110,7 +110,7 @@ class TC_OCC_3_1(MatterBaseTest):
             await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))
             # read HoldTime to check
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-            asserts.assert_equal(holdtime_dut, holdtime, "HoldTime is not written to HoldTimeMin")
+            asserts.assert_equal(holdtime_dut, hold_time, "HoldTime is not written to HoldTimeMin")
         else:
             logging.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality")
 
