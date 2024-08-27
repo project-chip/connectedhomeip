@@ -92,7 +92,7 @@ codes, discriminator and passcode from the logs.
 
 Open a new terminal to use chip tool. Commission the device using:
 
-`./out/linux-x64-chip-tool/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G0`
+`./out/linux-x64-chip-tool/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00`
 
 NOTE: pairing is the old name for commissioning. 0x12344321 is the node ID you
 want to assign to the node. 0x12344321 is the default for testing.
