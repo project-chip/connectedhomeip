@@ -468,7 +468,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("17")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             test_presets = new_presets_with_handle.copy()
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=9,
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kGoingToSleep,
                                                              name="Wake", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
             # Send the AtomicRequest begin command
@@ -491,7 +491,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Read the Presets to copy the existing presets into our testPresets list below.
             presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
 
-            # Since we currently support one preset of each type, run the test only if we have enough preset types to create a preset list whose length exceeds the
+            # TODO #34556 Since the sdk currently supports one preset of each type, run the test only if we have enough preset types to create a preset list whose length exceeds the
             # maximum number of presets supported.
             if len(presetTypes) > numberOfPresetsSupported:
                 didCopyPreset = False
@@ -508,7 +508,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                             break
                         else:
                             didCopyPreset = False
-                    if not didCopyPreset:
+                    if not didCopyPreset and len(testPresets) <= numberOfPresetsSupported:
                         testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetType.presetScenario,
                                                                  name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
@@ -520,7 +520,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
             else:
-                logger.info(f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported");
+                logger.info(f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
 
 if __name__ == "__main__":
     default_matter_test_main()
