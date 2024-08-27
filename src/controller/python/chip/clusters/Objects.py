@@ -38399,6 +38399,26 @@ class OccupancySensing(Cluster):
 
             value: 'uint' = 0
 
+    class Events:
+        @dataclass
+        class OccupancyChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000406
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=0, Type=uint),
+                    ])
+
+            occupancy: 'uint' = 0
+
 
 @dataclass
 class CarbonMonoxideConcentrationMeasurement(Cluster):
