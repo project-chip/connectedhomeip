@@ -7934,6 +7934,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _stayActiveDuration = @(0);
+
+        _timeoutMs = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -7945,6 +7947,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRBridgedDeviceBasicInformationClusterKeepActiveParams alloc] init];
 
     other.stayActiveDuration = self.stayActiveDuration;
+    other.timeoutMs = self.timeoutMs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -7953,7 +7956,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stayActiveDuration:%@; >", NSStringFromClass([self class]), _stayActiveDuration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stayActiveDuration:%@; timeoutMs:%@; >", NSStringFromClass([self class]), _stayActiveDuration, _timeoutMs];
     return descriptionString;
 }
 
@@ -7967,6 +7970,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.stayActiveDuration = self.stayActiveDuration.unsignedIntValue;
+    }
+    {
+        encodableStruct.timeoutMs = self.timeoutMs.unsignedIntValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

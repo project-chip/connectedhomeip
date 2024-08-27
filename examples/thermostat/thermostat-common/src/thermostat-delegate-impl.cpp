@@ -177,17 +177,17 @@ void ThermostatDelegate::InitializePendingPresets()
     }
 }
 
-CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Type & preset)
+CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
 {
     if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
     {
         mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
-        if (preset.presetHandle.IsNull())
+        if (preset.GetPresetHandle().IsNull())
         {
             // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
             // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
             // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
+            const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
             mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
         mNextFreeIndexInPendingPresetsList++;
