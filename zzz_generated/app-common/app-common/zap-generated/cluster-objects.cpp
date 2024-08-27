@@ -28890,8 +28890,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::RemovedOn::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, removedOn);
     case Attributes::DeviceDirectory::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, deviceDirectory);
     case Attributes::LocationDirectory::TypeInfo::GetAttributeId():
