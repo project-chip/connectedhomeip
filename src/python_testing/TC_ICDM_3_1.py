@@ -85,7 +85,7 @@ class TC_ICDM_3_1(MatterBaseTest):
             TestStep(7, "TTH sends UnregisterClient command with the CheckInNodeID from Step 6."),
             TestStep(8, "TH sends UnregisterClient command with the CheckInNodeID from Step 2."),
             TestStep(9, "TH reads from the DUT the RegisteredClients attribute."),
-            TestStep(10, "Repeat Step 9 with the rest of CheckInNodeIDs from the list of RegisteredClients from Step 4, if any."),
+            TestStep(10, "Repeat Step 8-9 with the rest of CheckInNodeIDs from the list of RegisteredClients from Step 4, if any."),
             TestStep(11, "TH reads from the DUT the RegisteredClients attribute."),
             TestStep(12, "TH sends UnregisterClient command with the CheckInNodeID from Step 2."),
         ]
@@ -239,6 +239,11 @@ class TC_ICDM_3_1(MatterBaseTest):
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
                 pass
+
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+            for remainingClient in registeredClients:
+                asserts.assert_not_equal(remainingClient.checkInNodeID, client["checkInNodeID"],
+                                         "CheckInNodeID was unregistered. It should not be present in the attribute list.")
 
         self.step(11)
         registeredClients = await self._read_icdm_attribute_expect_success(
