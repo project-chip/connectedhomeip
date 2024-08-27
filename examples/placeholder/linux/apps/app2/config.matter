@@ -2661,6 +2661,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   request struct KeepActiveRequest {
     int32u stayActiveDuration = 0;
+    int32u timeoutMs = 1;
   }
 
   /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
