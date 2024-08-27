@@ -11089,6 +11089,7 @@ namespace KeepActive {
 enum class Fields : uint8_t
 {
     kStayActiveDuration = 0,
+    kTimeoutMs          = 1,
 };
 
 struct Type
@@ -11099,6 +11100,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -11114,6 +11116,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeepActive

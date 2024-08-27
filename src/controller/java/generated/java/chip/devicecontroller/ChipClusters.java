@@ -15197,17 +15197,21 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration) {
-      keepActive(callback, stayActiveDuration, 0);
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs) {
+      keepActive(callback, stayActiveDuration, timeoutMs, 0);
     }
 
-    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, int timedInvokeTimeoutMs) {
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs, int timedInvokeTimeoutMs) {
       final long commandId = 128L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long stayActiveDurationFieldID = 0L;
       BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
       elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
+      final long timeoutMsFieldID = 1L;
+      BaseTLVType timeoutMstlvValue = new UIntType(timeoutMs);
+      elements.add(new StructElement(timeoutMsFieldID, timeoutMstlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

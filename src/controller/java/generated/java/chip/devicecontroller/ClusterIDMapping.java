@@ -4543,7 +4543,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+        }public enum KeepActiveCommandField {StayActiveDuration(0),TimeoutMs(1),;
                     private final int id;
                     KeepActiveCommandField(int id) {
                         this.id = id;
