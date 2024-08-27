@@ -575,7 +575,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [72, 74, 78, 80, 82]
+              contains: [72, 74, 78, 80]
 
     - label: "Step 5: TH reads EventList attribute from the DUT."
       PICS: PICS_EVENT_LIST_ENABLED
@@ -624,11 +624,12 @@ tests:
       response:
           constraints:
               type: list
-              contains: [254]
+              contains: [6, 254]
 
     - label:
-          "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."
-      PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
+          "Step 7a: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
+          the GeneratedCommandList attribute."
+      PICS: TSTAT.S.Cfe.Rsp
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

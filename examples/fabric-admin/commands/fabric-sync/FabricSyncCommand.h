@@ -22,6 +22,10 @@
 #include <commands/pairing/OpenCommissioningWindowCommand.h>
 #include <commands/pairing/PairingCommand.h>
 
+// Constants
+constexpr uint32_t kCommissionPrepareTimeMs = 500;
+constexpr uint16_t kMaxManualCodeLength     = 21;
+
 class FabricSyncAddBridgeCommand : public CHIPCommand, public CommissioningDelegate
 {
 public:
@@ -31,7 +35,7 @@ public:
         AddArgument("device-remote-ip", &mRemoteAddr);
     }
 
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override { return RunCommand(mNodeId); }
@@ -61,6 +65,47 @@ public:
 
 private:
     chip::NodeId mBridgeNodeId;
+};
+
+class FabricSyncAddLocalBridgeCommand : public CHIPCommand, public CommissioningDelegate
+{
+public:
+    FabricSyncAddLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("add-local-bridge", credIssuerCommands)
+    {
+        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
+    }
+
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override { return RunCommand(mNodeId); }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::NodeId mNodeId;
+    chip::NodeId mLocalBridgeNodeId;
+
+    CHIP_ERROR RunCommand(chip::NodeId deviceId);
+};
+
+class FabricSyncRemoveLocalBridgeCommand : public CHIPCommand, public PairingDelegate
+{
+public:
+    FabricSyncRemoveLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("remove-local-bridge", credIssuerCommands)
+    {}
+
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::NodeId mLocalBridgeNodeId;
 };
 
 class FabricSyncDeviceCommand : public CHIPCommand, public CommissioningWindowDelegate, public CommissioningDelegate

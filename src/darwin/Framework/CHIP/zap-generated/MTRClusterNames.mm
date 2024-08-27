@@ -8342,10 +8342,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster EcosystemInformation attributes
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
-            result = @"RemovedOn";
-            break;
-
         case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
             result = @"DeviceDirectory";
             break;
@@ -10763,6 +10759,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeOccupancySensingID:
 
         switch (eventID) {
+
+            // Cluster OccupancySensing events
+        case MTREventIDTypeClusterOccupancySensingEventOccupancyChangedID:
+            result = @"OccupancyChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];

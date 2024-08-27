@@ -36,8 +36,8 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: confirm whether we can open processes like this on the TH
-        app = self.matter_test_config.user_params.get("th_server_app_path", None)
+        self.app_process = None
+        app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
@@ -64,11 +64,15 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         logging.info("Commissioning TH_SERVER complete")
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process.send_signal(signal.SIGTERM.value)
-        self.app_process.wait()
+        # In case the th_server_app_path does not exist, then we failed the test
+        # and there is nothing to remove
+        if self.app_process is not None:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process.send_signal(signal.SIGTERM.value)
+            self.app_process.wait()
 
-        os.remove(self.kvs)
+            if os.path.exists(self.kvs):
+                os.remove(self.kvs)
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
@@ -88,7 +92,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.step(1)
         self.step(2)
         self.step(3)
-        th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         th_fsa_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
 
@@ -102,7 +106,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
         if not self.is_ci:
-            self.wait_for_use_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
+            self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
             new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
@@ -133,7 +137,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         if not self.is_ci:
             time.sleep(30)
 
-        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
         if not self.is_ci:
             asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),

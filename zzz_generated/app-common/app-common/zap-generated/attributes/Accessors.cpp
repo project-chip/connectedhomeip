@@ -27161,9 +27161,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace DriftCompensation {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -27177,9 +27177,10 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value,
+                                        MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -27190,9 +27191,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -27299,9 +27300,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace ColorMode {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorModeEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -27315,9 +27316,10 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum value,
+                                        MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -27328,9 +27330,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -27345,9 +27347,10 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 namespace Options {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -27361,9 +27364,10 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> value, MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -27374,9 +27378,10 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29237,9 +29242,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace EnhancedColorMode {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -29253,9 +29258,10 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value,
+                                        MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29266,9 +29272,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29513,9 +29519,10 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace ColorCapabilities {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -29529,9 +29536,11 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * va
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> value,
+                                        MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29542,9 +29551,10 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -37414,96 +37424,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace EcosystemInformation {
 namespace Attributes {
-
-namespace RemovedOn {
-
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE,
-                                 markDirty);
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE,
-                                 markDirty);
-}
-
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
-                                        MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace RemovedOn
 
 namespace FeatureMap {
 

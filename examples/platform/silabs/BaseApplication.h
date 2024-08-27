@@ -65,9 +65,12 @@
 
 class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
+public:
+    bool isCommissioningInProgress() { return isComissioningStarted; }
+
 private:
     // AppDelegate
-    bool isComissioningStarted;
+    bool isComissioningStarted = false;
     void OnCommissioningSessionStarted() override;
     void OnCommissioningSessionStopped() override;
     void OnCommissioningWindowClosed() override;
