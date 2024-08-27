@@ -77,10 +77,9 @@ class TC_ACL_2_11(MatterBaseTest):
                      "If the restriction is Type AttributeWriteForbidden, write restriction's the attribute ID and verify the response is UNSUPPORTED_ACCESS."
                      "If the restriction is Type CommandForbidden, invoke the restriction's command ID and verify the response is UNSUPPORTED_ACCESS."),
             TestStep(5, "TH1 sends DUT Endpoint 0 AccessControl cluster command ReviewFabricRestrictions"),
-            TestStep(6, "Wait for up to 1 hour", "AccessRestrictionReviewUpdate event is received"),
-            TestStep(7, "Follow instructions provided by device maker to remove all access restrictions",
-                     "AccessRestrictionEntryChanged event is received"),
-            TestStep(8, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute", "ARL is empty")
+            TestStep(6, "Wait for up to 1 hour. Follow instructions provided by device maker to remove all access restrictions",
+                     "AccessRestrictionReviewUpdate event is received"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute", "ARL is empty")
         ]
         return steps
 
@@ -154,12 +153,10 @@ class TC_ACL_2_11(MatterBaseTest):
                             "Result is not of type ReviewFabricRestrictionsResponse")
 
         self.step(6)
+        logging.info("Please follow instructions provided by the product maker to remove all ARL entries")
         WaitForEventReport(arru_queue, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
 
         self.step(7)
-        WaitForEventReport(arec_queue, Clusters.AccessControl.Events.AccessRestrictionEntryChanged)
-
-        self.step(8)
         cluster = Clusters.AccessControl
         attribute = Clusters.AccessControl.Attributes.Arl
         arl = await self.read_single_attribute_check_success(
