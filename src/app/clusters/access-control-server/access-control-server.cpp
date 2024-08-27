@@ -648,7 +648,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
         if (restrictionIter.GetStatus() != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
-            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
             return true;
         }
 
@@ -658,7 +658,7 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     if (entryIter.GetStatus() != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
         return true;
     }
 

@@ -106,7 +106,7 @@ source_set("app-main") {
   ]
 
   if (current_os != "nuttx") {
-      public_deps += [ jsoncpp_root ]
+    public_deps += [ jsoncpp_root ]
   }
 
   if (chip_enable_pw_rpc) {
