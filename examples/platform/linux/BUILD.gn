@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/jsoncpp.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
+
+if (current_os != "nuttx") {
+  import("//build_overrides/jsoncpp.gni")
+}
 
 declare_args() {
   chip_enable_smoke_co_trigger = false
