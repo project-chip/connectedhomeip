@@ -69,29 +69,64 @@ the wpa_supplicant integration with the Matter SDK.
         </method>
 
         <method name="NANPublish">
-            <arg name="nan_args" type="s" direction="in" />
+        <!--
+                srv_name as string
+                proto_type as byte
+                solicite as bool
+                unsolicite as bool
+                solicit_multicast as bool
+                ttl as uint16
+                disable_event as bool
+                fsd as bool
+                fsd_gas a bool
+                freq as uint16
+                announce_period as uint16
+                ssi_len as uint16
+                freq_list_len as uint16
+                ssi as array of uint8 in variant
+                freq_list as array of uint16 in variant
+            -->
+            <arg name="nan_args" type="(sybbbqbbbqqqqvv)" direction="in" />
             <arg name="publish_id" type="i" direction="out" />
         </method>
 
         <method name="NANCancelPublish">
-            <arg name="nan_args" type="s" direction="in" />
+            <arg name="nan_args" type="i" direction="in" />
+        </method>
+        <method name="NANUpdatePublish">
+            <arg name="nan_args" type="(iqv)" direction="in" />
         </method>
 
         <method name="NANSubscribe">
-            <arg name="nan_args" type="s" direction="in" />
+        <!--
+                srv_name as string
+                proto_type as byte
+                is_active as byte
+                ttl as uint16
+                freq as uint16
+                ssi_len as uint16
+                ssi as array of uint8 in variant
+            -->
+            <arg name="nan_args" type="(syyqqqv)" direction="in" />
             <arg name="subscribe_id" type="i" direction="out" />
         </method>
 
         <method name="NANCancelSubscribe">
-            <arg name="nan_args" type="s" direction="in" />
+            <arg name="nan_args" type="i" direction="in" />
         </method>
 
         <method name="NANTransmit">
-            <arg name="nan_args" type="s" direction="in" />
+        <!--
+                local_id as uint8
+                peer_id as uint8
+                peer_mac_addr as string
+                ssi_len as uint16
+                ssi as variant
+            -->
+            <arg name="nan_args" type="(yysqv)" direction="in" />
         </method>
 
         <method name="SaveConfig" />
-
         <property name="State" type="s" access="read" />
         <property name="CurrentBSS" type="o" access="read" />
         <property name="CurrentNetwork" type="o" access="read" />
