@@ -137,8 +137,8 @@ class ThreadNetworkDirectoryCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
+    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -161,8 +161,8 @@ class ThreadNetworkDirectoryCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
+    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

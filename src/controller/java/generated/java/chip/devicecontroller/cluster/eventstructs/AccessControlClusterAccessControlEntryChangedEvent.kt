@@ -44,14 +44,14 @@ class AccessControlClusterAccessControlEntryChangedEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (adminNodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_NODE_I_D), adminNodeID)
+        put(ContextSpecificTag(TAG_ADMIN_NODE_ID), adminNodeID)
       } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+        putNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
       }
       if (adminPasscodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D), adminPasscodeID)
+        put(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID), adminPasscodeID)
       } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+        putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
       }
       put(ContextSpecificTag(TAG_CHANGE_TYPE), changeType)
       if (latestValue != null) {
@@ -65,8 +65,8 @@ class AccessControlClusterAccessControlEntryChangedEvent(
   }
 
   companion object {
-    private const val TAG_ADMIN_NODE_I_D = 1
-    private const val TAG_ADMIN_PASSCODE_I_D = 2
+    private const val TAG_ADMIN_NODE_ID = 1
+    private const val TAG_ADMIN_PASSCODE_ID = 2
     private const val TAG_CHANGE_TYPE = 3
     private const val TAG_LATEST_VALUE = 4
     private const val TAG_FABRIC_INDEX = 254
@@ -78,16 +78,16 @@ class AccessControlClusterAccessControlEntryChangedEvent(
       tlvReader.enterStructure(tlvTag)
       val adminNodeID =
         if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+          tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
           null
         }
       val adminPasscodeID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+          tlvReader.getUInt(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
           null
         }
       val changeType = tlvReader.getUInt(ContextSpecificTag(TAG_CHANGE_TYPE))

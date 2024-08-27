@@ -55,19 +55,34 @@ public:
 
     chip::NodeId GetRemoteBridgeNodeId() const { return mRemoteBridgeNodeId; }
 
+    chip::NodeId GetLocalBridgeNodeId() const { return mLocalBridgeNodeId; }
+
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId remoteBridgeNodeId) { mRemoteBridgeNodeId = remoteBridgeNodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+
+    void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
     bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
 
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
+
+    bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
     void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
 
     void AddSyncedDevice(const Device & device);
 
     void RemoveSyncedDevice(chip::NodeId nodeId);
+
+    /**
+     * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
+     *
+     * @param nodeId            The ID of the node being checked.
+     *
+     * @return true if the nodeId matches either the local or remote bridge device; otherwise, false.
+     */
+    bool IsCurrentBridgeDevice(chip::NodeId nodeId) const { return nodeId == mLocalBridgeNodeId || nodeId == mRemoteBridgeNodeId; }
 
     /**
      * @brief Open the commissioning window for a specific device within its own fabric.
@@ -126,29 +141,59 @@ public:
      */
     void PairRemoteDevice(chip::NodeId nodeId, const char * payload);
 
+    /**
+     * @brief Pair a local fabric bridge with a given node ID.
+     *
+     * This function initiates the pairing process for the local fabric bridge using the specified parameters.
+
+     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
+     *                          as for the first fabric.
+     */
+    void PairLocalFabricBridge(chip::NodeId nodeId);
+
     void UnpairRemoteFabricBridge();
+
+    void UnpairLocalFabricBridge();
 
     void SubscribeRemoteFabricBridge();
 
-    void StartReverseCommissioning();
-
     void ReadSupportedDeviceCategories();
 
-    void CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
-    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader & data);
 
-    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
-
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
 private:
     friend DeviceManager & DeviceMgr();
 
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+
+    void RequestCommissioningApproval();
+
+    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
+
+    void HandleCommissioningRequestResult(chip::TLV::TLVReader & data);
+
+    void HandleAttributePartsListUpdate(chip::TLV::TLVReader & data);
+
+    void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+
+    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
+
     static DeviceManager sInstance;
 
-    chip::NodeId mLastUsedNodeId     = 0;
+    chip::NodeId mLastUsedNodeId = 0;
+
+    // The Node ID of the remote bridge used for Fabric-Sync
+    // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
+
+    // The Node ID of the local bridge used for Fabric-Sync
+    // This represents the bridge within its own ecosystem.
+    chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
+
     std::set<Device> mSyncedDevices;
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;

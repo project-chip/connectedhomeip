@@ -32,10 +32,6 @@ using namespace ::chip;
 
 namespace {
 
-// Constants
-constexpr uint32_t kCommissionPrepareTimeMs = 500;
-constexpr uint16_t kMaxManaulCodeLength     = 21;
-
 void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
 {
     DeviceMgr().ReadSupportedDeviceCategories();
@@ -43,7 +39,7 @@ void CheckFabricBridgeSynchronizationSupport(intptr_t ignored)
 
 } // namespace
 
-void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err)
+void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
     {
@@ -68,13 +64,16 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(chip::NodeId deviceId, 
 
         DeviceMgr().SubscribeRemoteFabricBridge();
 
-        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
-        // via the Commissioner Control Cluster. However, we must first verify that the
-        // remote Fabric-Bridge supports Fabric Synchronization.
-        //
-        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
-        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-        DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+        if (DeviceMgr().IsLocalBridgeReady())
+        {
+            // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+            // via the Commissioner Control Cluster. However, we must first verify that the
+            // remote Fabric-Bridge supports Fabric Synchronization.
+            //
+            // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+            // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+            DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+        }
     }
     else
     {
@@ -90,7 +89,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     if (DeviceMgr().IsFabricSyncReady())
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge has been alread configured.");
+        fprintf(stderr, "Remote Fabric Bridge has already been configured.");
         return CHIP_NO_ERROR;
     }
 
@@ -98,7 +97,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
 
     if (pairingCommand == nullptr)
     {
-        ChipLogError(NotSpecified, "Pairing onnetwork command is not available");
+        ChipLogError(NotSpecified, "Pairing already-discovered command is not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
@@ -110,7 +109,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     return CHIP_NO_ERROR;
 }
 
-void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err)
+void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
 {
     if (mBridgeNodeId != deviceId)
     {
@@ -150,7 +149,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
 
     if (pairingCommand == nullptr)
     {
-        ChipLogError(NotSpecified, "Pairing code command is not available");
+        ChipLogError(NotSpecified, "Pairing unpair command is not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
@@ -161,13 +160,116 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
+void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
+{
+    if (mLocalBridgeNodeId != deviceId)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to pair non-bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(deviceId), err.Format());
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Commissioning complete for non-bridge device: NodeId: " ChipLogFormatX64,
+                            ChipLogValueX64(deviceId));
+        }
+        return;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        DeviceMgr().SetLocalBridgeNodeId(mLocalBridgeNodeId);
+        ChipLogProgress(NotSpecified, "Successfully paired local bridge device: NodeId: " ChipLogFormatX64,
+                        ChipLogValueX64(mLocalBridgeNodeId));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to pair local bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+    }
+
+    mLocalBridgeNodeId = kUndefinedNodeId;
+}
+
+CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
+{
+    if (DeviceMgr().IsLocalBridgeReady())
+    {
+        // print to console
+        fprintf(stderr, "Local Fabric Bridge has already been configured.");
+        return CHIP_NO_ERROR;
+    }
+
+    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
+    VerifyOrDie(pairingCommand != nullptr);
+
+    pairingCommand->RegisterCommissioningDelegate(this);
+    mLocalBridgeNodeId = deviceId;
+
+    DeviceMgr().PairLocalFabricBridge(deviceId);
+
+    return CHIP_NO_ERROR;
+}
+
+void FabricSyncRemoveLocalBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR err)
+{
+    if (mLocalBridgeNodeId != deviceId)
+    {
+        ChipLogProgress(NotSpecified, "A non-bridge device: NodeId: " ChipLogFormatX64 " is removed.", ChipLogValueX64(deviceId));
+        return;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        DeviceMgr().SetLocalBridgeNodeId(kUndefinedNodeId);
+        ChipLogProgress(NotSpecified, "Successfully removed local bridge device: NodeId: " ChipLogFormatX64,
+                        ChipLogValueX64(mLocalBridgeNodeId));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to remove local bridge device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+    }
+
+    mLocalBridgeNodeId = kUndefinedNodeId;
+}
+
+CHIP_ERROR FabricSyncRemoveLocalBridgeCommand::RunCommand()
+{
+    NodeId bridgeNodeId = DeviceMgr().GetLocalBridgeNodeId();
+
+    if (bridgeNodeId == kUndefinedNodeId)
+    {
+        // print to console
+        fprintf(stderr, "Local Fabric Bridge is not configured yet, nothing to remove.");
+        return CHIP_NO_ERROR;
+    }
+
+    mLocalBridgeNodeId = bridgeNodeId;
+
+    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "unpair"));
+
+    if (pairingCommand == nullptr)
+    {
+        ChipLogError(NotSpecified, "Pairing unpair command is not available");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    pairingCommand->RegisterPairingDelegate(this);
+
+    DeviceMgr().UnpairLocalFabricBridge();
+
+    return CHIP_NO_ERROR;
+}
+
 void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload)
 {
     ChipLogProgress(NotSpecified, "FabricSyncDeviceCommand::OnCommissioningWindowOpened");
 
     if (err == CHIP_NO_ERROR)
     {
-        char payloadBuffer[kMaxManaulCodeLength + 1];
+        char payloadBuffer[kMaxManualCodeLength + 1];
         MutableCharSpan manualCode(payloadBuffer);
         CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
@@ -202,7 +304,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
     }
 }
 
-void FabricSyncDeviceCommand::OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err)
+void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err)
 {
     if (mAssignedNodeId != deviceId)
     {
@@ -252,6 +354,8 @@ CHIP_ERROR FabricAutoSyncCommand::RunCommand(bool enableAutoSync)
 
     // print to console
     fprintf(stderr, "Auto Fabric Sync is %s.\n", enableAutoSync ? "enabled" : "disabled");
+    fprintf(stderr,
+            "WARNING: The auto-sync command is currently under development and may contain bugs. Use it at your own risk.\n");
 
     return CHIP_NO_ERROR;
 }

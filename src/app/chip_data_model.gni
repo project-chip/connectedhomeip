@@ -428,11 +428,19 @@ template("chip_data_model") {
         ]
       } else if (cluster == "thermostat-server") {
         sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}-atomic.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}-presets.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/PresetStructWithOwnedMembers.cpp",
           "${_app_root}/clusters/${cluster}/PresetStructWithOwnedMembers.h",
           "${_app_root}/clusters/${cluster}/thermostat-delegate.h",
+        ]
+      } else if (cluster == "access-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/ArlEncoder.cpp",
+          "${_app_root}/clusters/${cluster}/ArlEncoder.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
