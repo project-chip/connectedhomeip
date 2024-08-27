@@ -21,4 +21,3 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate *GetDEMDelegate();
-
