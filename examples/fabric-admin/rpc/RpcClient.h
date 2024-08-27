@@ -55,7 +55,7 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data);
  * It logs the progress and checks if a `RemoveSynchronizedDevice` operation is already in progress.
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
- * @param data The Node ID of the device to be removed.
+ * @param nodeId The Node ID of the device to be removed.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
