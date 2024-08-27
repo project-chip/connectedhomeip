@@ -83,9 +83,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     if (GetDEMDelegate()->HasFeature(DeviceEnergyManagement::Feature::kPowerForecastReporting))
     {
-        sSlots[0].nominalPower.SetValue(1500);
-        sSlots[0].minPower.SetValue(1000);
-        sSlots[0].maxPower.SetValue(2000);
+        sSlots[0].nominalPower.SetValue(2500000);
+        sSlots[0].minPower.SetValue(1200000);
+        sSlots[0].maxPower.SetValue(7600000);
     }
 
     sSlots[0].nominalEnergy.SetValue(2000);
@@ -110,9 +110,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
         if (GetDEMDelegate()->HasFeature(DeviceEnergyManagement::Feature::kPowerForecastReporting))
         {
-            sSlots[slotNo].nominalPower.SetValue(2 * sSlots[slotNo - 1].nominalPower.Value());
-            sSlots[slotNo].minPower.SetValue(2 * sSlots[slotNo - 1].minPower.Value());
-            sSlots[slotNo].maxPower.SetValue(2 * sSlots[slotNo - 1].maxPower.Value());
+            sSlots[slotNo].nominalPower.SetValue(sSlots[slotNo - 1].nominalPower.Value());
+            sSlots[slotNo].minPower.SetValue(sSlots[slotNo - 1].minPower.Value());
+            sSlots[slotNo].maxPower.SetValue(sSlots[slotNo - 1].maxPower.Value());
 
             sSlots[slotNo].nominalEnergy.SetValue(2 * sSlots[slotNo - 1].nominalEnergy.Value());
         }
