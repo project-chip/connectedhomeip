@@ -29,14 +29,11 @@ using Protocols::InteractionModel::Status;
 
 MediaInputManager::MediaInputManager(chip::EndpointId endpoint) : mEndpoint(endpoint)
 {
-    struct InputData inputData1(1, InputTypeEnum::kHdmi, "HDMI 1",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData1(1, InputTypeEnum::kHdmi, "HDMI 1", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData1);
-    struct InputData inputData2(2, InputTypeEnum::kHdmi, "HDMI 2",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData2(2, InputTypeEnum::kHdmi, "HDMI 2", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData2);
-    struct InputData inputData3(3, InputTypeEnum::kHdmi, "HDMI 3",
-                                "High-Definition Multimedia Interface");
+    struct InputData inputData3(3, InputTypeEnum::kHdmi, "HDMI 3", "High-Definition Multimedia Interface");
     mInputs.push_back(inputData3);
 }
 
