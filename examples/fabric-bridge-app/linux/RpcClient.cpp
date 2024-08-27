@@ -107,7 +107,7 @@ void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Statu
 
 } // namespace
 
-void SetRpcClientPort(uint16_t port)
+void SetRpcRemoteServerPort(uint16_t port)
 {
     rpc::client::SetRpcServerPort(port);
 }

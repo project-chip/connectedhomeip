@@ -27,7 +27,7 @@
  *
  * @param port The port number.
  */
-void SetRpcClientPort(uint16_t port);
+void SetRpcRemoteServerPort(uint16_t port);
 
 /**
  * @brief Starts packet processing for the RPC client.

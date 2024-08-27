@@ -197,7 +197,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
 #if defined(PW_RPC_ENABLED)
-    SetRpcClientPort(mFabricBridgeServerPort.Value());
+    SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
     InitRpcServer(mLocalServerPort.Value());
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
     DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);

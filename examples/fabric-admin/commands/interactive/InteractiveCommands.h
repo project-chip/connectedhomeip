@@ -24,6 +24,9 @@
 
 #include <string>
 
+constexpr uint16_t kFabricBridgeServerPort = 33002;
+constexpr uint16_t kFabricLocalServerPort  = 33001;
+
 class Commands;
 
 class InteractiveCommand : public CHIPCommand
@@ -58,9 +61,8 @@ public:
     {
 #if defined(PW_RPC_ENABLED)
         AddArgument("fabric-bridge-server-port", 0, UINT16_MAX, &mFabricBridgeServerPort,
-                    "The fabric-bridge RPC port number to connect to (default: 33002).");
-        AddArgument("local-server-port", 0, UINT16_MAX, &mLocalServerPort,
-                    "The port number for local RPC server (default: 33001).");
+                    "The fabric-bridge RPC port number to connect to.");
+        AddArgument("local-server-port", 0, UINT16_MAX, &mLocalServerPort, "The port number for local RPC server.");
 #endif
     }
 
@@ -72,8 +74,8 @@ private:
     std::string GetHistoryFilePath() const;
 
 #if defined(PW_RPC_ENABLED)
-    chip::Optional<uint16_t> mFabricBridgeServerPort{ 33002 };
-    chip::Optional<uint16_t> mLocalServerPort{ 33001 };
+    chip::Optional<uint16_t> mFabricBridgeServerPort{ kFabricBridgeServerPort };
+    chip::Optional<uint16_t> mLocalServerPort{ kFabricLocalServerPort };
 #endif
 };
 
