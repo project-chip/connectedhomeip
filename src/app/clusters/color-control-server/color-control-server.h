@@ -203,27 +203,15 @@ public:
 
     template <typename Q, typename V>
     chip::app::MarkAttributeDirty SetQuietReportAttribute(chip::app::QuieterReportingAttribute<Q> & quietReporter, V newValue,
-                                                          bool isStartOrEndOfTransition, uint16_t transitionTime);
-    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime);
+                                                          bool isEndOfTransition, uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime, bool isNewTransition = false);
 
 private:
     /**********************************************************
      * Functions Definitions
      *********************************************************/
 
-    ColorControlServer()
-    {
-        for (size_t i = 0; i < kColorControlClusterServerMaxEndpointCount; i++)
-        {
-            // Set the quiet report policies for the RemaininTime Attribute on all endpoint
-            // - kMarkDirtyOnChangeToFromZero : When the value changes from 0 to any other value and vice versa, or
-            // - kMarkDirtyOnIncrement : When the value increases.
-            quietRemainingTime[i]
-                .policy()
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
-        }
-    }
+    ColorControlServer() {}
 
     bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask,
                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
@@ -312,6 +300,7 @@ private:
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietTemperatureMireds[kColorControlClusterServerMaxEndpointCount];
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
