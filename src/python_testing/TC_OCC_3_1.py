@@ -86,7 +86,7 @@ class TC_OCC_3_1(MatterBaseTest):
         app_pid = self.matter_test_config.app_pid
         if app_pid == 0:
             asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-        self.app_pipe = self.app_pipe + str(app_pid) 
+        self.app_pipe = self.app_pipe + str(app_pid)
     
     @async_test_body
     async def test_TC_OCC_3_1(self):
@@ -106,7 +106,7 @@ class TC_OCC_3_1(MatterBaseTest):
             # write HoldTimeLimits HoldtimeMin to be 10 sec.
             await self.write_single_attribute(cluster.Attributes.HoldTimeLimits.HoldTimeMin(hold_time))
             # write 10 as a HoldTime attribute
-            #asynch write_hold_time(hold_time)
+            # asynch write_hold_time(hold_time)
             await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))
             # read HoldTime to check
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
@@ -161,7 +161,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         # subscription verification
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-                          1], timeout_sec=post_prompt_settle_delay_seconds)
+            1], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step(5)
         # check if Occupancy attribute is back to 0 after HoldTime attribute period
