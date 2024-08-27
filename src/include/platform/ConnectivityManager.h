@@ -293,7 +293,7 @@ struct ConnectivityManager::WiFiPAFAdvertiseParam
 
     /* Frequency list */
     uint16_t freq_list_len;
-    uint16_t *pfreq_list;
+    uint16_t * pfreq_list;
 };
 #endif
 
