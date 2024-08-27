@@ -74,6 +74,10 @@ void FullWhmApplicationInit()
 
     GetDEMDelegate()->SetESAState(ESAStateEnum::kOnline);
     GetDEMDelegate()->SetDEMManufacturerDelegate(*GetWhmManufacturer());
+
+    // Set the abs min and max power
+    GetDEMDelegate()->SetAbsMinPower(1200000); // 1.2KW
+    GetDEMDelegate()->SetAbsMaxPower(7600000); // 7.6KW
 }
 
 void FullWhmApplicationShutdown()

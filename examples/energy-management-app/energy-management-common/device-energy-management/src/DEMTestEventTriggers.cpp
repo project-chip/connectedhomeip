@@ -126,8 +126,6 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, numSlots);
 
     GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
-    GetDEMDelegate()->SetAbsMinPower(1000);
-    GetDEMDelegate()->SetAbsMaxPower(256 * 2000 * 1000);
 
     return CHIP_NO_ERROR;
 }

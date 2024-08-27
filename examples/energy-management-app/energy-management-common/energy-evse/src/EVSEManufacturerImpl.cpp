@@ -70,6 +70,10 @@ CHIP_ERROR EVSEManufacturer::Init()
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
     dem->SetESAState(ESAStateEnum::kOnline);
 
+    // Set the abs min and max power
+    dem->SetAbsMinPower(1200000); // 1.2KW
+    dem->SetAbsMaxPower(7600000); // 7.6KW
+
     /*
      * This is an example implementation for manufacturers to consider
      *
