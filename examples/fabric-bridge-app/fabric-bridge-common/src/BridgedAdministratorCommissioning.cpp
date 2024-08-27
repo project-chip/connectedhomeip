@@ -55,7 +55,7 @@ CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePa
     switch (aPath.mAttributeId)
     {
     case Attributes::WindowStatus::Id: {
-        return aEncoder.Encode(attr.commissioningWindowStatus );
+        return aEncoder.Encode(attr.commissioningWindowStatus);
     }
     case Attributes::AdminFabricIndex::Id: {
         DataModel::Nullable<FabricIndex> encodeableFabricIndex = DataModel::NullNullable;

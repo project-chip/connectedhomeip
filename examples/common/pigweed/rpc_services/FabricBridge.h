@@ -49,7 +49,8 @@ public:
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status AdminCommissioningAttributeChanged (const chip_rpc_AdministratorCommissioningChanged & request, pw_protobuf_Empty & response)
+    virtual pw::Status AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request,
+                                                          pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }

@@ -84,8 +84,10 @@ void BridgedDevice::SetReachable(bool reachable)
 
 void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes)
 {
-    bool window_changed = (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
-    bool fabric_index_changed = (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
+    bool window_changed =
+        (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
+    bool fabric_index_changed =
+        (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
     bool vendor_changed = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
 
     mAdminCommissioningAttributes = aAdminCommissioningAttributes;
