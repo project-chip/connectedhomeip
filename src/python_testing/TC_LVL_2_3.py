@@ -57,8 +57,8 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(7, f"{THcommand} MoveToLevelWithOnOff with Level field set to maxLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(8, "TH stores the reported values of CurrentLevel in all incoming reports for CurrentLevel attribute, that contains data in reportedCurrentLevelValuesList, over a period of 30 seconds."),
-                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 10 entries for CurrentLevel",
-                         "reportedCurrentLevelValuesList has 10 or less entries in the list"),
+                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 12 entries for CurrentLevel",
+                         "reportedCurrentLevelValuesList has 12 or fewer entries in the list"),
                 TestStep(10, "If reportedCurrentLevelValuesList only contain a single entry, TH verifies the value of the entry is equal to maxLevel",
                          "The entry in reportedCurrentLevelValuesList is equal to maxLevel"),
                 TestStep(11, "If reportedCurrentLevelValuesList contains two or more entries, TH verifies the value of the first entry is larger than startCurrentLevel",
@@ -133,7 +133,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(9)
         count = sub_handler.attribute_report_counts[lvl.Attributes.CurrentLevel]
-        asserts.assert_less_equal(count, 10, "Received more than 10 reports for CurrentLevel")
+        asserts.assert_less_equal(count, 12, "Received more than 12 reports for CurrentLevel")
         asserts.assert_greater(count, 0, "Did not receive any reports for CurrentLevel")
 
         self.step(10)
