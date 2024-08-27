@@ -67,7 +67,7 @@ EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
     return gEvseManufacturer.get();
 }
 
-DeviceEnergyManagement::DeviceEnergyManagementDelegate *GetDEMDelegate()
+DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
 {
     VerifyOrDieWithMsg(gDEMDelegate.get() != nullptr, AppServer, "DEM Delegate is null");
 

@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <DEMManufacturerDelegate.h>
 #include <WhmDelegate.h>
 #include <WhmInstance.h>
-#include <DEMManufacturerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -33,7 +33,7 @@ namespace WaterHeaterManagement {
  * Helps with handling the test triggers.
  */
 
-class WhmManufacturer: public DeviceEnergyManagement::DEMManufacturerDelegate
+class WhmManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
 {
 public:
     WhmManufacturer(WaterHeaterManagementInstance * whmInstance) { mWhmInstance = whmInstance; }

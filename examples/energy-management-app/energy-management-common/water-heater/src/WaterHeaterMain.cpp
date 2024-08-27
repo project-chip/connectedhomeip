@@ -18,13 +18,13 @@
 
 #include "EnergyManagementAppCmdLineOptions.h"
 
-#include <DeviceEnergyManagementManager.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
+#include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <PowerTopologyDelegate.h>
+#include <WhmManufacturer.h>
 #include <device-energy-management-modes.h>
 #include <water-heater-mode.h>
-#include <WhmManufacturer.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,9 +36,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
+#include <DEMDelegate.h>
 #include <EnergyEvseMain.h>
 #include <WhmMain.h>
-#include <DEMDelegate.h>
 
 namespace chip {
 namespace app {
