@@ -9575,10 +9575,10 @@ endpoint 1 {
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x00;
     ram      attribute colorCapabilities default = 0x00;
-    ram      attribute colorTempPhysicalMinMireds default = 0x00;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xfeff;
+    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
+    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
+    ram      attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 7;
 
