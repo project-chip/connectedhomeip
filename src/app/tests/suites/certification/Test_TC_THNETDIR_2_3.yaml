@@ -60,7 +60,7 @@ tests:
               - name: Salt
                 value: "SPAKE2P Key Salt"
 
-    - label: "TH establishes a PASE session with the DUT"
+    - label: "TH2 establishes a PASE session with the DUT"
       identity: beta
       endpoint: 0
       cluster: CommissionerCommands
@@ -73,7 +73,7 @@ tests:
                 value: payload
 
     - label:
-          "TH sends GetOperationalDataset command to the DUT over the PASE
+          "TH2 sends GetOperationalDataset command to the DUT over the PASE
           session"
       identity: beta
       command: GetOperationalDataset

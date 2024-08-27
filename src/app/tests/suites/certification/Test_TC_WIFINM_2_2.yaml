@@ -61,7 +61,7 @@ tests:
               - name: Salt
                 value: "SPAKE2P Key Salt"
 
-    - label: "TH establishes a PASE session with the DUT"
+    - label: "TH2 establishes a PASE session with the DUT"
       identity: beta
       endpoint: 0
       cluster: CommissionerCommands
@@ -74,7 +74,7 @@ tests:
                 value: payload
 
     - label:
-          "TH sends the NetworkPassphraseRequest command to the DUT over the
+          "TH2 sends the NetworkPassphraseRequest command to the DUT over the
           PASE session"
       identity: beta
       command: NetworkPassphraseRequest
