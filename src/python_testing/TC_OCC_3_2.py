@@ -159,7 +159,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_all_remaining_steps("4b")
 
         self.step("4b")
-        hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint_id, attribute=attributes.HoldTimeLimits)
+        hold_time_limits_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTimeLimits)
         await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
         initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
         asserts.assert_equal(initial_dut, hold_time_limits_dut.holdTimeMin, "HoldTimeMin to HoldTime writing failure")
