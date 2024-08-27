@@ -10764,6 +10764,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
+            // Cluster OccupancySensing events
+        case MTREventIDTypeClusterOccupancySensingEventOccupancyChangedID:
+            result = @"OccupancyChanged";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
             break;
