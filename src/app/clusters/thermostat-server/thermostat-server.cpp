@@ -468,6 +468,52 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     }
 }
 
+void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    uint32_t flags;
+    if (FeatureMap::Get(attributePath.mEndpointId, &flags) != Status::Success)
+    {
+        ChipLogError(Zcl, "MatterThermostatClusterServerAttributeChangedCallback: could not get feature flags");
+        return;
+    }
+
+    auto featureMap = chip::BitMask<Feature, uint32_t>(flags);
+    if (!featureMap.Has(Feature::kPresets))
+    {
+        // This server does not support presets, so nothing to do
+        return;
+    }
+
+    bool occupied = true;
+    if (featureMap.Has(Feature::kOccupancy))
+    {
+        chip::BitMask<OccupancyBitmap, uint8_t> occupancy;
+        if (Occupancy::Get(attributePath.mEndpointId, &occupancy) == Status::Success)
+        {
+            occupied = occupancy.Has(OccupancyBitmap::kOccupied);
+        }
+    }
+
+    bool clearActivePreset = false;
+    switch (attributePath.mAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+    case OccupiedCoolingSetpoint::Id:
+        clearActivePreset = occupied;
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+    case UnoccupiedCoolingSetpoint::Id:
+        clearActivePreset = !occupied;
+        break;
+    }
+    if (!clearActivePreset)
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Setting active preset to null");
+    gThermostatAttrAccess.SetActivePreset(attributePath.mEndpointId, std::nullopt);
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
@@ -760,6 +806,11 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     default:
         return Status::Success;
     }
+}
+
+void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    Thermostat::MatterThermostatClusterServerAttributeChangedCallback(attributePath);
 }
 
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
