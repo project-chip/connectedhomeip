@@ -140,10 +140,10 @@ class TC_SEAR_1_2(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
         logging.info(f"CurrentArea {current_area}")
 
-        asserts.assert_true((len(self.selareaid_list) == 0 and current_area is NullValue)
-                            or
-                            current_area in self.selareaid_list,
-                            f"CurrentArea {current_area} is invalid. SelectedAreas is {self.selareaid_list}.")
+        if current_area is not NullValue:
+            asserts.assert_true(current_area in self.areaid_list,
+                                f"CurrentArea {current_area} is not in SupportedAreas: {self.areaid_list}.")
+
         # save so other methods can use this if needed
         self.current_area = current_area
 
