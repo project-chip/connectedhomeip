@@ -4099,6 +4099,23 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
 {
     using namespace Clusters::OccupancySensing;
     switch (aEventId) {
+    case Events::OccupancyChanged::Id: {
+        Events::OccupancyChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROccupancySensingClusterOccupancyChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Raw()];
+            value.occupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }

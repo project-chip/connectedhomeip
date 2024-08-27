@@ -13593,7 +13593,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OccupancyChanged(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
