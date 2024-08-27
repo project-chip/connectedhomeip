@@ -645,6 +645,13 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
             entry.restrictions.push_back(restriction);
         }
 
+        if (restrictionIter.GetStatus() != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidValue);
+            return true;
+        }
+
         entries.push_back(entry);
     }
 

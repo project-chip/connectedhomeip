@@ -122,7 +122,7 @@ CHIP_ERROR AccessRestrictionProvider::SetEntries(const FabricIndex fabricIndex, 
 bool AccessRestrictionProvider::StandardAccessRestrictionExceptionChecker::AreRestrictionsAllowed(EndpointId endpoint,
                                                                                                   ClusterId cluster)
 {
-    if (endpoint != 0 &&
+    if (endpoint != kRootEndpointId &&
         (cluster == app::Clusters::WiFiNetworkManagement::Id || cluster == app::Clusters::ThreadBorderRouterManagement::Id ||
          cluster == app::Clusters::ThreadNetworkDirectory::Id))
     {
