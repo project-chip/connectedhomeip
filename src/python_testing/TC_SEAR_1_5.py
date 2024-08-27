@@ -165,7 +165,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         if not self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP"):
             return
-        
+
         if Clusters.ServiceArea.Attributes.Progress.attribute_id in attribute_list:
             old_progress_list = await self.read_progress(step=9)
             asserts.assert_true(len(old_progress_list) > 0, f"len of Progress({len(old_progress_list)}) should not be zero)")

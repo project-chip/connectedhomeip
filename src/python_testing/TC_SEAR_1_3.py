@@ -163,5 +163,6 @@ class TC_SEAR_1_3(MatterBaseTest):
             else:
                 await self.send_cmd_select_areas_expect_response(step=15, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.Enums.SelectAreasStatus.kInvalidInMode)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
