@@ -911,7 +911,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     }
     break;
     default:
-    break;
+        break;
     }
 }
 
