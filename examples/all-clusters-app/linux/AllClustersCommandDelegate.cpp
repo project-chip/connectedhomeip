@@ -801,7 +801,8 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
         if (holdTime != nullptr)
         {
             CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
-                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler, reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
+                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler,
+                reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
             ChipLogDetail(NotSpecified, "Start HoldTime timer");
             if (CHIP_NO_ERROR != err)
             {
@@ -813,8 +814,9 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
 
 void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    uint8_t clearValue                         = 0;
-    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Set(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState)), clearValue);
+    uint8_t clearValue = 0;
+    Protocols::InteractionModel::Status status =
+        OccupancySensing::Attributes::Occupancy::Set(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState)), clearValue);
     ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
 
     if (status != Protocols::InteractionModel::Status::Success)
