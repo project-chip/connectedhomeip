@@ -57,6 +57,10 @@ CHIP_ERROR X509_PemToDer(const std::string & pemCert, MutableByteSpan & derCert)
     plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\n'), plainB64Str.end());
     plainB64Str.erase(std::remove(plainB64Str.begin(), plainB64Str.end(), '\r'), plainB64Str.end());
 
+    // Verify we have enough room to store the decoded certificate
+    size_t maxDecodeLen = BASE64_MAX_DECODED_LEN(plainB64Str.size());
+    VerifyOrReturnError(derCert.size() >= maxDecodeLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     // decode b64
     uint16_t derLen = Base64Decode(plainB64Str.c_str(), static_cast<uint16_t>(plainB64Str.size()), derCert.data());
     VerifyOrReturnError(derLen != UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
@@ -108,7 +112,7 @@ bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revoke
                                                       const CharSpan & issuerNameBase64Str)
 {
     std::string certPEM;
-    const char * certType __attribute__((unused));
+    [[maybe_unused]] const char * certType;
 
     if (revokedSet.isMember("crl_signer_delegator"))
     {
