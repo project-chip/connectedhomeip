@@ -68,6 +68,8 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
+    // value may be NULL when checking whether the key exists
+
     // Offset and partial reads are not supported in nvs, for now just return NOT_IMPLEMENTED. Support can be added in the
     // future if this is needed.
     VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
