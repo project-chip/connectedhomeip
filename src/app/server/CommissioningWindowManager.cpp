@@ -75,7 +75,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
         args.enable  = false;
-        args.ExtCmds = nullptr;
+        args.freq_list_len = 0;
         DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
 #endif
     }
