@@ -513,9 +513,9 @@ the manual step.
 self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 ```
 
-In the case that a test script requires the use of named-pipe commands to achieve
-the manual steps, you can use the `write_to_app_pipe(command)` to send these
-commands. This command requires the test class to define a `self.app_pipe`
+In the case that a test script requires the use of named-pipe commands to
+achieve the manual steps, you can use the `write_to_app_pipe(command)` to send
+these commands. This command requires the test class to define a `self.app_pipe`
 string value with the name of the pipe. This depends on how the app is set up.
 
 If the name of the pipe is dynamic and based on the app's PID, the following
