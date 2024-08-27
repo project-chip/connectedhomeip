@@ -491,34 +491,57 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Read the Presets to copy the existing presets into our testPresets list below.
             presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
 
-            # TODO #34556 Since the sdk currently supports one preset of each type, run the test only if we have enough preset types to create a preset list whose length exceeds the
-            # maximum number of presets supported.
-            if len(presetTypes) > numberOfPresetsSupported:
-                didCopyPreset = False
+            # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
+            totalExpectedPresetsLength = 0
+            for presetType in presetTypes:
+                totalExpectedPresetsLength += presetType.numberOfPresets;
+
+            if totalExpectedPresetsLength > numberOfPresetsSupported:
                 testPresets = []
                 for presetType in presetTypes:
+                    didCopyPreset = False
+                    isBuiltInPreset = False
                     scenario = presetType.presetScenario
 
-                    # For each scenario, check if there is a preset in the Presets attribute matching the scenario. iif so, copy the preset into testPresets.
-                    # Otherwide, add a new entry.
+                    # For each scenario, check if there are presets in the Presets attribute matching the scenario. If so, copy the presets into testPresets.
+                    # For built in presets, we can't add more entries since we can't add a built in preset according to the spec. For non built-in presets,
+                    # check if the total number of presets copied from the Presets attribute for each preset scenario is less than the number of presets supported
+                    # for that preset scenario. If yes, add more entries until we have reached the maximum number of presets for the scenario.
+                    # If we did not copy the presets, add entries up to the maximum number of presets supported for the preset scenario for this preset type.
                     for preset in presets:
                         if scenario == preset.presetScenario:
                             testPresets.append(preset)
                             didCopyPreset = True
+                            isBuiltInPreset = True
                             break
-                        else:
-                            didCopyPreset = False
-                    if not didCopyPreset and len(testPresets) <= numberOfPresetsSupported:
-                        testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetType.presetScenario,
+
+                    if didCopyPreset and not isBuiltInPreset:
+                        countNumberOfPresetsAdded = 0
+                        for testPreset in testPresets:
+                            if testPreset.presetScenario == scenario:
+                                ++countNumberOfPresetsAdded;
+
+                        if countNumberOfPresetsAdded < presetType.numberOfPresets:
+                            testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
+                                                             name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                            ++countNumberOfPresetsAdded
+                    elif not didCopyPreset and not len(testPresets) > numberOfPresetsSupported:
+                        for index in range(presetType.numberOfPresets):
+                            testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
                                                                  name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
-                # Send the AtomicRequest begin command
-                await self.send_atomic_request_begin_command()
+                # Since for built in presets, we can't add any more entries. That might cause the size of testPresets not to exceed the number of presets supported.
+                # If so, skip the test.
+                if not len(testPresets) > numberOfPresetsSupported:
+                    logger.info(f"Couldn't run test step 18 since we couldn't build a list that exceeds number of supported presets")
+                else:
+                    # Send the AtomicRequest begin command
+                    await self.send_atomic_request_begin_command()
 
-                await self.write_presets(endpoint=endpoint, presets=testPresets, expected_status=Status.ResourceExhausted)
+                    await self.write_presets(endpoint=endpoint, presets=testPresets, expected_status=Status.ResourceExhausted)
 
-                # Clear state for next test.
-                await self.send_atomic_request_rollback_command()
+                    # Clear state for next test.
+                    await self.send_atomic_request_rollback_command()
             else:
                 logger.info(f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
 
