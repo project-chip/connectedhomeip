@@ -26,8 +26,20 @@ message KeepActiveChanged {
   uint32 promised_active_duration_ms = 2;
 }
 
+message AdministratorCommissioningChange {
+  uint64 node_id = 1;
+  // TODO figure out the types we should use here
+  //uint8 window_status = 2;
+  //optional uint8 admin_fabric_index = 3;
+  //optional uint16 admin_vendor_id = 4;
+  uint32 window_status = 2;
+  optional uint32 opener_fabric_index = 3;
+  optional uint32 opener_vendor_id = 4;
+}
+
 service FabricBridge {
   rpc AddSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
   rpc RemoveSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
   rpc ActiveChanged(KeepActiveChanged) returns (pw.protobuf.Empty){}
+  rpc AdminCommissioningAttributeChanged(AdministratorCommissioningChange) returns (pw.protobuf.Empty){}
 }

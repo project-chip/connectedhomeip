@@ -21,6 +21,7 @@
 #include <cstdio>
 
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace {
@@ -78,5 +79,31 @@ void BridgedDevice::SetReachable(bool reachable)
     else
     {
         ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mAttributes.uniqueId.c_str());
+    }
+}
+
+void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes)
+{
+    bool window_changed = (aAdminCommissioningAttributes.commissioningWindowStatus != mAdminCommissioningAttributes.commissioningWindowStatus);
+    bool fabric_index_changed = (aAdminCommissioningAttributes.openerFabricIndex != mAdminCommissioningAttributes.openerFabricIndex);
+    bool vendor_changed = (aAdminCommissioningAttributes.openerVendorId != mAdminCommissioningAttributes.openerVendorId);
+
+    mAdminCommissioningAttributes = aAdminCommissioningAttributes;
+
+    if (window_changed)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
+                                               chip::app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id);
+    }
+    if (fabric_index_changed)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
+                                               chip::app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
+    }
+
+    if (vendor_changed)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, chip::app::Clusters::AdministratorCommissioning::Id,
+                                               chip::app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
     }
 }
