@@ -130,8 +130,10 @@ class FabricSyncApp:
         # FIXME: Passing custom PAA store breaks something
         # if paaTrustStorePath is not None:
         #     args.append(f"--paa-trust-store-path={paaTrustStorePath}")
-        args.append(f"--commissioner-name={fabricName}")
-        args.append(f"--commissioner-node-id={nodeId}")
+        if fabricName is not None:
+            args.append(f"--commissioner-name={fabricName}")
+        if nodeId is not None:
+            args.append(f"--commissioner-node-id={nodeId}")
         args.append(f"--commissioner-vendor-id={vendorId}")
         args.append(f"--secured-device-port={bridgePort}")
         args.append(f"--discriminator={bridgeDiscriminator}")
@@ -204,9 +206,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             bridgePort=self.fsa_bridge_port,
             bridgeDiscriminator=self.fsa_bridge_discriminator,
             bridgePasscode=self.fsa_bridge_passcode,
-            vendorId=0xFFF1,
-            fabricName="beta",
-            nodeId=1)
+            vendorId=0xFFF1)
 
         self.server_for_dut_port = 5544
         self.server_for_dut_discriminator = random.randint(0, 4095)

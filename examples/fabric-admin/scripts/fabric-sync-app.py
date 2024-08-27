@@ -51,7 +51,7 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
     while True:
         line = await reader.readline()
         if not line:
-            sys.exit(0)
+            break
         f_out.write(line)
 
 
@@ -155,7 +155,7 @@ async def main(args):
         # we will get the response, otherwise we will hit timeout.
         cmd = "descriptor read device-type-list 1 1 --timeout 1"
         admin.stdin.write((cmd + "\n").encode())
-        await asyncio.wait_for(BRIDGE_COMMISSIONED.wait(), timeout=1)
+        await asyncio.wait_for(BRIDGE_COMMISSIONED.wait(), timeout=1.5)
     except asyncio.TimeoutError:
         # Commission the bridge to the admin.
         cmd = "fabricsync add-local-bridge 1"
@@ -164,6 +164,13 @@ async def main(args):
         if args.secured_device_port is not None:
             cmd += f" --local-port {args.secured_device_port}"
         admin.stdin.write((cmd + "\n").encode())
+        # Wait for the bridge to be commissioned.
+        await asyncio.sleep(5)
+
+    # Open commissioning window with original setup code for the bridge,
+    # so it can be added by the TH fabric.
+    cmd = "pairing open-commissioning-window 1 0 0 600 1000 0"
+    admin.stdin.write((cmd + "\n").encode())
 
     try:
         await asyncio.gather(
