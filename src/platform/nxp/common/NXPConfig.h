@@ -23,10 +23,9 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "FreeRTOS.h"
 #include <functional>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_PLAT_NO_NVM 0
 #define CHIP_PLAT_NVM_FWK 1

@@ -247,6 +247,7 @@ void MdnsContexts::Delete(GenericContext * context)
     if (context->serviceRef != nullptr)
     {
         DNSServiceRefDeallocate(context->serviceRef);
+        context->serviceRef = nullptr;
     }
     chip::Platform::Delete(context);
 }

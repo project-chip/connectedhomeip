@@ -415,6 +415,8 @@ declare_args() {
 config("sanitize_address") {
   defines = []
   cflags = [
+    "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
+    "-fno-sanitize-coverage=pc-table",
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]

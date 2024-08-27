@@ -544,7 +544,7 @@ static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor,
 {
     Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
                                      .endpoint    = aPath.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest };
+                                     .requestType = Access::RequestType::kEventReadRequest };
     // leave requestPath.entityId optional value unset to indicate wildcard
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
@@ -555,7 +555,7 @@ static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor,
 {
     Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
                                      .endpoint    = aPath.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest,
+                                     .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = aPath.mEventId };
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
     return (err == CHIP_NO_ERROR);

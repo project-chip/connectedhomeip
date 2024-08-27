@@ -6739,7 +6739,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _landmarkTag = @(0);
 
-        _positionTag = nil;
+        _relativePositionTag = nil;
     }
     return self;
 }
@@ -6749,14 +6749,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRServiceAreaClusterLandmarkInfoStruct alloc] init];
 
     other.landmarkTag = self.landmarkTag;
-    other.positionTag = self.positionTag;
+    other.relativePositionTag = self.relativePositionTag;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; positionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _positionTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; relativePositionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _relativePositionTag];
     return descriptionString;
 }
 
@@ -6801,7 +6801,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mapID = nil;
 
-        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
+        _areaInfo = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
@@ -6812,14 +6812,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.areaDesc = self.areaDesc;
+    other.areaInfo = self.areaInfo;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaInfo:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaInfo];
     return descriptionString;
 }
 
@@ -7541,6 +7541,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROccupancySensingClusterOccupancyChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _occupancy = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterOccupancyChangedEvent alloc] init];
+
+    other.occupancy = self.occupancy;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: occupancy:%@; >", NSStringFromClass([self class]), _occupancy];
     return descriptionString;
 }
 
