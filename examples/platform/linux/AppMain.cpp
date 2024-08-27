@@ -378,6 +378,72 @@ public:
     }
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void int_array_add_unique(uint16_t **res, uint16_t a)
+{
+	size_t reslen, max_size;
+	uint16_t *n;
+
+	for (reslen = 0; *res && (*res)[reslen]; reslen++)
+    {
+        if ((*res)[reslen] == a)
+            return; /* already in the list */
+	}
+    max_size = (size_t) -1;
+    if (reslen > max_size - 2)
+    {
+        /* This should not really happen in practice, but if it did,
+            * something would overflow. Do not try to add the new value;
+            * instead, make this behave like memory allocation failure to
+            * avoid messing up memory. */
+        free(*res);
+        *res = NULL;
+        return;
+    }
+    n = (uint16_t *)realloc(*res, (reslen + 2)*sizeof(uint16_t));
+    if (n == NULL)
+    {
+        free(*res);
+        *res = NULL;
+        return;
+    }
+    n[reslen] = a;
+    n[reslen + 1] = 0;
+    *res = n;
+}
+
+static uint16_t WiFiPAFGet_FreqList(char * ArgStrn, uint16_t **pfreq_list)
+{
+    char *token;
+    uint16_t *freq_list = NULL;
+    uint16_t len = 0;
+
+    while ((token = strtok(ArgStrn, " ")))
+    {
+        if (strncmp(token, "freq_list=", 10) == 0)
+        {
+            char *pos = token + 10;
+            if (strcmp(pos, "all") == 0)
+            {
+                return NAN_FREQ_LIST_ALL;
+            }
+            while (pos && pos[0])
+            {
+                int_array_add_unique(&freq_list, atoi(pos));
+                len++;
+                pos = strchr(pos, ',');
+                if (pos)
+                    pos++;
+            }
+            *pfreq_list = freq_list;
+            break;
+        }
+    }
+    return len;
+}
+#endif
+
+
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
@@ -513,8 +579,13 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(NotSpecified, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
             args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+            args.freq_list_len = WiFiPAFGet_FreqList((char*)LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds, &args.pfreq_list);
             DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+            if ((args.freq_list_len > 0) && (args.freq_list_len != NAN_FREQ_LIST_ALL))
+            {
+                free(args.pfreq_list);
+                args.pfreq_list = nullptr;
+            }
         }
     }
 #endif

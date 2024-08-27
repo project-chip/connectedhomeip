@@ -289,12 +289,15 @@ struct ConnectivityManager::SEDIntervalsConfig
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define NAN_FREQ_LIST_ALL 0xff
 struct ConnectivityManager::WiFiPAFAdvertiseParam
 {
     /* To enable/disable WiFiPAF Commissioning */
     bool enable;
-    /* The optional commands */
-    const char * ExtCmds;
+
+    /* Frequency list */
+    uint16_t freq_list_len;
+    uint16_t *pfreq_list;
 };
 #endif
 
