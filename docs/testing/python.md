@@ -501,19 +501,19 @@ Fabric admin for default controller:
 
 Some test plans have manual steps that require the tester to manually change the
 state of the DUT. To run these tests in a CI environment, specific example apps
-can be built such that these manual steps can be achieved by matter or
+can be built such that these manual steps can be achieved by Matter or
 named-pipe commands.
 
 In the case that all the manual steps in a test script can be achieved just
-using matter commands, you can check if the `PICS_SDK_CI_ONLY` PICS is set to
-decide if the test script should send the required matter commands to perform
+using Matter commands, you can check if the `PICS_SDK_CI_ONLY` PICS is set to
+decide if the test script should send the required Matter commands to perform
 the manual step.
 
 ```python
 self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 ```
 
-In the case that a test script requires the use of name-pipe commands to achieve
+In the case that a test script requires the use of named-pipe commands to achieve
 the manual steps, you can use the `write_to_app_pipe(command)` to send these
 commands. This command requires the test class to define a `self.app_pipe`
 string value with the name of the pipe. This depends on how the app is set up.
