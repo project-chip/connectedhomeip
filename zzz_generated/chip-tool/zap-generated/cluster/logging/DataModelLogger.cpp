@@ -18169,11 +18169,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case EcosystemInformation::Id: {
         switch (path.mAttributeId)
         {
-        case EcosystemInformation::Attributes::RemovedOn::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RemovedOn", 1, value);
-        }
         case EcosystemInformation::Attributes::DeviceDirectory::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>

@@ -141,7 +141,7 @@ limitations under the License.
     <!-- DRIFT_COMPENSATION -->
     <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="char_string" length="254" writable="false" optional="true">CompensationText</attribute>
     <!-- COMPENSATION_TEXT -->
-    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
+    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0001" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
     <!-- COLOR_TEMPERATURE -->
     <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ColorModeEnum" writable="false" default="0x01">ColorMode</attribute>
     <!-- COLOR_MODE -->
@@ -384,7 +384,7 @@ limitations under the License.
     <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
     <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
     <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
-    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
+    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0001" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
     <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
 
     <command source="client" code="0x40" name="EnhancedMoveToHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohue">
