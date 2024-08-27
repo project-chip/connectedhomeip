@@ -11089,6 +11089,7 @@ namespace KeepActive {
 enum class Fields : uint8_t
 {
     kStayActiveDuration = 0,
+    kTimeoutMs          = 1,
 };
 
 struct Type
@@ -11099,6 +11100,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -11114,6 +11116,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
+    uint32_t timeoutMs          = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeepActive
@@ -41858,18 +41861,6 @@ using DecodableType = Type;
 
 namespace Attributes {
 
-namespace RemovedOn {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RemovedOn::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RemovedOn
 namespace DeviceDirectory {
 struct TypeInfo
 {
@@ -41944,7 +41935,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::RemovedOn::TypeInfo::DecodableType removedOn;
         Attributes::DeviceDirectory::TypeInfo::DecodableType deviceDirectory;
         Attributes::LocationDirectory::TypeInfo::DecodableType locationDirectory;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
