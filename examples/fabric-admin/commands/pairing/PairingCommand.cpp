@@ -127,10 +127,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-    if (mBypassAttestationVerifier.ValueOr(false))
-    {
-        params.SetDeviceAttestationDelegate(this);
-    }
+    params.SetDeviceAttestationDelegate(this);
 
     switch (mNetworkType)
     {
@@ -610,7 +607,7 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
         if (payload.vendorID == 0 || payload.productID == 0)
         {
             ChipLogProgress(NotSpecified,
-                            "Failed validation of vendorID or productID must not be 0."
+                            "Failed validation: vendorID or productID must not be 0."
                             "Requested VID: %u, Requested PID: %u.",
                             payload.vendorID, payload.productID);
             deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
@@ -637,9 +634,23 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
         return;
     }
 
-    // Bypass attestation verification, continue with success
-    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-        device, chip::Credentials::AttestationVerificationResult::kSuccess);
+    // OnDeviceAttestationCompleted() is called if ShouldWaitAfterDeviceAttestation() returns true
+    // or if there is an attestation error. The conditions for ShouldWaitAfterDeviceAttestation() have
+    // already been checked, so the call to OnDeviceAttestationCompleted() was an error.
+    if (mBypassAttestationVerifier.ValueOr(false))
+    {
+        // Bypass attestation verification, continue with success
+        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            device, chip::Credentials::AttestationVerificationResult::kSuccess);
+        if (CHIP_NO_ERROR != err)
+        {
+            SetCommandExitStatus(err);
+        }
+        return;
+    }
+
+    // Don't bypass attestation, continue with error.
+    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
     if (CHIP_NO_ERROR != err)
     {
         SetCommandExitStatus(err);
