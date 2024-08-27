@@ -341,7 +341,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
 
         Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
                                          .endpoint    = current->mValue.mEndpointId,
-                                         .requestType = RequestType::kEventReadOrSubscribeRequest,
+                                         .requestType = RequestType::kEventReadRequest,
                                          .entityId    = current->mValue.mEventId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
