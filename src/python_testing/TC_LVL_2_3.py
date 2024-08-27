@@ -194,7 +194,7 @@ class TC_LVL_2_3(MatterBaseTest):
         asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 
         self.step(22)
-        asserts.assert_less_equal(remaining_time[1].value, 150, "Unexpected first RemainingTime report")
+        asserts.assert_less_equal(remaining_time[1].value, 150, "Unexpected second RemainingTime report")
         asserts.assert_almost_equal(remaining_time[1].value, 150, delta=10, msg="Unexpected second RemainingTime report")
 
         self.step(23)
