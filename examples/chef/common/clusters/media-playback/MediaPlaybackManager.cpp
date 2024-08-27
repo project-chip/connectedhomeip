@@ -40,7 +40,7 @@ PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
     Status status = Attributes::CurrentState::Get(mEndpoint, &currentState);
     if (Status::Success != status)
     {
-        ChipLogError(Zcl, "Unable to save CurrentStage attribute, err:0x%x", to_underlying(status));
+        ChipLogError(Zcl, "Unable to get CurrentStage attribute, err:0x%x", to_underlying(status));
     }
     return currentState;
 }
@@ -67,7 +67,7 @@ float MediaPlaybackManager::HandleGetPlaybackSpeed()
     Status status = Attributes::PlaybackSpeed::Get(mEndpoint, &playbackSpeed);
     if (Status::Success != status)
     {
-        ChipLogError(Zcl, "Unable to save PlaybackSpeed attribute, err:0x%x", to_underlying(status));
+        ChipLogError(Zcl, "Unable to get PlaybackSpeed attribute, err:0x%x", to_underlying(status));
     }
     return playbackSpeed;
 }
@@ -114,16 +114,16 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
     });
 }
 
-CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
+CHIP_ERROR MediaPlaybackManager::HandleSetCurrentState(PlaybackStateEnum currentState)
 {
     Status status = Attributes::CurrentState::Set(mEndpoint, currentState);
 
     if (Status::Success != status)
     {
-        ChipLogError(Zcl, "Unable to save CurrentState attribute, 0x%x", to_underlying(status));
+        ChipLogError(Zcl, "Unable to set CurrentState attribute, 0x%x", to_underlying(status));
     }
 
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
@@ -135,7 +135,7 @@ CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
         ChipLogError(Zcl, "Unable to set PlaybackSpeed attribute, 0x%x", to_underlying(status));
     }
 
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
@@ -391,7 +391,7 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 
     gMediaPlaybackManagerInstance[endpoint] = std::make_unique<MediaPlaybackManager>(endpoint);
 
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, gMediaPlaybackManagerInstance[endpoint].get());
+    SetDefaultDelegate(endpoint, gMediaPlaybackManagerInstance[endpoint].get());
 }
 
 #endif /// MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
