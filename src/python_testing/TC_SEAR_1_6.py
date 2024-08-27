@@ -107,7 +107,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         if SelectedAreas not in attribute_list:
             asserts.fail("Selected areas attribute required in attribute list to run test")
 
-        if SelectedAreas not in attribute_list:
+        if Progress not in attribute_list:
             asserts.fail("Progress attribute required in attribute list to run test")
 
         self.print_step(1, "Commissioning, already done")
