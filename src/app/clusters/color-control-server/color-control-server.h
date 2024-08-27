@@ -204,7 +204,8 @@ public:
     template <typename Q, typename V>
     chip::app::MarkAttributeDirty SetQuietReportAttribute(chip::app::QuieterReportingAttribute<Q> & quietReporter, V newValue,
                                                           bool isEndOfTransition, uint16_t transitionTime);
-    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime, bool isNewTransition = false);
+    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime,
+                                                                          bool isNewTransition = false);
 
 private:
     /**********************************************************
