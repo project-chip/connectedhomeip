@@ -19,27 +19,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-#include "sl_status.h"
-
-#include "silabs_utils.h"
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "silabs_utils.h"
+#include "sl_status.h"
 #include "task.h"
-
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
-/* wfxRsi Task will use as its stack */
-StackType_t wfxRsiTaskStack[WFX_RSI_TASK_SZ] = { 0 };
+#include <platform/CHIPDeviceLayer.h>
 
-/* Structure that will hold the TCB of the wfxRsi Task being created. */
-StaticTask_t wfxRsiTaskBuffer;
+// Thread for the WLAN RSI
+constexpr uint32_t kWlanTaskSize = 2048;
+static uint8_t wlanStack[kWlanTaskSize];
+static osThread_t sWlanTaskControlBlock;
+constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = &sWlanTaskControlBlock,
+                                           .cb_size    = osThreadCbSize,
+                                           .stack_mem  = wlanStack,
+                                           .stack_size = kWlanTaskSize,
+                                           .priority   = osPriorityAboveNormal7 };
 
 /*********************************************************************
  * @fn  sl_status_t wfx_wifi_start(void)
@@ -52,21 +52,20 @@ StaticTask_t wfxRsiTaskBuffer;
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED)
-    {
+    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED) {
         return SL_STATUS_OK;
     }
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
+    SILABS_LOG("%s: starting..", __func__);
+
     /*
      * Create the Wifi driver task
      */
-    wfx_rsi.wlan_task = xTaskCreateStatic(wfx_rsi_task, "wfx_rsi", WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY,
-                                          wfxRsiTaskStack, &wfxRsiTaskBuffer);
+    // Creating a Wi-Fi driver thread
+    wfx_rsi.wlan_thread = osThreadNew(wfx_rsi_task, NULL, &kWlanTaskAttr);
 
-    if (NULL == wfx_rsi.wlan_task)
-    {
-        return SL_STATUS_FAIL;
-    }
+    VerifyOrReturnError(wfx_rsi.wlan_thread != NULL, SL_STATUS_FAIL);
+
     return SL_STATUS_OK;
 }
 

@@ -55,14 +55,17 @@
 
 #define WFX_QUEUE_SIZE 10
 
-/* Rsi driver Task will use as its stack */
-StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
+#define kDrvTaskSize 2048  // Example size, adjust as needed
 
-/* Structure that will hold the TCB of the wfxRsi Task being created. */
-StaticTask_t driverRsiTaskBuffer;
-
-/* Declare a variable to hold the data associated with the created event group. */
-StaticEventGroup_t rsiDriverEventGroup;
+static uint8_t drvStack[kDrvTaskSize];
+static osThread_t sDrvTaskControlBlock;
+osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = &sDrvTaskControlBlock,
+                                           .cb_size    = osThreadCbSize,
+                                           .stack_mem  = drvStack,
+                                           .stack_size = kDrvTaskSize,
+                                           .priority   = osPriorityHigh };
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -82,6 +85,10 @@ static osMessageQueueId_t sWifiEventQueue = NULL;
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 static wfx_wifi_scan_ext_t temp_reset;
+
+static void rsi_wireless_driver_task_wrapper(void *argument) {
+    rsi_wireless_driver_task();
+}
 
 static void DHCPTimerEventHandler(void * arg)
 {
@@ -359,15 +366,16 @@ static int32_t wfx_rsi_init(void)
     }
     SILABS_LOG("wfx_rsi_init: start wireless drv task", __func__);
     /*
-     * Create the driver task
+     * Create the driver thread
      */
-    wfx_rsi.drv_task = xTaskCreateStatic((TaskFunction_t) rsi_wireless_driver_task, "rsi_drv", WFX_RSI_WLAN_TASK_SZ, NULL,
-                                         WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
-    if (NULL == wfx_rsi.drv_task)
-    {
-        SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
-        return RSI_ERROR_INVALID_PARAM;
-    }
+    wfx_rsi.drv_thread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
+    // wfx_rsi.drv_task = xTaskCreateStatic((TaskFunction_t) rsi_wireless_driver_task, "rsi_drv", WFX_RSI_WLAN_TASK_SZ, NULL,
+    //                                      WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
+    // if (NULL == wfx_rsi.drv_task)
+    // {
+    //     SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
+    //     return RSI_ERROR_INVALID_PARAM;
+    // }
 
 #if (RSI_BLE_ENABLE)
     if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
