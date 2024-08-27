@@ -70,12 +70,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
-    "${chip_root}/examples/thermostat/linux/thermostat-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
     "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
@@ -102,8 +97,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
-    "${chip_root}/examples/thermostat/linux/include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
   ]
 
   if (chip_enable_pw_rpc) {
