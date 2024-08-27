@@ -1389,10 +1389,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint_id = self.matter_test_config.endpoint
 
         if self.runner_hook:
+            # TODO(#31928): Add endpoint support to hooks.
             self.runner_hook.show_prompt(msg=prompt_msg,
                                          placeholder=prompt_msg_placeholder,
-                                         default_value=default_value,
-                                         endpoint_id=endpoint_id)
+                                         default_value=default_value)
+
         logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
