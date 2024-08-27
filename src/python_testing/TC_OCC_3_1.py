@@ -87,7 +87,7 @@ class TC_OCC_3_1(MatterBaseTest):
         if app_pid == 0:
             asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
         self.app_pipe = self.app_pipe + str(app_pid)
-    
+
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10  # 10 seconds for occupancy state hold time
