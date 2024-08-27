@@ -146,6 +146,7 @@ public:
     CHIP_ERROR _WiFiPAFCancelConnect();
     CHIP_ERROR _WiFiPAFCancelIncompleteConnect();
     void OnDiscoveryResult(gboolean success, GVariant * obj);
+    void OnReplied(gboolean success, GVariant * obj);
     void OnNanReceive(GVariant * obj);
     void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
@@ -235,8 +236,18 @@ private:
         uint32_t subscribe_id;
         uint32_t peer_publish_id;
         uint8_t peer_addr[6];
+        bool fsd;
+        bool fsd_gas;
         uint32_t ssi_len;
     };
+    struct wpa_dbus_reply_info
+    {
+        uint32_t publish_id;
+        uint32_t peer_subscribe_id;
+        uint8_t peer_addr[6];
+        uint32_t ssi_len;
+    };
+
     uint32_t mpresubscribe_id;
     struct wpa_dbus_discov_info mpaf_info;
     struct wpa_dbus_nanrx_info
