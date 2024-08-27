@@ -168,10 +168,20 @@ menu "CHIP Core"
             default n
             help
                 This option enables the use of heap memory to allocate object pools.
-                When this option is enabled, it does not pre-allocate the object pools.
-                Additionally, there is no limit, (i.e. free heap is the limit) on the
-                maximum number of entries that can be allocated.
-                This option can be usefull if you run into static DRAM overflow.
+                When enabled, object pools are not pre-allocated.
+                Additionally, the maximum number of entries that can be allocated is
+                only limited by the available heap memory.
+
+                This option can be useful if you encounter static DRAM overflow.
+
+                NOTE: Since there is no cap on pool sizes, this may lead to issues
+                where embedded code assumes the pool size is limited, and no other
+                mechanisms are in place to restrict the size of allocations.
+
+                NOTE: If enabled and the free heap is exhausted, this may result in
+                undefined behavior, potential non-compliance with specifications,
+                or failure during certification tests. Even if it passes, it may fail
+                to function properly with actual controllers.
 
     endmenu # "General Options"
 
