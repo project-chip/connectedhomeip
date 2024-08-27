@@ -212,7 +212,6 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 bool wfx_is_sta_connected(void)
 {
     bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
-    ChipLogProgress(DeviceLayer, "Device %s to access point", (status ? "connected" : "not connected"));
     return status;
 }
 
@@ -345,8 +344,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     wfx_rsi.scan_cb = callback;
 
     VerifyOrReturnError(ssid != NULL, false);
-    size_t ssid_len;
-    ssid_len          = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+    size_t ssid_len = strnlen(ssid, WFX_MAX_SSID_LENGTH);
     wfx_rsi.scan_ssid = reinterpret_cast<char *>(pvPortMalloc(ssid_len + 1));
     VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
     strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);

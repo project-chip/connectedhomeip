@@ -993,7 +993,7 @@ sl_status_t wfx_connect_to_ap(void)
     sl_status_t result;
     sl_wfx_security_mode_t connect_security_mode;
 
-    VerifyOrReturnError(wifi_provision.ssid[0] != static_cast<char>(NULL), SL_STATUS_NOT_AVAILABLE);
+    VerifyOrReturnError(wifi_provision.ssid[0], SL_STATUS_NOT_AVAILABLE);
     ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", &wifi_provision.ssid[0]);
 
     ChipLogDetail(DeviceLayer,
@@ -1071,7 +1071,6 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
     VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
-    ChipLogProgress(DeviceLayer, "wfx_have_ipv6_addr");
     return wfx_is_sta_connected();
 }
 
@@ -1122,7 +1121,6 @@ bool wfx_is_sta_connected(void)
  *****************************************************************************/
 void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 {
-    ChipLogDetail(DeviceLayer, "Setup-IP6: TODO"); /* It is automatically done when lwip link up */
 }
 
 /****************************************************************************
