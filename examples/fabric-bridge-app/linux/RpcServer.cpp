@@ -189,19 +189,11 @@ pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_Admin
         VerifyOrReturnValue(request.opener_fabric_index <= chip::kMaxValidFabricIndex, pw::Status::InvalidArgument());
         adminCommissioningAttributes.openerFabricIndex = static_cast<FabricIndex>(request.opener_fabric_index);
     }
-    else
-    {
-        adminCommissioningAttributes.openerFabricIndex.reset();
-    }
 
     if (request.has_opener_vendor_id)
     {
         VerifyOrReturnValue(request.opener_vendor_id != chip::VendorId::NotSpecified, pw::Status::InvalidArgument());
         adminCommissioningAttributes.openerVendorId = static_cast<chip::VendorId>(request.opener_vendor_id);
-    }
-    else
-    {
-        adminCommissioningAttributes.openerVendorId.reset();
     }
 
     device->SetAdminCommissioningAttributes(adminCommissioningAttributes);
