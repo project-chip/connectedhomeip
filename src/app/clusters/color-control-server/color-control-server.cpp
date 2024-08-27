@@ -2679,39 +2679,32 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
 
     if (status == Status::Success && !startUpColorTemp.IsNull())
     {
-        uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
-        status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
+        uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+        Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+        // Avoid potential divide-by-zero in future Kelvin conversions.
+        tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
 
-        if (status == Status::Success)
+        uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
+        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
+
+        if (tempPhysicalMin <= startUpColorTemp.Value() && startUpColorTemp.Value() <= tempPhysicalMax)
         {
-            uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
-            // Avoid potential divide-by-zero in future Kelvin conversions.
-            tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
+            // Apply valid startup color temp value that is within physical limits of device.
+            // Otherwise, the startup value is outside the device's supported range, and the
+            // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
+            // if startup color temp was set to null).
+            uint16_t epIndex             = getEndpointIndex(endpoint);
+            MarkAttributeDirty markDirty = SetQuietReportAttribute(quietTemperatureMireds[epIndex], startUpColorTemp.Value(),
+                                                                   false /* isEndOfTransition */, 0);
+            status = Attributes::ColorTemperatureMireds::Set(endpoint, quietTemperatureMireds[epIndex].value().Value(), markDirty);
 
-            uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
-
-            if (tempPhysicalMin <= startUpColorTemp.Value() && startUpColorTemp.Value() <= tempPhysicalMax)
+            if (status == Status::Success)
             {
-                // Apply valid startup color temp value that is within physical limits of device.
-                // Otherwise, the startup value is outside the device's supported range, and the
-                // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
-                // if startup color temp was set to null).
-                uint16_t epIndex = getEndpointIndex(endpoint);
-                MarkAttributeDirty markDirty =
-                    SetQuietReportAttribute(quietTemperatureMireds[epIndex], updatedColorTemp, false /* isEndOfTransition */, 0);
-                status =
-                    Attributes::ColorTemperatureMireds::Set(endpoint, quietTemperatureMireds[epIndex].value().Value(), markDirty);
+                // Set ColorMode attributes to reflect ColorTemperature.
+                auto updateColorMode = ColorModeEnum::kColorTemperatureMireds;
+                Attributes::ColorMode::Set(endpoint, updateColorMode);
 
-                if (status == Status::Success)
-                {
-                    // Set ColorMode attributes to reflect ColorTemperature.
-                    auto updateColorMode = ColorModeEnum::kColorTemperatureMireds;
-                    Attributes::ColorMode::Set(endpoint, updateColorMode);
-
-                    Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorModeEnum>(updateColorMode));
-                }
+                Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorModeEnum>(updateColorMode));
             }
         }
     }
