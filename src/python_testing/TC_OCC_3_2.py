@@ -170,7 +170,7 @@ class TC_OCC_3_2(MatterBaseTest):
         asserts.assert_equal(final_dut, hold_time_limits_dut.holdTimeMax, "HoldTimeMax to HoldTime writing failure")
 
         self.step("4d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[initial_dut
+        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[initial_dut,
                                   final_dut], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("5a")
@@ -178,7 +178,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
         if has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features):
             self.step("5b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[initial_dut
+            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[initial_dut,
                                       final_dut], timeout_sec=post_prompt_settle_delay_seconds)
         else:
             logging.info("No PIR timing attribute support. Skipping steps 5b.")
@@ -190,7 +190,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("6b")
         else:
             self.step("6b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[initial_dut
+            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[initial_dut,
                                       final_dut], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("7a")
@@ -199,7 +199,7 @@ class TC_OCC_3_2(MatterBaseTest):
             self.skip_step("7b")
         else:
             self.step("7b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[initial_dut
+            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[initial_dut,
                                       final_dut], timeout_sec=post_prompt_settle_delay_seconds)
 
 
