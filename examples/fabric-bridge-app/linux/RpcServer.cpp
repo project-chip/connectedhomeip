@@ -46,7 +46,7 @@ public:
     pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
     pw::Status ActiveChanged(const chip_rpc_KeepActiveChanged & request, pw_protobuf_Empty & response) override;
-    pw::Status AdminCommissioningAttributeChanged (const chip_rpc_AdministratorCommissioningChange  & request, pw_protobuf_Empty & response) override;
+    pw::Status AdminCommissioningAttributeChanged (const chip_rpc_AdministratorCommissioningChanged & request, pw_protobuf_Empty & response) override;
 };
 
 pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
@@ -161,7 +161,7 @@ pw::Status FabricBridge::ActiveChanged(const chip_rpc_KeepActiveChanged & reques
     return pw::OkStatus();
 }
 
-pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChange  & request, pw_protobuf_Empty & response)
+pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & request, pw_protobuf_Empty & response)
 {
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received CADMIN attribut change: " ChipLogFormatX64, ChipLogValueX64(nodeId));
