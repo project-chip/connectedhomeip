@@ -638,6 +638,12 @@ markers must be present.
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
+-   `test-runner-run/<run_identifier>/script-start-delay`: Specifies the number
+    of seconds to wait before starting the test script. By default, the delay
+    is 0 seconds.
+
+    -   Example: `10`
+
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
