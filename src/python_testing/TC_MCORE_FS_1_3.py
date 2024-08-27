@@ -19,6 +19,19 @@
 # when reading UniqueID from BasicInformation Cluster. Please specify the app
 # location with --string-arg th_server_app_path:<path_to_app>
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
+# test-runner-run/run1/app-args: --storage-dir dut-fsa --discriminator 1234
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+# test-runner-run/run1/script-start-delay: 10
+# test-runner-run/run1/quiet: false
+# === END CI TEST ARGUMENTS ===
+
 import asyncio
 import logging
 import os
