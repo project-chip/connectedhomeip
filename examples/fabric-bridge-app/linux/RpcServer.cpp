@@ -176,22 +176,27 @@ pw::Status FabricBridge::AdminCommissioningAttributeChanged(const chip_rpc_Admin
 
     BridgedDevice::AdminCommissioningAttributes adminCommissioningAttributes;
 
-    // TODO these casts are all hacks just place holder until I figure out proto types
+    uint32_t max_window_status_value = static_cast<uint32_t>(chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
+    VerifyOrReturnValue(request.window_status < max_window_status_value, pw::Status::InvalidArgument());
     adminCommissioningAttributes.commissioningWindowStatus = static_cast<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>(request.window_status);
-    if (request.has_opener_fabric_index) {
+    if (request.has_opener_fabric_index)
+    {
+        VerifyOrReturnValue(request.opener_fabric_index >= chip::kMinValidFabricIndex, pw::Status::InvalidArgument());
+        VerifyOrReturnValue(request.opener_fabric_index <= chip::kMaxValidFabricIndex, pw::Status::InvalidArgument());
         adminCommissioningAttributes.openerFabricIndex = static_cast<FabricIndex>(request.opener_fabric_index);
     }
     else
     {
-        adminCommissioningAttributes.openerFabricIndex = std::nullopt;
+        adminCommissioningAttributes.openerFabricIndex.reset();
     }
 
     if (request.has_opener_vendor_id) {
+        VerifyOrReturnValue(request.opener_vendor_id != chip::VendorId::NotSpecified, pw::Status::InvalidArgument());
         adminCommissioningAttributes.openerVendorId = static_cast<chip::VendorId>(request.opener_vendor_id);
     }
     else
     {
-        adminCommissioningAttributes.openerVendorId = std::nullopt;
+        adminCommissioningAttributes.openerVendorId.reset();
     }
 
     device->SetAdminCommissioningAttributes(adminCommissioningAttributes);

@@ -28,10 +28,6 @@ message KeepActiveChanged {
 
 message AdministratorCommissioningChange {
   uint64 node_id = 1;
-  // TODO figure out the types we should use here
-  //uint8 window_status = 2;
-  //optional uint8 admin_fabric_index = 3;
-  //optional uint16 admin_vendor_id = 4;
   uint32 window_status = 2;
   optional uint32 opener_fabric_index = 3;
   optional uint32 opener_vendor_id = 4;
