@@ -627,8 +627,9 @@ tests:
               contains: [6, 254]
 
     - label:
-          "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."
-      PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
+          "Step 7a: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
+          the GeneratedCommandList attribute."
+      PICS: TSTAT.S.Cfe.Rsp
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
