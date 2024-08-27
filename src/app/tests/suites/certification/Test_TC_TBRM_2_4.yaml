@@ -55,7 +55,7 @@ tests:
                 value: "SPAKE2P Key Salt"
 
     - label: "TH2  establishes a PASE session with the DUT"
-      identity: beta   
+      identity: beta
       cluster: CommissionerCommands
       endpoint: 0
       command: EstablishPASESession
@@ -68,7 +68,7 @@ tests:
 
     - label:
           "TH2 send GetActiveDatasetRequest command to the DUT in PASE session"
-      identity: beta 
+      identity: beta
       cluster: Thread Border Router Management
       endpoint: 1
       command: GetActiveDatasetRequest
@@ -77,7 +77,7 @@ tests:
 
     - label:
           "TH2 send GetPendingDatasetRequest command to the DUT in PASE session"
-      identity: beta 
+      identity: beta
       cluster: Thread Border Router Management
       endpoint: 1
       command: GetPendingDatasetRequest
