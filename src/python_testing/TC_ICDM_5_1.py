@@ -81,7 +81,8 @@ class TC_ICDM_5_1(MatterBaseTest):
 
         services = await discovery.get_all_services(log_output=True, discovery_timeout_sec=240)
         icdTxtRecord = modes.kUnknownEnumValue.value
-
+        print("debugging mdns")
+        print(services)
         asserts.assert_true(mdns_discovery.MdnsServiceType.OPERATIONAL.value in services,
                             "Could not find ICD operational service information.")
 
