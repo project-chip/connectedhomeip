@@ -835,12 +835,13 @@ struct PAFPublishSSI
     uint16_t VendorId;
 };
 
-#define MAX_NAN_SRV_NAME_LEN		256
-#define NAN_FREQ_LIST_ALL			0xff
-enum nan_service_protocol_type {
-	NAN_SRV_PROTO_BONJOUR = 1,
-	NAN_SRV_PROTO_GENERIC = 2,
-	NAN_SRV_PROTO_CSA_MATTER = 3,
+#define MAX_NAN_SRV_NAME_LEN 256
+#define NAN_FREQ_LIST_ALL 0xff
+enum nan_service_protocol_type
+{
+    NAN_SRV_PROTO_BONJOUR    = 1,
+    NAN_SRV_PROTO_GENERIC    = 2,
+    NAN_SRV_PROTO_CSA_MATTER = 3,
 };
 #pragma pack(pop)
 
@@ -849,23 +850,23 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     GAutoPtr<GError> err;
     gint publish_id;
     uint16_t freq_list_buf[0xff];
-    uint16_t *pfreq_lst = freq_list_buf;
+    uint16_t * pfreq_lst                          = freq_list_buf;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    bool solicited = true;
-    bool unsolicited = true;
-    bool solicited_multicast = false;
-    unsigned int ttl = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT;
-    bool disable_events = false;
-    bool fsd = true;
-    bool fsd_gas = false;
-    unsigned int freq = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
-    unsigned int announcement_period = false;
+    bool solicited                                = true;
+    bool unsolicited                              = true;
+    bool solicited_multicast                      = false;
+    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT;
+    bool disable_events                           = false;
+    bool fsd                                      = true;
+    bool fsd_gas                                  = false;
+    unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    unsigned int announcement_period              = false;
     unsigned int freq_list_len;
     unsigned int ssi_len = sizeof(struct PAFPublishSSI);
 
     // Add the freq_list:
     freq_list_len = InArgs.freq_list_len;
-    if ((freq_list_len>0) && (freq_list_len != NAN_FREQ_LIST_ALL))
+    if ((freq_list_len > 0) && (freq_list_len != NAN_FREQ_LIST_ALL))
     {
         pfreq_lst = InArgs.pfreq_list;
     }
@@ -890,7 +891,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
         PafPublish_ssi.VendorId = 0;
     }
     GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
-    if (ssi_array_variant == nullptr) {
+    if (ssi_array_variant == nullptr)
+    {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_array_variant is NULL ");
         return CHIP_ERROR_INTERNAL;
     }
@@ -1433,14 +1435,14 @@ void ConnectivityManagerImpl::OnReplied(gboolean success, GVariant * reply_info)
         GAutoPtr<GVariant> dataValue(g_variant_lookup_value(reply_info, "reply_info", G_VARIANT_TYPE_BYTESTRING));
         size_t bufferLen;
         auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-        struct wpa_dbus_reply_info *preply_info;
+        struct wpa_dbus_reply_info * preply_info;
 
-        preply_info = (struct wpa_dbus_reply_info *)buffer;
+        preply_info = (struct wpa_dbus_reply_info *) buffer;
         ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u", preply_info->publish_id);
         ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_subscribe_id: %u", preply_info->peer_subscribe_id);
         ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", preply_info->peer_addr[0],
-            preply_info->peer_addr[1], preply_info->peer_addr[2], preply_info->peer_addr[3], preply_info->peer_addr[4],
-            preply_info->peer_addr[5]);
+                        preply_info->peer_addr[1], preply_info->peer_addr[2], preply_info->peer_addr[3], preply_info->peer_addr[4],
+                        preply_info->peer_addr[5]);
         ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_len: %u", preply_info->ssi_len);
     }
     else
@@ -1452,7 +1454,6 @@ void ConnectivityManagerImpl::OnReplied(gboolean success, GVariant * reply_info)
         }
     }
 }
-
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
 {
@@ -1508,11 +1509,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
 
     gint subscribe_id;
     GAutoPtr<GError> err;
-	enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    uint8_t is_active = 1;
-	unsigned int ttl = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT;
-	unsigned int freq = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
-	unsigned int ssi_len = sizeof(struct PAFPublishSSI);
+    enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
+    uint8_t is_active                             = 1;
+    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT;
+    unsigned int freq                             = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     mAppState                = appState;
@@ -1528,7 +1529,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
         PafPublish_ssi.VendorId = 0;
     }
     GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
-    if (ssi_array_variant == nullptr) {
+    if (ssi_array_variant == nullptr)
+    {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_array_variant is NULL ");
         return CHIP_ERROR_INTERNAL;
     }
@@ -1602,10 +1604,10 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
     GAutoPtr<GError> err;
     gchar peer_mac[18];
 
-    snprintf(peer_mac, sizeof(peer_mac), "%02x:%02x:%02x:%02x:%02x:%02x",
-             mpaf_info.peer_addr[0], mpaf_info.peer_addr[1], mpaf_info.peer_addr[2],
-             mpaf_info.peer_addr[3], mpaf_info.peer_addr[4], mpaf_info.peer_addr[5]);
-    GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, msgBuf->Start(), msgBuf->DataLength(), sizeof(guint8));
+    snprintf(peer_mac, sizeof(peer_mac), "%02x:%02x:%02x:%02x:%02x:%02x", mpaf_info.peer_addr[0], mpaf_info.peer_addr[1],
+             mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4], mpaf_info.peer_addr[5]);
+    GVariant * ssi_array_variant =
+        g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, msgBuf->Start(), msgBuf->DataLength(), sizeof(guint8));
     if (ssi_array_variant == nullptr)
     {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi_array_variant is NULL ");

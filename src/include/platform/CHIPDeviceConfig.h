@@ -453,7 +453,7 @@
  * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT
-#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT (3*60)
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT (3 * 60)
 #endif
 
 /**
@@ -462,7 +462,7 @@
  * The max amount of time (in seconds) after which the chip platform will stop PAF advertisement
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT
-#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT (15*60)
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT (15 * 60)
 #endif
 
 /**
@@ -471,7 +471,7 @@
  * The max amount of time (in seconds) the chip controller will discovery Wi-Fi PAF
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT
-#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT (15*60)
+#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT (15 * 60)
 #endif
 
 /**
@@ -500,7 +500,6 @@
 #ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL
 #define CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL 5745
 #endif
-
 
 // -------------------- WiFi AP Configuration --------------------
 
