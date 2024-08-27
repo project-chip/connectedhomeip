@@ -164,14 +164,12 @@ class TC_CCTRL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         self.step(11)
-        if not self.is_ci:
-            time.sleep(30)
+        time.sleep(30)
 
         self.step(12)
         th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
-        if not self.is_ci:
-            asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
-                                 "Unexpected number of fabrics on TH_SERVER")
+        asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
+                             "Unexpected number of fabrics on TH_SERVER")
 
 
 if __name__ == "__main__":
