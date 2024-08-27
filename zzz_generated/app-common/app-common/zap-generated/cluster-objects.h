@@ -34306,6 +34306,41 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace OccupancyChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kOccupancy = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OccupancyChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OccupancyChanged
+} // namespace Events
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
 
