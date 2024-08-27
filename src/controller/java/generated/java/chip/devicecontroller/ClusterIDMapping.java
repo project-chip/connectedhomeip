@@ -4543,7 +4543,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+        }public enum KeepActiveCommandField {StayActiveDuration(0),TimeoutMs(1),;
                     private final int id;
                     KeepActiveCommandField(int id) {
                         this.id = id;
@@ -13593,7 +13593,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OccupancyChanged(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;

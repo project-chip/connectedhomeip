@@ -3302,6 +3302,7 @@ class ChipClusters:
                 "commandName": "KeepActive",
                 "args": {
                     "stayActiveDuration": "int",
+                    "timeoutMs": "int",
                 },
             },
         },
