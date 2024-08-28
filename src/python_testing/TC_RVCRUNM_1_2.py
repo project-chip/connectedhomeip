@@ -64,101 +64,95 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
         RVCRun_cluster = Clusters.RvcRunMode
         attributes = Clusters.RvcRunMode.Attributes
-        RVCRun_attr_list = attributes.AttributeList
-        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_attr_list)
-        supported_modes_attr_id = attributes.SupportedModes.attribute_id
-        current_mode_attr_id = attributes.CurrentMode.attribute_id
 
         self.print_step(1, "Commissioning, already done")
 
-        if supported_modes_attr_id in attribute_list:
-            self.print_step(2, "Read SupportedModes attribute")
-            supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        self.print_step(2, "Read SupportedModes attribute")
+        supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-            logging.info("SupportedModes: %s" % (supported_modes))
+        logging.info("SupportedModes: %s" % (supported_modes))
 
-            # Verify that the list has at least 2 and at most 255 entries
-            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
-            asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
+        # Verify that the list has at least 2 and at most 255 entries
+        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
+        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
-            # Verify that each ModeOptionsStruct entry has a unique Mode field value
-            for m in supported_modes:
-                if m.mode in self.supported_modes_dut:
-                    asserts.fail("SupportedModes must have unique mode values!")
-                else:
-                    self.supported_modes_dut.append(m.mode)
+        # Verify that each ModeOptionsStruct entry has a unique Mode field value
+        for m in supported_modes:
+            if m.mode in self.supported_modes_dut:
+                asserts.fail("SupportedModes must have unique mode values!")
+            else:
+                self.supported_modes_dut.append(m.mode)
 
-            # Verify that each ModeOptionsStruct entry has a unique Label field value
-            labels = []
-            for m in supported_modes:
-                if m.label in labels:
-                    asserts.fail("SupportedModes must have unique mode label values!")
-                else:
-                    labels.append(m.label)
+        # Verify that each ModeOptionsStruct entry has a unique Label field value
+        labels = []
+        for m in supported_modes:
+            if m.label in labels:
+                asserts.fail("SupportedModes must have unique mode label values!")
+            else:
+                labels.append(m.label)
 
-            # Verify that each ModeOptionsStruct entry's ModeTags field has:
-            for m in supported_modes:
-                # * at least one entry
-                if len(m.modeTags) == 0:
-                    asserts.fail("SupportedModes must have at least one mode tag!")
+        # Verify that each ModeOptionsStruct entry's ModeTags field has:
+        for m in supported_modes:
+            # * at least one entry
+            if len(m.modeTags) == 0:
+                asserts.fail("SupportedModes must have at least one mode tag!")
 
-                at_least_one_common_or_run_tag = False
-                for t in m.modeTags:
-                    # * the values of the Value fields that are not larger than 16 bits
-                    if t.value > 0xFFFF or t.value < 0:
-                        asserts.fail("Mode tag values must not be larger than 16 bits!")
+            at_least_one_common_or_run_tag = False
+            for t in m.modeTags:
+                # * the values of the Value fields that are not larger than 16 bits
+                if t.value > 0xFFFF or t.value < 0:
+                    asserts.fail("Mode tag values must not be larger than 16 bits!")
 
-                    # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
-                    is_mfg = (0x8000 <= t.value <= 0xBFFF)
-                    if (t.value not in self.commonTags and
-                            t.value not in self.runTags and
-                            not is_mfg):
-                        asserts.fail("Mode tag value is not a common tag, run tag or vendor tag!")
+                # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
+                is_mfg = (0x8000 <= t.value <= 0xBFFF)
+                if (t.value not in self.commonTags and
+                        t.value not in self.runTags and
+                        not is_mfg):
+                    asserts.fail("Mode tag value is not a common tag, run tag or vendor tag!")
 
-                    # * for at least one Value field: {isCommonOrDerivedTagsVal}
-                    if not is_mfg:
-                        at_least_one_common_or_run_tag = True
+                # * for at least one Value field: {isCommonOrDerivedTagsVal}
+                if not is_mfg:
+                    at_least_one_common_or_run_tag = True
 
-                if not at_least_one_common_or_run_tag:
-                    asserts.fail("At least one mode tag must be a common tag or run tag!")
+            if not at_least_one_common_or_run_tag:
+                asserts.fail("At least one mode tag must be a common tag or run tag!")
 
-            # Verify that at least one ModeOptionsStruct entry includes the Idle(0x4000)
-            # mode tag in the ModeTags field
-            at_least_one_idle_mode_tag = False
-            # Verify that at least one ModeOptionsStruct entry includes the Cleaning(0x4001)
-            # mode tag in the ModeTags field
-            at_least_one_cleaning_mode_tag = False
-            for m in supported_modes:
-                # Verify that each ModeOptionsStruct entry includes at most one of the following
-                # mode tags: Idle(0x4000), Cleaning(0x4001), _Mapping(0x4002)
-                count_of_idle_cleaning_or_mapping_mode_tags = 0
-                for t in m.modeTags:
-                    if t.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
-                        at_least_one_idle_mode_tag = True
-                        count_of_idle_cleaning_or_mapping_mode_tags += 1
+        # Verify that at least one ModeOptionsStruct entry includes the Idle(0x4000)
+        # mode tag in the ModeTags field
+        at_least_one_idle_mode_tag = False
+        # Verify that at least one ModeOptionsStruct entry includes the Cleaning(0x4001)
+        # mode tag in the ModeTags field
+        at_least_one_cleaning_mode_tag = False
+        for m in supported_modes:
+            # Verify that each ModeOptionsStruct entry includes at most one of the following
+            # mode tags: Idle(0x4000), Cleaning(0x4001), _Mapping(0x4002)
+            count_of_idle_cleaning_or_mapping_mode_tags = 0
+            for t in m.modeTags:
+                if t.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
+                    at_least_one_idle_mode_tag = True
+                    count_of_idle_cleaning_or_mapping_mode_tags += 1
 
-                    if t.value == Clusters.RvcRunMode.Enums.ModeTag.kCleaning:
-                        at_least_one_cleaning_mode_tag = True
-                        count_of_idle_cleaning_or_mapping_mode_tags += 1
+                if t.value == Clusters.RvcRunMode.Enums.ModeTag.kCleaning:
+                    at_least_one_cleaning_mode_tag = True
+                    count_of_idle_cleaning_or_mapping_mode_tags += 1
 
-                    if t.value == Clusters.RvcRunMode.Enums.ModeTag.kMapping:
-                        count_of_idle_cleaning_or_mapping_mode_tags += 1
+                if t.value == Clusters.RvcRunMode.Enums.ModeTag.kMapping:
+                    count_of_idle_cleaning_or_mapping_mode_tags += 1
 
-                if count_of_idle_cleaning_or_mapping_mode_tags > 1:
-                    asserts.fail("A ModeOptionsStruct entry includes more than one of the following "
-                                 "mode tags: Idle(0x4000), Cleaning(0x4001), Mapping(0x4002)!")
+            if count_of_idle_cleaning_or_mapping_mode_tags > 1:
+                asserts.fail("A ModeOptionsStruct entry includes more than one of the following "
+                                "mode tags: Idle(0x4000), Cleaning(0x4001), Mapping(0x4002)!")
 
-            asserts.assert_true(at_least_one_idle_mode_tag,
-                                "The Supported Modes does not have an entry of Idle(0x4000)")
-            asserts.assert_true(at_least_one_cleaning_mode_tag,
-                                "The Supported Modes does not have an entry of Cleaning(0x4001)")
+        asserts.assert_true(at_least_one_idle_mode_tag,
+                            "The Supported Modes does not have an entry of Idle(0x4000)")
+        asserts.assert_true(at_least_one_cleaning_mode_tag,
+                            "The Supported Modes does not have an entry of Cleaning(0x4001)")
 
-        if current_mode_attr_id in attribute_list:
-            self.print_step(3, "Read CurrentMode attribute")
-            current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+        self.print_step(3, "Read CurrentMode attribute")
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-            logging.info("CurrentMode: %s" % (current_mode))
-            asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
+        logging.info("CurrentMode: %s" % (current_mode))
+        asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
 
 if __name__ == "__main__":

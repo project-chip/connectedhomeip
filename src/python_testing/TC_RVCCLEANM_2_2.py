@@ -92,25 +92,12 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     async def test_TC_RVCCLEANM_2_2(self):
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid != 0:
-                self.is_ci = True
-                self.app_pipe = self.app_pipe + str(app_pid)
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
+            self.app_pipe = self.app_pipe + str(app_pid)
 
-        # replaces the RVCRUNM attributes from PICS file
         RVCRun_cluster = Clusters.RvcRunMode
         attributes = Clusters.RvcRunMode.Attributes
-        RVCRun_attr_list = attributes.AttributeList
-        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_attr_list)
-        supported_modes_attr_id = attributes.SupportedModes.attribute_id
-        current_mode_attr_id = attributes.CurrentMode.attribute_id
-
-        if supported_modes_attr_id not in attribute_list:
-            asserts.fail("Supported modes needs to be supported attribute")
-
-        if current_mode_attr_id not in attribute_list:
-            asserts.fail("Current mode needs to be supported attribute")
 
         self.print_step(1, "Commissioning, already done")
 

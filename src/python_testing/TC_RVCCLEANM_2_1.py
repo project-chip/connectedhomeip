@@ -90,20 +90,12 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid != 0:
-                self.is_ci = True
-                self.app_pipe = self.app_pipe + str(app_pid)
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
+            self.app_pipe = self.app_pipe + str(app_pid)
 
         RVCClean_cluster = Clusters.RvcCleanMode
-
-        # Gathering Available Attributes and associated ids
         attributes = RVCClean_cluster.Attributes
-        RVCClean_attr_list = attributes.AttributeList
-        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_attr_list)
-        supported_modes_attr_id = attributes.SupportedModes.attribute_id
-        current_mode_attr_id = attributes.CurrentMode.attribute_id
 
         # Gathering Accepted and Generated Commands and associated ids
         commands = RVCClean_cluster.Commands
@@ -113,12 +105,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_gencmd_list)
         chg_mode_cmd_id = commands.ChangeToMode.command_id
         chg_rsp_cmd_id = commands.ChangeToModeResponse.command_id
-
-        if supported_modes_attr_id not in attribute_list:
-            asserts.fail("supported modes needs to be supported attribute")
-
-        if current_mode_attr_id not in attribute_list:
-            asserts.fail("Current mode needs to be supported attribute")
 
         if chg_mode_cmd_id not in accepted_cmd_list:
             asserts.fail("Change To Mode receiving commands needs to be supported")
