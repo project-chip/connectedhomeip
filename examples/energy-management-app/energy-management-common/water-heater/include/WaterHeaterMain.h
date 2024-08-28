@@ -18,16 +18,15 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WaterHeaterManagement {
 
-void EvseApplicationInit();
-void EvseApplicationShutdown();
+void FullWhmApplicationInit();
+void FullWhmApplicationShutdown();
 
-CHIP_ERROR DeviceEnergyManagementInit();
-CHIP_ERROR DeviceEnergyManagementShutdown();
-
-CHIP_ERROR EnergyMeterInit();
-CHIP_ERROR EnergyMeterShutdown();
-
-CHIP_ERROR PowerTopologyInit();
-CHIP_ERROR PowerTopologyShutdown();
+} // namespace WaterHeaterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
