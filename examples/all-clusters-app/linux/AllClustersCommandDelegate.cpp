@@ -19,6 +19,7 @@
 #include "AllClustersCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
@@ -27,7 +28,6 @@
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
-#include <app/EventLogging.h>
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
@@ -251,8 +251,8 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
 {
     Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
-    event.occupancy = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
-    EventNumber eventNumber           = 0;
+    event.occupancy         = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
+    EventNumber eventNumber = 0;
 
     CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
     if (err != CHIP_NO_ERROR)
