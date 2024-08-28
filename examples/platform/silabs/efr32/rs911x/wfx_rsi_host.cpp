@@ -23,6 +23,8 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "wfx_host_events.h"
@@ -52,7 +54,7 @@ StaticTask_t wfxRsiTaskBuffer;
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STARTED, SL_STATUS_OK);
+    VerifyOrReturnError(!(wfx_rsi.dev_state & WFX_RSI_ST_STARTED), SL_STATUS_OK);
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
     /*
      * Create the Wifi driver task
@@ -361,8 +363,8 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     wfx_rsi.scan_cb = callback;
 
     VerifyOrReturnError(ssid != NULL, false);
-    size_t ssid_len = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-    wfx_rsi.scan_ssid = reinterpret_cast<char *>(pvPortMalloc(ssid_len + 1));
+    size_t ssid_len   = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+    wfx_rsi.scan_ssid = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
     VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
     strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
 

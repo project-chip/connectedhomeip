@@ -274,9 +274,9 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     ChipLogDetail(DeviceLayer, "# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
                   ((int16_t) (scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
                   scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
-    /*Report one AP information*/
+    /* Report one AP information */
     /* don't save if filter only wants specific ssid */
-    if (scan_ssid != NULL)
+    if (scan_ssid != nullptr)
     {
         if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
             return;
@@ -418,18 +418,10 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
  *****************************************************************************/
 static void sl_wfx_start_ap_callback(uint32_t status)
 {
-    if (status == AP_START_SUCCESS)
-    {
-        ChipLogProgress(DeviceLayer, "AP started");
-        sl_wfx_context->state =
-            static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_AP_INTERFACE_UP));
-        xEventGroupSetBits(sl_wfx_event_group, SL_WFX_START_AP);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "AP start failed");
-        strncpy(event_log, "AP start failed", sizeof(event_log));
-    }
+    VerifyOrReturnLogError(status == AP_START_SUCCESS, CHIP_ERROR_INTERNAL);
+    sl_wfx_context->state =
+        static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_AP_INTERFACE_UP));
+    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_START_AP);
 }
 
 /****************************************************************************
@@ -490,7 +482,6 @@ static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * ma
 static void sl_wfx_generic_status_callback(sl_wfx_generic_ind_t * frame)
 {
     (void) (frame);
-    ChipLogDetail(DeviceLayer, "Generic status received");
 }
 
 /***************************************************************************
@@ -743,23 +734,20 @@ static void wfx_wifi_hw_start(void)
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
-    ChipLogDetail(DeviceLayer, "WIFI:SSID:: %s", &ap_info.ssid[0]);
-    memcpy(ap->ssid, ap_info.ssid, sizeof(ap_info.ssid));
-    ChipLogDetail(DeviceLayer, "WIFI:Mac addr:: %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
-                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
+    chip::Platform::CopyString(ap->ssid, ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
-    ChipLogDetail(DeviceLayer, "WIFI:security:: %d", ap->security);
-    ap->chan = ap_info.chan;
-    ChipLogDetail(DeviceLayer, "WIFI:Channel:: to %d", ap->chan);
+    ap->chan     = ap_info.chan;
+    ChipLogDetail(DeviceLayer, "WIFI:SSID     :: %s", &ap_info.ssid[0]);
+    ChipLogDetail(DeviceLayer, "WIFI:BSSID    :: %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
+                  ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
+    ChipLogDetail(DeviceLayer, "WIFI:security :: %d", ap->security);
+    ChipLogDetail(DeviceLayer, "WIFI:channel  ::  %d", ap->chan);
 
     sl_status_t status = sl_wfx_get_signal_strength((uint32_t *) &signal_strength);
-
-    if (status == SL_STATUS_OK)
-    {
-        ChipLogDetail(DeviceLayer, "status SL_STATUS_OK & signal_strength: %ld", signal_strength);
-        ap->rssi = (signal_strength - 220) / 2;
-    }
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
+    ap->rssi = (signal_strength - 220) / 2;
     return status;
 }
 
@@ -795,13 +783,13 @@ sl_status_t get_all_counters(void)
     sl_status_t result;
     uint8_t command_id         = 0x05;
     uint16_t mib_id            = 0x2035;
-    sl_wfx_mib_req_t * request = NULL;
+    sl_wfx_mib_req_t * request = nullptr;
     uint32_t request_length    = SL_WFX_ROUND_UP_EVEN(sizeof(sl_wfx_header_mib_t) + sizeof(sl_wfx_mib_req_body_t));
 
     result =
         sl_wfx_allocate_command_buffer((sl_wfx_generic_message_t **) &request, command_id, SL_WFX_CONTROL_BUFFER, request_length);
 
-    VerifyOrReturnError(request != NULL, SL_STATUS_NULL_POINTER);
+    VerifyOrReturnError(request != nullptr, SL_STATUS_NULL_POINTER);
 
     request->body.mib_id      = mib_id;
     request->header.interface = 0x2;
@@ -850,7 +838,7 @@ error_handler:
             sl_wfx_context->used_buffers--;
         }
     }
-    if (request != NULL)
+    if (request != nullptr)
     {
         sl_wfx_free_command_buffer((sl_wfx_generic_message_t *) request, command_id, SL_WFX_CONTROL_BUFFER);
     }
@@ -906,7 +894,7 @@ sl_wfx_state_t wfx_get_wifi_state(void)
  *****************************************************************************/
 struct netif * wfx_GetNetif(sl_wfx_interface_t interface)
 {
-    struct netif * SelectedNetif = NULL;
+    struct netif * SelectedNetif = nullptr;
     if (interface == SL_WFX_STA_INTERFACE)
     {
         SelectedNetif = sta_netif;
@@ -955,7 +943,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig)
  *****************************************************************************/
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-    VerifyOrReturnError(wifiConfig != NULL, false);
+    VerifyOrReturnError(wifiConfig != nullptr, false);
     memcpy(wifiConfig, &wifi_provision, sizeof(wfx_wifi_provision_t));
     return true;
 }
@@ -1119,9 +1107,7 @@ bool wfx_is_sta_connected(void)
  * @return returns true if sucessful,
  *         false otherwise
  *****************************************************************************/
-void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
-{
-}
+void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif) {}
 
 /****************************************************************************
  * @brief
@@ -1183,15 +1169,14 @@ void wfx_enable_sta_mode(void)
 #ifdef SL_WFX_CONFIG_SCAN
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
-    VerifyOrReturnError(scan_cb != NULL, false);
-    size_t sz = 0;
-    scan_cb   = callback;
+    VerifyOrReturnError(scan_cb != nullptr, false);
+    scan_cb = callback;
     if (ssid)
     {
-        sz        = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-        scan_ssid = reinterpret_cast<char *>(pvPortMalloc(sz + 1));
-        VerifyOrReturnError(scan_ssid != NULL, false);
-        strncpy(scan_ssid, ssid, sz);
+        size_t ssid_len = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+        scan_ssid       = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
+        VerifyOrReturnError(scan_ssid != nullptr, false);
+        strncpy(scan_ssid, ssid, ssid_len);
     }
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
     return true;
@@ -1205,20 +1190,20 @@ void wfx_cancel_scan(void)
 {
     struct scan_result_holder *hp, *next;
     /* Not possible */
-    VerifyOrReturn(scan_cb != NULL);
+    VerifyOrReturn(scan_cb != nullptr);
     sl_wfx_send_stop_scan_command();
     for (hp = scan_save; hp; hp = next)
     {
         next = hp->next;
-        vPortFree(hp);
+        chip::Platform::MemoryFree(hp);
     }
     scan_save  = (struct scan_result_holder *) 0;
     scan_count = 0;
     if (scan_ssid)
     {
-        vPortFree(scan_ssid);
-        scan_ssid = NULL;
+        chip::Platform::MemoryFree(scan_ssid);
+        scan_ssid = nullptr;
     }
-    scan_cb = NULL;
+    scan_cb = nullptr;
 }
 #endif /* SL_WFX_CONFIG_SCAN */

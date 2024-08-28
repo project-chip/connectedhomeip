@@ -24,6 +24,8 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "wfx_host_events.h"
@@ -98,7 +100,7 @@ bool wfx_is_sta_mode_enabled(void)
  ***********************************************************************/
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
-    VerifyOrReturn(addr != NULL);
+    VerifyOrReturn(addr != nullptr);
 #ifdef SL_WFX_CONFIG_SOFTAP
     *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
 #else
@@ -116,7 +118,7 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  ***********************************************************************/
 void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
-    VerifyOrReturn(cfg != NULL);
+    VerifyOrReturn(cfg != nullptr);
     wfx_rsi.sec = *cfg;
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
 }
@@ -131,7 +133,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
  ***********************************************************************/
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-    VerifyOrReturnError(wifiConfig != NULL, false);
+    VerifyOrReturnError(wifiConfig != nullptr, false);
     VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, false);
     *wifiConfig = wfx_rsi.sec;
     return true;
@@ -198,7 +200,6 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
      * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
      * This is hooked with MATTER code.
      */
-    return;
 }
 
 /*********************************************************************
@@ -340,13 +341,13 @@ int32_t wfx_reset_counts()
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     // check if already in progress
-    VerifyOrReturnError(wfx_rsi.scan_cb != NULL, false);
+    VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, false);
     wfx_rsi.scan_cb = callback;
 
-    VerifyOrReturnError(ssid != NULL, false);
-    size_t ssid_len = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-    wfx_rsi.scan_ssid = reinterpret_cast<char *>(pvPortMalloc(ssid_len + 1));
-    VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
+    VerifyOrReturnError(ssid != nullptr, false);
+    size_t ssid_len   = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+    wfx_rsi.scan_ssid = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
+    VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
     strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
 
     WfxEvent_t event;
