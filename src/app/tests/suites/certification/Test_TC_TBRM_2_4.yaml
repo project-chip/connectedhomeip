@@ -21,7 +21,8 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    payload: MT:Y.K9042C00KA0648G00
+
+    payload: "MT:-24J0AFN00KA0648G00"
     discriminator: 3840
     PakeVerifier:
         type: octet_string

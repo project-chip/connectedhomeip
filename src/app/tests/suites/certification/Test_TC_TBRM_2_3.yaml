@@ -75,6 +75,10 @@ tests:
                 value: 60
               - name: Breadcrumb
                 value: 1
+      response:
+          values:
+              - name: ErrorCode
+                value: CommissioningErrorEnum.OK
 
     # Step 3
     - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
