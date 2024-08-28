@@ -1096,7 +1096,6 @@ bool wfx_is_sta_connected(void)
 {
     bool val;
     val = (wifi_extra & WE_ST_STA_CONN) ? true : false;
-    ChipLogDetail(DeviceLayer, "WLAN: STA %s connected", (val ? "IS" : "NOT"));
     return val;
 }
 
