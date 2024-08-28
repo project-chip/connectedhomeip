@@ -30,11 +30,10 @@ enum class PairingMode
 
 enum class CommissioningType
 {
-    None, // establish PASE only
-    NoNetwork,
-    WiFi,
-    Thread,
-    Ethernet,
+    None,           // establish PASE only
+    WithoutNetwork, // commission but don't configure network
+    WithWiFi,       // commission and configure WiFi
+    WithThread,     // commission and configure Thread
 };
 
 class PairingCommandBridge : public CHIPCommandBridge
@@ -47,14 +46,13 @@ public:
         switch (commissioningType)
         {
         case CommissioningType::None:
-        case CommissioningType::NoNetwork:
-        case CommissioningType::Ethernet:
+        case CommissioningType::WithoutNetwork:
             break;
-        case CommissioningType::WiFi:
+        case CommissioningType::WithWiFi:
             AddArgument("ssid", &mSSID);
             AddArgument("password", &mPassword);
             break;
-        case CommissioningType::Thread:
+        case CommissioningType::WithThread:
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }

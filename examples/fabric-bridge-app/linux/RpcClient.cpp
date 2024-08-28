@@ -189,11 +189,12 @@ CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, Vendo
     return WaitForResponse(call);
 }
 
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
+CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
 {
     chip_rpc_KeepActiveParameters params;
     params.node_id                 = nodeId;
     params.stay_active_duration_ms = stayActiveDurationMs;
+    params.timeout_ms              = timeoutMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
