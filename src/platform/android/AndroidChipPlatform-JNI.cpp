@@ -60,9 +60,9 @@ static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUU
 namespace {
 JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
-jclass callbackClass;
-jmethodID onLogMessageMethod;
-jobject sLogCallback = nullptr;
+jclass sCallbackClass;
+jmethodID sOnLogMessageMethod;
+jobject sJavaLogCallbackObject = nullptr;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -305,7 +305,7 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
     vsnprintf(buffer, sizeof(buffer), msg, args);
     jstring jMsg = env->NewStringUTF(buffer);
 
-    env->CallVoidMethod(sLogCallback, onLogMessageMethod, jModule, jPriority, jMsg);
+    env->CallVoidMethod(sJavaLogCallbackObject, sOnLogMessageMethod, jModule, jPriority, jMsg);
 
     env->DeleteLocalRef(jModule);
     env->DeleteLocalRef(jMsg);
@@ -315,21 +315,21 @@ JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject cal
 {
     using namespace chip::Logging;
 
-    callbackClass      = env->GetObjectClass(callback);
-    onLogMessageMethod = env->GetMethodID(callbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
-    if (sLogCallback != nullptr)
+    sCallbackClass      = env->GetObjectClass(callback);
+    sOnLogMessageMethod = env->GetMethodID(sCallbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
+    if (sJavaLogCallbackObject != nullptr)
     {
-        env->DeleteGlobalRef(sLogCallback);
+        env->DeleteGlobalRef(sJavaLogCallbackObject);
     }
 
     if (env->IsSameObject(callback, NULL))
     {
-        sLogCallback = nullptr;
+        sJavaLogCallbackObject = nullptr;
         SetLogRedirectCallback(nullptr);
     }
     else
     {
-        sLogCallback = env->NewGlobalRef(callback);
+        sJavaLogCallbackObject = env->NewGlobalRef(callback);
         SetLogRedirectCallback(logRedirectCallback);
     }
 }
