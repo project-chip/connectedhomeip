@@ -108,7 +108,7 @@ table:
 | target name                                                | description                                                                                 |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | nxp-device-freertos-contact-sensor-low-power               | Default low-power contact sensor                                                            |
-| nxp-device-freertos-contact-sensor-low-power-factory       | Default low-power contact sensor with factory data                                           |
+| nxp-device-freertos-contact-sensor-low-power-factory       | Default low-power contact sensor with factory data                                          |
 | nxp-device-freertos-contact-sensor-low-power-lit           | Low-power contact sensor as LIT ICD                                                         |
 | nxp-device-freertos-contact-sensor-low-power-sw-v2         | Low-power contact sensor with software version 2 (can be used to test OTA)                  |
 | nxp-device-freertos-contact-sensor-low-power-factory-sw-v2 | Low-power contact sensor with factory data and software version 2 (can be used to test OTA) |
@@ -144,17 +144,17 @@ Intermittently Connected Device).
 
 This is a list of ICD configuration gn args.
 
-| gn arg                                                                       | default value | description                                                                                                |
-| ---------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
-| nxp_ot_idle_interval_ms                                                      | 2000 (ms)     | OT Idle Interval duration                                                                                  |
-| nxp_ot_active_interval_ms                                                    | 500 (ms)      | OT Active Interval duration                                                                                |
-| nxp_idle_mode_duration_s                                                     | 600 (s)       | Idle Mode Interval duration                                                                                |
-| nxp_active_mode_duration_ms                                                  | 10000 (ms)    | Active Mode Interval duration                                                                              |
-| nxp_active_mode_threshold_ms                                                 | 1000 (ms)     | Active Mode Threshold value                                                                                |
-| nxp_icd_supported_clients_per_fabric                                         | 2             | Registration slots per fabric                                                                              |
-| chip_enable_icd_lit                                                          | false         | Enable LIT ICD support                                                                                     |
-| chip_persist_subscriptions                                                   | true          | Try once to re-establish subscriptions from the server side after reboot. May be disabled for LIT use case |
-| chip_subscription_timeout_resumption                                         | true          | Same as above, but try to re-establish timeout out subscriptions                                           |
+| gn arg                                                                         | default value | description                                                                                                |
+| ------------------------------------------------------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| nxp_ot_idle_interval_ms                                                        | 2000 (ms)     | OT Idle Interval duration                                                                                  |
+| nxp_ot_active_interval_ms                                                      | 500 (ms)      | OT Active Interval duration                                                                                |
+| nxp_idle_mode_duration_s                                                       | 600 (s)       | Idle Mode Interval duration                                                                                |
+| nxp_active_mode_duration_ms                                                    | 10000 (ms)    | Active Mode Interval duration                                                                              |
+| nxp_active_mode_threshold_ms                                                   | 1000 (ms)     | Active Mode Threshold value                                                                                |
+| nxp_icd_supported_clients_per_fabric                                           | 2             | Registration slots per fabric                                                                              |
+| chip_enable_icd_lit                                                            | false         | Enable LIT ICD support                                                                                     |
+| chip_persist_subscriptions                                                     | true          | Try once to re-establish subscriptions from the server side after reboot. May be disabled for LIT use case |
+| chip_subscription_timeout_resumption                                           | true          | Same as above, but try to re-establish timeout out subscriptions                                           |
 | using `Fibonacci Backoff` for retries pacing. May be disabled for LIT use case |
 
 If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified

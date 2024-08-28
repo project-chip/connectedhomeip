@@ -86,8 +86,9 @@ J-Link > erase 0x8000000, 0x88a0000
 ```
 
 -   MCUBoot application can be built with SDK installed, using instructions
-   
+
     below.
+
 -   Retrieve the mcuboot directory with :
 
 ```
