@@ -533,7 +533,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Since for built in presets, we can't add any more entries. That might cause the size of testPresets not to exceed the number of presets supported.
                 # If so, skip the test.
                 if not len(testPresets) > numberOfPresetsSupported:
-                    logger.info(f"Couldn't run test step 18 since we couldn't build a list that exceeds number of supported presets")
+                    logger.info("Couldn't run test step 18 since we couldn't build a list that exceeds number of supported presets")
                 else:
                     # Send the AtomicRequest begin command
                     await self.send_atomic_request_begin_command()
@@ -544,7 +544,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     await self.send_atomic_request_rollback_command()
             else:
                 logger.info(
-                    f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
+                    "Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
 
 
 if __name__ == "__main__":
