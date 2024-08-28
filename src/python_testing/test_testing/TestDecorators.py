@@ -25,7 +25,6 @@
 #
 # You will get step_* calls as appropriate in between the test_start and test_stop calls if the test is not skipped.
 
-import os
 import sys
 
 import chip.clusters as Clusters
