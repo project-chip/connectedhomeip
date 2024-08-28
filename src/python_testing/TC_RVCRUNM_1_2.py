@@ -141,7 +141,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
             if count_of_idle_cleaning_or_mapping_mode_tags > 1:
                 asserts.fail("A ModeOptionsStruct entry includes more than one of the following "
-                                "mode tags: Idle(0x4000), Cleaning(0x4001), Mapping(0x4002)!")
+                             "mode tags: Idle(0x4000), Cleaning(0x4001), Mapping(0x4002)!")
 
         asserts.assert_true(at_least_one_idle_mode_tag,
                             "The Supported Modes does not have an entry of Idle(0x4000)")

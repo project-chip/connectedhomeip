@@ -64,7 +64,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
         RVCClean_cluster = Clusters.RvcCleanMode
         attributes = RVCClean_cluster.Attributes
-        
+
         self.print_step(1, "Commissioning, already done")
 
         self.print_step(2, "Read SupportedModes attribute")
