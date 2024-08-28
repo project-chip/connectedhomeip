@@ -60,6 +60,9 @@ static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUU
 namespace {
 JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
+jclass callbackClass;
+jmethodID onLogMessageMethod;
+jobject sLogCallback = nullptr;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -272,6 +275,63 @@ JNI_LOGGING_METHOD(void, setLogFilter)(JNIEnv * env, jclass clazz, jint level)
         break;
     }
     SetLogFilter(category);
+}
+
+static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    using namespace chip::Logging;
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    int priority = ANDROID_LOG_DEBUG;
+    switch (category)
+    {
+    case kLogCategory_Error:
+        priority = ANDROID_LOG_ERROR;
+        break;
+    case kLogCategory_Progress:
+        priority = ANDROID_LOG_INFO;
+        break;
+    case kLogCategory_Detail:
+        priority = ANDROID_LOG_DEBUG;
+        break;
+    default:
+        break;
+    }
+
+    jstring jModule = env->NewStringUTF(module);
+    jint jPriority  = static_cast<jint>(priority);
+
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(buffer, sizeof(buffer), msg, args);
+    jstring jMsg = env->NewStringUTF(buffer);
+
+    env->CallVoidMethod(sLogCallback, onLogMessageMethod, jModule, jPriority, jMsg);
+
+    env->DeleteLocalRef(jModule);
+    env->DeleteLocalRef(jMsg);
+}
+
+JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject callback)
+{
+    using namespace chip::Logging;
+
+    callbackClass      = env->GetObjectClass(callback);
+    onLogMessageMethod = env->GetMethodID(callbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
+    if (sLogCallback != nullptr)
+    {
+        env->DeleteGlobalRef(sLogCallback);
+    }
+
+    if (env->IsSameObject(callback, NULL))
+    {
+        sLogCallback = nullptr;
+        SetLogRedirectCallback(nullptr);
+    }
+    else
+    {
+        sLogCallback = env->NewGlobalRef(callback);
+        SetLogRedirectCallback(logRedirectCallback);
+    }
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
