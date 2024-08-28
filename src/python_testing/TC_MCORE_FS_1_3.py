@@ -469,6 +469,20 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
 
+        self.print_step(9, "Synchronize TH_SERVER_FOR_TH_FSA from TH_FSA to DUT_FSA fabric")
+        if not self.is_ci:
+            self.wait_for_user_input(
+                f"Synchronize endpoint from TH Fabric-Sync Bridge to DUT using manufacturer specified mechanism.\n"
+                f"Use the following parameters:\n"
+                f"- bridgeDynamicEndpoint: {th_fsa_bridge_th_server_endpoint}\n"
+                f"If using FabricSync Admin, you may type:\n"
+                f">>> fabricsync sync-device {th_fsa_bridge_th_server_endpoint}")
+        else:
+            self.dut_fsa_stdin.write(f"fabricsync sync-device {th_fsa_bridge_th_server_endpoint}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the synchronization to complete.
+            await asyncio.sleep(5)
+
         await asyncio.sleep(10)
 
         return
