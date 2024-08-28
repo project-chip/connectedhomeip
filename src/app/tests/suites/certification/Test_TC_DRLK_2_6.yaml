@@ -118,7 +118,7 @@ tests:
       response:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupportedValue
+                value: NumberOfHolidaySchedulesSupportedValue + 1 
               - name: "Status"
                 value: 133
 
