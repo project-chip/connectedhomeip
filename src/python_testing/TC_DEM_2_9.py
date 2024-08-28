@@ -108,7 +108,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
             asserts.assert_is_not_none(forecast.slots[0].maxPower)
             asserts.assert_is_not_none(forecast.slots[0].nominalEnergy)
         else:
-            logging.info('Device does not support StateForecastReporting. Skipping step 4b')
+            logging.info('Device does not support PowerForecastReporting. Skipping step 4b')
 
         self.step("5")
         await self.send_test_event_trigger_forecast_clear()
