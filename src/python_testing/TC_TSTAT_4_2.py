@@ -494,7 +494,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
             totalExpectedPresetsLength = 0
             for presetType in presetTypes:
-                totalExpectedPresetsLength += presetType.numberOfPresets;
+                totalExpectedPresetsLength += presetType.numberOfPresets
 
             if totalExpectedPresetsLength > numberOfPresetsSupported:
                 testPresets = []
@@ -519,16 +519,16 @@ class TC_TSTAT_4_2(MatterBaseTest):
                         countNumberOfPresetsAdded = 0
                         for testPreset in testPresets:
                             if testPreset.presetScenario == scenario:
-                                ++countNumberOfPresetsAdded;
+                                ++countNumberOfPresetsAdded
 
                         if countNumberOfPresetsAdded < presetType.numberOfPresets:
                             testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                             name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                                                                            name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
                             ++countNumberOfPresetsAdded
                     elif not didCopyPreset and not len(testPresets) > numberOfPresetsSupported:
                         for index in range(presetType.numberOfPresets):
                             testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                                                                            name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
                 # Since for built in presets, we can't add any more entries. That might cause the size of testPresets not to exceed the number of presets supported.
                 # If so, skip the test.
@@ -543,7 +543,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     # Clear state for next test.
                     await self.send_atomic_request_rollback_command()
             else:
-                logger.info(f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
+                logger.info(
+                    f"Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
