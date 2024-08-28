@@ -33,6 +33,8 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
+#define CHIP_MAX_NETWORK_TYPES 3
+
 // TODO: Use macro to disable some wifi or thread
 class Instance : public CommandHandlerInterface,
                  public AttributeAccessInterface,
@@ -80,6 +82,13 @@ private:
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     void SendNonConcurrentConnectNetworkResponse();
 #endif
+
+    // Array for recording NetworkCommissioningInstance.
+    static Instance * NetworkRecord[CHIP_MAX_NETWORK_TYPES];
+    // Record current network.
+    static void RecordNetwork(Instance *currentNetwork);
+    // Disconnect networks (if connected) in the array other than the current network.
+    static void DisconnectOtherNetworks(Instance *currentNetwork);
 
     EndpointId mEndpointId = kInvalidEndpointId;
     const BitFlags<Feature> mFeatureFlags;

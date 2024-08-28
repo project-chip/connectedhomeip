@@ -365,6 +365,7 @@ CHIP_ERROR Instance::Init()
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
+    RecordNetwork(this);
     return CHIP_NO_ERROR;
 }
 
@@ -1031,6 +1032,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    DisconnectOtherNetworks(this);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
@@ -1149,6 +1151,31 @@ exit:
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+Instance * Instance::NetworkRecord[CHIP_MAX_NETWORK_TYPES];
+
+void Instance::RecordNetwork(Instance * currentNetwork)
+{
+    for (size_t i = 0; i < CHIP_MAX_NETWORK_TYPES; ++i)
+    {
+        if (NetworkRecord[i] == nullptr)
+        {
+            NetworkRecord[i] = currentNetwork;
+            return;
+        }
+    }
+}
+
+void Instance::DisconnectOtherNetworks(Instance * currentNetwork)
+{
+    for (size_t i = 0; i < CHIP_MAX_NETWORK_TYPES; ++i)
+    {
+        if (NetworkRecord[i] != nullptr && NetworkRecord[i] != currentNetwork && NetworkRecord[i]->mpWirelessDriver)
+        {
+            NetworkRecord[i]->mpWirelessDriver->DisconnectNetwork();
+        }
+    }
+}
 
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {

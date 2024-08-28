@@ -218,6 +218,11 @@ public:
      */
     virtual CHIP_ERROR RevertConfiguration() = 0;
 
+    /**
+     * @brief Disconnects network if it has connected.
+     */
+    virtual CHIP_ERROR DisconnectNetwork() { return CHIP_NO_ERROR; }
+
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
