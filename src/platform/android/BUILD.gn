@@ -120,6 +120,7 @@ android_library("java") {
     "java/chip/platform/BleCallback.java",
     "java/chip/platform/BleConnectCallback.java",
     "java/chip/platform/BleManager.java",
+    "java/chip/platform/ChipError.java",
     "java/chip/platform/ChipMdnsCallback.java",
     "java/chip/platform/ChipMdnsCallbackImpl.java",
     "java/chip/platform/ConfigurationManager.java",

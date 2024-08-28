@@ -60,8 +60,10 @@ jobs:
               run: rm -rf src/controller/java/generated/
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
-            - name: Generate script-maintained items (ERROR_CODES.md)
-              run: ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ERROR_CODES.md"
+            - name: Generate script-maintained items
+              run: |
+                  ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ERROR_CODES.md"
+                  ./scripts/run_in_build_env.sh "scripts/gen_chip_error.py > src/platform/android/java/chip/platform/ChipError.java"
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes
