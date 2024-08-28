@@ -60,8 +60,8 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         """Execute the test steps."""
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
-            TestStep("2", "TH reads from the DUT the _Featuremap_ attribute",
-                     "Verify that the DUT response contains the _Featuremap_ attribute. Verify ConstraintBasedAdjustment and PowerForecastReporting is supported. Verify StateForecastReporting is not supported."),
+            TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
+                     "Verify that the DUT response contains the _FeatureMap_ attribute. Verify ConstraintBasedAdjustment and PowerForecastReporting is supported. Verify StateForecastReporting is not supported."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Test Event",
