@@ -6497,7 +6497,8 @@ PICS:
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051
 
-    - label: "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
+    - label:
+          "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
       id: TSTAT.S.A0052
 
     #
