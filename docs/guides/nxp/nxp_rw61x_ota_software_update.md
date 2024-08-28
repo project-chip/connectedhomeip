@@ -219,8 +219,8 @@ sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 running `imgtool` script during OTA Update Image generation.
 
 Note : When building the update image, the build arguments
-nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the gn
-gen command in order to specify the upgraded version.
+nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the
+gn gen command in order to specify the upgraded version.
 
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be
