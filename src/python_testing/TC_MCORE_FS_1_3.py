@@ -25,9 +25,9 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --storage-dir dut-fsa --discriminator 1234
+# test-runner-run/run1/app-args: --stdin-pipe=dut-fsa/stdin --storage-dir=dut-fsa --discriminator=1234
 # test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa/stdin
 # test-runner-run/run1/script-start-delay: 10
 # test-runner-run/run1/quiet: false
 # === END CI TEST ARGUMENTS ===
@@ -181,9 +181,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         # Get the path to the TH_FSA (fabric-admin and fabric-bridge) app from
         # the user params or use the default path.
-        FabricSyncApp.APP_PATH = self.user_params.get("th_fabric_sync_app_path", FabricSyncApp.APP_PATH)
+        FabricSyncApp.APP_PATH = self.user_params.get("th_fsa_app_path", FabricSyncApp.APP_PATH)
         if not os.path.exists(FabricSyncApp.APP_PATH):
-            asserts.fail("This test requires a TH_FSA app. Specify app path with --string-arg th_fabric_sync_app_path:<path_to_app>")
+            asserts.fail("This test requires a TH_FSA app. Specify app path with --string-arg th_fsa_app_path:<path_to_app>")
 
         # Get the path to the TH_SERVER app from the user params.
         th_server_app = self.user_params.get("th_server_app_path", None)
@@ -196,17 +196,23 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
         logging.info("Temporary storage directory: %s", self.storage.name)
 
-        self.fsa_bridge_port = 5543
-        self.fsa_bridge_discriminator = random.randint(0, 4095)
-        self.fsa_bridge_passcode = 20202021
+        self.th_fsa_bridge_address = "::1"
+        self.th_fsa_bridge_port = 5543
+        self.th_fsa_bridge_discriminator = random.randint(0, 4095)
+        self.th_fsa_bridge_passcode = 20202021
 
         self.th_fsa_controller = FabricSyncApp(
             storageDir=self.storage.name,
             paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
-            bridgePort=self.fsa_bridge_port,
-            bridgeDiscriminator=self.fsa_bridge_discriminator,
-            bridgePasscode=self.fsa_bridge_passcode,
+            bridgePort=self.th_fsa_bridge_port,
+            bridgeDiscriminator=self.th_fsa_bridge_discriminator,
+            bridgePasscode=self.th_fsa_bridge_passcode,
             vendorId=0xFFF1)
+
+        # Get the named pipe path for the DUT_FSA app input from the user params.
+        dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
+        if dut_fsa_stdin_pipe is not None:
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.server_for_dut_port = 5544
         self.server_for_dut_discriminator = random.randint(0, 4095)
@@ -314,6 +320,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         )
 
         self.print_step(2, "Verify that TH_SERVER_FOR_TH_FSA does not have a UniqueID")
+        # FIXME: Sometimes reading the UniqueID fails...
         await self.read_single_attribute_expect_error(
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.UniqueID,
@@ -365,9 +372,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.print_step(5, "Commissioning TH_FSA_BRIDGE to TH fabric")
         await self.default_controller.CommissionOnNetwork(
             nodeId=th_fsa_bridge_th_node_id,
-            setupPinCode=self.fsa_bridge_passcode,
+            setupPinCode=self.th_fsa_bridge_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.fsa_bridge_discriminator,
+            filter=self.th_fsa_bridge_discriminator,
         )
 
         # Get the list of endpoints on the TH_FSA_BRIDGE before adding the TH_SERVER_FOR_TH_FSA.
@@ -382,10 +389,10 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.print_step(6, "Open commissioning window on TH_SERVER_FOR_TH_FSA")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeid=th_server_for_th_fsa_th_node_id,
-            timeout=600,
-            iteration=10000,
+            option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
             discriminator=discriminator,
-            option=1)
+            iteration=10000,
+            timeout=600)
 
         # FIXME: Sometimes the commissioning does not work with the error:
         # > Failed to verify peer's MAC. This can happen when setup code is incorrect.
@@ -435,12 +442,34 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_not_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,
                                  "UniqueID on DUT_FSA_BRIDGE and TH_FSA_BRIDGE should be different")
 
-        self.print_step(9, "Commissioning TH_FSA_BRIDGE to DUT_FSA fabric")
-        await self.commission_via_commissioner_control(
-            controller_node_id=self.dut_node_id,
-            device_node_id=th_fsa_bridge_th_node_id)
+        discriminator = random.randint(0, 4095)
+        self.print_step(9, "Open commissioning window on TH_FSA_BRIDGE")
+        params = await self.default_controller.OpenCommissioningWindow(
+            nodeid=th_fsa_bridge_th_node_id,
+            option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
+            discriminator=discriminator,
+            iteration=10000,
+            timeout=600)
 
-        await asyncio.sleep(10000)
+        self.print_step(9, "Commissioning TH_FSA_BRIDGE to DUT_FSA fabric")
+        if not self.is_ci:
+            self.wait_for_user_input(
+                f"Commission TH Fabric-Sync Bridge on DUT using manufacturer specified mechanism.\n"
+                f"Use the following parameters:\n"
+                f"- discriminator: {discriminator}\n"
+                f"- setupPinCode: {params.setupPinCode}\n"
+                f"- setupQRCode: {params.setupQRCode}\n"
+                f"- setupManualCode: {params.setupManualCode}\n"
+                f"If using FabricSync Admin, you may type:\n"
+                f">>> fabricsync add-bridge <desired_node_id> {params.setupPinCode} <th_host_ip> {self.th_fsa_bridge_port}")
+        else:
+            self.dut_fsa_stdin.write(
+                f"fabricsync add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
+            self.dut_fsa_stdin.flush()
+            # Wait for the commissioning to complete.
+            await asyncio.sleep(5)
+
+        await asyncio.sleep(10)
 
         return
 

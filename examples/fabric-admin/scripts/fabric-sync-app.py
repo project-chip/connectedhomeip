@@ -42,6 +42,25 @@ async def forward_f(f_in, f_out, prefix: str):
         f_out.flush()
 
 
+async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
+    """Forward named pipe to f_out.
+
+    Unfortunately, Python does not support async file I/O on named pipes. This
+    function performs busy waiting with a short asyncio-friendly sleep to read
+    from the pipe.
+    """
+    fd = os.open(pipe_path, os.O_RDONLY | os.O_NONBLOCK)
+    while True:
+        try:
+            data = os.read(fd, 1024)
+            if data:
+                f_out.write(data)
+            if not data:
+                await asyncio.sleep(1)
+        except BlockingIOError:
+            await asyncio.sleep(1)
+
+
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
     loop = asyncio.get_event_loop()
@@ -51,7 +70,7 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
     while True:
         line = await reader.readline()
         if not line:
-            break
+            sys.exit(0)
         f_out.write(line)
 
 
@@ -118,6 +137,10 @@ async def main(args):
     if args.storage_dir is not None:
         os.makedirs(args.storage_dir, exist_ok=True)
 
+    pipe = args.stdin_pipe
+    if pipe and not os.path.exists(pipe):
+        os.mkfifo(pipe)
+
     def terminate(signum, frame):
         admin.terminate()
         bridge.terminate()
@@ -171,11 +194,15 @@ async def main(args):
     # so it can be added by the TH fabric.
     cmd = "pairing open-commissioning-window 1 0 0 600 1000 0"
     admin.stdin.write((cmd + "\n").encode())
+    # Wait some time for the bridge to open the commissioning window.
+    await asyncio.sleep(1)
 
     try:
         await asyncio.gather(
-            admin.wait(), bridge.wait(),
-            forward_stdin(admin.stdin))
+            forward_pipe(pipe, admin.stdin) if pipe else forward_stdin(admin.stdin),
+            admin.wait(),
+            bridge.wait(),
+        )
     except SystemExit:
         admin.terminate()
         bridge.terminate()
@@ -197,6 +224,8 @@ if __name__ == "__main__":
                         help="fabric-admin RPC server port")
     parser.add_argument("--app-bridge-rpc-port", metavar="PORT", type=int,
                         help="fabric-bridge RPC server port")
+    parser.add_argument("--stdin-pipe", metavar="PATH",
+                        help="read input from a named pipe instead of stdin")
     parser.add_argument("--storage-dir", metavar="PATH",
                         help="directory to place storage files in")
     parser.add_argument("--paa-trust-store-path", metavar="PATH",
