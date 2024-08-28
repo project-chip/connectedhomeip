@@ -879,7 +879,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, app_pipe_name : str, cmd_d : dict):
+    def write_to_app_pipe(self, app_pipe_name: str, cmd_d: dict):
         """
         Sends an out-of-band command to a Matter app.
 
@@ -896,13 +896,13 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
-        
+
         if not isinstance(app_pipe_name, str):
             raise TypeError("the named pipe must be provided as a string value")
-        
+
         if not isinstance(cmd_d, dict):
             raise TypeError("the command must be passed as a dictionary value")
-        
+
         import json
         command = json.dumps(cmd_d)
 
