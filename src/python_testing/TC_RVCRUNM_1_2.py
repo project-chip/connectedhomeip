@@ -62,7 +62,6 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
     async def test_TC_RVCRUNM_1_2(self):
         self.endpoint = self.matter_test_config.endpoint
 
-        RVCRun_cluster = Clusters.RvcRunMode
         attributes = Clusters.RvcRunMode.Attributes
 
         self.print_step(1, "Commissioning, already done")

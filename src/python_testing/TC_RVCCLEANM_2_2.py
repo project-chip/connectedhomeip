@@ -96,9 +96,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         if app_pid != 0:
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        RVCRun_cluster = Clusters.RvcRunMode
-        attributes = Clusters.RvcRunMode.Attributes
-
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
