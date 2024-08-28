@@ -150,9 +150,9 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         # Commission DUT - already done
 
         self.step("2")
-        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment,
-                                         Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting],
-                                        [Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting])
+        await self.validate_feature_map(must_have_features=[Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment,
+                                                            Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting],
+                                        must_not_have_features=[Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting])
 
         self.step("3")
         await self.check_test_event_triggers_enabled()
