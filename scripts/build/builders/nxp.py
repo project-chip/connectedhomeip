@@ -240,6 +240,9 @@ class NxpBuilder(GnBuilder):
             if 'ZEPHYR_NXP_BASE' not in os.environ:
                 raise Exception("ZEPHYR_NXP_BASE need to be set")
 
+            if 'ZEPHYR_TOOLCHAIN_VARIANT' in os.environ:
+                del os.environ['ZEPHYR_TOOLCHAIN_VARIANT']
+
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
 
