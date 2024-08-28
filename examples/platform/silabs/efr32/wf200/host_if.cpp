@@ -281,7 +281,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
             return;
     }
-    if ((ap = (struct scan_result_holder *) pvPortMalloc(sizeof(*ap))) == (struct scan_result_holder *) 0)
+    if ((ap = (struct scan_result_holder *) (chip::Platform::MemoryAlloc(sizeof(*ap)))) == (struct scan_result_holder *) 0)
     {
         ChipLogError(DeviceLayer, "Scan: No Mem");
     }
@@ -290,8 +290,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         ap->next  = scan_save;
         scan_save = ap;
         /* Not checking if scan_result->ssid_length is < 33 */
-        memcpy(ap->scan.ssid, scan_result->ssid_def.ssid, scan_result->ssid_def.ssid_length);
-        ap->scan.ssid[scan_result->ssid_def.ssid_length] = 0; /* make sure about null terminate */
+        chip::Platform::CopyString(ap->scan.ssid, sizeof(ap->scan.ssid), (char *) &scan_result->ssid_def.ssid[0]);
         /* We do it in this order WPA3 first */
         /* No EAP supported - Is this required */
         ap->scan.security = WFX_SEC_UNSPECIFIED;
@@ -633,14 +632,14 @@ static void wfx_events_task(void * p_arg)
             {
                 next = hp->next;
                 (*scan_cb)(&hp->scan);
-                vPortFree(hp);
+                chip::Platform::MemoryFree(hp);
             }
             (*scan_cb)((wfx_wifi_scan_result *) 0);
             scan_save  = (struct scan_result_holder *) 0;
             scan_count = 0;
             if (scan_ssid)
             {
-                vPortFree(scan_ssid);
+                chip::Platform::MemoryFree(scan_ssid);
                 scan_ssid = NULL;
             }
             /* Terminate scan */
@@ -734,7 +733,7 @@ static void wfx_wifi_hw_start(void)
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
-    chip::Platform::CopyString(ap->ssid, ap_info.ssid);
+    chip::Platform::CopyString(ap->ssid, sizeof(ap->ssid), ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
     ap->chan     = ap_info.chan;
