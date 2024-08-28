@@ -56,8 +56,7 @@ tests:
           value: null
 
     # Step 3
-    - label:
-          "TH sends a valid ActiveDatasetRequest command to the DUT without
+    - label: "TH sends a valid ActiveDatasetRequest command to the DUT without
           having armed the fail-safe"
       command: SetActiveDatasetRequest
       arguments:
@@ -78,6 +77,10 @@ tests:
                 value: 60
               - name: Breadcrumb
                 value: 1
+      response:
+          values:
+              - name: ErrorCode
+                value: CommissioningErrorEnum.OK
 
     # Step 5
     - label: "TH sends an invalid ActiveDatasetRequest command to the DUT"
