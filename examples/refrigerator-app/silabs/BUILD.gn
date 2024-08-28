@@ -1,0 +1,243 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+silabs_project_dir = "${chip_root}/examples/thermostat/silabs"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+}
+
+import("${examples_common_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # Enable the temperature sensor
+  # Some boards do not have a temperature sensor
+  use_temp_sensor = false
+}
+
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/SiWx917",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/efr32",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    if (use_wf200) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [ "${examples_plat_dir}/wf200" ]
+    }
+
+    if (chip_enable_ble_rs911x) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [
+        "${chip_root}/src/platform/silabs/efr32/rs911x",
+        "${examples_plat_dir}/rs911x",
+        "${examples_plat_dir}/rs911x/hal",
+      ]
+    }
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+
+    if (use_temp_sensor) {
+      include_dirs += [
+        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
+        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
+        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
+        "${efr32_sdk_root}/platform/common/config",
+      ]
+
+      defines += [ "USE_TEMP_SENSOR" ]
+    }
+  }
+}
+
+silabs_executable("thermostat_app") {
+  output_name = "matter-silabs-thermostat-example.out"
+  include_dirs = [ "include" ]
+  defines = []
+
+  sources = [
+    "${examples_common_plat_dir}/main.cpp",
+    "src/AppTask.cpp",
+    "src/SensorManager.cpp",
+    "src/TemperatureManager.cpp",
+    "src/ZclCallbacks.cpp",
+  ]
+
+  if (use_temp_sensor) {
+    sources += [
+      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
+      "${efr32_sdk_root}/platform/common/src/sl_status.c",
+      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+      "${examples_common_plat_dir}/TemperatureSensor.cpp",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
+    ]
+  }
+
+  if (!disable_lcd) {
+    sources += [ "src/ThermostatUI.cpp" ]
+  }
+
+  deps = [
+    ":sdk",
+    app_data_model,
+  ]
+
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+    ]
+
+    if (wifi_soc) {
+      deps += [ "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917" ]
+    } else {
+      deps += [ "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs" ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("silabs") {
+  deps = [ ":thermostat_app" ]
+}
+
+group("default") {
+  deps = [ ":silabs" ]
+}
