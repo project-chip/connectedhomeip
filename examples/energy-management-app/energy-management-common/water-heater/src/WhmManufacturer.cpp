@@ -152,6 +152,12 @@ WaterHeaterManagementDelegate * GetWhmDelegate()
     return wg;
 }
 
+// The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+int64_t WhmManufacturer::GetApproxEnergyDuringSession()
+{
+    return 300;
+}
+
 void SetTestEventTrigger_BasicInstallationTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
