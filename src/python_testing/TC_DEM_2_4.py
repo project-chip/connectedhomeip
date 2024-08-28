@@ -131,7 +131,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("17a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x05 (Paused)"),
-            TestStep("18", "",
+            TestStep("18", "Wait for minPauseDuration.",
                      "Event DEM.S.E03(Resumed) sent with Cause=0 (NormalCompletion)"),
             TestStep("18a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
