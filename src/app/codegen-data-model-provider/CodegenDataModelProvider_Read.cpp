@@ -289,16 +289,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                 return CHIP_NO_ERROR;
             }
 
-            if (err == CHIP_ERROR_ACCESS_DENIED)
-            {
-                // access denied has a specific code for IM
-                return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
-            }
-            else
-            {
-                // access restricted has a specific code for IM
-                return CHIP_IM_GLOBAL_STATUS(AccessRestricted);
-            }
+            // access denied and access restricted have specific codes for IM
+            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
         }
     }
 
