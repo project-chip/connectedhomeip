@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <DEMDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <EVSEManufacturerImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
@@ -40,16 +41,6 @@ static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::
 static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
 static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
     sPowerAdjustmentCapability;
-
-DeviceEnergyManagementDelegate * GetDEMDelegate()
-{
-    EVSEManufacturer * mn = GetEvseManufacturer();
-    VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
-    DeviceEnergyManagementDelegate * dg = mn->GetDEMDelegate();
-    VerifyOrDieWithMsg(dg != nullptr, AppServer, "DEM Delegate is null");
-
-    return dg;
-}
 
 CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {
@@ -92,9 +83,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     if (GetDEMDelegate()->HasFeature(DeviceEnergyManagement::Feature::kPowerForecastReporting))
     {
-        sSlots[0].nominalPower.SetValue(1500);
-        sSlots[0].minPower.SetValue(1000);
-        sSlots[0].maxPower.SetValue(2000);
+        sSlots[0].nominalPower.SetValue(2500000);
+        sSlots[0].minPower.SetValue(1200000);
+        sSlots[0].maxPower.SetValue(7600000);
     }
 
     sSlots[0].nominalEnergy.SetValue(2000);
@@ -119,9 +110,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
         if (GetDEMDelegate()->HasFeature(DeviceEnergyManagement::Feature::kPowerForecastReporting))
         {
-            sSlots[slotNo].nominalPower.SetValue(2 * sSlots[slotNo - 1].nominalPower.Value());
-            sSlots[slotNo].minPower.SetValue(2 * sSlots[slotNo - 1].minPower.Value());
-            sSlots[slotNo].maxPower.SetValue(2 * sSlots[slotNo - 1].maxPower.Value());
+            sSlots[slotNo].nominalPower.SetValue(sSlots[slotNo - 1].nominalPower.Value());
+            sSlots[slotNo].minPower.SetValue(sSlots[slotNo - 1].minPower.Value());
+            sSlots[slotNo].maxPower.SetValue(sSlots[slotNo - 1].maxPower.Value());
 
             sSlots[slotNo].nominalEnergy.SetValue(2 * sSlots[slotNo - 1].nominalEnergy.Value());
         }
@@ -134,10 +125,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, numSlots);
 
-    EVSEManufacturer * mn = GetEvseManufacturer();
-    mn->GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
-    mn->GetDEMDelegate()->SetAbsMinPower(1000);
-    mn->GetDEMDelegate()->SetAbsMaxPower(256 * 2000 * 1000);
+    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 
     return CHIP_NO_ERROR;
 }
