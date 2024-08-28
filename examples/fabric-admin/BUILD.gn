@@ -83,7 +83,7 @@ static_library("fabric-admin-utils") {
     "device_manager/DeviceManager.cpp",
     "device_manager/DeviceManager.h",
     "device_manager/DeviceSynchronization.cpp",
-    "device_manager/DeviceSynchronization.h",    
+    "device_manager/DeviceSynchronization.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
