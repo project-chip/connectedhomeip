@@ -131,7 +131,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             TestStep("29", "TH sends ClearUser Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
             TestStep("30", "TH sends ClearAliroReaderConfig Command to DUT.",
-                     "Verify that the DUT sends SUCCESS response."),]
+                     "Verify that the DUT sends SUCCESS response."), ]
 
         return steps
 
