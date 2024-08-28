@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
-from typing import Any, List, Optional, Tuple, Iterable
+from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -455,7 +455,7 @@ class ClusterAttributeChangeAccumulator:
                 self._attribute_report_counts[path.AttributeType] += 1
                 self._attribute_reports[path.AttributeType].append(value)
 
-    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float=1.0):
+    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
 
         Waits for at least `timeout_sec` seconds.
@@ -469,7 +469,8 @@ class ClusterAttributeChangeAccumulator:
         last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
 
         for element in expected_final_values:
-            logging.info(f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
+            logging.info(
+                f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
         logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
