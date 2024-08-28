@@ -32,12 +32,12 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import time
 import queue
+import time
 
 import chip.clusters as Clusters
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    await_sequence_of_reports, default_matter_test_main, AttributeValue)
+from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                    await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 
@@ -182,11 +182,14 @@ class TC_OCC_3_2(MatterBaseTest):
         # Build list of expectations based on attributes present.
         all_expected_final_values = [AttributeValue(endpoint_id, attribute=cluster.Attributes.HoldTime, value=hold_time_max)]
         if expect_legacy_pir_timing:
-            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, value=hold_time_max))
+            all_expected_final_values.append(AttributeValue(
+                endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, value=hold_time_max))
         if expect_legacy_us_timing:
-            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, value=hold_time_max))
+            all_expected_final_values.append(AttributeValue(
+                endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, value=hold_time_max))
         if expect_legacy_phy_timing:
-            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, value=hold_time_max))
+            all_expected_final_values.append(AttributeValue(
+                endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, value=hold_time_max))
 
         # Wait for the reports to come.
         attrib_listener.await_all_final_values_reported(all_expected_final_values, timeout_sec=post_prompt_settle_delay_seconds)
