@@ -272,8 +272,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    async def send_set_aliro_reader_config_cmd(self, use_group_resolving_key: bool,
-                                               expected_status: Status = Status.Success):
+    async def send_set_aliro_reader_config_cmd(self, expected_status: Status = Status.Success):
         try:
 
             signingKey = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4adb2f5d9bc9ea6c49e9566d144367df3ff")
@@ -635,15 +634,17 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             await self.send_clear_aliro_reader_config_cmd()
 
         self.step("23b")
-        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False, expected_status=Status.Success)
+        await self.send_set_aliro_reader_config_cmd(expected_status=Status.Success)
 
         self.step("24")
-        await self.set_credential_cmd(credentialData=aliroevictableendpointkey,
-                                      operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
-                                      credential_enum=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                      credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
+        if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.F08")
+                           and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
+            await self.set_credential_cmd(credentialData=aliroevictableendpointkey,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                          credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
         self.step("25")
-        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C1b.Rsp")):
+        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C1b.Rsp")):
 
             credentiallist: list[drlkcluster.Structs.CredentialStruct]
             credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
@@ -652,15 +653,14 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                                    credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey)]
             await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
         self.step("26")
-        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
-                           and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
+        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
             await self.set_credential_cmd(credentialData=self.pin_code2,
                                           operationType=drlkcluster.Enums.DataOperationTypeEnum.kModify,
                                           credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
 
         self.step("27")
-        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C1b.Rsp")):
+        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C1b.Rsp")):
 
             credentiallist: list[drlkcluster.Structs.CredentialStruct]
             credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
@@ -670,7 +670,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
 
         self.step("28")
-        if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C26.Rsp")):
+        if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
             await self.clear_credentials_cmd(credential=NullValue)
 
         self.step("29")
