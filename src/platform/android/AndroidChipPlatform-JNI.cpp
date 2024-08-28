@@ -298,12 +298,21 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
         break;
     }
 
-    jstring jModule = env->NewStringUTF(module);
     jint jPriority  = static_cast<jint>(priority);
+    jstring jModule = env->NewStringUTF(module);
+    if (jModule == nullptr)
+    {
+        return;
+    }
 
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(buffer, sizeof(buffer), msg, args);
     jstring jMsg = env->NewStringUTF(buffer);
+    if (jMsg == nullptr)
+    {
+        env->DeleteLocalRef(jModule);
+        return;
+    }
 
     env->CallVoidMethod(sJavaLogCallbackObject, sOnLogMessageMethod, jModule, jPriority, jMsg);
 
