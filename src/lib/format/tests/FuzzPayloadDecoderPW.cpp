@@ -73,7 +73,7 @@ void RunDecodePW(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mP
     // std::cout << "mMessageType: " << mMessageType << std::endl;
 }
 
-// This allows us to fuzz test with all the combinations of protocols 
+// This allows us to fuzz test with all the combinations of protocols
 auto ProtocolIDs()
 {
     return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,

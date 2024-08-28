@@ -14,7 +14,7 @@ using namespace fuzztest;
 using namespace chip;
 
 
-// The property Function 
+// The property Function
 void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
 {
     std::string base38EncodedString(reinterpret_cast<const char *>(bytes.data()), bytes.size());
@@ -28,14 +28,14 @@ void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
 
 
 
- 
+
 
 /* The property function for a base38 roundtrip Fuzzer.
  * It starts by encoding the fuzzing value passed
  * into Base38. The encoded value will then be decoded.
- * 
+ *
  * The fuzzer verifies that the decoded value is the same
- * as the one in input.*/ 
+ * as the one in input.*/
 void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
 {
 
@@ -44,7 +44,7 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
 
 
     ASSERT_LT(outputSizeNeeded, kMaxOutputSize);
-  
+
     ByteSpan span(bytes.data(), bytes.size());
 
     char encodedBuf[kMaxOutputSize];
@@ -60,7 +60,7 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
 
     ASSERT_EQ(decodingError, CHIP_NO_ERROR);
 
-    //Make sure that decoded data is equal to the original fuzzed input; the bytes vector 
+    //Make sure that decoded data is equal to the original fuzzed input; the bytes vector
     ASSERT_EQ(decodedData, bytes);
 
 }
