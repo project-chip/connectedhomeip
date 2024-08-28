@@ -65,10 +65,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (pw_enable_fuzz_test_targets) {
     group("pw_fuzz_tests") {
       deps = [
-        #":pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
-        #"$dir_pigweed:pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
-        # "${chip_root}/build/toolchain/pw_fuzzer:clang_pw_fuzz",
-        "${chip_root}/src/lib/format/tests:FuzzPayloadDecoderPW(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
     }
   }
