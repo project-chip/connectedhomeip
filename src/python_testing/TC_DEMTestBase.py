@@ -24,14 +24,6 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
-s_feature_strs = {Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment:           "kPowerAdjustment",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting:    "kPowerForecastReporting",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting:    "kStateForecastReporting",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStartTimeAdjustment:       "kStartTimeAdjustment",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPausable:                  "kPausable",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kForecastAdjustment:        "kForecastAdjustment",
-                  Clusters.DeviceEnergyManagement.Bitmaps.Feature.kConstraintBasedAdjustment: "kConstraintBasedAdjustment"}
-
 
 class DEMTestBase:
 
@@ -50,11 +42,11 @@ class DEMTestBase:
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
         for must_have_feature in must_have_features:
             asserts.assert_true(feature_map & must_have_feature,
-                                f"{s_feature_strs[must_have_feature]} must be set but is not. feature_map 0x{feature_map:x}")
+                                f"{must_have_feature.name} must be set but is not. feature_map 0x{feature_map:x}")
 
         for must_not_have_feature in must_not_have_features:
             asserts.assert_false(feature_map & must_not_have_feature,
-                                 f"{s_feature_strs[must_not_have_feature]} is not allowed to be set. feature_map 0x{feature_map:x}")
+                                 f"{must_not_have_feature.name} is not allowed to be set. feature_map 0x{feature_map:x}")
 
     async def validate_pfr_or_sfr_in_feature_map(self):
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
