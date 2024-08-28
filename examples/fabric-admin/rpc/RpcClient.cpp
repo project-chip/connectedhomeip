@@ -180,3 +180,20 @@ CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
 
     return WaitForResponse(call);
 }
+
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data)
+{
+    ChipLogProgress(NotSpecified, "AdminCommissioningAttributeChanged");
+
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.AdminCommissioningAttributeChanged(data, RpcCompletedWithEmptyResponse);
+
+    if (!call.active())
+    {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return WaitForResponse(call);
+}
