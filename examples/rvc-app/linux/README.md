@@ -1,7 +1,7 @@
 # Matter Linux Robotic Vacuum Cleaner Example
 
-An example showing the use of Matter on Linux. The document will describe how
-to build and run Matter Linux Robotic Vacuum Cleaner Example on Raspberry Pi. This
+An example showing the use of Matter on Linux. The document will describe how to
+build and run Matter Linux Robotic Vacuum Cleaner Example on Raspberry Pi. This
 doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 **Ubuntu for Raspberry Pi Desktop 20.10 (aarch64)**
 
