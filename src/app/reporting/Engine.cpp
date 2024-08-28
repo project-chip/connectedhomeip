@@ -346,23 +346,26 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if (err != CHIP_ERROR_ACCESS_DENIED)
+        if (err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
         {
             ReturnErrorOnFailure(err);
         }
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
+                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
+                                                                                                              : StatusIB(Status::AccessRestricted));
+
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId));
+                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
         }
         current = current->mpNext;
     }

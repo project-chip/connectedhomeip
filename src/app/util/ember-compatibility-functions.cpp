@@ -302,12 +302,13 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, err);
             if (aPath.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
+                                                   : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
         }
     }
 
@@ -701,9 +702,12 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            return apWriteHandler->AddStatus(aPath,
+                                             err == CHIP_ERROR_ACCESS_DENIED
+                                                 ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                 : Protocols::InteractionModel::Status::AccessRestricted);
         }
         apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
     }
