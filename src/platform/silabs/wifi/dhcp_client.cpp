@@ -27,7 +27,7 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#endif
+#endif // !(SLI_SI91X_MCU_INTERFACE)
 
 #include "dhcp_client.h"
 #include "lwip/dhcp.h"
@@ -109,10 +109,6 @@ uint8_t dhcpclient_poll(void * arg)
         if (dhcp_supplied_address(netif))
         {
             dhcp_state = DHCP_ADDRESS_ASSIGNED;
-
-            uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
-            ChipLogProgress(DeviceLayer, "DHCP IP: %lld.%lld.%lld.%lld", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1),
-                            NETIF_IPV4_ADDRESS(addr, 2), NETIF_IPV4_ADDRESS(addr, 3));
         }
         else
         {

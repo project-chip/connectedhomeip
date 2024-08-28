@@ -50,8 +50,10 @@ declare_args() {
 
 # Sanity check
 assert(chip_enable_wifi)
+
+silabs_plat_si91x_dir = "${chip_root}/src/platform/silabs"
 silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
-silabs_plat_si91x_common_wifi_dir = "${chip_root}/src/platform/silabs/wifi"
+
 import("${silabs_common_plat_dir}/args.gni")
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -181,8 +183,8 @@ source_set("siwx917-common") {
   include_dirs = [
     ".",
     "SiWx917/",
-    "${silabs_plat_si91x_wifi_dir}/wifi",
-    "${silabs_plat_si91x_wifi_dir}/SiWx917/wifi",
+    "${silabs_plat_si91x_dir}/wifi",
+    "${silabs_plat_si91x_wifi_dir}",
   ]
 
   sources = [

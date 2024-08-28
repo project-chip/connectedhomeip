@@ -164,12 +164,9 @@ static_library("efr32") {
       "wifi/wifi_config.h",
     ]
 
-    if (chip_enable_wifi_ipv4) {
-      sources += [ "${silabs_platform_dir}/wifi/dhcp_client.cpp" ]
-    }
-
     if (use_wf200 || use_rs9116 || use_SiWx917) {
       sources += [
+        "${silabs_platform_dir}/wifi/dhcp_client.cpp",
         "wifi/ethernetif.cpp",
         "wifi/ethernetif.h",
         "wifi/lwip_netif.cpp",
