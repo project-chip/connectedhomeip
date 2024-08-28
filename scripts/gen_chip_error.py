@@ -111,18 +111,18 @@ def dump_errors(header_path: Path, descriptor: ErrorDescriptor):
 
     title, _ = get_section_title(descriptor.section)
     print()
-    print(f"    /**")
+    print("    /**")
     print(f"     * {title}")
-    print(f"     *")
+    print("     *")
     print(f"     * These errors are defined in {header_path}")
-    print(f"     */")
+    print("     */")
 
     for code in sorted(codes_for_section, key=attrgetter("code")):
         print()
         if descriptor.include_description:
-            print(f"    /**")
+            print("    /**")
             print(f"     * {code.description}")
-            print(f"     */")
+            print("     */")
         print(f"    public static final long {code.name} = {code.code};")
 
 
