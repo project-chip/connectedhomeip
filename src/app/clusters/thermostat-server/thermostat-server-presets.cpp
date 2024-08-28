@@ -38,16 +38,16 @@ namespace {
  * @return true If the preset is valid i.e the PresetHandle (if not null) fits within size constraints and the presetScenario enum
  *         value is valid. Otherwise, return false.
  */
-bool IsValidPresetEntry(const PresetStruct::Type & preset)
+bool IsValidPresetEntry(const PresetStructWithOwnedMembers & preset)
 {
     // Check that the preset handle is not too long.
-    if (!preset.presetHandle.IsNull() && preset.presetHandle.Value().size() > kPresetHandleSize)
+    if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().size() > kPresetHandleSize)
     {
         return false;
     }
 
     // Ensure we have a valid PresetScenario.
-    return (preset.presetScenario != PresetScenarioEnum::kUnknownEnumValue);
+    return (preset.GetPresetScenario() != PresetScenarioEnum::kUnknownEnumValue);
 }
 
 /**
@@ -123,7 +123,7 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
  *
  * @return true if a matching entry was found in the  presets attribute list, false otherwise.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & presetToMatch,
+bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -143,7 +143,7 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStruct::Type & 
         }
 
         // Note: presets coming from our delegate always have a handle.
-        if (presetToMatch.presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
         }
@@ -351,53 +351,71 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
     return Status::Success;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & preset)
+CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & newPreset)
 {
+    PresetStructWithOwnedMembers preset = newPreset;
     if (!IsValidPresetEntry(preset))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (preset.presetHandle.IsNull())
+    if (preset.GetPresetHandle().IsNull())
     {
         if (IsBuiltIn(preset))
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
+        // Force to be false, if passed as null
+        preset.SetBuiltIn(false);
     }
     else
     {
-        auto & presetHandle = preset.presetHandle.Value();
-
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset, matchingPreset))
+        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
         // (b) There is no existing pending preset with this handle.
-        if (CountPresetsInPendingListWithPresetHandle(delegate, presetHandle) > 0)
+        if (CountPresetsInPendingListWithPresetHandle(delegate, preset.GetPresetHandle().Value()) > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
+        const auto & presetBuiltIn         = preset.GetBuiltIn();
+        const auto & matchingPresetBuiltIn = matchingPreset.GetBuiltIn();
         // (c)/(d) The built-in fields do not have a mismatch.
-        // TODO: What's the story with nullability on the BuiltIn field?
-        if (!preset.builtIn.IsNull() && !matchingPreset.GetBuiltIn().IsNull() &&
-            preset.builtIn.Value() != matchingPreset.GetBuiltIn().Value())
+        if (presetBuiltIn.IsNull())
         {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            if (matchingPresetBuiltIn.IsNull())
+            {
+                // This really shouldn't happen; internal presets should alway have built-in set
+                return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            }
+            preset.SetBuiltIn(matchingPresetBuiltIn.Value());
+        }
+        else
+        {
+            if (matchingPresetBuiltIn.IsNull())
+            {
+                // This really shouldn't happen; internal presets should alway have built-in set
+                return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            }
+            if (presetBuiltIn.Value() != matchingPresetBuiltIn.Value())
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
         }
     }
 
-    if (!PresetScenarioExistsInPresetTypes(delegate, preset.presetScenario))
+    if (!PresetScenarioExistsInPresetTypes(delegate, preset.GetPresetScenario()))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (preset.name.HasValue() && !PresetTypeSupportsNames(delegate, preset.presetScenario))
+    if (preset.GetName().HasValue() && !PresetTypeSupportsNames(delegate, preset.GetPresetScenario()))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
