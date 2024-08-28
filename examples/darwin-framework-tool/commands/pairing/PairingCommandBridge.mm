@@ -56,14 +56,13 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
         MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
         switch (mCommissioningType) {
         case CommissioningType::None:
-        case CommissioningType::NoNetwork:
-        case CommissioningType::Ethernet:
+        case CommissioningType::WithoutNetwork:
             break;
-        case CommissioningType::WiFi:
+        case CommissioningType::WithWiFi:
             [params setWifiSSID:[NSData dataWithBytes:mSSID.data() length:mSSID.size()]];
             [params setWifiCredentials:[NSData dataWithBytes:mPassword.data() length:mPassword.size()]];
             break;
-        case CommissioningType::Thread:
+        case CommissioningType::WithThread:
             [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
             break;
         }
