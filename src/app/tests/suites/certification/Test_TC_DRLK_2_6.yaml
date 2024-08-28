@@ -107,14 +107,14 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 5: TH sends GetHolidaySchedule Command to DUT with Invalid 
+          "Step 5: TH sends GetHolidaySchedule Command to DUT with Invalid
           HolidayIndex > number_holiday_sch_supported ."
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupportedValue + 1 
+                value: NumberOfHolidaySchedulesSupportedValue + 1
       response:
           values:
               - name: "HolidayIndex"
@@ -124,8 +124,8 @@ tests:
 
 
     - label:
-          "Step 6: TH sends GetHolidaySchedule Command to DUT with the 
-          HolidayIndex as any value that is different from 1  
+          "Step 6: TH sends GetHolidaySchedule Command to DUT with the
+          HolidayIndex as any value that is different from 1
           and value ⇐ number_holiday_sch_supported"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"

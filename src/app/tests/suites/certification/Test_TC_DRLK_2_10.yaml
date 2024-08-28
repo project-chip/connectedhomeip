@@ -100,9 +100,9 @@ tests:
           [1659521576.156368][4109:4114] CHIP:TOO:    }
       disabled: true
 
-    - label: 
-        "Step 2c: TH sends SetUser Command to DUT with the following values: 
-        a) OperationType as 0, b)UserIndex as 1, c)UserName as xxx, d)UserUniqueID as 6452, 
+    - label:
+        "Step 2c: TH sends SetUser Command to DUT with the following values:
+        a) OperationType as 0, b)UserIndex as 1, c)UserName as xxx, d)UserUniqueID as 6452,
         e)UserStatus as 1, f)UserType as 0, g)CredentialRule as 0"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
@@ -116,11 +116,11 @@ tests:
           [1721036387.040] [100957:100959] [DMG]                                 },
       disabled: true
 
-    - label: 
-        "Step 2d: TH reads MinPINCodeLength attribute and saves the 
+    - label:
+        "Step 2d: TH reads MinPINCodeLength attribute and saves the
         value as min_pin_code_length."
       PICS: DRLK.S.F08 && DRLK.S.F00
-      verification: |  
+      verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
 
           Via the TH (chip-tool), verify that the MinPINCodeLength attribute contains value in the range of 0 to 255.
@@ -129,11 +129,11 @@ tests:
           [1654680280.327558][3639:3644] CHIP:TOO:   MinPINCodeLength: 6
       disabled: true
 
-    - label: 
-        "Step 2e: TH reads MaxPINCodeLength attribute and saves the 
+    - label:
+        "Step 2e: TH reads MaxPINCodeLength attribute and saves the
         value as max_pin_code_length"
       PICS: DRLK.S.F08 && DRLK.S.F00
-      verification: |  
+      verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
 
           Via the TH (chip-tool), verify that the MaxPINCodeLength attribute contains value in the range of 0 to 255.
@@ -142,15 +142,15 @@ tests:
           [1654680165.815374][3630:3635] CHIP:TOO:   MaxPINCodeLength: 8
       disabled: true
 
-    - label: 
-        "Step 2f: TH sends SetCredential Command to DUT with the following fields 
-        and CredentialData Length is in an inclusive range of min_pin_code_length 
-        to max_pin_code_length, CredentialData='123456' a) OperationType as 0, 
-        b) Credential as 1 2, c) CredentialData as 123456, d) UserIndex as 1, 
+    - label:
+        "Step 2f: TH sends SetCredential Command to DUT with the following fields
+        and CredentialData Length is in an inclusive range of min_pin_code_length
+        to max_pin_code_length, CredentialData='123456' a) OperationType as 0,
+        b) Credential as 1 2, c) CredentialData as 123456, d) UserIndex as 1,
         e) UserStatus as null f) UserType as null.
         Save CredentialData as pin_code"
       PICS: DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      verification: |  
+      verification: |
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 2 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Via the TH (chip-tool), verify the SUCCESS response for setting the credential details.
@@ -287,7 +287,7 @@ tests:
     - label: "Step 3e: TH reads the LockOperation event from DUT"
       PICS: DRLK.S.E02
       verification: |
-          Note : This step can be validated in STEP 3d chip-tool log 
+          Note : This step can be validated in STEP 3d chip-tool log
 
           Via the TH (chip-tool), verify that the:
           -LockOperationType value as 1(Unlock).
@@ -437,7 +437,7 @@ tests:
           [1659777937.334846][3260:3265] CHIP:TOO:     UserIndex: 0
           [1659777937.334873][3260:3265] CHIP:TOO:     FabricIndex: 1
           [1659777937.334899][3260:3265] CHIP:TOO:     SourceNode: 112233
-          [1659777937.334970][3260:3265] CHIP:TOO:     Credentials: null 
+          [1659777937.334970][3260:3265] CHIP:TOO:     Credentials: null
       disabled: true
 
     - label:
@@ -595,7 +595,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 5e: TH sends ClearCredential Command to DUT with the following 
+          "Step 5e: TH sends ClearCredential Command to DUT with the following
           fields: a) CredentialType as 1, b) CredentialIndex as 2"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C26.Tx
       verification: |
@@ -609,7 +609,7 @@ tests:
           [1658995364.178137][4383:4388] CHIP:DMG:                                        status = 0x00 (SUCCESS),
           [1658995364.178185][4383:4388] CHIP:DMG:                                },
       disabled: true
-            
+
     - label:
           "Step 5f: TH sends Set Credential Command to DUT with the following
           fields: 1.OperationType as 0-Add 2.Credential as 1 1- PIN, Index
@@ -679,7 +679,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 6a: TH sends ClearCredential Command to DUT with the following 
+          "Step 6a: TH sends ClearCredential Command to DUT with the following
           fields: a) CredentialType as 1, b) CredentialIndex as 1"
       PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C26.Rsp
       verification: |
