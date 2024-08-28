@@ -1989,6 +1989,7 @@ TSTAT.S.A004a=1
 TSTAT.S.A004e=1
 TSTAT.S.A0050=1
 TSTAT.S.A0051=0
+TSTAT.S.A0052=0
 
 TSTAT.S.M.MinSetpointDeadBandWritable=1
 TSTAT.S.M.HVACSystemTypeConfigurationWritable=0
