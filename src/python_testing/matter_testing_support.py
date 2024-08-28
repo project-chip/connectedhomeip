@@ -879,9 +879,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    # Sends an out-of-band command to a Matter app
-    def write_to_app_pipe(self, command):
+    def write_to_app_pipe(self, app_pipe_name : str, cmd_d : dict):
         """
+        Sends an out-of-band command to a Matter app.
+
         Use the following environment variables:
 
          - LINUX_DUT_IP 
@@ -890,32 +891,39 @@ class MatterBaseTest(base_test.BaseTestClass):
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_UNAME
             * if LINUX_DUT_IP is provided, use this for the DUT user name
-            * if LINUX_DUT_NAME is not provided, a default value is used ("root")
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
+        
+        if not isinstance(app_pipe_name, str):
+            raise TypeError("the named pipe must be provided as a string value")
+        
+        if not isinstance(cmd_d, dict):
+            raise TypeError("the command must be passed as a dictionary value")
+        
+        import json
+        command = json.dumps(cmd_d)
+
         import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
-            with open(self.app_pipe, "w") as app_pipe:
+            with open(app_pipe_name, "w") as app_pipe:
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
             sleep(0.001)
         else:
-            print(f"Using DUT IP address: {dut_ip}")
+            logging.info(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_UNAME')
-            if dut_uname is None:
-                dut_uname = "root"
-                print("Using default DUT user name (root)")
-            else:
-                print(f"Using DUT user name: {dut_uname}")
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_UNAME environment variable must be set")
+
+            logging.info(f"Using DUT user name: {dut_uname}")
 
             command_fixed = command.replace('\"', '\\"')
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, self.app_pipe)
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.

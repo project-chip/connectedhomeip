@@ -149,7 +149,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
                      "of these modes: %i, %i" % (self.mode_a, self.mode_b))
@@ -228,7 +228,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         if op_state not in valid_op_states:
             self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "ChargerFound"}')
+                self.write_to_app_pipe(self.app_pipe, {"Name": "ChargerFound"})
             else:
                 self.wait_for_user_input(
                     prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")

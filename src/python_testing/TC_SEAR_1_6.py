@@ -89,7 +89,7 @@ class TC_SEAR_1_6(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
 
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
         self.print_step("2", test_step)
