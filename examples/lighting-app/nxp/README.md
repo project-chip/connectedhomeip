@@ -22,7 +22,6 @@ The example is based on:
 ## Supported devices
 
 -   [k32w1](k32w1/README.md)
--   [mcxw71](mcxw71/README.md)
 
 ## Introduction
 
@@ -54,10 +53,10 @@ supported device readme file for details.
 
 In order to build the example, it is recommended to use a Linux distribution.
 Please visit the supported Operating Systems list in
-[BUILDING.md](../../../docs/guides/BUILDING.md).
+[BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites).
 
 -   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../docs/guides/BUILDING.md))
+    [BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites))
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev

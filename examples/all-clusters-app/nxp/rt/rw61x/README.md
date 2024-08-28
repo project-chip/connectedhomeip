@@ -61,10 +61,10 @@ For Matter over Wi-Fi with OpenThread Border Router :
 
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (supported Operating Systems are listed in
-[BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+[BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)).
 
 -   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)))
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \

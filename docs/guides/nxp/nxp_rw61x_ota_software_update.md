@@ -50,7 +50,7 @@ self-upgrade. For more details, please refer to the
 
 For RW61x platform, the bootloader is configured to use the flash remapping
 mechanism by default, in order to perform the image upgrade. This is achieved by
-using the MCUBoot DIRECT-XIP upgrade mode.
+using the `MCUBoot DIRECT-XIP` upgrade mode.
 
 ## OTA Software Update process for RW61x example application
 
@@ -218,7 +218,7 @@ sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 running `imgtool` script during OTA Update Image generation.
 
 Note : When building the update image, the build arguments
-nxp_software_version=2 nxp_sofware_version_string=\"2.0\" can be added to the gn
+nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the gn
 gen command in order to specify the upgraded version.
 
 When the signed binary of the update is generated, the file should be converted

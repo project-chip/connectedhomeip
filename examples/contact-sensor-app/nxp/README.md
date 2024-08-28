@@ -24,7 +24,6 @@ The example is based on:
 ## Supported devices
 
 -   [k32w1](k32w1/README.md)
--   [mcxw71](mcxw71/README.md)
 
 ## Introduction
 
@@ -56,10 +55,10 @@ supported device readme file for details.
 
 In order to build the example, it is recommended to use a Linux distribution.
 Please visit the supported Operating Systems list in
-[BUILDING.md](../../../docs/guides/BUILDING.md).
+[BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites).
 
 -   Make sure that below prerequisites are correctly installed (as described in
-    [BUILDING.md](../../../docs/guides/BUILDING.md))
+    [BUILDING.md](../../../docs/guides/BUILDING.md#prerequisites))
 
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
@@ -109,7 +108,7 @@ table:
 | target name                                                | description                                                                                 |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | nxp-device-freertos-contact-sensor-low-power               | Default low-power contact sensor                                                            |
-| nxp-device-freertos-contact-sensor-low-power-factory       | Defaul low-power contact sensor with factory data                                           |
+| nxp-device-freertos-contact-sensor-low-power-factory       | Default low-power contact sensor with factory data                                           |
 | nxp-device-freertos-contact-sensor-low-power-lit           | Low-power contact sensor as LIT ICD                                                         |
 | nxp-device-freertos-contact-sensor-low-power-sw-v2         | Low-power contact sensor with software version 2 (can be used to test OTA)                  |
 | nxp-device-freertos-contact-sensor-low-power-factory-sw-v2 | Low-power contact sensor with factory data and software version 2 (can be used to test OTA) |
@@ -156,7 +155,7 @@ This is a list of ICD configuration gn args.
 | chip_enable_icd_lit                                                          | false         | Enable LIT ICD support                                                                                     |
 | chip_persist_subscriptions                                                   | true          | Try once to re-establish subscriptions from the server side after reboot. May be disabled for LIT use case |
 | chip_subscription_timeout_resumption                                         | true          | Same as above, but try to re-establish timeout out subscriptions                                           |
-| using Fibonacci backoff for retries pacing. May be disabled for LIT use case |
+| using `Fibonacci Backoff` for retries pacing. May be disabled for LIT use case |
 
 If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
 as gn argument and the above parameters must be modified to comply with LIT
