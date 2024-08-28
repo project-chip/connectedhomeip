@@ -125,7 +125,8 @@ rebooted to apply the update.
 To upgrade your device firmware over Bluetooth LE using a smartphone, complete
 the following steps:
 
-1. Install the [nRF Connect Device Manager](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager)
+1. Install the
+   [nRF Connect Device Manager](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager)
    application on your smartphone.
 2. Push the appropriate button on the device to enable the software update
    functionality (if it is not enabled by default) and start the Bluetooth LE
@@ -135,8 +136,10 @@ the following steps:
    advertising. See the user interface section in the example documentation to
    check the button number.
 4. Follow the instructions about downloading the new image to a device on the
-   FOTA updates page for either [nRF52 Series devices](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf52/fota_update.html)
-   or the [nRF5340 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf53/fota_update_nrf5340.html).
+   FOTA updates page for either
+   [nRF52 Series devices](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf52/fota_update.html)
+   or the
+   [nRF5340 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf53/fota_update_nrf5340.html).
 
 <hr>
 
