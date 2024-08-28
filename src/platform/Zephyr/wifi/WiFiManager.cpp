@@ -347,7 +347,8 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
             Instance().mWiFiParams.mParams.security =
                 scanResult->security <= WIFI_SECURITY_TYPE_MAX ? scanResult->security : WIFI_SECURITY_TYPE_PSK;
             Instance().mWiFiParams.mParams.psk_length = static_cast<uint8_t>(Instance().mWantedNetwork.passLen);
-            Instance().mWiFiParams.mParams.mfp = (scanResult->mfp == WIFI_MFP_REQUIRED) ? WIFI_MFP_REQUIRED : WIFI_MFP_OPTIONAL;
+            Instance().mWiFiParams.mParams.mfp        = scanResult->mfp;
+            Instance().mWiFiParams.mParams.band       = scanResult->band;
 
             // If the security is none, WiFi driver expects the psk to be nullptr
             if (Instance().mWiFiParams.mParams.security == WIFI_SECURITY_TYPE_NONE)
