@@ -468,7 +468,7 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     }
 }
 
-void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
     uint32_t flags;
     if (FeatureMap::Get(attributePath.mEndpointId, &flags) != Status::Success)
@@ -477,7 +477,7 @@ void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::Conc
         return;
     }
 
-    auto featureMap = chip::BitMask<Feature, uint32_t>(flags);
+    auto featureMap = BitMask<Feature, uint32_t>(flags);
     if (!featureMap.Has(Feature::kPresets))
     {
         // This server does not support presets, so nothing to do
@@ -487,7 +487,7 @@ void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::Conc
     bool occupied = true;
     if (featureMap.Has(Feature::kOccupancy))
     {
-        chip::BitMask<OccupancyBitmap, uint8_t> occupancy;
+        BitMask<OccupancyBitmap, uint8_t> occupancy;
         if (Occupancy::Get(attributePath.mEndpointId, &occupancy) == Status::Success)
         {
             occupied = occupancy.Has(OccupancyBitmap::kOccupied);
@@ -808,7 +808,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     }
 }
 
-void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
     Thermostat::MatterThermostatClusterServerAttributeChangedCallback(attributePath);
 }
