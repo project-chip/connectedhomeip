@@ -500,7 +500,7 @@ class ClusterAttributeChangeAccumulator:
         logging.info("Values found:")
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
-        asserts.fail(f"Did not find all expected last report values before time-out")
+        asserts.fail("Did not find all expected last report values before time-out")
 
     @property
     def attribute_queue(self) -> queue.Queue:
