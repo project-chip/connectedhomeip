@@ -530,7 +530,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                             testPresets.append(preset)
                             presetsAddedForScenario = presetsAddedForScenario + 1
 
-                    if presetsAddedForScenario < presetType.numberOfPresets:
+                    while presetsAddedForScenario < presetType.numberOfPresets:
                         testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
                                                                         name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
                         presetsAddedForScenario = presetsAddedForScenario + 1
