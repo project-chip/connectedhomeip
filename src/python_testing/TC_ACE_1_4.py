@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --int-arg PIXIT.ACE.APPENDPOINT:1 PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff PIXIT.ACE.APPATTRIBUTE:OnOff --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --int-arg PIXIT.ACE.APPENDPOINT:1 --int-arg PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff --string-arg PIXIT.ACE.APPATTRIBUTE:OnOff --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import sys
@@ -36,8 +36,8 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT.ACE.ENDPOINT:<endpoint> PIXIT.ACE.APPDEVTYPE:<device_type_id>
-# --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> PIXIT.ACE.APPATTRIBUTE:<attribute_name>
+# --int-arg PIXIT.ACE.ENDPOINT:<endpoint> --int-arg PIXIT.ACE.APPDEVTYPE:<device_type_id>
+# --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> --string-arg PIXIT.ACE.APPATTRIBUTE:<attribute_name>
 
 
 def str_to_cluster(str):

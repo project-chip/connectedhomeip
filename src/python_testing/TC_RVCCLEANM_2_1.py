@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:2
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -36,7 +36,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
+# --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
 
 
 class TC_RVCCLEANM_2_1(MatterBaseTest):
