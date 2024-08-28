@@ -246,8 +246,12 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
             await self.send_atomic_request_begin_command()
 
+            # Set the new preset to a null built-in value; will be replaced with false on reading
+            test_presets = copy.deepcopy(new_presets)
+            test_presets[2].builtIn = NullValue
+
             # Write to the presets attribute after calling AtomicRequest command
-            status = await self.write_presets(endpoint=endpoint, presets=new_presets)
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -268,8 +272,12 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
 
+            # Set the existing preset to a null built-in value; will be replaced with true on reading
+            test_presets = copy.deepcopy(new_presets)
+            test_presets[0].builtIn = NullValue
+
             # Write to the presets attribute after calling AtomicRequest command
-            await self.write_presets(endpoint=endpoint, presets=new_presets)
+            await self.write_presets(endpoint=endpoint, presets=test_presets)
 
             # Send the AtomicRequest commit command
             await self.send_atomic_request_commit_command()

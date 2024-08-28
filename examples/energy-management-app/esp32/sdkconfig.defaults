@@ -67,3 +67,21 @@ CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
 
 # Enable sntp time sync
 CONFIG_ENABLE_SNTP_TIME_SYNC=y
+
+# Enable EVSE device on EP1
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_EVSE=y
+
+# Enable test triggers used by the Device Energy Management tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=y
+
+# Enable test triggers used by the Evse tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=y
+
+# Enable test triggers used by the Water Heater Management tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=y
+
+# Enable test triggers used by the Electrical Reporting tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=y
+
+# Ensure kPowerForecastReporting (PFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set PFR and SFR.
+CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=y

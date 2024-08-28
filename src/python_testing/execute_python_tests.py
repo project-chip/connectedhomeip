@@ -59,6 +59,7 @@ def main(search_directory, env_file):
         "TC_CNET_4_4.py",
         "TC_CCTRL_2_1.py",
         "TC_CCTRL_2_2.py",
+        "TC_CCTRL_2_3.py",
         "TC_DGGEN_3_2.py",
         "TC_EEVSE_Utils.py",
         "TC_ECOINFO_2_1.py",

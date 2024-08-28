@@ -151,23 +151,31 @@ public:
         // TODO(#33221): We should really be using ScopedNode, but that requires larger fix in communication between
         // fabric-admin and fabric-bridge. For now we make the assumption that there is only one fabric used by
         // fabric-admin.
-        KeepActiveWorkData * data = chip::Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms);
+        KeepActiveWorkData * data =
+            Platform::New<KeepActiveWorkData>(this, request.node_id, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
         chip::DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 
-    void ScheduleSendingKeepActiveOnCheckIn(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
+    void ScheduleSendingKeepActiveOnCheckIn(NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
     {
         // Needs for accessing mPendingCheckIn
         assertChipStackLockedByCurrentThread();
 
-        auto timeNow = System::SystemClock().GetMonotonicTimestamp();
-        // Spec says we should expire the request 60 mins after we get it
-        System::Clock::Timestamp expiryTimestamp = timeNow + System::Clock::Seconds64(60 * 60);
+        auto timeNow                             = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Timestamp expiryTimestamp = timeNow + System::Clock::Milliseconds64(timeoutMs);
         KeepActiveDataForCheckIn checkInData     = { .mStayActiveDurationMs   = stayActiveDurationMs,
                                                      .mRequestExpiryTimestamp = expiryTimestamp };
-        mPendingCheckIn[nodeId]                  = checkInData;
+
+        auto it = mPendingCheckIn.find(nodeId);
+        if (it != mPendingCheckIn.end())
+        {
+            checkInData.mStayActiveDurationMs   = std::max(checkInData.mStayActiveDurationMs, it->second.mStayActiveDurationMs);
+            checkInData.mRequestExpiryTimestamp = std::max(checkInData.mRequestExpiryTimestamp, it->second.mRequestExpiryTimestamp);
+        }
+
+        mPendingCheckIn[nodeId] = checkInData;
     }
 
 private:
@@ -179,19 +187,20 @@ private:
 
     struct KeepActiveWorkData
     {
-        KeepActiveWorkData(FabricAdmin * fabricAdmin, chip::NodeId nodeId, uint32_t stayActiveDurationMs) :
-            mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs)
+        KeepActiveWorkData(FabricAdmin * fabricAdmin, NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs) :
+            mFabricAdmin(fabricAdmin), mNodeId(nodeId), mStayActiveDurationMs(stayActiveDurationMs), mTimeoutMs(timeoutMs)
         {}
 
         FabricAdmin * mFabricAdmin;
         chip::NodeId mNodeId;
         uint32_t mStayActiveDurationMs;
+        uint32_t mTimeoutMs;
     };
 
     static void KeepActiveWork(intptr_t arg)
     {
         KeepActiveWorkData * data = reinterpret_cast<KeepActiveWorkData *>(arg);
-        data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs);
+        data->mFabricAdmin->ScheduleSendingKeepActiveOnCheckIn(data->mNodeId, data->mStayActiveDurationMs, data->mTimeoutMs);
         chip::Platform::Delete(data);
     }
 
