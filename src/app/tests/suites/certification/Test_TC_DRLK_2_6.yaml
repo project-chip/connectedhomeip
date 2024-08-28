@@ -122,11 +122,10 @@ tests:
               - name: "Status"
                 value: 133
 
-
     - label:
           "Step 6: TH sends GetHolidaySchedule Command to DUT with the
-          HolidayIndex as any value that is different from 1
-          and value ⇐ number_holiday_sch_supported"
+          HolidayIndex as any value that is different from 1 and value ⇐
+          number_holiday_sch_supported"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:

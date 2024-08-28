@@ -216,7 +216,6 @@ tests:
       response:
           error: INVALID_COMMAND
 
-
     - label:
           "Step 7: TH sends Set User Command to DUT with the following values:
           OperationType as 2 UserIndex as 2 UserName as NULL UserUniqueID as
