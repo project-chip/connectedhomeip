@@ -32,7 +32,6 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import queue
 import time
 
 import chip.clusters as Clusters
