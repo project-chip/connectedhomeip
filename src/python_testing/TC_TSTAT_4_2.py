@@ -480,11 +480,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     if presetType.presetScenario == scenario:
                         foundMatchingScenario = True
                         break
-                if foundMatchingScenario == False:
+                if not foundMatchingScenario:
                     scenarioNotPresent = scenario
                     break
 
-            if scenarioNotPresent == None:
+            if scenarioNotPresent is None:
                 logger.info(
                     "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
             else:
