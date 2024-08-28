@@ -26,12 +26,12 @@
 # You will get step_* calls as appropriate in between the test_start and test_stop calls if the test is not skipped.
 
 import sys
+from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from matter_testing_support.matter_testing import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test,
-                                                   has_attribute, has_cluster, has_feature, per_endpoint_test, per_node_test)
-from typing import Optional
+from matter_testing_support.matter_testing import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
+                                                   has_cluster, has_feature, per_endpoint_test, per_node_test)
 from mobly import asserts
 from MockTestRunner import MockTestRunner
 
