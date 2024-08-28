@@ -660,6 +660,12 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
+    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:startupParams.operationalCertificate andRootCertificate:startupParams.rootCertificate];
+    if (existingController) {
+        return existingController;
+    }
+
     return [self _startDeviceController:[MTRDeviceController alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
@@ -1133,11 +1139,11 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (nullable MTRDeviceController *)_findControllerWithPendingShutdownMatchingParams:(MTRDeviceControllerParameters *)parameters
+- (nullable MTRDeviceController *)_findPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
 {
     std::lock_guard lock(_controllersLock);
     for (MTRDeviceController * controller in _controllers) {
-        if ([controller matchesPendingShutdownWithParams:parameters]) {
+        if ([controller matchesPendingShutdownControllerWithOperationalCertificate:operationalCertificate andRootCertificate:rootCertificate]) {
             MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
             [controller clearPendingShutdown];
             return controller;
@@ -1153,7 +1159,7 @@ MTR_DIRECT_MEMBERS
     [self _assertCurrentQueueIsNotMatterQueue];
 
     // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
-    MTRDeviceController * existingController = [self _findControllerWithPendingShutdownMatchingParams:parameters];
+    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:parameters.operationalCertificate andRootCertificate:parameters.rootCertificate];
     if (existingController) {
         return existingController;
     }
