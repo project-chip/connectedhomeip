@@ -2,17 +2,14 @@
 #include <cstdint>
 #include <iostream>
 
-
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
-
 
 #include <setup_payload/Base38Decode.h>
 #include <setup_payload/Base38Encode.h>
 
 using namespace fuzztest;
 using namespace chip;
-
 
 // The property Function
 void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
@@ -25,11 +22,6 @@ void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
     chip::base38Decode(base38EncodedString, decodedData);
 }
 
-
-
-
-
-
 /* The property function for a base38 roundtrip Fuzzer.
  * It starts by encoding the fuzzing value passed
  * into Base38. The encoded value will then be decoded.
@@ -41,7 +33,6 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
 
     size_t outputSizeNeeded     = base38EncodedLength(bytes.size());
     const size_t kMaxOutputSize = 512;
-
 
     ASSERT_LT(outputSizeNeeded, kMaxOutputSize);
 
@@ -57,16 +48,15 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
     std::vector<uint8_t> decodedData;
     CHIP_ERROR decodingError = base38Decode(base38EncodedString, decodedData);
 
-
     ASSERT_EQ(decodingError, CHIP_NO_ERROR);
 
-    //Make sure that decoded data is equal to the original fuzzed input; the bytes vector
+    // Make sure that decoded data is equal to the original fuzzed input; the bytes vector
     ASSERT_EQ(decodedData, bytes);
-
 }
 
 // The invocation of the FuzzTest
 FUZZ_TEST(Base38Decoder, Base38DecodeFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
 
-//Max size of the vector is defined as 306 since that will give an outputSizeNeeded of 511 which is less than the required kMaxOutputSize
+// Max size of the vector is defined as 306 since that will give an outputSizeNeeded of 511 which is less than the required
+// kMaxOutputSize
 FUZZ_TEST(Base38Decoder, Base38RoundTripFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>().WithMaxSize(306));

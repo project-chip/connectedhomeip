@@ -10,9 +10,7 @@
 
 using chip::TLV::TLVReader;
 
-
 using namespace fuzztest;
-
 
 static CHIP_ERROR FuzzIterator(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
@@ -27,7 +25,6 @@ void FuzzTlvRead(const std::vector<std::uint8_t> & bytes)
     TLVReader reader;
     reader.Init(bytes.data(), bytes.size());
     chip::TLV::Utilities::Iterate(reader, FuzzIterator, nullptr);
-
 }
 
 FUZZ_TEST(ChipCert, FuzzTlvRead).WithDomains(Arbitrary<std::vector<std::uint8_t>>());

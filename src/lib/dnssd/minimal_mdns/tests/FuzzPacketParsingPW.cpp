@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <cstdint>
 
-
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
@@ -10,9 +9,7 @@
 
 using namespace fuzztest;
 
-
 namespace {
-
 
 using namespace chip;
 using namespace mdns::Minimal;
@@ -63,11 +60,10 @@ private:
 
 void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
 {
-        BytesRange packet(bytes.data(), bytes.data() +  bytes.size());
-        FuzzDelegate delegate(packet);
+    BytesRange packet(bytes.data(), bytes.data() + bytes.size());
+    FuzzDelegate delegate(packet);
 
-        mdns::Minimal::ParsePacket(packet, &delegate);
-
+    mdns::Minimal::ParsePacket(packet, &delegate);
 }
 
 FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>());

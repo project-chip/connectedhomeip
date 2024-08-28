@@ -43,7 +43,6 @@ void RunDecodePW(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mP
     // Fuzzing with different Protocols
     params.SetProtocol(mProtocol);
 
-
     // Fuzzing with different MessageTypes
     params.SetMessageType(mMessageType);
     chip::Decoders::PayloadDecoder<64, 128> decoder(params);
