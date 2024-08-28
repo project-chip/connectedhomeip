@@ -163,12 +163,14 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 }
 
 CHIP_ERROR
-CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params)
+CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
 {
     chip_rpc_DeviceCommissioningInfo device;
     device.setup_pin     = params.GetSetupPIN();
     device.discriminator = params.GetDiscriminator();
     device.iterations    = params.GetIteration();
+    device.vendor_id     = vendorId;
+    device.product_id    = productId;
 
     VerifyOrReturnError(params.GetSalt().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(device.salt.bytes, params.GetSalt().data(), params.GetSalt().size());
@@ -187,11 +189,12 @@ CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params)
     return WaitForResponse(call);
 }
 
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs)
+CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
 {
     chip_rpc_KeepActiveParameters params;
     params.node_id                 = nodeId;
     params.stay_active_duration_ms = stayActiveDurationMs;
+    params.timeout_ms              = timeoutMs;
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.

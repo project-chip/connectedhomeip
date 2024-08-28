@@ -15197,17 +15197,21 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration) {
-      keepActive(callback, stayActiveDuration, 0);
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs) {
+      keepActive(callback, stayActiveDuration, timeoutMs, 0);
     }
 
-    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, int timedInvokeTimeoutMs) {
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, Long timeoutMs, int timedInvokeTimeoutMs) {
       final long commandId = 128L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long stayActiveDurationFieldID = 0L;
       BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
       elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
+      final long timeoutMsFieldID = 1L;
+      BaseTLVType timeoutMstlvValue = new UIntType(timeoutMs);
+      elements.add(new StructElement(timeoutMsFieldID, timeoutMstlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -40637,16 +40641,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle) {
       setActivePresetRequest(callback, presetHandle, 0);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, int timedInvokeTimeoutMs) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, @Nullable byte[] presetHandle, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long presetHandleFieldID = 0L;
-      BaseTLVType presetHandletlvValue = new ByteArrayType(presetHandle);
+      BaseTLVType presetHandletlvValue = presetHandle != null ? new ByteArrayType(presetHandle) : new NullType();
       elements.add(new StructElement(presetHandleFieldID, presetHandletlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -60768,9 +60772,8 @@ public class ChipClusters {
   public static class EcosystemInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1872L;
 
-    private static final long REMOVED_ON_ATTRIBUTE_ID = 0L;
-    private static final long DEVICE_DIRECTORY_ATTRIBUTE_ID = 1L;
-    private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 2L;
+    private static final long DEVICE_DIRECTORY_ATTRIBUTE_ID = 0L;
+    private static final long LOCATION_DIRECTORY_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -60786,10 +60789,6 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
-    }
-
-    public interface RemovedOnAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
     }
 
     public interface DeviceDirectoryAttributeCallback extends BaseAttributeCallback {
@@ -60814,32 +60813,6 @@ public class ChipClusters {
 
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
-    }
-
-    public void readRemovedOnAttribute(
-        RemovedOnAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REMOVED_ON_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REMOVED_ON_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeRemovedOnAttribute(
-        RemovedOnAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REMOVED_ON_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, REMOVED_ON_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readDeviceDirectoryAttribute(

@@ -334,6 +334,15 @@ class AttributeChangeCallback:
             asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
+def clear_queue(report_queue: queue.Queue):
+    """Flush all contents of a report queue. Useful to get back to empty point."""
+    while not report_queue.empty():
+        try:
+            report_queue.get(block=False)
+        except queue.Empty:
+            break
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -343,6 +352,9 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
       - attribute: attribute to match for reports to check.
       - sequence: list of attribute values in order that are expected.
       - timeout_sec: number of seconds to wait for.
+
+    *** WARNING: The queue contains every report since the sub was established. Use
+        clear_queue to make it empty. ***
 
     This will fail current Mobly test with assertion failure if the data is not as expected in order.
 
@@ -455,6 +467,20 @@ class ClusterAttributeChangeAccumulator:
     @property
     def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
         return self._attribute_reports
+
+    def get_last_report(self) -> Optional[Any]:
+        """Flush entire queue, returning last (newest) report only."""
+        last_report: Optional[Any] = None
+        while True:
+            try:
+                last_report = self._q.get(block=False)
+            except queue.Empty:
+                return last_report
+
+    def flush_reports(self) -> None:
+        """Flush entire queue, returning nothing."""
+        _ = self.get_last_report()
+        return
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -1822,6 +1848,14 @@ def per_node_test(body):
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+
+
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
     try:
         return cluster in wildcard.attributes[endpoint]
@@ -1854,7 +1888,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
 
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
-    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
         return attribute.attribute_id in attr_list

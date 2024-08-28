@@ -240,63 +240,71 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         }
     }
 
+    uint32_t selectedAreasBuffer[kMaxNumSelectedAreas];
+    auto selectedAreasSpan         = Span<uint32_t>(selectedAreasBuffer, kMaxNumSelectedAreas);
+    uint32_t numberOfSelectedAreas = 0;
+
+    // Closure for checking if an area ID exists in the selectedAreasSpan
+    auto areaAlreadyExists = [&numberOfSelectedAreas, &selectedAreasSpan](uint32_t areaId) {
+        for (uint32_t i = 0; i < numberOfSelectedAreas; i++)
+        {
+            if (areaId == selectedAreasSpan[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
     bool matchesCurrentSelectedAreas = (numberOfAreas == mDelegate->GetNumberOfSelectedAreas());
 
+    // do as much parameter validation as we can
     if (numberOfAreas != 0)
     {
-        // do as much parameter validation as we can
+        uint32_t ignoredIndex = 0;
+        uint32_t oldSelectedArea;
+        auto iAreaIter = req.newAreas.begin();
+        while (iAreaIter.Next())
         {
-            uint32_t ignoredIndex = 0;
-            uint32_t oldSelectedArea;
-            uint32_t i     = 0;
-            auto iAreaIter = req.newAreas.begin();
-            while (iAreaIter.Next())
+            uint32_t selectedArea = iAreaIter.GetValue();
+
+            // If aSelectedArea is already in selectedAreasSpan skip
+            if (areaAlreadyExists(selectedArea))
             {
-                uint32_t aSelectedArea = iAreaIter.GetValue();
-
-                // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
-                // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
-                if (!IsSupportedArea(aSelectedArea))
-                {
-                    exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
-                    return;
-                }
-
-                // Checking for duplicate locations.
-                uint32_t j     = 0;
-                auto jAreaIter = req.newAreas.begin();
-                while (j < i)
-                {
-                    jAreaIter.Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
-                    if (jAreaIter.GetValue() == aSelectedArea)
-                    {
-                        exitResponse(SelectAreasStatus::kDuplicatedAreas, ""_span);
-                        return;
-                    }
-                    j += 1;
-                }
-
-                // check to see if parameter list and attribute still match
-                if (matchesCurrentSelectedAreas)
-                {
-                    if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) || (aSelectedArea != oldSelectedArea))
-                    {
-                        matchesCurrentSelectedAreas = false;
-                    }
-                }
-
-                i += 1;
+                continue;
             }
 
-            // after iterating with Next through DecodableType - check for failure
-            if (CHIP_NO_ERROR != iAreaIter.GetStatus())
+            // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
+            // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
+            if (!IsSupportedArea(selectedArea))
             {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+                exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
                 return;
             }
+
+            // check to see if parameter list and attribute still match
+            if (matchesCurrentSelectedAreas)
+            {
+                if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) || (selectedArea != oldSelectedArea))
+                {
+                    matchesCurrentSelectedAreas = false;
+                }
+            }
+
+            selectedAreasSpan[numberOfSelectedAreas] = selectedArea;
+            numberOfSelectedAreas += 1;
+        }
+
+        // after iterating with Next through DecodableType - check for failure
+        if (CHIP_NO_ERROR != iAreaIter.GetStatus())
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
         }
     }
+
+    selectedAreasSpan.reduce_size(numberOfSelectedAreas);
 
     // If the newAreas field is the same as the value of the SelectedAreas attribute
     // the SelectAreasResponse command SHALL have the Status field set to Success and
@@ -327,7 +335,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // ask the device to handle SelectAreas Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
     auto locationStatus = SelectAreasStatus::kSuccess;
-    if (!mDelegate->IsValidSelectAreasSet(req, locationStatus, delegateStatusText))
+    if (!mDelegate->IsValidSelectAreasSet(selectedAreasSpan, locationStatus, delegateStatusText))
     {
         exitResponse(locationStatus, delegateStatusText);
         return;
@@ -342,11 +350,10 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
         if (numberOfAreas != 0)
         {
-            auto locationIter = req.newAreas.begin();
             uint32_t ignored;
-            while (locationIter.Next())
+            for (uint32_t areaId : selectedAreasSpan)
             {
-                mDelegate->AddSelectedArea(locationIter.GetValue(), ignored);
+                mDelegate->AddSelectedArea(areaId, ignored);
             }
         }
 
@@ -373,17 +380,8 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
     // If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
     if (!IsSupportedArea(req.skippedArea))
     {
-        ChipLogError(Zcl, "SkippedArea (%u) is not in the SupportedAreas attribute.", req.skippedArea);
+        ChipLogError(Zcl, "SkippedArea (%" PRIu32 ") is not in the SupportedAreas attribute.", req.skippedArea);
         exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
-        return;
-    }
-
-    // If the CurrentArea attribute is null, the status should be set to InvalidInMode.
-    // If the Status field is not set to Success, or InvalidAreaList, the StatusText field SHALL include a vendor defined error
-    // description.
-    if (mCurrentArea.IsNull())
-    {
-        exitResponse(SkipAreaStatus::kInvalidInMode, "Current Area attribute is null"_span);
         return;
     }
 
@@ -451,21 +449,22 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
 {
     // If the LocationInfo field is null, the LandmarkInfo field SHALL NOT be null.
     // If the LandmarkInfo field is null, the LocationInfo field SHALL NOT be null.
-    if (aArea.areaDesc.locationInfo.IsNull() && aArea.areaDesc.landmarkInfo.IsNull())
+    if (aArea.areaInfo.locationInfo.IsNull() && aArea.areaInfo.landmarkInfo.IsNull())
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedArea %u - must have locationInfo and/or LandmarkInfo", aArea.areaID);
+        ChipLogDetail(Zcl, "IsValidAsSupportedArea %" PRIu32 " - must have locationInfo and/or LandmarkInfo", aArea.areaID);
         return false;
     }
 
     // If LocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
     // be null: LocationInfo's FloorNumber field, LocationInfo's AreaType field, the LandmarkInfo
-    if (!aArea.areaDesc.locationInfo.IsNull())
+    if (!aArea.areaInfo.locationInfo.IsNull())
     {
-        if (aArea.areaDesc.locationInfo.Value().locationName.empty() && aArea.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
-            aArea.areaDesc.locationInfo.Value().areaType.IsNull() && aArea.areaDesc.landmarkInfo.IsNull())
+        if (aArea.areaInfo.locationInfo.Value().locationName.empty() && aArea.areaInfo.locationInfo.Value().floorNumber.IsNull() &&
+            aArea.areaInfo.locationInfo.Value().areaType.IsNull() && aArea.areaInfo.landmarkInfo.IsNull())
         {
-            ChipLogDetail(Zcl, "IsValidAsSupportedArea %u - AreaName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
-                          aArea.areaID);
+            ChipLogDetail(
+                Zcl, "IsValidAsSupportedArea %" PRIu32 " - AreaName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
+                aArea.areaID);
             return false;
         }
     }
@@ -475,14 +474,15 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
     {
         if (aArea.mapID.IsNull())
         {
-            ChipLogDetail(Zcl, "IsValidSupportedArea %u - map Id should not be null when there are supported maps", aArea.areaID);
+            ChipLogDetail(Zcl, "IsValidSupportedArea %" PRIu32 " - map Id should not be null when there are supported maps",
+                          aArea.areaID);
             return false;
         }
 
         // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
         if (!IsSupportedMap(aArea.mapID.Value()))
         {
-            ChipLogError(Zcl, "IsValidSupportedArea %u - map Id %u is not in supported map list", aArea.areaID,
+            ChipLogError(Zcl, "IsValidSupportedArea %" PRIu32 " - map Id %" PRIu32 " is not in supported map list", aArea.areaID,
                          aArea.mapID.Value());
             return false;
         }
@@ -491,8 +491,8 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
     {
         if (!aArea.mapID.IsNull())
         {
-            ChipLogDetail(Zcl, "IsValidSupportedArea %u - map Id %u is not in empty supported map list", aArea.areaID,
-                          aArea.mapID.Value());
+            ChipLogDetail(Zcl, "IsValidSupportedArea %" PRIu32 " - map Id %" PRIu32 " is not in empty supported map list",
+                          aArea.areaID, aArea.mapID.Value());
             return false;
         }
     }
@@ -578,14 +578,14 @@ bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
     // Check there is space for the entry.
     if (mDelegate->GetNumberOfSupportedAreas() >= kMaxNumSupportedAreas)
     {
-        ChipLogError(Zcl, "AddSupportedArea %u - too many entries", aNewArea.areaID);
+        ChipLogError(Zcl, "AddSupportedArea %" PRIu32 " - too many entries", aNewArea.areaID);
         return false;
     }
 
     // Verify cluster requirements concerning valid fields and field relationships.
     if (!IsValidSupportedArea(aNewArea))
     {
-        ChipLogError(Zcl, "AddSupportedArea %u - not a valid location object", aNewArea.areaID);
+        ChipLogError(Zcl, "AddSupportedArea %" PRIu32 " - not a valid location object", aNewArea.areaID);
         return false;
     }
 
@@ -595,7 +595,7 @@ bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
     // the AreaInfo field.
     if (!IsUniqueSupportedArea(aNewArea, false))
     {
-        ChipLogError(Zcl, "AddSupportedArea %u - not a unique location object", aNewArea.areaID);
+        ChipLogError(Zcl, "AddSupportedArea %" PRIu32 " - not a unique location object", aNewArea.areaID);
         return false;
     }
 
@@ -619,7 +619,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
     AreaStructureWrapper supportedArea;
     if (!mDelegate->GetSupportedAreaById(aNewArea.areaID, listIndex, supportedArea))
     {
-        ChipLogError(Zcl, "ModifySupportedArea %u - not a supported areaID", aNewArea.areaID);
+        ChipLogError(Zcl, "ModifySupportedArea %" PRIu32 " - not a supported areaID", aNewArea.areaID);
         return false;
     }
 
@@ -639,7 +639,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedArea(aNewArea))
         {
-            ChipLogError(Zcl, "ModifySupportedArea %u - not a valid location object", aNewArea.areaID);
+            ChipLogError(Zcl, "ModifySupportedArea %" PRIu32 " - not a valid location object", aNewArea.areaID);
             return false;
         }
 
@@ -647,7 +647,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
         // We ignore comparing the area ID as one of the locations will match this one.
         if (!IsUniqueSupportedArea(aNewArea, true))
         {
-            ChipLogError(Zcl, "ModifySupportedArea %u - not a unique location object", aNewArea.areaID);
+            ChipLogError(Zcl, "ModifySupportedArea %" PRIu32 " - not a unique location object", aNewArea.areaID);
             return false;
         }
 
@@ -701,14 +701,14 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
     // check max# of list entries
     if (mDelegate->GetNumberOfSupportedMaps() >= kMaxNumSupportedMaps)
     {
-        ChipLogError(Zcl, "AddSupportedMap %u - maximum number of entries", aMapId);
+        ChipLogError(Zcl, "AddSupportedMap %" PRIu32 " - maximum number of entries", aMapId);
         return false;
     }
 
     //  Map name SHALL include readable text that describes the map name (cannot be empty string).
     if (aMapName.empty())
     {
-        ChipLogError(Zcl, "AddSupportedMap %u - Name must not be empty string", aMapId);
+        ChipLogError(Zcl, "AddSupportedMap %" PRIu32 " - Name must not be empty string", aMapId);
         return false;
     }
 
@@ -721,7 +721,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%.*s'", aMapId,
+            ChipLogError(Zcl, "AddSupportedMap %" PRIu32 " - A map already exists with same name '%.*s'", aMapId,
                          static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
@@ -729,7 +729,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         //  Each entry in this list SHALL have a unique value for the MapID field.
         if (aMapId == entry.mapID)
         {
-            ChipLogError(Zcl, "AddSupportedMap - non-unique Id %u", aMapId);
+            ChipLogError(Zcl, "AddSupportedMap - non-unique Id %" PRIu32 "", aMapId);
             return false;
         }
     }
@@ -757,14 +757,14 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
     // get existing entry
     if (!mDelegate->GetSupportedMapById(aMapId, modifiedIndex, modifiedMap))
     {
-        ChipLogError(Zcl, "RenameSupportedMap Id %u - map does not exist", aMapId);
+        ChipLogError(Zcl, "RenameSupportedMap Id %" PRIu32 " - map does not exist", aMapId);
         return false;
     }
 
     //  Map name SHALL include readable text that describes the map's name. It cannot be empty string.
     if (newMapName.empty())
     {
-        ChipLogError(Zcl, "RenameSupportedMap %u - Name must not be empty string", aMapId);
+        ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - Name must not be empty string", aMapId);
         return false;
     }
 
@@ -784,7 +784,7 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "RenameSupportedMap %u - map already exists with same name '%.*s'", aMapId,
+            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%.*s'", aMapId,
                          static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
@@ -828,21 +828,21 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
     // check max# of list entries
     if (mDelegate->GetNumberOfSelectedAreas() >= kMaxNumSelectedAreas)
     {
-        ChipLogError(Zcl, "AddSelectedArea %u - maximum number of entries", aSelectedArea);
+        ChipLogError(Zcl, "AddSelectedArea %" PRIu32 " - maximum number of entries", aSelectedArea);
         return false;
     }
 
     // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
     if (!IsSupportedArea(aSelectedArea))
     {
-        ChipLogError(Zcl, "AddSelectedArea %u - not a supported location", aSelectedArea);
+        ChipLogError(Zcl, "AddSelectedArea %" PRIu32 " - not a supported location", aSelectedArea);
         return false;
     }
 
     // each entry in this list SHALL have a unique value
     if (mDelegate->IsSelectedArea(aSelectedArea))
     {
-        ChipLogError(Zcl, "AddSelectedArea %u - duplicated location", aSelectedArea);
+        ChipLogError(Zcl, "AddSelectedArea %" PRIu32 " - duplicated location", aSelectedArea);
         return false;
     }
 
@@ -852,7 +852,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedArea %u - %.*s", aSelectedArea, static_cast<int>(locationStatusText.size()),
+        ChipLogError(Zcl, "AddSelectedArea %" PRIu32 " - %.*s", aSelectedArea, static_cast<int>(locationStatusText.size()),
                      locationStatusText.data());
         return false;
     }
@@ -886,7 +886,7 @@ bool Instance::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea
     // list.
     if ((!aCurrentArea.IsNull()) && (!IsSupportedArea(aCurrentArea.Value())))
     {
-        ChipLogError(Zcl, "SetCurrentArea %u - location is not supported", aCurrentArea.Value());
+        ChipLogError(Zcl, "SetCurrentArea %" PRIu32 " - location is not supported", aCurrentArea.Value());
         return false;
     }
 
@@ -955,14 +955,14 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
     // For each entry in this list, the AreaID field SHALL match an entry on the SupportedAreas attribute's list.
     if (!IsSupportedArea(aAreaId))
     {
-        ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %u", aAreaId);
+        ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %" PRIu32 "", aAreaId);
         return false;
     }
 
     // Each entry in this list SHALL have a unique value for the AreaID field.
     if (mDelegate->IsProgressElement(aAreaId))
     {
-        ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %u", aAreaId);
+        ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %" PRIu32 "", aAreaId);
         return false;
     }
 
@@ -984,7 +984,7 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
 
     if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %u", aAreaId);
+        ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %" PRIu32 "", aAreaId);
         return false;
     }
 
@@ -1020,7 +1020,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
 
     if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %u", aAreaId);
+        ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %" PRIu32 "", aAreaId);
         return false;
     }
 
@@ -1036,7 +1036,8 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
         !aTotalOperationalTime.IsNull())
     {
         ChipLogError(Zcl,
-                     "SetProgressTotalOperationalTime - location %u opStatus value %u - can be non-null only if opStatus is "
+                     "SetProgressTotalOperationalTime - location %" PRIu32
+                     " opStatus value %u - can be non-null only if opStatus is "
                      "Completed or Skipped",
                      aAreaId, to_underlying(progressElement.status));
         return false;
@@ -1062,7 +1063,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
 
     if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %u", aAreaId);
+        ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %" PRIu32 "", aAreaId);
         return false;
     }
 

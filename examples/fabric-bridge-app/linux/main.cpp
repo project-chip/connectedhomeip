@@ -18,6 +18,7 @@
 
 #include <AppMain.h>
 
+#include "BridgedAdministratorCommissioning.h"
 #include "BridgedDevice.h"
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
@@ -198,15 +199,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
     ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
 
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
-
     handlerContext.SetCommandHandled();
-
-    if (device == nullptr || !device->IsIcd())
-    {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
-        return;
-    }
 
     BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType commandData;
     if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
@@ -215,10 +208,25 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
+    const uint32_t kMinTimeoutMs = 30 * 1000;
+    const uint32_t kMaxTimeoutMs = 60 * 60 * 1000;
+    if (commandData.timeoutMs < kMinTimeoutMs || commandData.timeoutMs > kMaxTimeoutMs)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    if (device == nullptr || !device->IsIcd())
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
+        return;
+    }
+
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration) == CHIP_NO_ERROR)
+    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "KeepActive successfully processed");
         status = Status::Success;
@@ -234,6 +242,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
@@ -258,6 +267,7 @@ void ApplicationInit()
     pollingThread.detach();
 
     BridgeDeviceMgr().Init();
+    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
 
     VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");

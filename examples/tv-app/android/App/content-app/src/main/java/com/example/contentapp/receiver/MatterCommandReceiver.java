@@ -4,11 +4,13 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Settings;
 import android.util.Log;
 import com.example.contentapp.AttributeHolder;
 import com.example.contentapp.CommandResponseHolder;
 import com.example.contentapp.MainActivity;
 import com.example.contentapp.matter.MatterAgentClient;
+import com.matter.tv.app.api.Clusters;
 import com.matter.tv.app.api.MatterIntentConstants;
 
 public class MatterCommandReceiver extends BroadcastReceiver {
@@ -44,6 +46,21 @@ public class MatterCommandReceiver extends BroadcastReceiver {
                   .append(command)
                   .toString();
           Log.d(TAG, message);
+
+          int pinCode =
+              Settings.Secure.getInt(context.getContentResolver(), "matter_pin_code", 20202021);
+          Log.d(TAG, "Retrieved pin code:" + pinCode);
+
+          CommandResponseHolder.getInstance()
+              .setResponseValue(
+                  Clusters.AccountLogin.Id,
+                  Clusters.AccountLogin.Commands.GetSetupPIN.ID,
+                  "{\""
+                      + Clusters.AccountLogin.Commands.GetSetupPINResponse.Fields.SetupPIN
+                      + "\":\""
+                      + pinCode
+                      + "\"}");
+
           String response =
               CommandResponseHolder.getInstance().getCommandResponse(clusterId, commandId);
 

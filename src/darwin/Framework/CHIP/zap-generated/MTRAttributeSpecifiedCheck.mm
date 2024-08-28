@@ -6060,9 +6060,6 @@ static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttri
 {
     using namespace Clusters::EcosystemInformation;
     switch (aAttributeId) {
-    case Attributes::RemovedOn::Id: {
-        return YES;
-    }
     case Attributes::DeviceDirectory::Id: {
         return YES;
     }
