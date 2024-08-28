@@ -164,7 +164,8 @@ class TC_OCC_3_1(MatterBaseTest):
 
         if occupancy_event_supported:
             self.step("5c")
-            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
+            event = event_listener.wait_for_event_report(
+                cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_equal(event.occupancy, 1, "Unexpected occupancy on OccupancyChanged")
         else:
             self.skip_step("5c")
@@ -187,11 +188,12 @@ class TC_OCC_3_1(MatterBaseTest):
         asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not back to 0 after HoldTime period")
 
         await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-          0], timeout_sec=post_prompt_settle_delay_seconds)
+            0], timeout_sec=post_prompt_settle_delay_seconds)
 
         if occupancy_event_supported:
             self.step("7b")
-            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
+            event = event_listener.wait_for_event_report(
+                cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_equal(event.occupancy, 0, "Unexpected occupancy on OccupancyChanged")
         else:
             self.skip_step("7b")
