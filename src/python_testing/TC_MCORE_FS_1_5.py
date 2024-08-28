@@ -264,7 +264,8 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             elapsed = time.time() - start_time
             time_remaining = report_waiting_timeout_delay_sec - elapsed
 
-        asserts.assert_true(cadmin_sub_new_data, "Timed out waiting for DUT to reflect AdministratorCommissioning attributes for bridged device")
+        asserts.assert_true(cadmin_sub_new_data,
+                            "Timed out waiting for DUT to reflect AdministratorCommissioning attributes for bridged device")
 
         dut_read = await self.default_controller.ReadAttribute(self.dut_node_id, [(newly_added_endpoint, Clusters.AdministratorCommissioning)])
         dut_cadmin_for_th_server = dut_read[newly_added_endpoint][Clusters.AdministratorCommissioning]
