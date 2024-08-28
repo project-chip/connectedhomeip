@@ -1782,17 +1782,17 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               help='Path to chip-tool credentials file root')
 
     args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='*', type=int_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--int-arg', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='*', type=bool_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--bool-arg', action='append', type=bool_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='*', type=float_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--float-arg', action='append', type=float_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='*', type=str_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--string-arg', action='append', type=str_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='*', type=json_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--json-arg', action='append', type=json_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+    args_group.add_argument('--hex-arg', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
