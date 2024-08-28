@@ -42,6 +42,7 @@ class HostFuzzingType(Enum):
     NONE = auto()
     LIB_FUZZER = auto()
     OSS_FUZZ = auto()
+    PW_FUZZTEST = auto()
 
 
 class HostApp(Enum):
@@ -376,6 +377,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
             self.extra_gn_options.append('oss_fuzz=true')
+        elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.extra_gn_options.append('is_pw_fuzz=true pw_enable_fuzz_test_targets=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -463,6 +466,9 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'
+
+        if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.build_command = 'pw_fuzz_tests'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
