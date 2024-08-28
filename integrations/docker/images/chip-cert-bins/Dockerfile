@@ -261,6 +261,7 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
+# Touching file to trigger CI to run docker CI.
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
