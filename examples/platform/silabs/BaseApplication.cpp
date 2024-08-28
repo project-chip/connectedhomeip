@@ -232,7 +232,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppEventQueue = osMessageQueueNew(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), &appEventQueueAttr);
     if (sAppEventQueue == NULL)
     {
-        ChipLogDetail(AppServer, "Failed to allocate app event queue");
+        ChipLogError(AppServer, "Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
@@ -240,7 +240,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppTaskHandle = osThreadNew(taskFunction, &sAppEventQueue, &appTaskAttr);
     if (sAppTaskHandle == nullptr)
     {
-        ChipLogDetail(AppServer, "Failed to create app task");
+        ChipLogError(AppServer, "Failed to create app task");
         appError(APP_ERROR_CREATE_TASK_FAILED);
     }
     return CHIP_NO_ERROR;
@@ -276,7 +276,7 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sFunctionTimer == NULL)
     {
-        ChipLogDetail(AppServer, "funct timer create failed");
+        ChipLogError(AppServer, "funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -288,7 +288,7 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sLightTimer == NULL)
     {
-        ChipLogDetail(AppServer, "Light Timer create failed");
+        ChipLogError(AppServer, "Light Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -543,7 +543,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogDetail(AppServer, "Failed to open the Basic Commissioning Window");
+                    ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
                 }
             }
             else
@@ -571,7 +571,7 @@ void BaseApplication::CancelFunctionTimer()
 {
     if (osTimerStop(sFunctionTimer) == osError)
     {
-        ChipLogDetail(AppServer, "app timer stop() failed");
+        ChipLogError(AppServer, "app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -581,7 +581,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     // Starts or restarts the function timer
     if (osTimerStart(sFunctionTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
-        ChipLogDetail(AppServer, "app timer start() failed");
+        ChipLogError(AppServer, "app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -626,7 +626,7 @@ void BaseApplication::StartStatusLEDTimer()
 {
     if (osTimerStart(sLightTimer, kLightTimerPeriod) != osOK)
     {
-        ChipLogDetail(AppServer, "Light Time start failed");
+        ChipLogError(AppServer, "Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -639,7 +639,7 @@ void BaseApplication::StopStatusLEDTimer()
 
     if (osTimerStop(sLightTimer) == osError)
     {
-        ChipLogDetail(AppServer, "Light Time start failed");
+        ChipLogError(AppServer, "Light Time start failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -770,7 +770,7 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
     {
         if (osMessageQueuePut(sAppEventQueue, aEvent, osPriorityNormal, 0) != osOK)
         {
-            ChipLogDetail(AppServer, "Failed to post event to app task event queue");
+            ChipLogError(AppServer, "Failed to post event to app task event queue");
         }
     }
     else
@@ -884,7 +884,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
     else
     {
-        ChipLogDetail(AppServer, "Getting QR code failed!");
+        ChipLogError(AppServer, "Getting QR code failed!");
     }
 }
 
