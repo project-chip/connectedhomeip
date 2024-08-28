@@ -1380,11 +1380,21 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             str: User input or none if input is closed.
         """
+
+        # TODO(#31928): Remove any assumptions of test params for endpoint ID.
+
+        # Get the endpoint user param instead of `--endpoint-id` result, if available, temporarily.
+        endpoint_id = self.user_params.get("endpoint", None)
+        if endpoint_id is None or not isinstance(endpoint_id, int):
+            endpoint_id = self.matter_test_config.endpoint
+
         if self.runner_hook:
+            # TODO(#31928): Add endpoint support to hooks.
             self.runner_hook.show_prompt(msg=prompt_msg,
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
-        logging.info("========= USER PROMPT =========")
+
+        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
@@ -1881,6 +1891,9 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
     cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+        if not isinstance(attr_list, list):
+            asserts.fail(
+                f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
         return attribute.attribute_id in attr_list
     except KeyError:
         return False
@@ -1910,9 +1923,13 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
-def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+        if not isinstance(feature_map, int):
+            asserts.fail(
+                f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
+
         return (feature & feature_map) != 0
     except KeyError:
         return False
@@ -1926,8 +1943,8 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
 
         EP0: cluster A, B, C
         EP1: cluster D with feature F0
-        EP2, cluster D with feature F0
-        EP3, cluster D without feature F0
+        EP2: cluster D with feature F0
+        EP3: cluster D without feature F0
 
         And the following test specification:
         @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))
