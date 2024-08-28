@@ -112,7 +112,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                  TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
                  TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
                  TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH subscribes to AdministratorCommissioning attrbutes on DUT_FSA for the newly added endpoint identified in step 3"),
+                 TestStep(6, "TH subscribes to AdministratorCommissioning attributes on DUT_FSA for the newly added endpoint identified in step 3"),
                  TestStep(7, "TH opens commissioning window to TH_SERVER directly (not using DUT)"),
                  TestStep(8, "TH reads AdministratorCommissioning from TH_SERVER directly (not using DUT)"),
                  TestStep(9, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
