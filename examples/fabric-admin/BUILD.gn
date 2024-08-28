@@ -76,6 +76,8 @@ static_library("fabric-admin-utils") {
     "commands/common/StayActiveSender.cpp",
     "commands/common/StayActiveSender.h",
     "commands/fabric-sync/FabricSyncCommand.cpp",
+    "commands/pairing/DeviceSubscription.cpp",
+    "commands/pairing/DeviceSubscription.h",
     "commands/pairing/DeviceSynchronization.cpp",
     "commands/pairing/DeviceSynchronization.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
