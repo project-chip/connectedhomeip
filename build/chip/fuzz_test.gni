@@ -72,8 +72,25 @@ template("chip_fuzz_target") {
   }
 }
 
+# Define a fuzz target for chip using pw_fuzzer and Google FuzzTest Framework.
+#
+# Fuzz generally only apply on the following environments:
+#   - linux and mac host builds when using clang
+#
+# Sample usage
+#
+# chip_pw_fuzz_target("fuzz-target-name") {
+#   test_source = [
+#      "FuzzTarget.cpp", # Fuzz target
+#   ]
+#
+#   public_deps = [
+#     "${chip_root}/src/lib/foo",         # add dependencies here
+#   ]
+# }
+#
+#
 template("chip_pw_fuzz_target") {
-  not_needed([ "target_name" ])
   if (!defined(invoker.sources)) {
     sources = []
   }
@@ -84,40 +101,38 @@ template("chip_pw_fuzz_target") {
     deps = []
   }
 
-  if (defined(invoker.test_sources)) {
-    foreach(_test, invoker.test_sources) {
-      _test_name = string_replace(_test, ".cpp", "")
+  if (defined(invoker.test_source)) {
+    _test_output_dir = "${root_out_dir}/tests"
 
-      _test_output_dir = "${root_out_dir}/fuzz_tests"
-      if (defined(invoker.output_dir)) {
-        _test_output_dir = invoker.output_dir
-      }
+    if (defined(invoker.output_dir)) {
+      _test_output_dir = invoker.output_dir
+    }
 
-      pw_test(_test_name) {
-        forward_variables_from(invoker,
-                               [
-                                 "deps",
-                                 "public_deps",
-                                 "cflags",
-                                 "configs",
-                               ])
+    pw_test(target_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "public_deps",
+                               "cflags",
+                               "configs",
+                               "remove_configs",
+                             ])
 
-        # TODO: remove this
-        #just a test for running FuzzTest with libfuzzer-compatibility mode, since this is the mode supported by OSS-fuzz
-        # defines = [
-        # "FUZZTEST_COMPATIBILITY_MODE=libfuzzer",
-        #   "MAKE_BUILD_TYPE=RelWithDebug",
-        #  ]
+      # TODO: remove this after pw_fuzzer implementation its integration with OSS-Fuzz is complete
+      #just a test for running FuzzTest with libfuzzer-compatibility mode, since this is the mode supported by OSS-fuzz
+      # defines = [
+      # "FUZZTEST_COMPATIBILITY_MODE=libfuzzer",
+      #   "MAKE_BUILD_TYPE=RelWithDebug",
+      #  ]
 
-        sources = [ _test ]
-        output_dir = _test_output_dir
+      sources = invoker.test_source
+      output_dir = _test_output_dir
 
-        deps += [ "$dir_pw_fuzzer:fuzztest" ]
+      deps += [ "$dir_pw_fuzzer:fuzztest" ]
 
-        # this is necessary so it is not disable in third_party/pigweed/repo/pw_unit_test/test.gni
-        # otherwise it will be built successfully but with FuzzPayloadDecoderPW.DISABLED.ninja and no executable
-        enable_if = true
-      }
+      # this is necessary so FuzzTest is compiled into an executable in third_party/pigweed/repo/pw_unit_test/test.gni
+      # otherwise it will be built successfully but with FuzzTarget.DISABLED.ninja and no executable.
+      enable_if = true
     }
   }
 }

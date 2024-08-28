@@ -239,9 +239,7 @@ config("strict_warnings") {
     "-Wunreachable-code",
     "-Wvla",
     "-Wformat",
-
-    #TODO: Remove this workaround to build FuzzTests; Abseil C++ submodule is has an error related to this warning
-    #"-Wformat-nonliteral",
+    "-Wformat-nonliteral",
     "-Wformat-security",
   ]
 
