@@ -151,9 +151,7 @@ rt_executable("laundry-washer") {
   ]
 
   if (chip_enable_secure_dac_private_key_storage == 1) {
-    sources += [
-      "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp",
-    ]
+    sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
   } else {
     sources += [
       "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
