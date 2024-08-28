@@ -285,7 +285,6 @@ void ApplicationShutdown()
     Clusters::WaterHeaterMode::Shutdown();
 
     Clusters::WaterHeaterManagement::WhmApplicationShutdown();
-    Clusters::WaterHeaterMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
