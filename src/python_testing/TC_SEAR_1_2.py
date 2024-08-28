@@ -158,7 +158,8 @@ class TC_SEAR_1_2(MatterBaseTest):
         if self.current_area is NullValue:
             asserts.assert_true(estimated_end_time is NullValue,
                                 "EstimatedEndTime should be null if CurrentArea is null.")
-        else:
+
+        if estimated_end_time is not NullValue:
             # allow for some clock skew
             asserts.assert_true(estimated_end_time >= read_time - 3*60,
                                 f"EstimatedEndTime({estimated_end_time}) should be greater than the time when it was read({read_time})")
