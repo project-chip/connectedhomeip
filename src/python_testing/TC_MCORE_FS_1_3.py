@@ -176,6 +176,11 @@ class AppServer:
 
 class TC_MCORE_FS_1_3(MatterBaseTest):
 
+    @property
+    def default_timeout(self) -> int:
+        # This test has some manual steps, so we need a longer timeout.
+        return 200
+
     def setup_class(self):
         super().setup_class()
 
@@ -363,23 +368,23 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             endpoint=0,
         ))
 
-        # Get the endpoint number for just added TH_SERVER_FOR_TH_FSA.
+        # Get the endpoint number for just added TH_SERVER_FOR_DUT_FSA.
         logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint on DUT_FSA")
-        dut_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
+        dut_fsa_bridge_dut_server_endpoint = list(unique_endpoints_set)[0]
         dut_fsa_bridge_endpoints = dut_fsa_bridge_endpoints_new
 
         self.print_step(4, "Verify that DUT_FSA created a UniqueID for TH_SERVER_FOR_DUT_FSA")
-        dut_fsa_bridge_th_server_unique_id = await self.read_single_attribute_check_success(
+        dut_fsa_bridge_dut_server_unique_id = await self.read_single_attribute_check_success(
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
-            endpoint=dut_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
-        asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
-        logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", dut_fsa_bridge_th_server_unique_id)
+            endpoint=dut_fsa_bridge_dut_server_endpoint)
+        asserts.assert_true(type_matches(dut_fsa_bridge_dut_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(dut_fsa_bridge_dut_server_unique_id, "UniqueID should not be an empty string")
+        logging.info("TH_SERVER_FOR_DUT_FSA on DUT_SERVER_BRIDGE UniqueID: %s", dut_fsa_bridge_dut_server_unique_id)
 
         th_fsa_bridge_th_node_id = 2
         self.print_step(5, "Commissioning TH_FSA_BRIDGE to TH fabric")
@@ -437,7 +442,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         logging.info("TH_SERVER_FOR_TH_FSA on TH_SERVER_BRIDGE UniqueID: %s", th_fsa_bridge_th_server_unique_id)
 
         # Make sure that the UniqueID on the TH_FSA_BRIDGE is different from the one on the DUT_FSA_BRIDGE.
-        asserts.assert_not_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,
+        asserts.assert_not_equal(dut_fsa_bridge_dut_server_unique_id, th_fsa_bridge_th_server_unique_id,
                                  "UniqueID on DUT_FSA_BRIDGE and TH_FSA_BRIDGE should be different")
 
         discriminator = random.randint(0, 4095)
@@ -480,6 +485,36 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             self.dut_fsa_stdin.flush()
             # Wait for the synchronization to complete.
             await asyncio.sleep(5)
+
+        # Get the list of endpoints on the DUT_FSA_BRIDGE after synchronization
+        dut_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=self.dut_node_id,
+            endpoint=0,
+        ))
+
+        # Get the endpoint number for just synced TH_SERVER_FOR_TH_FSA.
+        logging.info("Endpoints on DUT_FSA_BRIDGE: old=%s, new=%s", dut_fsa_bridge_endpoints, dut_fsa_bridge_endpoints_new)
+        asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
+                            "Expected only new endpoints to be added")
+        unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
+        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint on DUT_FSA")
+        dut_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
+        dut_fsa_bridge_endpoints = dut_fsa_bridge_endpoints_new
+
+        self.print_step(11, "Verify that DUT_FSA copied the TH_SERVER_FOR_TH_FSA UniqueID from TH_FSA")
+        dut_fsa_bridge_th_server_unique_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BridgedDeviceBasicInformation,
+            attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
+            endpoint=dut_fsa_bridge_th_server_endpoint)
+        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
+        logging.info("TH_SERVER_FOR_TH_FSA on DUT_SERVER_BRIDGE UniqueID: %s", dut_fsa_bridge_th_server_unique_id)
+
+        # Make sure that the UniqueID on the DUT_FSA_BRIDGE is the same as the one on the DUT_FSA_BRIDGE.
+        asserts.assert_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,
+                             "UniqueID on DUT_FSA_BRIDGE and TH_FSA_BRIDGE should be the same")
 
         await asyncio.sleep(1000)
 
