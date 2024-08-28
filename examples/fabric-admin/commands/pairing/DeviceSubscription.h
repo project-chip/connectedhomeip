@@ -26,20 +26,15 @@
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
-/// Ensures that device data is synchronized to the remote fabric bridge.
-///
-/// Includes a state machine that:
-///   - initiates a "read basic information data" command to fetch basic information
-///   - upon receiving such information, ensures that synchronized device data is sent
-///     to the remote end.
+/// Attribute subscription to attributes that are important to keep track and send to fabric-bridge
+/// via RPC when change has been identified.
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
 public:
     DeviceSubscription();
 
-    /// Usually called after commissioning is complete, initiates a
-    /// read of required data from the remote node ID and then will synchronize
-    /// the device towards the fabric bridge
+    /// Usually called after we have added a syncronized device to fabric-bridge to monitor
+    /// for any changes that need to be propgated to fabric-bridge.
     void StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
 
     ///////////////////////////////////////////////////////////////
