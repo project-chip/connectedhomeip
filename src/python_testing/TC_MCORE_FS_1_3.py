@@ -25,9 +25,9 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --stdin-pipe=dut-fsa/stdin --storage-dir=dut-fsa --discriminator=1234
+# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa/stdin --storage-dir=dut-fsa --discriminator=1234
 # test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa/stdin
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa/stdin
 # test-runner-run/run1/script-start-delay: 10
 # test-runner-run/run1/quiet: false
 # === END CI TEST ARGUMENTS ===
@@ -103,6 +103,8 @@ class ThreadWithStop(threading.Thread):
 class FabricSyncApp:
 
     APP_PATH = "examples/fabric-admin/scripts/fabric-sync-app.py"
+    FABRIC_ADMIN_PATH = "out/linux-x64-fabric-admin-rpc/fabric-admin"
+    FABRIC_BRIDGE_PATH = "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
 
     def _process_admin_output(self, line):
         if self.wait_for_text_text is not None and self.wait_for_text_text in line:
@@ -121,6 +123,8 @@ class FabricSyncApp:
         self.wait_for_text_text = None
 
         args = [self.APP_PATH]
+        args.append(f"--app-admin={self.FABRIC_ADMIN_PATH}")
+        args.append(f"--app-bridge={self.FABRIC_BRIDGE_PATH}")
         # Override default ports, so it will be possible to run
         # our TH_FSA alongside the DUT_FSA during CI testing.
         args.append("--app-admin-rpc-port=44000")
@@ -189,6 +193,12 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         FabricSyncApp.APP_PATH = self.user_params.get("th_fsa_app_path", FabricSyncApp.APP_PATH)
         if not os.path.exists(FabricSyncApp.APP_PATH):
             asserts.fail("This test requires a TH_FSA app. Specify app path with --string-arg th_fsa_app_path:<path_to_app>")
+        FabricSyncApp.FABRIC_ADMIN_PATH = self.user_params.get("th_fsa_admin_path", FabricSyncApp.FABRIC_ADMIN_PATH)
+        if not os.path.exists(FabricSyncApp.FABRIC_ADMIN_PATH):
+            asserts.fail("This test requires a TH_FSA_ADMIN app. Specify app path with --string-arg th_fsa_admin_path:<path_to_app>")
+        FabricSyncApp.FABRIC_BRIDGE_PATH = self.user_params.get("th_fsa_bridge_path", FabricSyncApp.FABRIC_BRIDGE_PATH)
+        if not os.path.exists(FabricSyncApp.FABRIC_BRIDGE_PATH):
+            asserts.fail("This test requires a TH_FSA_BRIDGE app. Specify app path with --string-arg th_fsa_bridge_path:<path_to_app>")
 
         # Get the path to the TH_SERVER app from the user params.
         th_server_app = self.user_params.get("th_server_app_path", None)
