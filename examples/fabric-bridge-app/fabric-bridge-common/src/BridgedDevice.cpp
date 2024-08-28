@@ -35,9 +35,9 @@ struct ActiveChangeEventWorkData
 struct ReportAttributeChangedWorkData
 {
     chip::EndpointId mEndpointId;
-    bool mWindowChanged = false;
+    bool mWindowChanged      = false;
     bool mFabricIndexChanged = false;
-    bool mVendorChanged = false;
+    bool mVendorChanged      = false;
 };
 
 void ActiveChangeEventWork(intptr_t arg)
@@ -114,7 +114,7 @@ void BridgedDevice::SetReachable(bool reachable)
 
 void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes)
 {
-    ReportAttributeChangedWorkData  * workdata = chip::Platform::New<ReportAttributeChangedWorkData>();
+    ReportAttributeChangedWorkData * workdata = chip::Platform::New<ReportAttributeChangedWorkData>();
 
     workdata->mEndpointId = mEndpointId;
     workdata->mWindowChanged =
