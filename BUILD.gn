@@ -152,6 +152,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [ "//:fuzz_tests" ]
     }
 
+    if (pw_enable_fuzz_test_targets) {
+      deps += [ "//:pw_fuzz_tests" ]
+    }
+
     if (chip_device_platform != "none") {
       deps += [ "${chip_root}/src/app/server" ]
     }
