@@ -817,7 +817,7 @@ struct CheckData
     bool allow;
 };
 
-constexpr CheckData checkData1[] = {
+CheckData checkData1[] = {
     // Checks for implicit PASE
     { .subjectDescriptor = { .fabricIndex = 0, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
       .requestPath       = { .cluster = 1, .endpoint = 2 },
@@ -1749,9 +1749,12 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
 TEST_F(TestAccessControl, TestCheck)
 {
     LoadAccessControl(accessControl, entryData1, entryData1Count);
-    for (const auto & checkData : checkData1)
+    for (auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        checkData.requestPath.requestType = Access::RequestType::kAttributeReadRequest;
+#endif
         EXPECT_EQ(accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege), expectedResult);
     }
 }
