@@ -27,6 +27,7 @@
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
+#include <app/EventLogging.h>
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
@@ -244,6 +245,24 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     {
         ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u",
                       static_cast<unsigned>(positionId));
+    }
+}
+
+void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
+{
+    Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
+    event.occupancy = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
+    EventNumber eventNumber           = 0;
+
+    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to log OccupancyChanged event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Logged OccupancyChanged(occupancy=%u) on Endpoint %u", static_cast<unsigned>(occupancyValue),
+                        static_cast<unsigned>(endpointId));
     }
 }
 
@@ -784,18 +803,29 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     }
 }
 
-void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t occupancyValue)
+void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
 {
+    BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
 
-    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Set(endpointId, occupancyValue);
-    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u", occupancyValue);
+    if (static_cast<BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(newOccupancyValue) == currentOccupancy)
+    {
+        ChipLogDetail(NotSpecified, "Skipping setting occupancy changed due to same value.");
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, newOccupancyValue);
+    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u", newOccupancyValue);
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
+        return;
     }
 
-    if (1 == occupancyValue)
+    EmitOccupancyChangedEvent(endpointId, newOccupancyValue);
+
+    if (1 == newOccupancyValue)
     {
         uint16_t * holdTime = chip::app::Clusters::OccupancySensing::GetHoldTimeForEndpoint(endpointId);
         if (holdTime != nullptr)
@@ -814,14 +844,27 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
 
 void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    uint8_t clearValue = 0;
-    Protocols::InteractionModel::Status status =
-        OccupancySensing::Attributes::Occupancy::Set(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState)), clearValue);
-    ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
+    EndpointId endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState));
+    chip::BitMask<Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
 
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    uint8_t clearValue = 0;
+    if (!currentOccupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied))
+    {
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, clearValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogDetail(NotSpecified, "Failed to set occupancy state.");
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
+        EmitOccupancyChangedEvent(endpointId, clearValue);
     }
 }
 

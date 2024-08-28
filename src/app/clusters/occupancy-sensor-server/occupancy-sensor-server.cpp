@@ -94,8 +94,11 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
     switch (aPath.mAttributeId)
     {
-    case Attributes::HoldTime::Id: {
-
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id:
+    {
         uint16_t newHoldTime;
 
         ReturnErrorOnFailure(aDecoder.Decode(newHoldTime));
@@ -173,16 +176,26 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
     return &sHoldTime[index];
 }
 
-CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
+CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
 {
     VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t * holdTimeForEndpoint = GetHoldTimeForEndpoint(endpointId);
     VerifyOrReturnError(holdTimeForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    *holdTimeForEndpoint = holdTime;
+    uint16_t previousHoldTime = *holdTimeForEndpoint;
+    *holdTimeForEndpoint = newHoldTime;
 
-    MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    if (previousHoldTime != newHoldTime)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    }
+
+    // Blindly try to write RAM-backed legacy attributes (will fail silently if absent)
+    // to keep them in sync.
+    (void)Attributes::PIROccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
+    (void)Attributes::UltrasonicOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
+    (void)Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
 
     return CHIP_NO_ERROR;
 }

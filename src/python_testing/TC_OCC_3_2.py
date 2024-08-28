@@ -23,7 +23,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1 --bool-arg simulate_occupancy:true
 # === END CI TEST ARGUMENTS ===
 
 #  There are CI integration for the test cases below that implements manually controlling sensor device for
@@ -33,14 +33,19 @@
 
 import logging
 import time
+import queue
 
 import chip.clusters as Clusters
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    await_sequence_of_reports, default_matter_test_main)
+                                    await_sequence_of_reports, default_matter_test_main, AttributeValue)
 from mobly import asserts
 
 
 class TC_OCC_3_2(MatterBaseTest):
+    def setup_test(self):
+        super().setup_test()
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_occupancy', False)
+
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
         endpoint_id = self.matter_test_config.endpoint
@@ -58,15 +63,9 @@ class TC_OCC_3_2(MatterBaseTest):
             TestStep("3c", "Trigger DUT to change the occupancy state."),
             TestStep("3d", "TH awaits a ReportDataMessage containing an attribute report for DUT Occupancy attribute."),
             TestStep("4a", "Check if DUT supports HoldTime attribute, If not supported, then stop and skip the rest of test cases."),
-            TestStep("4b", "TH writes HoldTimeMin to HoldTime attribute and saves its attribute value as initial_dut."),
-            TestStep("4c", "TH writes HoldTimeMax to HoldTime attribute and saves its attribute value as final_dut."),
-            TestStep("4d", "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute."),
-            TestStep("5a", "Check if DUT supports DUT feature flag PIR or (!PIR & !US & !PHY) and has the PIROccupiedToUnoccupiedDelay attribute, If not supported, then skip 5b."),
-            TestStep("5b", "TH awaits a ReportDataMessage containing an attribute report for DUT PIROccupiedToUnoccupiedDelay attribute."),
-            TestStep("6a", "Check if DUT supports DUT feature flag US and has the UltrasonicOccupiedToUnoccupiedDelay attribute. If not supported, then skip 6b."),
-            TestStep("6b", "TH awaits a ReportDataMessage containing an attribute report for DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
-            TestStep("7a", "Check if DUT supports DUT feature flag PHY and has the PhysicalContactOccupiedToUnoccupiedDelay attribute. If not supported, skip 7b."),
-            TestStep("7d", "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")
+            TestStep("4b", "TH writes HoldTimeMin to HoldTime attribute."),
+            TestStep("4c", "TH clears its report history and writes HoldTimeMax to HoldTime attribute."),
+            TestStep("4d", "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute and all legacy attributes supported."),
         ]
         return steps
 
@@ -78,15 +77,12 @@ class TC_OCC_3_2(MatterBaseTest):
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
-
         # CI app pipe id creation
         self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        self.is_ci = self.matter_test_config.global_test_params['simulate_occupancy']
-        #self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
             app_pid = self.matter_test_config.app_pid
             if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+                asserts.fail("The --app-pid flag must be set when using named pipe")
             self.app_pipe = self.app_pipe + str(app_pid)
 
         with open(self.app_pipe, "w") as app_pipe:
@@ -142,6 +138,8 @@ class TC_OCC_3_2(MatterBaseTest):
 
         # add Namepiped to assimilate the manual sensor trigger here
         self.step("3c")
+        attrib_listener.reset()
+
         # CI call to trigger on
         if self.is_ci:
             self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
@@ -160,47 +158,38 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4b")
         hold_time_limits_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTimeLimits)
-        await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
-        initial_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-        asserts.assert_equal(initial_dut, hold_time_limits_dut.holdTimeMin, "HoldTimeMin to HoldTime writing failure")
+        hold_time_min = hold_time_limits_dut.holdTimeMin
+        hold_time_max = hold_time_limits_dut.holdTimeMax
+        await self.write_single_attribute(attributes.HoldTime(hold_time_min))
+        hold_time_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        asserts.assert_equal(hold_time_dut, hold_time_min, "HoldTime did not match written HoldTimeMin")
+
+        # HoldTime may already have been HoldTimeMin, or not. Make sure we look only at subsequent reports.
+        attrib_listener.reset()
 
         self.step("4c")
-        await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMax))
-        final_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-        asserts.assert_equal(final_dut, hold_time_limits_dut.holdTimeMax, "HoldTimeMax to HoldTime writing failure")
+        await self.write_single_attribute(attributes.HoldTime(hold_time_max))
+        hold_time_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        asserts.assert_equal(hold_time_dut, hold_time_max, "HoldTime did not match written HoldTimeMax")
 
         self.step("4d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[initial_dut,
-                                  final_dut], timeout_sec=post_prompt_settle_delay_seconds)
-
-        self.step("5a")
         has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
 
-        if has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features):
-            self.step("5b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[initial_dut,
-                                      final_dut], timeout_sec=post_prompt_settle_delay_seconds)
-        else:
-            logging.info("No PIR timing attribute support. Skipping steps 5b.")
-            self.skip_step("5b")
+        expect_legacy_pir_timing = has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features)
+        expect_legacy_us_timing = has_ultrasonic_timing_attrib and has_feature_ultrasonic
+        expect_legacy_phy_timing = has_contact_timing_attrib and has_feature_contact
 
-        self.step("6a")
-        if not has_feature_ultrasonic or not has_ultrasonic_timing_attrib:
-            logging.info("No Ultrasonic timing attribute supports. Skipping steps 6b.")
-            self.skip_step("6b")
-        else:
-            self.step("6b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[initial_dut,
-                                      final_dut], timeout_sec=post_prompt_settle_delay_seconds)
+        # Build list of expectations based on attributes present.
+        all_expected_final_values = [AttributeValue(endpoint_id, attribute=cluster.Attributes.HoldTime, value=hold_time_max)]
+        if expect_legacy_pir_timing:
+            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, value=hold_time_max))
+        if expect_legacy_us_timing:
+            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, value=hold_time_max))
+        if expect_legacy_phy_timing:
+            all_expected_final_values.append(AttributeValue(endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, value=hold_time_max))
 
-        self.step("7a")
-        if not has_feature_contact or not has_contact_timing_attrib:
-            logging.info("No Physical contact timing attribute supports. Skipping steps 7b.")
-            self.skip_step("7b")
-        else:
-            self.step("7b")
-            await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[initial_dut,
-                                      final_dut], timeout_sec=post_prompt_settle_delay_seconds)
+        # Wait for the reports to come.
+        attrib_listener.await_all_final_values_reported(all_expected_final_values, timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":
