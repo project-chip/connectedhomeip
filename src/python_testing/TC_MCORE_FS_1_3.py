@@ -40,7 +40,6 @@ import subprocess
 import sys
 import tempfile
 import threading
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -423,7 +422,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         )
 
         # Wait some time, so the dynamic endpoint will appear on the TH_FSA_BRIDGE.
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
 
         # Get the list of endpoints on the TH_FSA_BRIDGE after adding the TH_SERVER_FOR_TH_FSA.
         th_fsa_bridge_endpoints_new = set(await self.read_single_attribute_check_success(
@@ -525,62 +524,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         # Make sure that the UniqueID on the DUT_FSA_BRIDGE is the same as the one on the DUT_FSA_BRIDGE.
         asserts.assert_equal(dut_fsa_bridge_th_server_unique_id, th_fsa_bridge_th_server_unique_id,
                              "UniqueID on DUT_FSA_BRIDGE and TH_FSA_BRIDGE should be the same")
-
-        await asyncio.sleep(1000)
-
-        return
-
-        # These steps are not explicitly in step 1, but they help identify the dynamically added endpoint in step 1.
-        root_node_endpoint = 0
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
-        set_of_endpoints_before_adding_device = set(root_part_list)
-
-        kvs = f'kvs_{str(uuid.uuid4())}'
-        device_info = "for DUT ecosystem"
-        await self.create_device_and_commission_to_th_fabric(kvs, self.device_for_dut_eco_port, self.device_for_dut_eco_nodeid, device_info)
-
-        self.device_for_dut_eco_kvs = kvs
-        read_result = await self.TH_server_controller.ReadAttribute(self.device_for_dut_eco_nodeid, [(root_node_endpoint, Clusters.BasicInformation.Attributes.UniqueID)])
-        result = read_result[root_node_endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.UniqueID]
-        asserts.assert_true(type_matches(result, Clusters.Attribute.ValueDecodeFailure), "We were expecting a value decode failure")
-        asserts.assert_equal(result.Reason.status, Status.UnsupportedAttribute, "Incorrect error returned from reading UniqueID")
-
-        params = await self.openCommissioningWindow(dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid)
-
-        self.wait_for_user_input(
-            prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"
-            f"- discriminator: {params.randomDiscriminator}\n"
-            f"- setupPinCode: {params.commissioningParameters.setupPinCode}\n"
-            f"- setupQRCode: {params.commissioningParameters.setupQRCode}\n"
-            f"- setupManualcode: {params.commissioningParameters.setupManualCode}\n"
-            f"If using FabricSync Admin, you may type:\n"
-            f">>> pairing onnetwork <desired_node_id> {params.commissioningParameters.setupPinCode}")
-
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
-        set_of_endpoints_after_adding_device = set(root_part_list)
-
-        asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
-            set_of_endpoints_before_adding_device), "Expected only new endpoints to be added")
-        unique_endpoints_set = set_of_endpoints_after_adding_device - set_of_endpoints_before_adding_device
-        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
-        newly_added_endpoint = list(unique_endpoints_set)[0]
-
-        th_sed_dut_unique_id = await self.read_single_attribute_check_success(cluster=Clusters.BridgedDeviceBasicInformation, attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID, endpoint=newly_added_endpoint)
-        asserts.assert_true(type_matches(th_sed_dut_unique_id, str), "UniqueID should be a string")
-        asserts.assert_true(th_sed_dut_unique_id, "UniqueID should not be an empty string")
-
-        self.step(2)
-        kvs = f'kvs_{str(uuid.uuid4())}'
-        device_info = "for TH_FSA ecosystem"
-        await self.create_device_and_commission_to_th_fabric(kvs, self.device_for_th_eco_port, self.device_for_th_eco_nodeid, device_info)
-        self.device_for_th_eco_kvs = kvs
-        # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) During setup we need to create the TH_FSA device
-        # where we would commission device created in create_device_and_commission_to_th_fabric to be commissioned into TH_FSA.
-
-        # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) Because we cannot create a TH_FSA and there is
-        # no way to mock it the following 2 test steps are skipped for now.
-        self.skip_step(3)
-        self.skip_step(4)
 
 
 if __name__ == "__main__":
