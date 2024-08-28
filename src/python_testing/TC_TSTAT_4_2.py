@@ -467,17 +467,38 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         self.step("17")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
-            test_presets = new_presets_with_handle.copy()
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kGoingToSleep,
-                                                             name="Wake", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
+            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+            scenarioNotPresent = None
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+            # Find a preset scenario not present in PresetTypes to run this test.
+            for scenario in cluster.Enums.PresetScenarioEnum:
+                foundMatchingScenario = False
+                for presetType in presetTypes:
+                    if presetType.presetScenario == scenario:
+                         foundMatchingScenario = True
+                         break
+                if foundMatchingScenario == False:
+                    scenarioNotPresent = scenario
+                    break
+
+            if scenarioNotPresent == None:
+                logger.info(
+                    "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
+            else:
+                test_presets = new_presets_with_handle.copy()
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenarioNotPresent,
+                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
 
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
@@ -501,18 +522,18 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 for presetType in presetTypes:
                     scenario = presetType.presetScenario
 
-                    # For each scenario, copy all the existing presets that match it, then add more presets
+                    # For each supported scenario, copy all the existing presets that match it, then add more presets
                     # until we hit the cap on the number of presets for that scenario.
                     presetsAddedForScenario = 0
                     for preset in presets:
                         if scenario == preset.presetScenario:
                             testPresets.append(preset)
-                            ++presetsAddedForScenario
+                            presetsAddedForScenario = presetsAddedForScenario + 1
 
-                    while presetsAddedForScenario < presetType.numberOfPresets:
-                            testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                                            name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
-                            ++presetsAddedForScenario
+                    if presetsAddedForScenario < presetType.numberOfPresets:
+                        testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
+                                                                        name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                        presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
