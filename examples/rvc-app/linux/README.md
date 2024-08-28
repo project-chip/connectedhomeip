@@ -1,9 +1,9 @@
 # Matter Linux Robotic Vacuum Cleaner Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Robotic Vacuum Cleaner Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Raspberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of Matter on Linux. The document will describe how
+to build and run Matter Linux Robotic Vacuum Cleaner Example on Raspberry Pi. This
+doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
+**Ubuntu for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
@@ -12,7 +12,7 @@ details.
 
 <hr>
 
--   [CHIP Linux Robotic Vacuum Cleaner Example](#chip-linux-robotic-vacuum-cleaner-example)
+-   [Matter Linux Robotic Vacuum Cleaner Example](#matter-linux-robotic-vacuum-cleaner-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
@@ -138,4 +138,3 @@ Obtain tracing json file.
     $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
      -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
-
