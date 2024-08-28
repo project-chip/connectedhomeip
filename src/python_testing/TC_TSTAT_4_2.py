@@ -478,8 +478,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 foundMatchingScenario = False
                 for presetType in presetTypes:
                     if presetType.presetScenario == scenario:
-                         foundMatchingScenario = True
-                         break
+                        foundMatchingScenario = True
+                        break
                 if foundMatchingScenario == False:
                     scenarioNotPresent = scenario
                     break
