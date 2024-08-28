@@ -556,7 +556,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest,
+                                     .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = event.mEventId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =

@@ -3019,6 +3019,8 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBridgedDeviceBasicInformationClusterKeepActiveParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull stayActiveDuration MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull timeoutMs MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
