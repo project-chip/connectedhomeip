@@ -50,6 +50,7 @@ constexpr uint8_t defaultTestFabricCapacity = (defaultTestTableSize - 1) / 2;
 // Test Cluster ID
 constexpr chip::ClusterId kOnOffClusterId        = 0x0006;
 constexpr chip::ClusterId kLevelControlClusterId = 0x0008;
+constexpr chip::ClusterId kFakeClusterId         = 0x0007;
 constexpr chip::ClusterId kColorControlClusterId = 0x0300;
 constexpr chip::ClusterId kScenesClusterId       = 0x0062;
 
@@ -168,7 +169,7 @@ static EmberAfAttributeMinMaxValue minMaxValue8  = { static_cast<uint8_t>(0), st
 static EmberAfAttributeMinMaxValue minMaxValue8S = { static_cast<uint8_t>(0), static_cast<uint8_t>(-1),
                                                      static_cast<uint8_t>(0x7F) };
 static EmberAfAttributeMinMaxValue minMaxValue16S = { static_cast<uint16_t>(0), static_cast<uint16_t>(-1),
-                                                      static_cast<uint16_t>(0x7FFE) };
+                                                      static_cast<uint16_t>(0x7FFD) };
 
 static EmberAfAttributeMetadata mockMetadataBool = {
     .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(&minMaxValueBool),
@@ -199,7 +200,7 @@ static EmberAfAttributeMetadata mockMetadataUint16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint24 = {
@@ -207,7 +208,7 @@ static EmberAfAttributeMetadata mockMetadataUint24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint32 = {
@@ -215,7 +216,15 @@ static EmberAfAttributeMetadata mockMetadataUint32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
+};
+
+static EmberAfAttributeMetadata mockMetadataUint40 = {
+    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(defaultValueData64),
+    .attributeId   = 0,
+    .size          = 5,
+    .attributeType = ZCL_INT40U_ATTRIBUTE_TYPE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint48 = {
@@ -223,7 +232,7 @@ static EmberAfAttributeMetadata mockMetadataUint48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint56 = {
@@ -231,7 +240,7 @@ static EmberAfAttributeMetadata mockMetadataUint56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint64 = {
@@ -239,7 +248,7 @@ static EmberAfAttributeMetadata mockMetadataUint64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt8 = {
@@ -247,7 +256,7 @@ static EmberAfAttributeMetadata mockMetadataInt8 = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt16 = {
@@ -255,7 +264,7 @@ static EmberAfAttributeMetadata mockMetadataInt16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt24 = {
@@ -263,7 +272,7 @@ static EmberAfAttributeMetadata mockMetadataInt24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt32 = {
@@ -271,7 +280,15 @@ static EmberAfAttributeMetadata mockMetadataInt32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
+};
+
+static EmberAfAttributeMetadata mockMetadataInt40 = {
+    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(defaultValueData64),
+    .attributeId   = 0,
+    .size          = 5,
+    .attributeType = ZCL_INT40S_ATTRIBUTE_TYPE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt48 = {
@@ -279,7 +296,7 @@ static EmberAfAttributeMetadata mockMetadataInt48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt56 = {
@@ -287,7 +304,7 @@ static EmberAfAttributeMetadata mockMetadataInt56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt64 = {
@@ -295,7 +312,7 @@ static EmberAfAttributeMetadata mockMetadataInt64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 // clang-format off
@@ -353,6 +370,9 @@ static const MockNodeConfig SceneMockNodeConfig({
         }),
         MockClusterConfig(MockClusterId(kLevelControlClusterId), {
             MockAttributeConfig(MockAttributeId(kCurrentLevelId), mockMetadataInt56), MockAttributeConfig(MockAttributeId(kCurrentFrequencyId), mockMetadataInt64)
+        }),
+        MockClusterConfig(MockClusterId(kFakeClusterId), {
+            MockAttributeConfig(MockAttributeId(kCurrentLevelId), mockMetadataUint40), MockAttributeConfig(MockAttributeId(kCurrentFrequencyId), mockMetadataInt40)
         }),
     }),
 });
@@ -443,7 +463,7 @@ public:
         if (endpoint == kTestEndpoint4)
         {
             if (cluster == MockClusterId(kColorControlClusterId) || cluster == MockClusterId(kLevelControlClusterId) ||
-                cluster == MockClusterId(kColorControlClusterId))
+                cluster == MockClusterId(kColorControlClusterId) || cluster == MockClusterId(kFakeClusterId))
             {
                 return true;
             }
@@ -986,8 +1006,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     EXPECT_EQ(CHIP_NO_ERROR,
               mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
 
-    // Verify that the output value is capped to 1
-    EXPECT_EQ(1, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
+    // Verify that the output value is capped to 255 (NULL) as Level Control Current Level is a nullable uint8_t
+    EXPECT_EQ(255, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
 
     // Clear buffer
     memset(buffer, 0, buff_span.size());
@@ -1013,14 +1033,12 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     iteratorMax.Next();
     pair = iteratorMax.GetValue();
     EXPECT_EQ(pair.valueUnsigned8.Value(), LCPairs[0].valueUnsigned8.Value());
-
-    // Verify that we cap the value to the mock attribute size when serializing
     EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
     EXPECT_EQ(CHIP_NO_ERROR,
               mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
 
-    // Verify that the output value is capped to 0xFE
-    EXPECT_EQ(0xFE, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
+    // Verify that the output value is 0xFF (NULL) as Level Control Current Level is a nullable uint8_t
+    EXPECT_EQ(0xFF, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
 
     // Clear buffer
     memset(buffer, 0, buff_span.size());
@@ -1032,6 +1050,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockOOPairs[1];
         app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockLCPairs[2];
         app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockCCPairs[9];
+        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockFKPairs[2];
         // Mock CC
         MockCCPairs[0].attributeID = MockAttributeId(kCurrentSaturationId);
         MockCCPairs[0].valueUnsigned32.SetValue(UINT32_MAX); // will cap to 0x00FFFFFF (uint24)
@@ -1046,7 +1065,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         MockCCPairs[5].attributeID = MockAttributeId(kEnhancedColorMode);
         MockCCPairs[5].valueSigned8.SetValue(static_cast<int8_t>(-2)); // will cap to -1
         MockCCPairs[6].attributeID = MockAttributeId(kColorLoopActiveId);
-        MockCCPairs[6].valueSigned16.SetValue(static_cast<int16_t>(0x7FFF)); // will cap to 0x7FFE in int16
+        MockCCPairs[6].valueSigned16.SetValue(static_cast<int16_t>(0x7FFE)); // will cap to 0x7FFD in int16
         MockCCPairs[7].attributeID = MockAttributeId(kColorLoopDirectionId);
         MockCCPairs[7].valueSigned32.SetValue(-1); // will cap to -1 in int24
         MockCCPairs[8].attributeID = MockAttributeId(kColorLoopTimeId);
@@ -1059,6 +1078,11 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         MockLCPairs[0].valueSigned64.SetValue(INT64_MIN); // will cap to 0x0080000000000000 (int56 min)
         MockLCPairs[1].attributeID = MockAttributeId(kCurrentFrequencyId);
         MockLCPairs[1].valueSigned64.SetValue(INT64_MIN); // not capped
+        // Mock Fake
+        MockFKPairs[0].attributeID = MockAttributeId(kCurrentLevelId);
+        MockFKPairs[0].valueUnsigned64.SetValue(UINT64_MAX); // will cap to UINT40_MAX
+        MockFKPairs[1].attributeID = MockAttributeId(kCurrentFrequencyId);
+        MockFKPairs[1].valueSigned64.SetValue(INT64_MAX); // will cap to INT40_MIN
 
         // Initialize Extension Field sets as if they were received by add commands
         OOextensionFieldSet.clusterID          = MockClusterId(kOnOffClusterId);
@@ -1212,7 +1236,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         EXPECT_EQ(static_cast<int8_t>(-1), extensionFieldValueCapOut.attributeValueList[5].valueSigned8.Value());
 
         // Verify that the output value is capped to the defined max for this attribute
-        EXPECT_EQ(0x7FFE, extensionFieldValueCapOut.attributeValueList[6].valueSigned16.Value());
+        EXPECT_EQ(0x7FFD, extensionFieldValueCapOut.attributeValueList[6].valueSigned16.Value());
 
         // Verify that the output value is not capped to -1 in int24t
         using Int24Type = app::NumericAttributeTraits<app::OddSizedInteger<3, true>>::WorkingType;
@@ -1223,6 +1247,47 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Clear buffer
         memset(buffer, 0, buff_span.size());
+
+        LCextensionFieldSet.clusterID          = MockClusterId(kFakeClusterId);
+        LCextensionFieldSet.attributeValueList = MockFKPairs;
+
+        writer.Init(mock_LC_buffer);
+        EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), LCextensionFieldSet.attributeValueList));
+        LC_buffer_serialized_length = writer.GetLengthWritten();
+
+        // Reinit buffer
+        buff_span = MutableByteSpan(buffer);
+
+        reader.Init(Mock_LC_list);
+        extensionFieldValueCapIn.clusterID = MockClusterId(kFakeClusterId);
+        EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+        EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+        // Verify that the initial values are not capped
+        auto iteratorFK = extensionFieldValueCapIn.attributeValueList.begin();
+        iteratorFK.Next();
+        pair = iteratorFK.GetValue();
+        EXPECT_EQ(pair.valueUnsigned64.Value(), MockFKPairs[0].valueUnsigned64.Value());
+        iteratorFK.Next();
+        pair = iteratorFK.GetValue();
+        EXPECT_EQ(pair.valueSigned64.Value(), MockFKPairs[1].valueSigned64.Value());
+
+        // Verify that we cap the value to the mock attribute size when serializing
+        EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, buff_span));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kFakeClusterId), buff_span, extensionFieldValueCapOut));
+
+        // Verify that the output value is capped to uint40 max value
+        uint64_t uint40Max = static_cast<uint64_t>(0x000000FFFFFFFFFF);
+        EXPECT_EQ(uint40Max, static_cast<uint64_t>(extensionFieldValueCapOut.attributeValueList[0].valueUnsigned64.Value()));
+
+        // Verify that the output value is not capped
+        int64_t int40Max = static_cast<int64_t>(0x0000007FFFFFFFFF);
+        EXPECT_EQ(int40Max, extensionFieldValueCapOut.attributeValueList[1].valueSigned64.Value());
+
+        // Clear buffer
+        memset(buffer, 0, buff_span.size());
+        // Reinit buffer
     }
 };
 
