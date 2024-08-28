@@ -30,9 +30,9 @@ import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support.matter_testing import (MatterBaseTest, SimpleEventCallback, TestStep, async_test_body,
                                                    default_matter_test_main)
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
