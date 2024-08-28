@@ -78,14 +78,14 @@ static_library("fabric-admin-utils") {
     "commands/fabric-sync/FabricSyncCommand.cpp",
     "commands/pairing/DeviceSubscription.cpp",
     "commands/pairing/DeviceSubscription.h",
-    "commands/pairing/DeviceSynchronization.cpp",
-    "commands/pairing/DeviceSynchronization.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
     "device_manager/DeviceManager.cpp",
     "device_manager/DeviceManager.h",
+    "device_manager/DeviceSynchronization.cpp",
+    "device_manager/DeviceSynchronization.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
