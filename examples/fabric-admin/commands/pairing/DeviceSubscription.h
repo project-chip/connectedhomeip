@@ -64,6 +64,6 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
-    bool mChangeDetected = false;
+    bool mChangeDetected      = false;
     bool mSubscriptionStarted = false;
 };

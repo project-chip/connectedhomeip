@@ -44,7 +44,6 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
 
 } // namespace
 
-
 DeviceSubscription::DeviceSubscription() :
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
@@ -57,20 +56,18 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
 
     switch (path.mAttributeId)
     {
-    case Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id:
-    {
+    case Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id: {
         Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum windowStatus;
         CHIP_ERROR err = data->Get(windowStatus);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(NotSpecified, "Failed to read WindowStatus"));
         VerifyOrReturn(windowStatus != Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
         mCurrentAdministratorCommissioningAttributes.window_status = static_cast<uint32_t>(windowStatus);
-        mChangeDetected = true;
+        mChangeDetected                                            = true;
         break;
     }
-    case Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id:
-    {
+    case Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
         FabricIndex fabricIndex;
-        CHIP_ERROR err = data->Get(fabricIndex);
+        CHIP_ERROR err                                                       = data->Get(fabricIndex);
         mCurrentAdministratorCommissioningAttributes.has_opener_fabric_index = err == CHIP_NO_ERROR;
         if (mCurrentAdministratorCommissioningAttributes.has_opener_fabric_index)
         {
@@ -79,10 +76,9 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
         mChangeDetected = true;
         break;
     }
-    case Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id:
-    {
+    case Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id: {
         chip::VendorId vendorId;
-        CHIP_ERROR err = data->Get(vendorId);
+        CHIP_ERROR err                                                    = data->Get(vendorId);
         mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id = err == CHIP_NO_ERROR;
         if (mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id)
         {
@@ -123,8 +119,7 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
-                                           const SessionHandle & sessionHandle)
+void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Subscribe);
@@ -162,9 +157,10 @@ void DeviceSubscription::StartSubscription(Controller::DeviceController & contro
 {
     VerifyOrDie(!mSubscriptionStarted);
 
-    mCurrentAdministratorCommissioningAttributes = chip_rpc_AdministratorCommissioningChanged_init_default;
+    mCurrentAdministratorCommissioningAttributes         = chip_rpc_AdministratorCommissioningChanged_init_default;
     mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
-    mCurrentAdministratorCommissioningAttributes.window_status = static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+    mCurrentAdministratorCommissioningAttributes.window_status =
+        static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     mSubscriptionStarted = true;
 
     ChipLogError(NotSpecified, "TMsg: are now hoping to get a connection to device");
