@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -202,6 +202,18 @@ public:
             AddArgument("dst-offset", &mComplex_DSTOffsets,
                         "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute",
                         Argument::kOptional);
+
+            AddArgument("require-tc-acknowledgements", 0, 1, &mRequireTCAcknowledgements,
+                        "Terms and Conditions acknowledgements is known to be required or not, (when required, the commissioner "
+                        "will wait until they are provided)");
+
+            AddArgument("tc-acknowledgements", 0, UINT16_MAX, &mTCAcknowledgements,
+                        "Terms and Conditions acknowledgements to use to set the General Commissioning cluster's TC "
+                        "Acknowledgements bit-field");
+
+            AddArgument("tc-acknowledgements-version", 0, UINT16_MAX, &mTCAcknowledgementVersion,
+                        "Terms and Conditions acknowledgement version to use to set the General Commissioning cluster's TC "
+                        "Acknowledgement version");
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -259,6 +271,9 @@ private:
     chip::Optional<uint64_t> mICDMonitoredSubject;
     chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
+    chip::Optional<bool> mRequireTCAcknowledgements;
+    chip::Optional<uint16_t> mTCAcknowledgements;
+    chip::Optional<uint16_t> mTCAcknowledgementVersion;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

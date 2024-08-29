@@ -630,6 +630,7 @@ class MatterTestConfig:
     app_pid: int = 0
 
     commissioning_method: Optional[str] = None
+    in_test_commissioning_method: Optional[str] = None
     discriminators: List[int] = field(default_factory=list)
     setup_passcodes: List[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: Optional[str] = None
@@ -669,6 +670,10 @@ class MatterTestConfig:
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
     trace_to: List[str] = field(default_factory=list)
+
+    # Accepted Terms and Conditions if used
+    tc_version: int = None
+    tc_user_response: int = None
 
 
 class ClusterMapper:
@@ -965,6 +970,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.is_commissioning = False
         # The named pipe name must be set in the derived classes
         self.app_pipe = None
+
+    async def commission_devices(self) -> bool:
+        conf = self.matter_test_config
+
+        for commission_idx, node_id in enumerate(conf.dut_node_ids):
+            logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
+                         (conf.root_of_trust_index, conf.fabric_id, node_id))
+            logging.info("Commissioning method: %s" % conf.commissioning_method)
+
+            await CommissionDeviceTest.commission_device(self, commission_idx)
+
+        return True
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -1772,6 +1789,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.dut_node_ids = args.dut_node_ids
 
     config.commissioning_method = args.commissioning_method
+    config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
 
     config.qr_code_content.extend(args.qr_code)
@@ -1874,6 +1892,9 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
+    config.tc_version = args.tc_version
+    config.tc_user_response = args.tc_user_response
+
     # Accumulate all command-line-passed named args
     all_global_args = []
     argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
@@ -1932,6 +1953,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   metavar='METHOD_NAME',
                                   choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use')
+    commission_group.add_argument('--in-test-commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
                                   dest='discriminators',
@@ -1966,6 +1991,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
+
+    commission_group.add_argument('--tc-version', type=int, help="Terms and conditions version")
+
+    commission_group.add_argument('--tc-user-response', type=int, help="Terms and conditions acknowledgements")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -2236,20 +2265,21 @@ class CommissionDeviceTest(MatterBaseTest):
         self.is_commissioning = True
 
     def test_run_commissioning(self):
-        conf = self.matter_test_config
-        for commission_idx, node_id in enumerate(conf.dut_node_ids):
-            logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-                         (conf.root_of_trust_index, conf.fabric_id, node_id))
-            logging.info("Commissioning method: %s" % conf.commissioning_method)
+        if not asyncio.run(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node")
 
-            if not asyncio.run(self._commission_device(commission_idx)):
-                raise signals.TestAbortAll("Failed to commission node")
+    async def commission_device(instance: MatterBaseTest, i) -> bool:
+        dev_ctrl = instance.default_controller
+        conf = instance.matter_test_config
 
-    async def _commission_device(self, i) -> bool:
-        dev_ctrl = self.default_controller
-        conf = self.matter_test_config
+        info = instance.get_setup_payload_info()[i]
 
-        info = self.get_setup_payload_info()[i]
+        if conf.tc_version is not None and conf.tc_user_response is not None:
+            logging.debug(f"Setting TC Acknowledgements to version {conf.tc_version} with user response {conf.tc_user_response}.")
+            dev_ctrl.SetTCAcknowledgements(conf.tc_version, conf.tc_user_response)
+            dev_ctrl.SetTCRequired(True)
+        else:
+            dev_ctrl.SetTCRequired(False)
 
         if conf.commissioning_method == "on-network":
             try:
