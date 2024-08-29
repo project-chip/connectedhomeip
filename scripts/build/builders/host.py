@@ -313,8 +313,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
-                 enable_thread=True, disable_unique_id=False,
-                 use_tsan=False, use_asan=False, use_ubsan=False,
+                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
@@ -347,9 +346,6 @@ class HostBuilder(GnBuilder):
 
         if not enable_thread:
             self.extra_gn_options.append('chip_enable_openthread=false')
-
-        if disable_unique_id:
-            self.extra_gn_options.append('chip_disable_unique_id=true')
 
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')

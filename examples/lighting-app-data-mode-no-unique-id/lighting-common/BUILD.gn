@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/chip_additional_args.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
