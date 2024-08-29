@@ -181,8 +181,7 @@ Example command:
 
 ### TC 1.3
 
-PIXIT: `PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'` 
-Example command: 
+PIXIT: `PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'` Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_SEAR_1_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --json-arg PIXIT.SEAR.VALID_AREAS:'[7, 1234567]'`
 
 ### TC 1.4
