@@ -105,7 +105,7 @@ def get_section_title(section: str) -> tuple[str, str]:
     return markdown_title, anchor_name
 
 
-def dump_errors(header_path: Path, descriptor: ErrorDescriptor):
+def dump_errors(header_path: Path, descriptor: ErrorDescriptor, is_last: bool):
     loader = ErrorCodeLoader()
     codes_for_section = loader.load_error_header(header_path, descriptor)
 
@@ -118,12 +118,10 @@ def dump_errors(header_path: Path, descriptor: ErrorDescriptor):
     print("     */")
 
     for code in sorted(codes_for_section, key=attrgetter("code")):
-        print()
-        if descriptor.include_description:
-            print("    /**")
-            print(f"     * {code.description}")
-            print("     */")
-        print(f"    public static final long {code.name} = {code.code};")
+        if is_last and code == codes_for_section[-1]:
+            print(f"    {code.name}({code.code});")
+        else:
+            print(f"    {code.name}({code.code}),")
 
 
 def main():
@@ -133,7 +131,7 @@ def main():
         "src/include/platform/CHIPDeviceError.h": ErrorDescriptor(section="SDK Device Layer", code_range=0x200, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_DEVICE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]", include_description=True),
         "src/lib/asn1/ASN1Error.h": ErrorDescriptor(section="ASN1 Layer", code_range=0x300, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_ASN1_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]", include_description=True),
         "src/ble/BleError.h": ErrorDescriptor(section="BLE Layer", code_range=0x400, macro_regex=r"^#define\s+(?P<name>[_A-Z0-9]+)\s+CHIP_BLE_ERROR[(](?P<code>(0x[a-fA-F0-9]+)|\d+)[)]", include_description=True),
-        "src/protocols/interaction_model/StatusCodeList.h": ErrorDescriptor(section="IM Global errors", code_range=0x500, macro_regex=r"^CHIP_IM_STATUS_CODE[(][A-Za-z0-9_]+\s*,\s*(?P<name>[A-Z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
+        "src/protocols/interaction_model/StatusCodeList.h": ErrorDescriptor(section="IM Global", code_range=0x500, macro_regex=r"^CHIP_IM_STATUS_CODE[(][A-Za-z0-9_]+\s*,\s*(?P<name>[A-Z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]"),
     }
 
     print(r'''/*
@@ -155,15 +153,35 @@ def main():
  */
 package chip.platform;
 
-public class ChipError {''')
+public enum ChipError {''')
 
-    for filename, descriptor in descriptors.items():
-        dump_errors(Path(filename), descriptor)
+    for i, (filename, descriptor) in enumerate(descriptors.items()):
+        dump_errors(Path(filename), descriptor, i == len(descriptors) - 1)
 
     print(r'''
-    /**
-     * Returns a string representation of the given error code.
-     */
+    private final long value;
+
+    public ChipError(long value) {
+        this.value = value;
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+    public static ChipError value(long value) {
+        for (ChipError error : values()) {
+            if (error.value == value) {
+                return error;
+            }
+        }
+        throw new IllegalArgumentException("Invalid value: " + value);
+    }
+
+    public String toString() {
+        return toString(value);
+    }
+
     public static native String toString(long errorCode);
 }''')
 
