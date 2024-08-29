@@ -120,7 +120,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
     if (err == CHIP_NO_ERROR)
     {
         mNextStep = Step::kWaitCommissionNodeRequest;
-        ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));        
+        ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
     }
     else
     {
@@ -133,7 +133,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
 {
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering ValidateCommissionNodeCommand, current state: %s", GetStateString(mNextStep));
-    
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mNextStep == Step::kWaitCommissionNodeRequest, CHIP_ERROR_INCORRECT_STATE);
@@ -145,7 +145,7 @@ CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId cli
     VerifyOrExit(mRequestId == requestId, err = CHIP_ERROR_INCORRECT_STATE);
 
     mNextStep = Step::kStartCommissionNode;
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));    
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
 
 exit:
     return err;
