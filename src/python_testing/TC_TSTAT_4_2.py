@@ -291,6 +291,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
+            # Send the SetActivePresetRequest command
+            await self.send_set_active_preset_handle_request_command(value=b'\x03')
+
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
@@ -326,6 +331,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Send the AtomicRequest commit command and expect InvalidInState for presets.
             await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
+
+            # Write the occupied cooling setpoint to a different value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(2300), endpoint_id=endpoint)
+
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+            logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+            asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
