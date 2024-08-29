@@ -1019,14 +1019,6 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
-    if (osTimerIsRunning(sbleAdvTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
     if (osTimerStart(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
