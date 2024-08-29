@@ -16,7 +16,7 @@
  *
  */
 
-#include "DeviceSubscription.h"
+#include "DeviceSubscriptionManager.h"
 #include "rpc/RpcClient.h"
 
 #include <app/InteractionModelEngine.h>
@@ -34,22 +34,52 @@ namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    reinterpret_cast<DeviceSubscription *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
+    reinterpret_cast<DeviceSubscriptionManager::DeviceSubscription *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
 }
 
 void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    reinterpret_cast<DeviceSubscription *>(context)->OnDeviceConnectionFailure(peerId, error);
+    reinterpret_cast<DeviceSubscriptionManager::DeviceSubscription *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
 } // namespace
 
-DeviceSubscription::DeviceSubscription() :
+DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
+{
+    static DeviceSubscriptionManager instance;
+    return instance;
+}
+
+CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
+{
+    auto it = mDeviceSubscriptionMap.find(nodeId);
+    VerifyOrReturnError((it == mDeviceSubscriptionMap.end()), CHIP_ERROR_INCORRECT_STATE);
+
+    auto deviceSubscription = std::make_unique<DeviceSubscription>();
+    VerifyOrReturnError(deviceSubscription, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(deviceSubscription->StartSubscription(this, controller, nodeId));
+
+    mDeviceSubscriptionMap[nodeId] = std::move(deviceSubscription);
+    return CHIP_NO_ERROR;
+}
+
+void DeviceSubscriptionManager::DeviceSubscriptionTerminated(NodeId nodeId)
+{
+    auto it = mDeviceSubscriptionMap.find(nodeId);
+    // DeviceSubscriptionTerminated is a private method that is expected to only
+    // be called by DeviceSubscription when it is terminal and is ready to be
+    // cleaned up and removed. If it is not mapped that means something has gone
+    // really wrong and there is likely a memory leak somewhere.
+    VerifyOrDie(it != mDeviceSubscriptionMap.end());
+    mDeviceSubscriptionMap.erase(nodeId);
+}
+
+DeviceSubscriptionManager::DeviceSubscription::DeviceSubscription() :
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
+void DeviceSubscriptionManager::DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
 {
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::AdministratorCommissioning::Id);
@@ -92,7 +122,7 @@ void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path,
     }
 }
 
-void DeviceSubscription::OnReportEnd()
+void DeviceSubscriptionManager::DeviceSubscription::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
     if (mChangeDetected)
@@ -106,17 +136,18 @@ void DeviceSubscription::OnReportEnd()
     }
 }
 
-void DeviceSubscription::OnDone(ReadClient * apReadClient)
+void DeviceSubscriptionManager::DeviceSubscription::OnDone(ReadClient * apReadClient)
 {
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+    mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
-void DeviceSubscription::OnError(CHIP_ERROR error)
+void DeviceSubscriptionManager::DeviceSubscription::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Subscribe);
@@ -136,17 +167,19 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+        // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+        mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
     }
 }
 
-void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
+void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+    mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
-void DeviceSubscription::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
+CHIP_ERROR DeviceSubscriptionManager::DeviceSubscription::StartSubscription(DeviceSubscriptionManager * manager, Controller::DeviceController & controller, NodeId nodeId)
 {
     VerifyOrDie(!mSubscriptionStarted);
 
@@ -155,6 +188,7 @@ void DeviceSubscription::StartSubscription(Controller::DeviceController & contro
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     mSubscriptionStarted = true;
+    mManager = manager;
 
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

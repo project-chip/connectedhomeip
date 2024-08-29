@@ -65,6 +65,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+    chip::Controller::DeviceController * mController;
     bool mDeviceSyncInProcess                      = false;
     chip_rpc_SynchronizedDevice mCurrentDeviceData = chip_rpc_SynchronizedDevice_init_default;
 };

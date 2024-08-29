@@ -17,6 +17,8 @@
  */
 
 #include "DeviceSynchronization.h"
+
+#include "DeviceSubscriptionManager.h"
 #include "rpc/RpcClient.h"
 
 #include <app/InteractionModelEngine.h>
@@ -72,13 +74,6 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
-    CHIP_ERROR error = status.ToChipError();
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(NotSpecified, "Response Failure: %" CHIP_ERROR_FORMAT, error.Format());
-        return;
-    }
-
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
@@ -131,6 +126,13 @@ void DeviceSynchronizer::OnReportEnd()
     if (!DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
     {
         AddSynchronizedDevice(mCurrentDeviceData);
+        // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
+        if (!mCurrentDeviceData.is_icd)
+        {
+            VerifyOrDie(mController);
+            // TODO should I do VerifyOrDie below?
+            DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+        }
     }
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
@@ -194,5 +196,6 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
 
     mDeviceSyncInProcess = true;
 
+    mController = &controller;
     controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

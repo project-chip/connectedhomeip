@@ -544,6 +544,7 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
 #if defined(PW_RPC_ENABLED)
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(), nodeId);
         RemoveSynchronizedDevice(nodeId);
 #endif
     }
