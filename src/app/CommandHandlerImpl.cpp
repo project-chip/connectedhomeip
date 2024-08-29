@@ -410,7 +410,7 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            if (err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+            if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
             {
                 return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
             }

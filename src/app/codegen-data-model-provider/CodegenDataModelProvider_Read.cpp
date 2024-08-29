@@ -281,7 +281,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
 
             // Implementation of 8.4.3.2 of the spec for path expansion
             if (request.path.mExpanded)
