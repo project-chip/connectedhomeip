@@ -32,8 +32,7 @@ public:
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) override;
     CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) override;
-    CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                    const Optional<uint16_t> & port) override;
+    CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) override;
 
     ~CommissionerControlDelegate() = default;
 
