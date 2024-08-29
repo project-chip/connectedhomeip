@@ -152,14 +152,14 @@ public:
      *
      * @param waterTemperature  The water temperature in 100th's Celsius
      */
-    void SetWaterTemperature(uint16_t waterTemperature);
+    void SetWaterTemperature(int16_t waterTemperature);
 
     /**
      * @brief Set the target water temperature of the tank
      *
      * @param targetWaterTemperature  The water temperature in 100th's Celsius
      */
-    void SetTargetWaterTemperature(uint16_t targetWaterTemperature);
+    void SetTargetWaterTemperature(int16_t targetWaterTemperature);
 
     /**
      * @brief Determine whether the heating sources need to be turned on or off or left unchanged.
@@ -197,7 +197,7 @@ public:
      * @param replacedWaterTemperature  The temperature of the
      * percentageReplaced water.
      */
-    void DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature);
+    void DrawOffHotWater(Percent percentageReplaced, int16_t replacedWaterTemperature);
 
     /**
      * Set the temperature of the cold water that fills the tank as the hot water
@@ -205,7 +205,7 @@ public:
      *
      * @param coldWaterTemperature  The cold water temperature in 100th of a C
      */
-    void SetColdWaterTemperature(uint16_t coldWaterTemperature);
+    void SetColdWaterTemperature(int16_t coldWaterTemperature);
 
 private:
     /**
@@ -215,7 +215,7 @@ private:
      *
      * @return the target temperature
      */
-    uint16_t GetActiveTargetWaterTemperature() const;
+    int16_t GetActiveTargetWaterTemperature() const;
 
     /**
      * @brief Calculate the percentage of the water in the tank at the target
@@ -251,13 +251,13 @@ private:
     WhmManufacturer * mpWhmManufacturer;
 
     // Target water temperature in 100ths of a C
-    uint16_t mTargetWaterTemperature;
+    int16_t mTargetWaterTemperature;
 
     // Actual water temperature in 100ths of a C
-    uint16_t mWaterTemperature;
+    int16_t mWaterTemperature;
 
     // The cold water temperature in 100ths of a C
-    uint16_t mColdWaterTemperature;
+    int16_t mColdWaterTemperature;
 
     // Boost command parameters
 

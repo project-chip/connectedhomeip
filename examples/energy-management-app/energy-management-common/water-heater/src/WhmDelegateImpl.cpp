@@ -300,15 +300,15 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
  *
  *********************************************************************************/
 
-uint16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
+int16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
 {
     // Determine the target temperature. If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
     // target temperature.
     // Note, in practise the actual heating is likely to be controlled by the thermostat's occupiedHeatingSetpoint most of the
     // time, and the TemporarySetpoint (if not null) would be overiding the thermostat's occupiedHeatingSetpoint.
     // However, this code doesn't rely upon the thermostat cluster.
-    uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
-        ? static_cast<uint16_t>(mBoostTemporarySetpoint.Value())
+    int16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
+        ? static_cast<int16_t>(mBoostTemporarySetpoint.Value())
         : mTargetWaterTemperature;
 
     return targetTemperature;
@@ -316,21 +316,27 @@ uint16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
 
 uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
 {
-    int32_t tankPercentage = 100 * (static_cast<int32_t>(mWaterTemperature) - static_cast<int32_t>(mColdWaterTemperature)) /
-        (static_cast<int32_t>(GetActiveTargetWaterTemperature()) - static_cast<int32_t>(mColdWaterTemperature));
+    int32_t tankPercentage;
+    int32_t divisor = static_cast<int32_t>(GetActiveTargetWaterTemperature()) - static_cast<int32_t>(mColdWaterTemperature);
 
+    tankPercentage = 100;
+    if (divisor >= 0)
+    {
+        tankPercentage = 100 * (static_cast<int32_t>(mWaterTemperature) - static_cast<int32_t>(mColdWaterTemperature)) / divisor;
+    }
+    
     tankPercentage = std::min(tankPercentage, static_cast<int32_t>(100));
     tankPercentage = std::max(tankPercentage, static_cast<int32_t>(0));
 
     return static_cast<uint8_t>(tankPercentage);
 }
 
-void WaterHeaterManagementDelegate::SetColdWaterTemperature(uint16_t coldWaterTemperature)
+void WaterHeaterManagementDelegate::SetColdWaterTemperature(int16_t coldWaterTemperature)
 {
     mColdWaterTemperature = coldWaterTemperature;
 }
 
-void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
+void WaterHeaterManagementDelegate::SetWaterTemperature(int16_t waterTemperature)
 {
     mWaterTemperature = waterTemperature;
 
@@ -344,7 +350,7 @@ void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperatur
     ChangeHeatingIfNecessary();
 }
 
-void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWaterTemperature)
+void WaterHeaterManagementDelegate::SetTargetWaterTemperature(int16_t targetWaterTemperature)
 {
     mTargetWaterTemperature = targetWaterTemperature;
 
@@ -352,10 +358,10 @@ void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWat
     ChangeHeatingIfNecessary();
 }
 
-void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature)
+void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, int16_t replacedWaterTemperature)
 {
     // First calculate the new average water temperature
-    mWaterTemperature = static_cast<uint16_t>(
+    mWaterTemperature = static_cast<int16_t>(
         (mWaterTemperature * (100 - percentageReplaced) + replacedWaterTemperature * percentageReplaced) / 100);
 
     // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
@@ -370,7 +376,7 @@ void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, 
 
 bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 {
-    uint16_t targetTemperature = GetActiveTargetWaterTemperature();
+    int16_t targetTemperature = GetActiveTargetWaterTemperature();
 
     if (mBoostState == BoostStateEnum::kActive)
     {
