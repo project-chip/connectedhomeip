@@ -53,7 +53,8 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED) {
+    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED)
+    {
         return SL_STATUS_OK;
     }
 

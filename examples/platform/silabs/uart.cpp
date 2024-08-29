@@ -139,10 +139,10 @@ constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
                                            .stack_mem  = uartStack,
                                            .stack_size = kUartTaskSize,
 #if SLI_SI91X_MCU_INTERFACE
-// Reducing the priority of the UART task to avoid priority inversion
-                                           .priority   = osPriorityNormal
+                                           // Reducing the priority of the UART task to avoid priority inversion
+                                           .priority = osPriorityNormal
 #else
-                                           .priority   = osPriorityRealtime
+                                           .priority = osPriorityRealtime
 #endif // SLI_SI91X_MCU_INTERFACE
 };
 

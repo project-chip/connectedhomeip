@@ -80,12 +80,12 @@ constexpr uint32_t kBleTaskSize = 2048;
 static uint8_t bleStack[kBleTaskSize];
 static osThread_t sBleTaskControlBlock;
 constexpr osThreadAttr_t kBleTaskAttr = { .name       = "rsi_ble",
-                                           .attr_bits  = osThreadDetached,
-                                           .cb_mem     = &sBleTaskControlBlock,
-                                           .cb_size    = osThreadCbSize,
-                                           .stack_mem  = bleStack,
-                                           .stack_size = kBleTaskSize,
-                                           .priority   = osPriorityHigh };
+                                          .attr_bits  = osThreadDetached,
+                                          .cb_mem     = &sBleTaskControlBlock,
+                                          .cb_size    = osThreadCbSize,
+                                          .stack_mem  = bleStack,
+                                          .stack_size = kBleTaskSize,
+                                          .priority   = osPriorityHigh };
 
 using namespace ::chip;
 using namespace ::chip::Ble;
