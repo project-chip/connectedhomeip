@@ -31,8 +31,8 @@
 
 
 import logging
-import time
 import sys
+import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
