@@ -19,7 +19,7 @@ guides to get started.
     example.
 
 -   Follow the steps
-    present[here](https://github.com/espressif/esp-insights/blob/main/examples/README.md#set-up-esp-insights-account)
+    present [here](https://github.com/espressif/esp-insights/blob/main/examples/README.md#set-up-esp-insights-account)
     to set up an insights_account and the auth key created while setting it up
     will be used in the example.
 
@@ -39,7 +39,7 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/
 ### Build time configuration
 
 -   Application mode: By default the example app will run the EVSE example,
-    however this can be changed using the `idy.py menuconfig` command and
+    however this can be changed using the `idf.py menuconfig` command and
     searching for:
 
         ENABLE_EXAMPLE_WATER_HEATER_DEVICE
