@@ -397,9 +397,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
 
-                # Write to the presets attribute after removing the preset that was set as the active preset handle. Remove the last entry with preset handle (b'\x03')
-                test_presets = current_presets.copy()
-                test_presets = list(preset for preset in test_presets if preset.presetHandle is not activePresetHandle)
+                # Write to the presets attribute after removing the preset that was set as the active preset handle.
+                test_presets = list(preset for preset in current_presets if preset.presetHandle is not activePresetHandle)
                 logger.info(f"Sending Presets: {test_presets}")
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 
@@ -412,7 +411,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("7")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Write to the presets attribute after setting the builtIn flag to False for preset with handle (b'\x01')
+            # Write to the presets attribute after setting the builtIn flag to False for a built-in preset.
             test_presets = copy.deepcopy(current_presets)
 
             builtInPresets = list(preset for preset in test_presets if preset.builtIn is True)
@@ -484,7 +483,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
 
-                # Write to the presets attribute after adding a duplicate preset with handle (b'\x03')
+                # Write to the presets attribute after adding a duplicate preset
                 test_presets.append(cluster.Structs.PresetStruct(
                     presetHandle=duplicatePreset.presetHandle, presetScenario=availableScenario, coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
 
@@ -504,7 +503,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             notBuiltInPresets = list(preset for preset in test_presets if preset.builtIn is False)
 
             if len(notBuiltInPresets) > 0:
-                # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
+                # Write to the presets attribute after setting the builtIn flag to True for a non-built-in preset.
                 notBuiltInPresets[0].builtIn = True
 
                 # Send the AtomicRequest begin command
