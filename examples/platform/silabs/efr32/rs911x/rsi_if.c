@@ -55,7 +55,7 @@
 
 #define WFX_QUEUE_SIZE 10
 
-#define kDrvTaskSize 2048  // Example size, adjust as needed
+#define kDrvTaskSize 1792  // Example size, adjust as needed
 
 static uint8_t drvStack[kDrvTaskSize];
 static osThread_t sDrvTaskControlBlock;
@@ -369,13 +369,12 @@ static int32_t wfx_rsi_init(void)
      * Create the driver thread
      */
     wfx_rsi.drv_thread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
-    // wfx_rsi.drv_task = xTaskCreateStatic((TaskFunction_t) rsi_wireless_driver_task, "rsi_drv", WFX_RSI_WLAN_TASK_SZ, NULL,
-    //                                      WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
-    // if (NULL == wfx_rsi.drv_task)
-    // {
-    //     SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
-    //     return RSI_ERROR_INVALID_PARAM;
-    // }
+                                     WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
+    if (NULL == wfx_rsi.drv_task)
+    {
+        SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
+        return RSI_ERROR_INVALID_PARAM;
+    }
 
 #if (RSI_BLE_ENABLE)
     if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)

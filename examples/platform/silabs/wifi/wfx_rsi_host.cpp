@@ -56,7 +56,6 @@ sl_status_t wfx_wifi_start(void)
     if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED) {
         return SL_STATUS_OK;
     }
-    // VerifyOrReturnValue(wfx_rsi.dev_state & WFX_RSI_ST_STARTED, SL_STATUS_OK);
 
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
     SILABS_LOG("%s: starting..", __func__);
