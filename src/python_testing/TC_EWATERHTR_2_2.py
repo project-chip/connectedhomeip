@@ -90,9 +90,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
                      "Event EWATERHTR.S.E00(BoostEnded) sent"),
             TestStep("10a", "TH reads from the DUT the HeatDemand",
                      "Value has to be 0x00 (no demand on any source)"),
-            TestStep("10b", "TH reads from the DUT the HeatDemand",
-                     "Value has to be 0x00 (no demand on any source)"),
-            TestStep("10c", "TH reads from the DUT the BoostState",
+            TestStep("10b", "TH reads from the DUT the BoostState",
                      "Value has to be 0 (Inactive)"),
             TestStep("11", "TH sends command Boost with Duration=600s,OneShot=True",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=600 and OneShot=True"),
@@ -267,15 +265,13 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("10")
         time.sleep(6)
-
-        self.step("10a")
         event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
 
-        self.step("10b")
+        self.step("10a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_equal(heatDemand, 0)
 
-        self.step("10c")
+        self.step("10b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("11")
