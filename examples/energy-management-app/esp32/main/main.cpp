@@ -236,7 +236,7 @@ extern "C" void app_main()
     chip::rpc::Init();
 #endif
 
-    uint8_t features = static_cast<uint8_t>(chip::app::Clusters::DeviceEnergyManagement::sFeatureMap.Raw());
+    uint8_t features = static_cast<uint8_t>(DeviceEnergyManagement::sFeatureMap.Raw());
 
     ESP_LOGI(TAG, "==================================================");
 #if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE)
