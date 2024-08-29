@@ -33,7 +33,7 @@ namespace Thermostat {
  *
  */
 
-static constexpr uint8_t kMaxNumberOfPresetTypes = 5;
+static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
 // TODO: #34556 Support multiple presets of each type.
 // We will support only one preset of each preset type.
