@@ -59,7 +59,7 @@ class _SetupParamters:
     passcode: int
 
 
-class TC_MCORE_FS_1_4(MatterBaseTest):
+class TC_MCORE_FS_1_5(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -106,7 +106,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             f"If using FabricSync Admin test app, you may type:\n"
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
-    def steps_TC_MCORE_FS_1_4(self) -> list[TestStep]:
+    def steps_TC_MCORE_FS_1_5(self) -> list[TestStep]:
         steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
                  TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
                  TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -114,8 +114,9 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                  TestStep(5, "TH commissions TH_SERVER"),
                  TestStep(6, "TH subscribes to AdministratorCommissioning attributes on DUT_FSA for the newly added endpoint identified in step 3"),
                  TestStep(7, "TH opens commissioning window to TH_SERVER directly (not using DUT)"),
-                 TestStep(8, "TH reads AdministratorCommissioning from TH_SERVER directly (not using DUT)"),
-                 TestStep(9, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
+                 TestStep(8, "TH reads CurrentFabricIndex attributes on OperationalCredentials cluster from TH_SERVER directly (not using DUT_FSA)"),
+                 TestStep(9, "TH reads AdministratorCommissioning from TH_SERVER directly (not using DUT)"),
+                 TestStep(10, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
         return steps
 
     @property
@@ -123,7 +124,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         return self.user_params.get("report_waiting_timeout_delay_sec", 10)*2 + 60
 
     @async_test_body
-    async def test_TC_MCORE_FS_1_4(self):
+    async def test_TC_MCORE_FS_1_5(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         min_report_interval_sec = 0
@@ -236,10 +237,18 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         await self.default_controller.OpenCommissioningWindow(nodeid=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
 
         self.step(8)
-        th_server_directly_read_result = await self.default_controller.ReadAttribute(self.th_server_local_nodeid, [(root_endpoint, Clusters.AdministratorCommissioning)])
-        th_server_direct_cadmin = th_server_directly_read_result[root_endpoint][Clusters.AdministratorCommissioning]
+        current_fabric_index = await self.read_single_attribute_check_success(node_id=self.th_server_local_nodeid, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
 
         self.step(9)
+        th_server_directly_read_result = await self.default_controller.ReadAttribute(self.th_server_local_nodeid, [(root_endpoint, Clusters.AdministratorCommissioning)])
+        th_server_direct_cadmin = th_server_directly_read_result[root_endpoint][Clusters.AdministratorCommissioning]
+        cadmin_attr = Clusters.AdministratorCommissioning.Attributes
+        asserts.assert_equal(th_server_direct_cadmin[cadmin_attr.WindowStatus],
+                             Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen, "WindowStatus is expected to be EnhancedWindowOpen")
+        asserts.assert_equal(th_server_direct_cadmin[cadmin_attr.AdminFabricIndex],
+                             current_fabric_index, "AdminFabricIndex is unexpected")
+
+        self.step(10)
         report_waiting_timeout_delay_sec = 10
         logging.info("Waiting for update to AdministratorCommissioning attributes.")
         start_time = time.time()
@@ -269,7 +278,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         dut_read = await self.default_controller.ReadAttribute(self.dut_node_id, [(newly_added_endpoint, Clusters.AdministratorCommissioning)])
         dut_cadmin_for_th_server = dut_read[newly_added_endpoint][Clusters.AdministratorCommissioning]
-        cadmin_attr = Clusters.AdministratorCommissioning.Attributes
         asserts.assert_equal(th_server_direct_cadmin[cadmin_attr.WindowStatus],
                              dut_cadmin_for_th_server[cadmin_attr.WindowStatus], "WindowStatus incorrectly reported by DUT")
         asserts.assert_equal(th_server_direct_cadmin[cadmin_attr.AdminFabricIndex],
