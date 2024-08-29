@@ -115,6 +115,7 @@ def BuildHostTarget():
         TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER, data_model_interface="disabled"),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
+        TargetPart('light-data-model-no-unique-id', app=HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID),
         TargetPart('lock', app=HostApp.LOCK),
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
@@ -191,7 +192,6 @@ def BuildHostTarget():
     target.AppendModifier('data-model-check', data_model_interface="check").ExceptIfRe('-data-model-(enabled|disabled)')
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-(check|enabled)')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-(check|disabled)')
-    target.AppendModifier("data-model-no-unique-id", disable_unique_id=True)
 
     return target
 

@@ -12,32 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# CHIPProjectConfig.h
+
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/chip_additional_args.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 
-config("config") {
-  include_dirs = [ "include" ]
-}
+import("${chip_root}/config/standalone/args.gni")
 
-chip_data_model("lighting-common") {
-  zap_file = "lighting-app.zap"
-  is_server = true
-}
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
 
-source_set("color-format") {
-  public_configs = [ ":config" ]
-  sources = [
-    "include/ColorFormat.h",
-    "src/ColorFormat.cpp",
-  ]
-}
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/lighting-app-data-mode-no-unique-id/linux/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-source_set("lighting-manager") {
-  deps = [ "${chip_root}/src/lib" ]
-  public_configs = [ ":config" ]
-  sources = [
-    "include/LightingManager.h",
-    "src/LightingManager.cpp",
-  ]
-}
+matter_enable_tracing_support = true
+
+chip_enable_additional_data_advertising = true
+chip_enable_rotating_device_id = true
+
+chip_enable_read_client = false

@@ -56,6 +56,7 @@ class HostApp(Enum):
     TV_APP = auto()
     TV_CASTING_APP = auto()
     LIGHT = auto()
+    LIGHT_DATA_MODEL_NO_UNIQUE_ID = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -104,6 +105,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.LIGHT:
             return 'lighting-app/linux'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            return 'lighting-app-data-mode-no-unique-id/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -187,7 +190,7 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT:
+        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
