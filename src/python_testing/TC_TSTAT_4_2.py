@@ -260,6 +260,12 @@ class TC_TSTAT_4_2(MatterBaseTest):
         minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
         maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
 
+        asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
+        asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
+
+        heatSetpoint = minHeatSetpointLimit + ((maxHeatSetpointLimit - minHeatSetpointLimit) / 2)
+        coolSetpoint = minCoolSetpointLimit + ((maxCoolSetpointLimit - minCoolSetpointLimit) / 2)
+
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
 
@@ -439,7 +445,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute after adding a preset with builtIn set to True
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True))
 
                 status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -458,7 +464,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
             test_presets = copy.deepcopy(current_presets)
             test_presets.append(cluster.Structs.PresetStruct(presetHandle=random.randbytes(16), presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
-                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+                                name="Wake", coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.NotFound)
 
@@ -523,7 +529,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             if len(presets_without_name_support) is 0 and len(availableScenarios) > 0:
                 new_preset = cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenarios[0],
-                                                          coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True)
+                                                          coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True)
                 test_presets.append(new_preset)
                 presets_without_name_support = [new_preset]
 
@@ -553,7 +559,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Write to the presets attribute with a new valid preset added
                 test_presets = copy.deepcopy(current_presets)
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                    coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
+                                    coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
