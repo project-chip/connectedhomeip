@@ -28,7 +28,7 @@
 class PairCode : public PairingCommandBridge
 {
 public:
-    PairCode() : PairingCommandBridge("code", PairingMode::Code, CommissioningType::NoNetwork) {}
+    PairCode() : PairingCommandBridge("code", PairingMode::Code, CommissioningType::WithoutNetwork) {}
 };
 
 class PairCodePASEOnly : public PairingCommandBridge
@@ -40,32 +40,32 @@ public:
 class PairCodeWifi : public PairingCommandBridge
 {
 public:
-    PairCodeWifi() : PairingCommandBridge("code-wifi", PairingMode::Code, CommissioningType::WiFi) {}
+    PairCodeWifi() : PairingCommandBridge("code-wifi", PairingMode::Code, CommissioningType::WithWiFi) {}
 };
 
 class PairCodeThread : public PairingCommandBridge
 {
 public:
-    PairCodeThread() : PairingCommandBridge("code-thread", PairingMode::Code, CommissioningType::Thread) {}
+    PairCodeThread() : PairingCommandBridge("code-thread", PairingMode::Code, CommissioningType::WithThread) {}
 };
 
 class PairBleWiFi : public PairingCommandBridge
 {
 public:
-    PairBleWiFi() : PairingCommandBridge("ble-wifi", PairingMode::Ble, CommissioningType::WiFi) {}
+    PairBleWiFi() : PairingCommandBridge("ble-wifi", PairingMode::Ble, CommissioningType::WithWiFi) {}
 };
 
 class PairBleThread : public PairingCommandBridge
 {
 public:
-    PairBleThread() : PairingCommandBridge("ble-thread", PairingMode::Ble, CommissioningType::Thread) {}
+    PairBleThread() : PairingCommandBridge("ble-thread", PairingMode::Ble, CommissioningType::WithThread) {}
 };
 
 class PairAlreadyDiscoveredByIndex : public PairingCommandBridge
 {
 public:
     PairAlreadyDiscoveredByIndex() :
-        PairingCommandBridge("by-index", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::NoNetwork)
+        PairingCommandBridge("by-index", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::WithoutNetwork)
     {}
 };
 
@@ -81,7 +81,7 @@ class PairAlreadyDiscoveredByIndexWithWiFi : public PairingCommandBridge
 {
 public:
     PairAlreadyDiscoveredByIndexWithWiFi() :
-        PairingCommandBridge("by-index-with-wifi", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::WiFi)
+        PairingCommandBridge("by-index-with-wifi", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::WithWiFi)
     {}
 };
 
@@ -89,7 +89,7 @@ class PairAlreadyDiscoveredByIndexWithThread : public PairingCommandBridge
 {
 public:
     PairAlreadyDiscoveredByIndexWithThread() :
-        PairingCommandBridge("by-index-with-thread", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::Thread)
+        PairingCommandBridge("by-index-with-thread", PairingMode::AlreadyDiscoveredByIndex, CommissioningType::WithThread)
     {}
 };
 

@@ -44,6 +44,8 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
+SIMULATED_LONG_PRESS_LENGTH_SECONDS = 2.0
+
 
 def bump_substep(step: str) -> str:
     """Given a string like "5a", bump it to "5b", or "6c" to "6d" """
@@ -94,7 +96,8 @@ class TC_SwitchTests(MatterBaseTest):
 
     def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
         command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
-                        "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500, "FeatureMap": feature_map}
+                        "ButtonId": pressed_position, "LongPressDelayMillis": int(1000 * (SIMULATED_LONG_PRESS_LENGTH_SECONDS - 0.5)),
+                        "LongPressDurationMillis": int(1000 * SIMULATED_LONG_PRESS_LENGTH_SECONDS), "FeatureMap": feature_map}
         self._send_named_pipe_command(command_dict)
 
     def _send_latching_switch_named_pipe_command(self, endpoint_id: int, new_position: int):
@@ -168,7 +171,9 @@ class TC_SwitchTests(MatterBaseTest):
                 prompt_msg="Release the button."
             )
         else:
-            time.sleep(self.keep_pressed_delay/1000)
+            # This will await for the events to be generated properly. Note that there is a bit of a
+            # race here for the button simulator, but this race is extremely unlikely to be lost.
+            time.sleep(SIMULATED_LONG_PRESS_LENGTH_SECONDS + 0.5)
 
     def _await_sequence_of_events(self, event_queue: queue.Queue, endpoint_id: int, sequence: list[ClusterObjects.ClusterEvent], timeout_sec: float):
         start_time = time.time()
@@ -373,7 +378,6 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(5)
         # We're using a long press here with a very long duration (in computer-land). This will let us check the intermediate values.
         # This is 1s larger than the subscription ceiling
-        self.keep_pressed_delay = 6000
         self.pressed_position = 1
         self._ask_for_keep_pressed(endpoint_id, self.pressed_position, feature_map)
         event_listener.wait_for_event_report(cluster.Events.InitialPress)
@@ -595,7 +599,7 @@ class TC_SwitchTests(MatterBaseTest):
     @staticmethod
     def should_run_SWTCH_2_5(wildcard, endpoint):
         msm = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
-        asf = has_feature(Clusters.Switch, 0x20)
+        asf = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kActionSwitch)
         return msm(wildcard, endpoint) and not asf(wildcard, endpoint)
 
     @per_endpoint_test(should_run_SWTCH_2_5)

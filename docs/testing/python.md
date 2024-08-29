@@ -635,8 +635,18 @@ markers must be present.
 
 -   `test-runner-run/<run_identifier>/script-args`: Specifies the arguments to
     be passed to the test script.
+
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+
+-   `test-runner-run/<run_identifier>/script-start-delay`: Specifies the number
+    of seconds to wait before starting the test script. This parameter can be
+    used to allow the application to initialize itself properly before the test
+    script will try to commission it (e.g. in case if the application needs to
+    be commissioned to some other controller first). By default, the delay is 0
+    seconds.
+
+    -   Example: `10`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

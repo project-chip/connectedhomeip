@@ -1615,7 +1615,7 @@ cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
+/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -1651,6 +1651,10 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeMin = 0;
     int16u holdTimeMax = 1;
     int16u holdTimeDefault = 2;
+  }
+
+  info event OccupancyChanged = 0 {
+    OccupancyBitmap occupancy = 0;
   }
 
   readonly attribute OccupancyBitmap occupancy = 0;
@@ -1896,7 +1900,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_occupancysensor = 263, version 1;
+  device type ma_occupancysensor = 263, version 4;
 
   binding cluster Groups;
   binding cluster Binding;
