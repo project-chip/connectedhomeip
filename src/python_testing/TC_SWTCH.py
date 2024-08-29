@@ -38,7 +38,7 @@ import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
 from chip.tlv import uint
-from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
                                     await_sequence_of_reports, default_matter_test_main, has_feature, per_endpoint_test)
 from mobly import asserts
 
@@ -69,6 +69,10 @@ class TC_SwitchTests(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._default_pressed_position = self.user_params.get("default_pressed_position", 1)
+
+    def setup_test(self):
+        super().setup_test()
+        self.is_ci = self._use_button_simulator()
 
     def _send_named_pipe_command(self, command_dict: dict[str, Any]):
         app_pid = self.matter_test_config.app_pid
@@ -253,32 +257,37 @@ class TC_SwitchTests(MatterBaseTest):
 
     def steps_TC_SWTCH_2_2(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-                TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
+                TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
                 TestStep(3, "Operator sets switch to first position on the DUT"),
-                TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                TestStep(4, "TH reads the CurrentPosition attribute from the DUT.", "Verify that the value is 0."),
                 TestStep(5, "Operator sets switch to second position (one) on the DUT",
-                         "Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT"),
-                TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1"),
+                         "Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT."),
+                TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1, and that a subscription report was received for that change."),
                 TestStep(7, "If there are more than 2 positions, test subsequent positions of the DUT"),
                 TestStep(8, "Operator sets switch to first position on the DUT."),
                 TestStep(9, "Wait 10 seconds for event reports stable." "Verify that last SwitchLatched event received is for NewPosition 0."),
-                TestStep(10, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                TestStep(10, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
     @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
+        cluster = Clusters.Switch
+        endpoint_id = self.matter_test_config.endpoint
 
         # Step 1: Commissioning - already done
         self.step(1)
-
-        cluster = Clusters.Switch
-        endpoint_id = self.matter_test_config.endpoint
 
         # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
         self.step(2)
         event_listener = EventChangeCallback(cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+
+        # Pre-get number of positions for step 7 later.
+        num_positions = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.NumberOfPositions)
+        asserts.assert_greater(num_positions, 1, "Latching switch has only 1 position, this is impossible.")
 
         # Step 3: Operator sets switch to first position on the DUT.
         self.step(3)
@@ -291,25 +300,38 @@ class TC_SwitchTests(MatterBaseTest):
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Switch position value is not 0")
 
-        # Step 5: Operator sets switch to second position (one) on the DUT",
-        # Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT
-        self.step(5)
-        expected_switch_position = 1
-        self._ask_for_switch_position(endpoint_id, expected_switch_position)
+        attrib_listener.reset()
+        event_listener.reset()
 
-        data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
-        logging.info(f"-> SwitchLatched event last received: {data}")
-        asserts.assert_equal(data, cluster.Events.SwitchLatched(
-            newPosition=expected_switch_position), "Did not get expected switch position")
+        for expected_switch_position in range(1, num_positions):
+            # Step 5: Operator sets switch to second position (one) on the DUT",
+            # Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT
+            if expected_switch_position == 1:
+                self.step(5)
+            self._ask_for_switch_position(endpoint_id, expected_switch_position)
 
-        # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
-        self.step(6)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
-        asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
+            data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
+            logging.info(f"-> SwitchLatched event last received: {data}")
+            asserts.assert_equal(data, cluster.Events.SwitchLatched(
+                newPosition=expected_switch_position), "Did not get expected switch position")
 
-        # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
-        # # TODO(#34656): Implement loop for > 2 total positions
-        self.skip_step(7)
+            # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
+            if expected_switch_position == 1: ## Indicate step 7 only once
+                self.step(6)
+            button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+            asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
+            logging.info(f"Checking to see if a report for {expected_switch_position} is received")
+            attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
+
+            # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
+            if expected_switch_position == 1:
+                if num_positions > 2: ## Indicate step 7 only once
+                    self.step(7)
+                else:
+                    self.skip_step(7)
+
+            if num_positions > 2:
+                logging.info("Looping for the other positions")
 
         # Step 8: Operator sets switch to first position on the DUT.
         self.step(8)
@@ -319,7 +341,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 9: Wait 10 seconds for event reports stable.
         # Verify that last SwitchLatched event received is for NewPosition 0.
         self.step(9)
-        time.sleep(10.0)
+        time.sleep(10.0 if not self.is_ci else 1.0)
 
         expected_switch_position = 0
         last_event = event_listener.get_last_event()
@@ -332,15 +354,20 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 10: TH reads the CurrentPosition attribute from the DUT.
         # Verify that the value is 0
         self.step(10)
+
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
+
+        logging.info(f"Checking to see if a report for {expected_switch_position} is received")
+        expected_final_value = [AttributeValue(endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
+        attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)
 
     def steps_TC_SWTCH_2_3(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
                 TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
-                TestStep(5, "Operator operates switch (keep it pressed)",
+                TestStep(5, "Operator operates switch (keep it pressed, and wait at least 5 seconds)",
                          "Verify that the TH receives InitialPress event with NewPosition set to 1 on the DUT"),
                 TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1"),
                 TestStep(7, "Operator releases switch on the DUT"),
@@ -419,12 +446,12 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
-                TestStep(5, "Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, the release it",
+                TestStep(5, "Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, then release it",
                 """
                 * TH expects receiving a subscription report of CurrentPosition 1, followed by a report of Current Position 0.
                 * TH expects receiving at InitialPress event with NewPosition = 1.
-                * if MSL or AS feature is supported, TH expect receiving LongPress/LongRelease in that order.
-                * if MS & (!MSL & !AS & !MSR) features present, TH expects receiving no further events for 10 seconds after release.
+                * if MSL feature is supported, TH expect receiving LongPress/LongRelease in that order.
+                * if MS & (!MSL & !AS & !MSR & !MSM) features present, TH expects receiving no further events for 10 seconds after release.
                 * if (MSR & !MSL) features present, TH expects receiving ShortRelease event.
                 """)
                 ]
@@ -446,6 +473,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_ms_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitch) != 0
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
+        has_msm_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchMultiPress) != 0
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
 
         if not has_ms_feature:
@@ -455,8 +483,8 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 2: Set up subscription to all events of Switch cluster on the endpoint
         self.step(2)
         event_listener = EventChangeCallback(cluster)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Step 3: Operator does not operate switch on the DUT
@@ -486,8 +514,8 @@ class TC_SwitchTests(MatterBaseTest):
         self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                        sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
-        # - if MSL or AS feature is supported, expect to see LongPress/LongRelease in that order.
-        if not has_msl_feature and not has_as_feature:
+        # - if MSL feature is supported, expect to see LongPress/LongRelease in that order.
+        if not has_msl_feature:
             logging.info("Since MSL and AS features both unsupported, skipping check for LongPress/LongRelease")
         else:
             # - TH expects report of LongPress, LongRelease in that order.
@@ -498,8 +526,8 @@ class TC_SwitchTests(MatterBaseTest):
             self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                            sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
-        # - if MS & (!MSL & !AS & !MSR) features present, expect no further events for 10 seconds after release.
-        if not has_msl_feature and not has_as_feature and not has_msr_feature:
+        # - if MS & (!MSL & !AS & !MSR & !MSM) features present, expect no further events for 10 seconds after release.
+        if not has_msl_feature and not has_as_feature and not has_msr_feature and not has_msm_feature:
             self._expect_no_events_for_cluster(event_queue=event_listener.event_queue,
                                                endpoint_id=endpoint_id, expected_cluster=cluster, timeout_sec=10.0)
 
