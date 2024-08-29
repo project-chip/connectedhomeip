@@ -73,9 +73,9 @@ class TC_ACL_2_11(MatterBaseTest):
             TestStep(2, "TH1 reads DUT Endpoint 0 AccessControl cluster CommissioningARL attribute"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute"),
             TestStep(4, "For each entry in ARL, iterate over each restriction and attempt access the restriction's ID on the Endpoint and Cluster in the ARL entry.",
-                     "If the restriction is Type AttributeAccessForbidden, read the restriction's attribute ID and verify the response is UNSUPPORTED_ACCESS."
-                     "If the restriction is Type AttributeWriteForbidden, write restriction's the attribute ID and verify the response is UNSUPPORTED_ACCESS."
-                     "If the restriction is Type CommandForbidden, invoke the restriction's command ID and verify the response is UNSUPPORTED_ACCESS."),
+                     "If the restriction is Type AttributeAccessForbidden, read the restriction's attribute ID and verify the response is ACCESS_RESTRICTED."
+                     "If the restriction is Type AttributeWriteForbidden, write restriction's the attribute ID and verify the response is ACCESS_RESTRICTED."
+                     "If the restriction is Type CommandForbidden, invoke the restriction's command ID and verify the response is ACCESS_RESTRICTED."),
             TestStep(5, "TH1 sends DUT Endpoint 0 AccessControl cluster command ReviewFabricRestrictions"),
             TestStep(6, "Wait for up to 1 hour. Follow instructions provided by device maker to remove all access restrictions",
                      "AccessRestrictionReviewUpdate event is received"),
@@ -119,15 +119,15 @@ class TC_ACL_2_11(MatterBaseTest):
                 command = ALL_ACCEPTED_COMMANDS[C1][ID1]
 
                 if restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeAccessForbidden:
-                    await self.read_single_attribute_expect_error(cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess, endpoint=E1)
+                    await self.read_single_attribute_expect_error(cluster=cluster, attribute=attribute, error=Status.AccessRestricted, endpoint=E1)
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeWriteForbidden:
                     status = await self.write_single_attribute(attribute_value=attribute, endpoint_id=E1)
-                    asserts.assert_equal(status, Status.UnsupportedAccess,
-                                         f"Failed to verify UNSUPPORTED_ACCESS when writing to Attribute {ID1} Cluster {C1} Endpoint {E1}")
+                    asserts.assert_equal(status, Status.AccessRestricted,
+                                         f"Failed to verify ACCESS_RESTRICTED when writing to Attribute {ID1} Cluster {C1} Endpoint {E1}")
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kCommandForbidden:
                     result = await self.send_single_cmd(cmd=command, endpoint=E1)
-                    asserts.assert_equal(result.status, Status.UnsupportedAccess,
-                                         f"Failed to verify UNSUPPORTED_ACCESS when sending command {ID1} to Cluster {C1} Endpoint {E1}")
+                    asserts.assert_equal(result.status, Status.AccessRestricted,
+                                         f"Failed to verify ACCESS_RESTRICTED when sending command {ID1} to Cluster {C1} Endpoint {E1}")
 
         # Belongs to step 6, but needs to be subscribed before executing step 5: begin
         arru_queue = queue.Queue()
