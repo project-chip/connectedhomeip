@@ -79,7 +79,8 @@ DeviceSubscriptionManager::DeviceSubscription::DeviceSubscription() :
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-void DeviceSubscriptionManager::DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
+void DeviceSubscriptionManager::DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data,
+                                                                    const StatusIB & status)
 {
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::AdministratorCommissioning::Id);
@@ -147,7 +148,8 @@ void DeviceSubscriptionManager::DeviceSubscription::OnError(CHIP_ERROR error)
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
+                                                                      const SessionHandle & sessionHandle)
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Subscribe);
@@ -179,7 +181,9 @@ void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnectionFailure(co
     mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
-CHIP_ERROR DeviceSubscriptionManager::DeviceSubscription::StartSubscription(DeviceSubscriptionManager * manager, Controller::DeviceController & controller, NodeId nodeId)
+CHIP_ERROR DeviceSubscriptionManager::DeviceSubscription::StartSubscription(DeviceSubscriptionManager * manager,
+                                                                            Controller::DeviceController & controller,
+                                                                            NodeId nodeId)
 {
     VerifyOrDie(!mSubscriptionStarted);
 
@@ -188,7 +192,7 @@ CHIP_ERROR DeviceSubscriptionManager::DeviceSubscription::StartSubscription(Devi
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     mSubscriptionStarted = true;
-    mManager = manager;
+    mManager             = manager;
 
     return controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

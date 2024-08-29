@@ -43,7 +43,8 @@ public:
     public:
         DeviceSubscription();
 
-        CHIP_ERROR StartSubscription(DeviceSubscriptionManager * manager, chip::Controller::DeviceController & controller, chip::NodeId nodeId);
+        CHIP_ERROR StartSubscription(DeviceSubscriptionManager * manager, chip::Controller::DeviceController & controller,
+                                     chip::NodeId nodeId);
 
         ///////////////////////////////////////////////////////////////
         // ReadClient::Callback implementation
@@ -79,7 +80,6 @@ public:
     CHIP_ERROR StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
 
 private:
-
     void DeviceSubscriptionTerminated(chip::NodeId nodeId);
 
     std::unordered_map<chip::NodeId, std::unique_ptr<DeviceSubscription>> mDeviceSubscriptionMap;
