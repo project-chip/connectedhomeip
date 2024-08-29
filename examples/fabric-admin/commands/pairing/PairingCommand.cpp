@@ -21,9 +21,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <commands/common/DeviceScanner.h>
 #include <commands/interactive/InteractiveCommands.h>
-#include <commands/pairing/DeviceSynchronization.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <device_manager/DeviceSynchronization.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>

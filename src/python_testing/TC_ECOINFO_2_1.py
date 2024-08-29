@@ -115,6 +115,11 @@ class TC_ECOINFO_2_1(MatterBaseTest):
 
         self.print_step(0, "Commissioning, already done")
 
+        pause_for_pre_condition = self.user_params.get("pause_for_pre_condition", False)
+        if pause_for_pre_condition:
+            self.wait_for_user_input(
+                "Paused test to allow for manufacturer to satisfy precondition where one or more bridged devices of a supported type is connected to DUT")
+
         self.step(1)
         endpoint_wild_card_read = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.EcosystemInformation.Attributes.ClusterRevision)])
         list_of_endpoints = list(endpoint_wild_card_read.keys())

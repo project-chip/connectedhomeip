@@ -129,14 +129,16 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             asserts.fail('This test requires a TH_ICD_SERVER app. Specify app path with --string-arg th_icd_server_app_path:<path_to_app>')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
         discriminator = 3850
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} '
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
 
         logging.info("Starting ICD Server App")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("ICD started")
         time.sleep(3)
 

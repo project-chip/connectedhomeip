@@ -41,19 +41,21 @@ tests:
           values:
               - name: nodeId
                 value: nodeId
-
+    # Step 1
     - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: ActiveDatasetTimestamp
       response:
           value: null
 
+    # Step 2
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
       response:
           value: null
 
+    # Step 3
     - label:
           "TH sends a valid ActiveDatasetRequest command to the DUT without
           having armed the fail-safe"
@@ -65,6 +67,7 @@ tests:
       response:
           error: FAILSAFE_REQUIRED
 
+    # Step 4
     - label: "TH sends ArmFailSafe command to the DUT"
       cluster: General Commissioning
       command: ArmFailSafe
@@ -75,7 +78,12 @@ tests:
                 value: 60
               - name: Breadcrumb
                 value: 1
+      response:
+          values:
+              - name: ErrorCode
+                value: CommissioningErrorEnum.OK
 
+    # Step 5
     - label: "TH sends an invalid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
       arguments:
@@ -85,6 +93,7 @@ tests:
       response:
           error: INVALID_COMMAND
 
+    # Step 6
     - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
       arguments:
@@ -92,12 +101,20 @@ tests:
               - name: ActiveDataset
                 value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
 
+    # Step 7
+    - label: "TH sends CommissioningComplete command to the DUT"
+      cluster: General Commissioning
+      command: CommissioningComplete
+      endpoint: 0
+
+    # Step 8
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
       command: readAttribute
       attribute: InterfaceEnabled
       response:
           value: true
 
+    # Step 9
     - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: ActiveDatasetTimestamp
@@ -106,7 +123,8 @@ tests:
           constraints:
               type: int64u
 
-    - label: "TH sends a valid GetActiveDatasetRequest command to the DUT"
+    # Step 10
+    - label: "TH send a GetActiveDatasetRequest command to the DUT"
       command: GetActiveDatasetRequest
       response:
           values:
