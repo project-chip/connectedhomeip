@@ -44,7 +44,6 @@ CHIP_ERROR WhmManufacturer::Init()
     }
 
     dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
-    dg->SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
     dg->SetColdWaterTemperature(2000);
 
     return CHIP_NO_ERROR;
