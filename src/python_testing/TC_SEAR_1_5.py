@@ -99,7 +99,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         sleep(0.001)
 
     def TC_SEAR_1_5(self) -> list[str]:
-        return ["SEAR.S", "SEAR.S.C02.Rsp"]
+        return ["SEAR.S"]
 
     @async_test_body
     async def test_TC_SEAR_1_5(self):
@@ -114,6 +114,12 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         attribute_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
+        accepted_cmd_list = await self.read_sear_attribute_expect_success(
+            endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
+        
+        if Clusters.ServiceArea.Commands.SkipArea.command_id not in accepted_cmd_list:
+            asserts.fail("Skip Area Response command needs to be supported to run this test")
+
         self.print_step(1, "Commissioning, already done")
 
         # Ensure that the device is in the correct state
