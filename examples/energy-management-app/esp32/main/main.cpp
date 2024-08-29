@@ -236,8 +236,16 @@ extern "C" void app_main()
     chip::rpc::Init();
 #endif
 
+    uint8_t features = static_cast<uint8_t>(chip::app::Clusters::DeviceEnergyManagement::sFeatureMap.Raw());
+
     ESP_LOGI(TAG, "==================================================");
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example starting");
+#if defined(CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE)
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example evse starting. featureMap 0x%02x", features);
+#elif defined(CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example water-heater starting. featureMap 0x%02x", features);
+#else
+    ESP_LOGI(TAG, "chip-esp32-energy-management-example starting. featureMap 0x%02x", features);
+#endif
     ESP_LOGI(TAG, "==================================================");
 
 #if CONFIG_ENABLE_CHIP_SHELL
