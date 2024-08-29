@@ -147,7 +147,7 @@ class TC_OCC_2_3(MatterBaseTest):
             await self.write_single_attribute(attributes.PhysicalContactOccupiedToUnoccupiedDelay(hold_time_limits_dut.holdTimeMin))
             occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-            asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut, 
+            asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut,
 				 "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
 
 
