@@ -72,12 +72,14 @@ class Subprocess(threading.Thread):
         t1.start()
         t2 = threading.Thread(target=self.forward_f, args=[self.p.stderr, sys.stderr])
         t2.start()
+        # Wait for the process to finish.
         self.p.wait()
         t1.join()
         t2.join()
 
     def stop(self):
         self.p.terminate()
+        self.join()
 
 
 class AppServer:
@@ -222,6 +224,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             error=Status.UnsupportedAttribute,
         )
 
+        self.step(2)
+
         # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
         dut_fsa_bridge_endpoints = set(await self.read_single_attribute_check_success(
             cluster=Clusters.Descriptor,
@@ -229,8 +233,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=0,
         ))
-
-        self.step(2)
 
         await self.commission_via_commissioner_control(
             controller_node_id=self.dut_node_id,

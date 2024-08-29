@@ -16,11 +16,10 @@
 
 import asyncio
 import contextlib
+import os
 import signal
 import sys
-import os
 from argparse import ArgumentParser
-
 
 BRIDGE_COMMISSIONED = asyncio.Event()
 # Log message which should appear in the fabric-admin output if
