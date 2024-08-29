@@ -283,15 +283,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-
-#if defined(CHIP_DISABLE_UNIQUE_ID) && CHIP_DISABLE_UNIQUE_ID
-    if (aPath.mEndpointId == 0 && aPath.mClusterId == chip::app::Clusters::BasicInformation::Id &&
-        aPath.mAttributeId == chip::app::Clusters::BasicInformation::Attributes::UniqueID::Id)
-    {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
-    }
-#endif
-
     FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
