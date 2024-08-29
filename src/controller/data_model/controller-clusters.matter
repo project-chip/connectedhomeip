@@ -2587,6 +2587,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   request struct KeepActiveRequest {
     int32u stayActiveDuration = 0;
+    int32u timeoutMs = 1;
   }
 
   /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
@@ -7598,7 +7599,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
+/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -7634,6 +7635,10 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeMin = 0;
     int16u holdTimeMax = 1;
     int16u holdTimeDefault = 2;
+  }
+
+  info event OccupancyChanged = 0 {
+    OccupancyBitmap occupancy = 0;
   }
 
   readonly attribute OccupancyBitmap occupancy = 0;
@@ -9402,9 +9407,8 @@ provisional cluster EcosystemInformation = 1872 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute access(read: manage) optional nullable epoch_us removedOn = 0;
-  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 1;
-  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 2;
+  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 0;
+  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9446,8 +9450,6 @@ provisional cluster CommissionerControl = 1873 {
   request struct CommissionNodeRequest {
     int64u requestId = 0;
     int16u responseTimeoutSeconds = 1;
-    optional octet_string ipAddress = 2;
-    optional int16u port = 3;
   }
 
   response struct ReverseOpenCommissioningWindow = 2 {

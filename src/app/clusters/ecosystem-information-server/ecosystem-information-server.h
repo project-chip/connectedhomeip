@@ -186,16 +186,6 @@ public:
      */
     CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId, FabricIndex aFabricIndex,
                                std::unique_ptr<EcosystemLocationStruct> aLocation);
-
-    /**
-     * @brief Removes device at the provided endpoint.
-     *
-     * @param aEndpoint Endpoint of the associated device that has been removed.
-     * @param aEpochUs Epoch time in micro seconds assoicated with when device was removed.
-     * @return #CHIP_NO_ERROR on success.
-     * @return Other CHIP_ERROR associated with issue.
-     */
-    CHIP_ERROR RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs);
     // TODO(#33223) Add removal and update counterparts to AddDeviceInfo and AddLocationInfo.
 
     CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
@@ -214,12 +204,10 @@ private:
 
     struct DeviceInfo
     {
-        Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
         std::map<EcosystemLocationKey, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
 
-    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
 

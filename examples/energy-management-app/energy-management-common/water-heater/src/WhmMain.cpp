@@ -167,25 +167,22 @@ CHIP_ERROR WhmManufacturerShutdown()
     return CHIP_NO_ERROR;
 }
 
-void WhmApplicationInit()
+CHIP_ERROR WhmApplicationInit()
 {
-    if (WhmInit() != CHIP_NO_ERROR)
-    {
-        return;
-    }
+    ReturnErrorOnFailure(WhmInit());
 
     /* Do this last so that the instances for other clusters can be wrapped inside */
-    if (WhmManufacturerInit() != CHIP_NO_ERROR)
-    {
-        WhmShutdown();
-        return;
-    }
+    ReturnErrorOnFailure(WhmManufacturerInit());
+
+    return CHIP_NO_ERROR;
 }
 
-void WhmApplicationShutdown()
+CHIP_ERROR WhmApplicationShutdown()
 {
     /* Shutdown in reverse order that they were created */
     WhmManufacturerShutdown();
+
+    return WhmShutdown();
 }
 
 } // namespace WaterHeaterManagement

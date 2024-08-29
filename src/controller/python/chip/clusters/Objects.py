@@ -12168,9 +12168,11 @@ class BridgedDeviceBasicInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="stayActiveDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=1, Type=uint),
                     ])
 
             stayActiveDuration: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -38399,6 +38401,26 @@ class OccupancySensing(Cluster):
 
             value: 'uint' = 0
 
+    class Events:
+        @dataclass
+        class OccupancyChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000406
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=0, Type=uint),
+                    ])
+
+            occupancy: 'uint' = 0
+
 
 @dataclass
 class CarbonMonoxideConcentrationMeasurement(Cluster):
@@ -47185,9 +47207,8 @@ class EcosystemInformation(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="removedOn", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
-                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000002, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
+                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000000, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
+                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -47196,7 +47217,6 @@ class EcosystemInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    removedOn: 'typing.Union[None, Nullable, uint]' = None
     deviceDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]' = None
     locationDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -47264,22 +47284,6 @@ class EcosystemInformation(Cluster):
 
     class Attributes:
         @dataclass
-        class RemovedOn(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000750
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
         class DeviceDirectory(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -47287,7 +47291,7 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -47303,7 +47307,7 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000002
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -47473,14 +47477,10 @@ class CommissionerControl(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="responseTimeoutSeconds", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ipAddress", Tag=2, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="port", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             requestId: 'uint' = 0
             responseTimeoutSeconds: 'uint' = 0
-            ipAddress: 'typing.Optional[bytes]' = None
-            port: 'typing.Optional[uint]' = None
 
         @dataclass
         class ReverseOpenCommissioningWindow(ClusterCommand):

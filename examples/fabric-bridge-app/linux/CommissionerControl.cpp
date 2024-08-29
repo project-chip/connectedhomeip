@@ -166,8 +166,7 @@ CHIP_ERROR CommissionerControlDelegate::GetCommissioningWindowParams(Commissioni
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params,
-                                                             const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
+CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

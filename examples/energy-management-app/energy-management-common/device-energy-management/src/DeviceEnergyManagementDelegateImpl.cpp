@@ -377,9 +377,13 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
             mForecast.Value().startTime            = savedStartTime;
             mForecast.Value().endTime              = savedEndTime;
 
+            MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
+
             return Status::Failure;
         }
     }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
 
     return Status::Success;
 }
@@ -457,10 +461,14 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
     if (cause == AdjustmentCauseEnum::kLocalOptimization)
     {
         mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kLocalOptimization;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
     }
     else if (cause == AdjustmentCauseEnum::kGridOptimization)
     {
         mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kGridOptimization;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
     }
 
     return Status::Success;
@@ -606,6 +614,8 @@ Status DeviceEnergyManagementDelegate::ResumeRequest()
             // The PauseRequest has effectively been cancelled so as a result the device should
             // go back to InternalOptimisation
             mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
+            MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
         }
 
         CHIP_ERROR err = CancelPauseRequestAndGenerateEvent(CauseEnum::kCancelled);
@@ -672,6 +682,8 @@ Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
         }
 
         mForecast.Value().forecastID++;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
     }
 
     return status;
@@ -725,6 +737,8 @@ Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
 
         mForecast.Value().forecastID++;
 
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
+
         status = Status::Success;
     }
 
@@ -747,6 +761,8 @@ Status DeviceEnergyManagementDelegate::CancelRequest()
     Status status = Status::Success;
 
     mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
 
     /* It is expected the mpDEMManufacturerDelegate will cancel the effects of any previous adjustment
      * request commands, and re-evaluate its forecast for intended operation ignoring those previous
@@ -980,6 +996,8 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             if ((mOptOutState == OptOutStateEnum::kOptOut) || (mOptOutState == OptOutStateEnum::kLocalOptOut))
             {
                 mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
+                MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
                 // Generate a new forecast with Internal Optimization
                 // TODO
             }
@@ -988,6 +1006,8 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             if ((mOptOutState == OptOutStateEnum::kOptOut) || (mOptOutState == OptOutStateEnum::kGridOptOut))
             {
                 mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
+                MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
                 // Generate a new forecast with Internal Optimization
                 // TODO
             }

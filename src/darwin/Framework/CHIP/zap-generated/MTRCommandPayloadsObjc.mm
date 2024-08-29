@@ -7934,6 +7934,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _stayActiveDuration = @(0);
+
+        _timeoutMs = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -7945,6 +7947,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRBridgedDeviceBasicInformationClusterKeepActiveParams alloc] init];
 
     other.stayActiveDuration = self.stayActiveDuration;
+    other.timeoutMs = self.timeoutMs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -7953,7 +7956,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stayActiveDuration:%@; >", NSStringFromClass([self class]), _stayActiveDuration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stayActiveDuration:%@; timeoutMs:%@; >", NSStringFromClass([self class]), _stayActiveDuration, _timeoutMs];
     return descriptionString;
 }
 
@@ -7967,6 +7970,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.stayActiveDuration = self.stayActiveDuration.unsignedIntValue;
+    }
+    {
+        encodableStruct.timeoutMs = self.timeoutMs.unsignedIntValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -31577,10 +31583,6 @@ NS_ASSUME_NONNULL_BEGIN
         _requestId = @(0);
 
         _responseTimeoutSeconds = @(0);
-
-        _ipAddress = nil;
-
-        _port = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -31593,8 +31595,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.requestId = self.requestId;
     other.responseTimeoutSeconds = self.responseTimeoutSeconds;
-    other.ipAddress = self.ipAddress;
-    other.port = self.port;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -31603,7 +31603,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; responseTimeoutSeconds:%@; ipAddress:%@; port:%@; >", NSStringFromClass([self class]), _requestId, _responseTimeoutSeconds, [_ipAddress base64EncodedStringWithOptions:0], _port];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; responseTimeoutSeconds:%@; >", NSStringFromClass([self class]), _requestId, _responseTimeoutSeconds];
     return descriptionString;
 }
 
@@ -31620,18 +31620,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.responseTimeoutSeconds = self.responseTimeoutSeconds.unsignedShortValue;
-    }
-    {
-        if (self.ipAddress != nil) {
-            auto & definedValue_0 = encodableStruct.ipAddress.Emplace();
-            definedValue_0 = AsByteSpan(self.ipAddress);
-        }
-    }
-    {
-        if (self.port != nil) {
-            auto & definedValue_0 = encodableStruct.port.Emplace();
-            definedValue_0 = self.port.unsignedShortValue;
-        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
