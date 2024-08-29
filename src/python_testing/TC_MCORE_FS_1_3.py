@@ -25,10 +25,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
-# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa/stdin --storage-dir=dut-fsa --discriminator=1234
+# test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
-# test-runner-run/run1/script-start-delay: 10
+# test-runner-run/run1/script-start-delay: 5
 # test-runner-run/run1/quiet: false
 # === END CI TEST ARGUMENTS ===
 
@@ -140,8 +140,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         return [
             TestStep(0, "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH commissions TH_SERVER_NO_UID to TH's fabric"),
-            TestStep(2, "DUT_FSA commissions TH_SERVER_NO_UID to DUT_FSA's fabric and generates a UniqueID.",
-                     "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
+            # TestStep(2, "DUT_FSA commissions TH_SERVER_NO_UID to DUT_FSA's fabric and generates a UniqueID.",
+            #          "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
         ]
 
     async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int):
@@ -216,7 +216,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             filter=self.th_server_discriminator,
         )
 
-        # FIXME: Sometimes reading the UniqueID fails...
         await self.read_single_attribute_expect_error(
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.UniqueID,

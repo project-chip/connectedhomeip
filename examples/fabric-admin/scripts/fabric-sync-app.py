@@ -20,6 +20,7 @@ import os
 import signal
 import sys
 from argparse import ArgumentParser
+from tempfile import TemporaryDirectory
 
 BRIDGE_COMMISSIONED = asyncio.Event()
 # Log message which should appear in the fabric-admin output if
@@ -133,8 +134,12 @@ async def main(args):
     if args.commissioner_node_id == 1:
         raise ValueError("NodeID=1 is reserved for the local fabric-bridge")
 
-    if args.storage_dir is not None:
-        os.makedirs(args.storage_dir, exist_ok=True)
+    storage_dir = args.storage_dir
+    if storage_dir is not None:
+        os.makedirs(storage_dir, exist_ok=True)
+    else:
+        storage = TemporaryDirectory(prefix="fabric-sync-app")
+        storage_dir = storage.name
 
     pipe = args.stdin_pipe
     if pipe and not os.path.exists(pipe):
@@ -151,7 +156,7 @@ async def main(args):
     admin, bridge = await asyncio.gather(
         run_admin(
             args.app_admin,
-            storage_dir=args.storage_dir,
+            storage_dir=storage_dir,
             rpc_admin_port=args.app_admin_rpc_port,
             rpc_bridge_port=args.app_bridge_rpc_port,
             paa_trust_store_path=args.paa_trust_store_path,
@@ -161,7 +166,7 @@ async def main(args):
         ),
         run_bridge(
             args.app_bridge,
-            storage_dir=args.storage_dir,
+            storage_dir=storage_dir,
             rpc_admin_port=args.app_admin_rpc_port,
             rpc_bridge_port=args.app_bridge_rpc_port,
             secured_device_port=args.secured_device_port,
@@ -226,7 +231,8 @@ if __name__ == "__main__":
     parser.add_argument("--stdin-pipe", metavar="PATH",
                         help="read input from a named pipe instead of stdin")
     parser.add_argument("--storage-dir", metavar="PATH",
-                        help="directory to place storage files in")
+                        help=("directory to place storage files in; by default "
+                              "volatile storage is used"))
     parser.add_argument("--paa-trust-store-path", metavar="PATH",
                         help="path to directory holding PAA certificates")
     parser.add_argument("--commissioner-name", metavar="NAME",
