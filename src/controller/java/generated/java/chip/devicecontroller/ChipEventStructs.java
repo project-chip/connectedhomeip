@@ -5871,6 +5871,52 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
     return output.toString();
   }
 }
+public static class OccupancySensingClusterOccupancyChangedEvent {
+  public Integer occupancy;
+  private static final long OCCUPANCY_ID = 0L;
+
+  public OccupancySensingClusterOccupancyChangedEvent(
+    Integer occupancy
+  ) {
+    this.occupancy = occupancy;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(OCCUPANCY_ID, new UIntType(occupancy)));
+
+    return new StructType(values);
+  }
+
+  public static OccupancySensingClusterOccupancyChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer occupancy = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == OCCUPANCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          occupancy = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OccupancySensingClusterOccupancyChangedEvent(
+      occupancy
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OccupancySensingClusterOccupancyChangedEvent {\n");
+    output.append("\toccupancy: ");
+    output.append(occupancy);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;

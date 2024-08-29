@@ -6494,6 +6494,13 @@ PICS:
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051
 
+    - label: "Does the device implement the Schedules attribute?"
+      id: TSTAT.S.A0051
+
+    - label:
+          "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
+      id: TSTAT.S.A0052
+
     #
     # server / commandsReceived
     #
@@ -6541,7 +6548,7 @@ PICS:
       id: TSTAT.S.C01.Tx
 
     - label: "Does the device implement sending the AtomicResponse command?"
-      id: TSTAT.S.CFD.Tx
+      id: TSTAT.S.Cfd.Tx
 
     #
     # server / features
