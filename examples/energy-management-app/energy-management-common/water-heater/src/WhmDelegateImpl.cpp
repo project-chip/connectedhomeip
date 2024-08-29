@@ -320,7 +320,7 @@ uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
     int32_t divisor = static_cast<int32_t>(GetActiveTargetWaterTemperature()) - static_cast<int32_t>(mColdWaterTemperature);
 
     tankPercentage = 100;
-    if (divisor >= 0)
+    if (divisor > 0)
     {
         tankPercentage = 100 * (static_cast<int32_t>(mWaterTemperature) - static_cast<int32_t>(mColdWaterTemperature)) / divisor;
     }
