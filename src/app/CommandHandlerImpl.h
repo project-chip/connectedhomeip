@@ -294,7 +294,13 @@ private:
         {
             return CHIP_NO_ERROR;
         }
-        ReturnErrorOnFailure(RollbackResponse());
+        // Here the err from previous step is returned intentionally if RollBackResonse fails due to
+        // running out of packet buffers i.e due to CHIP_ERROR_NO_MEMORY in AllocateBuffer() and
+        // fails to set the mRollBackBackupValid.
+        if (RollbackResponse() != CHIP_NO_ERROR)
+        {
+            return err;
+        }
         // If we failed to add a command due to lack of space in the
         // packet, we will make another attempt to add the response using
         // an additional InvokeResponseMessage.
