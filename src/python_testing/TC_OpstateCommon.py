@@ -113,7 +113,7 @@ class TC_OPSTATE_BASE():
 
     def send_raw_manual_or_pipe_command(self, command: dict):
         if self.is_ci:
-            self.write_to_app_pipe(self.app_pipe, command)
+            self.write_to_app_pipe(command)
             time.sleep(0.1)
         else:
             self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")

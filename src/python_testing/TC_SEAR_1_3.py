@@ -91,7 +91,7 @@ class TC_SEAR_1_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset"})
 
         supported_area_ids = await self.read_supported_areas(step=2)
         asserts.assert_true(len(self.supported_areas) > 0, "SupportedAreas is empty")
@@ -124,7 +124,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({supported_area_ids}) command"
             self.print_step("9", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -140,7 +140,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_area_id}) command, and put the device in a non-idle state"
             self.print_step("13", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset"})
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1), endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")

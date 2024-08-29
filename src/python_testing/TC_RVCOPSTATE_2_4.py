@@ -119,13 +119,13 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset"})
 
         if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
             step_name = "Manually put the device in the ERROR operational state"
             self.print_step(2, step_name)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
+                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -137,9 +137,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the CHARGING operational state"
             self.print_step(5, step_name)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Docked"})
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Charging"})
+                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Docked"})
+                self.write_to_app_pipe({"Name": "Charging"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -151,7 +151,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the DOCKED operational state"
             self.print_step(8, step_name)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "Charged"})
+                self.write_to_app_pipe({"Name": "Charged"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 

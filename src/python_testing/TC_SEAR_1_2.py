@@ -207,7 +207,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe(self.app_pipe, {"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset"})
 
         if self.check_pics("SEAR.S.F02"):
             await self.read_and_validate_supported_maps(step=2)
@@ -237,7 +237,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "RemoveMap", "MapId": 3})
+                self.write_to_app_pipe({"Name": "RemoveMap", "MapId": 3})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -272,7 +272,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"})
+                self.write_to_app_pipe({"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -307,7 +307,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "RemoveArea", "AreaId": 10050})
+                self.write_to_app_pipe({"Name": "RemoveArea", "AreaId": 10050})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -341,7 +341,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe(self.app_pipe, {"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
+                self.write_to_app_pipe({"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

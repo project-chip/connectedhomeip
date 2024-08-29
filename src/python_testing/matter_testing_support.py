@@ -816,6 +816,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
+        # The named pipe name must be set in the derived classes
+        self.app_pipe = None
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -879,7 +881,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, app_pipe_name: str, cmd_d: dict):
+    def get_default_app_pipe_name(self) -> str:
+        return self.app_pipe
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
         """
         Sends an out-of-band command to a Matter app.
 
@@ -889,7 +894,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
-        - LINUX_DUT_UNAME
+        - LINUX_DUT_USER
+        
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
@@ -897,14 +903,17 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
 
+        if app_pipe_name is None:
+            app_pipe_name = self.get_default_app_pipe_name()
+
         if not isinstance(app_pipe_name, str):
             raise TypeError("the named pipe must be provided as a string value")
 
-        if not isinstance(cmd_d, dict):
+        if not isinstance(command_dict, dict):
             raise TypeError("the command must be passed as a dictionary value")
 
         import json
-        command = json.dumps(cmd_d)
+        command = json.dumps(command_dict)
 
         import os
         dut_ip = os.getenv('LINUX_DUT_IP')
@@ -917,8 +926,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
-            dut_uname = os.getenv('LINUX_DUT_UNAME')
-            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_UNAME environment variable must be set")
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
 
             logging.info(f"Using DUT user name: {dut_uname}")
 
