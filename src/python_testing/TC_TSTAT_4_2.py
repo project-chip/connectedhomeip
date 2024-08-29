@@ -73,7 +73,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                                  "Schedules attribute should have the right status")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
 
-    def check_saved_presets(self, sent_presets: list, returned_presets: list):
+    def check_returned_presets(self, sent_presets: list, returned_presets: list):
         asserts.assert_true(len(sent_presets) == len(returned_presets), "Returned presets are a different length than sent presets")
         for i, sent_preset in enumerate(sent_presets):
             returned_preset = returned_presets[i]
@@ -309,7 +309,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Read the presets attribute and verify it was updated by the write
                 saved_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
                 logger.info(f"Rx'd Presets: {saved_presets}")
-                self.check_saved_presets(test_presets, saved_presets)
+                self.check_returned_presets(test_presets, saved_presets)
 
                 await self.send_atomic_request_rollback_command()
 
@@ -348,7 +348,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
                 current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
                 logger.info(f"Rx'd Presets: {current_presets}")
-                self.check_saved_presets(test_presets, current_presets)
+                self.check_returned_presets(test_presets, current_presets)
 
                 presetScenarioCounts = self.count_preset_scenarios(current_presets)
             else:
@@ -475,7 +475,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
+            if len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
                 test_presets = copy.deepcopy(current_presets)
                 duplicatePreset = test_presets[0]
@@ -485,7 +485,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute after adding a duplicate preset
                 test_presets.append(cluster.Structs.PresetStruct(
-                    presetHandle=duplicatePreset.presetHandle, presetScenario=availableScenario, coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+                    presetHandle=duplicatePreset.presetHandle, presetScenario=availableScenario, coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
 
@@ -520,8 +520,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("12")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) != 0 and presetScenarioCounts.get(
-                presetType.presetScenario, 0) < presetType.numberOfPresets)
+            availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) == 0 and presetScenarioCounts.get(
+                presetType.presetScenario, 0) <= presetType.numberOfPresets)
 
             test_presets = copy.deepcopy(current_presets)
             presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
@@ -553,7 +553,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
+            if len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
                 # Write to the presets attribute with a new valid preset added
                 test_presets = copy.deepcopy(current_presets)
@@ -611,15 +611,14 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("17")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            scenarioNotPresent = None
-
             # Find a preset scenario not present in PresetTypes to run this test.
             scenarioMap = dict(map(lambda presetType: (presetType.presetScenario, presetType), presetTypes))
-            unavailableScenarios = list(preset for preset in test_presets if preset.presetScenario not in scenarioMap)
+            unavailableScenarios = list(
+                presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in scenarioMap)
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
-                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenarioNotPresent,
-                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=unavailableScenarios[0],
+                                                                 name="Preset", coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -653,7 +652,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                     while presetsAddedForScenario < presetType.numberOfPresets:
                         testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                                        coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                                                                        coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
                         presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command
