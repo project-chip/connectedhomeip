@@ -144,7 +144,7 @@ async def main(args):
     def terminate(signum, frame):
         admin.terminate()
         bridge.terminate()
-        sys.exit(1)
+        sys.exit(0)
 
     signal.signal(signal.SIGINT, terminate)
     signal.signal(signal.SIGTERM, terminate)
