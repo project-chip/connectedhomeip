@@ -612,9 +612,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Find a preset scenario not present in PresetTypes to run this test.
-            scenarioMap = dict(map(lambda presetType: (presetType.presetScenario, presetType), presetTypes))
+            supportedScenarios = set(presetType.presetScenario for presetType in presetTypes)
             unavailableScenarios = list(
-                presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in scenarioMap)
+                presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios)
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=unavailableScenarios[0],
@@ -629,7 +629,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_rollback_command()
             else:
                 logger.info(
-                    "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
+                    "Couldn't run test step 17 since all preset scenarios in PresetScenarioEnum are supported by this Thermostat")
 
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
