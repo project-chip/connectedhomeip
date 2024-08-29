@@ -130,7 +130,6 @@ void DeviceSynchronizer::OnReportEnd()
         if (!mCurrentDeviceData.is_icd)
         {
             VerifyOrDie(mController);
-            // TODO should I do VerifyOrDie below?
             DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
         }
     }
