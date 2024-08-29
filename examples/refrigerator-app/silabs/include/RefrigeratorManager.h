@@ -18,6 +18,7 @@
 
 #pragma once
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
+#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,16 +29,23 @@
 #include <lib/core/CHIPError.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::RefrigeratorAlarm;
+using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
+using namespace chip::app::Clusters::TemperatureControl;
+using namespace chip::app::Clusters::TemperatureControl::Attributes;
+using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
+using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 // AppCluster Spec Table 85.
-enum RefrigeratorMode
+enum SUPPORTED_MODES
 {
     OFF = 0,
-    NORMAL,
-    RAPID_COOL,
-    RAPID_FREEZE,
-    ENERGY_SAVE,
-    HEAT,
+    CURRENT_MODE,
+    START_UP_MODE,
+    ON_MODE,
 };
 
 class RefrigeratorManager
