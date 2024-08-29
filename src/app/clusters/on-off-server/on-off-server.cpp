@@ -340,8 +340,10 @@ Status OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * currentOnOff
  * @param endpoint   Ver.: always
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
+ * @param forceSend Send value of the On/Off even when it is the same as current On/Off value.
+ * This parameter is useful at the start when you try to determine startup state of On/Off relay that does not store state after losing power
  */
-Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange)
+Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange, bool forceSend)
 {
     MATTER_TRACE_SCOPE("setOnOffValue", "OnOff");
     Status status;
@@ -355,18 +357,33 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         return status;
     }
 
-    // if the value is already what we want to set it to then do nothing
-    if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
+    if (forceSend)
     {
-        ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
-        return Status::Success;
+        if (command == Commands::Off::Id)
+        {
+            newValue = false;
+        }
+        else if (command == Commands::On::Id)
+        {
+            newValue = true;
+
+        }
+        // I guess that, I can only get ON/OFF at startup
     }
+    else
+    {
+        // if the value is already what we want to set it to then do nothing
+        if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
+        {
+            ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
+            return Status::Success;
+        }
 
-    // we either got a toggle, or an on when off, or an off when on,
-    // so we need to swap the value
-    newValue = !currentValue;
-    ChipLogProgress(Zcl, "Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
-
+        // we either got a toggle, or an on when off, or an off when on,
+        // so we need to swap the value
+        newValue = !currentValue;
+        ChipLogProgress(Zcl, "Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
+    }
     // the sequence of updating on/off attribute and kick off level change effect should
     // be depend on whether we are turning on or off. If we are turning on the light, we
     // should update the on/off attribute before kicking off level change, if we are
@@ -499,7 +516,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         Status status             = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == Status::Success)
         {
-            status = setOnOffValue(endpoint, onOffValueForStartUp, true);
+            status = setOnOffValue(endpoint, onOffValueForStartUp, true, true);
         }
 
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
