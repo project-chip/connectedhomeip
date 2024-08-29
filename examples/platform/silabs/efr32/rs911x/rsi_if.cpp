@@ -49,9 +49,9 @@ extern "C" {
 }
 #endif
 
-#include "silabs_utils.h"
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
+#include "silabs_utils.h"
 #include "wfx_rsi.h"
 
 // TODO convert this file to cpp and use CodeUtils.h
@@ -696,8 +696,7 @@ void ProcessEvent(WfxEvent_t inEvent)
     // Process event
     switch (inEvent.eventType)
     {
-    case WFX_EVT_STA_CONN:
-        {
+    case WFX_EVT_STA_CONN: {
         SILABS_LOG("Starting LwIP STA");
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
         ResetDHCPNotificationFlags();
@@ -707,10 +706,9 @@ void ProcessEvent(WfxEvent_t inEvent)
         // of AP connectivity.
         // wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
         // is independant of IP connectivity.
-        }
-        break;
-    case WFX_EVT_STA_DISCONN:
-        {
+    }
+    break;
+    case WFX_EVT_STA_DISCONN: {
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
         wfx_rsi.dev_state &=
             ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
@@ -723,16 +721,15 @@ void ProcessEvent(WfxEvent_t inEvent)
         wfx_ip_changed_notify(IP_STATUS_FAIL);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
-        }
-        break;
+    }
+    break;
     case WFX_EVT_AP_START:
         // TODO: Currently unimplemented
         break;
     case WFX_EVT_AP_STOP:
         // TODO: Currently unimplemented
         break;
-    case WFX_EVT_SCAN:
-        {
+    case WFX_EVT_SCAN: {
 #ifdef SL_WFX_CONFIG_SCAN
         rsi_rsp_scan_t scan_rsp = { 0 };
         int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
@@ -777,31 +774,27 @@ void ProcessEvent(WfxEvent_t inEvent)
             wfx_rsi.scan_ssid = (char *) 0;
         }
 #endif /* SL_WFX_CONFIG_SCAN */
-        }
-        break;
-    case WFX_EVT_STA_START_JOIN:
-        {
+    }
+    break;
+    case WFX_EVT_STA_START_JOIN: {
         // saving the AP related info
         wfx_rsi_save_ap_info();
         // Joining to the network
         wfx_rsi_do_join();
-        }
-        break;
-    case WFX_EVT_STA_DO_DHCP:
-        {
+    }
+    break;
+    case WFX_EVT_STA_DO_DHCP: {
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
-        }
-        break;
-    case WFX_EVT_STA_DHCP_DONE:
-        {
+    }
+    break;
+    case WFX_EVT_STA_DHCP_DONE: {
         CancelDHCPTimer();
-        }
-        break;
-    case WFX_EVT_DHCP_POLL:
-        {
+    }
+    break;
+    case WFX_EVT_DHCP_POLL: {
         HandleDHCPPolling();
-        }
-        break;
+    }
+    break;
     default:
         break;
     }
