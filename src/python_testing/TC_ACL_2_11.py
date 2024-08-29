@@ -160,12 +160,12 @@ class TC_ACL_2_11(MatterBaseTest):
             server_list = ret[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
             for server in server_list:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[server]
-                attribute_data = await dev_ctrl.ReadAttribute(dut_node_id, [endpoint,
-                                                                            cluster.Attributes.GeneratedCommandList,
-                                                                            cluster.Attributes.AcceptedCommandList,
-                                                                            cluster.Attributes.AttributeList,
-                                                                            cluster.Attributes.FeatureMap,
-                                                                            cluster.Attributes.ClusterRevision])
+                await dev_ctrl.ReadAttribute(dut_node_id, [endpoint,
+                                                           cluster.Attributes.GeneratedCommandList,
+                                                           cluster.Attributes.AcceptedCommandList,
+                                                           cluster.Attributes.AttributeList,
+                                                           cluster.Attributes.FeatureMap,
+                                                           cluster.Attributes.ClusterRevision])
 
         self.step(6)
         response = await self.send_single_cmd(cmd=Clusters.AccessControl.Commands.ReviewFabricRestrictions([care_struct]), endpoint=0)
