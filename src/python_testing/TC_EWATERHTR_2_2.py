@@ -81,7 +81,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
             TestStep("8a", "TH reads from the DUT the HeatDemand",
                      "Value has to be 0x00 (no demand on any source)"),
             TestStep("9", "TH sends command Boost with Duration=5s,OneShot=True",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=6 and OneShot=True"),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=5 and OneShot=True"),
             TestStep("9a", "TH reads from the DUT the HeatDemand",
                      "Value has to be greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
             TestStep("9b", "TH reads from the DUT the BoostState",
