@@ -64,7 +64,7 @@ public:
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     chip::Protocols::InteractionModel::Status getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
     chip::Protocols::InteractionModel::Status setOnOffValue(chip::EndpointId endpoint, chip::CommandId command,
-                                                            bool initiatedByLevelChange, bool forceSend=false);
+                                                            bool initiatedByLevelChange, bool forceSend = false);
     chip::Protocols::InteractionModel::Status getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);

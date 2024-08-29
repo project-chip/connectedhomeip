@@ -341,7 +341,8 @@ Status OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * currentOnOff
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
  * @param forceSend Send value of the On/Off even when it is the same as current On/Off value.
- * This parameter is useful at the start when you try to determine startup state of On/Off relay that does not store state after losing power
+ * This parameter is useful at the start when you try to determine startup state of On/Off relay that does not store state after
+ * losing power
  */
 Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange, bool forceSend)
 {
@@ -366,7 +367,6 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         else if (command == Commands::On::Id)
         {
             newValue = true;
-
         }
         // I guess that, I can only get ON/OFF at startup
     }
