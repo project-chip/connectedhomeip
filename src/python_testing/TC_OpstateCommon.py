@@ -112,7 +112,7 @@ class TC_OPSTATE_BASE():
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-    def send_raw_manual_or_pipe_command(self, command):
+    def send_raw_manual_or_pipe_command(self, command : dict):
         if self.is_ci:
             self.write_to_app_pipe(self.app_pipe, command)
             time.sleep(0.1)
@@ -129,7 +129,7 @@ class TC_OPSTATE_BASE():
         if param is not None:
             command["Param"] = param
 
-        self.send_raw_manual_or_pipe_command(json.dumps(command))
+        self.send_raw_manual_or_pipe_command(command)
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
         logging.info(f"##### Command {cmd}")
