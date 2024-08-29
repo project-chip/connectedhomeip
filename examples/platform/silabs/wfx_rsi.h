@@ -31,8 +31,7 @@
  */
 
 #define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/ // TODO: For rs9116
-#define WFX_RSI_BUF_SZ (1024 * 10) /* May need tweak 			*/                 // TODO: For rs9116
-// TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
+#define WFX_RSI_BUF_SZ (1024 * 10)
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
 #define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
 
