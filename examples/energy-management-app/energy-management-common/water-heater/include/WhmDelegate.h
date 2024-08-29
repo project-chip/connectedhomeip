@@ -203,7 +203,7 @@ public:
      * Set the temperature of the cold water that fills the tank as the hot water
      * is drawn off.
      *
-     * @param oldWaterTemperature  The cold water temperature in 100th of a C
+     * @param coldWaterTemperature  The cold water temperature in 100th of a C
      */
     void SetColdWaterTemperature(uint16_t coldWaterTemperature);
 
