@@ -207,6 +207,7 @@ private:
     friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
 
     friend void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint);
+    friend void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
     friend bool emberAfThermostatClusterSetActivePresetRequestCallback(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
