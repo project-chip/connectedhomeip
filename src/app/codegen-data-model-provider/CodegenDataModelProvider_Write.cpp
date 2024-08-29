@@ -290,8 +290,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED && err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, err);
 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
-                                                   : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
+            return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
         }
     }
 
