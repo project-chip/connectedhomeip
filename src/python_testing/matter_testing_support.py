@@ -1941,7 +1941,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
 
 
 def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
-    """ Test decorator for a test that needs to be run only if the endpoint that meets the accept_function criteria.
+    """ Test decorator for a test that needs to be run only if the endpoint meets the accept_function criteria.
 
         Place this decorator above the test_ method to have the test framework run this test only if the endpoint matches.
         This decorator takes an EndpointCheckFunction to assess whether a test needs to be run on a particular
