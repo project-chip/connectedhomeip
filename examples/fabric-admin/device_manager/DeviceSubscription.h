@@ -63,7 +63,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
-    bool mChangeDetected      = false;
+    bool mChangeDetected = false;
     // Used to ensure DeviceSubscription is only starts subscription only once. If instance of
     // DeviceSubscription is allowed reused class documentation should be updated.
     bool mSubscriptionStarted = false;
