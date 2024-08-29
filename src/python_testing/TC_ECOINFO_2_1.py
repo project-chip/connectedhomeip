@@ -87,9 +87,12 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             if current_fabric_index != location.fabricIndex:
                 # Fabric sensitve field still exist in python, just that they have default values
                 asserts.assert_equal(location.uniqueLocationID, "", "Unexpected value in uniqueLocationID")
-                asserts.assert_equal(location.locationDescriptor.locationName, "", "Unexpected value in locationDescriptor.locationName")
-                asserts.assert_equal(location.locationDescriptor.floorNumber, NullValue, "Unexpected value in locationDescriptor.floorNumber")
-                asserts.assert_equal(location.locationDescriptor.areaType, NullValue, "Unexpected value in locationDescriptor.areaType")
+                asserts.assert_equal(location.locationDescriptor.locationName, "",
+                                     "Unexpected value in locationDescriptor.locationName")
+                asserts.assert_equal(location.locationDescriptor.floorNumber, NullValue,
+                                     "Unexpected value in locationDescriptor.floorNumber")
+                asserts.assert_equal(location.locationDescriptor.areaType, NullValue,
+                                     "Unexpected value in locationDescriptor.areaType")
                 asserts.assert_equal(location.locationDescriptorLastEdit, 0, "Unexpected value in locationDescriptorLastEdit")
                 continue
 
