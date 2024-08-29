@@ -318,7 +318,7 @@ RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requ
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-# PIP requires MASON package compilation, which seems to require a JDK
+# PIP requires MASON package compilation, which seems to require a JDK -Try build
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
 
 RUN pip install --break-system-packages --no-cache-dir python_lib/controller/python/chip*.whl
