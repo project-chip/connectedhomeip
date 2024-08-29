@@ -114,23 +114,35 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                      "Verify that the DUT responds with GetUserResponse Command."),
             TestStep("22", "TH sends ClearCredential Command to DUT to clear all the credentials.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("23a", "TH sends ClearAliroReaderConfig Command to DUT.",
+            TestStep("23", "TH sends ClearUser Command to DUT to clear all the users.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("23b", ",TH sends SetAliroReaderConfig Command to DUT without GroupResolvingKey.",
+            TestStep("24", "TH sends SetUser Command to DUT.",
+                     "Verify that the DUT sends SUCCESS response."),
+            TestStep("25", "TH sends ClearAliroReaderConfig Command to DUT.",
+                     "Verify that the DUT sends SUCCESS response."),
+            TestStep("26", ",TH sends SetAliroReaderConfig Command to DUT without GroupResolvingKey.",
                      "Verify that DUT sends success response."),
-            TestStep("24", "TH sends SetCredential Command CredentialType as AliroEvictableEndpointKey.",
+            TestStep("27", ",TH sends SetAliroReaderConfig Command to DUT with GroupResolvingKey.",
+                     "Verify that DUT sends success response."),
+            TestStep("28", "TH sends SetCredential Command CredentialType as AliroEvictableEndpointKey.",
                      "Verify that the DUT responds with SetCredentialResponse commad with status success "),
-            TestStep("25", "TH sends GetUser Command to DUT.",
+            TestStep("29", "TH sends SetCredential Command to DUT with CredentialType.PIN.",
+                     "Verify that the DUT sends SetCredentialResponse command  with Status SUCCESS."),
+            TestStep("30", "TH sends GetUser Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("26", "TH sends SetCredential Command to modify PIN CredentialType",
+            TestStep("31", "TH sends SetCredential Command to modify PIN CredentialType",
                      "Verify that the DUT responds with SetCredentialResponse command with status success "),
-            TestStep("27", "TH sends GetUser Command to DUT.",
+            TestStep("32", "TH sends GetUser Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("28", "TH sends ClearCredential Command to DUT.",
+            TestStep("33", "TH sends SetCredential Command to modify AliroEvictableEndpointKey CredentialType",
+                     "Verify that the DUT responds with SetCredentialResponse command with status success "),
+            TestStep("34", "TH sends GetUser Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("29", "TH sends ClearUser Command to DUT.",
+            TestStep("35", "TH sends ClearCredential Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
-            TestStep("30", "TH sends ClearAliroReaderConfig Command to DUT.",
+            TestStep("36", "TH sends ClearUser Command to DUT.",
+                     "Verify that the DUT sends SUCCESS response."),
+            TestStep("37", "TH sends ClearAliroReaderConfig Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."), ]
 
         return steps
@@ -242,7 +254,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 timedRequestTimeoutMs=1000)
             asserts.assert_true(type_matches(response, drlkcluster.Commands.SetCredentialResponse),
                                 "Unexpected return type for SetCredential")
-
+            asserts.assert_equal(response.userIndex, NullValue)
             if (statuscode != custom_stautus_code):
                 asserts.assert_true(response.status == statuscode,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))
@@ -272,7 +284,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    async def send_set_aliro_reader_config_cmd(self, expected_status: Status = Status.Success):
+    async def send_set_aliro_reader_config_cmd(self, use_group_resolving_key: bool,
+                                               expected_status: Status = Status.Success):
         try:
 
             signingKey = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4adb2f5d9bc9ea6c49e9566d144367df3ff")
@@ -281,23 +294,22 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             groupIdentifier = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4ad")
             groupResolvingKey = bytes.fromhex("89d0859bfcdecdf3c4adfc302ca53e27")
 
-            grp_resolve = False
-
             # Checks Pics condition
-            if self.check_pics("DRLK.S.F0e") is False:
-                grp_resolve = self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C28.Rsp"))
+            if use_group_resolving_key is False:
+                pics_check = self.pics_guard(self.check_pics("DRLK.S.F0d") and not self.check_pics("DRLK.S.F0e") and
+                                             self.check_pics("DRLK.S.C28.Rsp"))
             else:
-                grp_resolve = self.pics_guard(self.check_pics("DRLK.S.C28.Rsp"))
+                pics_check = self.pics_guard(self.check_pics("DRLK.S.F0e") and self.check_pics("DRLK.S.C28.Rsp"))
 
-            if not grp_resolve:
+            if not use_group_resolving_key and pics_check:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=signingKey,
                     verificationKey=verificationKey,
-                    groupIdentifier=self.groupIdentifier),
+                    groupIdentifier=groupIdentifier),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
-            elif grp_resolve:
+            elif use_group_resolving_key and pics_check:
                 await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.SetAliroReaderConfig(
                     signingKey=signingKey,
                     verificationKey=verificationKey,
@@ -334,10 +346,13 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.inavlid_pincode = b""
         self.rfid_tag = b""
 
-       # Aliro Keys for setting Aliro configuration and credential
+        # Aliro Keys for setting Aliro configuration and credential
 
-        aliroevictableendpointkey = bytes.fromhex(
+        aliroevictableendpointkey1 = bytes.fromhex(
             "047a4c772d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
+
+        aliroevictableendpointkey2 = bytes.fromhex(
+            "047a4c662d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A0011")):
@@ -623,60 +638,102 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
 
         self.step("22")
-        if self.pics_guard(self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C26.Rsp")):
+        if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
+            await self.clear_credentials_cmd(credential=NullValue)
 
-            credentials = drlkcluster.Structs.CredentialStruct(credentialIndex=1,
-                                                               credentialType=drlkcluster.Enums.CredentialTypeEnum.kRfid)
-        await self.clear_credentials_cmd(credential=credentials)
+        self.step("23")
+        if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
+            await self.send_clear_user_cmd(userIndex_1)
 
-        self.step("23a")
+        self.step("24")
+        if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
+            try:
+                await self.send_single_cmd(cmd=drlkcluster.Commands.SetUser(
+                    operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                    userIndex=userIndex_1,
+                    userName=user_name,
+                    userUniqueID=user_unique_id1,
+                    userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
+                    userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
+                    credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                    endpoint=self.app_cluster_endpoint,
+                    timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                logging.exception(e)
+
+        self.step("25")
         if self.check_pics("DRLK.S.C29.Rsp"):
             await self.send_clear_aliro_reader_config_cmd()
 
-        self.step("23b")
-        await self.send_set_aliro_reader_config_cmd(expected_status=Status.Success)
+        self.step("26")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False, expected_status=Status.Success)
+        self.step("27")
+        await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.Success)
 
-        self.step("24")
-        if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.F08")
+        self.step("28")
+        if self.pics_guard(self.check_pics("DRLK.S.F0d")
                            and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
-            await self.set_credential_cmd(credentialData=aliroevictableendpointkey,
+            await self.set_credential_cmd(credentialData=aliroevictableendpointkey1,
                                           operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                                           credential_enum=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
                                           credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
-        self.step("25")
+
+        self.step("29")
+        if self.pics_guard(self.check_pics("DRLK.S.F00")
+                           and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
+            await self.set_credential_cmd(credentialData=self.pin_code,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
+                                          credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
+        self.step("30")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C1b.Rsp")):
 
             credentiallist: list[drlkcluster.Structs.CredentialStruct]
             credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
-                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin),
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey),
                               drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
-                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey)]
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)]
             await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
-        self.step("26")
+        self.step("31")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
             await self.set_credential_cmd(credentialData=self.pin_code2,
                                           operationType=drlkcluster.Enums.DataOperationTypeEnum.kModify,
                                           credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
                                           credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
 
-        self.step("27")
+        self.step("32")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C1b.Rsp")):
 
             credentiallist: list[drlkcluster.Structs.CredentialStruct]
             credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
-                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin),
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey),
                               drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
-                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey)]
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)]
+            await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
+        self.step("33")
+        if self.pics_guard(self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
+            await self.set_credential_cmd(credentialData=aliroevictableendpointkey2,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kModify,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                          credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
+        self.step("34")
+        if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F0d") and self.check_pics("DRLK.S.C1b.Rsp")):
+
+            credentiallist: list[drlkcluster.Structs.CredentialStruct]
+            credentiallist = [drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey),
+                              drlkcluster.Structs.CredentialStruct(credentialIndex=credentialIndex_1,
+                                                                   credentialType=drlkcluster.Enums.CredentialTypeEnum.kPin)]
             await self.get_user(userIndex_1, user_name, user_unique_id1, credentiallist, Status.Success)
 
-        self.step("28")
+        self.step("35")
         if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
             await self.clear_credentials_cmd(credential=NullValue)
 
-        self.step("29")
+        self.step("36")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
             await self.send_clear_user_cmd(userIndex_1)
-        self.step("30")
+        self.step("37")
         if self.pics_guard(self.check_pics("DRLK.S.C29.Rsp")):
             await self.send_clear_aliro_reader_config_cmd()
 
