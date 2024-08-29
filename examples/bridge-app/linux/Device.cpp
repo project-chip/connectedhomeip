@@ -19,8 +19,8 @@
 
 #include "Device.h"
 
-#include <cstdio>
 #include <crypto/RandUtils.h>
+#include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <string>
@@ -100,7 +100,7 @@ void Device::SetLocation(std::string szLocation)
 void Device::GenerateUniqueId()
 {
     // Ensure the buffer is zeroed out
-    memset(mUniqueId, 0, kDeviceUniqueIdSize+1);
+    memset(mUniqueId, 0, kDeviceUniqueIdSize + 1);
 
     static const char kRandCharChoices[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
