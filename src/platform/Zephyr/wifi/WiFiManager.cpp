@@ -155,9 +155,9 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
 
 const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
     { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
-                                    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
-                                    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
+    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
+    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
+    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
     { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler },
 });
 
@@ -317,15 +317,15 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
 #if CONFIG_CHIP_NXP_PLATFORM
-	/* Zephyr 3.6 doesn't support the unicast stat in net_stats_wifi struct */
-	stats.mPacketUnicastRxCount   = data.pkts.rx - data.multicast.rx - data.broadcast.rx;
-	stats.mPacketUnicastRxCount   = data.pkts.tx - data.multicast.tx - data.broadcast.tx;
+    /* Zephyr 3.6 doesn't support the unicast stat in net_stats_wifi struct */
+    stats.mPacketUnicastRxCount = data.pkts.rx - data.multicast.rx - data.broadcast.rx;
+    stats.mPacketUnicastRxCount = data.pkts.tx - data.multicast.tx - data.broadcast.tx;
 #else
-    stats.mPacketUnicastRxCount   = data.unicast.rx;
-    stats.mPacketUnicastTxCount   = data.unicast.tx;
+    stats.mPacketUnicastRxCount = data.unicast.rx;
+    stats.mPacketUnicastTxCount = data.unicast.tx;
 #endif
-    stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
-    stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
+    stats.mBeaconsSuccessCount = data.sta_mgmt.beacons_rx;
+    stats.mBeaconsLostCount    = data.sta_mgmt.beacons_miss;
 
     return CHIP_NO_ERROR;
 }
@@ -451,15 +451,15 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
 void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
 {
     net_if_start_rs(Instance().mNetIf);
-        Instance().mRouterSolicitationCounter++;
-        if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
-        {
+    Instance().mRouterSolicitationCounter++;
+    if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
+    {
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs), SendRouterSolicitation,
                                               nullptr);
-        }
-        else
-        {
-            Instance().mRouterSolicitationCounter = 0;
+    }
+    else
+    {
+        Instance().mRouterSolicitationCounter = 0;
     }
 }
 

@@ -242,7 +242,7 @@ Status ZephyrWifiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutab
 void ZephyrWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     Status status = Status::kSuccess;
-	WiFiManager::StationStatus stationStatus;
+    WiFiManager::StationStatus stationStatus;
     WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
                                                  Instance().OnNetworkConnStatusChanged(connStatus);
                                              },
