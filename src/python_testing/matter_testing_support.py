@@ -896,7 +896,7 @@ class MatterBaseTest(base_test.BaseTestClass):
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_USER
-        
+
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
