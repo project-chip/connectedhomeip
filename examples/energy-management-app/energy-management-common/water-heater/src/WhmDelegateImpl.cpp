@@ -324,7 +324,7 @@ uint8_t WaterHeaterManagementDelegate::CalculateTankPercentage() const
     {
         tankPercentage = 100 * (static_cast<int32_t>(mWaterTemperature) - static_cast<int32_t>(mColdWaterTemperature)) / divisor;
     }
-    
+
     tankPercentage = std::min(tankPercentage, static_cast<int32_t>(100));
     tankPercentage = std::max(tankPercentage, static_cast<int32_t>(0));
 
