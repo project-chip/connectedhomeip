@@ -123,7 +123,7 @@ RUN set -x \
     ruff \
     && : # last line
 
-#TODO: this is only added as a workaround to bloaty build failures, remove it once not needed
+#TODO Issue #35280: this is only added as a workaround to bloaty build failures, remove it once bloaty fixes issue
 # Clone and install abseil-cpp
 RUN git clone https://github.com/abseil/abseil-cpp.git /tmp/abseil-cpp \
     && cd /tmp/abseil-cpp \
