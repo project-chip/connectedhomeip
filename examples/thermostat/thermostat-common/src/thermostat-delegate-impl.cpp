@@ -87,6 +87,9 @@ CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStru
         { .presetScenario     = PresetScenarioEnum::kVacation,
           .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
           .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
+        { .presetScenario     = PresetScenarioEnum::kUserDefined,
+          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
+          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
     };
     if (index < ArraySize(presetTypes))
     {

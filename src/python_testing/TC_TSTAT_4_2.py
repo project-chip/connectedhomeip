@@ -328,10 +328,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Set the existing preset to a null built-in value; will be replaced with true on reading
             test_presets = copy.deepcopy(current_presets)
 
-            builtInPresets = list(preset for preset in test_presets if preset.builtIn)
+            if availableScenario is not None:
+                builtInPresets = list(preset for preset in test_presets if preset.builtIn)
 
-            if availableScenario is not None and len(builtInPresets) > 0:
-                builtInPresets[0].builtIn = NullValue
+                if len(builtInPresets) > 0:
+                    builtInPresets[0].builtIn = NullValue
 
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
                                                                  coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
