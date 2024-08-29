@@ -197,6 +197,7 @@ sl_status_t wfx_connect_to_ap(void)
 }
 
 #if SL_ICD_ENABLED
+#if SLI_SI917
 /*********************************************************************
  * @fn  sl_status_t wfx_power_save()
  * @brief
@@ -208,12 +209,22 @@ sl_status_t wfx_connect_to_ap(void)
  ***********************************************************************/
 sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
-    if (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) != SL_STATUS_OK)
-    {
-        return SL_STATUS_FAIL;
-    }
-    return SL_STATUS_OK;
+    return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
+#else  // For RS9116
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save()
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save()
+{
+    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
 
 /*********************************************************************
