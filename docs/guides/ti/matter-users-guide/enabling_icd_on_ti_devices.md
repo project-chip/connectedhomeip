@@ -17,7 +17,7 @@ and set the following parameter to true:
 chip_enable_icd_server = true
 ```
 
-To enable LIT ICD behavior, Check In Protcol Support and User Active Mode
+To enable LIT ICD behavior, Check In Protocol Support and User Active Mode
 Trigger Support, set the following parameter to true:
 
 ```
