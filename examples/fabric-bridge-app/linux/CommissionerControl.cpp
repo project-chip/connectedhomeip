@@ -73,7 +73,8 @@ void CommissionerControlDelegate::ResetDelegateState()
 
 CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request)
 {
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissioningApprovalRequest, current state: %s", GetStateString(mNextStep));
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissioningApprovalRequest, current state: %s",
+                    GetStateString(mNextStep));
 
     VerifyOrReturnError(mNextStep == Step::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
@@ -132,7 +133,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
 
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
 {
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering ValidateCommissionNodeCommand, current state: %s", GetStateString(mNextStep));
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering ValidateCommissionNodeCommand, current state: %s",
+                    GetStateString(mNextStep));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -178,7 +180,8 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const Commissioning
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissionNode, current state: %s", GetStateString(mNextStep));
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissionNode, current state: %s",
+                    GetStateString(mNextStep));
 
     VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
