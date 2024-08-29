@@ -49,6 +49,8 @@ import chip.CertificateAuthority
 from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
+from time import sleep
+
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
@@ -67,8 +69,6 @@ from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 from pics_support import read_pics_from_file
-
-from time import sleep
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
