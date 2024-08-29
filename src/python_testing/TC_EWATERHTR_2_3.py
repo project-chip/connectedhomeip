@@ -94,7 +94,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("8c", "TH reads from the DUT the TankPercentage",
                      "Value has to be 76%"),
             TestStep("9", "TH sends command Boost with Duration=400s,TargetPercentage=100%,TargetReheat=65%",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=600 and TargetPercentage=100 and TargetReheat=65"),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and Event EWATERHTR.S.E00(BoostStarted) sent with Duration=400 and TargetPercentage=100 and TargetReheat=65"),
             TestStep("9a", "TH reads from the DUT the HeatDemand",
                      "Value has to be greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
             TestStep("9b", "TH reads from the DUT the BoostState",
