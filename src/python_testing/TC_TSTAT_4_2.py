@@ -88,7 +88,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
     def count_preset_scenarios(self, presets: list):
         presetScenarios = {}
         for preset in presets:
-            if not preset.presetScenario in presetScenarios:
+            if preset.presetScenario not in presetScenarios:
                 presetScenarios[preset.presetScenario] = 1
             else:
                 presetScenarios[preset.presetScenario] += 1
@@ -527,7 +527,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             test_presets = copy.deepcopy(current_presets)
             presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
 
-            if len(presets_without_name_support) is 0 and len(availableScenarios) > 0:
+            if len(presets_without_name_support) == 0 and len(availableScenarios) > 0:
                 new_preset = cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenarios[0],
                                                           coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=True)
                 test_presets.append(new_preset)
