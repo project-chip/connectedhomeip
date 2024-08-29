@@ -58,6 +58,15 @@ declare_args() {
       current_os != "android"
 }
 
+config("enhanced_setup_flow_config") {
+  defines = []
+  if (chip_config_tc_required) {
+    defines += [ "CHIP_CONFIG_TC_REQUIRED=1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_TC_REQUIRED=0" ]
+  }
+}
+
 buildconfig_header("app_buildconfig") {
   header = "AppBuildConfig.h"
   header_dir = "app"
@@ -77,6 +86,13 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
     "CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE=${chip_data_model_check_die_on_failure}",
   ]
+
+  if (chip_config_tc_required) {
+    defines += [
+      "CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS=${chip_config_tc_required_acknowledgements}",
+      "CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION=${chip_config_tc_required_acknowledgements_version}",
+    ]
+  }
 
   if (chip_use_data_model_interface == "disabled") {
     defines += [
@@ -522,5 +538,8 @@ static_library("app") {
 
   cflags = [ "-Wconversion" ]
 
-  public_configs = [ "${chip_root}/src:includes" ]
+  public_configs = [
+    ":enhanced_setup_flow_config",
+    "${chip_root}/src:includes",
+  ]
 }
