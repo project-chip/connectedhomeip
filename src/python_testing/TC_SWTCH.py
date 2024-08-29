@@ -262,11 +262,13 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT.", "Verify that the value is 0."),
                 TestStep(5, "Operator sets switch to second position (one) on the DUT",
                          "Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT."),
-                TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1, and that a subscription report was received for that change."),
+                TestStep(6, "TH reads the CurrentPosition attribute from the DUT",
+                         "Verify that the value is 1, and that a subscription report was received for that change."),
                 TestStep(7, "If there are more than 2 positions, test subsequent positions of the DUT"),
                 TestStep(8, "Operator sets switch to first position on the DUT."),
                 TestStep(9, "Wait 10 seconds for event reports stable." "Verify that last SwitchLatched event received is for NewPosition 0."),
-                TestStep(10, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0, and that a subscription report was received for that change."),
+                TestStep(10, "TH reads the CurrentPosition attribute from the DUT",
+                         "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
     @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
@@ -316,16 +318,17 @@ class TC_SwitchTests(MatterBaseTest):
                 newPosition=expected_switch_position), "Did not get expected switch position")
 
             # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
-            if expected_switch_position == 1: ## Indicate step 7 only once
+            if expected_switch_position == 1:  # Indicate step 7 only once
                 self.step(6)
             button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
             asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
             logging.info(f"Checking to see if a report for {expected_switch_position} is received")
-            attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
+            attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                                      expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
 
             # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
             if expected_switch_position == 1:
-                if num_positions > 2: ## Indicate step 7 only once
+                if num_positions > 2:  # Indicate step 7 only once
                     self.step(7)
                 else:
                     self.skip_step(7)
@@ -359,7 +362,8 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
         logging.info(f"Checking to see if a report for {expected_switch_position} is received")
-        expected_final_value = [AttributeValue(endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
+        expected_final_value = [AttributeValue(
+            endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
         attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)
 
     def steps_TC_SWTCH_2_3(self):

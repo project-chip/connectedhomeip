@@ -303,7 +303,6 @@ class EventChangeCallback:
         """Resets state as if no events had ever been received."""
         self.flush_events()
 
-
     @property
     def event_queue(self) -> queue.Queue:
         return self._q
@@ -524,7 +523,8 @@ class ClusterAttributeChangeAccumulator:
 
         Returns nothing on success so the test can go on.
         """
-        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id, attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
+        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
+                                  attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
 
     @property
     def attribute_queue(self) -> queue.Queue:
