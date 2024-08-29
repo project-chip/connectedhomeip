@@ -86,6 +86,14 @@ static osMessageQueueId_t sWifiEventQueue = NULL;
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 static wfx_wifi_scan_ext_t temp_reset;
 
+/******************************************************************
+ * @fn   void rsi_wireless_driver_task_wrapper(void * argument)
+ * @brief
+ *       wrapper thread for the driver task
+ * @param[in] argument: argument
+ * @return
+ *       None
+ *********************************************************************/
 static void rsi_wireless_driver_task_wrapper(void * argument)
 {
     rsi_wireless_driver_task();
@@ -367,10 +375,10 @@ static int32_t wfx_rsi_init(void)
     }
     SILABS_LOG("wfx_rsi_init: start wireless drv task", __func__);
     /*
-     * Create the driver thread
+     * Create the driver wrapper thread
      */
     wfx_rsi.drv_thread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
-    if (NULL == wfx_rsi.drv_task)
+    if (NULL == wfx_rsi.drv_thread)
     {
         SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
         return RSI_ERROR_INVALID_PARAM;
