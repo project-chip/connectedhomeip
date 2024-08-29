@@ -28,6 +28,7 @@
 
 import copy
 import logging
+import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
@@ -40,21 +41,6 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
-
-
-initial_presets = []
-initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x01', presetScenario=cluster.Enums.PresetScenarioEnum.kOccupied,
-                       name=None, coolingSetpoint=2500, heatingSetpoint=2100, builtIn=True))
-initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x02', presetScenario=cluster.Enums.PresetScenarioEnum.kUnoccupied,
-                       name=None, coolingSetpoint=2600, heatingSetpoint=2000, builtIn=True))
-
-new_presets = initial_presets.copy()
-new_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kSleep,
-                   name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
-
-new_presets_with_handle = initial_presets.copy()
-new_presets_with_handle.append(cluster.Structs.PresetStruct(
-    presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
 
 
 class TC_TSTAT_4_2(MatterBaseTest):
@@ -86,6 +72,34 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(attrStatus.statusCode, expected_schedules_status,
                                  "Schedules attribute should have the right status")
         asserts.assert_true(found_preset_status, "Preset attribute should have a status")
+
+    def check_saved_presets(self, sent_presets: list, returned_presets: list):
+        asserts.assert_true(len(sent_presets) == len(returned_presets), "Returned presets are a different length than sent presets")
+        for i, sent_preset in enumerate(sent_presets):
+            returned_preset = returned_presets[i]
+            if sent_preset.presetHandle is NullValue:
+                sent_preset = copy.copy(sent_preset)
+                sent_preset.presetHandle = returned_preset.presetHandle
+            if sent_preset.builtIn is NullValue:
+                sent_preset.builtIn = returned_preset.builtIn
+            asserts.assert_equal(sent_preset, returned_preset,
+                                 "Returned preset is not the same as sent preset")
+
+    def count_preset_scenarios(self, presets: list):
+        presetScenarios = {}
+        for preset in presets:
+            if not preset.presetScenario in presetScenarios:
+                presetScenarios[preset.presetScenario] = 1
+            else:
+                presetScenarios[preset.presetScenario] += 1
+        return presetScenarios
+
+    def get_available_scenario(self, presetTypes: list, presetScenarioCounts: map):
+        availableScenarios = list(presetType.presetScenario for presetType in presetTypes if presetScenarioCounts.get(
+            presetType.presetScenario, 0) < presetType.numberOfPresets)
+        if len(availableScenarios) > 0:
+            return availableScenarios[0]
+        return None
 
     async def write_presets(self,
                             endpoint,
@@ -237,126 +251,203 @@ class TC_TSTAT_4_2(MatterBaseTest):
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
 
+        current_presets = []
+        presetTypes = []
+        presetScenarioCounts = {}
+        numberOfPresetsSupported = 0
+        minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
+        maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
+        minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
+        maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
+
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            logger.info(f"Rx'd Presets: {presets}")
-            asserts.assert_equal(presets, initial_presets, "Presets do not match initial value")
+
+            # Read the numberOfPresets supported.
+            numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
+
+            # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
+            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
+            logger.info(f"Rx'd Preset Types: {presetTypes}")
+
+            current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+            logger.info(f"Rx'd Presets: {current_presets}")
+
+            presetScenarioCounts = self.count_preset_scenarios(current_presets)
 
             # Write to the presets attribute without calling AtomicRequest command
-            await self.write_presets(endpoint=endpoint, presets=new_presets, expected_status=Status.InvalidInState)
+            await self.write_presets(endpoint=endpoint, presets=current_presets, expected_status=Status.InvalidInState)
 
         self.step("3")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
-            await self.send_atomic_request_begin_command()
 
-            # Set the new preset to a null built-in value; will be replaced with false on reading
-            test_presets = copy.deepcopy(new_presets)
-            test_presets[2].builtIn = NullValue
+            availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            # Write to the presets attribute after calling AtomicRequest command
-            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
-            status_ok = (status == Status.Success)
-            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+            if availableScenario is not None and len(current_presets) < numberOfPresetsSupported:
 
-            # Read the presets attribute and verify it was updated by the write
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            logger.info(f"Rx'd Presets: {presets}")
-            asserts.assert_equal(presets, new_presets_with_handle, "Presets were updated, as expected")
+                # Set the preset builtIn fields to a null built-in value
+                test_presets = copy.deepcopy(current_presets)
+                for preset in test_presets:
+                    preset.builtIn = NullValue
 
-            await self.send_atomic_request_rollback_command()
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
+                                                                 coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
 
-            # Read the presets attribute and verify it has been properly rolled back
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
+                await self.send_atomic_request_begin_command()
+
+                # Write to the presets attribute after calling AtomicRequest command
+                status = await self.write_presets(endpoint=endpoint, presets=test_presets)
+                status_ok = (status == Status.Success)
+                asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+
+                # Read the presets attribute and verify it was updated by the write
+                saved_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+                logger.info(f"Rx'd Presets: {saved_presets}")
+                self.check_saved_presets(test_presets, saved_presets)
+
+                await self.send_atomic_request_rollback_command()
+
+                # Read the presets attribute and verify it has been properly rolled back
+                presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+                asserts.assert_equal(presets, current_presets, "Presets were updated which is not expected")
+            else:
+                logger.info(
+                    "Couldn't run test step 3 since there was no available preset scenario to append")
 
         self.step("4")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
             # Set the existing preset to a null built-in value; will be replaced with true on reading
-            test_presets = copy.deepcopy(new_presets)
-            test_presets[0].builtIn = NullValue
+            test_presets = copy.deepcopy(current_presets)
 
-            # Write to the presets attribute after calling AtomicRequest command
-            await self.write_presets(endpoint=endpoint, presets=test_presets)
+            builtInPresets = list(preset for preset in test_presets if preset.builtIn)
 
-            # Send the AtomicRequest commit command
-            await self.send_atomic_request_commit_command()
+            if availableScenario is not None and len(builtInPresets) > 0:
+                builtInPresets[0].builtIn = NullValue
 
-            # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            logger.info(f"Rx'd Presets: {presets}")
-            asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
+                                                                 coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                # Write to the presets attribute after calling AtomicRequest command
+                await self.write_presets(endpoint=endpoint, presets=test_presets)
+
+                # Send the AtomicRequest commit command
+                await self.send_atomic_request_commit_command()
+
+                # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
+                current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+                logger.info(f"Rx'd Presets: {current_presets}")
+                self.check_saved_presets(test_presets, current_presets)
+
+                presetScenarioCounts = self.count_preset_scenarios(current_presets)
+            else:
+                logger.info(
+                    "Couldn't run test step 4 since there were no built-in presets")
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
-
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
-            test_presets = new_presets_with_handle.copy()
-            test_presets.pop(0)
-            await self.write_presets(endpoint=endpoint, presets=test_presets)
+            test_presets = current_presets.copy()
 
-            # Send the AtomicRequest commit command and expect ConstraintError for presets.
-            await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
+            builtInPresets = list(preset for preset in test_presets if preset.builtIn)
+            if len(builtInPresets) > 0:
+                builtInPreset = builtInPresets[0]
+                test_presets.remove(builtInPreset)
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
+
+                # Write to the presets attribute after calling AtomicRequest command
+                await self.write_presets(endpoint=endpoint, presets=test_presets)
+
+                # Send the AtomicRequest commit command and expect ConstraintError for presets.
+                await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
+            else:
+                logger.info(
+                    "Couldn't run test step 5 since there were no built-in presets")
 
         self.step("6")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the SetActivePresetRequest command
-            await self.send_set_active_preset_handle_request_command(value=b'\x03')
+            notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
+            if len(notBuiltInPresets) > 0:
+                activePreset = notBuiltInPresets[0]
 
-            # Read the active preset handle attribute and verify it was updated to preset handle
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
-            asserts.assert_equal(activePresetHandle, b'\x03', "Active preset handle was not updated as expected")
+                # Send the SetActivePresetRequest command
+                await self.send_set_active_preset_handle_request_command(value=activePreset.presetHandle)
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+                # Read the active preset handle attribute and verify it was updated to preset handle
+                activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+                logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+                asserts.assert_equal(activePresetHandle, activePreset.presetHandle,
+                                     "Active preset handle was not updated as expected")
 
-            # Write to the presets attribute after removing the preset that was set as the active preset handle. Remove the last entry with preset handle (b'\x03')
-            test_presets = new_presets_with_handle.copy()
-            del test_presets[-1]
-            await self.write_presets(endpoint=endpoint, presets=test_presets)
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
 
-            # Send the AtomicRequest commit command and expect InvalidInState for presets.
-            await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
+                # Write to the presets attribute after removing the preset that was set as the active preset handle. Remove the last entry with preset handle (b'\x03')
+                test_presets = current_presets.copy()
+                test_presets = list(preset for preset in test_presets if preset.presetHandle is not activePresetHandle)
+                logger.info(f"Sending Presets: {test_presets}")
+                await self.write_presets(endpoint=endpoint, presets=test_presets)
+
+                # Send the AtomicRequest commit command and expect InvalidInState for presets.
+                await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
+            else:
+                logger.info(
+                    "Couldn't run test step 6 since there were no non-built-in presets to activate and delete")
 
         self.step("7")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
-
             # Write to the presets attribute after setting the builtIn flag to False for preset with handle (b'\x01')
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets[0].builtIn = False
+            test_presets = copy.deepcopy(current_presets)
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+            builtInPresets = list(preset for preset in test_presets if preset.builtIn is True)
+            if len(builtInPresets) > 0:
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                builtInPresets[0].builtIn = False
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 7 since there was no built-in presets")
 
         self.step("8")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            # Write to the presets attribute after adding a preset with builtIn set to True
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
-                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
-            status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+                test_presets = copy.deepcopy(current_presets)
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                # Write to the presets attribute after adding a preset with builtIn set to True
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
+                                                                 coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+
+                status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 8 since there was no available preset scenario to append")
 
         self.step("9")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
@@ -365,8 +456,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_begin_command()
 
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x08', presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+            test_presets = copy.deepcopy(current_presets)
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=random.randbytes(16), presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
                                 name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
 
             status = await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.NotFound)
@@ -377,67 +468,106 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("10")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            # Write to the presets attribute after adding a duplicate preset with handle (b'\x03')
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(
-                presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+                test_presets = copy.deepcopy(current_presets)
+                duplicatePreset = test_presets[0]
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                # Write to the presets attribute after adding a duplicate preset with handle (b'\x03')
+                test_presets.append(cluster.Structs.PresetStruct(
+                    presetHandle=duplicatePreset.presetHandle, presetScenario=availableScenario, coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 10 since there was no available preset scenario to duplicate")
 
         self.step("11")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            test_presets = copy.deepcopy(current_presets)
 
-            # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets[2].builtIn = True
+            notBuiltInPresets = list(preset for preset in test_presets if preset.builtIn is False)
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+            if len(notBuiltInPresets) > 0:
+                # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
+                notBuiltInPresets[0].builtIn = True
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 11 since there were no presets that were not built-in")
 
         self.step("12")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) != 0 and presetScenarioCounts.get(
+                presetType.presetScenario, 0) < presetType.numberOfPresets)
 
-            # Write to the presets attribute after setting a name for preset with handle (b'\x01') that doesn't support names
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets[0].name = "Occupied"
+            test_presets = copy.deepcopy(current_presets)
+            presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+            if len(presets_without_name_support) is 0 and len(availableScenarios) > 0:
+                new_preset = cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenarios[0],
+                                                          coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True)
+                test_presets.append(new_preset)
+                presets_without_name_support = [new_preset]
 
-            # Clear state for next test.
-            await self.send_atomic_request_rollback_command()
+            if len(availableScenarios) > 0:
+
+                # Write to the presets attribute after setting a name for preset with handle (b'\x01') that doesn't support names
+                presets_without_name_support[0].name = "Name"
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 12 since there was no available preset scenario without name support")
 
         self.step("13")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Send the AtomicRequest begin command
-            await self.send_atomic_request_begin_command()
+            availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            # Write to the presets attribute with a new valid preset added
-            test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
-                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
+            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets)
+                # Write to the presets attribute with a new valid preset added
+                test_presets = copy.deepcopy(current_presets)
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
+                                    coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
 
-            # Roll back
-            await self.send_atomic_request_rollback_command()
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
 
-            # Send the AtomicRequest commit command and expect InvalidInState as the previous edit request was cancelled
-            await self.send_atomic_request_commit_command(expected_status=Status.InvalidInState)
+                await self.write_presets(endpoint=endpoint, presets=test_presets)
+
+                # Roll back
+                await self.send_atomic_request_rollback_command()
+
+                # Send the AtomicRequest commit command and expect InvalidInState as the previous edit request was cancelled
+                await self.send_atomic_request_commit_command(expected_status=Status.InvalidInState)
+            else:
+                logger.info(
+                    "Couldn't run test step 13 since there was no available preset scenario to add")
 
         self.step("14")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
@@ -453,7 +583,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command()
 
-            await self.write_presets(endpoint=endpoint, presets=test_presets, dev_ctrl=secondary_controller, expected_status=Status.Busy)
+            await self.write_presets(endpoint=endpoint, presets=current_presets, dev_ctrl=secondary_controller, expected_status=Status.Busy)
 
             # Roll back
             await self.send_atomic_request_rollback_command()
@@ -476,27 +606,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("17")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
-            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
-
             scenarioNotPresent = None
 
             # Find a preset scenario not present in PresetTypes to run this test.
-            for scenario in cluster.Enums.PresetScenarioEnum:
-                foundMatchingScenario = False
-                for presetType in presetTypes:
-                    if presetType.presetScenario == scenario:
-                        foundMatchingScenario = True
-                        break
-                if not foundMatchingScenario:
-                    scenarioNotPresent = scenario
-                    break
-
-            if scenarioNotPresent is None:
-                logger.info(
-                    "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
-            else:
-                test_presets = new_presets_with_handle.copy()
+            scenarioMap = dict(map(lambda presetType: (presetType.presetScenario, presetType), presetTypes))
+            unavailableScenarios = list(preset for preset in test_presets if preset.presetScenario not in scenarioMap)
+            if len(unavailableScenarios) > 0:
+                test_presets = current_presets.copy()
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenarioNotPresent,
                                                                  name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
 
@@ -507,23 +623,15 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Clear state for next test.
                 await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
 
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            # Read the numberOfPresets supported.
-            numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
-
-            # Read the PresetTypes to get the preset scenarios to build the Presets list.
-            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
-
-            # Read the Presets to copy the existing presets into our testPresets list below.
-            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-
             # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
-            totalExpectedPresetsLength = 0
-            for presetType in presetTypes:
-                totalExpectedPresetsLength += presetType.numberOfPresets
+            totalExpectedPresetsLength = sum(presetType.numberOfPresets for presetType in presetTypes)
 
             if totalExpectedPresetsLength > numberOfPresetsSupported:
                 testPresets = []
@@ -533,14 +641,14 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     # For each supported scenario, copy all the existing presets that match it, then add more presets
                     # until we hit the cap on the number of presets for that scenario.
                     presetsAddedForScenario = 0
-                    for preset in presets:
+                    for preset in current_presets:
                         if scenario == preset.presetScenario:
                             testPresets.append(preset)
                             presetsAddedForScenario = presetsAddedForScenario + 1
 
                     while presetsAddedForScenario < presetType.numberOfPresets:
                         testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
-                                                                        name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                                                                        coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
                         presetsAddedForScenario = presetsAddedForScenario + 1
 
                 # Send the AtomicRequest begin command
