@@ -119,9 +119,9 @@ def dump_errors(header_path: Path, descriptor: ErrorDescriptor, is_last: bool):
 
     for code in sorted(codes_for_section, key=attrgetter("code")):
         if is_last and code == codes_for_section[-1]:
-            print(f"    {code.name}({code.code});")
+            print(f"    {code.name}({code.code}L);")
         else:
-            print(f"    {code.name}({code.code}),")
+            print(f"    {code.name}({code.code}L),")
 
 
 def main():
@@ -161,7 +161,7 @@ public enum ChipError {''')
     print(r'''
     private final long value;
 
-    public ChipError(long value) {
+    ChipError(long value) {
         this.value = value;
     }
 
