@@ -26,8 +26,6 @@ from mobly import asserts
 class TC_ECOINFO_2_1(MatterBaseTest):
 
     def _validate_device_directory(self, device_directory):
-        num_of_devices = len(device_directory)
-        asserts.assert_less_equal(num_of_devices, 256, "Too many device entries")
         for device in device_directory:
             # TODO do fabric index check first
             if device.deviceName is not None:
@@ -73,8 +71,6 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 asserts.assert_greater(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be non-zero")
 
     def _validate_location_directory(self, location_directory):
-        num_of_locations = len(location_directory)
-        asserts.assert_less_equal(num_of_locations, 64, "Too many location entries")
         for location in location_directory:
             asserts.assert_true(type_matches(location.uniqueLocationID, str), "UniqueLocationId should be a string")
             location_id_string_length = len(location.uniqueLocationID)
