@@ -74,3 +74,14 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs);
+
+/**
+ * @brief CADMIN attribute has changed of one of the bridged devices that was previously added.
+ *
+ * @param data information regarding change in AdministratorCommissioning attributes
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data);

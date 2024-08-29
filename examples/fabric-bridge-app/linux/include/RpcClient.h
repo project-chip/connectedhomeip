@@ -76,4 +76,4 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams para
 CHIP_ERROR
 CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, chip::VendorId vendorId, uint16_t productId);
 
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs);
+CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs);

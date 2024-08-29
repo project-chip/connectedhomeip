@@ -18678,18 +18678,7 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readEcosystemInformationInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readEcosystemInformationRemovedOnCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readEcosystemInformationRemovedOnAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.EcosystemInformationCluster) cluster).readRemovedOnAttribute(
-              (ChipClusters.EcosystemInformationCluster.RemovedOnAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterRemovedOnAttributeCallback(),
-          readEcosystemInformationRemovedOnCommandParams
-        );
-        result.put("readRemovedOnAttribute", readEcosystemInformationRemovedOnAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readEcosystemInformationDeviceDirectoryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readEcosystemInformationDeviceDirectoryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readEcosystemInformationDeviceDirectoryAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.EcosystemInformationCluster) cluster).readDeviceDirectoryAttribute(

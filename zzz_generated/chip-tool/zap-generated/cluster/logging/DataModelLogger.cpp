@@ -7756,6 +7756,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OccupancySensing::Events::OccupancyChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Occupancy", indent + 1, value.occupancy);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Occupancy'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const TargetNavigator::Events::TargetUpdated::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -18153,11 +18169,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case EcosystemInformation::Id: {
         switch (path.mAttributeId)
         {
-        case EcosystemInformation::Attributes::RemovedOn::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RemovedOn", 1, value);
-        }
         case EcosystemInformation::Attributes::DeviceDirectory::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>
@@ -20952,6 +20963,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
+        }
+        }
+        break;
+    }
+    case OccupancySensing::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case OccupancySensing::Events::OccupancyChanged::Id: {
+            chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OccupancyChanged", 1, value);
         }
         }
         break;

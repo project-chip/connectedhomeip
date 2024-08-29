@@ -7546,6 +7546,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROccupancySensingClusterOccupancyChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _occupancy = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterOccupancyChangedEvent alloc] init];
+
+    other.occupancy = self.occupancy;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: occupancy:%@; >", NSStringFromClass([self class]), _occupancy];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
 - (instancetype)init
 {
