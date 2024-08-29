@@ -37,7 +37,7 @@ class DeviceSubscription : public chip::app::ReadClient::Callback
 public:
     DeviceSubscription();
 
-    /// Usually called after we have added a syncronized device to fabric-bridge to monitor
+    /// Usually called after we have added a synchronized device to fabric-bridge to monitor
     /// for any changes that need to be propgated to fabric-bridge.
     void StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
 
@@ -64,7 +64,7 @@ private:
 
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
     bool mChangeDetected = false;
-    // Used to ensure DeviceSubscription is only starts subscription only once. If instance of
-    // DeviceSubscription is allowed reused class documentation should be updated.
+    // Ensures that DeviceSubscription starts a subscription only once.  If instance of
+    // DeviceSubscription  can be reused, the class documentation should be updated accordingly.
     bool mSubscriptionStarted = false;
 };
