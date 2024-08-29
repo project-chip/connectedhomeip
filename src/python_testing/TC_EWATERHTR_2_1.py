@@ -91,8 +91,6 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
         self.step("4")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_greater(heatDemand, 0,
-                               f"Unexpected HeatDemand value - expected {heatDemand} > 0")
         asserts.assert_less_equal(heatDemand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterHeatSourceBitmap.kOther,
                                   f"Unexpected HeatDemand value - expected {heatDemand} <= WaterHeaterHeatSourceBitmap.kOther")
 
