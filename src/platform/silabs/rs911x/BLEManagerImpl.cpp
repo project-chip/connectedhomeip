@@ -76,6 +76,7 @@ osSemaphoreId_t sl_rs_ble_init_sem;
 
 osTimerId_t sbleAdvTimeoutTimer;
 
+static osThreadId_t sBleThread;
 constexpr uint32_t kBleTaskSize = 2048;
 static uint8_t bleStack[kBleTaskSize];
 static osThread_t sBleTaskControlBlock;
@@ -259,9 +260,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
     sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
-    wfx_rsi.ble_thread = osThreadNew(sl_ble_event_handling_task, NULL, &kBleTaskAttr);
+    sBleThread = osThreadNew(sl_ble_event_handling_task, NULL, &kBleTaskAttr);
 
-    VerifyOrReturnError(wfx_rsi.ble_thread != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sBleThread != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());

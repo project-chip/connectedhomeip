@@ -31,6 +31,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 // Thread for the WLAN RSI
+static osThreadId_t sWlanThread;
 constexpr uint32_t kWlanTaskSize = 2048;
 static uint8_t wlanStack[kWlanTaskSize];
 static osThread_t sWlanTaskControlBlock;
@@ -65,9 +66,9 @@ sl_status_t wfx_wifi_start(void)
      * Create the Wifi driver task
      */
     // Creating a Wi-Fi driver thread
-    wfx_rsi.wlan_thread = osThreadNew(wfx_rsi_task, NULL, &kWlanTaskAttr);
+    sWlanThread = osThreadNew(wfx_rsi_task, NULL, &kWlanTaskAttr);
 
-    VerifyOrReturnError(wfx_rsi.wlan_thread != NULL, SL_STATUS_FAIL);
+    VerifyOrReturnError(sWlanThread != NULL, SL_STATUS_FAIL);
 
     return SL_STATUS_OK;
 }

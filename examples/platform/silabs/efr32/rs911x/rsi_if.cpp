@@ -61,8 +61,8 @@ extern "C" {
 
 #define WFX_QUEUE_SIZE 10
 
-#define kDrvTaskSize 1792
-
+static osThreadId_t sDrvThread;
+constexpr uint32_t kDrvTaskSize = 1792;
 static uint8_t drvStack[kDrvTaskSize];
 static osThread_t sDrvTaskControlBlock;
 osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
@@ -383,8 +383,8 @@ static int32_t wfx_rsi_init(void)
     /*
      * Create the driver wrapper thread
      */
-    wfx_rsi.drv_thread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
-    if (NULL == wfx_rsi.drv_thread)
+    sDrvThread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
+    if (NULL == sDrvThread)
     {
         SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
         return RSI_ERROR_INVALID_PARAM;

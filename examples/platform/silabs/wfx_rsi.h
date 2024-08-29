@@ -71,11 +71,6 @@ typedef struct WfxEvent_s
 
 typedef struct wfx_rsi_s
 {
-    osThreadId_t drv_thread;
-    osThreadId_t wlan_thread;
-#ifdef RSI_BLE_ENABLE
-    osThreadId_t ble_thread;
-#endif
     uint16_t dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;
