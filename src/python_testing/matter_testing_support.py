@@ -38,7 +38,6 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
 from typing import Any, Iterable, List, Optional, Tuple
-from time import sleep
 
 from chip.tlv import float32, uint
 
@@ -68,6 +67,8 @@ from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 from pics_support import read_pics_from_file
+
+from time import sleep
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
