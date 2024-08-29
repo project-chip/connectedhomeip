@@ -194,7 +194,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     uint32_t mPausedTime = gRvcOperationalStateDelegate->mPausedTime;
     uint32_t mRunningTime = gRvcOperationalStateDelegate->mRunningTime;
 
-    if(gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime + mPausedTime)
+    if(gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
     }
