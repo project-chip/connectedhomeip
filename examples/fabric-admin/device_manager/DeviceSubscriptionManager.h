@@ -75,7 +75,7 @@ public:
 
     static DeviceSubscriptionManager & Instance();
 
-    /// Usually called after we have added a syncronized device to fabric-bridge to monitor
+    /// Usually called after we have added a synchronized device to fabric-bridge to monitor
     /// for any changes that need to be propgated to fabric-bridge.
     CHIP_ERROR StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
 
