@@ -65,13 +65,13 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
 
-    if(state== OperationalState::OperationalStateEnum::kPaused)
+    if (state == OperationalState::OperationalStateEnum::kPaused)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         return;
     }
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
@@ -95,7 +95,7 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;
@@ -172,13 +172,14 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
-    if(gRvcOperationalStateDelegate->mCountdownTime.IsNull())
+    if (gRvcOperationalStateDelegate->mCountdownTime.IsNull())
     {
-        if(state == OperationalState::OperationalStateEnum::kRunning)
+        if (state == OperationalState::OperationalStateEnum::kRunning)
         {
-            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
+            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(
+                static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
             gRvcOperationalStateDelegate->mRunningTime = 0;
-            gRvcOperationalStateDelegate->mPausedTime = 0;
+            gRvcOperationalStateDelegate->mPausedTime  = 0;
         }
     }
 
@@ -191,10 +192,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
         gRvcOperationalStateDelegate->mPausedTime++;
     }
 
-    uint32_t mPausedTime = gRvcOperationalStateDelegate->mPausedTime;
+    uint32_t mPausedTime  = gRvcOperationalStateDelegate->mPausedTime;
     uint32_t mRunningTime = gRvcOperationalStateDelegate->mRunningTime;
 
-    if(gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
+    if (gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
     }
@@ -202,8 +203,9 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
 
-        CHIP_ERROR err = gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-        if(err == CHIP_NO_ERROR)
+        CHIP_ERROR err =
+            gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        if (err == CHIP_NO_ERROR)
         {
             OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
             gRvcOperationalStateInstance->GetCurrentOperationalError(current_err);
@@ -211,7 +213,8 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(mPausedTime + mRunningTime)));
             Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(mPausedTime)));
 
-            gRvcOperationalStateInstance->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
+            gRvcOperationalStateInstance->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime,
+                                                                        pausedTime);
 
             gRvcOperationalStateDelegate->mRunningTime = 0;
             gRvcOperationalStateDelegate->mPausedTime  = 0;
@@ -252,12 +255,14 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
     break;
     case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
         uint8_t currentState = gRvcOperationalStateInstance->GetCurrentOperationalState();
-        uint8_t m      = static_cast<uint8_t>(buffer[0]);
-        CHIP_ERROR err = gRvcOperationalStateInstance->SetOperationalState(m);
+        uint8_t m            = static_cast<uint8_t>(buffer[0]);
+        CHIP_ERROR err       = gRvcOperationalStateInstance->SetOperationalState(m);
 
-        if(currentState == to_underlying(OperationalState::OperationalStateEnum::kStopped) && m == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+        if (currentState == to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
+            m == to_underlying(OperationalState::OperationalStateEnum::kRunning))
         {
-            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
+            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(
+                static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
         }
 
         if (CHIP_NO_ERROR == err)
