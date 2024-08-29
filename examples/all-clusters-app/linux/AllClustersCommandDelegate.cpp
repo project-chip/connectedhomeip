@@ -63,7 +63,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     uint8_t numPositions = 0;
 
     // On failure, the numPositions won't be changed, so 0 returned.
-    (void)Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+    (void) Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
 
     return numPositions;
 }
