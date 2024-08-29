@@ -210,6 +210,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
                      "Verify that the write request is rejected"),
             TestStep("16", "TH starts an atomic write, and before it's complete, TH2 removes TH's fabric; TH2 then opens an atomic write",
                      "Verify that the atomic request is successful"),
+            TestStep("17", "TH writes to the Presets attribute with a preset that has a presetScenario not present in PresetTypes attribute",
+                     "Verify that the write request returned CONSTRAINT_ERROR (0x87)."),
+            TestStep("18", "TH writes to the Presets attribute such that the total number of presets is greater than the number of presets supported",
+                     "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
         ]
 
         return steps
@@ -469,7 +473,86 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Roll back
             await self.send_atomic_request_rollback_command()
 
-        # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
+        self.step("17")
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+
+            # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
+            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
+
+            scenarioNotPresent = None
+
+            # Find a preset scenario not present in PresetTypes to run this test.
+            for scenario in cluster.Enums.PresetScenarioEnum:
+                foundMatchingScenario = False
+                for presetType in presetTypes:
+                    if presetType.presetScenario == scenario:
+                        foundMatchingScenario = True
+                        break
+                if not foundMatchingScenario:
+                    scenarioNotPresent = scenario
+                    break
+
+            if scenarioNotPresent is None:
+                logger.info(
+                    "Couldn't run test step 17 since all preset types in PresetScenarioEnum are supported by this Thermostat")
+            else:
+                test_presets = new_presets_with_handle.copy()
+                test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenarioNotPresent,
+                                                                 name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ConstraintError)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+
+        self.step("18")
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+
+            # Read the numberOfPresets supported.
+            numberOfPresetsSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets)
+
+            # Read the PresetTypes to get the preset scenarios to build the Presets list.
+            presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
+
+            # Read the Presets to copy the existing presets into our testPresets list below.
+            presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+
+            # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
+            totalExpectedPresetsLength = 0
+            for presetType in presetTypes:
+                totalExpectedPresetsLength += presetType.numberOfPresets
+
+            if totalExpectedPresetsLength > numberOfPresetsSupported:
+                testPresets = []
+                for presetType in presetTypes:
+                    scenario = presetType.presetScenario
+
+                    # For each supported scenario, copy all the existing presets that match it, then add more presets
+                    # until we hit the cap on the number of presets for that scenario.
+                    presetsAddedForScenario = 0
+                    for preset in presets:
+                        if scenario == preset.presetScenario:
+                            testPresets.append(preset)
+                            presetsAddedForScenario = presetsAddedForScenario + 1
+
+                    while presetsAddedForScenario < presetType.numberOfPresets:
+                        testPresets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=scenario,
+                                                                        name="Preset", coolingSetpoint=2500, heatingSetpoint=1700, builtIn=False))
+                        presetsAddedForScenario = presetsAddedForScenario + 1
+
+                # Send the AtomicRequest begin command
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=testPresets, expected_status=Status.ResourceExhausted)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
+            else:
+                logger.info(
+                    "Couldn't run test step 18 since there are not enough preset types to build a Presets list that exceeds the number of presets supported")
 
 
 if __name__ == "__main__":
