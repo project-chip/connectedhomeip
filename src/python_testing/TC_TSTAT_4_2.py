@@ -297,7 +297,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     preset.builtIn = NullValue
 
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 await self.send_atomic_request_begin_command()
 
@@ -334,7 +334,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 builtInPresets[0].builtIn = NullValue
 
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=availableScenario,
-                                                                 coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
