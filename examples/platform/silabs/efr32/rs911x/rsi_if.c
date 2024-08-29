@@ -370,7 +370,6 @@ static int32_t wfx_rsi_init(void)
      * Create the driver thread
      */
     wfx_rsi.drv_thread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
-                                     WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
                                      if (NULL == wfx_rsi.drv_task)
                                      {
                                          SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
