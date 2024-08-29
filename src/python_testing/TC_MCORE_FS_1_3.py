@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# This test requires a TH_SERVER application that returns UnsupportedAttribute when reading UniqueID from BasicInformation Cluster. Please specify with --string-arg th_server_app_path:<path_to_app>
+# This test requires a TH_SERVER application that returns UnsupportedAttribute when reading UniqueID from BasicInformation Cluster. Please specify with --string-arg th_server_no_uid_app_path:<path_to_app>
 
 import logging
 import os
@@ -58,9 +58,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         super().teardown_class()
 
     async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
-        app = self.user_params.get("th_server_app_path", None)
+        app = self.user_params.get("th_server_no_uid_app_path", None)
         if not app:
-            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
+            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_no_uid_app_path:<path_to_app>')
 
         if not os.path.exists(app):
             asserts.fail(f'The path {app} does not exist')
