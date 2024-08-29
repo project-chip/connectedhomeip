@@ -2662,7 +2662,7 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0077</deviceId>
         <clusters lockOthers="true">
-            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OFFONLY" name="OffOnly">
                     <mandatoryConform/>
