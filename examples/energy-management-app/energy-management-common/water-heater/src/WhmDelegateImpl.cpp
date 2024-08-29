@@ -285,7 +285,7 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
         CHIP_ERROR err = GenerateBoostEndedEvent();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "HandleCancelBoost: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "HandleCancelBoost: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
 
             return Status::Failure;
         }
@@ -440,7 +440,7 @@ Status WaterHeaterManagementDelegate::ChangeHeatingIfNecessary()
             CHIP_ERROR err = GenerateBoostEndedEvent();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "ChangeHeatingIfNecessary: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer, "ChangeHeatingIfNecessary: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT,
                              err.Format());
             }
         }
