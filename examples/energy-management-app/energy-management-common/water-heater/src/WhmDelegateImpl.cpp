@@ -211,7 +211,7 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
     err = GenerateBoostStartedEvent(durationS, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "HandleBoost: Failed to send BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "HandleBoost: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
 
         return Status::Failure;
     }
@@ -252,7 +252,7 @@ void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
     CHIP_ERROR err = GenerateBoostEndedEvent();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "HandleBoostTimerExpiry: Failed to send BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "HandleBoostTimerExpiry: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
