@@ -436,7 +436,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             availableScenario = self.get_available_scenario(presetTypes=presetTypes, presetScenarioCounts=presetScenarioCounts)
 
-            if len(current_presets) > 0 and len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
+            if len(current_presets) < numberOfPresetsSupported and availableScenario is not None:
 
                 test_presets = copy.deepcopy(current_presets)
 
