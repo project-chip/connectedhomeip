@@ -116,7 +116,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
         accepted_cmd_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
-        
+
         if Clusters.ServiceArea.Commands.SkipArea.command_id not in accepted_cmd_list:
             asserts.fail("Skip Area Response command needs to be supported to run this test")
 
