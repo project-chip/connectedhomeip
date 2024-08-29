@@ -443,7 +443,6 @@ class ClusterAttributeChangeAccumulator:
         except asyncio.CancelledError:
             pass
 
-
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
