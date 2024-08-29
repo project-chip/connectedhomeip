@@ -28,6 +28,10 @@
 
 /// Attribute subscription to attributes that are important to keep track and send to fabric-bridge
 /// via RPC when change has been identified.
+///
+/// An instance of DeviceSubscription is intended to be used only once. Once a DeviceSubscription is
+/// terminal, either from an error or from subscriptions getting shut down, we expect the instance
+/// to be deleted. Any new subscription should instantiate another instance of DeviceSubscription.
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
 public:
@@ -60,5 +64,7 @@ private:
 
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
     bool mChangeDetected      = false;
+    // Used to ensure DeviceSubscription is only starts subscription only once. If instance of
+    // DeviceSubscription is allowed reused class documentation should be updated.
     bool mSubscriptionStarted = false;
 };

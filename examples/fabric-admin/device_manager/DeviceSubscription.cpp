@@ -98,7 +98,6 @@ void DeviceSubscription::OnReportEnd()
     if (mChangeDetected)
     {
 #if defined(PW_RPC_ENABLED)
-        // TODO we need to schedule work instead of calling this directly
         AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
         ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
@@ -109,9 +108,7 @@ void DeviceSubscription::OnReportEnd()
 
 void DeviceSubscription::OnDone(ReadClient * apReadClient)
 {
-    // TODO setting mSubscriptionStarted to false is not needs as this instance should be torn down,
-    // likely need an error callback to the manager once it exists.
-    mSubscriptionStarted = false;
+    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
 }
 
 void DeviceSubscription::OnError(CHIP_ERROR error)
@@ -139,18 +136,14 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // TODO setting mSubscriptionStarted to false is not needs as this instance should be torn down,
-        // likely need an error callback to the manager once it exists.
-        mSubscriptionStarted = false;
+        // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
     }
 }
 
 void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // TODO setting mSubscriptionStarted to false is not needs as this instance should be torn down,
-    // likely need an error callback to the manager once it exists.
-    mSubscriptionStarted = false;
+    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
 }
 
 void DeviceSubscription::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
@@ -163,6 +156,5 @@ void DeviceSubscription::StartSubscription(Controller::DeviceController & contro
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     mSubscriptionStarted = true;
 
-    ChipLogError(NotSpecified, "TMsg: are now hoping to get a connection to device");
     controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
