@@ -28973,8 +28973,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kRequestId), requestId);
     encoder.Encode(to_underlying(Fields::kResponseTimeoutSeconds), responseTimeoutSeconds);
-    encoder.Encode(to_underlying(Fields::kIpAddress), ipAddress);
-    encoder.Encode(to_underlying(Fields::kPort), port);
     return encoder.Finalize();
 }
 
@@ -28999,14 +28997,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kResponseTimeoutSeconds))
         {
             err = DataModel::Decode(reader, responseTimeoutSeconds);
-        }
-        else if (__context_tag == to_underlying(Fields::kIpAddress))
-        {
-            err = DataModel::Decode(reader, ipAddress);
-        }
-        else if (__context_tag == to_underlying(Fields::kPort))
-        {
-            err = DataModel::Decode(reader, port);
         }
         else
         {

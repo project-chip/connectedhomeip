@@ -28,6 +28,7 @@ import random
 import re
 import sys
 import textwrap
+import threading
 import time
 import typing
 import uuid
@@ -37,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
-from typing import Any, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -263,6 +264,7 @@ class EventChangeCallback:
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
+        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
         try:
             res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
@@ -270,6 +272,7 @@ class EventChangeCallback:
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+        logging.info(f"Successfully waited for {expected_event}")
         return res.Data
 
     def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
@@ -343,6 +346,14 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
+@dataclass
+class AttributeValue:
+    endpoint_id: int
+    attribute: ClusterObjects.ClusterAttributeDescriptor
+    value: Any
+    timestamp_utc: Optional[datetime] = None
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -370,6 +381,7 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
     while time_remaining > 0:
         expected_value = sequence[sequence_idx]
         logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
         try:
             item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
 
@@ -382,7 +394,7 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
                     sequence_idx += 1
                 else:
                     asserts.assert_equal(item.value, expected_value,
-                                         msg="Did not get expected attribute value in correct sequence.")
+                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
 
                 # We are done waiting when we have accumulated all results.
                 if sequence_idx == len(sequence):
@@ -398,29 +410,25 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
     asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
 
-@dataclass
-class AttributeValue:
-    endpoint_id: int
-    attribute: ClusterObjects.ClusterAttributeDescriptor
-    value: Any
-    timestamp_utc: datetime
-
-
 class ClusterAttributeChangeAccumulator:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self._lock = threading.Lock()
+        self._q = queue.Queue()
         self.reset()
 
     def reset(self):
-        self._attribute_report_counts = {}
-        attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
-            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-        self._attribute_reports = {}
-        for a in attrs:
-            self._attribute_report_counts[a] = 0
-            self._attribute_reports[a] = []
-        self._q = queue.Queue()
+        with self._lock:
+            self._attribute_report_counts = {}
+            attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
+                cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+            self._attribute_reports = {}
+            for a in attrs:
+                self._attribute_report_counts[a] = 0
+                self._attribute_reports[a] = []
+
+        self.flush_reports()
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
@@ -452,8 +460,56 @@ class ClusterAttributeChangeAccumulator:
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
-            self._attribute_report_counts[path.AttributeType] += 1
-            self._attribute_reports[path.AttributeType].append(value)
+            with self._lock:
+                self._attribute_report_counts[path.AttributeType] += 1
+                self._attribute_reports[path.AttributeType].append(value)
+
+    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
+        """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
+
+        for element in expected_final_values:
+            logging.info(
+                f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, expected_element in enumerate(expected_final_values):
+                last_value = None
+                for report in all_reports.get(expected_element.attribute, []):
+                    if report.endpoint_id == expected_element.endpoint_id:
+                        last_value = report.value
+
+                last_report_matches[expected_idx] = (last_value is not None and last_value == expected_element.value)
+
+            # Determine if all were met
+            if all(last_report_matches.values()):
+                logging.info("Found all expected reports were true.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        logging.info("Values found:")
+        for expected_idx, expected_element in enumerate(expected_final_values):
+            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected last report values before time-out")
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -461,11 +517,13 @@ class ClusterAttributeChangeAccumulator:
 
     @property
     def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
-        return self._attribute_report_counts
+        with self._lock:
+            return self._attribute_report_counts
 
     @property
     def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
-        return self._attribute_reports
+        with self._lock:
+            return self._attribute_reports.copy()
 
     def get_last_report(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) report only."""
@@ -1389,11 +1447,21 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             str: User input or none if input is closed.
         """
+
+        # TODO(#31928): Remove any assumptions of test params for endpoint ID.
+
+        # Get the endpoint user param instead of `--endpoint-id` result, if available, temporarily.
+        endpoint_id = self.user_params.get("endpoint", None)
+        if endpoint_id is None or not isinstance(endpoint_id, int):
+            endpoint_id = self.matter_test_config.endpoint
+
         if self.runner_hook:
+            # TODO(#31928): Add endpoint support to hooks.
             self.runner_hook.show_prompt(msg=prompt_msg,
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
-        logging.info("========= USER PROMPT =========")
+
+        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
@@ -1890,6 +1958,9 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
     cluster = get_cluster_from_attribute(attribute)
     try:
         attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+        if not isinstance(attr_list, list):
+            asserts.fail(
+                f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
         return attribute.attribute_id in attr_list
     except KeyError:
         return False
@@ -1919,9 +1990,13 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
-def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+def _has_feature(wildcard, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     try:
         feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+        if not isinstance(feature_map, int):
+            asserts.fail(
+                f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
+
         return (feature & feature_map) != 0
     except KeyError:
         return False
@@ -1935,8 +2010,8 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
 
         EP0: cluster A, B, C
         EP1: cluster D with feature F0
-        EP2, cluster D with feature F0
-        EP3, cluster D without feature F0
+        EP2: cluster D with feature F0
+        EP3: cluster D without feature F0
 
         And the following test specification:
         @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))

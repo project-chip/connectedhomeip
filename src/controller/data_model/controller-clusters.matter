@@ -3453,7 +3453,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kIdle = 16384;
@@ -3473,7 +3473,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -3512,7 +3512,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kDeepClean = 16384;
@@ -3525,7 +3525,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -9450,8 +9450,6 @@ provisional cluster CommissionerControl = 1873 {
   request struct CommissionNodeRequest {
     int64u requestId = 0;
     int16u responseTimeoutSeconds = 1;
-    optional octet_string ipAddress = 2;
-    optional int16u port = 3;
   }
 
   response struct ReverseOpenCommissioningWindow = 2 {

@@ -42016,8 +42016,6 @@ enum class Fields : uint8_t
 {
     kRequestId              = 0,
     kResponseTimeoutSeconds = 1,
-    kIpAddress              = 2,
-    kPort                   = 3,
 };
 
 struct Type
@@ -42029,8 +42027,6 @@ public:
 
     uint64_t requestId              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> ipAddress;
-    Optional<uint16_t> port;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -42047,8 +42043,6 @@ public:
 
     uint64_t requestId              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> ipAddress;
-    Optional<uint16_t> port;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommissionNode
