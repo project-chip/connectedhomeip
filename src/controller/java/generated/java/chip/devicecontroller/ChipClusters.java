@@ -61087,11 +61087,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds, Optional<byte[]> ipAddress, Optional<Integer> port) {
-      commissionNode(callback, requestId, responseTimeoutSeconds, ipAddress, port, 0);
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds) {
+      commissionNode(callback, requestId, responseTimeoutSeconds, 0);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds, Optional<byte[]> ipAddress, Optional<Integer> port, int timedInvokeTimeoutMs) {
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -61102,14 +61102,6 @@ public class ChipClusters {
       final long responseTimeoutSecondsFieldID = 1L;
       BaseTLVType responseTimeoutSecondstlvValue = new UIntType(responseTimeoutSeconds);
       elements.add(new StructElement(responseTimeoutSecondsFieldID, responseTimeoutSecondstlvValue));
-
-      final long ipAddressFieldID = 2L;
-      BaseTLVType ipAddresstlvValue = ipAddress.<BaseTLVType>map((nonOptionalipAddress) -> new ByteArrayType(nonOptionalipAddress)).orElse(new EmptyType());
-      elements.add(new StructElement(ipAddressFieldID, ipAddresstlvValue));
-
-      final long portFieldID = 3L;
-      BaseTLVType porttlvValue = port.<BaseTLVType>map((nonOptionalport) -> new UIntType(nonOptionalport)).orElse(new EmptyType());
-      elements.add(new StructElement(portFieldID, porttlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
