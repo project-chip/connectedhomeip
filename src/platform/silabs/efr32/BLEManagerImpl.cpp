@@ -986,7 +986,7 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
     return freeIndex;
 }
 
-void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
