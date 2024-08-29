@@ -14,29 +14,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --endpoint 1
-# === END CI TEST ARGUMENTS ===
-
 import logging
 
+from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-
 class TC_OCC_2_3(MatterBaseTest):
-    async def read_occ_attribute_expect_success(self, endpoint, attribute):
+    async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
+        endpoint_id = self.matter_test_config.endpoint
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_OCC_2_3(self) -> str:
@@ -45,11 +34,16 @@ class TC_OCC_2_3(MatterBaseTest):
     def steps_TC_OCC_2_3(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
-            TestStep(2, "DUT supports HoldTime attribute. If DUT doesn’t support it, then stop and exit this test case."),
-            TestStep(3, "Based on the feature flag value table, read OccupancySensorType attribute from DUT"),
-            TestStep(4, "If TH reads 0 - PIR, TH reads PIROccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime"),
-            TestStep(5, "If TH reads 1 - Ultrasonic, TH reads UltrasonicOccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime"),
-            TestStep(6, "If TH reads 2 - PHY, TH reads PhysicalContactOccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime")
+            TestStep(2, "TH reads the FeatureMap attribute on the endpoint and verifies if DUT supports any of the PIR (PassiveInfrared), US (Ultrasonic), PHY (PhysicalContact) or OTHER features."),
+            TestStep(3, "TH checks DUT HoldTime attribute support. If DUT doesn't support HoldTime, skip the rest of this test case."),
+            TestStep(4, "TH writes DUT HoldTime attribute with HoldTimeMin and verify."),
+            TestStep(5, "TH writes DUT HoldTime attribute with HoldTimeMax and verify."),
+            TestStep(6a, "If DUT supports either of PIR or OTHER featuremap, and PIROccupiedToUnoccupiedDelay, then TH reads DUT PIROccupiedToUnoccupiedDelay and HoldTime attributes.")
+            TestStep(6b, "TH writes DUT PIROccupiedToUnoccupiedDelay attribute with HoldTimeMin, then TH reads DUT PIROccupiedToUnoccupiedDelay and HoldTime attributes.")
+            TestStep(7a, "If DUT supports US featuremap and UltrasonicOccupiedToUnoccupiedDelay, then TH reads DUT UltrasonicOccupiedToUnoccupiedDelay and HoldTime attributes.")
+            TestStep(7b, "TH writes DUT UltrasonicOccupiedToUnoccupiedDelay attribute with HoldTimeMin, then TH reads DUT UltrasonicOccupiedToUnoccupiedDelay and HoldTime attributes.")
+            TestStep(8a, "If DUT supports PHY featuremap and PhysicalContactOccupiedToUnoccupiedDelay, then TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay and HoldTime attributes.")
+            TestStep(8b, "TH writes DUT PhysicalContactOccupiedToUnoccupiedDelay attribute with HoldTimeMin, then TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay and HoldTime attributes.")
         ]
         return steps
 
@@ -61,67 +55,93 @@ class TC_OCC_2_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_3(self):
-        endpoint = self.matter_test_config.endpoint
 
-        self.step(1)  # Already done, immediately go to step 2
+        endpoint_id = self.matter_test_config.endpoint
+        node_id = self.dut_node_id
+        dev_ctrl = self.default_controller
 
+        post_prompt_settle_delay_seconds = 10.0
+        cluster = Clusters.Objects.OccupancySensing
+        attributes = cluster.Attributes
+
+        self.step(1) # Commissioning already done
+        
         self.step(2)
+        attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
 
-        attributes = Clusters.OccupancySensing.Attributes
-        attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        feature_map = await self.read_occ_attribute_expect_success(attribute=attributes.FeatureMap)
+        has_feature_pir = (feature_map & cluster.Bitmaps.Feature.kPassiveInfrared) != 0
+        has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
+        has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
+        has_feature_other = (feature_map & cluster.Bitmaps.Feature.kOther) != 0
 
-        if attributes.HoldTime.attribute_id in attribute_list:
-            occupancy_hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
-        else:
-            logging.info("No HoldTime attribute supports. Terminate this test case")
-
+        logging.info(
+            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        
+        if not has_feature_pir or not has_feature_ultrasonic or not has_feature_contact or not has_feature_other:
+        	logging.info("PIR, US, PHY, OTHER featuremap not supported. Stop this test case.")
+        	self.skip_all_remaining_steps("3")
+        	
         self.step(3)
-        if attributes.OccupancySensorType.attribute_id in attribute_list:
-            occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
+        if not attributes.HoldTime.attribute_id in attribute_list:
+            logging.info("No HoldTime attribute supports. Terminate this test case")
+            self.skip_all_remaining_steps("4")
+            occupancy_hold_time_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
 
-            asserts.assert_less_equal(occupancy_sensor_type_dut, 3, "OccupancySensorType attribute is out of range")
-            asserts.assert_greater_equal(occupancy_sensor_type_dut, 0, "OccupancySensorType attribute is out of range")
-        else:
-            logging.info("OccupancySensorType attribute doesn't exist. Test step skipped")
+        self.step(4)
+        hold_time_limits_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTimeLimits)
+        asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 1, "HoldTimeMin has to be greater or equal to 1.")
+        await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
+        holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        asserts.assert_equal(holdtime_dut, hold_time_limits_dut.holdTimeMin, "HoldTimeMin to HoldTime writing failure")
 
-        if occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir:
-            self.step(4)
-            occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+        self.step(5)
+        await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMax))
+        asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, 10, "HoldTimeMax has to be greater or equal to 10.")
+        holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        asserts.assert_equal(holdtime_dut, hold_time_limits_dut.holdTimeMax, "HoldTimeMax to HoldTime writing failure")
+        
+        self.step(6a)
+        has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
+        has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
+        has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
 
-            asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut,
-                                 "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
-            self.skip_step(5)
-            self.skip_step(6)
+        if (has_feature_pir or has_feature_other) and has_pir_timing_attrib:
+        	occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
+        	asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut, "PIROccupiedToUnoccupiedDelay has a different value from HoldTime.")
 
-        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic:
-            self.step(4)
-            occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+		    self.step(6b)
+			# perform reverse
+			await self.write_single_attribute(attributes.PIROccupiedToUnoccupiedDelay(hold_time_limits_dut.holdTimeMin))
+			occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
+			holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+			asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut, "PIROccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
+			self.skip_all_remaining_steps("7a")
 
-            asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut,
-                                 "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
-            self.step(5)
-            occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+      	self.step(7a)
+        if has_feature_ultrasonic and has_ultrasonic_timing_attrib:
+        	occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+        	asserts.assert_equal(occupancy_us_otou_delay_dut, holdtime_dut, "UltrasonicOccupiedToUnoccupiedDelay has a different value from HoldTime.")
 
-            asserts.assert_equal(occupancy_us_otou_delay_dut, occupancy_hold_time_dut,
-                                 "HoldTime attribute value is not equal to UltrasonicOccupiedToUnoccupiedDelay")
-            self.skip_step(6)
+			self.step(7b)
+			# perform reverse
+			await self.write_single_attribute(attributes.UltrasonicOccupiedToUnoccupiedDelay(hold_time_limits_dut.holdTimeMin))
+			occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+			holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+			asserts.assert_equal(occupancy_us_otou_delay_dut, holdtime_dut, "UltrasonicOccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
+			self.skip_all_remaining_steps("8a")
 
-        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic:
-            occupancy_pirus_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
-
-            asserts.assert_equal(occupancy_pirus_otou_delay_dut, occupancy_hold_time_dut,
-                                 "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
-
-        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact:
-            self.skip_step(4)
-            self.skip_step(5)
-            self.step(6)
-            occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
-
-            asserts.assert_equal(occupancy_phy_otou_delay_dut, occupancy_hold_time_dut,
-                                 "HoldTime attribute value is not equal to PhysicalContactOccupiedToUnoccupiedDelay")
-        else:
-            logging.info("OccupancySensorType attribute value is out of range")
+      	self.step(8a)
+        if has_feature_contact and has_contact_timing_attrib:
+        	occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
+        	asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut, "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime.")
+        	
+        	self.step(8b)
+        	# perform reverse
+        	await self.write_single_attribute(attributes.PhysicalContactOccupiedToUnoccupiedDelay(hold_time_limits_dut.holdTimeMin))
+        	occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
+        	holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+        	asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut, "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
 
 
 if __name__ == "__main__":
