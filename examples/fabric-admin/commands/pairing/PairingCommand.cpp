@@ -590,6 +590,9 @@ chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
 bool PairingCommand::ShouldWaitAfterDeviceAttestation()
 {
     // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
+    // Currently this is added in the case that the example is performing reverse commissioning,
+    // but it would be an improvement to store that explicitly.
+    // TODO: Issue #35297 - [Fabric Sync] Improve where we get VID and PID when validating CCTRL CommissionNode command
     SetupPayload payload;
     CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
     return err == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0);
