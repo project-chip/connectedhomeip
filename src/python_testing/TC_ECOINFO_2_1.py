@@ -25,11 +25,21 @@ from mobly import asserts
 
 class TC_ECOINFO_2_1(MatterBaseTest):
 
-    def _validate_device_directory(self, device_directory):
-        num_of_devices = len(device_directory)
-        asserts.assert_less_equal(num_of_devices, 256, "Too many device entries")
+    def _validate_device_directory(self, current_fabric_index, device_directory):
         for device in device_directory:
-            # TODO do fabric index check first
+            if current_fabric_index != device.fabricIndex:
+                # Fabric sensitve field still exist in python, just that they have default values
+                asserts.assert_equal(device.deviceName, None, "Unexpected value in deviceName")
+                asserts.assert_equal(device.deviceNameLastEdit, None, "Unexpected value in deviceNameLastEdit")
+                asserts.assert_equal(device.bridgedEndpoint, 0, "Unexpected value in bridgedEndpoint")
+                asserts.assert_equal(device.originalEndpoint, 0, "Unexpected value in originalEndpoint")
+                asserts.assert_true(type_matches(device.deviceTypes, list), "DeviceTypes should be a list")
+                asserts.assert_equal(len(device.deviceTypes), 0, "DeviceTypes list should be empty")
+                asserts.assert_true(type_matches(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
+                asserts.assert_equal(len(device.uniqueLocationIDs), 0, "uniqueLocationIDs list should be empty")
+                asserts.assert_equal(device.uniqueLocationIDsLastEdit, 0, "Unexpected value in uniqueLocationIDsLastEdit")
+                continue
+
             if device.deviceName is not None:
                 asserts.assert_true(type_matches(device.deviceName, str), "DeviceName should be a string")
                 asserts.assert_less_equal(len(device.deviceName), 64, "DeviceName should be <= 64")
@@ -72,10 +82,20 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             if num_of_unique_location_ids:
                 asserts.assert_greater(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be non-zero")
 
-    def _validate_location_directory(self, location_directory):
-        num_of_locations = len(location_directory)
-        asserts.assert_less_equal(num_of_locations, 64, "Too many location entries")
+    def _validate_location_directory(self, current_fabric_index, location_directory):
         for location in location_directory:
+            if current_fabric_index != location.fabricIndex:
+                # Fabric sensitve field still exist in python, just that they have default values
+                asserts.assert_equal(location.uniqueLocationID, "", "Unexpected value in uniqueLocationID")
+                asserts.assert_equal(location.locationDescriptor.locationName, "",
+                                     "Unexpected value in locationDescriptor.locationName")
+                asserts.assert_equal(location.locationDescriptor.floorNumber, NullValue,
+                                     "Unexpected value in locationDescriptor.floorNumber")
+                asserts.assert_equal(location.locationDescriptor.areaType, NullValue,
+                                     "Unexpected value in locationDescriptor.areaType")
+                asserts.assert_equal(location.locationDescriptorLastEdit, 0, "Unexpected value in locationDescriptorLastEdit")
+                continue
+
             asserts.assert_true(type_matches(location.uniqueLocationID, str), "UniqueLocationId should be a string")
             location_id_string_length = len(location.uniqueLocationID)
             asserts.assert_greater_equal(location_id_string_length, 1,
@@ -120,6 +140,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             self.wait_for_user_input(
                 "Paused test to allow for manufacturer to satisfy precondition where one or more bridged devices of a supported type is connected to DUT")
 
+        current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
         self.step(1)
         endpoint_wild_card_read = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.EcosystemInformation.Attributes.ClusterRevision)])
         list_of_endpoints = list(endpoint_wild_card_read.keys())
@@ -134,7 +155,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 attribute=Clusters.EcosystemInformation.Attributes.DeviceDirectory,
                 fabricFiltered=False)
 
-            self._validate_device_directory(device_directory)
+            self._validate_device_directory(current_fabric_index, device_directory)
 
             if idx == 0:
                 self.step(3)
@@ -145,7 +166,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
                 fabricFiltered=False)
 
-            self._validate_location_directory(location_directory)
+            self._validate_location_directory(current_fabric_index, location_directory)
 
             if idx == 0:
                 self.step(4)
