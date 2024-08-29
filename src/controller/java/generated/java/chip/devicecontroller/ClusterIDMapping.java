@@ -17424,7 +17424,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),IpAddress(2),Port(3),;
+                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),;
                     private final int id;
                     CommissionNodeCommandField(int id) {
                         this.id = id;

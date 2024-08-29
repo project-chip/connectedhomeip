@@ -22,17 +22,19 @@
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
-constexpr uint16_t kFabricBridgeServerPort = 33002;
+/**
+ * @brief Sets the RPC server port to which the RPC client will connect.
+ *
+ * @param port The port number.
+ */
+void SetRpcRemoteServerPort(uint16_t port);
 
 /**
- * @brief Initializes the RPC client with the specified server port.
+ * @brief Starts packet processing for the RPC client.
  *
- * This function sets the RPC server port and starts packet processing for the RPC client.
- *
- * @param rpcServerPort The port number on which the RPC server is running.
- * @return CHIP_NO_ERROR on successful initialization, or an appropriate CHIP_ERROR on failure.
+ * @return CHIP_NO_ERROR on successful start, or an appropriate CHIP_ERROR on failure.
  */
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
+CHIP_ERROR StartRpcClient();
 
 /**
  * @brief Adds a synchronized device to the RPC client.
