@@ -495,7 +495,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-             actor = AppEvent::kEventType_ButtonRight;
+            actor = AppEvent::kEventType_ButtonRight;
 #if CHIP_CONFIG_ENABLE_ICD_UAT
             LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION)
                                    : LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);

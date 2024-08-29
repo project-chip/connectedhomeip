@@ -505,18 +505,19 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         {
             actor = AppEvent::kEventType_ButtonRight;
 #if CHIP_CONFIG_ENABLE_ICD_UAT
-            if(switchIsTurnedOn){
+            if (switchIsTurnedOn)
+            {
                 LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_OFF_ACTION);
                 switchIsTurnedOn = false;
             }
-            else{
+            else
+            {
                 LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_ON_ACTION);
                 switchIsTurnedOn = true;
             }
 #else
             LightSwitchMgr().InitiateAction(actor, LightSwitchManager::SWITCH_ON_ACTION);
 #endif
-
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {

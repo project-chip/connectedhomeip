@@ -17,8 +17,8 @@ and set the following parameter to true:
 chip_enable_icd_server = true
 ```
 
-To enable LIT ICD behavior, Check In Protcol Support and User Active Mode Trigger
-Support, set the following parameter to true:
+To enable LIT ICD behavior, Check In Protcol Support and User Active Mode
+Trigger Support, set the following parameter to true:
 
 ```
 chip_enable_icd_lit = true
@@ -50,7 +50,8 @@ mode threshold, and polling intervals can be configured in
 #define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(100)
 ```
 
-To enable LIT ICD behavior, set the polling period to be greater than 15 seconds, and the active mode threshold to at least 5000 milliseconds.
+To enable LIT ICD behavior, set the polling period to be greater than 15
+seconds, and the active mode threshold to at least 5000 milliseconds.
 
 ## ZAP File Changes
 
@@ -60,15 +61,14 @@ Endpoint 0 as either a Server or Client, depending on your configuration.
 
 To enable LIT ICD behavior, set the FeatureMap to 0x0007 to enable Check-In
 Protocol Support, User Active Mode Trigger Support, and Long Idle Time Support.
-In addition, enable the UserActiveModeTriggerHint, UserActiveModeTriggerInstruction,
-and MaximumCheckInBackOff attributes.
+In addition, enable the UserActiveModeTriggerHint,
+UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes.
 
-After making the desired changes in the zap file, generate the .matter file by running
-the following commands:
+After making the desired changes in the zap file, generate the .matter file by
+running the following commands:
 
 ```
 $ cd /connectedhomeip/scripts/tools/zap
 $ ./generate.py examples/<example>/<example>-common/<example>-app.zap
 
 ```
-
