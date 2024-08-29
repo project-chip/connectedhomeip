@@ -82,6 +82,7 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
     if (error == CHIP_NO_ERROR)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, GetInstance());
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -105,8 +106,9 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
     auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, GetInstance());
+        GetInstance()->UpdateCountdownTimeFromDelegate();
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
@@ -130,6 +132,7 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
     if (error == CHIP_NO_ERROR)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, GetInstance());
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -145,6 +148,7 @@ void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalErro
     if (error == CHIP_NO_ERROR)
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+        GetInstance()->UpdateCountdownTimeFromDelegate();
 
         OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         GetInstance()->GetCurrentOperationalError(current_err);
