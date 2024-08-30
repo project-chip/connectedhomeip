@@ -82,6 +82,8 @@ static_library("fabric-admin-utils") {
     "commands/pairing/ToTLVCert.cpp",
     "device_manager/DeviceManager.cpp",
     "device_manager/DeviceManager.h",
+    "device_manager/DeviceSubscription.cpp",
+    "device_manager/DeviceSubscription.h",
     "device_manager/DeviceSynchronization.cpp",
     "device_manager/DeviceSynchronization.h",
   ]
