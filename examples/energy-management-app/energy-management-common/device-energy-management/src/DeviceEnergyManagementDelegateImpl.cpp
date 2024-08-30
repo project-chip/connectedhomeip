@@ -120,11 +120,11 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
     switch (cause)
     {
     case AdjustmentCauseEnum::kLocalOptimization:
-        mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+        SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kLocalOptimizationAdjustment);
         break;
 
     case AdjustmentCauseEnum::kGridOptimization:
-        mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kGridOptimizationAdjustment;
+        SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kGridOptimizationAdjustment);
         break;
 
     default:
@@ -175,7 +175,7 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustRequestFailure()
 
     mPowerAdjustmentInProgress = false;
 
-    mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
+    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     // TODO
     // Should we inform the mpDEMManufacturerDelegate that PowerAdjustRequest has failed?
@@ -210,7 +210,7 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustTimerExpiry()
 
     SetESAState(ESAStateEnum::kOnline);
 
-    mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
+    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     // Generate a PowerAdjustEnd event
     GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion);
@@ -264,8 +264,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
     SetESAState(ESAStateEnum::kOnline);
 
     mPowerAdjustmentInProgress = false;
-
-    mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
+    SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);
 
@@ -922,6 +921,18 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DeviceEnergyManagementDelegate::SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum powerAdjustReason)
+{
+    assertChipStackLockedByCurrentThread();
+
+    mPowerAdjustCapabilityStruct.Value().cause = powerAdjustReason;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerAdjustmentCapability::Id);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
 {
     assertChipStackLockedByCurrentThread();
@@ -962,9 +973,9 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
     if (mPowerAdjustmentInProgress)
     {
         if ((newValue == OptOutStateEnum::kLocalOptOut &&
-             mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
+             GetPowerAdjustmentCapability().Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
             (newValue == OptOutStateEnum::kGridOptOut &&
-             mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
+             GetPowerAdjustmentCapability().Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
             newValue == OptOutStateEnum::kOptOut)
         {
             err = CancelPowerAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);

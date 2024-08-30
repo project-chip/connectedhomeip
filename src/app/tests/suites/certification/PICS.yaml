@@ -6525,6 +6525,11 @@ PICS:
       id: TSTAT.S.C04.Rsp
 
     - label:
+          "Does the device implement receiving the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.S.C05.Rsp
+
+    - label:
           "Does the device implement receiving the SetActivePresetRequest
           command?"
       id: TSTAT.S.C06.Rsp
@@ -6620,6 +6625,11 @@ PICS:
 
     - label: "Does the device implement sending the GetRelayStatusLog command?"
       id: TSTAT.C.C04.Tx
+
+    - label:
+          "Does the device implement sending the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.C.C05.Tx
 
     - label:
           "Does the device implement sending the SetActivePresetRequest command?"
