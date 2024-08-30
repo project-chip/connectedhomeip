@@ -143,15 +143,19 @@ config BT_BUF_ACL_TX_SIZE
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X
+    default 810 if BT_TLX
     default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 640 if BT_B9X
+    default 640 if BT_TLX
     default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
     default n
+
+if SOC_SERIES_RISCV_TELINK_B9X
 
 config B9X_BLE_CTRL_THREAD_STACK_SIZE
     default 576
@@ -170,7 +174,30 @@ choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
-endif
+endif # SOC_SERIES_RISCV_TELINK_B9X
+
+if SOC_SERIES_RISCV_TELINK_TLX
+
+# config TLX_BLE_CTRL_THREAD_STACK_SIZE
+#     default 576
+# 
+# config TLX_BLE_CTRL_MASTER_MAX_NUM
+#     default 0
+# 
+# config TLX_BLE_CTRL_SLAVE_MAX_NUM
+#     default 1
+# 
+# config TLX_BLE_CTRL_RF_POWER
+#     default 3 if PM 
+#     default 9
+# 
+# choice TLX_BLE_CTRL_MAC_TYPE
+#     default TLX_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+# endchoice
+
+endif # TLX_BLE_CTRL_MASTER_MAX_NUM
+
+endif # BT
 
 # Board retention config
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
@@ -182,11 +209,25 @@ config TELINK_B9X_MATTER_RETENTION_LAYOUT
 
 config PWM
     default n
+
+endif
+
+if BOARD_TL3218X_RETENTION
+
+config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
+    default y if PM
+
+config TELINK_TLX_MATTER_RETENTION_LAYOUT
+    default y if PM
+
+config PWM
+    default n
+
 endif
 
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+    BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X
 config PWM
     default y
 endif
