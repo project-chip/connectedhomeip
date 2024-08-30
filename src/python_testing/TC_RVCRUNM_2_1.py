@@ -85,18 +85,27 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.C00.Rsp"), "RVCRUNM.S.C00.Rsp must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.C01.Tx"), "RVCRUNM.S.C01.Tx must be supported")
+        RVCRun_cluster = Clusters.RvcRunMode
+        attributes = RVCRun_cluster.Attributes
 
-        attributes = Clusters.RvcRunMode.Attributes
+        # Gathering Accepted and Generated Commands and associated ids
+        commands = RVCRun_cluster.Commands
+        RVCRun_accptcmd_list = attributes.AcceptedCommandList
+        RVCRun_gencmd_list = attributes.GeneratedCommandList
+        accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
+        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_gencmd_list)
+        chg_mode_cmd_id = commands.ChangeToMode.command_id
+        chg_rsp_cmd_id = commands.ChangeToModeResponse.command_id
+
+        if chg_mode_cmd_id not in accepted_cmd_list:
+            asserts.fail("Change To Mode receiving commands needs to be supported")
+
+        if chg_rsp_cmd_id not in generated_cmd_list:
+            asserts.fail("Change To Mode Response to send commands needs to be supported")
 
         self.print_step(1, "Commissioning, already done")
 

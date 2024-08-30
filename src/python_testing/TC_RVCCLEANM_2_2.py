@@ -94,7 +94,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
-    # Sends and out-of-band command to the rvc-app
+    # Sends an out-of-band command to the rvc-app
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
@@ -109,15 +109,9 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.directmodech_bit_mask = 0x8000
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
             self.app_pipe = self.app_pipe + str(app_pid)
-
-        asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")
 
         self.print_step(1, "Commissioning, already done")
 
@@ -127,8 +121,10 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step(
             2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
+
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
+
         else:
             self.wait_for_user_input(
                 prompt_msg="Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag, and press Enter when done.")
