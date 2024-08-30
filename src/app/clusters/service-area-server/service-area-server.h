@@ -57,7 +57,8 @@ public:
      *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
+    Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId,
+             BitMask<ServiceArea::Feature> aFeature);
 
     ~Instance() override;
 
