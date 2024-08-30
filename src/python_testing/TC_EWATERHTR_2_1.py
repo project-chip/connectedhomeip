@@ -51,20 +51,20 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
-            TestStep("2", "TH reads from the DUT FeatureMap attribute.",
-                     "Store the value as FeatureMap."),
+            TestStep("2", "TH reads from the DUT the FeatureMap attribute.",
+                     "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT the HeaterTypes attribute.",
                      "Verify that the DUT response contains a WaterHeaterTypeBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)"),
             TestStep("4", "TH reads from the DUT the HeatDemand attribute.",
-                     "Verify that the DUT response contains a WaterHeaterDemandBitmap (enum8)."),
+                     "Verify that the DUT response contains a WaterHeaterDemandBitmap (enum8) value less than 0x20 (no undefined types supported)."),
             TestStep("5", "TH reads from the DUT the TankVolume attribute.",
                      "Verify that the DUT response contains a uint16 value."),
             TestStep("6", "TH reads from the DUT the EstimatedHeatRequired attribute.",
-                     "Verify that the DUT response contains an energy-mWh value."),
+                     "Verify that the DUT response contains an energy-mWh value that is greater or equal to 0."),
             TestStep("7", "TH reads from the DUT the TankPercentage attribute.",
-                     "Verify that the DUT response contains a percent value."),
+                     "Verify that the DUT response contains a percent value that is between 0 and 100."),
             TestStep("8", "TH reads from the DUT the BoostState attribute.",
-                     "Verify that the DUT response contains a BoostStateEnum (enum8) value."),
+                     "Verify that the DUT response contains a BoostStateEnum (enum8) value that is less than or equal to 1."),
         ]
 
         return steps
