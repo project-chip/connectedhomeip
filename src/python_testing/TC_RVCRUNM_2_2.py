@@ -122,9 +122,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                          "PIXIT.RVCRUNM.MODE_A:<mode id> \n"
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
-        # TODO Replace 0x8000 with python object of RVCRUN FEATURE bit when implemented
-        # 0x8000 corresponds to 16 bit DIRECTMODECH Feature map
-        self.directmodech_bit_mask = 0x8000
+        self.directmodech_bit_mask = Clusters.RvcRunMode.Bitmaps.Feature.kDirectModeChange
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
