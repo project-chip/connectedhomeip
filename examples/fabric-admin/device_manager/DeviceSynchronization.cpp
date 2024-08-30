@@ -130,7 +130,12 @@ void DeviceSynchronizer::OnReportEnd()
         if (!mCurrentDeviceData.is_icd)
         {
             VerifyOrDie(mController);
-            DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+            // TODO(#35333) Figure out how we should recover in this circumstance.
+            CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed start subscription to ");
+            }
         }
     }
 #else

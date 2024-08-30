@@ -100,7 +100,7 @@ void DeviceSubscription::OnReportEnd()
 #if defined(PW_RPC_ENABLED)
         AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
-        ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+        ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to bridge: RPC not enabled");
 #endif
         mChangeDetected = false;
     }
@@ -188,7 +188,8 @@ const char * DeviceSubscription::GetStateStr() const
 void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     VerifyOrDie(mState == State::Connecting || mState == State::Stopping);
-    ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    // TODO(#35333) Figure out how we should recover if we fail to connect and mState == State::Connecting.
 
     // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
