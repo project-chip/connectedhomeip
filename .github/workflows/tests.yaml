@@ -479,7 +479,7 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die \
                       --target linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -493,7 +493,7 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test-data-model-check-check-failure-die/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
