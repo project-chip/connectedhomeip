@@ -1014,9 +1014,9 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ICDClientInfo clientInfo;
-    clientInfo.peer_node = icdNodeId;
-    clientInfo.check_in_node =
-        chip::ScopedNodeId(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value(), icdNodeId.GetFabricIndex());
+    clientInfo.peer_node         = icdNodeId;
+    clientInfo.check_in_node     = chip::ScopedNodeId(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value(),
+                                                      icdNodeId.GetFabricIndex());
     clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -1072,7 +1072,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
         jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
         static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId.GetNodeId()),
-        static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value()), static_cast<jlong>(icdCounter),
+        static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value()),
+        static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 

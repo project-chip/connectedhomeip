@@ -23,17 +23,17 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _checkInNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey,       \
-                          _jniICDHmacKey)                                                                                           \
-    jlong _peerNodeId = static_cast<jlong>(_clientInfo.peer_node.GetNodeId());                                                      \
-    jlong _checkInNodeId    = static_cast<jlong>(_clientInfo.check_in_node.GetNodeId());                                            \
-    jlong _startCounter     = static_cast<jlong>(_clientInfo.start_icd_counter);                                                    \
-    jlong _offset           = static_cast<jlong>(_clientInfo.offset);                                                               \
-    jlong _monitoredSubject = static_cast<jlong>(_clientInfo.monitored_subject);                                                    \
-    chip::ByteSpan aes_buf(_clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                                  \
-    chip::ByteSpan hmac_buf(_clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                                \
-    chip::ByteArray _jniICDAesKey(env, aes_buf);                                                                                    \
-    chip::ByteArray _jniICDHmacKey(env, hmac_buf);                                                                                  \
+#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _checkInNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey,      \
+                          _jniICDHmacKey)                                                                                          \
+    jlong _peerNodeId       = static_cast<jlong>(_clientInfo.peer_node.GetNodeId());                                               \
+    jlong _checkInNodeId    = static_cast<jlong>(_clientInfo.check_in_node.GetNodeId());                                           \
+    jlong _startCounter     = static_cast<jlong>(_clientInfo.start_icd_counter);                                                   \
+    jlong _offset           = static_cast<jlong>(_clientInfo.offset);                                                              \
+    jlong _monitoredSubject = static_cast<jlong>(_clientInfo.monitored_subject);                                                   \
+    chip::ByteSpan aes_buf(_clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                                 \
+    chip::ByteSpan hmac_buf(_clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                               \
+    chip::ByteArray _jniICDAesKey(env, aes_buf);                                                                                   \
+    chip::ByteArray _jniICDHmacKey(env, hmac_buf);
 
 namespace chip {
 namespace app {
