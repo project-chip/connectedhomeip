@@ -179,9 +179,10 @@ void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & pe
     mDeviceSyncInProcess = false;
 }
 
-void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
                                                     bool deviceIsIcd)
 {
+    VerifyOrDie(controller);
     if (mDeviceSyncInProcess)
     {
         ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
@@ -195,6 +196,6 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
 
     mDeviceSyncInProcess = true;
 
-    mController = &controller;
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mController = controller;
+    controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
