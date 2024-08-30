@@ -118,7 +118,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 133
+                value: 0x85
 
     - label:
           "Step 6: TH sends GetHolidaySchedule Command to DUT with the
@@ -135,7 +135,7 @@ tests:
               - name: "HolidayIndex"
                 value: NumberOfHolidaySchedulesSupportedValue
               - name: "Status"
-                value: 139
+                value: 0x8B
 
     - label:
           "Step 7a: TH send Clear Holiday Schedule Command to DUT with

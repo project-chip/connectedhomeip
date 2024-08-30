@@ -350,22 +350,4 @@ tests:
       arguments:
           values:
               - name: "UserIndex"
-                value: 1
-
-    - label: "Clear a year day schedule for the first user"
-      PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
-      command: "ClearYearDaySchedule"
-      arguments:
-          values:
-              - name: "YearDayIndex"
-                value: 1
-              - name: "UserIndex"
-                value: 5
-
-    - label: "Cleanup the created user with UserIndex 5"
-      command: "ClearUser"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 5
+                value: 0xFFFE
