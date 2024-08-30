@@ -33,8 +33,6 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-#define CHIP_MAX_NETWORK_TYPES 3
-
 // TODO: Use macro to disable some wifi or thread
 class Instance : public CommandHandlerInterface,
                  public AttributeAccessInterface,
@@ -83,12 +81,19 @@ private:
     void SendNonConcurrentConnectNetworkResponse();
 #endif
 
+    class InstanceRecord
+    {
+    public:
+        Instance * mInstance;
+        InstanceRecord * next;
+    };
+
     // Array for recording NetworkCommissioningInstance.
-    static Instance * NetworkRecord[CHIP_MAX_NETWORK_TYPES];
+    static InstanceRecord * sInstanceRecord;
     // Record current network.
-    static void RecordNetwork(Instance *currentNetwork);
+    static void RecordNetwork(Instance * currentNetwork);
     // Disconnect networks (if connected) in the array other than the current network.
-    static void DisconnectOtherNetworks(Instance *currentNetwork);
+    static void DisconnectOtherNetworks(Instance * currentNetwork);
 
     EndpointId mEndpointId = kInvalidEndpointId;
     const BitFlags<Feature> mFeatureFlags;
@@ -142,8 +147,26 @@ public:
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate);
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate);
-    virtual ~Instance() = default;
-};
+    virtual ~Instance()
+    {
+        InstanceRecord * prev = nullptr;
+        InstanceRecord * curr = sInstanceRecord;
+        while (curr && curr->mInstance != this)
+        {
+            prev = curr;
+            curr = curr->next;
+        }
+        if (!prev)
+        {
+            sInstanceRecord = curr->next;
+        }
+        else
+        {
+            prev->next = curr->next;
+        }
+        Platform::MemoryFree(curr);
+    }
+}; // namespace NetworkCommissioning
 
 // NetworkDriver for the devices that don't have / don't need a real network driver.
 class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver

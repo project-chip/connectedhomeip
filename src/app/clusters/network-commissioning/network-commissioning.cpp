@@ -1152,28 +1152,57 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
-Instance * Instance::NetworkRecord[CHIP_MAX_NETWORK_TYPES];
+Instance::InstanceRecord * Instance::sInstanceRecord = nullptr;
 
 void Instance::RecordNetwork(Instance * currentNetwork)
 {
-    for (size_t i = 0; i < CHIP_MAX_NETWORK_TYPES; ++i)
+    InstanceRecord * curr = sInstanceRecord;
+    while (curr)
     {
-        if (NetworkRecord[i] == nullptr)
+        if (curr->mInstance == currentNetwork)
         {
-            NetworkRecord[i] = currentNetwork;
             return;
         }
+        curr = curr->next;
     }
+
+    InstanceRecord * newInstanceRecord = reinterpret_cast<InstanceRecord *>(Platform::MemoryAlloc(sizeof(InstanceRecord)));
+    newInstanceRecord->mInstance       = currentNetwork;
+    newInstanceRecord->next            = sInstanceRecord;
+    sInstanceRecord                    = newInstanceRecord;
 }
 
 void Instance::DisconnectOtherNetworks(Instance * currentNetwork)
 {
-    for (size_t i = 0; i < CHIP_MAX_NETWORK_TYPES; ++i)
+    InstanceRecord * curr = sInstanceRecord;
+    while (curr)
     {
-        if (NetworkRecord[i] != nullptr && NetworkRecord[i] != currentNetwork && NetworkRecord[i]->mpWirelessDriver)
+        if (curr->mInstance != currentNetwork && curr->mInstance->mpWirelessDriver)
         {
-            NetworkRecord[i]->mpWirelessDriver->DisconnectNetwork();
+            uint8_t networkNo         = 0;
+            uint8_t maxNetworks       = curr->mInstance->mpBaseDriver->GetMaxNetworks();
+            bool haveConnectedNetwork = false;
+            EnumerateAndRelease(curr->mInstance->mpBaseDriver->GetNetworks(), [&](const Network & network) {
+                if (network.connected)
+                {
+                    haveConnectedNetwork = true;
+                    return Loop::Break;
+                }
+                ++networkNo;
+                return (networkNo == maxNetworks) ? Loop::Break : Loop::Continue;
+            });
+
+            if (!haveConnectedNetwork)
+            {
+                /* It's different to check the media driver connection state here.
+                 * Check the `Connected` flag in `NetworkInfoStruct` in stead, if not set,
+                 * exec `DisconnectDriver` for driver. However, the physical media connection
+                 * may not necessarily exist in this case, such as after initialization.
+                 */
+                curr->mInstance->mpWirelessDriver->DisconnectDriver();
+            }
         }
+        curr = curr->next;
     }
 }
 

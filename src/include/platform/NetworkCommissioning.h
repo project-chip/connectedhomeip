@@ -219,9 +219,9 @@ public:
     virtual CHIP_ERROR RevertConfiguration() = 0;
 
     /**
-     * @brief Disconnects network if it has connected.
+     * @brief Disconnects driver, but maybe it is not connected on media driver.
      */
-    virtual CHIP_ERROR DisconnectNetwork() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR DisconnectDriver() { return CHIP_NO_ERROR; }
 
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
