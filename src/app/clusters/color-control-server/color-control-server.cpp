@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #include "color-control-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -2586,6 +2588,9 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     uint16_t temperatureMin = MIN_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &temperatureMin);
 
+    // Avoid potential divide-by-zero in future Kelvin conversions.
+    temperatureMin = std::max(static_cast<uint16_t>(1u), temperatureMin);
+
     uint16_t temperatureMax = MAX_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &temperatureMax);
 
@@ -2640,6 +2645,9 @@ uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
     {
         // Not less than the physical min.
         Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
+
+        // Avoid potential divide-by-zero in future Kelvin conversions.
+        colorTemperatureCoupleToLevelMin = std::max(static_cast<uint16_t>(1u), colorTemperatureCoupleToLevelMin);
     }
 
     return colorTemperatureCoupleToLevelMin;
@@ -2670,11 +2678,11 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     // EnhancedColorMode attributes SHALL be set to 0x02 (color temperature). The values of
     // the StartUpColorTemperatureMireds attribute are listed in the table below.
     // Value                Action on power up
-    // 0x0000-0xffef        Set the ColorTemperatureMireds attribute to this value.
+    // 0x0001-0xffef        Set the ColorTemperatureMireds attribute to this value.
     // null                 Set the ColorTemperatureMireds attribute to its previous value.
 
     // Initialize startUpColorTempMireds to "maintain previous value" value null
-    app::DataModel::Nullable<uint16_t> startUpColorTemp;
+    app::DataModel::Nullable<uint16_t> startUpColorTemp = DataModel::NullNullable;
     Status status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
 
     if (status == Status::Success && !startUpColorTemp.IsNull())
@@ -2686,6 +2694,8 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
         {
             uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
             Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+            // Avoid potential divide-by-zero in future Kelvin conversions.
+            tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
 
             uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
             Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
@@ -2807,6 +2817,9 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
+    // Avoid potential divide-by-zero in future Kelvin conversions.
+    tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
+
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -2817,7 +2830,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     }
 
     // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
-    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always >= to 0)
+    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always > 0)
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
@@ -2933,8 +2946,11 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
+    // Avoid potential divide-by-zero in future Kelvin conversions.
+    tempPhysicalMin = std::max(static_cast<uint16_t>(1u), tempPhysicalMin);
+
     // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
-    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always >= to 0)
+    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always > 0)
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
@@ -2953,6 +2969,8 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
     Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
+    colorTempTransitionState->initialValue = std::max(static_cast<uint16_t>(1u), colorTempTransitionState->initialValue);
+
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (stepMode == HueStepMode::kUp)
