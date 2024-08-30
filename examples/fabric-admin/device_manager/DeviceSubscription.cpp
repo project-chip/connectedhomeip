@@ -191,7 +191,7 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
     ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     // TODO(#35333) Figure out how we should recover if we fail to connect and mState == State::Connecting.
 
-    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+    // After calling mOnDoneCallback we are indicating that  `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
@@ -222,7 +222,7 @@ void DeviceSubscription::StopSubscription()
 
     if (mState == State::Stopping)
     {
-        // Stop is called again we are still waiting on connectioned callbacks
+        // Stop is called again while we are still waiting on connected callbacks
         return;
     }
 
@@ -235,7 +235,7 @@ void DeviceSubscription::StopSubscription()
     // By calling reset on our ReadClient we terminate the subscription.
     VerifyOrDie(mClient);
     mClient.reset();
-    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
     // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
