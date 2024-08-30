@@ -121,8 +121,8 @@ class TC_OCC_2_1(MatterBaseTest):
             hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTimeLimits)
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeMin, hold_time_limits_dut.holdTimeMax,
                                       "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 1, "HoldTimeMin minimum value is not 1.")
-            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, 10, "HoldTimeMax minimum value is not 10.")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 1, "HoldTimeMin is less than 1.")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, 10, "HoldTimeMax is less than 10.")
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeMin, 0xFFFE, "HoldTimeMin is not in valid range.")
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeMax, 0xFFFE, "HoldTimeMax is not in valid range.")
             asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax, hold_time_limits_dut.holdTimeMin,
