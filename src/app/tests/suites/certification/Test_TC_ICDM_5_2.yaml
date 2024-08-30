@@ -210,7 +210,7 @@ tests:
 
     - label: "Step 6: TH1 sends UnregisterClient command with CheckInNodeID1."
       verification: |
-          ./chip-tool icdmanagement unregister-client 1 1 0 
+          ./chip-tool icdmanagement unregister-client 1 1 0
           On TH, Verify DUT responds w/ status SUCCESS(0x00).
 
           [1718189143.416585][1582:1584] CHIP:DMG: },
