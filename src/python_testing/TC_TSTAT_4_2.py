@@ -356,12 +356,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 logger.info(
                     "Couldn't run test step 4 since there were no built-in presets")
 
-            notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
-            if len(notBuiltInPresets) > 0:
-                activePreset = notBuiltInPresets[0]
-
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
