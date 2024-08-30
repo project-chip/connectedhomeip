@@ -16,10 +16,13 @@
  */
 
 #import "MTRDiagnosticLogsDownloader.h"
+#import <Matter/Matter.h>
 
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/LockTracker.h>
 #include <protocols/bdx/BdxTransferServerDelegate.h>
+#include <protocols/bdx/DiagnosticLogs.h>
 
-#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -425,15 +428,15 @@ private:
         [download checkInteractionModelResponse:response error:error];
     };
 
-    auto * device = [controller deviceForNodeID:nodeID];
-    auto * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
+    auto * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:controller];
+    auto * cluster = [[MTRBaseClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
 
     auto * params = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
     params.intent = @(type);
     params.requestedProtocol = @(MTRDiagnosticLogsTransferProtocolBDX);
     params.transferFileDesignator = download.fileDesignator;
 
-    [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
+    [cluster retrieveLogsRequestWithParams:params completion:interactionModelDone];
 
     if (timeoutInSeconds > 0) {
         auto err = _bridge->StartBDXTransferTimeout(download, timeoutInSeconds);

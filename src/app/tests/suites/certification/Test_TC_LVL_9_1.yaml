@@ -236,7 +236,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 6c: TH reads the CurrentLevel attribute from DUT"
+    - label: "Step 6b: TH reads the CurrentLevel attribute from DUT"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"

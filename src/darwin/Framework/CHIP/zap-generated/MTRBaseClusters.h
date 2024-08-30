@@ -18583,7 +18583,7 @@ typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCRunModeFeature) {
-    MTRRVCRunModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
+    MTRRVCRunModeFeatureDirectModeChange MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
@@ -18597,7 +18597,7 @@ typedef NS_ENUM(uint8_t, MTRRVCCleanModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeFeature) {
-    MTRRVCCleanModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
+    MTRRVCCleanModeFeatureDirectModeChange MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
