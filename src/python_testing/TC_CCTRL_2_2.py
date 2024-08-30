@@ -136,7 +136,6 @@ class TC_CCTRL_2_2(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
 
         self.step(5)
-        ipaddr = ipaddress.IPv6Address('::1')
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=1, responseTimeoutSeconds=30)
         try:
             await self.send_single_cmd(cmd)
