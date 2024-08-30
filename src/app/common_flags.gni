@@ -32,7 +32,7 @@ declare_args() {
     chip_use_data_model_interface = "disabled"
   }
 
-  # If we call `chipDie` on DM `check` errors
+  # Whether we call `chipDie` on DM `check` errors
   #
   # If/once the chip_use_data_model_interface flag is removed or does not support
   # a `check` option, this should alwo be removed
