@@ -154,32 +154,34 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
 /**
  * @brief Gets the maximum number of presets allowed for a given preset scenario.
  *
- * @param[in] delegate The delegate to use.
- * @param[in] presetScenario The presetScenario to match with.
- *
- * @return The maximum number of presets allowed for the preset scenario
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetScenario The presetScenario to match with.
+ * @param[out] count The maximum number of presets for the specified presetScenario
+ * @return CHIP_NO_ERROR if the maximum number was determined, or an error if not
  */
-uint8_t MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum presetScenario)
+CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
 {
-    VerifyOrReturnValue(delegate != nullptr, false);
-
+    count = 0;
     for (uint8_t i = 0; true; i++)
     {
         PresetTypeStruct::Type presetType;
         auto err = delegate->GetPresetTypeAtIndex(i, presetType);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            // Either we failed to fetch the next preset type, in which case we should error higher,
-            // or we exhausted the list trying to find the preset type
-            return 0;
+            // We exhausted the list trying to find the preset scenario
+            return CHIP_NO_ERROR;
         }
-
+        else if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
         if (presetType.presetScenario == presetScenario)
         {
-            return presetType.numberOfPresets;
+            count = presetType.numberOfPresets;
+            return CHIP_NO_ERROR;
         }
     }
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -379,8 +381,13 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         }
     }
 
-    size_t maximumPresetCount         = delegate->GetNumberOfPresets();
-    size_t maximumPresetScenarioCount = MaximumPresetScenarioCount(delegate, preset.GetPresetScenario());
+    size_t maximumPresetCount = delegate->GetNumberOfPresets();
+
+    size_t maximumPresetScenarioCount = 0;
+    if (MaximumPresetScenarioCount(delegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
+    {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
 
     if (maximumPresetScenarioCount == 0)
     {
