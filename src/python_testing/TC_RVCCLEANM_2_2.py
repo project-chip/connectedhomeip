@@ -95,9 +95,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
-        # TODO Replace 0x8000 with python object of RVCCLEAN FEATURE bit map when implemented
-        # 0x8000 corresponds to 16 bit DIRECTMODECH Feature map
-        self.directmodech_bit_mask = 0x8000
+        self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
         self.endpoint = self.matter_test_config.endpoint
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
