@@ -30,8 +30,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -70,11 +68,6 @@ class TC_OCC_2_3(MatterBaseTest):
     @async_test_body
     async def test_TC_OCC_2_3(self):
 
-        endpoint_id = self.matter_test_config.endpoint
-        node_id = self.dut_node_id
-        dev_ctrl = self.default_controller
-
-        post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Objects.OccupancySensing
         attributes = cluster.Attributes
 
@@ -93,7 +86,7 @@ class TC_OCC_2_3(MatterBaseTest):
 
         self.step(3)
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
-        if not attributes.HoldTime.attribute_id in attribute_list:
+        if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
             self.skip_all_remaining_steps(4)
         holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
