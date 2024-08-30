@@ -1,0 +1,171 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 217.2.9 [TC-ICDM-6.1] Functionality with DUT as Client
+
+PICS:
+    - ICDM.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: DUT issues an C_REGISTER_CLIENT command to the Test Harness."
+      PICS: ICDM.C.C00.Tx
+      verification: |
+          The product maker needs to provide instructions on how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when the DUT is a commissioner/Client).
+
+
+          ./chip-tool icdmanagement register-client 1 1 hex:1234567890abcdef1234567890abcdef 1 1 0 --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          On the TH (LIT-ICD-APP), verify that the TH receives the C_REGISTER_CLIENT command from the DUT. Ensure the command includes the following parameters:
+          ID 0 (CheckInNodeID): a valid node-id.
+          ID 1 (MonitoredSubject): a valid subject-id.
+          ID 2 (Key): an octstr.
+          Optional ID 3 (VerificationKey): an octstr.
+
+          00000001B669 [D503] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1720526270.174] [3885:3885] [EM] Handling via exchange: 41032r, Delegate: 0xaaaab2d7b2d0
+          [1720526270.175] [3885:3885] [DMG] InvokeRequestMessage =
+          [1720526270.175] [3885:3885] [DMG] {
+          [1720526270.175] [3885:3885] [DMG]         suppressResponse = false, 
+          [1720526270.175] [3885:3885] [DMG]         timedRequest = false, 
+          [1720526270.175] [3885:3885] [DMG]         InvokeRequests =
+          [1720526270.175] [3885:3885] [DMG]         [
+          [1720526270.175] [3885:3885] [DMG]                 CommandDataIB =
+          [1720526270.175] [3885:3885] [DMG]                 {
+          [1720526270.175] [3885:3885] [DMG]                         CommandPathIB =
+          [1720526270.175] [3885:3885] [DMG]                         {
+          [1720526270.175] [3885:3885] [DMG]                                 EndpointId = 0x0,
+          [1720526270.175] [3885:3885] [DMG]                                 ClusterId = 0x46,
+          [1720526270.175] [3885:3885] [DMG]                                 CommandId = 0x0,
+          [1720526270.175] [3885:3885] [DMG]                         },
+          [1720526270.175] [3885:3885] [DMG]                         
+          [1720526270.175] [3885:3885] [DMG]                         CommandFields = 
+          [1720526270.175] [3885:3885] [DMG]                         {
+          [1720526270.175] [3885:3885] [DMG]                                 0x0 = 1 (unsigned), 
+          [1720526270.175] [3885:3885] [DMG]                                 0x1 = 1 (unsigned), 
+          [1720526270.175] [3885:3885] [DMG]                                 0x2 = [
+          [1720526270.175] [3885:3885] [DMG]                                                 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 
+          [1720526270.175] [3885:3885] [DMG]                                 ] (16 bytes)
+          [1720526270.175] [3885:3885] [DMG]                                 0x3 = [
+          [1720526270.175] [3885:3885] [DMG]                                                 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 
+          [1720526270.175] [3885:3885] [DMG]                                 ] (16 bytes)
+          [1720526270.176] [3885:3885] [DMG]                                 0x4 = 1 (unsigned), 
+          [1720526270.176] [3885:3885] [DMG]                         },
+          [1720526270.176] [3885:3885] [DMG]                 },
+          [1720526270.176] [3885:3885] [DMG]                 
+          [1720526270.176] [3885:3885] [DMG]         ],
+          [1720526270.176] [3885:3885] [DMG]         
+          [1720526270.176] [3885:3885] [DMG]         InteractionModelRevision = 11
+          [1720526270.176] [3885:3885] [DMG] },
+          [1720526270.176] [3885:3885] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0046 e=0 p=m
+          [1720526270.176] [3885:3885] [DMG] AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 2: DUT issues an C_UNREGISTER_CLIENT command to the Test
+          Harness."
+      PICS: ICDM.C.C02.Tx
+      verification: |
+          The product maker needs to provide instructions on how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when the DUT is a commissioner/Client).
+
+
+          ./chip-tool icdmanagement unregister-client 1 1 0  --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          On the TH (LIT-ICD-APP), verify that the TH receives the C_UNREGISTER_CLIENT command from the DUT. Ensure the command includes the following parameters:
+          ID 0 (CheckInNodeID): a node-id.
+          Optional ID 1 (VerificationKey): an octstr.
+
+          [1718185855.777079][1472:1472] CHIP:EM: Handling via exchange: 48188r, Delegate: 0xaaaae3976df8
+          [1718185855.777200][1472:1472] CHIP:DMG: InvokeRequestMessage =
+          [1718185855.777233][1472:1472] CHIP:DMG: {
+          [1718185855.777256][1472:1472] CHIP:DMG:         suppressResponse = false, 
+          [1718185855.777292][1472:1472] CHIP:DMG:         timedRequest = false, 
+          [1718185855.777315][1472:1472] CHIP:DMG:         InvokeRequests =
+          [1718185855.777344][1472:1472] CHIP:DMG:         [
+          [1718185855.777366][1472:1472] CHIP:DMG:                 CommandDataIB =
+          [1718185855.777391][1472:1472] CHIP:DMG:                 {
+          [1718185855.777415][1472:1472] CHIP:DMG:                         CommandPathIB =
+          [1718185855.777447][1472:1472] CHIP:DMG:                         {
+          [1718185855.777476][1472:1472] CHIP:DMG:                                 EndpointId = 0x0,
+          [1718185855.777507][1472:1472] CHIP:DMG:                                 ClusterId = 0x46,
+          [1718185855.777537][1472:1472] CHIP:DMG:                                 CommandId = 0x2,
+          [1718185855.777565][1472:1472] CHIP:DMG:                         },
+          [1718185855.777595][1472:1472] CHIP:DMG:                         
+          [1718185855.777620][1472:1472] CHIP:DMG:                         CommandFields = 
+          [1718185855.777648][1472:1472] CHIP:DMG:                         {
+          [1718185855.777678][1472:1472] CHIP:DMG:                                 0x0 = 1 (unsigned), 
+          [1718185855.777709][1472:1472] CHIP:DMG:                                 0x1 = [
+          [1718185855.777744][1472:1472] CHIP:DMG:                                                 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 
+          [1718185855.777779][1472:1472] CHIP:DMG:                                 ] (16 bytes)
+          [1718185855.777809][1472:1472] CHIP:DMG:                         },
+          [1718185855.777835][1472:1472] CHIP:DMG:                 },
+          [1718185855.777865][1472:1472] CHIP:DMG:                 
+          [1718185855.777887][1472:1472] CHIP:DMG:         ],
+          [1718185855.777916][1472:1472] CHIP:DMG:         
+          [1718185855.777937][1472:1472] CHIP:DMG:         InteractionModelRevision = 11
+          [1718185855.777959][1472:1472] CHIP:DMG: },
+          [1718185855.778076][1472:1472] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0046 e=0 p=m
+          [1718185855.778113][1472:1472] CHIP:DMG: AccessControl: allowed
+          [1718185855.778142][1472:1472] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002
+          [1718185855.778182][1472:1472] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0046 e=0 p=a
+          [1718185855.778207][1472:1472] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 3: DUT issues an C_STAY_ACTIVE_REQUEST command to the Test
+          Harness."
+      PICS: ICDM.C.C03.Tx
+      verification: |
+          The product maker needs to provide instructions on how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when the DUT is a commissioner/Client).
+
+          ./chip-tool icdmanagement stay-active-request 10 1 0
+          On the TH (LIT-ICD-APP), verify that the TH receives the C_STAY_ACTIVE_REQUEST command from the DUT. Ensure the command includes the following parameter:
+          ID 0 (StayActiveDuration): a uint32.
+
+          [1718184926.138208][1472:1472] CHIP:DMG: InvokeRequestMessage =
+          [1718184926.138244][1472:1472] CHIP:DMG: {
+          [1718184926.138274][1472:1472] CHIP:DMG:         suppressResponse = false, 
+          [1718184926.138304][1472:1472] CHIP:DMG:         timedRequest = false, 
+          [1718184926.138330][1472:1472] CHIP:DMG:         InvokeRequests =
+          [1718184926.138365][1472:1472] CHIP:DMG:         [
+          [1718184926.138392][1472:1472] CHIP:DMG:                 CommandDataIB =
+          [1718184926.138427][1472:1472] CHIP:DMG:                 {
+          [1718184926.138455][1472:1472] CHIP:DMG:                         CommandPathIB =
+          [1718184926.138490][1472:1472] CHIP:DMG:                         {
+          [1718184926.138525][1472:1472] CHIP:DMG:                                 EndpointId = 0x0,
+          [1718184926.138560][1472:1472] CHIP:DMG:                                 ClusterId = 0x46,
+          [1718184926.138593][1472:1472] CHIP:DMG:                                 CommandId = 0x3,
+          [1718184926.138625][1472:1472] CHIP:DMG:                         },
+          [1718184926.138659][1472:1472] CHIP:DMG:                         
+          [1718184926.138687][1472:1472] CHIP:DMG:                         CommandFields = 
+          [1718184926.138719][1472:1472] CHIP:DMG:                         {
+          [1718184926.138753][1472:1472] CHIP:DMG:                                 0x0 = 10 (unsigned), 
+          [1718184926.138787][1472:1472] CHIP:DMG:                         },
+          [1718184926.138817][1472:1472] CHIP:DMG:                 },
+          [1718184926.138849][1472:1472] CHIP:DMG:                 
+          [1718184926.138874][1472:1472] CHIP:DMG:         ],
+          [1718184926.138906][1472:1472] CHIP:DMG:         
+          [1718184926.138931][1472:1472] CHIP:DMG:         InteractionModelRevision = 11
+          [1718184926.138957][1472:1472] CHIP:DMG: },
+          [1718184926.139084][1472:1472] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0046 e=0 p=m
+          [1718184926.139125][1472:1472] CHIP:DMG: AccessControl: allowed
+          [1718184926.139154][1472:1472] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0003
+          [1718184926.139229][1472:1472] CHIP:DMG: Command handler moving to [NewRespons]
+      disabled: true

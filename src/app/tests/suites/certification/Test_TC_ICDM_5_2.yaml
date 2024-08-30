@@ -1,0 +1,304 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 217.2.8 [TC-ICDM-5.2] Operating Mode with DUT as Server - Multi-Fabrics
+
+PICS:
+    - ICDM.S
+    - ICDM.S.F02
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1a: TH1 reads from the DUT the RegisteredClients attribute.
+          RegisteredClients is empty."
+      verification: |
+          TH1 reads the RegisteredClients attribute from the DUT. If a RegisteredClients entry is present, TH sends an unregisterclient command and ensures that the RegisteredClients attribute is empty.
+
+          ./chip-tool icdmanagement read registered-clients 1 0
+          [1718188779.575015][1538:1540] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 2743878261
+          [1718188779.577470][1538:1540] CHIP:TOO:   RegisteredClients: 0 entries
+          [1718188779.577928][1538:1540] CHIP:EM: <<< [E:53088i S:19826 M:50965508 (Ack:261929127)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+          If any entries are present, please send the command below to remove them:
+
+          ./chip-tool icdmanagement unregister-client 1<checkinnodeid> 1 0
+      disabled: true
+
+    - label:
+          "Step 1b: TH2 reads from the DUT the RegisteredClients attribute.
+          RegisteredClients is empty."
+      verification: |
+          TH2 reads the RegisteredClients attribute from the DUT. If a RegisteredClients entry is present, TH sends an unregisterclient command and ensures that the RegisteredClients attribute is empty.
+
+
+
+          ./chip-tool icdmanagement read registered-clients 2 0  --commissioner-name beta
+
+          [1718188868.404398][1546:1548] CHIP:DMG: }
+          [1718188868.404600][1546:1548] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 2743878261
+          [1718188868.404679][1546:1548] CHIP:TOO:   RegisteredClients: 0 entries
+          [1718188868.404970][1546:1548] CHIP:EM: <<< [E:9534i S:43682 M:97254828 (Ack:163009948)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+          If any entries are present, please send the command below to remove them:
+
+          ./chip-tool icdmanagement unregister-client 1<checkinnodeid> 2 0  --commissioner-name beta
+      disabled: true
+
+    - label: "Step 1c: TH1 and TH2 read from the DUT OperatingMode attribute."
+      verification: |
+          ./chip-tool icdmanagement read operating-mode 1 0
+          On TH, Verify that the DUT response contains value of OperatingMode=0 (SIT Operating Mode).
+          [1718188884.691163][1550:1552] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878261
+          [1718188884.691229][1550:1552] CHIP:TOO:   OperatingMode: 0
+          [1718188884.691543][1550:1552] CHIP:EM: <<< [E:53940i S:11253 M:155981998 (Ack:182200844)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+           ./chip-tool icdmanagement read operating-mode 2 0  --commissioner-name beta
+          On TH2, Verify that the DUT response contains value of OperatingMode=0 (SIT Operating Mode).
+
+          [1718188895.420406][1553:1555] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878261
+          [1718188895.420471][1553:1555] CHIP:TOO:   OperatingMode: 0
+          [1718188895.420787][1553:1555] CHIP:EM: <<< [E:16018i S:1269 M:59440251 (Ack:255733754)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 1d: Verify that mDNS is advertising ICD key."
+      verification: |
+          avahi-browse -r _matter._tcp
+          on TH1 or TH2, Verify that ICD DNS-SD TXT key shows ICD=0.
+
+          +   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+          =   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=0" "SAT=5000" "SAI=500" "SII=5500"]
+          =   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=0" "SAT=5000" "SAI=500" "SII=5500"]
+      disabled: true
+
+    - label:
+          "Step 2: TH1 sends RegisterClient command. - CheckInNodeID:
+          CheckInNodeID1 - MonitoredSubject: MonitoredSubID1 - Key: Key1"
+      verification: |
+          ./chip-tool icdmanagement register-client 1 2 hex:abcdef1234567890abcdef1234567890 1 1 0 --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          On TH1, Verify that  DUT responds w/ status SUCCESS(0x00) response and  ICDCounter.
+
+          [1718188933.468621][1558:1560] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1718188933.468664][1558:1560] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1718188933.468746][1558:1560] CHIP:TOO:   RegisterClientResponse: {
+          [1718188933.468770][1558:1560] CHIP:TOO:     ICDCounter: 2148292888
+          [1718188933.468788][1558:1560] CHIP:TOO:    }
+          [1718188933.468826][1558:1560] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1718188933.469057][1558:1560] CHIP:EM: <<< [E:52970i S:17033 M:267258594 (Ack:102084478)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 3a: TH1 and TH2 read from the DUT OperatingMode attribute."
+      verification: |
+          ./chip-tool icdmanagement read operating-mode 1 0
+          On TH, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+          [1718188954.621091][1562:1564] CHIP:DMG: }
+          [1718188954.621238][1562:1564] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718188954.621284][1562:1564] CHIP:TOO:   OperatingMode: 1
+          [1718188954.621515][1562:1564] CHIP:EM: <<< [E:59450i S:48110 M:163043347 (Ack:28482573)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+           ./chip-tool icdmanagement read operating-mode 2 0  --commissioner-name beta
+          On TH2, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+
+          [1718188966.427789][1566:1568] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718188966.427838][1566:1568] CHIP:TOO:   OperatingMode: 1
+          [1718188966.428091][1566:1568] CHIP:EM: <<< [E:44220i S:24683 M:99058895 (Ack:194620668)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 3b: Verify that mDNS is advertising ICD key."
+      verification: |
+          avahi-browse -r _matter._tcp
+          on TH1 or TH2, Verify that ICD DNS-SD TXT key shows ICD=1.
+
+          +   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+          =   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+      disabled: true
+
+    - label:
+          "Step 4: TH2 sends RegisterClient command. - CheckInNodeID:
+          CheckInNodeID2 - MonitoredSubject: MonitoredSubID2 - Key: Key2"
+      verification: |
+          ./chip-tool icdmanagement register-client 3 3 hex:3334567890abcdef3334567890abcdef 1 2 0  --commissioner-name beta --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          On TH2, Verify that  DUT responds w/ status SUCCESS(0x00) response and  ICDCounter.
+
+          [1718189024.889207][1571:1573] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1718189024.889252][1571:1573] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1718189024.889320][1571:1573] CHIP:TOO:   RegisterClientResponse: {
+          [1718189024.889347][1571:1573] CHIP:TOO:     ICDCounter: 2148292891
+          [1718189024.889369][1571:1573] CHIP:TOO:    }
+          [1718189024.889414][1571:1573] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1718189024.889686][1571:1573] CHIP:EM: <<< [E:27414i S:16889 M:93269840 (Ack:126671448)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 5a: TH1 and TH2 read from the DUT OperatingMode attribute."
+      verification: |
+          ./chip-tool icdmanagement read operating-mode 1 0
+          On TH, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+          [1718189043.128354][1574:1576] CHIP:DMG: }
+          [1718189043.128528][1574:1576] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718189043.128579][1574:1576] CHIP:TOO:   OperatingMode: 1
+          [1718189043.128841][1574:1576] CHIP:EM: <<< [E:17806i S:49928 M:187130211 (Ack:148509244)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+           ./chip-tool icdmanagement read operating-mode 2 0  --commissioner-name beta
+          On TH2, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+
+          [1718189053.446350][1577:1579] CHIP:DMG: }
+          [1718189053.446592][1577:1579] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718189053.446661][1577:1579] CHIP:TOO:   OperatingMode: 1
+          [1718189053.446982][1577:1579] CHIP:EM: <<< [E:51091i S:59128 M:163210167 (Ack:129974250)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 5b: Verify that mDNS is advertising ICD key."
+      verification: |
+          avahi-browse -r _matter._tcp
+          on TH1 or TH2, Verify that ICD DNS-SD TXT key shows ICD=1.
+
+          +   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+          =   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+      disabled: true
+
+    - label: "Step 6: TH1 sends UnregisterClient command with CheckInNodeID1."
+      verification: |
+          ./chip-tool icdmanagement unregister-client 1 1 0 
+          On TH, Verify DUT responds w/ status SUCCESS(0x00).
+
+          [1718189143.416585][1582:1584] CHIP:DMG: },
+          [1718189143.416649][1582:1584] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+          [1718189143.416699][1582:1584] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1718189143.416936][1582:1584] CHIP:EM: <<< [E:55156i S:56068 M:240702385 (Ack:25944841)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 7a: TH1 and TH2 read from the DUT OperatingMode attribute."
+      verification: |
+          ./chip-tool icdmanagement read operating-mode 1 0
+          On TH, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+          [1718189163.691946][1585:1587] CHIP:DMG: }
+          [1718189163.692114][1585:1587] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718189163.692168][1585:1587] CHIP:TOO:   OperatingMode: 1
+          [1718189163.692441][1585:1587] CHIP:EM: <<< [E:24789i S:44583 M:96178308 (Ack:90033865)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+           ./chip-tool icdmanagement read operating-mode 2 0  --commissioner-name beta
+          On TH2, Verify that the DUT response contains value of OperatingMode=1 (LIT Operating Mode).
+          [1718189174.380519][1588:1590] CHIP:DMG: }
+          [1718189174.380712][1588:1590] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878262
+          [1718189174.380775][1588:1590] CHIP:TOO:   OperatingMode: 1
+          [1718189174.381077][1588:1590] CHIP:EM: <<< [E:23610i S:35948 M:44882357 (Ack:2066542)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 7b: Verify that mDNS is advertising ICD key."
+      verification: |
+          avahi-browse -r _matter._tcp
+          on TH, Verify that ICD DNS-SD TXT key shows ICD=1.
+
+          +   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+          =   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=1" "SAT=5000" "SAI=500"]
+      disabled: true
+
+    - label: "Step 8: TH2 sends UnregisterClient command with CheckInNodeID2."
+      verification: |
+          ./chip-tool icdmanagement unregister-client 3 2 0  --commissioner-name beta
+          On TH, Verify DUT responds w/ status SUCCESS(0x00).
+
+          [1718189199.143561][1593:1595] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+          [1718189199.143607][1593:1595] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1718189199.143842][1593:1595] CHIP:EM: <<< [E:1551i S:27789 M:160941704 (Ack:172459873)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 9a: TH reads from the DUT the OperatingMode attribute."
+      verification: |
+          ./chip-tool icdmanagement read operating-mode 1 0
+          On TH, Verify that the DUT response contains value of OperatingMode=0 (SIT Operating Mode).
+          [1718189226.816559][1596:1598] CHIP:DMG: }
+          [1718189226.816990][1596:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878263
+          [1718189226.817171][1596:1598] CHIP:TOO:   OperatingMode: 0
+          [1718189226.817480][1596:1598] CHIP:EM: <<< [E:3075i S:59688 M:54055131 (Ack:234382633)] (S) Msg TX to 1:0000000000000001 [7914] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+
+
+           ./chip-tool icdmanagement read operating-mode 2 0  --commissioner-name beta
+          On TH2, Verify that the DUT response contains value of OperatingMode=0 (SIT Operating Mode).
+          [1718189234.617211][1599:1601] CHIP:DMG: }
+          [1718189234.617359][1599:1601] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0008 DataVersion: 2743878263
+          [1718189234.617406][1599:1601] CHIP:TOO:   OperatingMode: 0
+          [1718189234.617653][1599:1601] CHIP:EM: <<< [E:33570i S:8730 M:41471619 (Ack:148286668)] (S) Msg TX to 2:0000000000000002 [F3C7] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 9b: Verify that mDNS is advertising ICD key."
+      verification: |
+          avahi-browse -r _matter._tcp
+          on TH, Verify that ICD DNS-SD TXT key shows ICD=0.
+
+          +   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 0EB3A70BDFE4F3C7-0000000000000002             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=0" "SAT=5000" "SAI=500" "SII=5500"]
+          =   eth0 IPv6 871D3BE415567914-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE1B0000.local]
+             address = [fe80::e65f:1ff:fe49:ae1a]
+             port = [5540]
+             txt = ["ICD=0" "SAT=5000" "SAI=500" "SII=5500"]
+      disabled: true
