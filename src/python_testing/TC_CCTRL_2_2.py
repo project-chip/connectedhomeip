@@ -137,8 +137,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(5)
         ipaddr = ipaddress.IPv6Address('::1')
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(
-            requestId=1, responseTimeoutSeconds=30, ipAddress=ipaddr.packed, port=self.port)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=1, responseTimeoutSeconds=30)
         try:
             await self.send_single_cmd(cmd)
             asserts.fail("Unexpected success on CommissionNode")
