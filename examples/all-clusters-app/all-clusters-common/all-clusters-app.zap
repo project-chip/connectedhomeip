@@ -23905,7 +23905,7 @@
             },
             {
               "name": "readFailureCode",
-              "code": 20480,
+              "code": 16640,
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
@@ -23921,7 +23921,7 @@
             },
             {
               "name": "failureInt32U",
-              "code": 20481,
+              "code": 16641,
               "mfgCode": null,
               "side": "server",
               "type": "int32u",
