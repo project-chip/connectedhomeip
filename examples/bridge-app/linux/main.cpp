@@ -63,6 +63,7 @@ using namespace chip::app::Clusters;
 namespace {
 
 const int kNodeLabelSize = 32;
+const int kUniqueIdSize  = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
 
@@ -126,6 +127,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
@@ -277,6 +279,12 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
+
+                    if (dev->GetUniqueId()[0] == '\0')
+                    {
+                        dev->GenerateUniqueId();
+                    }
+
                     return index;
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
@@ -456,6 +464,11 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
         MakeZclCharString(zclNameSpan, dev->GetName());
+    }
+    else if ((attributeId == UniqueID::Id) && (maxReadLength == 32))
+    {
+        MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
+        MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
     {
