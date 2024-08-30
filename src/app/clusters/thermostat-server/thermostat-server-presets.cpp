@@ -425,14 +425,14 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
 
     if (presetCount > maximumPresetCount)
     {
-        ChipLogError(Zcl, "Preset count exceeded %u: %u ", (unsigned) maximumPresetCount, (unsigned) presetCount);
+        ChipLogError(Zcl, "Preset count exceeded %u: %u ", static_cast<unsigned>(maximumPresetCount), static_cast<unsigned>(presetCount));
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
     if (presetScenarioCount > maximumPresetScenarioCount)
     {
-        ChipLogError(Zcl, "Preset scenario count exceeded %u: %u ", (unsigned) maximumPresetScenarioCount,
-                     (unsigned) presetScenarioCount);
+        ChipLogError(Zcl, "Preset scenario count exceeded %u: %u ", static_cast<unsigned>(maximumPresetScenarioCount),
+                     static_cast<unsigned>(presetScenarioCount));
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 

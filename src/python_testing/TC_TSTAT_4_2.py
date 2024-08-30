@@ -649,14 +649,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
-            presetScenarioHeadroom = list([presetType.presetScenario,
-                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)] for presetType in presetTypes)
+            presetScenarioHeadroom = list((presetType.presetScenario,
+                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes)
 
             if len(presetScenarioHeadroom) > 0:
-                # Find the preset scenario with the fewest number of remaining allowed presets
+                # Find the preset scenario with the smallest number of remaining allowed presets
                 presetScenarioHeadroom = sorted(presetScenarioHeadroom, key=lambda diff: diff[1])
-                presetScenario = presetScenarioHeadroom[0][0]
-                headroom = presetScenarioHeadroom[0][1]
+                (presetScenario, headroom) = presetScenarioHeadroom[0]
 
                 # Add one more preset than is allowed by the preset type
                 test_presets = copy.deepcopy(current_presets)
