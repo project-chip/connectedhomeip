@@ -150,6 +150,7 @@ lighting-app/qpg/APPLICATION
 ```
 
 ## Lighting example without unique id
+
 ```{toctree}
 :glob:
 :maxdepth: 1
