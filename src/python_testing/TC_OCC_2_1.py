@@ -130,7 +130,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(hold_time_limits_dut.holdTimeDefault,
                                       hold_time_limits_dut.holdTimeMax, "HoldTimeDefault is greater than HoldTimeMax.")
             asserts.assert_greater_equal(hold_time_limits_dut.holdTimeDefault,
-                                         hold_time_limits_dut.holdTimeMin, "HoldTimeDefault is greater than HoldTimeMin.")
+                                         hold_time_limits_dut.holdTimeMin, "HoldTimeDefault is less than HoldTimeMin.")
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
             self.mark_current_step_skipped()
