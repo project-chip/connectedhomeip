@@ -118,7 +118,8 @@ class TC_OCC_2_3(MatterBaseTest):
             await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PIROccupiedToUnoccupiedDelay)
-            asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut, "PIROccupiedToUnoccupiedDelay has a different value from HoldTime.")
+            asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut,
+                                 "PIROccupiedToUnoccupiedDelay has a different value from HoldTime.")
 
             self.step("6b")
             # perform reverse
@@ -139,7 +140,8 @@ class TC_OCC_2_3(MatterBaseTest):
             await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
-            asserts.assert_equal(occupancy_us_otou_delay_dut, holdtime_dut, "UltrasonicOccupiedToUnoccupiedDelay has a different value from HoldTime.")
+            asserts.assert_equal(occupancy_us_otou_delay_dut, holdtime_dut,
+                                 "UltrasonicOccupiedToUnoccupiedDelay has a different value from HoldTime.")
 
             self.step("7b")
             # perform reverse
@@ -160,7 +162,8 @@ class TC_OCC_2_3(MatterBaseTest):
             await self.write_single_attribute(attributes.HoldTime(hold_time_limits_dut.holdTimeMin))
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
-            asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut, "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime.")
+            asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut,
+                                 "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime.")
 
             self.step("8b")
             # perform reverse
@@ -172,8 +175,8 @@ class TC_OCC_2_3(MatterBaseTest):
             asserts.assert_equal(occupancy_phy_otou_delay_dut, holdtime_dut,
                                  "PhysicalContactOccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
         else:
-             self.skip_step("8a")
-             self.skip_step("8b")
+            self.skip_step("8a")
+            self.skip_step("8b")
 
 
 if __name__ == "__main__":
