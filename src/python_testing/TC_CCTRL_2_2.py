@@ -22,7 +22,6 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
-import ipaddress
 import logging
 import os
 import random
