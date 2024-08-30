@@ -15089,6 +15089,20 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00005000: {
+                "attributeName": "ReadFailureCode",
+                "attributeId": 0x00005000,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00005001: {
+                "attributeName": "FailureInt32U",
+                "attributeId": 0x00005001,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

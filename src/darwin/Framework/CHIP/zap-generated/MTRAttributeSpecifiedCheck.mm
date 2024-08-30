@@ -6792,6 +6792,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::NullableGlobalStruct::Id: {
         return YES;
     }
+    case Attributes::ReadFailureCode::Id: {
+        return YES;
+    }
+    case Attributes::FailureInt32U::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

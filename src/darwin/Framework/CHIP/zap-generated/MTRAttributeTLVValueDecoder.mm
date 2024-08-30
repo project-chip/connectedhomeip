@@ -20296,6 +20296,28 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         }
         return value;
     }
+    case Attributes::ReadFailureCode::Id: {
+        using TypeInfo = Attributes::ReadFailureCode::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::FailureInt32U::Id: {
+        using TypeInfo = Attributes::FailureInt32U::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     case Attributes::MeiInt8u::Id: {
         using TypeInfo = Attributes::MeiInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;

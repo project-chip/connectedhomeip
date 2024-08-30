@@ -50247,6 +50247,8 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="writeOnlyInt8u", Tag=0x0000402A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="nullableGlobalEnum", Tag=0x00004033, Type=typing.Union[Nullable, Globals.Enums.TestGlobalEnum]),
                 ClusterObjectFieldDescriptor(Label="nullableGlobalStruct", Tag=0x00004034, Type=typing.Union[Nullable, Globals.Structs.TestGlobalStruct]),
+                ClusterObjectFieldDescriptor(Label="readFailureCode", Tag=0x00005000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="failureInt32U", Tag=0x00005001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -50342,6 +50344,8 @@ class UnitTesting(Cluster):
     writeOnlyInt8u: 'typing.Optional[uint]' = None
     nullableGlobalEnum: 'typing.Union[Nullable, Globals.Enums.TestGlobalEnum]' = None
     nullableGlobalStruct: 'typing.Union[Nullable, Globals.Structs.TestGlobalStruct]' = None
+    readFailureCode: 'typing.Optional[uint]' = None
+    failureInt32U: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -52726,6 +52730,38 @@ class UnitTesting(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, Globals.Structs.TestGlobalStruct])
 
             value: 'typing.Union[Nullable, Globals.Structs.TestGlobalStruct]' = NullValue
+
+        @dataclass
+        class ReadFailureCode(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00005000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class FailureInt32U(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00005001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

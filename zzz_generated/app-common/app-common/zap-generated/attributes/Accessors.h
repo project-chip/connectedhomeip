@@ -7318,6 +7318,18 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         MarkAttributeDirty markDirty);
 } // namespace NullableGlobalEnum
 
+namespace ReadFailureCode {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace ReadFailureCode
+
+namespace FailureInt32U {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FailureInt32U
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);

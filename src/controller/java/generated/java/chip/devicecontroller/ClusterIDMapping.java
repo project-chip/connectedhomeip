@@ -17811,6 +17811,8 @@ public class ClusterIDMapping {
             WriteOnlyInt8u(16426L),
             NullableGlobalEnum(16435L),
             NullableGlobalStruct(16436L),
+            ReadFailureCode(20480L),
+            FailureInt32U(20481L),
             MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

@@ -9315,6 +9315,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NullableGlobalStruct";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeReadFailureCodeID:
+            result = @"ReadFailureCode";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeFailureInt32UID:
+            result = @"FailureInt32U";
+            break;
+
         case MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

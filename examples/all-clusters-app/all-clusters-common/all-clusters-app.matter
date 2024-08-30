@@ -7343,6 +7343,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
+  attribute optional int8u readFailureCode = 20480;
+  attribute optional int32u failureInt32U = 20481;
   attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -9582,6 +9584,8 @@ endpoint 1 {
     callback attribute writeOnlyInt8u default = 0;
     ram      attribute nullableGlobalEnum;
     callback attribute nullableGlobalStruct;
+    ram      attribute readFailureCode default = 1;
+    callback attribute failureInt32U default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
     ram      attribute meiInt8u default = 0;

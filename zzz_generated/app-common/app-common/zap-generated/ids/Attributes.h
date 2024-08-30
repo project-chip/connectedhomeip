@@ -8448,6 +8448,14 @@ namespace NullableGlobalStruct {
 static constexpr AttributeId Id = 0x00004034;
 } // namespace NullableGlobalStruct
 
+namespace ReadFailureCode {
+static constexpr AttributeId Id = 0x00005000;
+} // namespace ReadFailureCode
+
+namespace FailureInt32U {
+static constexpr AttributeId Id = 0x00005001;
+} // namespace FailureInt32U
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
