@@ -16,8 +16,6 @@
 #
 
 # TODO: add to CI. See https://github.com/project-chip/connectedhomeip/issues/34676
-# for details about the block below.
-#
 
 import hashlib
 import logging
