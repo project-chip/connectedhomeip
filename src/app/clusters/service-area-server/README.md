@@ -12,8 +12,8 @@ attributes.
 
 Storage management is delegated to the `StorageDelegate` class, which provides a
 list of virtual methods for the user to implement. These methods are
-straightforward and do not require input validation, but they should not be 
-used directly.
+straightforward and do not require input validation, but they should not be used
+directly.
 
 The business logic specific to the device is encapsulated in a second `Delegate`
 class. This class can access the `Instance` through the `GetInstance()` method,
