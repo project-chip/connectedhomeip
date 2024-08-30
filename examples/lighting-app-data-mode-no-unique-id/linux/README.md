@@ -11,7 +11,7 @@ on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
 ```{toctree}
-:orphan:
+:hidden:
 
 *
 
