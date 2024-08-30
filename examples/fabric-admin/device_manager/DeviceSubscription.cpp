@@ -100,7 +100,7 @@ void DeviceSubscription::OnReportEnd()
 #if defined(PW_RPC_ENABLED)
         AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
-        ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to bridge: RPC not enabled");
+        ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge: RPC not enabled");
 #endif
         mChangeDetected = false;
     }
