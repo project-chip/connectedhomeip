@@ -28,21 +28,6 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
-using chip::app::ReadClient;
-
-namespace {
-
-void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
-{
-    reinterpret_cast<DeviceSubscriptionManager::DeviceSubscription *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
-}
-
-void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
-{
-    reinterpret_cast<DeviceSubscriptionManager::DeviceSubscription *>(context)->OnDeviceConnectionFailure(peerId, error);
-}
-
-} // namespace
 
 DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
 {
@@ -52,19 +37,33 @@ DeviceSubscriptionManager & DeviceSubscriptionManager::Instance()
 
 CHIP_ERROR DeviceSubscriptionManager::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
 {
+    assertChipStackLockedByCurrentThread();
     auto it = mDeviceSubscriptionMap.find(nodeId);
     VerifyOrReturnError((it == mDeviceSubscriptionMap.end()), CHIP_ERROR_INCORRECT_STATE);
 
     auto deviceSubscription = std::make_unique<DeviceSubscription>();
     VerifyOrReturnError(deviceSubscription, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(deviceSubscription->StartSubscription(this, controller, nodeId));
+    ReturnErrorOnFailure(deviceSubscription->StartSubscription([this](NodeId aNodeId)
+    {
+        this->DeviceSubscriptionTerminated(aNodeId);
+    }, controller, nodeId));
 
     mDeviceSubscriptionMap[nodeId] = std::move(deviceSubscription);
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceSubscriptionManager::RemoveSubscription(chip::NodeId nodeId)
+{
+    assertChipStackLockedByCurrentThread();
+    auto it = mDeviceSubscriptionMap.find(nodeId);
+    VerifyOrReturnError((it != mDeviceSubscriptionMap.end()), CHIP_ERROR_NOT_FOUND);
+    it->second->StopSubscription();
+    return CHIP_NO_ERROR;
+}
+
 void DeviceSubscriptionManager::DeviceSubscriptionTerminated(NodeId nodeId)
 {
+    assertChipStackLockedByCurrentThread();
     auto it = mDeviceSubscriptionMap.find(nodeId);
     // DeviceSubscriptionTerminated is a private method that is expected to only
     // be called by DeviceSubscription when it is terminal and is ready to be
@@ -72,127 +71,4 @@ void DeviceSubscriptionManager::DeviceSubscriptionTerminated(NodeId nodeId)
     // really wrong and there is likely a memory leak somewhere.
     VerifyOrDie(it != mDeviceSubscriptionMap.end());
     mDeviceSubscriptionMap.erase(nodeId);
-}
-
-DeviceSubscriptionManager::DeviceSubscription::DeviceSubscription() :
-    mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
-{}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data,
-                                                                    const StatusIB & status)
-{
-    VerifyOrDie(path.mEndpointId == kRootEndpointId);
-    VerifyOrDie(path.mClusterId == Clusters::AdministratorCommissioning::Id);
-
-    switch (path.mAttributeId)
-    {
-    case Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id: {
-        Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum windowStatus;
-        CHIP_ERROR err = data->Get(windowStatus);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(NotSpecified, "Failed to read WindowStatus"));
-        VerifyOrReturn(windowStatus != Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kUnknownEnumValue);
-        mCurrentAdministratorCommissioningAttributes.window_status = static_cast<uint32_t>(windowStatus);
-        mChangeDetected                                            = true;
-        break;
-    }
-    case Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id: {
-        FabricIndex fabricIndex;
-        CHIP_ERROR err                                                       = data->Get(fabricIndex);
-        mCurrentAdministratorCommissioningAttributes.has_opener_fabric_index = err == CHIP_NO_ERROR;
-        if (mCurrentAdministratorCommissioningAttributes.has_opener_fabric_index)
-        {
-            mCurrentAdministratorCommissioningAttributes.opener_fabric_index = static_cast<uint32_t>(fabricIndex);
-        }
-        mChangeDetected = true;
-        break;
-    }
-    case Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-        chip::VendorId vendorId;
-        CHIP_ERROR err                                                    = data->Get(vendorId);
-        mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id = err == CHIP_NO_ERROR;
-        if (mCurrentAdministratorCommissioningAttributes.has_opener_vendor_id)
-        {
-            mCurrentAdministratorCommissioningAttributes.opener_vendor_id = static_cast<uint32_t>(vendorId);
-        }
-        mChangeDetected = true;
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnReportEnd()
-{
-    // Report end is at the end of all attributes (success)
-    if (mChangeDetected)
-    {
-#if defined(PW_RPC_ENABLED)
-        AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
-#else
-        ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
-#endif
-        mChangeDetected = false;
-    }
-}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnDone(ReadClient * apReadClient)
-{
-    // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
-    mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
-}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnError(CHIP_ERROR error)
-{
-    ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
-}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
-                                                                      const SessionHandle & sessionHandle)
-{
-    mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
-                                           *this /* callback */, ReadClient::InteractionType::Subscribe);
-    VerifyOrDie(mClient);
-
-    AttributePathParams readPaths[1];
-    readPaths[0] = AttributePathParams(kRootEndpointId, Clusters::AdministratorCommissioning::Id);
-
-    ReadPrepareParams readParams(sessionHandle);
-
-    readParams.mpAttributePathParamsList    = readPaths;
-    readParams.mAttributePathParamsListSize = 1;
-    readParams.mMaxIntervalCeilingSeconds   = 5 * 60;
-
-    CHIP_ERROR err = mClient->SendRequest(readParams);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
-        mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
-    }
-}
-
-void DeviceSubscriptionManager::DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
-{
-    ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // After calling DeviceSubscriptionTerminated `this` is deleted and we shouldn't do anything else with DeviceSubscription.
-    mManager->DeviceSubscriptionTerminated(mCurrentAdministratorCommissioningAttributes.node_id);
-}
-
-CHIP_ERROR DeviceSubscriptionManager::DeviceSubscription::StartSubscription(DeviceSubscriptionManager * manager,
-                                                                            Controller::DeviceController & controller,
-                                                                            NodeId nodeId)
-{
-    VerifyOrDie(!mSubscriptionStarted);
-
-    mCurrentAdministratorCommissioningAttributes         = chip_rpc_AdministratorCommissioningChanged_init_default;
-    mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
-    mCurrentAdministratorCommissioningAttributes.window_status =
-        static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-    mSubscriptionStarted = true;
-    mManager             = manager;
-
-    return controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
