@@ -47,6 +47,21 @@ private:
         kStartCommissionNode,
     };
 
+    static const char * GetStateString(Step step)
+    {
+        switch (step)
+        {
+        case Step::kIdle:
+            return "kIdle";
+        case Step::kWaitCommissionNodeRequest:
+            return "kWaitCommissionNodeRequest";
+        case Step::kStartCommissionNode:
+            return "kStartCommissionNode";
+        default:
+            return "Unknown";
+        }
+    }
+
     void ResetDelegateState();
 
     static constexpr size_t kLabelBufferSize = 64;

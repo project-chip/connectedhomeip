@@ -454,6 +454,7 @@ DS
 duplicative
 DUT
 DUTS
+DUT's
 DV
 DVK
 dynload
