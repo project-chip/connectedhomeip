@@ -37,8 +37,19 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
   
+    <features>
+      <!-- TODO: ZAP still generates feature bits for things with disallowConform!
+           Tracked in https://github.com/project-chip/zap/issues/1413 -->
+      <!--<feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster is disallowed for this cluster">
+        <disallowConform/>
+      </feature>-->
+      <feature bit="16" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing clean modes from non-Idle states">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
@@ -61,11 +72,5 @@ limitations under the License.
       <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
     </command>
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-     <cluster code="0x0055"/>
-     <field name="NoFeatures" mask="0x0"/>
-     <!-- Feature OnOff with code 0x01 is deprecated -->
-   </bitmap>
 
 </configurator>
