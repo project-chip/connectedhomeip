@@ -273,7 +273,7 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    (void)Switch::Attributes::CurrentPosition::Set(endpointId, 0);
+    (void) Switch::Attributes::CurrentPosition::Set(endpointId, 0);
 }
 
 void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
