@@ -34,7 +34,7 @@ import chip.clusters as Clusters
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
-from chip.interaction_model import Status, InteractionModelError
+from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
