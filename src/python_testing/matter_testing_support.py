@@ -50,6 +50,8 @@ import chip.CertificateAuthority
 from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
+from time import sleep
+
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
@@ -908,6 +910,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
+        # The named pipe name must be set in the derived classes
+        self.app_pipe = None
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -970,6 +974,60 @@ class MatterBaseTest(base_test.BaseTestClass):
             return fn()
         except AttributeError:
             return test
+
+    def get_default_app_pipe_name(self) -> str:
+        return self.app_pipe
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+        """
+        Sends an out-of-band command to a Matter app.
+
+        Use the following environment variables:
+
+         - LINUX_DUT_IP 
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_USER
+
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        """
+
+        if app_pipe_name is None:
+            app_pipe_name = self.get_default_app_pipe_name()
+
+        if not isinstance(app_pipe_name, str):
+            raise TypeError("the named pipe must be provided as a string value")
+
+        if not isinstance(command_dict, dict):
+            raise TypeError("the command must be passed as a dictionary value")
+
+        import json
+        command = json.dumps(command_dict)
+
+        import os
+        dut_ip = os.getenv('LINUX_DUT_IP')
+
+        if dut_ip is None:
+            with open(app_pipe_name, "w") as app_pipe:
+                app_pipe.write(command + "\n")
+            # TODO(#31239): remove the need for sleep
+            sleep(0.001)
+        else:
+            logging.info(f"Using DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+
+            logging.info(f"Using DUT user name: {dut_uname}")
+
+            command_fixed = command.replace('\"', '\\"')
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
+            os.system(cmd)
 
     # Override this if the test requires a different default timeout.
     # This value will be overridden if a timeout is supplied on the command line.
