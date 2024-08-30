@@ -117,7 +117,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
         self.step("8")
         boost_state = await self.read_whm_attribute_expect_success(attribute="BoostState")
-        asserts.assert_less_equal(boost_state, Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive,
+        asserts.assert_less_equal(boost_state, Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive,
                                   f"Unexpected BoostState value - expected {boost_state} should be BoostStateEnum (enum8) value in range 0x00 to 0x01")
 
 
