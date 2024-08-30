@@ -1,4 +1,4 @@
-:orphan:
+:hidden:
 
 # CHIP Linux Lighting Example (Data Mode, No Unique ID)
 
