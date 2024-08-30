@@ -249,8 +249,8 @@ limitations under the License.
          They are internal SDK-test code that are intended to only run trhrough EMBER interfaces instead of
          code-backed support (to be able to test ember-based error paths)
       -->
-    <attribute side="server" code="0x5000" define="INT8U" type="int8u" writable="true" min="1" max="0xcb" default="1" optional="true">readFailureCode</attribute>
-    <attribute side="server" code="0x5001" define="INT32U" type="int32u" writable="true" default="0" optional="true">failureInt32U</attribute>
+    <attribute side="server" code="0x4100" define="INT8U" type="int8u" writable="true" min="1" max="0xcb" default="1" optional="true">readFailureCode</attribute>
+    <attribute side="server" code="0x4101" define="INT32U" type="int32u" writable="true" default="0" optional="true">failureInt32U</attribute>
 
     <!-- Attribute MEI sample having a different vendor ID than the cluster. -->
     <attribute side="server" code="0xFFF24F01" define="MEI_INT8U" type="int8u" writable="true" default="0" optional="false">mei_int8u</attribute>

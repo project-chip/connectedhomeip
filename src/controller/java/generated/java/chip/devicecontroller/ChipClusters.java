@@ -65206,8 +65206,8 @@ public class ChipClusters {
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
     private static final long NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID = 16435L;
     private static final long NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID = 16436L;
-    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 20480L;
-    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 20481L;
+    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 16640L;
+    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 16641L;
     private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;

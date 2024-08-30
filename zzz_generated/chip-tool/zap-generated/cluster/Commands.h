@@ -14258,8 +14258,8 @@ private:
 | * WriteOnlyInt8u                                                    | 0x402A |
 | * NullableGlobalEnum                                                | 0x4033 |
 | * NullableGlobalStruct                                              | 0x4034 |
-| * ReadFailureCode                                                   | 0x5000 |
-| * FailureInt32U                                                     | 0x5001 |
+| * ReadFailureCode                                                   | 0x4100 |
+| * FailureInt32U                                                     | 0x4101 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |

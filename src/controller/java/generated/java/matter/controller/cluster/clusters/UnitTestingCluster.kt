@@ -13668,7 +13668,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   }
 
   suspend fun readReadFailureCodeAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 20480u
+    val ATTRIBUTE_ID: UInt = 16640u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -13704,7 +13704,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   }
 
   suspend fun writeReadFailureCodeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 20480u
+    val ATTRIBUTE_ID: UInt = 16640u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -13747,7 +13747,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 20480u
+    val ATTRIBUTE_ID: UInt = 16640u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -13801,7 +13801,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   }
 
   suspend fun readFailureInt32UAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 20481u
+    val ATTRIBUTE_ID: UInt = 16641u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -13837,7 +13837,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   }
 
   suspend fun writeFailureInt32UAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 20481u
+    val ATTRIBUTE_ID: UInt = 16641u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -13880,7 +13880,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 20481u
+    val ATTRIBUTE_ID: UInt = 16641u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)

@@ -8449,11 +8449,11 @@ static constexpr AttributeId Id = 0x00004034;
 } // namespace NullableGlobalStruct
 
 namespace ReadFailureCode {
-static constexpr AttributeId Id = 0x00005000;
+static constexpr AttributeId Id = 0x00004100;
 } // namespace ReadFailureCode
 
 namespace FailureInt32U {
-static constexpr AttributeId Id = 0x00005001;
+static constexpr AttributeId Id = 0x00004101;
 } // namespace FailureInt32U
 
 namespace GeneratedCommandList {

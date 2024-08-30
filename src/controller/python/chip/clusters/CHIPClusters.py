@@ -15089,16 +15089,16 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
-            0x00005000: {
+            0x00004100: {
                 "attributeName": "ReadFailureCode",
-                "attributeId": 0x00005000,
+                "attributeId": 0x00004100,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00005001: {
+            0x00004101: {
                 "attributeName": "FailureInt32U",
-                "attributeId": 0x00005001,
+                "attributeId": 0x00004101,
                 "type": "int",
                 "reportable": True,
                 "writable": True,

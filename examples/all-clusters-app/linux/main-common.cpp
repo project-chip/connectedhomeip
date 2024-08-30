@@ -21,6 +21,7 @@
 #include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
+#include "app-common/zap-generated/ids/Clusters.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -335,4 +336,30 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     auto & delegate = ThermostatDelegate::GetInstance();
 
     SetDefaultDelegate(endpoint, &delegate);
+}
+
+using namespace chip::app;
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength)
+{
+
+    VerifyOrReturnValue(clusterId == Clusters::UnitTesting::Id, chip::Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(attributeMetadata != nullptr, chip::Protocols::InteractionModel::Status::Failure);
+
+    if (attributeMetadata->attributeId == Clusters::UnitTesting::Attributes::FailureInt32U::Id)
+    {
+        uint8_t forced_code = 0;
+        chip::Protocols::InteractionModel::Status status;
+
+        status = chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Get(endpoint, &forced_code);
+        if (status == chip::Protocols::InteractionModel::Status::Success)
+        {
+            status = static_cast<chip::Protocols::InteractionModel::Status>(forced_code);
+        }
+        return status;
+    }
+
+    // Finally we just do not support external attributes in all-clusters at this point
+    return chip::Protocols::InteractionModel::Status::Failure;
 }
