@@ -49,8 +49,7 @@ DeviceSubscription::DeviceSubscription() :
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data,
-                                                                    const StatusIB & status)
+void DeviceSubscription::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
 {
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::AdministratorCommissioning::Id);
@@ -109,7 +108,8 @@ void DeviceSubscription::OnReportEnd()
 
 void DeviceSubscription::OnDone(ReadClient * apReadClient)
 {
-    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }
@@ -119,12 +119,12 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr,
-                                                                      const SessionHandle & sessionHandle)
+void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     if (mState == State::Stopping)
     {
-        // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+        // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
         MoveToState(State::AwaitingDestruction);
         mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
         return;
@@ -148,7 +148,8 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+        // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
         MoveToState(State::AwaitingDestruction);
         mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
         return;
@@ -184,19 +185,18 @@ const char * DeviceSubscription::GetStateStr() const
     return "N/A";
 }
 
-
 void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     VerifyOrDie(mState == State::Connecting || mState == State::Stopping);
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
-    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
-CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback,
-                                                 Controller::DeviceController & controller,
+CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, Controller::DeviceController & controller,
                                                  NodeId nodeId)
 {
     assertChipStackLockedByCurrentThread();
@@ -234,7 +234,8 @@ void DeviceSubscription::StopSubscription()
     // By calling reset on our ReadClient we terminate the subscription.
     VerifyOrDie(mClient);
     mClient.reset();
-    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with DeviceSubscription.
+    // After calling mOnDoneCallback we are indicatating that  `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }

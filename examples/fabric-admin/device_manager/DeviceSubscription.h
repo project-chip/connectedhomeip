@@ -89,5 +89,5 @@ private:
     // Ensures that DeviceSubscription starts a subscription only once.  If instance of
     // DeviceSubscription  can be reused, the class documentation should be updated accordingly.
     bool mSubscriptionStarted = false;
-    State mState = State::Idle;
+    State mState              = State::Idle;
 };
