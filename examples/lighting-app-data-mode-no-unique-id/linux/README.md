@@ -17,7 +17,7 @@ details.
 
 <hr>
 
--   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
+-   [CHIP Linux Lighting Example](#chip-linux-lighting-example-data-mode-no-unique-id)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
