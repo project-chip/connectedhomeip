@@ -248,6 +248,34 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     }
 }
 
+/**
+ * Named pipe handler for simulating switch is idle
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateSwitchIdle"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+
+void HandleSimulateSwitchIdle(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+
+    if (!hasEndpointId)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    (void)Switch::Attributes::CurrentPosition::Set(endpointId, 0);
+}
+
 void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
 {
     Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
@@ -426,6 +454,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateLatchPosition")
     {
         HandleSimulateLatchPosition(self->mJsonValue);
+    }
+    else if (name == "SimulateSwitchIdle")
+    {
+        HandleSimulateSwitchIdle(self->mJsonValue);
     }
     else if (name == "SetOccupancy")
     {
