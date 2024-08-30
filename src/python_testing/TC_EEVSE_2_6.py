@@ -29,11 +29,9 @@
 import logging
 import time
 
-from pprint import pprint
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
+
 from matter_testing_support import ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -118,9 +116,6 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                                     self.dut_node_id,
                                     self.matter_test_config.endpoint)
 
-        print("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
-        pprint(events_callback._subscription)
-
         self.step("2")
         feature_map = await self.read_evse_attribute_expect_success(attribute="FeatureMap")
         logger.info(f"FeatureMap: {feature_map}")
@@ -135,9 +130,6 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                                 self.matter_test_config.endpoint,
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
-
-        print("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
-        print(sub_handler._subscription)
 
         def accumulate_reports(wait_time):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
