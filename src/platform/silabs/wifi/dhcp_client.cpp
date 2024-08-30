@@ -21,14 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !(SLI_SI91X_MCU_INTERFACE)
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-#endif // !(SLI_SI91X_MCU_INTERFACE)
-
 #include "dhcp_client.h"
 #include "lwip/dhcp.h"
 #include "wfx_host_events.h"
