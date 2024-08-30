@@ -93,12 +93,18 @@ extern "C" {
 
 #if (_SILICON_LABS_32B_SERIES < 3)
 #define EUSART_INT_ENABLE EUSART_IntEnable
+#define EUSART_INT_DISABLE EUSART_IntDisable
 #define EUSART_INT_CLEAR EUSART_IntClear
+#define EUSART_CLEAR_RX
+#define EUSART_GET_PENDING_INT EUSART_IntGet
 #define EUSART_ENABLE(eusart) EUSART_Enable(eusart, eusartEnable)
 #else
 #define EUSART_INT_ENABLE sl_hal_eusart_enable_interrupts
+#define EUSART_INT_DISABLE sl_hal_eusart_disable_interrupts
 #define EUSART_INT_SET sl_hal_eusart_set_interrupts
 #define EUSART_INT_CLEAR sl_hal_eusart_clear_interrupts
+#define EUSART_CLEAR_RX sl_hal_eusart_clear_rx
+#define EUSART_GET_PENDING_INT sl_hal_eusart_get_pending_interrupts
 #define EUSART_ENABLE(eusart)                                                                                                      \
     {                                                                                                                              \
         sl_hal_eusart_enable(eusart);                                                                                              \
@@ -139,7 +145,11 @@ typedef struct
 #if SILABS_LOG_OUT_UART
 #define UART_MAX_QUEUE_SIZE 125
 #else
+#if (_SILICON_LABS_32B_SERIES < 3)
 #define UART_MAX_QUEUE_SIZE 25
+#else
+#define UART_MAX_QUEUE_SIZE 50
+#endif
 #endif
 
 #ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
@@ -159,7 +169,7 @@ constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
                                            .cb_size    = osThreadCbSize,
                                            .stack_mem  = uartStack,
                                            .stack_size = kUartTaskSize,
-                                           .priority   = osPriorityRealtime };
+                                           .priority   = osPriorityBelowNormal };
 
 typedef struct
 {
@@ -324,7 +334,8 @@ void uartConsoleInit(void)
 
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     // Clear previous RX interrupts
-    EUSART_INT_CLEAR(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+    EUSART_INT_CLEAR(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, (EUSART_IF_RXFL | EUSART_IF_RXOF));
+    EUSART_CLEAR_RX(SL_UARTDRV_EUSART_VCOM_PERIPHERAL);
 
     // Enable RX interrupts
     EUSART_INT_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
@@ -359,9 +370,15 @@ void USART_IRQHandler(void)
 #elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
     otSysEventSignalPending();
 #endif
-
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
+    // disable RXFL IRQ until data read by uartConsoleRead
+    EUSART_INT_DISABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
     EUSART_INT_CLEAR(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+    if (EUSART_GET_PENDING_INT(SL_UARTDRV_EUSART_VCOM_PERIPHERAL) & EUSART_IF_RXOF)
+    {
+        EUSART_CLEAR_RX(SL_UARTDRV_EUSART_VCOM_PERIPHERAL);
+    }
 #endif
 }
 
@@ -433,7 +450,8 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     memcpy(workBuffer.data, Buf, BufLength);
     workBuffer.length = BufLength;
 
-    if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
+    // this is usually a command response. Wait on queue if full.
+    if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, osWaitForever) == osOK)
     {
         return BufLength;
     }
@@ -460,6 +478,7 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     memcpy(workBuffer.data + length, "\r\n", 2);
     workBuffer.length = length + 2;
 
+    // Don't wait when queue is full. Drop the log and return UART_CONSOLE_ERR
     if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
         return length;
@@ -476,6 +495,10 @@ int16_t uartLogWrite(const char * log, uint16_t length)
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
     uint8_t * data;
+
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
+    EUSART_INT_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+#endif
 
     if (Buf == NULL || NbBytesToRead < 1)
     {
