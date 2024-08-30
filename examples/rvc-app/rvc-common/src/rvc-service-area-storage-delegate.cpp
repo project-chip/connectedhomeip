@@ -43,7 +43,7 @@ bool RvcServiceAreaStorageDelegate::GetSupportedAreaByIndex(uint32_t listIndex, 
 };
 
 bool RvcServiceAreaStorageDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex,
-                                                        AreaStructureWrapper & supportedArea)
+                                                         AreaStructureWrapper & supportedArea)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -312,7 +312,7 @@ bool RvcServiceAreaStorageDelegate::GetProgressElementByIndex(uint32_t listIndex
 };
 
 bool RvcServiceAreaStorageDelegate::GetProgressElementById(uint32_t aAreaID, uint32_t & listIndex,
-                                                          Structs::ProgressStruct::Type & aProgressElement)
+                                                           Structs::ProgressStruct::Type & aProgressElement)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -334,7 +334,7 @@ bool RvcServiceAreaStorageDelegate::GetProgressElementById(uint32_t aAreaID, uin
 };
 
 bool RvcServiceAreaStorageDelegate::AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement,
-                                                         uint32_t & listIndex)
+                                                          uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -354,7 +354,7 @@ bool RvcServiceAreaStorageDelegate::AddProgressElementRaw(const Structs::Progres
 }
 
 bool RvcServiceAreaStorageDelegate::ModifyProgressElementRaw(uint32_t listIndex,
-                                                            const Structs::ProgressStruct::Type & modifiedProgressElement)
+                                                             const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {

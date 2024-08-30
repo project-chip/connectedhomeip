@@ -82,7 +82,7 @@ bool StorageDelegate::IsSelectedArea(uint32_t aAreaId)
 }
 
 bool StorageDelegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                            Structs::ProgressStruct::Type & aProgressElement)
+                                             Structs::ProgressStruct::Type & aProgressElement)
 {
     listIndex = 0;
 
