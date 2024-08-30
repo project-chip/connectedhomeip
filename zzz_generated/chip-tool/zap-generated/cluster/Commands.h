@@ -13886,8 +13886,6 @@ public:
     {
         AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
         AddArgument("ResponseTimeoutSeconds", 0, UINT16_MAX, &mRequest.responseTimeoutSeconds);
-        AddArgument("IpAddress", &mRequest.ipAddress);
-        AddArgument("Port", 0, UINT16_MAX, &mRequest.port);
         ClusterCommand::AddArguments();
     }
 

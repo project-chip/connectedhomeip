@@ -29,7 +29,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
@@ -74,14 +73,6 @@ class TC_SEAR_1_3(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakiness which is very annoying for everyone in CI.
-        sleep(0.001)
-
     def TC_SEAR_1_3(self) -> list[str]:
         return ["SEAR.S"]
 
@@ -100,7 +91,7 @@ class TC_SEAR_1_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         supported_area_ids = await self.read_supported_areas(step=2)
         asserts.assert_true(len(self.supported_areas) > 0, "SupportedAreas is empty")
@@ -135,7 +126,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({supported_area_ids}) command"
             self.print_step("9", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -151,7 +142,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_area_id}) command, and put the device in a non-idle state"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1), endpoint=self.endpoint)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")

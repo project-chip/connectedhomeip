@@ -28,6 +28,7 @@ import random
 import re
 import sys
 import textwrap
+import threading
 import time
 import typing
 import uuid
@@ -37,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
-from typing import Any, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -49,6 +50,8 @@ import chip.CertificateAuthority
 from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
+from time import sleep
+
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
@@ -263,6 +266,7 @@ class EventChangeCallback:
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
+        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
         try:
             res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
@@ -270,6 +274,7 @@ class EventChangeCallback:
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+        logging.info(f"Successfully waited for {expected_event}")
         return res.Data
 
     def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
@@ -343,6 +348,14 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
+@dataclass
+class AttributeValue:
+    endpoint_id: int
+    attribute: ClusterObjects.ClusterAttributeDescriptor
+    value: Any
+    timestamp_utc: Optional[datetime] = None
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -370,6 +383,7 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
     while time_remaining > 0:
         expected_value = sequence[sequence_idx]
         logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
         try:
             item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
 
@@ -382,7 +396,7 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
                     sequence_idx += 1
                 else:
                     asserts.assert_equal(item.value, expected_value,
-                                         msg="Did not get expected attribute value in correct sequence.")
+                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
 
                 # We are done waiting when we have accumulated all results.
                 if sequence_idx == len(sequence):
@@ -398,41 +412,46 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
     asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
 
-@dataclass
-class AttributeValue:
-    endpoint_id: int
-    attribute: ClusterObjects.ClusterAttributeDescriptor
-    value: Any
-    timestamp_utc: datetime
-
-
 class ClusterAttributeChangeAccumulator:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self._lock = threading.Lock()
+        self._q = queue.Queue()
         self.reset()
 
     def reset(self):
-        self._attribute_report_counts = {}
-        attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
-            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-        self._attribute_reports = {}
-        for a in attrs:
-            self._attribute_report_counts[a] = 0
-            self._attribute_reports[a] = []
-        self._q = queue.Queue()
+        with self._lock:
+            self._attribute_report_counts = {}
+            attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
+                cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+            self._attribute_reports = {}
+            for a in attrs:
+                self._attribute_report_counts[a] = 0
+                self._attribute_reports[a] = []
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
+        self.flush_reports()
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=[(endpoint, self._expected_cluster)],
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
-            keepSubscriptions=True
+            keepSubscriptions=keepSubscriptions
         )
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
+
+    async def cancel(self):
+        """This cancels a subscription."""
+        # Wait for the asyncio.CancelledError to be called before returning
+        try:
+            self._subscription.Shutdown()
+            await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            pass
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
@@ -443,8 +462,56 @@ class ClusterAttributeChangeAccumulator:
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
-            self._attribute_report_counts[path.AttributeType] += 1
-            self._attribute_reports[path.AttributeType].append(value)
+            with self._lock:
+                self._attribute_report_counts[path.AttributeType] += 1
+                self._attribute_reports[path.AttributeType].append(value)
+
+    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
+        """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
+
+        for element in expected_final_values:
+            logging.info(
+                f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, expected_element in enumerate(expected_final_values):
+                last_value = None
+                for report in all_reports.get(expected_element.attribute, []):
+                    if report.endpoint_id == expected_element.endpoint_id:
+                        last_value = report.value
+
+                last_report_matches[expected_idx] = (last_value is not None and last_value == expected_element.value)
+
+            # Determine if all were met
+            if all(last_report_matches.values()):
+                logging.info("Found all expected reports were true.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        logging.info("Values found:")
+        for expected_idx, expected_element in enumerate(expected_final_values):
+            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected last report values before time-out")
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -452,11 +519,13 @@ class ClusterAttributeChangeAccumulator:
 
     @property
     def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
-        return self._attribute_report_counts
+        with self._lock:
+            return self._attribute_report_counts
 
     @property
     def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
-        return self._attribute_reports
+        with self._lock:
+            return self._attribute_reports.copy()
 
     def get_last_report(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) report only."""
@@ -841,6 +910,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
+        # The named pipe name must be set in the derived classes
+        self.app_pipe = None
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -903,6 +974,60 @@ class MatterBaseTest(base_test.BaseTestClass):
             return fn()
         except AttributeError:
             return test
+
+    def get_default_app_pipe_name(self) -> str:
+        return self.app_pipe
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+        """
+        Sends an out-of-band command to a Matter app.
+
+        Use the following environment variables:
+
+         - LINUX_DUT_IP 
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_USER
+
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        """
+
+        if app_pipe_name is None:
+            app_pipe_name = self.get_default_app_pipe_name()
+
+        if not isinstance(app_pipe_name, str):
+            raise TypeError("the named pipe must be provided as a string value")
+
+        if not isinstance(command_dict, dict):
+            raise TypeError("the command must be passed as a dictionary value")
+
+        import json
+        command = json.dumps(command_dict)
+
+        import os
+        dut_ip = os.getenv('LINUX_DUT_IP')
+
+        if dut_ip is None:
+            with open(app_pipe_name, "w") as app_pipe:
+                app_pipe.write(command + "\n")
+            # TODO(#31239): remove the need for sleep
+            sleep(0.001)
+        else:
+            logging.info(f"Using DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+
+            logging.info(f"Using DUT user name: {dut_uname}")
+
+            command_fixed = command.replace('\"', '\\"')
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
+            os.system(cmd)
 
     # Override this if the test requires a different default timeout.
     # This value will be overridden if a timeout is supplied on the command line.

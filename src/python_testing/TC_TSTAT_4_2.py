@@ -356,6 +356,12 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 logger.info(
                     "Couldn't run test step 4 since there were no built-in presets")
 
+            notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
+            if len(notBuiltInPresets) > 0:
+                activePreset = notBuiltInPresets[0]
+
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
@@ -408,6 +414,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
             else:
                 logger.info(
                     "Couldn't run test step 6 since there were no non-built-in presets to activate and delete")
+
+            # Write the occupied cooling setpoint to a different value
+            await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(2300), endpoint_id=endpoint)
+
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+            logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+            asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
