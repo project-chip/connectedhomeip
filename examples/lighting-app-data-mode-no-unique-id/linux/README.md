@@ -1,4 +1,5 @@
 :orphan:
+
 # CHIP Linux Lighting Example (Data Mode, No Unique ID)
 
 An example was created to perform TC-MCORE-FS-1.3 test. This is a copy of
