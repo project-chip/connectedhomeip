@@ -413,6 +413,7 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
+            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
 
         if app == HostApp.EFR32_TEST_RUNNER:
