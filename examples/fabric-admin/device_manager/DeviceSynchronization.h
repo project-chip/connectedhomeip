@@ -70,7 +70,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    // mController is expected to be valid the entire device synchronization process (i.e. when
+    // mController is expected to remain valid throughout the entire device synchronization process (i.e. when
     // mDeviceSyncInProcess is true).
     chip::Controller::DeviceController * mController = nullptr;
     bool mDeviceSyncInProcess                        = false;
