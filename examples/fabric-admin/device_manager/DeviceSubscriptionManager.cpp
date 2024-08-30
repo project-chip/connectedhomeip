@@ -55,10 +55,11 @@ CHIP_ERROR DeviceSubscriptionManager::RemoveSubscription(chip::NodeId nodeId)
     assertChipStackLockedByCurrentThread();
     auto it = mDeviceSubscriptionMap.find(nodeId);
     VerifyOrReturnError((it != mDeviceSubscriptionMap.end()), CHIP_ERROR_NOT_FOUND);
-    // We cannot safely erase the DeviceSubscription from mDeviceSubscriptionMap,
-    // after calling StopSubscription we expect DeviceSubscription to eventually
+    // We cannot safely erase the DeviceSubscription from mDeviceSubscriptionMap.
+    // After calling StopSubscription we expect DeviceSubscription to eventually
     // call the OnDoneCallback we provided in StartSubscription which will call
-    // DeviceSubscriptionTerminated and have itself removed from the map.
+    // DeviceSubscriptionTerminated where it will be erased from the 
+    // mDeviceSubscriptionMap.
     it->second->StopSubscription();
     return CHIP_NO_ERROR;
 }
