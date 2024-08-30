@@ -46,9 +46,9 @@ namespace ServiceArea {
 // ****************************************************************************
 // Service Area Server Instance
 
-Instance::Instance(MemoryDelegate * memoryDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
+Instance::Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
     AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-    mMemoryDelegate(memoryDelegate), mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(Id), mFeature(aFeature)
+    mStorageDelegate(storageDelegate), mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(Id), mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
     mDelegate->SetInstance(this);
@@ -72,7 +72,7 @@ CHIP_ERROR Instance::Init()
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(mMemoryDelegate->Init());
+    ReturnErrorOnFailure(mStorageDelegate->Init());
 
     return mDelegate->Init();
 }
@@ -279,7 +279,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
             // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
             // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
-            if (!mMemoryDelegate->IsSupportedArea(selectedArea))
+            if (!mStorageDelegate->IsSupportedArea(selectedArea))
             {
                 exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
                 return;
@@ -348,14 +348,14 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         // indicated by the entries of the newArea field, when requested to operate,
         // the SelectAreasResponse command SHALL have the Status field set to Success,
         // and the SelectedAreas attribute SHALL be set to the value of the newAreas field.
-        mMemoryDelegate->ClearSelectedAreasRaw();
+        mStorageDelegate->ClearSelectedAreasRaw();
 
         if (numberOfAreas != 0)
         {
             uint32_t ignored;
             for (uint32_t areaId : selectedAreasSpan)
             {
-                mMemoryDelegate->AddSelectedAreaRaw(areaId, ignored);
+                mStorageDelegate->AddSelectedAreaRaw(areaId, ignored);
             }
         }
 
@@ -380,7 +380,7 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
 
     // The SkippedArea field SHALL match an entry in the SupportedAreas list.
     // If the Status field is set to InvalidAreaList, the StatusText field SHALL be an empty string.
-    if (!mMemoryDelegate->IsSupportedArea(req.skippedArea))
+    if (!mStorageDelegate->IsSupportedArea(req.skippedArea))
     {
         ChipLogError(Zcl, "SkippedArea (%" PRIu32 ") is not in the SupportedAreas attribute.", req.skippedArea);
         exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
@@ -474,7 +474,7 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
         }
 
         // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
-        if (!mMemoryDelegate->IsSupportedMap(aArea.mapID.Value()))
+        if (!mStorageDelegate->IsSupportedMap(aArea.mapID.Value()))
         {
             ChipLogError(Zcl, "IsValidSupportedArea %" PRIu32 " - map Id %" PRIu32 " is not in supported map list", aArea.areaID,
                          aArea.mapID.Value());
@@ -582,7 +582,7 @@ void Instance::HandleSupportedAreasUpdated()
 
         while (GetSelectedAreaByIndex(i, areaId))
         {
-            if (!mMemoryDelegate->IsSupportedArea(areaId))
+            if (!mStorageDelegate->IsSupportedArea(areaId))
             {
                 areasToRemoveSpan[areasToRemoveIndex] = areaId;
                 areasToRemoveIndex++;
@@ -603,7 +603,7 @@ void Instance::HandleSupportedAreasUpdated()
     // Set current Area to null if current area is not in the supported areas attribute.
     {
         auto currentAreaId = GetCurrentArea();
-        if (!currentAreaId.IsNull() && !mMemoryDelegate->IsSupportedArea(currentAreaId.Value()))
+        if (!currentAreaId.IsNull() && !mStorageDelegate->IsSupportedArea(currentAreaId.Value()))
         {
             SetCurrentArea(DataModel::NullNullable);
         }
@@ -617,9 +617,9 @@ void Instance::HandleSupportedAreasUpdated()
         uint32_t progressToRemoveBuffer[kMaxNumProgressElements];
         Span<uint32_t> progressToRemoveSpan(progressToRemoveBuffer);
 
-        while (mMemoryDelegate->GetProgressElementByIndex(i, tempProgressElement))
+        while (mStorageDelegate->GetProgressElementByIndex(i, tempProgressElement))
         {
-            if (mMemoryDelegate->IsSupportedArea(tempProgressElement.areaID))
+            if (mStorageDelegate->IsSupportedArea(tempProgressElement.areaID))
             {
                 progressToRemoveSpan[progressToRemoveIndex] = tempProgressElement.areaID;
                 progressToRemoveIndex++;
@@ -630,7 +630,7 @@ void Instance::HandleSupportedAreasUpdated()
 
         for (auto areaId : progressToRemoveSpan)
         {
-            if (!mMemoryDelegate->RemoveProgressElementRaw(areaId))
+            if (!mStorageDelegate->RemoveProgressElementRaw(areaId))
             {
                 ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove progress element with area ID %" PRIu32 "",
                              areaId);
@@ -641,17 +641,17 @@ void Instance::HandleSupportedAreasUpdated()
 
 uint32_t Instance::GetNumberOfSupportedAreas()
 {
-    return mMemoryDelegate->GetNumberOfSupportedAreas();
+    return mStorageDelegate->GetNumberOfSupportedAreas();
 }
 
 bool Instance::GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    return mMemoryDelegate->GetSupportedAreaByIndex(listIndex, aSupportedArea);
+    return mStorageDelegate->GetSupportedAreaByIndex(listIndex, aSupportedArea);
 }
 
 bool Instance::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    return mMemoryDelegate->GetSupportedAreaById(aAreaId, listIndex, aSupportedArea);
+    return mStorageDelegate->GetSupportedAreaById(aAreaId, listIndex, aSupportedArea);
 }
 
 bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
@@ -688,7 +688,7 @@ bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
 
     // Add the SupportedArea to the SupportedAreas attribute.
     uint32_t ignoredIndex;
-    if (!mMemoryDelegate->AddSupportedAreaRaw(aNewArea, ignoredIndex))
+    if (!mStorageDelegate->AddSupportedAreaRaw(aNewArea, ignoredIndex))
     {
         return false;
     }
@@ -739,7 +739,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
         }
 
         // Replace the supported location with the modified location.
-        if (!mMemoryDelegate->ModifySupportedAreaRaw(listIndex, aNewArea))
+        if (!mStorageDelegate->ModifySupportedAreaRaw(listIndex, aNewArea))
         {
             return false;
         }
@@ -762,7 +762,7 @@ bool Instance::ClearSupportedAreas()
         return false;
     }
 
-    if (mMemoryDelegate->ClearSupportedAreasRaw())
+    if (mStorageDelegate->ClearSupportedAreasRaw())
     {
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -774,7 +774,7 @@ bool Instance::ClearSupportedAreas()
 
 bool Instance::RemoveSupportedArea(uint32_t areaId)
 {
-    if (mMemoryDelegate->RemoveSupportedAreaRaw(areaId))
+    if (mStorageDelegate->RemoveSupportedAreaRaw(areaId))
     {
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -788,17 +788,17 @@ bool Instance::RemoveSupportedArea(uint32_t areaId)
 
 uint32_t Instance::GetNumberOfSupportedMaps()
 {
-    return mMemoryDelegate->GetNumberOfSupportedMaps();
+    return mStorageDelegate->GetNumberOfSupportedMaps();
 }
 
 bool Instance::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    return mMemoryDelegate->GetSupportedMapByIndex(listIndex, aSupportedMap);
+    return mStorageDelegate->GetSupportedMapByIndex(listIndex, aSupportedMap);
 }
 
 bool Instance::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
-    return mMemoryDelegate->GetSupportedMapById(aMapId, listIndex, aSupportedMap);
+    return mStorageDelegate->GetSupportedMapById(aMapId, listIndex, aSupportedMap);
 }
 
 bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
@@ -843,7 +843,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // add to supported maps attribute
         MapStructureWrapper newMap(aMapId, aMapName);
         uint32_t ignoredIndex;
-        if (!mMemoryDelegate->AddSupportedMapRaw(newMap, ignoredIndex))
+        if (!mStorageDelegate->AddSupportedMapRaw(newMap, ignoredIndex))
         {
             return false;
         }
@@ -897,7 +897,7 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
         ++loopIndex;
     }
 
-    if (!mMemoryDelegate->ModifySupportedMapRaw(modifiedIndex, modifiedMap))
+    if (!mStorageDelegate->ModifySupportedMapRaw(modifiedIndex, modifiedMap))
     {
         return false;
     }
@@ -915,7 +915,7 @@ bool Instance::ClearSupportedMaps()
         return false;
     }
 
-    if (mMemoryDelegate->ClearSupportedMapsRaw())
+    if (mStorageDelegate->ClearSupportedMapsRaw())
     {
         ClearSupportedAreas();
         NotifySupportedMapsChanged();
@@ -927,7 +927,7 @@ bool Instance::ClearSupportedMaps()
 
 bool Instance::RemoveSupportedMap(uint32_t mapId)
 {
-    if (!mMemoryDelegate->RemoveSupportedMapRaw(mapId))
+    if (!mStorageDelegate->RemoveSupportedMapRaw(mapId))
     {
         return false;
     }
@@ -948,7 +948,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
         uint32_t supportedAreaIdsSize = 0;
         uint32_t supportedAreasIndex  = 0;
         AreaStructureWrapper tempSupportedArea;
-        while (mMemoryDelegate->GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
+        while (mStorageDelegate->GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
         {
             if (tempSupportedArea.mapID == mapId)
             {
@@ -965,7 +965,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
     {
         for (uint32_t supportedAreaId : supportedAreaIdsSpan)
         {
-            mMemoryDelegate->RemoveSupportedAreaRaw(supportedAreaId);
+            mStorageDelegate->RemoveSupportedAreaRaw(supportedAreaId);
         }
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -979,12 +979,12 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
 
 uint32_t Instance::GetNumberOfSelectedAreas()
 {
-    return mMemoryDelegate->GetNumberOfSelectedAreas();
+    return mStorageDelegate->GetNumberOfSelectedAreas();
 }
 
 bool Instance::GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea)
 {
-    return mMemoryDelegate->GetSelectedAreaByIndex(listIndex, selectedArea);
+    return mStorageDelegate->GetSelectedAreaByIndex(listIndex, selectedArea);
 }
 
 bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
@@ -997,14 +997,14 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
     }
 
     // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
-    if (!mMemoryDelegate->IsSupportedArea(aSelectedArea))
+    if (!mStorageDelegate->IsSupportedArea(aSelectedArea))
     {
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - not a supported location", aSelectedArea);
         return false;
     }
 
     // each entry in this list SHALL have a unique value
-    if (mMemoryDelegate->IsSelectedArea(aSelectedArea))
+    if (mStorageDelegate->IsSelectedArea(aSelectedArea))
     {
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - duplicated location", aSelectedArea);
         return false;
@@ -1022,12 +1022,12 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
     }
 
     uint32_t ignoredIndex;
-    return mMemoryDelegate->AddSelectedAreaRaw(aSelectedArea, ignoredIndex);
+    return mStorageDelegate->AddSelectedAreaRaw(aSelectedArea, ignoredIndex);
 }
 
 bool Instance::ClearSelectedAreas()
 {
-    if (mMemoryDelegate->ClearSelectedAreasRaw())
+    if (mStorageDelegate->ClearSelectedAreasRaw())
     {
         NotifySelectedAreasChanged();
         return true;
@@ -1038,7 +1038,7 @@ bool Instance::ClearSelectedAreas()
 
 bool Instance::RemoveSelectedAreas(uint32_t areaId)
 {
-    if (mMemoryDelegate->RemoveSelectedAreasRaw(areaId))
+    if (mStorageDelegate->RemoveSelectedAreasRaw(areaId))
     {
         NotifySelectedAreasChanged();
         return true;
@@ -1059,7 +1059,7 @@ bool Instance::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea
 {
     // If not null, the value of this attribute SHALL match the AreaID field of an entry on the SupportedAreas attribute's
     // list.
-    if ((!aCurrentArea.IsNull()) && (!mMemoryDelegate->IsSupportedArea(aCurrentArea.Value())))
+    if ((!aCurrentArea.IsNull()) && (!mStorageDelegate->IsSupportedArea(aCurrentArea.Value())))
     {
         ChipLogError(Zcl, "SetCurrentArea %" PRIu32 " - location is not supported", aCurrentArea.Value());
         return false;
@@ -1117,17 +1117,17 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 
 uint32_t Instance::GetNumberOfProgressElements()
 {
-    return mMemoryDelegate->GetNumberOfProgressElements();
+    return mStorageDelegate->GetNumberOfProgressElements();
 }
 
 bool Instance::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    return mMemoryDelegate->GetProgressElementByIndex(listIndex, aProgressElement);
+    return mStorageDelegate->GetProgressElementByIndex(listIndex, aProgressElement);
 }
 
 bool Instance::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    return mMemoryDelegate->GetProgressElementById(aAreaId, listIndex, aProgressElement);
+    return mStorageDelegate->GetProgressElementById(aAreaId, listIndex, aProgressElement);
 }
 
 bool Instance::AddPendingProgressElement(uint32_t aAreaId)
@@ -1143,14 +1143,14 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
     }
 
     // For each entry in this list, the AreaID field SHALL match an entry on the SupportedAreas attribute's list.
-    if (!mMemoryDelegate->IsSupportedArea(aAreaId))
+    if (!mStorageDelegate->IsSupportedArea(aAreaId))
     {
         ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %" PRIu32 "", aAreaId);
         return false;
     }
 
     // Each entry in this list SHALL have a unique value for the AreaID field.
-    if (mMemoryDelegate->IsProgressElement(aAreaId))
+    if (mStorageDelegate->IsProgressElement(aAreaId))
     {
         ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %" PRIu32 "", aAreaId);
         return false;
@@ -1158,7 +1158,7 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
 
     uint32_t ignoredIndex;
 
-    if (!mMemoryDelegate->AddProgressElementRaw(inactiveProgress, ignoredIndex))
+    if (!mStorageDelegate->AddProgressElementRaw(inactiveProgress, ignoredIndex))
     {
         return false;
     }
@@ -1194,7 +1194,7 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
     }
 
     // add the updated element to the progress attribute
-    if (!mMemoryDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1237,7 +1237,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
     progressElement.totalOperationalTime.Emplace(aTotalOperationalTime);
 
     // add the updated element to the progress attribute
-    if (!mMemoryDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1267,7 +1267,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
     progressElement.estimatedTime.Emplace(aEstimatedTime);
 
     // add the updated element to the progress attribute
-    if (!mMemoryDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1278,7 +1278,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
 
 bool Instance::ClearProgress()
 {
-    if (mMemoryDelegate->ClearProgressRaw())
+    if (mStorageDelegate->ClearProgressRaw())
     {
         NotifyProgressChanged();
         return true;
@@ -1289,7 +1289,7 @@ bool Instance::ClearProgress()
 
 bool Instance::RemoveProgressElement(uint32_t areaId)
 {
-    if (mMemoryDelegate->RemoveProgressElementRaw(areaId))
+    if (mStorageDelegate->RemoveProgressElementRaw(areaId))
     {
         NotifyProgressChanged();
         return true;

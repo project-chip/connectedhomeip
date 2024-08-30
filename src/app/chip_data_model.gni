@@ -404,8 +404,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/service-area-cluster-objects.h",
           "${_app_root}/clusters/${cluster}/service-area-delegate.h",
-          "${_app_root}/clusters/${cluster}/service-area-memory-delegate.cpp",
-          "${_app_root}/clusters/${cluster}/service-area-memory-delegate.h",
+          "${_app_root}/clusters/${cluster}/service-area-storage-delegate.cpp",
+          "${_app_root}/clusters/${cluster}/service-area-storage-delegate.h",
         ]
       } else if (cluster == "thread-border-router-management-server") {
         sources += [

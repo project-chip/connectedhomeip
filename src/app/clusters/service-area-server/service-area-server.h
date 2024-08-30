@@ -20,7 +20,7 @@
 
 #include "service-area-cluster-objects.h"
 #include "service-area-delegate.h"
-#include "service-area-memory-delegate.h"
+#include "service-area-storage-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/AttributeAccessInterface.h>
@@ -57,7 +57,7 @@ public:
      *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    Instance(MemoryDelegate * memoryDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
+    Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
 
     ~Instance() override;
 
@@ -72,12 +72,12 @@ public:
      * @return CHIP_NO_ERROR if there are on errors. Returns an error if
      *   - the given endpoint and cluster ID have not been enabled in zap
      *   - if the CommandHandler or AttributeHandler registration fails
-     *   - if the MemoryDelegate or Delegate initialisation fails.
+     *   - if the StorageDelegate or Delegate initialisation fails.
      */
     CHIP_ERROR Init();
 
 private:
-    MemoryDelegate * mMemoryDelegate;
+    StorageDelegate * mStorageDelegate;
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
