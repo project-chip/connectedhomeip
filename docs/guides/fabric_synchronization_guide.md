@@ -107,7 +107,7 @@ fabricsync add-local-bridge 1
 Pair the Ecosystem 2 bridge to Ecosystem 1 with node ID 2:
 
 ```
-fabricsync add-bridge 2 <e2-fabric-bridge-ip>
+fabricsync add-bridge 2 <setup-pin-code> <e2-fabric-bridge-ip> <e2-fabric-bridge-port>
 ```
 
 This command will initiate the reverse commissioning process. After a few

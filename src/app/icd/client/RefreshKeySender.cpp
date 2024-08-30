@@ -77,7 +77,7 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
     EndpointId endpointId = 0;
 
     Clusters::IcdManagement::Commands::RegisterClient::Type registerClientCommand;
-    registerClientCommand.checkInNodeID    = mICDClientInfo.peer_node.GetNodeId();
+    registerClientCommand.checkInNodeID    = mICDClientInfo.check_in_node.GetNodeId();
     registerClientCommand.monitoredSubject = mICDClientInfo.monitored_subject;
     registerClientCommand.key              = mNewKey.Span();
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, endpointId, registerClientCommand, onSuccess, onFailure);

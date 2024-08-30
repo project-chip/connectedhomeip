@@ -54,7 +54,7 @@ private:
 
 CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
 
-CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime);
+CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime);
 
 Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId endpoint);
 
