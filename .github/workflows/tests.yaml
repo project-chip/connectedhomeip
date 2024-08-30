@@ -475,6 +475,13 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Build Python REPL and example apps
+              # NOTE: the data-mode-check + check-failure-die is not 100% perfect as different
+              #
+              #       encoding sizes for data that keeps changing may alter over time (e.g. anything relating to time
+              #       or resources such as packet counts or other similar counters)
+              #
+              #       This may result in invalid errors, however for most purposes of our testing, we are unlikely to
+              #       hit such cases so we remain very strict on testing here.
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
