@@ -64,9 +64,9 @@ private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
 
 protected:
-    bool mReachable;
-    char mName[kDeviceNameSize + 1];
-    char mUniqueId[kDeviceUniqueIdSize + 1];
+    bool mReachable                         = false;
+    char mName[kDeviceNameSize + 1]         = { 0 };
+    char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
     std::string mLocation;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;
