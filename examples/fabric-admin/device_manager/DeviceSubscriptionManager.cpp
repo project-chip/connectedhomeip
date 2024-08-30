@@ -58,7 +58,7 @@ CHIP_ERROR DeviceSubscriptionManager::RemoveSubscription(chip::NodeId nodeId)
     // We cannot safely erase the DeviceSubscription from mDeviceSubscriptionMap.
     // After calling StopSubscription we expect DeviceSubscription to eventually
     // call the OnDoneCallback we provided in StartSubscription which will call
-    // DeviceSubscriptionTerminated where it will be erased from the 
+    // DeviceSubscriptionTerminated where it will be erased from the
     // mDeviceSubscriptionMap.
     it->second->StopSubscription();
     return CHIP_NO_ERROR;
