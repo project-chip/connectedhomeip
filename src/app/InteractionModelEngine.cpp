@@ -511,19 +511,16 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         {
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
-            if (ConcreteAttributePathExists(concretePath))
-            {
-                Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                                 .endpoint    = concretePath.mEndpointId,
-                                                 .requestType = Access::RequestType::kAttributeReadRequest,
-                                                 .entityId    = paramsList.mValue.mAttributeId };
+            Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                              .endpoint    = concretePath.mEndpointId,
+                                              .requestType = Access::RequestType::kAttributeReadRequest,
+                                              .entityId    = paramsList.mValue.mAttributeId };
 
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(concretePath));
-                if (err == CHIP_NO_ERROR)
-                {
-                    aHasValidAttributePath = true;
-                }
+            err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
+                                                    RequiredPrivilege::ForReadAttribute(concretePath));
+            if ((err == CHIP_NO_ERROR) && ConcreteAttributePathExists(concretePath))
+            {
+                aHasValidAttributePath = true;
             }
         }
 

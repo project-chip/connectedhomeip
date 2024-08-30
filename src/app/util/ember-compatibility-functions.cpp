@@ -278,18 +278,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
 
-    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
-    // mandatory global attributes (which just check for cluster on endpoint).
-
-    const EmberAfCluster * attributeCluster            = nullptr;
-    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
-
-    if (attributeCluster == nullptr && attributeMetadata == nullptr)
-    {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
-    }
-
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
     // depending on whether the path was expanded.
 
@@ -310,6 +298,18 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
                                                    : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
         }
+    }
+
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
+
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
+    {
+        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
     }
 
     {
@@ -672,22 +672,7 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
-    // mandatory global attributes (which just check for cluster on endpoint).
-    const EmberAfCluster * attributeCluster            = nullptr;
-    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
-
-    if (attributeCluster == nullptr && attributeMetadata == nullptr)
-    {
-        return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
-    }
-
-    // All the global attributes we don't have metadata for are readonly.
-    if (attributeMetadata == nullptr || attributeMetadata->IsReadOnly())
-    {
-        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
-    }
+    // Always check access first.
 
     {
         Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
@@ -710,6 +695,23 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
                                                  : Protocols::InteractionModel::Status::AccessRestricted);
         }
         apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
+    }
+
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
+
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
+    {
+        return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
+    }
+
+    // All the global attributes we don't have metadata for are readonly.
+    if (attributeMetadata == nullptr || attributeMetadata->IsReadOnly())
+    {
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())

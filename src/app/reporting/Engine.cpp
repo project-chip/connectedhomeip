@@ -326,18 +326,6 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = CheckEventSupportStatus(path);
-        if (status != Status::Success)
-        {
-            TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
-            if (err != CHIP_NO_ERROR)
-            {
-                aWriter = checkpoint;
-                break;
-            }
-            aHasEncodedData = true;
-        }
 
         Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
                                          .endpoint    = current->mValue.mEndpointId,
@@ -350,7 +338,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         {
             ReturnErrorOnFailure(err);
         }
-        else
+
         {
             TLV::TLVWriter checkpoint = aWriter;
             err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
@@ -367,6 +355,20 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
         }
+
+        Status status = CheckEventSupportStatus(path);
+        if (status != Status::Success)
+        {
+            TLV::TLVWriter checkpoint = aWriter;
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            if (err != CHIP_NO_ERROR)
+            {
+                aWriter = checkpoint;
+                break;
+            }
+            aHasEncodedData = true;
+        }
+
         current = current->mpNext;
     }
 
