@@ -19,7 +19,7 @@ The business logic specific to the device is encapsulated in a second `Delegate`
 class. This class can access the `Instance` through the `GetInstance()` method,
 enabling it to utilize all the attribute access methods provided by the
 `Instance` class. This design allows for a clear separation of concerns, with
-each class handling a specific aspect of the cluster's functionality..
+each class handling a specific aspect of the cluster's functionality.
 
 ## How to use
 
