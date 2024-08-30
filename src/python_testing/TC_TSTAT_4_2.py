@@ -236,6 +236,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         secondary_controller = secondary_fabric_admin.NewController(nodeId=112233)
 
+        accepted_cmd_list = await self.read_tstat_attribute_expect_success(attribute=cluster.Attributes.AcceptedCommandList)
+
         await secondary_controller.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
@@ -250,7 +252,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.write_presets(endpoint=endpoint, presets=new_presets, expected_status=Status.InvalidInState)
 
         self.step("3")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
             await self.send_atomic_request_begin_command()
 
             # Set the new preset to a null built-in value; will be replaced with false on reading
@@ -274,7 +276,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
 
         self.step("4")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
 
@@ -294,7 +296,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
         self.step("5")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
@@ -308,7 +310,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.ConstraintError)
 
         self.step("6")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the SetActivePresetRequest command
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
@@ -330,7 +332,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_overall_status=Status.Failure, expected_preset_status=Status.InvalidInState)
 
         self.step("7")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -345,7 +347,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("8")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -361,7 +363,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("9")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -377,7 +379,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("10")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -393,7 +395,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("11")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -408,7 +410,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("12")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -423,7 +425,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("13")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command
             await self.send_atomic_request_begin_command()
@@ -442,7 +444,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_commit_command(expected_status=Status.InvalidInState)
 
         self.step("14")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             await self.send_atomic_request_begin_command()
             # Send the AtomicRequest begin command from separate controller, which should receive busy
@@ -452,7 +454,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("15")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command()
@@ -463,7 +465,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_atomic_request_rollback_command()
 
         self.step("16")
-        if supports_presets and presets_attr_id in attribute_list and self.pics_guard(self.check_pics("TSTAT.S.Cfe.Rsp")):
+        if supports_presets and presets_attr_id in attribute_list and cluster.Commands.AtomicRequest.command_id in accepted_cmd_list:
 
             # Send the AtomicRequest begin command from the secondary controller
             await self.send_atomic_request_begin_command(dev_ctrl=secondary_controller)
