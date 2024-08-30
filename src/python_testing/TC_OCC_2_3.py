@@ -35,6 +35,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_OCC_2_3(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
