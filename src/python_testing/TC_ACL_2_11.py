@@ -31,10 +31,10 @@ import logging
 import queue
 
 import chip.clusters as Clusters
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -118,16 +118,16 @@ class TC_ACL_2_11(MatterBaseTest):
                 restriction_type = restriction.type
                 ID1 = restriction.id
 
-                attribute = ALL_ATTRIBUTES[C1][ID1]
-                command = ALL_ACCEPTED_COMMANDS[C1][ID1]
-
                 if restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeAccessForbidden:
+                    attribute = ALL_ATTRIBUTES[C1][ID1]
                     await self.read_single_attribute_expect_error(cluster=cluster, attribute=attribute, error=Status.AccessRestricted, endpoint=E1)
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kAttributeWriteForbidden:
+                    attribute = ALL_ATTRIBUTES[C1][ID1]
                     status = await self.write_single_attribute(attribute_value=attribute, endpoint_id=E1)
                     asserts.assert_equal(status, Status.AccessRestricted,
                                          f"Failed to verify ACCESS_RESTRICTED when writing to Attribute {ID1} Cluster {C1} Endpoint {E1}")
                 elif restriction_type == AccessControl.Enums.AccessRestrictionTypeEnum.kCommandForbidden:
+                    command = ALL_ACCEPTED_COMMANDS[C1][ID1]
                     result = await self.send_single_cmd(cmd=command, endpoint=E1)
                     asserts.assert_equal(result.status, Status.AccessRestricted,
                                          f"Failed to verify ACCESS_RESTRICTED when sending command {ID1} to Cluster {C1} Endpoint {E1}")
@@ -160,12 +160,18 @@ class TC_ACL_2_11(MatterBaseTest):
             server_list = ret[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
             for server in server_list:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[server]
-                await dev_ctrl.ReadAttribute(dut_node_id, [endpoint,
-                                                           cluster.Attributes.GeneratedCommandList,
-                                                           cluster.Attributes.AcceptedCommandList,
-                                                           cluster.Attributes.AttributeList,
-                                                           cluster.Attributes.FeatureMap,
-                                                           cluster.Attributes.ClusterRevision])
+                data = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, cluster.Attributes.GeneratedCommandList),
+                                                                  (endpoint, cluster.Attributes.AcceptedCommandList),
+                                                                  (endpoint, cluster.Attributes.AttributeList),
+                                                                  (endpoint, cluster.Attributes.FeatureMap),
+                                                                  (endpoint, cluster.Attributes.ClusterRevision)])
+                for endpoint, clusters in data.items():
+                    for cluster, attributes in clusters.items():
+                        for attribute, value in attributes.items():
+                            asserts.assert_false(isinstance(value, ValueDecodeFailure) and
+                                                 isinstance(value.Reason, InteractionModelError) and
+                                                 value.Reason.status == Status.AccessRestricted,
+                                                 "AccessRestricted is not allowed on Global attributes")
 
         self.step(6)
         response = await self.send_single_cmd(cmd=Clusters.AccessControl.Commands.ReviewFabricRestrictions([care_struct]), endpoint=0)
