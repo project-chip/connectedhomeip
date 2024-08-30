@@ -34,9 +34,6 @@ constexpr size_t kUniqueLocationIdMaxSize       = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize  = 64;
 constexpr size_t kLocationDescriptorNameMaxSize = 128;
 
-constexpr size_t kDeviceDirectoryMaxSize   = 256;
-constexpr size_t kLocationDirectoryMaxSize = 64;
-
 class AttrAccess : public AttributeAccessInterface
 {
 public:
@@ -264,7 +261,6 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() < kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
 }
@@ -282,17 +278,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[key] = std::move(aLocation);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EcosystemInformationServer::RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs)
-{
-    auto it = mDevicesMap.find(aEndpoint);
-    VerifyOrReturnError((it != mDevicesMap.end()), CHIP_ERROR_INVALID_ARGUMENT);
-    auto & deviceInfo = it->second;
-    deviceInfo.mRemovedOn.SetValue(aEpochUs);
     return CHIP_NO_ERROR;
 }
 
@@ -300,8 +286,6 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::RemovedOn::Id:
-        return EncodeRemovedOnAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::DeviceDirectory::Id:
         return EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::LocationDirectory::Id:
@@ -320,28 +304,6 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EcosystemInformationServer::EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder)
-{
-    auto it = mDevicesMap.find(aEndpoint);
-    if (it == mDevicesMap.end())
-    {
-        // We are always going to be given a valid endpoint. If the endpoint
-        // doesn't exist in our map that indicate that the cluster was not
-        // added on this endpoint, hence UnsupportedCluster.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-    }
-
-    auto & deviceInfo = it->second;
-    if (!deviceInfo.mRemovedOn.HasValue())
-    {
-        aEncoder.EncodeNull();
-        return CHIP_NO_ERROR;
-    }
-
-    aEncoder.Encode(deviceInfo.mRemovedOn.Value());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder)
 {
 
@@ -355,7 +317,7 @@ CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId
     }
 
     auto & deviceInfo = it->second;
-    if (deviceInfo.mDeviceDirectory.empty() || deviceInfo.mRemovedOn.HasValue())
+    if (deviceInfo.mDeviceDirectory.empty())
     {
         return aEncoder.EncodeEmptyList();
     }
@@ -381,7 +343,7 @@ CHIP_ERROR EcosystemInformationServer::EncodeLocationStructAttribute(EndpointId 
     }
 
     auto & deviceInfo = it->second;
-    if (deviceInfo.mLocationDirectory.empty() || deviceInfo.mRemovedOn.HasValue())
+    if (deviceInfo.mLocationDirectory.empty())
     {
         return aEncoder.EncodeEmptyList();
     }

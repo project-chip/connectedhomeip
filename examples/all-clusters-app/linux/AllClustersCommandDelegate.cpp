@@ -19,7 +19,9 @@
 #include "AllClustersCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
@@ -246,6 +248,24 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     }
 }
 
+void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
+{
+    Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
+    event.occupancy         = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
+    EventNumber eventNumber = 0;
+
+    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to log OccupancyChanged event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Logged OccupancyChanged(occupancy=%u) on Endpoint %u", static_cast<unsigned>(occupancyValue),
+                        static_cast<unsigned>(endpointId));
+    }
+}
+
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -406,6 +426,20 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateLatchPosition")
     {
         HandleSimulateLatchPosition(self->mJsonValue);
+    }
+    else if (name == "SetOccupancy")
+    {
+        uint8_t occupancy     = static_cast<uint8_t>(self->mJsonValue["Occupancy"].asUInt());
+        EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+
+        if (1 == occupancy || 0 == occupancy)
+        {
+            self->HandleSetOccupancyChange(endpointId, occupancy);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
+        }
     }
     else
     {
@@ -766,6 +800,71 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
+    }
+}
+
+void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
+{
+    BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
+
+    if (static_cast<BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(newOccupancyValue) == currentOccupancy)
+    {
+        ChipLogDetail(NotSpecified, "Skipping setting occupancy changed due to same value.");
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, newOccupancyValue);
+    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u", newOccupancyValue);
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
+        return;
+    }
+
+    EmitOccupancyChangedEvent(endpointId, newOccupancyValue);
+
+    if (1 == newOccupancyValue)
+    {
+        uint16_t * holdTime = chip::app::Clusters::OccupancySensing::GetHoldTimeForEndpoint(endpointId);
+        if (holdTime != nullptr)
+        {
+            CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler,
+                reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
+            ChipLogDetail(NotSpecified, "Start HoldTime timer");
+            if (CHIP_NO_ERROR != err)
+            {
+                ChipLogError(NotSpecified, "Failed to start HoldTime timer.");
+            }
+        }
+    }
+}
+
+void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    EndpointId endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState));
+    chip::BitMask<Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
+
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    uint8_t clearValue = 0;
+    if (!currentOccupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied))
+    {
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, clearValue);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Failed to set occupancy state.");
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
+        EmitOccupancyChangedEvent(endpointId, clearValue);
     }
 }
 

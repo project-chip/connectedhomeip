@@ -27,7 +27,9 @@ declare_args() {
   #   - check:    runs BOTH datamodel and non-data-model (if possible) functionality and compares results
   #   - enabled:  runs only the data model interface (does not use the legacy code)
   if (current_os == "linux") {
-    chip_use_data_model_interface = "check"
+    # "check" is broken, see https://github.com/project-chip/connectedhomeip/issues/35306
+    #chip_use_data_model_interface = "check"
+    chip_use_data_model_interface = "disabled"
   } else {
     chip_use_data_model_interface = "disabled"
   }

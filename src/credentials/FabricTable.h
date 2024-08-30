@@ -737,6 +737,18 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
+     * @brief If a newly-added fabric is pending, this returns its index, or kUndefinedFabricIndex if none are pending.
+     *
+     * A newly-added fabric is pending if AddNOC has been previously called successfully but the
+     * fabric is not yet fully committed by CommissioningComplete.
+     *
+     * NOTE: that this never returns a value other than kUndefinedFabricIndex when UpdateNOC is pending.
+     *
+     * @return the fabric index of the pending fabric, or kUndefinedFabricIndex if no fabrics are pending.
+     */
+    FabricIndex GetPendingNewFabricIndex() const;
+
+    /**
      * @brief Returns the operational keystore. This is used for
      *        CASE and the only way the keystore should be used.
      *
@@ -967,6 +979,11 @@ public:
     // get copied (directly) into the fabric table.
     CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                    const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
+
+    // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
+    // get copied (directly) into the fabric table. The fabric will NOT be committed, and will remain pending.
+    CHIP_ERROR AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
+                                              const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
 
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.

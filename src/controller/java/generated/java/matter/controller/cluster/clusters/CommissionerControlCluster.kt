@@ -130,8 +130,6 @@ class CommissionerControlCluster(
   suspend fun commissionNode(
     requestId: ULong,
     responseTimeoutSeconds: UShort,
-    ipAddress: ByteArray?,
-    port: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): ReverseOpenCommissioningWindow {
     val commandId: UInt = 1u
@@ -144,12 +142,6 @@ class CommissionerControlCluster(
 
     val TAG_RESPONSE_TIMEOUT_SECONDS_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_RESPONSE_TIMEOUT_SECONDS_REQ), responseTimeoutSeconds)
-
-    val TAG_IP_ADDRESS_REQ: Int = 2
-    ipAddress?.let { tlvWriter.put(ContextSpecificTag(TAG_IP_ADDRESS_REQ), ipAddress) }
-
-    val TAG_PORT_REQ: Int = 3
-    port?.let { tlvWriter.put(ContextSpecificTag(TAG_PORT_REQ), port) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

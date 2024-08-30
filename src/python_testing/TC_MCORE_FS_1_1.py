@@ -45,11 +45,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.port = 5543
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting application to acts mock a server portion of TH_FSA")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("Started application to acts mock a server portion of TH_FSA")
         time.sleep(3)
 

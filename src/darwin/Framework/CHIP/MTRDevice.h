@@ -37,13 +37,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * TODO: Document usage better
+ * Get an MTRDevice object representing a device with a specific node ID
+ * associated with a specific controller.
  *
- * Directly instantiate a MTRDevice with a MTRDeviceController as a shim.
- *
- * All device-specific information would be stored on the device controller, and
- * retrieved when performing actions using a combination of MTRBaseDevice
- * and MTRAsyncCallbackQueue.
+ * MTRDevice objects are stateful, and callers should hold on to the MTRDevice
+ * while they are using it.
  */
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
