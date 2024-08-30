@@ -619,7 +619,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
                 test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=unavailableScenarios[0],
-                                                                 name="Preset", coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                                                                 coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
 
                 # Send the AtomicRequest begin command
                 await self.send_atomic_request_begin_command()
@@ -634,6 +634,29 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
+
+            # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
+            presetScenarioHeadroom = list([presetType.presetScenario,
+                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)] for presetType in presetTypes)
+
+            if len(presetScenarioHeadroom) > 0:
+                # Find the preset scenario with the fewest number of remaining allowed presets
+                presetScenarioHeadroom = sorted(presetScenarioHeadroom, key=lambda diff: diff[1])
+                presetScenario = presetScenarioHeadroom[0][0]
+                headroom = presetScenarioHeadroom[0][1]
+
+                # Add one more preset than is allowed by the preset type
+                test_presets = copy.deepcopy(current_presets)
+                for _ in range(0, headroom + 1):
+                    test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetScenario,
+                                                                     coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+
+                await self.send_atomic_request_begin_command()
+
+                await self.write_presets(endpoint=endpoint, presets=test_presets, expected_status=Status.ResourceExhausted)
+
+                # Clear state for next test.
+                await self.send_atomic_request_rollback_command()
 
             # Calculate the length of the Presets list that could be created using the preset scenarios in PresetTypes and numberOfPresets supported for each scenario.
             totalExpectedPresetsLength = sum(presetType.numberOfPresets for presetType in presetTypes)
