@@ -62,7 +62,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             TestStep("6", "TH reads from the DUT the EstimatedHeatRequired attribute.",
                      "Verify that the DUT response contains an energy-mWh value that is greater or equal to 0."),
             TestStep("7", "TH reads from the DUT the TankPercentage attribute.",
-                     "Verify that the DUT response contains a percent value that is between 0 and 100."),
+                     "Verify that the DUT response contains a percent value that is between 0 and 100 inclusive."),
             TestStep("8", "TH reads from the DUT the BoostState attribute.",
                      "Verify that the DUT response contains a BoostStateEnum (enum8) value that is less than or equal to 1."),
         ]
