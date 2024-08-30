@@ -18,6 +18,7 @@
 
 #include "CommissionerDeclarationHandler.h"
 
+#include "CastingPlayer.h"
 #include "Types.h"
 #include "support/ChipDeviceEventHandler.h"
 #include <app/server/Server.h>
@@ -50,6 +51,25 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     support::ChipDeviceEventHandler::SetUdcStatus(false);
 
+    // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
+    if (cd.GetCancelPasscode())
+    {
+        ChipLogProgress(AppServer,
+                        "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), Got CancelPasscode parameter, "
+                        "CastingPlayer/Commissioner user has decided to exit the commissioning attempt. Connection aborted.");
+        // Since the user has decided to exit the commissioning process on the CastingPlayer/Commissioner, we cancel the ongoing
+        // connection attempt without notifying the CastingPlayer/Commissioner.
+        if (auto sharedPtr = mTargetCastingPlayer.lock())
+        {
+            CHIP_ERROR err = sharedPtr->StopConnecting(false);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() Failed to StopConnecting");
+            }
+        }
+    }
+
     if (mCmmissionerDeclarationCallback_)
     {
         mCmmissionerDeclarationCallback_(source, cd);
@@ -62,10 +82,14 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
 }
 
 void CommissionerDeclarationHandler::SetCommissionerDeclarationCallback(
-    matter::casting::core::CommissionerDeclarationCallback callback)
+    matter::casting::core::CommissionerDeclarationCallback callback, memory::Weak<CastingPlayer> castingPlayer)
 {
     ChipLogProgress(AppServer, "CommissionerDeclarationHandler::SetCommissionerDeclarationCallback()");
-    mCmmissionerDeclarationCallback_ = std::move(callback);
+    if (callback != nullptr)
+    {
+        mCmmissionerDeclarationCallback_ = std::move(callback);
+    }
+    mTargetCastingPlayer = castingPlayer;
 }
 
 } // namespace core

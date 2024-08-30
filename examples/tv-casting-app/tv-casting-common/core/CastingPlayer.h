@@ -207,12 +207,14 @@ public:
     /**
      * @brief This cancels the CastingPlayer/Commissioner-Generated passcode commissioning flow started via the
      * VerifyOrEstablishConnection() API above. It constructs and sends an IdentificationDeclaration message to the
-     * CastingPlayer/Commissioner containing CancelPasscode set to true. It is used to indicate that the user, and thus the
-     * Client/Commissionee, have cancelled the commissioning process. This indicates that the CastingPlayer/Commissioner can dismiss
-     * any dialogs corresponding to commissioning, such as a Passcode input dialog or a Passcode display dialog.
-     * Note: stopConnecting() does not call the ConnectCallback() callback passed to the VerifyOrEstablishConnection() API above
-     * since no connection is established.
-     * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and an error otherwise.
+     * CastingPlayer/Commissioner containing CancelPasscode set to true. It is used to indicate that the Client/Commissionee user
+     * has cancelled the commissioning process. This indicates that the CastingPlayer/Commissioner can dismiss any dialogs
+     * corresponding to commissioning, such as a Passcode input dialog or a Passcode display dialog. Note: StopConnecting() does not
+     * call the ConnectCallback() callback passed to the VerifyOrEstablishConnection() API above since no connection is established.
+     * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and CHIP_ERROR_INCORRECT_STATE.
+     * otherwise. StopConnecting() can only be called by the client during the CastingPlayer/Commissioner-Generated passcode
+     * commissioning flow. Calling StopConnecting() during the Client/Commissionee-Generated commissioning flow will return a
+     * CHIP_ERROR_INCORRECT_STATE error.
      */
     CHIP_ERROR StopConnecting();
 
@@ -295,6 +297,28 @@ private:
     static memory::Weak<CastingPlayer> mTargetCastingPlayer;
     uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted            = {};
+    bool mClientProvidedCommissionerDeclarationCallback;
+
+    /**
+     * @brief This internal version of the StopConnecting API cancels the Client/Commissionee-Generated passcode or the
+     * CastingPlayer/Commissioner-Generated passcode commissioning flow started via the VerifyOrEstablishConnection() API above.
+     * Furthermore, StopConnecting operates in two ways as governed by the shouldSendIdentificationDeclarationMessage flag:
+     * 1. If shouldSendIdentificationDeclarationMessage is true. StopConnecting constructs and sends an IdentificationDeclaration
+     * message to the CastingPlayer/Commissioner containing CancelPasscode set to true. The CancelPasscode flag set to true conveys
+     * that the Client/Commissionee user has cancelled the commissioning session. This indicates that the CastingPlayer/Commissioner
+     * can dismiss any dialogs corresponding to commissioning, such as a Passcode input dialog or a Passcode display dialog. In this
+     * case, since StopConnecting was called by the Client/Commissionee, StopConnecting() does not call the ConnectCallback()
+     * callback passed to the VerifyOrEstablishConnection().
+     * 2. If shouldSendIdentificationDeclarationMessage is false. StopConnecting does not send an IdentificationDeclaration message
+     * to the CastingPlayer/Commissioner since the CastingPlayer/Commissioner notified the Client/Commissionee that the connection
+     * is aborted. If the (Optional) ConnectionCallbacks mCommissionerDeclarationCallback is not set, it calls ConnectionCallbacks
+     * mOnConnectionComplete callback with CHIP_ERROR_CONNECTION_ABORTED.
+     * @param shouldSendIdentificationDeclarationMessage if true, send the IdentificationDeclaration message to the CastingPlayer
+     * with CancelPasscode set to true. If false, only call the ConnectionCallbacks mCommissionerDeclarationCallback callback passed
+     * to the VerifyOrEstablishConnection() API above, without sending the IdentificationDeclaration message.
+     * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and an error otherwise.
+     */
+    CHIP_ERROR StopConnecting(bool shouldSendIdentificationDeclarationMessage);
 
     /**
      * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it
@@ -329,6 +353,7 @@ private:
     // and connect to a CastingPlayer
     friend class support::ChipDeviceEventHandler;
 
+    friend class CommissionerDeclarationHandler;
     friend class ConnectionContext;
     friend class support::EndpointListLoader;
 };

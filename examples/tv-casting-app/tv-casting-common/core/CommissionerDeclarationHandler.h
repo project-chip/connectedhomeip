@@ -48,7 +48,7 @@ public:
     /**
      * @brief OnCommissionerDeclarationMessage() will call the CommissionerDeclarationCallback set by this function.
      */
-    void SetCommissionerDeclarationCallback(CommissionerDeclarationCallback callback);
+    void SetCommissionerDeclarationCallback(CommissionerDeclarationCallback callback, memory::Weak<CastingPlayer> castingPlayer);
 
     /**
      * @brief returns true if the CommissionerDeclarationHandler sigleton has a CommissionerDeclarationCallback set, false
@@ -59,6 +59,7 @@ public:
 private:
     static CommissionerDeclarationHandler * sCommissionerDeclarationHandler_;
     CommissionerDeclarationCallback mCmmissionerDeclarationCallback_;
+    memory::Weak<CastingPlayer> mTargetCastingPlayer;
 
     CommissionerDeclarationHandler() {}
     ~CommissionerDeclarationHandler() {}
