@@ -21,7 +21,7 @@ package matter.controller
 /** Class for holding ICD Client information. */
 data class ICDClientInfo(
   val peerNodeId: Long,
-  val checkInNodeId: Long
+  val checkInNodeId: Long,
   val startCounter: Long,
   val offset: Long,
   val monitoredSubject: Long,
