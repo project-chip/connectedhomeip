@@ -1,5 +1,3 @@
-:hidden:
-
 # CHIP Linux Lighting Example (Data Mode, No Unique ID)
 
 An example was created to perform TC-MCORE-FS-1.3 test. This is a copy of
@@ -11,6 +9,13 @@ An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
+
+```{toctree}
+:orphan:
+
+*
+
+```
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
