@@ -108,7 +108,7 @@ class TC_SwitchTests(MatterBaseTest):
         command_dict = {"Name": "SimulateSwitchIdle", "EndpointId": endpoint_id}
         self._send_named_pipe_command(command_dict)
 
-    def _ask_for_switch_idle(self, endpoint_id: int, omit_for_simulator: bool=False):
+    def _ask_for_switch_idle(self, endpoint_id: int, omit_for_simulator: bool = False):
         if not self._use_button_simulator():
             self.wait_for_user_input(prompt_msg="Ensure switch is idle")
         elif not omit_for_simulator:
