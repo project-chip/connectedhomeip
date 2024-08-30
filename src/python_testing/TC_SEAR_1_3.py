@@ -126,7 +126,6 @@ class TC_SEAR_1_3(MatterBaseTest):
             return
 
         valid_areas = self.matter_test_config.global_test_params['PIXIT.SEAR.VALID_AREAS']
-        print(f"REMOVE ME: valid_areas json = {valid_areas}")
 
         if self.check_pics("SEAR.S.M.INVALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that prevents it from executing the SelectAreas command"
