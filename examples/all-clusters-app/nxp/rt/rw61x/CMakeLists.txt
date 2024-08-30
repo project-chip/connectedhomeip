@@ -14,6 +14,11 @@
 #   limitations under the License.
 #
 
+# ****************************************************************
+# Notice :
+# This CMakeLists.txt allows to build a Matter application where the pre and post build actions
+# are processed with cmake and the build is performed with GN build system.
+
 cmake_minimum_required(VERSION 3.13.1)
 
 project(chip-rw61x-all-cluster-example)

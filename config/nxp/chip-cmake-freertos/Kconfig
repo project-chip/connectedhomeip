@@ -1,0 +1,118 @@
+#
+#   Copyright (c) 2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+rsource "../cmake/Kconfig.matter.common"
+rsource "../cmake/Kconfig.matter.nxp"
+rsource "Kconfig.features"
+rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
+
+if CHIP
+
+config APP_FREERTOS_OS
+	bool "FreeRTOS Application OS"
+	default y
+	help
+		When enabled this will differentiate between FreeRTOS and Zephyr in common NXP app code.
+
+choice CHIP_NXP_PLATFORM_SELECTION
+	prompt "CHIP NXP platform selection"
+	config CHIP_NXP_PLATFORM_RW61X
+		bool "RW61x platform"
+		depends on MCUX_HW_DEVICE_RW612 || MCUX_HW_DEVICE_RW610
+		help
+			NXP RW61x platform.
+		    
+	config CHIP_NXP_PLATFORM_RT1170
+		bool "RT1170 platform"
+		depends on MCUX_HW_DEVICE_MIMXRT1171 || MCUX_HW_DEVICE_MIMXRT1172 || MCUX_HW_DEVICE_MIMXRT1173 || MCUX_HW_DEVICE_MIMXRT1175 || MCUX_HW_DEVICE_MIMXRT1176
+		help
+			NXP RT1170 platform.
+		
+	config CHIP_NXP_PLATFORM_RT1060
+		bool "RT1060 platform"
+		depends on MCUX_HW_DEVICE_MIMXRT1061 || MCUX_HW_DEVICE_MIMXRT1062
+		help
+			NXP RT1060 platform.
+endchoice # CHIP_NXP_PLATFORM_SELECTION
+
+config CHIP_NXP_PLATFORM_FOLDER_NAME
+	string "NXP platform folder name"
+	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
+	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
+	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
+	default "not specified"
+	help
+		Defines the platform folder name to be used.
+
+choice CHIP_NVM_COMPONENT
+	prompt "NVM Component selection"
+	default CHIP_NVM_COMPONENT_NVS
+	
+	config CHIP_NVM_COMPONENT_NVS
+		bool "NVS"
+		help
+			Use NVS component to store CHIP data.
+
+	config CHIP_NVM_COMPONENT_LITTLEFS
+		bool "LittleFS"
+		help
+			Use LittleFS component to store CHIP data. 
+		
+	config CHIP_NVM_COMPONENT_KEYSTORAGE
+		bool "Key Storage"
+		help
+			Use the KeyStorage component to store CHIP data.
+
+	config CHIP_NVM_COMPONENT_NVMFWK
+		bool "NVM Framework"
+		help
+			Use the NVM Framework component to store CHIP data.
+endchoice	
+
+choice CHIP_CRYPTO
+	prompt "CHIP Crypto selection"
+	default CHIP_CRYPTO_MBEDTLS
+	
+	config CHIP_CRYPTO_MBEDTLS
+		bool "CHIP MbeTLS crypto"
+		help
+			Use mbedtls for the crypto.
+	
+	config CHIP_CRYPTO_PLATFORM
+		bool "CHIP platform crypto"
+		help
+			Use platform crypto.
+
+	config CHIP_CRYPTO_PSA
+		bool "CHIP PSA crypto"
+		help
+			Use PSA API for crypto.
+endchoice
+
+# Thread network features
+
+if NET_L2_OPENTHREAD
+
+endif # NET_L2_OPENTHREAD
+
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	help
+		If disabled, it allows to build NXP SDK application
+	  	with IPv4 support independently of the Matter stack still
+	  	running over IPv6.
+
+endif # CHIP
