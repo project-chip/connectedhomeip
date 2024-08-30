@@ -1,8 +1,9 @@
 # CHIP Linux Lighting Example (Data Mode, No Unique ID)
 
-An example was created to perform TC-MCORE-FS-1.3 test. This is a copy of original CHIP Linux Lighting Example.
-The difference is that this example does not use UniqueID for the device, and Revision of
-the device is kept to revision where it is allowed.
+An example was created to perform TC-MCORE-FS-1.3 test. This is a copy of
+original CHIP Linux Lighting Example. The difference is that this example does
+not use UniqueID for the device, and Revision of the device is kept to revision
+where it is allowed.
 
 An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
