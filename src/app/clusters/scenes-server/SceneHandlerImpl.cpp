@@ -121,8 +121,16 @@ void CapAttributeValue(typename app::NumericAttributeTraits<Type>::WorkingType &
 
     if (metadata->IsBoolean())
     {
-        // Caping the value to 1 in case values greater than 1 are set
-        value = value ? 1 : 0;
+        if (metadata->IsNullable() && (value != 1 && value != 0))
+        {
+            // If the attribute is nullable, the value can be set to NULL
+            app::NumericAttributeTraits<WorkingType>::SetNull(value);
+        }
+        else
+        {
+            // Caping the value to 1 in case values greater than 1 are set
+            value = value ? 1 : 0;
+        }
         return;
     }
 
@@ -134,6 +142,10 @@ void CapAttributeValue(typename app::NumericAttributeTraits<Type>::WorkingType &
         maxValue                                        = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->maxValue);
     }
 
+    // If the attribute is nullable, the min and max values calculated for types will not be valid, however this does not
+    // change the behavior here as the value will already be NULL if it is out of range. E.g. a nullable INT8U has a minValue of
+    // -127. The code above determin minValue = -128, so an input value of -128 would not enter the condition block below, but would
+    // be considered NULL nonetheless.
     if (metadata->IsNullable() && (minValue > value || maxValue < value))
     {
         // If the attribute is nullable, the value can be set to NULL

@@ -176,7 +176,7 @@ static EmberAfAttributeMetadata mockMetadataBool = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint8 = {
@@ -1065,7 +1065,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         MockCCPairs[5].attributeID = MockAttributeId(kEnhancedColorMode);
         MockCCPairs[5].valueSigned8.SetValue(static_cast<int8_t>(-2)); // will cap to -1
         MockCCPairs[6].attributeID = MockAttributeId(kColorLoopActiveId);
-        MockCCPairs[6].valueSigned16.SetValue(static_cast<int16_t>(0x7FFE)); // will cap to 0x7FFD in int16
+        MockCCPairs[6].valueSigned16.SetValue(
+            static_cast<int16_t>(0x7FFE)); // will cap to 0x7FFD in int16 due to declared maximum in the attribute's mock metadata
         MockCCPairs[7].attributeID = MockAttributeId(kColorLoopDirectionId);
         MockCCPairs[7].valueSigned32.SetValue(-1); // will cap to -1 in int24
         MockCCPairs[8].attributeID = MockAttributeId(kColorLoopTimeId);
@@ -1279,9 +1280,9 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Verify that the output value is capped to uint40 max value
         uint64_t uint40Max = static_cast<uint64_t>(0x000000FFFFFFFFFF);
-        EXPECT_EQ(uint40Max, static_cast<uint64_t>(extensionFieldValueCapOut.attributeValueList[0].valueUnsigned64.Value()));
+        EXPECT_EQ(uint40Max, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned64.Value());
 
-        // Verify that the output value is not capped
+        // Verify that the output value is capped to int40 max value
         int64_t int40Max = static_cast<int64_t>(0x0000007FFFFFFFFF);
         EXPECT_EQ(int40Max, extensionFieldValueCapOut.attributeValueList[1].valueSigned64.Value());
 
