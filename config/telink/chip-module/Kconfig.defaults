@@ -113,6 +113,7 @@ config GPIO
 # Bluetooth Low Energy configs
 
 config BT
+    default n if SOC_SERIES_RISCV_TELINK_TLX
     default y
 
 if BT
