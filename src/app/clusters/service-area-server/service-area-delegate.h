@@ -56,7 +56,8 @@ public:
      * @param[out] statusText text describing why the selected locations cannot be set (if return is false).
      * Max size kMaxSizeStatusText.
      * Note: If the return is false and statusText is not successfully set, for example due to a string that can be longer than
-     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized memory.
+     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized
+     * memory.
      * @return true if the current device state allows selected locations to be set by user.
      *
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
@@ -77,7 +78,8 @@ public:
      * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see description above). Max size kMaxSizeStatusText.
      * Note: If the return is false and statusText is not successfully set, for example due to a string that can be longer than
-     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized memory.
+     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized
+     * memory.
      * @return true if success.
      *
      * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
@@ -92,7 +94,8 @@ public:
      * @param[in] skippedArea the area ID to skip.
      * @param[out] skipStatusText text describing why the current location cannot be skipped. Max size kMaxSizeStatusText.
      * Note: If the return is false and skipStatusText is not successfully set, for example due to a string that can be longer than
-     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized memory.
+     * kMaxSizeStatusText, the size of this value should be set to 0 with .reduce_size(0) to avoid callers using un-initialized
+     * memory.
      * @return true if command is successful, false if the received skip request cannot be handled due to the current mode of the
      * device.
      *
