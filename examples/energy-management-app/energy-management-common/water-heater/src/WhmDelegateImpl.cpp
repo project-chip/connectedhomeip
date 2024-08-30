@@ -308,7 +308,7 @@ int16_t WaterHeaterManagementDelegate::GetActiveTargetWaterTemperature() const
     // time, and the TemporarySetpoint (if not null) would be overiding the thermostat's occupiedHeatingSetpoint.
     // However, this code doesn't rely upon the thermostat cluster.
     int16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
-        ? static_cast<int16_t>(mBoostTemporarySetpoint.Value())
+        ? mBoostTemporarySetpoint.Value()
         : mTargetWaterTemperature;
 
     return targetTemperature;
