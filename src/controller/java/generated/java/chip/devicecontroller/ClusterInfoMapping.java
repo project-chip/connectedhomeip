@@ -29046,12 +29046,6 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo = new CommandParameterInfo("responseTimeoutSeconds", Integer.class, Integer.class);
     commissionerControlcommissionNodeCommandParams.put("responseTimeoutSeconds",commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo);
-
-    CommandParameterInfo commissionerControlcommissionNodeipAddressCommandParameterInfo = new CommandParameterInfo("ipAddress", Optional.class, byte[].class);
-    commissionerControlcommissionNodeCommandParams.put("ipAddress",commissionerControlcommissionNodeipAddressCommandParameterInfo);
-
-    CommandParameterInfo commissionerControlcommissionNodeportCommandParameterInfo = new CommandParameterInfo("port", Optional.class, Integer.class);
-    commissionerControlcommissionNodeCommandParams.put("port",commissionerControlcommissionNodeportCommandParameterInfo);
     InteractionInfo commissionerControlcommissionNodeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CommissionerControlCluster) cluster)
@@ -29061,12 +29055,6 @@ public class ClusterInfoMapping {
 
            , (Integer)
              commandArguments.get("responseTimeoutSeconds")
-
-           , (Optional<byte[]>)
-             commandArguments.get("ipAddress")
-
-           , (Optional<Integer>)
-             commandArguments.get("port")
 
             );
         },

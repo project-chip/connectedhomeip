@@ -221,7 +221,9 @@ class TestRunnerHooks():
     def show_prompt(self,
                     msg: str,
                     placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    default_value: Optional[str] = None,
+                    endpoint_id: Optional[int] = None,
+                    ) -> None:
         """
         This method is called when the step needs to ask the user to perform some action or provide some value.
         """

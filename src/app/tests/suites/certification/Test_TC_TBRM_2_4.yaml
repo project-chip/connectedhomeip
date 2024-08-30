@@ -1,0 +1,86 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    "[TC-TBRM-2.4] Verify that getting Active or Pending Dataset in the PASE
+    session results in unsupported access"
+
+PICS:
+    - TBRM.S
+
+config:
+    nodeId: 0x12344321
+
+    payload: "MT:-24J0AFN00KA0648G00"
+    discriminator: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: DelayCommands
+      command: WaitForCommissionee
+      arguments:
+          values:
+              - name: nodeId
+                value: nodeId
+
+    - label: "Open Commissioning Window"
+      endpoint: 0
+      cluster: Administrator Commissioning
+      command: OpenCommissioningWindow
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: CommissioningTimeout
+                value: 180
+              - name: PAKEPasscodeVerifier
+                value: PakeVerifier
+              - name: Discriminator
+                value: discriminator
+              - name: Iterations
+                value: 1000
+              - name: Salt
+                value: "SPAKE2P Key Salt"
+
+    - label: "TH2  establishes a PASE session with the DUT"
+      identity: beta
+      cluster: CommissionerCommands
+      endpoint: 0
+      command: EstablishPASESession
+      arguments:
+          values:
+              - name: nodeId
+                value: nodeId
+              - name: payload
+                value: payload
+
+    - label:
+          "TH2 send GetActiveDatasetRequest command to the DUT in PASE session"
+      identity: beta
+      cluster: Thread Border Router Management
+      endpoint: 1
+      command: GetActiveDatasetRequest
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH2 send GetPendingDatasetRequest command to the DUT in PASE session"
+      identity: beta
+      cluster: Thread Border Router Management
+      endpoint: 1
+      command: GetPendingDatasetRequest
+      response:
+          error: UNSUPPORTED_ACCESS
