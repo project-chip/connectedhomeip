@@ -108,9 +108,15 @@ class TC_SwitchTests(MatterBaseTest):
         command_dict = {"Name": "SimulateLatchPosition", "EndpointId": endpoint_id, "PositionId": new_position}
         self._send_named_pipe_command(command_dict)
 
-    def _ask_for_switch_idle(self):
+    def _send_switch_idle_named_pipe_command(self, endpoint_id: int):
+        command_dict = {"Name": "SimulateSwitchIdle", "EndpointId": endpoint_id}
+        self._send_named_pipe_command(command_dict)
+
+    def _ask_for_switch_idle(self, endpoint_id: int, omit_for_simulator: bool = False):
         if not self._use_button_simulator():
             self.wait_for_user_input(prompt_msg="Ensure switch is idle")
+        elif not omit_for_simulator:
+            self._send_switch_idle_named_pipe_command(endpoint_id)
 
     def _ask_for_switch_position(self, endpoint_id: int, new_position: int):
         if not self._use_button_simulator():
@@ -294,7 +300,6 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 3: Operator sets switch to first position on the DUT.
         self.step(3)
         self._ask_for_switch_position(endpoint_id, new_position=0)
-        event_listener.flush_events()
 
         # Step 4: TH reads the CurrentPosition attribute from the DUT.
         # Verify that the value is 0.
@@ -400,7 +405,7 @@ class TC_SwitchTests(MatterBaseTest):
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id)
 
         self.step(4)
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
@@ -493,7 +498,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 3: Operator does not operate switch on the DUT
         self.step(3)
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id)
 
         # Step 4: TH reads the CurrentPosition attribute from the DUT
         self.step(4)
@@ -520,7 +525,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # - if MSL feature is supported, expect to see LongPress/LongRelease in that order.
         if not has_msl_feature:
-            logging.info("Since MSL and AS features both unsupported, skipping check for LongPress/LongRelease")
+            logging.info("Since MSL feature unsupported, skipping check for LongPress/LongRelease")
         else:
             # - TH expects report of LongPress, LongRelease in that order.
             logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
@@ -570,13 +575,13 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep("6b", "Operator repeat step 4a 3 times quickly",
                          """
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
+                         * If MSR supported, Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
                          * Verify that the TH receives MultiPressOngoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
+                         * If MSR supported, Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
                          * Verify that the TH receives MultiPressOngoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT +
+                         * If MSR supported, Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT +
 
                          The events sequence from the subscription SHALL follow the same sequence as expressed above, in the exact order of events specified.
                          """),
@@ -593,11 +598,11 @@ class TC_SwitchTests(MatterBaseTest):
                          """
 
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
+                         * If MSR supported, Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
 
                          * Verify that the TH receives MultiPressOngoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
+                         * If MSR supported, verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH does not receive LongPress event from the DUT
                          * Verify that the TH does not receive LongRelease event from the DUT
 
@@ -618,7 +623,7 @@ class TC_SwitchTests(MatterBaseTest):
                          * Verify that the TH receives (one, not more than one) LongPress event with NewPosition set to 1 from the DUT
                          * Verify that the TH receives LongRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
-                         * Verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
+                         * If MSR supported, verify that the TH receives ShortRelease event with PreviousPosition set to 1 from the DUT
                          * Verify that the TH does not receive MultiPressOngoing event from the DUT
 
                          The events sequence from the subscription SHALL follow the same sequence as expressed above, in the exact order of events specified.
@@ -642,6 +647,7 @@ class TC_SwitchTests(MatterBaseTest):
         cluster = Clusters.Switch
         feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress)
+        has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease)
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
         endpoint_id = self.matter_test_config.endpoint
@@ -652,7 +658,7 @@ class TC_SwitchTests(MatterBaseTest):
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id)
 
         def test_multi_press_sequence(starting_step: str, count: int, short_long: bool = False):
             step = starting_step
@@ -672,12 +678,13 @@ class TC_SwitchTests(MatterBaseTest):
                     asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on MultiPressOngoing")
                     asserts.assert_equal(event.currentNumberOfPressesCounted, pos_idx + 1,
                                          "Unexpected CurrentNumberOfPressesCounted on MultiPressOngoing")
-                event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
-                asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
+                if has_msr_feature:
+                    event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
+                    asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
 
             step = bump_substep(step)
             self.step(step)
-            self._ask_for_switch_idle()
+            self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
             event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
             asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
             asserts.assert_equal(event.totalNumberOfPressesCounted, count, "Unexpected count on MultiPressComplete")
@@ -719,13 +726,15 @@ class TC_SwitchTests(MatterBaseTest):
 
         event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
         asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
-        event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
-        asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
+
+        if has_msr_feature:
+            event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
+            asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
 
         # Because this is a queue, we verify that no multipress ongoing is received by verifying that the next event is the multipress complete
 
         self.step("9b")
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
         event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
         asserts.assert_equal(event.totalNumberOfPressesCounted, 1, "Unexpected count on MultiPressComplete")
@@ -827,7 +836,7 @@ class TC_SwitchTests(MatterBaseTest):
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id)
 
         def test_multi_press_sequence(starting_step: str, count: int, short_long: bool = False):
             step = starting_step
@@ -845,7 +854,7 @@ class TC_SwitchTests(MatterBaseTest):
 
             step = bump_substep(step)
             self.step(step)
-            self._ask_for_switch_idle()
+            self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
             event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
             asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
             expected_count = 0 if count > multi_press_max else count
@@ -885,7 +894,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Verify that we don't receive the multi-press ongoing or short release by verifying that the next event in the sequence is the multi-press complete
         self.step("9b")
-        self._ask_for_switch_idle()
+        self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
         event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
         asserts.assert_equal(event.totalNumberOfPressesCounted, 1, "Unexpected count on MultiPressComplete")
