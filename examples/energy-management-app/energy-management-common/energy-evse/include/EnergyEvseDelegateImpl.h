@@ -77,7 +77,7 @@ public:
 
     /**
      * @brief This function updates the session Duration to allow read attributes to return latest values
-     * 
+     *
      * @param aEndpointId           - The endpoint to report the update on
      */
     void RecalculateSessionDuration(EndpointId aEndpointId);
