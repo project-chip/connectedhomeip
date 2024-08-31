@@ -45,6 +45,7 @@ namespace {
 
 CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 {
+    VerifyOrReturnValue(setUpCode, CHIP_ERROR_INVALID_ARGUMENT);
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     if (isQRCode)
     {

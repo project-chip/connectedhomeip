@@ -19,17 +19,10 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
+#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
-
-// system dependencies
-#import <XCTest/XCTest.h>
-
-// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1 \
-    --dac_provider credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json \
-    --product-id 32768 --discriminator 3839
-// For manual testing, CASE retry code paths can be tested by adding --faults chip_CASEServerBusy_f1 (or similar)
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -138,7 +131,7 @@ static MTRTestKeys * sTestKeys = nil;
 
 @end
 
-@interface MTRPairingTests : XCTestCase
+@interface MTRPairingTests : MTRTestCase
 @property (nullable) MTRPairingTestControllerDelegate * controllerDelegate;
 @end
 
@@ -146,6 +139,8 @@ static MTRTestKeys * sTestKeys = nil;
 
 + (void)setUp
 {
+    [super setUp];
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -170,6 +165,8 @@ static MTRTestKeys * sTestKeys = nil;
     sController = nil;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+
+    [super tearDown];
 }
 
 - (void)setUp
@@ -182,11 +179,37 @@ static MTRTestKeys * sTestKeys = nil;
 {
     [sController setDeviceControllerDelegate:(id _Nonnull) nil queue:dispatch_get_main_queue()]; // TODO: do we need a clearDeviceControllerDelegate API?
     self.controllerDelegate = nil;
+
+    [super tearDown];
+}
+
+- (void)startServerApp
+{
+    // For manual testing, CASE retry code paths can be tested by adding --faults chip_CASEServerBusy_f1 (or similar)
+    __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initWithAppName:@"all-clusters"
+                                                                    arguments:@[
+                                                                        @"--dac_provider",
+                                                                        [self absolutePathFor:@"credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json"],
+                                                                        @"--product-id",
+                                                                        @"32768",
+                                                                    ]
+                                                                      payload:kOnboardingPayload
+                                                                     testcase:self];
+    XCTAssertNotNil(appRunner);
 }
 
 // attestationDelegate and failSafeExtension can both be nil
 - (void)doPairingTestWithAttestationDelegate:(id<MTRDeviceAttestationDelegate>)attestationDelegate failSafeExtension:(NSNumber *)failSafeExtension
 {
+    [self doPairingTestWithAttestationDelegate:attestationDelegate failSafeExtension:failSafeExtension startServerApp:YES];
+}
+
+- (void)doPairingTestWithAttestationDelegate:(id<MTRDeviceAttestationDelegate>)attestationDelegate failSafeExtension:(NSNumber *)failSafeExtension startServerApp:(BOOL)startServerApp
+{
+    if (startServerApp) {
+        [self startServerApp];
+    }
+
     // Don't reuse node ids, because that will confuse us.
     ++sDeviceId;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning Complete"];
@@ -209,9 +232,6 @@ static MTRTestKeys * sTestKeys = nil;
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
     XCTAssertNil(controllerDelegate.commissioningCompleteError);
-
-    ResetCommissionee([MTRBaseDevice deviceWithNodeID:@(sDeviceId) controller:sController], dispatch_get_main_queue(), self,
-        kTimeoutInSeconds);
 }
 
 - (void)test001_PairWithoutAttestationDelegate
@@ -297,6 +317,8 @@ static MTRTestKeys * sTestKeys = nil;
 
 - (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger attestationDelegate:(nullable id<MTRDeviceAttestationDelegate>)attestationDelegate
 {
+    [self startServerApp];
+
     // Run pairing up and wait for the trigger
     [self doPairingAndWaitForProgress:trigger attestationDelegate:attestationDelegate];
 
@@ -314,7 +336,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqual(error.code, MTRErrorCodeCancelled);
 
     // Now pair again. If the previous attempt was cancelled correctly this should work fine.
-    [self doPairingTestWithAttestationDelegate:nil failSafeExtension:nil];
+    [self doPairingTestWithAttestationDelegate:nil failSafeExtension:nil startServerApp:NO];
 }
 
 - (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger
