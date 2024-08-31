@@ -563,6 +563,7 @@ forkpty
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FS
 fsl
 fstab
 fsync
@@ -855,6 +856,7 @@ MbedNewTarget
 mbedos
 mbedTarget
 mbedTLS
+MCORE
 mcu
 MCUboot
 mcumgr
