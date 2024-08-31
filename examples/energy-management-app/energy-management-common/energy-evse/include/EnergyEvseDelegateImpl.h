@@ -56,7 +56,7 @@ enum EVSEStateMachineEvent
 class EvseSession
 {
 public:
-    EvseSession() { }
+    EvseSession() {}
     /**
      * @brief This function records the start time and provided energy meter values as part of the new session.
      *

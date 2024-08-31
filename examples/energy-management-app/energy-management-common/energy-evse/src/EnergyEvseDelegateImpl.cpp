@@ -1688,7 +1688,6 @@ void EvseSession::StopSession(EndpointId aEndpointId, int64_t chargingMeterValue
     UpdateEnergyDischarged(aEndpointId, dischargingMeterValue);
 }
 
-
 /*---------------------- EvseSession functions --------------------------*/
 
 /**
