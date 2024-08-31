@@ -90,16 +90,30 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
             TestStep("14", "Wait 5 seconds"),
             TestStep("14a", "TH counts all report transactions with an attribute report for the SessionID attribute",
-                     "TH verifies that numberOfReportsReceived >= 1"),
+                     "TH verifies that numberOfReportsReceived = 0"),
             TestStep("14b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
             TestStep("14c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
             TestStep("14d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("15", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
+            TestStep("15", "Reset all accumulated report counts"),
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("17", "Wait 5 seconds"),
+            TestStep("17a", "TH counts all report transactions with an attribute report for the SessionID attribute",
+                     "TH verifies that numberOfReportsReceived = 1"),
+            TestStep("17b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
+                     "TH verifies that numberOfReportsReceived >= 1"),
+            TestStep("17c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
+                     "TH verifies that numberOfReportsReceived >= 1"),
+            TestStep("17d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
+                     "TH verifies that numberOfReportsReceived >= 1"),
+            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("16", "Cancel the subscription to the Device Energy Management cluster",
+            TestStep("20", "Cancel the subscription to the Device Energy Management cluster",
                      "The subscription is cancelled successfully"),
         ]
 
@@ -211,7 +225,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("14a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
         logging.info(f"Received {count} SessionID updates in {wait} seconds")
-        asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionID updates after a Unplugged operation")
+        asserts.assert_equal(count, 0, "Expected = 0 SessionID updates after a Unplugged operation - it changes on next plug-in")
 
         self.step("14b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
@@ -230,9 +244,47 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
             asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
 
         self.step("15")
+        sub_handler.reset()
+
+        self.step("16")
+        await self.send_test_event_trigger_pluggedin()
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVConnected)
+
+        self.step("17")
+        wait = 5  # We expect a change to the Session attributes after the EV is plugged in again, Wait 5 seconds - allow time for the report to come in
+        accumulate_reports(wait)
+
+        self.step("17a")
+        count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
+        logging.info(f"Received {count} SessionID updates in {wait} seconds")
+        asserts.assert_equal(count, 0, "Expected = 1 SessionID updates after a plug-in")
+
+        self.step("17b")
+        count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
+        logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
+        asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionDuration updates after a Unplugged operation")
+
+        self.step("17c")
+        count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
+        logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
+        asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyCharged updates after a Unplugged operation")
+
+        self.step("17d")
+        if has_v2x:
+            count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
+            logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
+            asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
+
+        self.step("18")
+        await self.send_test_event_trigger_pluggedin_clear()
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVNotDetected)
+
+        self.step("19")
         await self.send_test_event_trigger_basic_clear()
 
-        self.step("26")
+        self.step("20")
         await sub_handler.cancel()
 
 
