@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +16,35 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- * @brief The include file for all the types for the data model that are not
- *        dependent on an individual application configuration.
- */
-
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
-// Pull in core types
-#include <lib/core/DataModelTypes.h>
+struct RgbColor_t
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
 
-namespace chip {
+struct HsvColor_t
+{
+    uint8_t h;
+    uint8_t s;
+    uint8_t v;
+};
 
-typedef uint8_t Percent;
-typedef uint16_t Percent100ths;
-typedef int64_t Energy_mWh;
-typedef int64_t Amperage_mA;
-typedef int64_t Power_mW;
-typedef int64_t Voltage_mV;
+struct XyColor_t
+{
+    uint16_t x;
+    uint16_t y;
+};
 
-} // namespace chip
+struct CtColor_t
+{
+    uint16_t ctMireds;
+};
+
+RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
+RgbColor_t HsvToRgb(HsvColor_t hsv);
+RgbColor_t CTToRgb(CtColor_t ct);
