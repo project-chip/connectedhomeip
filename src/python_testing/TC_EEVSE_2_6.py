@@ -258,7 +258,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("17a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
         logging.info(f"Received {count} SessionID updates in {wait} seconds")
-        asserts.assert_equal(count, 0, "Expected = 1 SessionID updates after a plug-in")
+        asserts.assert_equal(count, 1, "Expected = 1 SessionID updates after a plug-in")
 
         self.step("17b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
