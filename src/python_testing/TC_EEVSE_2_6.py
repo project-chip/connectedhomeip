@@ -58,7 +58,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "Set up a subscription to the EnergyEVSE cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 10 and KeepSubscriptions set to false",
+            TestStep("4", "Set up a subscription to the EnergyEVSE cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 10 and KeepSubscriptions set to True",
                      "Subscription successfully established"),
             TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
@@ -129,7 +129,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         await sub_handler.start(self.default_controller, self.dut_node_id,
                                 self.matter_test_config.endpoint,
                                 min_interval_sec=0,
-                                max_interval_sec=10, keepSubscriptions=False)
+                                max_interval_sec=10, keepSubscriptions=True)
 
         def accumulate_reports(wait_time):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
@@ -143,8 +143,8 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         await self.send_test_event_trigger_pluggedin()
-        # event_data = events_callback.wait_for_event_report(
-        #    Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVConnected)
 
         self.step("7")
         charge_until = NullValue
@@ -154,7 +154,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("8")
         await self.send_test_event_trigger_charge_demand()
-        # event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("8a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -190,19 +190,19 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("11")
         await self.send_disable_command()
-        # event_data = events_callback.wait_for_event_report(
-        #    Clusters.EnergyEvse.Events.EnergyTransferStopped)
-        # expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
-        # asserts.assert_equal(expected_reason, event_data.reason,
-        #                     f"EnergyTransferStopped event reason was {event_data.reason}, expected {expected_reason}")
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
+        asserts.assert_equal(expected_reason, event_data.reason,
+                             f"EnergyTransferStopped event reason was {event_data.reason}, expected {expected_reason}")
 
         self.step("12")
         await self.send_test_event_trigger_charge_demand_clear()
 
         self.step("13")
         await self.send_test_event_trigger_pluggedin_clear()
-        # event_data = events_callback.wait_for_event_report(
-        #    Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVNotDetected)
 
         self.step("14")
         wait = 5  # We expect a change to the Session attributes after the EV is unplugged, Wait 5 seconds - allow time for the report to come in
