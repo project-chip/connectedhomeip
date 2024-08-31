@@ -777,10 +777,11 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
     case StateEnum::kPluggedInNoDemand:
         break;
     case StateEnum::kPluggedInDemand:
-    case StateEnum::kPluggedInCharging:
         ComputeMaxChargeCurrentLimit();
         SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
+        break;
+    case StateEnum::kPluggedInCharging:
         break;
     case StateEnum::kPluggedInDischarging:
         /* Switched from discharging to charging */
