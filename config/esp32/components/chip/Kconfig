@@ -261,8 +261,8 @@ menu "CHIP Core"
             depends on ENABLE_OTA_REQUESTOR
             default n
             help
-                Enable this option for delta OTA image updates. 
-                Delta OTA updates allow for smaller, more efficient updates by only 
+                Enable this option for delta OTA image updates.
+                Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
         config OTA_AUTO_REBOOT_ON_APPLY
@@ -1301,6 +1301,15 @@ menu "CHIP Device Layer"
             default 4
             help
                 The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Matter TCP payload options"
+        config MAX_LARGE_BUFFER_SIZE_BYTES
+            int "Max buffer size for TCP payloads"
+            default 6400
+            help
+                Max TCP payload buffer size.
 
     endmenu
 
