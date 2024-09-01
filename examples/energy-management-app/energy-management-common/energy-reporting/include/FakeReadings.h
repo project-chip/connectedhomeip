@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <lib/core/DataModelTypes.h>
 #include <system/SystemLayer.h>
 
+using namespace ::chip;
 class FakeReadings
 {
 public:
@@ -57,6 +59,15 @@ public:
      * @brief   Sends fake meter data into the cluster and restarts the timer
      */
     void FakeReadingsUpdate();
+
+    void SetPower(Power_mW power_mW);
+    Power_mW GetPower();
+
+    void SetVoltage(Voltage_mV voltage_mV);
+    Voltage_mV GetVoltage();
+
+    void SetCurrent(Amperage_mA current_mA);
+    Amperage_mA GetCurrent();
 
     /**
      * @brief   Timer expiry callback to handle fake load

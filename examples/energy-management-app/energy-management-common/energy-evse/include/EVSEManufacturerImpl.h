@@ -213,6 +213,13 @@ public:
      */
     static void FakeReadingsTimerExpiry(System::Layer * systemLayer, void * manufacturer);
 
+    /*
+     * @brief   Updates the parameters used to generate fake power and energy readings
+     *
+     * @param   Amperage_mA   Maximum Charge current in mA
+     */
+    void UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent);
+
 private:
     EnergyEvseManager * mEvseInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
