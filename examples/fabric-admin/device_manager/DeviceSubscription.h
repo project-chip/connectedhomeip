@@ -26,6 +26,8 @@
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
+class DeviceSubscriptionManager;
+
 /// Attribute subscription to attributes that are important to keep track and send to fabric-bridge
 /// via RPC when change has been identified.
 ///
@@ -35,11 +37,18 @@
 class DeviceSubscription : public chip::app::ReadClient::Callback
 {
 public:
+    using OnDoneCallback = std::function<void(chip::NodeId)>;
+
     DeviceSubscription();
 
-    /// Usually called after we have added a synchronized device to fabric-bridge to monitor
-    /// for any changes that need to be propgated to fabric-bridge.
-    void StartSubscription(chip::Controller::DeviceController & controller, chip::NodeId nodeId);
+    CHIP_ERROR StartSubscription(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
+                                 chip::NodeId nodeId);
+
+    /// This will trigger stopping the subscription. Once subscription is stopped the OnDoneCallback
+    /// provided in StartSubscription will be called to indicate that subscription have been terminated.
+    ///
+    /// Must only be called after StartSubscription was successfully called.
+    void StopSubscription();
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
@@ -57,6 +66,19 @@ public:
     void OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
 private:
+    enum class State : uint8_t
+    {
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        Connecting,          ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        Stopping,            ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks so we can terminate
+        SubscriptionStarted, ///< We have started a subscription.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction.
+    };
+
+    void MoveToState(const State aTargetState);
+    const char * GetStateStr() const;
+
+    OnDoneCallback mOnDoneCallback;
     std::unique_ptr<chip::app::ReadClient> mClient;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
@@ -64,7 +86,5 @@ private:
 
     chip_rpc_AdministratorCommissioningChanged mCurrentAdministratorCommissioningAttributes;
     bool mChangeDetected = false;
-    // Ensures that DeviceSubscription starts a subscription only once.  If instance of
-    // DeviceSubscription  can be reused, the class documentation should be updated accordingly.
-    bool mSubscriptionStarted = false;
+    State mState         = State::Idle;
 };
