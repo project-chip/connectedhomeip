@@ -29,6 +29,7 @@
 import copy
 import logging
 import random
+from collections import namedtuple
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
@@ -642,20 +643,20 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("18")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
+            ScenarioHeadroom = namedtuple("ScenarioHeadroom", "presetScenario remaining")
             # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
-            presetScenarioHeadroom = list((presetType.presetScenario,
+            presetScenarioHeadrooms = list(ScenarioHeadroom(presetType.presetScenario,
                                            presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes)
 
-            if len(presetScenarioHeadroom) > 0:
+            if presetScenarioHeadrooms:
                 # Find the preset scenario with the smallest number of remaining allowed presets
-                presetScenarioHeadroom = sorted(presetScenarioHeadroom, key=lambda diff: diff[1])
-                (presetScenario, headroom) = presetScenarioHeadroom[0]
+                presetScenarioHeadrooms = sorted(presetScenarioHeadrooms, key=lambda psh: psh.remaining)
+                presetScenarioHeadroom = presetScenarioHeadrooms[0]
 
                 # Add one more preset than is allowed by the preset type
                 test_presets = copy.deepcopy(current_presets)
-                for _ in range(0, headroom + 1):
-                    test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetScenario,
-                                                                     coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False))
+                test_presets.extend([cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=presetScenarioHeadroom.presetScenario,
+                                                                  coolingSetpoint=coolSetpoint, heatingSetpoint=heatSetpoint, builtIn=False)] * (presetScenarioHeadroom.remaining + 1))
 
                 await self.send_atomic_request_begin_command()
 

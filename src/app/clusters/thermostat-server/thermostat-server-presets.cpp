@@ -171,7 +171,7 @@ CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum pr
             // We exhausted the list trying to find the preset scenario
             return CHIP_NO_ERROR;
         }
-        else if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
         {
             return err;
         }
@@ -326,10 +326,6 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    // We're going to append this preset, so let's assume a count as though it had already been inserted
-    size_t presetCount         = 1;
-    size_t presetScenarioCount = 1;
-
     if (preset.GetPresetHandle().IsNull())
     {
         if (IsBuiltIn(preset))
@@ -381,8 +377,7 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         }
     }
 
-    size_t maximumPresetCount = delegate->GetNumberOfPresets();
-
+    size_t maximumPresetCount         = delegate->GetNumberOfPresets();
     size_t maximumPresetScenarioCount = 0;
     if (MaximumPresetScenarioCount(delegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
     {
@@ -403,6 +398,9 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     // Before adding this preset to the pending presets, if the expected length of the pending presets' list
     // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
 
+    // We're going to append this preset, so let's assume a count as though it had already been inserted
+    size_t presetCount         = 1;
+    size_t presetScenarioCount = 1;
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers otherPreset;
