@@ -236,6 +236,16 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
 
+CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
+{
+    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
+    {
+        // Attaching to an empty network will disconnect the network.
+        ReturnErrorOnFailure(ConnectWiFiNetwork(nullptr, 0, nullptr, 0));
+    }
+    return CHIP_NO_ERROR;
+}
+
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
