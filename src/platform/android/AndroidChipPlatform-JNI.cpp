@@ -282,6 +282,7 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
     using namespace chip::Logging;
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr);
     int priority = ANDROID_LOG_DEBUG;
     switch (category)
     {
