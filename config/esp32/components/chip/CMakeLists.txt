@@ -190,7 +190,7 @@ if (CONFIG_ENABLE_CHIP_CONTROLLER_BUILD)
     chip_gn_arg_append("chip_build_controller"              "true")
 endif()
 
-if (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP)
+if (CONFIG_ENABLE_WIFI_STATION)
     chip_gn_arg_append("chip_enable_wifi"                       "true")
 else()
     chip_gn_arg_append("chip_enable_wifi"                       "false")
