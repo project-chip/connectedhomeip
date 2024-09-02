@@ -41,13 +41,6 @@ using namespace chip;
 using namespace chip::app;
 
 namespace {
-// Zigbee spec says types between signed 8 bit and signed 64 bit
-bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
-{
-    return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE) ||
-        dataType == ZCL_TEMPERATURE_ATTRIBUTE_TYPE;
-}
-
 /**
  * @brief Simple integer comparison function.
  * Compares two values of a known length as integers.
@@ -386,7 +379,7 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
             maxBytes = maxv.ptrToDefaultValue;
         }
 
-        bool isAttributeSigned = emberAfIsTypeSigned(metadata->attributeType);
+        bool isAttributeSigned = metadata->IsSignedIntegerAttribute();
         bool isOutOfRange      = emberAfCompareValues(minBytes, data, dataLen, isAttributeSigned) == 1 ||
             emberAfCompareValues(maxBytes, data, dataLen, isAttributeSigned) == -1;
 
