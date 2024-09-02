@@ -82,13 +82,34 @@
 
 @implementation MTRDevice_XPC
 
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    // TODO: Verify that this is a valid MTRDeviceController_XPC?
+
+    if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
+        // Nothing else to do, all set.
+    }
+
+    return self;
+}
+
+- (NSString *)description
+{
+    // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
+    // internalDeviceState (do we even have such a thing here?), last
+    // subscription attempt wait (does that apply to us?) queued work (do we
+    // have any?), last report, last subscription failure (does that apply to us?).
+    return [NSString
+        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self stateChanged:state];
     }];
 }
@@ -96,7 +117,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedAttributeReport:attributeReport];
     }];
 }
@@ -104,7 +125,7 @@
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         [delegate device:self receivedEventReport:eventReport];
     }];
 }
@@ -113,7 +134,7 @@
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
     MTR_LOG("%s", __PRETTY_FUNCTION__);
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
         }
@@ -122,7 +143,7 @@
 
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
         }
@@ -131,7 +152,7 @@
 
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
             [delegate deviceConfigurationChanged:self];
         }
@@ -142,10 +163,10 @@
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate *, nil, getEstimatedStartTimeWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getEstimatedSubscriptionLatencyWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
-typedef NSDictionary<NSString *, id> * readAttributeResponseType;
+typedef NSDictionary<NSString *, id> * _Nullable readAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
                                      : (NSNumber *) clusterID attributeID
@@ -173,18 +194,20 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
+    // TODO: use asynchronous XPC and register a block with controller to call for this transaction
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
@@ -196,13 +219,14 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueInterval
                  timedInvokeTimeout:timeout
+        serverSideProcessingTimeout:serverSideProcessingTimeout
                          completion:completion];
 }
 
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(clientDataKeys, NSArray *, nil, getClientDataKeysWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(clientDataKeys, NSArray * _Nullable, nil, getClientDataKeysWithReply)
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey
                                      : (NSString *) key, id<NSSecureCoding> _Nullable, nil, clientDataForKey
                                      : key withReply)

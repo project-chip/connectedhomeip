@@ -62,8 +62,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#define BLE_MIN_CONNECTION_INTERVAL_MS 45
-#define BLE_MAX_CONNECTION_INTERVAL_MS 45
+#define BLE_MIN_CONNECTION_INTERVAL_MS 24
+#define BLE_MAX_CONNECTION_INTERVAL_MS 40
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)

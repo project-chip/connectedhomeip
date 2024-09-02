@@ -500,6 +500,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
+    kInProgress = auto()
     kMaster = auto()
 
 
@@ -511,6 +512,8 @@ class DataModelLevel(str, Enum):
 def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', data_model_level)
+    elif data_model_directory == PrebuiltDataModelDirectory.kInProgress:
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'in_progress', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', data_model_level)
     else:
@@ -743,7 +746,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
