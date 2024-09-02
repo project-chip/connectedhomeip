@@ -253,7 +253,11 @@ JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject res
 
 JNI_CHIP_ERROR_METHOD(jstring, toString)(JNIEnv * env, jclass clazz, jlong errorCode)
 {
-    return env->NewStringUTF(ErrorStr(CHIP_ERROR(static_cast<CHIP_ERROR::StorageType>(errorCode))));
+    jobject jErrorStr;
+    const char * errorStr = ErrorStr(CHIP_ERROR(static_cast<CHIP_ERROR::StorageType>(errorCode)));
+    CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(errorStr), jErrorStr);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(DeviceLayer, "Failed to CharToStringUTF: %s", ErrorStr(err)));
+    return static_cast<jstring>(jErrorStr);
 }
 
 JNI_LOGGING_METHOD(void, setLogFilter)(JNIEnv * env, jclass clazz, jint level)
