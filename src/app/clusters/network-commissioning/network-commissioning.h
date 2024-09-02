@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/data-model/Nullable.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
 #include <platform/NetworkCommissioning.h>
@@ -33,9 +34,17 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
+// Instance inherits privately from this class to participate in Instance::sInstances
+class InstanceListNode : public IntrusiveListNodeBase<>
+{
+};
+
 // TODO: Use macro to disable some wifi or thread
 class Instance : public CommandHandlerInterface,
                  public AttributeAccessInterface,
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+                 private InstanceListNode,
+#endif
                  public DeviceLayer::NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback,
                  public DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback,
                  public DeviceLayer::NetworkCommissioning::WiFiDriver::ScanCallback,
@@ -81,14 +90,10 @@ private:
     void SendNonConcurrentConnectNetworkResponse();
 #endif
 
-    // NetworkCommissioningInstance records.
-    static Instance * sInstanceRecord;
-    // Record current network.
-    static void RecordNetwork(Instance * currentNetwork);
-    // Disconnect networks (if connected) in the array other than the current network.
-    static void DisconnectOtherNetworks(Instance * currentNetwork);
-
-    Instance * mNext;
+// TODO: This could be guarded by a separate multi-interface condition instead
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    static IntrusiveList<InstanceListNode> sInstances;
+#endif
 
     EndpointId mEndpointId = kInvalidEndpointId;
     const BitFlags<Feature> mFeatureFlags;
@@ -119,6 +124,9 @@ private:
     void SetLastConnectErrorValue(Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
     void SetLastNetworkId(ByteSpan lastNetworkId);
     void ReportNetworksListChanged() const;
+
+    // Disconnect if the current connection is not in the Networks list
+    void DisconnectLingeringConnection();
 
     // Commits the breadcrumb value saved in mCurrentOperationBreadcrumb to the breadcrumb attribute in GeneralCommissioning
     // cluster. Will set mCurrentOperationBreadcrumb to NullOptional.
