@@ -42,17 +42,19 @@ using chip::Protocols::InteractionModel::Status;
 // AppCluster Spec Table 85.
 enum SUPPORTED_MODES
 {
-    OFF = 0,
-    CURRENT_MODE,
-    START_UP_MODE,
-    ON_MODE,
+    NORMAL = 0x0000,
+    ENERGY_SAVE = 0x0004,
+    RAPID_COOL = 0x4000,
+    RAPID_FREEZE = 0x4001,
 };
 
 class RefrigeratorManager
 {
 public:
     CHIP_ERROR Init();
-    void AttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
+    void RefAndTempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
+    void TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
+    void RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
     uint8_t GetMode();
     int8_t GetCurrentTemp();
     int8_t SetMode();
@@ -61,7 +63,20 @@ private:
     friend RefrigeratorManager & RefrigeratorMgr();
 
     int8_t mCurrentTempCelsius;
-    uint8_t mRefrigeratorMode;
+    uint8_t mCurrentMode;
+    uint8_t mStartUpMode;
+    uint8_t mOnMode;
+
+    int8_t mTemperatureSetpoint;
+    uint8_t mMinTemperature;
+    uint8_t mMaxTemperature;
+    uint8_t mStep;
+    int8_t mSelectedTemperatureLevel;
+    uint8_t mSupportedTemperatureLevels;
+
+    uint8_t mMask;
+    uint8_t mState;
+    uint8_t mSupported;
 
     int8_t ConvertToPrintableTemp(int16_t temperature);
     static RefrigeratorManager sRefrigeratorMgr;

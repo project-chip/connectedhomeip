@@ -96,43 +96,108 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
 {
     switch (attributeId)
     {
-    case ThermAttr::LocalTemperature::Id: {
-        int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
-        SILABS_LOG("Local temp %d", Temp);
-        mCurrentTempCelsius = Temp;
-    }
-    break;
-
-    case ThermAttr::OccupiedCoolingSetpoint::Id: {
-        int8_t coolingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-        SILABS_LOG("CoolingSetpoint %d", coolingTemp);
-        mCoolingCelsiusSetPoint = coolingTemp;
-    }
-    break;
-
-    case ThermAttr::OccupiedHeatingSetpoint::Id: {
-        int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-        SILABS_LOG("HeatingSetpoint %d", heatingTemp);
-        mHeatingCelsiusSetPoint = heatingTemp;
-    }
-    break;
-
-    case ThermAttr::SystemMode::Id: {
-        SILABS_LOG("SystemMode %d", static_cast<uint8_t>(*value));
-        uint8_t mode = static_cast<uint8_t>(*value);
-        if (mThermMode != mode)
-        {
-            mThermMode = mode;
+        case RefAndTempAttr::CurrentMode::Id: {
+            int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
+            mCurrentMode = Temp;
         }
-    }
-    break;
+        break;
 
-    default: {
-        SILABS_LOG("Unhandled thermostat attribute %x", attributeId);
-        return;
+        case RefAndTempAttr::StartUpMode::Id: {
+            int8_t startUpMode = ConvertToPrintableTemp(*((int16_t *) value));
+            mStartUpMode = startUpMode;
+        }
+        break;
+
+        case RefAndTempAttr::OnMode::Id: {
+            int8_t onMode = ConvertToPrintableTemp(*((int16_t *) value));
+            mOnMode = onMode;
+        }
+        break;
+
+        default: {
+            SILABS_LOG("Unhandled Refrigerator and Temprature attribute %x", attributeId);
+            return;
+        }
+        break;
     }
-    break;
+}
+
+void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
+{
+    switch (attributeId)
+    {
+        case TempCtrlAttr::TemperatureSetpoint::Id: {
+            int8_t temperatureSetpoint = ConvertToPrintableTemp(*((int16_t *) value));
+            mTemperatureSetpoint = temperatureSetpoint;
+        }
+        break;
+
+        case TempCtrlAttr::MinTemperature::Id: {
+            int8_t minTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+            mMinTemperature = minTemperature;
+        }
+        break;
+
+        case TempCtrlAttr::MaxTemperature::Id: {
+            int8_t maxTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+            mMaxTemperature = maxTemperature;
+        }
+        break;
+
+        case TempCtrlAttr::Step::Id: {
+            int8_t step = ConvertToPrintableTemp(*((int16_t *) value));
+            mStep = step;
+        }
+        break;
+
+        case TempCtrlAttr::SelectedTemperatureLevel::Id: {
+            int8_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
+            mSelectedTemperatureLevel = selectedTemperatureLevel;
+        }
+        break;
+
+        case TempCtrlAttr::SupportedTemperatureLevels::Id: {
+            int8_t supportedTemperatureLevels = ConvertToPrintableTemp(*((int16_t *) value));
+            mSupportedTemperatureLevels = supportedTemperatureLevels;
+        }
+        break;
+
+        default: {
+            SILABS_LOG("Unhandled Temprature controlled attribute %x", attributeId);
+            return;
+        }
+        break;
     }
 
     AppTask::GetAppTask().UpdateThermoStatUI();
+}
+
+void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
+{
+    switch (attributeId)
+    {
+        case RefAlarmAttr::Mask::Id: {
+            int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
+            mCurrentMode = Temp;
+        }
+        break;
+
+        case RefAlarmAttr::State::Id: {
+            int8_t startUpMode = ConvertToPrintableTemp(*((int16_t *) value));
+            mStartUpMode = startUpMode;
+        }
+        break;
+
+        case RefAlarmAttr::Supported::Id: {
+            int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
+            mHeatingCelsiusSetPoint = heatingTemp;
+        }
+        break;
+
+        default: {
+            SILABS_LOG("Unhandled Refrigerator Alarm attribute %x", attributeId);
+            return;
+        }
+        break;
+    }
 }
