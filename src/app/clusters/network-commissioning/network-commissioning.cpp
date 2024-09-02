@@ -1190,6 +1190,8 @@ void Instance::DisconnectOtherNetworks(Instance * currentNetwork)
                 return (networkNo == maxNetworks) ? Loop::Break : Loop::Continue;
             });
 
+            // If none of the configured networks is `connected`, we may have a
+            // lingering connection to a different network that we need to disconnect.
             if (!haveConnectedNetwork)
             {
                 /* It's different to check the media driver connection state here.
