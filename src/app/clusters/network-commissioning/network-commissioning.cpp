@@ -372,6 +372,22 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     mpBaseDriver->Shutdown();
+
+    Instance * prev = nullptr;
+    Instance * curr = sInstanceRecord;
+    while (curr && curr != this)
+    {
+        prev = curr;
+        curr = curr->mNext;
+    }
+    if (!prev)
+    {
+        sInstanceRecord = curr->mNext;
+    }
+    else
+    {
+        prev->mNext = curr->mNext;
+    }
 }
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -1177,8 +1193,6 @@ void Instance::DisconnectOtherNetworks(Instance * currentNetwork)
     {
         if (curr != currentNetwork && curr->mpWirelessDriver)
         {
-            uint8_t networkNo         = 0;
-            uint8_t maxNetworks       = curr->mpBaseDriver->GetMaxNetworks();
             bool haveConnectedNetwork = false;
             EnumerateAndRelease(curr->mpBaseDriver->GetNetworks(), [&](const Network & network) {
                 if (network.connected)
@@ -1186,20 +1200,19 @@ void Instance::DisconnectOtherNetworks(Instance * currentNetwork)
                     haveConnectedNetwork = true;
                     return Loop::Break;
                 }
-                ++networkNo;
-                return (networkNo == maxNetworks) ? Loop::Break : Loop::Continue;
+                return Loop::Continue;
             });
 
             // If none of the configured networks is `connected`, we may have a
             // lingering connection to a different network that we need to disconnect.
             if (!haveConnectedNetwork)
             {
-                /* It's different to check the media driver connection state here.
+                /* It's difficult to check the media driver connection state here.
                  * Check the `Connected` flag in `NetworkInfoStruct` in stead, if not set,
                  * exec `DisconnectFromNetwork` for driver. However, the physical media connection
                  * may not necessarily exist in this case, such as after initialization.
                  */
-                curr->mpWirelessDriver->DisconnectFromNetwork();
+                ReturnOnFailure(curr->mpWirelessDriver->DisconnectFromNetwork());
             }
         }
         curr = curr->mNext;
