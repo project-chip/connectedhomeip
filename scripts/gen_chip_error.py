@@ -286,7 +286,8 @@ def main():
 
     with open(IM_STATUS_FILE, "w") as im_status_file:
         header_path = Path("src/protocols/interaction_model/StatusCodeList.h")
-        descriptor = ErrorDescriptor(section="IM Global", code_range=0x000, macro_regex=r"^CHIP_IM_STATUS_CODE[(](?P<name>[A-Za-z0-9_]+)\s*,\s*(?P<spec_name>[A-Za-z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]")
+        descriptor = ErrorDescriptor(section="IM Global", code_range=0x000,
+                                     macro_regex=r"^CHIP_IM_STATUS_CODE[(](?P<name>[A-Za-z0-9_]+)\s*,\s*(?P<spec_name>[A-Za-z0-9_]+)\s*,\s*(?P<code>(0x[a-fA-F0-9]+)|\d+)[)]")
         dump_im_status(im_status_file, header_path, descriptor)
 
 
