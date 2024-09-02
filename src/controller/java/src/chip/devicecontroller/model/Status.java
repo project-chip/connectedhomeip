@@ -24,11 +24,11 @@ import java.util.Optional;
 /** Class for Interaction Model Status * */
 public final class Status {
   public enum Code {
-    Success(0x0),
+    Success(0x00),
     Failure(0x01),
-    InvalidSusbscription(0x7d),
+    InvalidSubscription(0x7d),
     UnsupportedAccess(0x7e),
-    UnsupportedEndPoint(0x7f),
+    UnsupportedEndpoint(0x7f),
     InvalidAction(0x80),
     UnsupportedCommand(0x81),
     Deprecated82(0x82),
@@ -62,10 +62,10 @@ public final class Status {
     Deprecatedc2(0xc2),
     UnsupportedCluster(0xc3),
     Deprecatedc4(0xc4),
-    NoUpstreamSubsricption(0xc5),
-    NeedTimedInteraction(0xc6),
+    NoUpstreamSubscription(0xc5),
+    NeedsTimedInteraction(0xc6),
     UnsupportedEvent(0xc7),
-    PathExhausted(0xc8),
+    PathsExhausted(0xc8),
     TimedRequestMismatch(0xc9),
     FailsafeRequired(0xca),
     InvalidInState(0xcb),
