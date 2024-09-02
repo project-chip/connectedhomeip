@@ -127,10 +127,10 @@ class FabricSyncApp:
         args.append(f"--passcode={bridge_passcode}")
 
         self.fabric_sync_app = Subprocess(args, stdout_cb=self._process_admin_output)
-        self.wait_for_text_text = "Connected to Fabric-Bridge"
+        self.wait_for_text_text = "Successfully opened pairing window on the device"
         self.fabric_sync_app.start()
 
-        # Wait for the bridge to connect to the admin.
+        # Wait for the fabric-sync-app to be ready.
         self.wait_for_text()
 
     def commission_on_network(self, node_id, setup_pin_code=None, filter_type=None, filter=None):
