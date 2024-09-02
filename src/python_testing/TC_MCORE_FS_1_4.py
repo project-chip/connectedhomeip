@@ -71,14 +71,14 @@ class Subprocess(threading.Thread):
         self.p = subprocess.Popen(self.args, errors="ignore", stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # Forward stdout and stderr with a tag attached.
-        t1 = threading.Thread(target=self.forward_f, args=[self.p.stdout, sys.stdout])
-        t1.start()
-        t2 = threading.Thread(target=self.forward_f, args=[self.p.stderr, sys.stderr])
-        t2.start()
+        forwarding_stdout_thread = threading.Thread(target=self.forward_f, args=[self.p.stdout, sys.stdout])
+        forwarding_stdout_thread.start()
+        forwarding_stderr_thread = threading.Thread(target=self.forward_f, args=[self.p.stderr, sys.stderr])
+        forwarding_stderr_thread.start()
         # Wait for the process to finish.
         self.p.wait()
-        t1.join()
-        t2.join()
+        forwarding_stdout_thread.join()
+        forwarding_stderr_thread.join()
 
     def stop(self):
         self.p.terminate()
@@ -97,59 +97,60 @@ class FabricSyncApp:
         self.wait_for_text_event.clear()
         self.wait_for_text_text = None
 
-    def __init__(self, fabricSyncAppPath, fabricAdminAppPath, fabricBridgeAppPath,
-                 storageDir, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
-                 bridgePort=None, bridgeDiscriminator=None, bridgePasscode=None):
+    def __init__(self, fabric_sync_app_path, fabric_admin_app_path, fabric_bridge_app_path,
+                 storage_dir, fabric_name=None, node_id=None, vendor_id=None,
+                 paa_trust_store_path=None, bridge_port=None, bridge_discriminator=None,
+                 bridge_passcode=None):
 
         self.wait_for_text_event = threading.Event()
         self.wait_for_text_text = None
 
-        args = [fabricSyncAppPath]
-        args.append(f"--app-admin={fabricAdminAppPath}")
-        args.append(f"--app-bridge={fabricBridgeAppPath}")
+        args = [fabric_sync_app_path]
+        args.append(f"--app-admin={fabric_admin_app_path}")
+        args.append(f"--app-bridge={fabric_bridge_app_path}")
         # Override default ports, so it will be possible to run
         # our TH_FSA alongside the DUT_FSA during CI testing.
         args.append("--app-admin-rpc-port=44000")
         args.append("--app-bridge-rpc-port=44001")
         # Keep the storage directory in a temporary location.
-        args.append(f"--storage-dir={storageDir}")
+        args.append(f"--storage-dir={storage_dir}")
         # FIXME: Passing custom PAA store breaks something
-        # if paaTrustStorePath is not None:
-        #     args.append(f"--paa-trust-store-path={paaTrustStorePath}")
-        if fabricName is not None:
-            args.append(f"--commissioner-name={fabricName}")
-        if nodeId is not None:
-            args.append(f"--commissioner-node-id={nodeId}")
-        args.append(f"--commissioner-vendor-id={vendorId}")
-        args.append(f"--secured-device-port={bridgePort}")
-        args.append(f"--discriminator={bridgeDiscriminator}")
-        args.append(f"--passcode={bridgePasscode}")
+        # if paa_trust_store_path is not None:
+        #     args.append(f"--paa-trust-store-path={paa_trust_store_path}")
+        if fabric_name is not None:
+            args.append(f"--commissioner-name={fabric_name}")
+        if node_id is not None:
+            args.append(f"--commissioner-node-id={node_id}")
+        args.append(f"--commissioner-vendor-id={vendor_id}")
+        args.append(f"--secured-device-port={bridge_port}")
+        args.append(f"--discriminator={bridge_discriminator}")
+        args.append(f"--passcode={bridge_passcode}")
 
-        self.admin = Subprocess(args, stdout_cb=self._process_admin_output)
+        self.fabric_sync_app = Subprocess(args, stdout_cb=self._process_admin_output)
         self.wait_for_text_text = "Connected to Fabric-Bridge"
-        self.admin.start()
+        self.fabric_sync_app.start()
 
         # Wait for the bridge to connect to the admin.
         self.wait_for_text()
 
-    def CommissionOnNetwork(self, nodeId, setupPinCode=None, filterType=None, filter=None):
-        self.wait_for_text_text = f"Commissioning complete for node ID 0x{nodeId:016x}: success"
+    def commission_on_network(self, node_id, setup_pin_code=None, filter_type=None, filter=None):
+        self.wait_for_text_text = f"Commissioning complete for node ID {node_id:#018x}: success"
         # Send the commissioning command to the admin.
-        self.admin.p.stdin.write(f"pairing onnetwork {nodeId} {setupPinCode}\n")
-        self.admin.p.stdin.flush()
+        self.fabric_sync_app.p.stdin.write(f"pairing onnetwork {node_id} {setup_pin_code}\n")
+        self.fabric_sync_app.p.stdin.flush()
         # Wait for success message.
         self.wait_for_text()
 
     def stop(self):
-        self.admin.stop()
+        self.fabric_sync_app.stop()
 
 
 class AppServer:
 
-    def __init__(self, app, storageDir, port=None, discriminator=None, passcode=None):
+    def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
 
         args = [app]
-        args.extend(["--KVS", tempfile.mkstemp(dir=storageDir, prefix="kvs-app-")[1]])
+        args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
@@ -207,12 +208,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             th_fsa_app_path,
             th_fsa_admin_path,
             th_fsa_bridge_path,
-            storageDir=self.storage.name,
-            paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
-            bridgePort=self.th_fsa_bridge_port,
-            bridgeDiscriminator=self.th_fsa_bridge_discriminator,
-            bridgePasscode=self.th_fsa_bridge_passcode,
-            vendorId=0xFFF1)
+            storage_dir=self.storage.name,
+            paa_trust_store_path=self.matter_test_config.paa_trust_store_path,
+            bridge_port=self.th_fsa_bridge_port,
+            bridge_discriminator=self.th_fsa_bridge_discriminator,
+            bridge_passcode=self.th_fsa_bridge_passcode,
+            vendor_id=0xFFF1)
 
         # Get the named pipe path for the DUT_FSA app input from the user params.
         dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe", None)
@@ -226,7 +227,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServer(
             th_server_app,
-            storageDir=self.storage.name,
+            storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
@@ -357,10 +358,10 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         th_server_th_fsa_node_id = 3
         # Commissioning TH_SERVER_NO_UID to TH_FSA.
-        self.th_fsa_controller.CommissionOnNetwork(
-            nodeId=th_server_th_fsa_node_id,
-            setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        self.th_fsa_controller.commission_on_network(
+            node_id=th_server_th_fsa_node_id,
+            setup_pin_code=params.setupPinCode,
+            filter_type=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=discriminator,
         )
 

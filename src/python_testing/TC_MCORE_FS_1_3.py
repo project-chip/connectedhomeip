@@ -84,10 +84,10 @@ class Subprocess(threading.Thread):
 
 class AppServer:
 
-    def __init__(self, app, storageDir, port=None, discriminator=None, passcode=None):
+    def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
 
         args = [app]
-        args.extend(["--KVS", tempfile.mkstemp(dir=storageDir, prefix="kvs-app-")[1]])
+        args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
@@ -126,7 +126,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServer(
             th_server_app,
-            storageDir=self.storage.name,
+            storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
