@@ -1307,7 +1307,7 @@ menu "CHIP Device Layer"
     menu "Matter TCP payload options"
         config MAX_LARGE_BUFFER_SIZE_BYTES
             int "Max buffer size for TCP payloads"
-            default 6400
+            default 1530
             help
                 Max TCP payload buffer size.
 
