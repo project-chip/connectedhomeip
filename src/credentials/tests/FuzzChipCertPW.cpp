@@ -13,7 +13,6 @@ using namespace fuzztest;
 
 void ChipCertFuzzer(const std::vector<std::uint8_t> & bytes)
 {
-
     ByteSpan span(bytes.data(), bytes.size());
 
     {
@@ -58,6 +57,43 @@ void ChipCertFuzzer(const std::vector<std::uint8_t> & bytes)
         MutableByteSpan outCert(outCertBuf);
         (void) ConvertChipCertToX509Cert(span, outCert);
     }
+
+    {
+        // TODO: #34352 To Move this to a Fixture once Errors related to FuzzTest Fixtures are resolved
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ByteSpan span(bytes.data(), bytes.size());
+        ValidateChipRCAC(span);
+        chip::Platform::MemoryShutdown();
+    }
 }
 
 FUZZ_TEST(ChipCert, ChipCertFuzzer).WithDomains(Arbitrary<std::vector<std::uint8_t>>());
+
+// The Property function for DecodeChipCertFuzzer, The FUZZ_TEST Macro will call this function.
+void DecodeChipCertFuzzer(const std::vector<std::uint8_t> & bytes, BitFlags<CertDecodeFlags> aDecodeFlag)
+{
+    ByteSpan span(bytes.data(), bytes.size());
+
+    // TODO: #34352 To Move this to a Fixture once Errors related to FuzzTest Fixtures are resolved
+    ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+
+    ChipCertificateData certData;
+    (void) DecodeChipCert(span, certData, aDecodeFlag);
+
+    chip::Platform::MemoryShutdown();
+}
+
+// This function allows us to fuzz using one of three CertDecodeFlags flags; by using FuzzTests's `ElementOf` API, we define an
+// input domain by explicitly enumerating the set of values in it More Info:
+// https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#elementof-domains-element-of
+auto AnyCertDecodeFlag()
+{
+
+    constexpr BitFlags<CertDecodeFlags> NullDecodeFlag;
+    constexpr BitFlags<CertDecodeFlags> GenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
+    constexpr BitFlags<CertDecodeFlags> TrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
+
+    return ElementOf<CertDecodeFlags>({ NullDecodeFlag, GenTBSHashFlag, TrustAnchorFlag });
+}
+
+FUZZ_TEST(ChipCert, DecodeChipCertFuzzer).WithDomains(Arbitrary<std::vector<std::uint8_t>>(), AnyCertDecodeFlag());

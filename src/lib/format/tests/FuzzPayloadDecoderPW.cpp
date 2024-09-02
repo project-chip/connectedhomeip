@@ -34,7 +34,8 @@ using namespace chip::TLV;
 using namespace chip::TLVMeta;
 using namespace fuzztest;
 
-void RunDecodePW(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mProtocol, uint8_t mMessageType)
+// The Property Function; The FUZZ_TEST macro will call this function, with the fuzzed input domains
+void RunDecodeFuzz(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mProtocol, uint8_t mMessageType)
 {
 
     PayloadDecoderInitParams params;
@@ -56,29 +57,15 @@ void RunDecodePW(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id mP
     {
         // Nothing to do ...
     }
-
-    // TODO: remove
-    // PRINT BYTES: To check the combination of bytes being printed
-    //  std::cout << "bytes: ";
-    //  for (const auto& byte : bytes) {
-    //      std::cout << static_cast<int>(byte) << " ";
-    //  }
-    //  std::cout <<std::endl << std::endl;
-
-    // printing Protocol IDs
-    // std::cout << "protocol ID: " << mProtocol.GetProtocolId()<<std::endl;
-
-    // printing mMessageType
-    // std::cout << "mMessageType: " << mMessageType << std::endl;
 }
 
-// This allows us to fuzz test with all the combinations of protocols
-auto ProtocolIDs()
+// This allows us to create a FuzzTest "Input Domain" to fuzz test with all the combinations of protocols.
+auto AnyProtocolID()
 {
     return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,
                        chip::Protocols::UserDirectedCommissioning::Id });
 }
 
-FUZZ_TEST(PayloadDecoder, RunDecodePW).WithDomains(Arbitrary<std::vector<std::uint8_t>>(), ProtocolIDs(), Arbitrary<uint8_t>());
+FUZZ_TEST(PayloadDecoder, RunDecodeFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>(), AnyProtocolID(), Arbitrary<uint8_t>());
 
 } // namespace

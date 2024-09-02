@@ -8,6 +8,7 @@
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 
 using namespace fuzztest;
+using namespace std;
 
 namespace {
 
@@ -66,4 +67,64 @@ void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
     mdns::Minimal::ParsePacket(packet, &delegate);
 }
 
-FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<std::vector<std::uint8_t>>());
+class TxtRecordAccumulator : public TxtRecordDelegate
+{
+public:
+    using DataType = vector<pair<string, string>>;
+
+    void OnRecord(const BytesRange & name, const BytesRange & value) override
+    {
+        mData.push_back(make_pair(AsString(name), AsString(value)));
+    }
+
+    DataType & Data() { return mData; }
+    const DataType & Data() const { return mData; }
+
+private:
+    DataType mData;
+
+    static string AsString(const BytesRange & range)
+    {
+        return string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
+    }
+};
+
+void TxtResponderFuzz2(const std::vector<std::uint8_t> & aRecord)
+{
+
+    bool equal_sign_present = false;
+    auto equal_sign_pos     = aRecord.end();
+
+    // This test is only giving a set of values, it can be gives more
+    vector<uint8_t> prefixedRecord{ static_cast<uint8_t>(aRecord.size()) };
+
+    prefixedRecord.insert(prefixedRecord.end(), aRecord.begin(), aRecord.end());
+
+    TxtRecordAccumulator accumulator;
+
+    // The Function under Test, Check that the function does not Crash
+    ParseTxtRecord(BytesRange(prefixedRecord.data(), (&prefixedRecord.back() + 1)), &accumulator);
+
+    for (auto it = aRecord.begin(); it != aRecord.end(); it++)
+    {
+        // if this is first `=` found in the fuzzed record
+        if ('=' == static_cast<char>(*it) && false == equal_sign_present)
+        {
+            equal_sign_present = true;
+            equal_sign_pos     = it;
+        }
+    }
+
+    // The Fuzzed Input (record) needs to have at least two characters in order for ParseTxtRecord to do something
+    if (aRecord.size() > 1)
+    {
+        if (true == equal_sign_present)
+        {
+            std::string input_record_value(equal_sign_pos + 1, aRecord.end());
+            EXPECT_EQ(accumulator.Data().at(0).second, input_record_value);
+        }
+    }
+}
+
+FUZZ_TEST(MinimalmDNS, TxtResponderFuzz2).WithDomains(Arbitrary<vector<uint8_t>>().WithMaxSize(254));
+FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<vector<uint8_t>>());

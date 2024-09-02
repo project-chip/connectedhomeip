@@ -5,6 +5,7 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
+#include "setup_payload/QRCodeSetupPayloadParser.h"
 #include <setup_payload/Base38Decode.h>
 #include <setup_payload/Base38Encode.h>
 
@@ -54,9 +55,19 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
     ASSERT_EQ(decodedData, bytes);
 }
 
+void FuzzQRCodeSetupPayloadParser(const std::string & s)
+{
+    chip::Platform::MemoryInit();
+
+    SetupPayload payload;
+    QRCodeSetupPayloadParser(s).populatePayload(payload);
+}
+
 // The invocation of the FuzzTest
 FUZZ_TEST(Base38Decoder, Base38DecodeFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
 
 // Max size of the vector is defined as 306 since that will give an outputSizeNeeded of 511 which is less than the required
 // kMaxOutputSize
 FUZZ_TEST(Base38Decoder, Base38RoundTripFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>().WithMaxSize(306));
+
+FUZZ_TEST(Base38Decoder, FuzzQRCodeSetupPayloadParser).WithDomains(Arbitrary<std::string>());
