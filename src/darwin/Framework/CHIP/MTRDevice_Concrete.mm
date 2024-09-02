@@ -464,11 +464,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         stringWithFormat:@"<MTRDevice: %p, XPC: NO, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
-+ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    return [controller deviceForNodeID:nodeID];
-}
-
 #pragma mark - Time Synchronization
 
 - (void)_setTimeOnDevice
@@ -2593,7 +2588,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
-    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
+    //
+    // But all this only happens if this device has been accessed via the public
+    // API.  If it's a device we just created internally, don't do read-throughs.
+    BOOL readThroughsAllowed;
+    {
+        std::lock_guard lock(_lock);
+        readThroughsAllowed = _accessedViaPublicAPI;
+    }
+    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.

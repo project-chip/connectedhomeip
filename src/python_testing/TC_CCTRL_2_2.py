@@ -22,7 +22,6 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
-import ipaddress
 import logging
 import os
 import random
@@ -53,11 +52,14 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.port = 5543
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting TH_SERVER")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("TH_SERVER started")
         time.sleep(3)
 
@@ -133,9 +135,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
 
         self.step(5)
-        ipaddr = ipaddress.IPv6Address('::1')
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(
-            requestId=1, responseTimeoutSeconds=30, ipAddress=ipaddr.packed, port=self.port)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=1, responseTimeoutSeconds=30)
         try:
             await self.send_single_cmd(cmd)
             asserts.fail("Unexpected success on CommissionNode")
