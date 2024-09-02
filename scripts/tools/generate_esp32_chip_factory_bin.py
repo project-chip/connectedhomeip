@@ -377,7 +377,7 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['product-url']['value'] = args.product_url
     if args.product_label:
         FACTORY_DATA['product-label']['value'] = args.product_label
-    if args.device_type  is not None:
+    if args.device_type is not None:
         FACTORY_DATA['device-type']['value'] = args.device_type
 
     # SupportedModes are stored as multiple entries
