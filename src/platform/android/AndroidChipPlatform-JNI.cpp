@@ -60,9 +60,8 @@ static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUU
 namespace {
 JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
-jclass sCallbackClass;
-jmethodID sOnLogMessageMethod;
-jobject sJavaLogCallbackObject = nullptr;
+jmethodID sOnLogMessageMethod = nullptr;
+JniGlobalReference sJavaLogCallbackObject;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -283,6 +282,9 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr);
+    VerifyOrReturn(sJavaLogCallbackObject.HasValidObjectRef());
+    VerifyOrReturn(sOnLogMessageMethod != nullptr);
+
     JniLocalReferenceScope scope(env);
     int priority = ANDROID_LOG_DEBUG;
     switch (category)
@@ -309,28 +311,34 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
     jstring jMsg = env->NewStringUTF(buffer);
     VerifyOrReturn(jMsg != nullptr);
 
-    env->CallVoidMethod(sJavaLogCallbackObject, sOnLogMessageMethod, jModule, jPriority, jMsg);
+    env->CallVoidMethod(sJavaLogCallbackObject.ObjectRef(), sOnLogMessageMethod, jModule, jPriority, jMsg);
 }
 
 JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject callback)
 {
     using namespace chip::Logging;
 
-    sCallbackClass      = env->GetObjectClass(callback);
-    sOnLogMessageMethod = env->GetMethodID(sCallbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
-    if (sJavaLogCallbackObject != nullptr)
+    if (sOnLogMessageMethod == nullptr)
     {
-        env->DeleteGlobalRef(sJavaLogCallbackObject);
+        jclass callbackClass = env->GetObjectClass(callback);
+        sOnLogMessageMethod  = env->GetMethodID(callbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
+    }
+    VerifyOrReturn(sOnLogMessageMethod != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to access AndroidChipLogging.LogCallback 'onLogMessage' method"));
+
+    if (sJavaLogCallbackObject.HasValidObjectRef())
+    {
+        sJavaLogCallbackObject.Reset();
     }
 
     if (env->IsSameObject(callback, NULL))
     {
-        sJavaLogCallbackObject = nullptr;
         SetLogRedirectCallback(nullptr);
     }
     else
     {
-        sJavaLogCallbackObject = env->NewGlobalRef(callback);
+        VerifyOrReturn(sJavaLogCallbackObject.Init(callback) == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to init sJavaLogCallbackObject"));
         SetLogRedirectCallback(logRedirectCallback);
     }
 }
