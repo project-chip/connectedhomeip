@@ -19,13 +19,30 @@ import contextlib
 import os
 import signal
 import sys
-import typing
 from argparse import ArgumentParser
 from tempfile import TemporaryDirectory
 
 
-async def forward_f(f_in: asyncio.StreamReader, f_out: typing.BinaryIO,
-                    prefix: bytes, cb=None):
+async def asyncio_stdin() -> asyncio.StreamReader:
+    """Wrap sys.stdin in an asyncio StreamReader."""
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    return reader
+
+
+async def asyncio_stdout(file=sys.stdout) -> asyncio.StreamWriter:
+    """Wrap an IO stream in an asyncio StreamWriter."""
+    loop = asyncio.get_event_loop()
+    transport, protocol = await loop.connect_write_pipe(
+        lambda: asyncio.streams.FlowControlMixin(loop=loop),
+        os.fdopen(file.fileno(), 'wb'))
+    return asyncio.streams.StreamWriter(transport, protocol, None, loop)
+
+
+async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
+                    f_out: asyncio.StreamWriter, cb=None):
     """Forward f_in to f_out with a prefix attached.
 
     This function can optionally feed received lines to a callback function.
@@ -36,9 +53,9 @@ async def forward_f(f_in: asyncio.StreamReader, f_out: typing.BinaryIO,
             break
         if cb is not None:
             cb(line)
-        f_out.buffer.write(prefix)
-        f_out.buffer.write(line)
-        f_out.flush()
+        f_out.write(prefix)
+        f_out.write(line)
+        await f_out.drain()
 
 
 async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
@@ -62,10 +79,7 @@ async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
 
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
-    loop = asyncio.get_event_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    reader = await asyncio_stdin()
     while True:
         line = await reader.readline()
         if not line:
@@ -94,9 +108,15 @@ class Subprocess:
                                                       stdout=asyncio.subprocess.PIPE,
                                                       stderr=asyncio.subprocess.PIPE)
         # Add the stdout and stderr processing to the event loop.
-        asyncio.create_task(forward_f(self.p.stderr, sys.stderr, self.tag))
-        asyncio.create_task(forward_f(self.p.stdout, sys.stdout, self.tag,
-                                      cb=self._check_output))
+        asyncio.create_task(forward_f(
+            self.tag,
+            self.p.stderr,
+            await asyncio_stdout(sys.stderr)))
+        asyncio.create_task(forward_f(
+            self.tag,
+            self.p.stdout,
+            await asyncio_stdout(sys.stdout),
+            cb=self._check_output))
 
     async def send(self, message: str, expected_output: str = None, timeout: float = None):
         """Send a message to a process and optionally wait for a response."""
