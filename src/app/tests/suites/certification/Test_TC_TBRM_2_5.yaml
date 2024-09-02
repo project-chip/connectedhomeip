@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: "[TC-TBRM-2.5] Verify network configuration of a Thread Border Router endpoint that support also Secondary Network Interface device type"
+name:
+    "[TC-TBRM-2.5] Verify network configuration of a Thread Border Router
+    endpoint that support also Secondary Network Interface device type"
 
 PICS:
     - TBRM.S
