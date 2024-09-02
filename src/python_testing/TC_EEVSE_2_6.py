@@ -55,64 +55,65 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the FeatureMap",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
-            TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+            TestStep("3", "Set up a subscription to all EnergyEVSE cluster events"),
+            TestStep("4", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
-            TestStep("4", "Set up a subscription to the EnergyEVSE cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 10 and KeepSubscriptions set to True",
+            TestStep("5", "Set up a subscription to the EnergyEVSE cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 10 and KeepSubscriptions set to True",
                      "Subscription successfully established"),
-            TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("5a", "After a few seconds TH reads from the DUT the State",
+            TestStep("6a", "TH reads from the DUT the State",
                      "Value has to be 0x00 (NotPluggedIn)"),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
+            TestStep("7", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
-            TestStep("7", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=12000",
+            TestStep("8", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=12000",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event",
+            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E02(EnergyTransferStarted) sent"),
-            TestStep("8a", "TH reads from the DUT the State",
+            TestStep("9a", "TH reads from the DUT the State",
                      "Value has to be 0x03 (PluggedInCharging)"),
-            TestStep("9", "Reset all accumulated report counts, then wait 12 seconds"),
-            TestStep("9a", "TH counts all report transactions with an attribute report for the SessionID attribute",
+            TestStep("10", "Reset all accumulated report counts, then wait 12 seconds"),
+            TestStep("10a", "TH counts all report transactions with an attribute report for the SessionID attribute",
                      "TH verifies that numberOfReportsReceived = 0"),
-            TestStep("9b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
-                     "TH verifies that numberOfReportsReceived \<= 2"),
-            TestStep("9c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
-                     "TH verifies that numberOfReportsReceived \<= 2"),
-            TestStep("9d", "TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
-                     "TH verifies that numberOfReportsReceived \<= 2"),
-            TestStep("10", "Reset all accumulated report counts"),
-            TestStep("11", "TH sends command Disable",
+            TestStep("10b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
+                     "TH verifies that numberOfReportsReceived <= 2"),
+            TestStep("10c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
+                     "TH verifies that numberOfReportsReceived <= 2"),
+            TestStep("10d", "TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
+                     "TH verifies that numberOfReportsReceived <= 2"),
+            TestStep("11", "Reset all accumulated report counts"),
+            TestStep("12", "TH sends command Disable",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvseStopped"),
-            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event Clear",
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Charge Demand Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
+            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
-            TestStep("14", "Wait 5 seconds"),
-            TestStep("14a", "TH counts all report transactions with an attribute report for the SessionID attribute",
+            TestStep("15", "Wait 5 seconds"),
+            TestStep("15a", "TH counts all report transactions with an attribute report for the SessionID attribute",
                      "TH verifies that numberOfReportsReceived = 0"),
-            TestStep("14b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
+            TestStep("15b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("14c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
+            TestStep("15c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("14d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
+            TestStep("15d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("15", "Reset all accumulated report counts"),
-            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
+            TestStep("16", "Reset all accumulated report counts"),
+            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E00(EVConnected) sent"),
-            TestStep("17", "Wait 5 seconds"),
-            TestStep("17a", "TH counts all report transactions with an attribute report for the SessionID attribute",
+            TestStep("18", "Wait 5 seconds"),
+            TestStep("18a", "TH counts all report transactions with an attribute report for the SessionID attribute",
                      "TH verifies that numberOfReportsReceived = 1"),
-            TestStep("17b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
+            TestStep("18b", "TH counts all report transactions with an attribute report for the SessionDuration attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("17c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
+            TestStep("18c", "TH counts all report transactions with an attribute report for the SessionEnergyCharged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("17d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
+            TestStep("18d", "If V2X feature is supported on the cluster, TH counts all report transactions with an attribute report for the SessionEnergyDischarged attribute",
                      "TH verifies that numberOfReportsReceived >= 1"),
-            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
+            TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for EV Plugged-in Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EEVSE.S.E01(EVNotDetected) sent"),
-            TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
+            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep("20", "Cancel the subscription to the Device Energy Management cluster",
+            TestStep("21", "Cancel the subscription to the Device Energy Management cluster",
                      "The subscription is cancelled successfully"),
         ]
 
@@ -123,21 +124,22 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("1")
         # Commission DUT - already done
 
-        # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.EnergyEvse)
-        await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                    self.matter_test_config.endpoint)
-
         self.step("2")
         feature_map = await self.read_evse_attribute_expect_success(attribute="FeatureMap")
         logger.info(f"FeatureMap: {feature_map}")
         has_v2x = feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kV2x
 
+        # Subscribe to Events and when they are sent push them to a queue for checking later
         self.step("3")
-        await self.check_test_event_triggers_enabled()
+        events_callback = EventChangeCallback(Clusters.EnergyEvse)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    self.matter_test_config.endpoint)
 
         self.step("4")
+        await self.check_test_event_triggers_enabled()
+
+        self.step("5")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.EnergyEvse)
         await sub_handler.start(self.default_controller, self.dut_node_id,
                                 self.matter_test_config.endpoint,
@@ -148,60 +150,60 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
             time.sleep(wait_time)
 
-        self.step("5")
+        self.step("6")
         await self.send_test_event_trigger_basic()
 
-        self.step("5a")
+        self.step("6a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
 
-        self.step("6")
+        self.step("7")
         await self.send_test_event_trigger_pluggedin()
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EVConnected)
 
-        self.step("7")
+        self.step("8")
         charge_until = NullValue
         min_charge_current = 6000
         max_charge_current = 12000
         await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
 
-        self.step("8")
+        self.step("9")
         await self.send_test_event_trigger_charge_demand()
         event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
-        self.step("8a")
+        self.step("9a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
 
-        self.step("9")
+        self.step("10")
         wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
         sub_handler.reset()
         accumulate_reports(wait)
 
-        self.step("9a")
+        self.step("10a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
         logging.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 0, f"Expected NO SessionID updates in {wait} seconds")
 
-        self.step("9b")
+        self.step("10b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
         logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionDuration updates in {wait} seconds")
 
-        self.step("9c")
+        self.step("10c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
         logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionEnergyCharged updates in {wait} seconds")
 
-        self.step("9d")
+        self.step("10d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
             logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_less_equal(count, 2, f"Expected <= 2 SessionEnergyDischarged updates in {wait} seconds")
 
-        self.step("10")
+        self.step("11")
         sub_handler.reset()
 
-        self.step("11")
+        self.step("12")
         await self.send_disable_command()
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EnergyTransferStopped)
@@ -209,81 +211,81 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         asserts.assert_equal(expected_reason, event_data.reason,
                              f"EnergyTransferStopped event reason was {event_data.reason}, expected {expected_reason}")
 
-        self.step("12")
+        self.step("13")
         await self.send_test_event_trigger_charge_demand_clear()
 
-        self.step("13")
+        self.step("14")
         await self.send_test_event_trigger_pluggedin_clear()
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EVNotDetected)
 
-        self.step("14")
+        self.step("15")
         wait = 5  # We expect a change to the Session attributes after the EV is unplugged, Wait 5 seconds - allow time for the report to come in
         accumulate_reports(wait)
 
-        self.step("14a")
+        self.step("15a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
         logging.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 0, "Expected = 0 SessionID updates after a Unplugged operation - it changes on next plug-in")
 
-        self.step("14b")
+        self.step("15b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
         logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionDuration updates after a Unplugged operation")
 
-        self.step("14c")
+        self.step("15c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
         logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyCharged updates after a Unplugged operation")
 
-        self.step("14d")
+        self.step("15d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
             logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
 
-        self.step("15")
+        self.step("16")
         sub_handler.reset()
 
-        self.step("16")
+        self.step("17")
         await self.send_test_event_trigger_pluggedin()
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EVConnected)
 
-        self.step("17")
+        self.step("18")
         wait = 5  # We expect a change to the Session attributes after the EV is plugged in again, Wait 5 seconds - allow time for the report to come in
         accumulate_reports(wait)
 
-        self.step("17a")
+        self.step("18a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
         logging.info(f"Received {count} SessionID updates in {wait} seconds")
         asserts.assert_equal(count, 1, "Expected = 1 SessionID updates after a plug-in")
 
-        self.step("17b")
+        self.step("18b")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionDuration]
         logging.info(f"Received {count} SessionDuration updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionDuration updates after a Unplugged operation")
 
-        self.step("17c")
+        self.step("18c")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyCharged]
         logging.info(f"Received {count} SessionEnergyCharged updates in {wait} seconds")
         asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyCharged updates after a Unplugged operation")
 
-        self.step("17d")
+        self.step("18d")
         if has_v2x:
             count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionEnergyDischarged]
             logging.info(f"Received {count} SessionEnergyDischarged updates in {wait} seconds")
             asserts.assert_greater_equal(count, 1, "Expected >= 1 SessionEnergyDischarged updates after a Unplugged operation")
 
-        self.step("18")
+        self.step("19")
         await self.send_test_event_trigger_pluggedin_clear()
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EVNotDetected)
 
-        self.step("19")
+        self.step("20")
         await self.send_test_event_trigger_basic_clear()
 
-        self.step("20")
+        self.step("21")
         await sub_handler.cancel()
 
 
