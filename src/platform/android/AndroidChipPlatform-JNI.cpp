@@ -283,6 +283,7 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr);
+    JniLocalReferenceScope scope(env);
     int priority = ANDROID_LOG_DEBUG;
     switch (category)
     {
@@ -301,24 +302,14 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
 
     jint jPriority  = static_cast<jint>(priority);
     jstring jModule = env->NewStringUTF(module);
-    if (jModule == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(jModule != nullptr);
 
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(buffer, sizeof(buffer), msg, args);
     jstring jMsg = env->NewStringUTF(buffer);
-    if (jMsg == nullptr)
-    {
-        env->DeleteLocalRef(jModule);
-        return;
-    }
+    VerifyOrReturn(jMsg != nullptr);
 
     env->CallVoidMethod(sJavaLogCallbackObject, sOnLogMessageMethod, jModule, jPriority, jMsg);
-
-    env->DeleteLocalRef(jModule);
-    env->DeleteLocalRef(jMsg);
 }
 
 JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject callback)
