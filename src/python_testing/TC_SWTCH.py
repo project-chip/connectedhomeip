@@ -452,7 +452,7 @@ class TC_SwitchTests(MatterBaseTest):
 
     def steps_TC_SWTCH_2_4(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-                TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
+                TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 TestStep(5, "Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, then release it",
@@ -489,7 +489,7 @@ class TC_SwitchTests(MatterBaseTest):
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
             self.skip_all_remaining_steps("2")
 
-        # Step 2: Set up subscription to all events of Switch cluster on the endpoint
+        # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
         event_listener = EventChangeCallback(cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
