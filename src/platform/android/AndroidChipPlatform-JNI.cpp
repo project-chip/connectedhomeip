@@ -302,16 +302,19 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
         break;
     }
 
-    jint jPriority  = static_cast<jint>(priority);
-    jstring jModule = env->NewStringUTF(module);
+    jint jPriority = static_cast<jint>(priority);
+    jobject jModule;
+    JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(module), jModule);
     VerifyOrReturn(jModule != nullptr);
 
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(buffer, sizeof(buffer), msg, args);
-    jstring jMsg = env->NewStringUTF(buffer);
+    jobject jMsg;
+    JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(buffer), jMsg);
     VerifyOrReturn(jMsg != nullptr);
 
-    env->CallVoidMethod(sJavaLogCallbackObject.ObjectRef(), sOnLogMessageMethod, jModule, jPriority, jMsg);
+    env->CallVoidMethod(sJavaLogCallbackObject.ObjectRef(), sOnLogMessageMethod, static_cast<jstring>(jModule), jPriority,
+                        static_cast<jstring>(jMsg));
 }
 
 JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject callback)
