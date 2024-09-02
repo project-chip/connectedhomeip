@@ -16,6 +16,7 @@ name: "[TC-TBRM-2.5] Verify network configuration of a Thread Border Router endp
 
 PICS:
     - TBRM.S
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
