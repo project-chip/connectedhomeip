@@ -62,17 +62,16 @@ public:
 private:
     friend RefrigeratorManager & RefrigeratorMgr();
 
-    int8_t mCurrentTempCelsius;
     uint8_t mCurrentMode;
     uint8_t mStartUpMode;
     uint8_t mOnMode;
 
     int8_t mTemperatureSetpoint;
-    uint8_t mMinTemperature;
-    uint8_t mMaxTemperature;
-    uint8_t mStep;
+    int8_t mMinTemperature;
+    int8_t mMaxTemperature;
+    int8_t mStep;
     int8_t mSelectedTemperatureLevel;
-    uint8_t mSupportedTemperatureLevels;
+    int8_t mSupportedTemperatureLevels;
 
     uint8_t mMask;
     uint8_t mState;

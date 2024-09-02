@@ -97,19 +97,19 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
     switch (attributeId)
     {
         case RefAndTempAttr::CurrentMode::Id: {
-            int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
-            mCurrentMode = Temp;
+            int8_t currentMode = static_cast<int16_t>(*value);
+            mCurrentMode = currentMode;
         }
         break;
 
         case RefAndTempAttr::StartUpMode::Id: {
-            int8_t startUpMode = ConvertToPrintableTemp(*((int16_t *) value));
+            int8_t startUpMode = static_cast<int16_t>(*value);
             mStartUpMode = startUpMode;
         }
         break;
 
         case RefAndTempAttr::OnMode::Id: {
-            int8_t onMode = ConvertToPrintableTemp(*((int16_t *) value));
+            int8_t onMode = static_cast<int16_t>(*value);
             mOnMode = onMode;
         }
         break;
@@ -144,21 +144,9 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         }
         break;
 
-        case TempCtrlAttr::Step::Id: {
-            int8_t step = ConvertToPrintableTemp(*((int16_t *) value));
-            mStep = step;
-        }
-        break;
-
         case TempCtrlAttr::SelectedTemperatureLevel::Id: {
             int8_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
             mSelectedTemperatureLevel = selectedTemperatureLevel;
-        }
-        break;
-
-        case TempCtrlAttr::SupportedTemperatureLevels::Id: {
-            int8_t supportedTemperatureLevels = ConvertToPrintableTemp(*((int16_t *) value));
-            mSupportedTemperatureLevels = supportedTemperatureLevels;
         }
         break;
 
@@ -169,7 +157,7 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         break;
     }
 
-    AppTask::GetAppTask().UpdateThermoStatUI();
+    // AppTask::GetAppTask().UpdateRefUI();
 }
 
 void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
@@ -177,20 +165,20 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
     switch (attributeId)
     {
         case RefAlarmAttr::Mask::Id: {
-            int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
-            mCurrentMode = Temp;
+            int8_t mask = static_cast<int8_t>(*value);
+            mCurrentMode = mask;
         }
         break;
 
         case RefAlarmAttr::State::Id: {
-            int8_t startUpMode = ConvertToPrintableTemp(*((int16_t *) value));
-            mStartUpMode = startUpMode;
+            int8_t state = static_cast<int8_t>(*value);
+            mState = state;
         }
         break;
 
         case RefAlarmAttr::Supported::Id: {
-            int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-            mHeatingCelsiusSetPoint = heatingTemp;
+            int8_t supported = static_cast<int8_t>(*value);
+            mSupported = supported;
         }
         break;
 
