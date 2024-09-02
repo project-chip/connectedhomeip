@@ -22,21 +22,20 @@ import sys
 from argparse import ArgumentParser
 from tempfile import TemporaryDirectory
 
-BRIDGE_COMMISSIONED = asyncio.Event()
+_bridge_commissioned_event = asyncio.Event()
 # Log message which should appear in the fabric-admin output if
 # the bridge is already commissioned.
-BRIDGE_COMMISSIONED_MSG = b"Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000"
+_BRIDGE_COMMISSIONED_MSG = b"Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000"
 
 
 async def forward_f(f_in, f_out, prefix: str):
     """Forward f_in to f_out with a prefix attached."""
-    global BRIDGE_COMMISSIONED
     while True:
         line = await f_in.readline()
         if not line:
             break
-        if not BRIDGE_COMMISSIONED.is_set() and BRIDGE_COMMISSIONED_MSG in line:
-            BRIDGE_COMMISSIONED.set()
+        if not _bridge_commissioned_event.is_set() and _BRIDGE_COMMISSIONED_MSG in line:
+            _bridge_commissioned_event.set()
         f_out.buffer.write(prefix.encode())
         f_out.buffer.write(line)
         f_out.flush()
@@ -182,7 +181,7 @@ async def main(args):
         # we will get the response, otherwise we will hit timeout.
         cmd = "descriptor read device-type-list 1 1 --timeout 1"
         admin.stdin.write((cmd + "\n").encode())
-        await asyncio.wait_for(BRIDGE_COMMISSIONED.wait(), timeout=1.5)
+        await asyncio.wait_for(_bridge_commissioned_event.wait(), timeout=1.5)
     except asyncio.TimeoutError:
         # Commission the bridge to the admin.
         cmd = "fabricsync add-local-bridge 1"

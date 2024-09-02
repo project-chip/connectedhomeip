@@ -87,10 +87,6 @@ class Subprocess(threading.Thread):
 
 class FabricSyncApp:
 
-    APP_PATH = "examples/fabric-admin/scripts/fabric-sync-app.py"
-    FABRIC_ADMIN_PATH = "out/linux-x64-fabric-admin-rpc/fabric-admin"
-    FABRIC_BRIDGE_PATH = "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
-
     def _process_admin_output(self, line):
         if self.wait_for_text_text is not None and self.wait_for_text_text in line:
             self.wait_for_text_event.set()
@@ -101,15 +97,16 @@ class FabricSyncApp:
         self.wait_for_text_event.clear()
         self.wait_for_text_text = None
 
-    def __init__(self, storageDir, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
+    def __init__(self, fabricSyncAppPath, fabricAdminAppPath, fabricBridgeAppPath,
+                 storageDir, fabricName=None, nodeId=None, vendorId=None, paaTrustStorePath=None,
                  bridgePort=None, bridgeDiscriminator=None, bridgePasscode=None):
 
         self.wait_for_text_event = threading.Event()
         self.wait_for_text_text = None
 
-        args = [self.APP_PATH]
-        args.append(f"--app-admin={self.FABRIC_ADMIN_PATH}")
-        args.append(f"--app-bridge={self.FABRIC_BRIDGE_PATH}")
+        args = [fabricSyncAppPath]
+        args.append(f"--app-admin={fabricAdminAppPath}")
+        args.append(f"--app-bridge={fabricBridgeAppPath}")
         # Override default ports, so it will be possible to run
         # our TH_FSA alongside the DUT_FSA during CI testing.
         args.append("--app-admin-rpc-port=44000")
@@ -173,17 +170,22 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
-        # Get the path to the TH_FSA (fabric-admin and fabric-bridge) app from
-        # the user params or use the default path.
-        FabricSyncApp.APP_PATH = self.user_params.get("th_fsa_app_path", FabricSyncApp.APP_PATH)
-        if not os.path.exists(FabricSyncApp.APP_PATH):
+        # Get the path to the TH_FSA (fabric-admin and fabric-bridge) app from the user params.
+        th_fsa_app_path = self.user_params.get("th_fsa_app_path")
+        if not th_fsa_app_path:
             asserts.fail("This test requires a TH_FSA app. Specify app path with --string-arg th_fsa_app_path:<path_to_app>")
-        FabricSyncApp.FABRIC_ADMIN_PATH = self.user_params.get("th_fsa_admin_path", FabricSyncApp.FABRIC_ADMIN_PATH)
-        if not os.path.exists(FabricSyncApp.FABRIC_ADMIN_PATH):
+        if not os.path.exists(th_fsa_app_path):
+            asserts.fail(f"The path {th_fsa_app_path} does not exist")
+        th_fsa_admin_path = self.user_params.get("th_fsa_admin_path")
+        if not th_fsa_admin_path:
             asserts.fail("This test requires a TH_FSA_ADMIN app. Specify app path with --string-arg th_fsa_admin_path:<path_to_app>")
-        FabricSyncApp.FABRIC_BRIDGE_PATH = self.user_params.get("th_fsa_bridge_path", FabricSyncApp.FABRIC_BRIDGE_PATH)
-        if not os.path.exists(FabricSyncApp.FABRIC_BRIDGE_PATH):
+        if not os.path.exists(th_fsa_admin_path):
+            asserts.fail(f"The path {th_fsa_admin_path} does not exist")
+        th_fsa_bridge_path = self.user_params.get("th_fsa_bridge_path")
+        if not th_fsa_bridge_path:
             asserts.fail("This test requires a TH_FSA_BRIDGE app. Specify app path with --string-arg th_fsa_bridge_path:<path_to_app>")
+        if not os.path.exists(th_fsa_bridge_path):
+            asserts.fail(f"The path {th_fsa_bridge_path} does not exist")
 
         # Get the path to the TH_SERVER_NO_UID app from the user params.
         th_server_app = self.user_params.get("th_server_no_uid_app_path", None)
@@ -202,6 +204,9 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.th_fsa_bridge_passcode = 20202021
 
         self.th_fsa_controller = FabricSyncApp(
+            th_fsa_app_path,
+            th_fsa_admin_path,
+            th_fsa_bridge_path,
             storageDir=self.storage.name,
             paaTrustStorePath=self.matter_test_config.paa_trust_store_path,
             bridgePort=self.th_fsa_bridge_port,
