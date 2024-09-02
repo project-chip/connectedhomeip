@@ -195,7 +195,14 @@ async def main(args):
 
     # Open commissioning window with original setup code for the bridge,
     # so it can be added by the TH fabric.
-    cmd = "pairing open-commissioning-window 1 0 0 600 1000 0"
+    cwNodeId = 1
+    cwEndpointId = 0
+    cwOption = 0  # 0: Original setup code, 1: New setup code
+    cwTimeout = 600
+    cwIteration = 1000
+    cwDiscriminator = 0
+    cmd = (f"pairing open-commissioning-window {cwNodeId} {cwEndpointId}"
+           f" {cwOption} {cwTimeout} {cwIteration} {cwDiscriminator}")
     admin.stdin.write((cmd + "\n").encode())
     # Wait some time for the bridge to open the commissioning window.
     await asyncio.sleep(1)
