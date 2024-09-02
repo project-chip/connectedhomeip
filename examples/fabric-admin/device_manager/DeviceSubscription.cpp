@@ -100,7 +100,7 @@ void DeviceSubscription::OnReportEnd()
 #if defined(PW_RPC_ENABLED)
         AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
-        ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+        ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge: RPC not enabled");
 #endif
         mChangeDetected = false;
     }
@@ -108,7 +108,10 @@ void DeviceSubscription::OnReportEnd()
 
 void DeviceSubscription::OnDone(ReadClient * apReadClient)
 {
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
 void DeviceSubscription::OnError(CHIP_ERROR error)
@@ -118,6 +121,15 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
 
 void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
+    if (mState == State::Stopping)
+    {
+        // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
+        MoveToState(State::AwaitingDestruction);
+        mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
+        return;
+    }
+    VerifyOrDie(mState == State::Connecting);
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Subscribe);
     VerifyOrDie(mClient);
@@ -136,25 +148,95 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+        // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+        // DeviceSubscription.
+        MoveToState(State::AwaitingDestruction);
+        mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
+        return;
     }
+    MoveToState(State::SubscriptionStarted);
+}
+
+void DeviceSubscription::MoveToState(const State aTargetState)
+{
+    mState = aTargetState;
+    ChipLogDetail(NotSpecified, "DeviceSubscription moving to [%10.10s]", GetStateStr());
+}
+
+const char * DeviceSubscription::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::Connecting:
+        return "Connecting";
+
+    case State::Stopping:
+        return "Stopping";
+
+    case State::SubscriptionStarted:
+        return "SubscriptionStarted";
+
+    case State::AwaitingDestruction:
+        return "AwaitingDestruction";
+    }
+    return "N/A";
 }
 
 void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    // TODO(#35077) In follow up PR we will indicate to a manager DeviceSubscription is terminal.
+    VerifyOrDie(mState == State::Connecting || mState == State::Stopping);
+    ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    // TODO(#35333) Figure out how we should recover if we fail to connect and mState == State::Connecting.
+
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }
 
-void DeviceSubscription::StartSubscription(Controller::DeviceController & controller, NodeId nodeId)
+CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, Controller::DeviceController & controller,
+                                                 NodeId nodeId)
 {
-    VerifyOrDie(!mSubscriptionStarted);
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDie(mState == State::Idle);
 
     mCurrentAdministratorCommissioningAttributes         = chip_rpc_AdministratorCommissioningChanged_init_default;
     mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-    mSubscriptionStarted = true;
+    mState          = State::Connecting;
+    mOnDoneCallback = onDoneCallback;
 
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
+
+void DeviceSubscription::StopSubscription()
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDie(mState != State::Idle);
+    // Something is seriously wrong if we die on the line below
+    VerifyOrDie(mState != State::AwaitingDestruction);
+
+    if (mState == State::Stopping)
+    {
+        // Stop is called again while we are still waiting on connected callbacks
+        return;
+    }
+
+    if (mState == State::Connecting)
+    {
+        MoveToState(State::Stopping);
+        return;
+    }
+
+    // By calling reset on our ReadClient we terminate the subscription.
+    VerifyOrDie(mClient);
+    mClient.reset();
+    // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
+    // DeviceSubscription.
+    MoveToState(State::AwaitingDestruction);
+    mOnDoneCallback(mCurrentAdministratorCommissioningAttributes.node_id);
 }

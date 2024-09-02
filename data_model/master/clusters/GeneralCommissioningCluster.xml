@@ -65,7 +65,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
   <features>
-    <feature bit="0" code="TC" name="Terms" summary="Supports Terms &amp; Conditions acknowledgement">
+    <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
       <optionalConform/>
     </feature>
   </features>

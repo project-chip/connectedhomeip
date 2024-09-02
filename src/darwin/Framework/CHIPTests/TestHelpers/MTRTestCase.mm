@@ -32,10 +32,6 @@
 #endif // HAVE_NSTASK
 }
 
-/**
- * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
- * does not trigger a test failure even if the XCTAssertEqual fails.
- */
 - (void)tearDown
 {
 #if defined(ENABLE_LEAK_DETECTION) && ENABLE_LEAK_DETECTION
@@ -43,12 +39,17 @@
         int pid = getpid();
         __auto_type * cmd = [NSString stringWithFormat:@"leaks %d", pid];
         int ret = system(cmd.UTF8String);
+        /**
+         * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
+         * does not trigger a test failure even if the XCTAssertEqual fails.
+         */
         XCTAssertEqual(ret, 0, "LEAKS DETECTED");
     }
 #endif
 
 #if HAVE_NSTASK
     for (NSTask * task in _runningTasks) {
+        NSLog(@"Terminating task %@", task);
         [task terminate];
     }
     _runningTasks = nil;
