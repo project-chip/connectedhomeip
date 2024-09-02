@@ -209,6 +209,11 @@ FACTORY_DATA = {
         'encoding': 'string',
         'value': None,
     },
+    'device-type': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
 }
 
 
@@ -372,6 +377,8 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['product-url']['value'] = args.product_url
     if args.product_label:
         FACTORY_DATA['product-label']['value'] = args.product_label
+    if args.device_type  is not None:
+        FACTORY_DATA['device-type']['value'] = args.device_type
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -553,6 +560,8 @@ def get_args():
     parser.add_argument("--part-number", type=str, help='human readable product number')
     parser.add_argument("--product-label", type=str, help='human readable product label')
     parser.add_argument("--product-url", type=str, help='link to product specific web page')
+
+    parser.add_argument("--device-type", type=any_base_int, help='commissionable device type')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
