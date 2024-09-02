@@ -24,7 +24,8 @@ from argparse import ArgumentParser
 from tempfile import TemporaryDirectory
 
 
-async def forward_f(f_in, f_out: typing.BinaryIO, prefix: bytes, cb=None):
+async def forward_f(f_in: asyncio.StreamReader, f_out: typing.BinaryIO,
+                    prefix: bytes, cb=None):
     """Forward f_in to f_out with a prefix attached.
 
     This function can optionally feed received lines to a callback function.
@@ -73,15 +74,49 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
         f_out.write(line)
 
 
-async def run(tag, program, *args, stdin=None, stdout_cb=None):
-    p = await asyncio.create_subprocess_exec(program, *args,
-                                             stdout=asyncio.subprocess.PIPE,
-                                             stderr=asyncio.subprocess.PIPE,
-                                             stdin=stdin)
-    # Add the stdout and stderr processing to the event loop.
-    asyncio.create_task(forward_f(p.stderr, sys.stderr, tag.encode()))
-    asyncio.create_task(forward_f(p.stdout, sys.stdout, tag.encode(), cb=stdout_cb))
-    return p
+class Subprocess:
+
+    def __init__(self, tag: str, program: str, *args, stdout_cb=None):
+        self.event = asyncio.Event()
+        self.tag = tag.encode()
+        self.program = program
+        self.args = args
+        self.stdout_cb = stdout_cb
+        self.expected_output = None
+
+    def _check_output(self, line: bytes):
+        if self.expected_output is not None and self.expected_output in line:
+            self.event.set()
+
+    async def run(self):
+        self.p = await asyncio.create_subprocess_exec(self.program, *self.args,
+                                                      stdin=asyncio.subprocess.PIPE,
+                                                      stdout=asyncio.subprocess.PIPE,
+                                                      stderr=asyncio.subprocess.PIPE)
+        # Add the stdout and stderr processing to the event loop.
+        asyncio.create_task(forward_f(self.p.stderr, sys.stderr, self.tag))
+        asyncio.create_task(forward_f(self.p.stdout, sys.stdout, self.tag,
+                                      cb=self._check_output))
+
+    async def send(self, message: str, expected_output: str = None, timeout: float = None):
+        """Send a message to a process and optionally wait for a response."""
+
+        if expected_output is not None:
+            self.expected_output = expected_output.encode()
+            self.event.clear()
+
+        self.p.stdin.write((message + "\n").encode())
+        await self.p.stdin.drain()
+
+        if expected_output is not None:
+            await asyncio.wait_for(self.event.wait(), timeout=timeout)
+            self.expected_output = None
+
+    async def wait(self):
+        await self.p.wait()
+
+    def terminate(self):
+        self.p.terminate()
 
 
 async def run_admin(program, stdout_cb=None, storage_dir=None,
@@ -103,9 +138,10 @@ async def run_admin(program, stdout_cb=None, storage_dir=None,
         args.extend(["--commissioner-nodeid", str(commissioner_node_id)])
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", str(commissioner_vendor_id)])
-    return await run("[FS-ADMIN]", program, "interactive", "start", *args,
-                     stdin=asyncio.subprocess.PIPE,
-                     stdout_cb=stdout_cb)
+    p = Subprocess("[FS-ADMIN]", program, "interactive", "start", *args,
+                   stdout_cb=stdout_cb)
+    await p.run()
+    return p
 
 
 async def run_bridge(program, storage_dir=None, rpc_admin_port=None,
@@ -125,14 +161,18 @@ async def run_bridge(program, storage_dir=None, rpc_admin_port=None,
         args.extend(["--passcode", str(passcode)])
     if secured_device_port is not None:
         args.extend(["--secured-device-port", str(secured_device_port)])
-    return await run("[FS-BRIDGE]", program, *args,
-                     stdin=asyncio.subprocess.DEVNULL)
+    p = Subprocess("[FS-BRIDGE]", program, *args)
+    await p.run()
+    return p
 
 
 async def main(args):
 
-    if args.commissioner_node_id == 1:
-        raise ValueError("NodeID=1 is reserved for the local fabric-bridge")
+    # Node ID of the bridge on the fabric.
+    bridge_node_id = 1
+
+    if args.commissioner_node_id == bridge_node_id:
+        raise ValueError(f"NodeID={bridge_node_id} is reserved for the local fabric-bridge")
 
     storage_dir = args.storage_dir
     if storage_dir is not None:
@@ -153,19 +193,9 @@ async def main(args):
     signal.signal(signal.SIGINT, terminate)
     signal.signal(signal.SIGTERM, terminate)
 
-    bridge_commissioned_event = asyncio.Event()
-    # Log message which should appear in the fabric-admin output if
-    # the bridge is already commissioned.
-    _BRIDGE_COMMISSIONED_MSG = b"Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000"
-
-    def check_for_commissioned_bridge(line: bytes):
-        if not bridge_commissioned_event.is_set() and _BRIDGE_COMMISSIONED_MSG in line:
-            bridge_commissioned_event.set()
-
     admin, bridge = await asyncio.gather(
         run_admin(
             args.app_admin,
-            stdout_cb=check_for_commissioned_bridge,
             storage_dir=storage_dir,
             rpc_admin_port=args.app_admin_rpc_port,
             rpc_bridge_port=args.app_bridge_rpc_port,
@@ -190,35 +220,39 @@ async def main(args):
     try:
         # Check whether the bridge is already commissioned. If it is,
         # we will get the response, otherwise we will hit timeout.
-        cmd = "descriptor read device-type-list 1 1 --timeout 1"
-        admin.stdin.write((cmd + "\n").encode())
-        await asyncio.wait_for(bridge_commissioned_event.wait(), timeout=1.5)
+        await admin.send(
+            f"descriptor read device-type-list {bridge_node_id} 1 --timeout 1",
+            # Log message which should appear in the fabric-admin output if
+            # the bridge is already commissioned.
+            expected_output="Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000",
+            timeout=1.5)
     except asyncio.TimeoutError:
         # Commission the bridge to the admin.
-        cmd = "fabricsync add-local-bridge 1"
+        cmd = f"fabricsync add-local-bridge {bridge_node_id}"
         if args.passcode is not None:
             cmd += f" --setup-pin-code {args.passcode}"
         if args.secured_device_port is not None:
             cmd += f" --local-port {args.secured_device_port}"
-        admin.stdin.write((cmd + "\n").encode())
-        # Wait for the bridge to be commissioned.
-        await asyncio.sleep(5)
+        await admin.send(
+            cmd,
+            # Wait for the log message indicating that the bridge has been
+            # added to the fabric.
+            f"Commissioning complete for node ID {bridge_node_id:#018x}: success")
 
     # Open commissioning window with original setup code for the bridge,
     # so it can be added by the TH fabric.
-    cwNodeId = 1
-    cwEndpointId = 0
-    cwOption = 0  # 0: Original setup code, 1: New setup code
-    cwTimeout = 600
-    cwIteration = 1000
-    cwDiscriminator = 0
-    cmd = (f"pairing open-commissioning-window {cwNodeId} {cwEndpointId}"
-           f" {cwOption} {cwTimeout} {cwIteration} {cwDiscriminator}")
-    admin.stdin.write((cmd + "\n").encode())
+    cw_endpoint_id = 0
+    cw_option = 0  # 0: Original setup code, 1: New setup code
+    cw_timeout = 600
+    cw_iteration = 1000
+    cw_discriminator = 0
+    cmd = (f"pairing open-commissioning-window {bridge_node_id} {cw_endpoint_id}"
+           f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
+    await admin.send(cmd)
 
     try:
         await asyncio.gather(
-            forward_pipe(pipe, admin.stdin) if pipe else forward_stdin(admin.stdin),
+            forward_pipe(pipe, admin.p.stdin) if pipe else forward_stdin(admin.p.stdin),
             admin.wait(),
             bridge.wait(),
         )

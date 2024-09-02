@@ -27,7 +27,7 @@
 # test-runner-run/run1/app: examples/fabric-admin/scripts/fabric-sync-app.py
 # test-runner-run/run1/app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
 # test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
 # test-runner-run/run1/script-start-delay: 5
 # test-runner-run/run1/quiet: false
 # === END CI TEST ARGUMENTS ===
@@ -302,9 +302,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             ),
             timedRequestTimeoutMs=5000,
         )
-
-        if not self.is_ci:
-            await asyncio.sleep(30)
 
     @async_test_body
     async def test_TC_MCORE_FS_1_4(self):

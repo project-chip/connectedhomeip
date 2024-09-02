@@ -196,9 +196,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             timedRequestTimeoutMs=5000,
         )
 
-        if not self.is_ci:
-            await asyncio.sleep(30)
-
     @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
