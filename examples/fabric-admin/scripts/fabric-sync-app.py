@@ -259,16 +259,14 @@ async def main(args):
             # added to the fabric.
             f"Commissioning complete for node ID {bridge_node_id:#018x}: success")
 
-    # Open commissioning window with original setup code for the bridge,
-    # so it can be added by the TH fabric.
+    # Open commissioning window with original setup code for the bridge.
     cw_endpoint_id = 0
     cw_option = 0  # 0: Original setup code, 1: New setup code
     cw_timeout = 600
     cw_iteration = 1000
     cw_discriminator = 0
-    cmd = (f"pairing open-commissioning-window {bridge_node_id} {cw_endpoint_id}"
-           f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
-    await admin.send(cmd)
+    await admin.send(f"pairing open-commissioning-window {bridge_node_id} {cw_endpoint_id}"
+                     f" {cw_option} {cw_timeout} {cw_iteration} {cw_discriminator}")
 
     try:
         await asyncio.gather(

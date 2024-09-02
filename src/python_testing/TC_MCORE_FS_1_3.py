@@ -48,6 +48,7 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
+# TODO: Make this class more generic. Issue #35348
 class Subprocess(threading.Thread):
 
     def __init__(self, args: list = [], tag="", **kw):
@@ -108,6 +109,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
+        self.th_server = None
+        self.storage = None
+
         # Get the path to the TH_SERVER_NO_UID app from the user params.
         th_server_app = self.user_params.get("th_server_no_uid_app_path", None)
         if not th_server_app:
@@ -132,8 +136,10 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             passcode=self.th_server_passcode)
 
     def teardown_class(self):
-        self.th_server.stop()
-        self.storage.cleanup()
+        if self.th_server is not None:
+            self.th_server.stop()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_3(self) -> list[TestStep]:

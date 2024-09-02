@@ -48,6 +48,7 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
+# TODO: Make this class more generic. Issue #35348
 class Subprocess(threading.Thread):
 
     def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
@@ -114,9 +115,8 @@ class FabricSyncApp:
         args.append("--app-bridge-rpc-port=44001")
         # Keep the storage directory in a temporary location.
         args.append(f"--storage-dir={storage_dir}")
-        # FIXME: Passing custom PAA store breaks something
-        # if paa_trust_store_path is not None:
-        #     args.append(f"--paa-trust-store-path={paa_trust_store_path}")
+        if paa_trust_store_path is not None:
+            args.append(f"--paa-trust-store-path={paa_trust_store_path}")
         if fabric_name is not None:
             args.append(f"--commissioner-name={fabric_name}")
         if node_id is not None:
@@ -171,6 +171,10 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
+        self.th_fsa_controller = None
+        self.th_server = None
+        self.storage = None
+
         # Get the path to the TH_FSA (fabric-admin and fabric-bridge) app from the user params.
         th_fsa_app_path = self.user_params.get("th_fsa_app_path")
         if not th_fsa_app_path:
@@ -201,7 +205,9 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         self.th_fsa_bridge_address = "::1"
         self.th_fsa_bridge_port = 5543
-        self.th_fsa_bridge_discriminator = random.randint(0, 4095)
+        # Random discriminator between 0 and MAX - 1. The one-less is to save
+        # a room for the TH_SERVER_NO_UID discriminator.
+        self.th_fsa_bridge_discriminator = random.randint(0, 4094)
         self.th_fsa_bridge_passcode = 20202021
 
         self.th_fsa_controller = FabricSyncApp(
@@ -221,7 +227,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
 
         self.th_server_port = 5544
-        self.th_server_discriminator = random.randint(0, 4095)
+        self.th_server_discriminator = self.th_fsa_bridge_discriminator + 1
         self.th_server_passcode = 20202021
 
         # Start the TH_SERVER_NO_UID app.
@@ -233,9 +239,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             passcode=self.th_server_passcode)
 
     def teardown_class(self):
-        self.th_fsa_controller.stop()
-        self.th_server.stop()
-        self.storage.cleanup()
+        if self.th_fsa_controller is not None:
+            self.th_fsa_controller.stop()
+        if self.th_server is not None:
+            self.th_server.stop()
+        if self.storage is not None:
+            self.storage.cleanup()
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_4(self) -> list[TestStep]:
@@ -251,58 +260,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             TestStep(6, "DUT_FSA synchronizes TH_SERVER_NO_UID onto DUT_FSA's fabric and copies the UniqueID presented"
                      " by TH_FSA's Bridged Device Basic Information Cluster."),
         ]
-
-    async def commission_via_commissioner_control(self, controller_node_id: int, device_node_id: int):
-        """Commission device_node_id to controller_node_id using CommissionerControl cluster."""
-
-        request_id = random.randint(0, 0xFFFFFFFFFFFFFFFF)
-
-        vendor_id = await self.read_single_attribute_check_success(
-            node_id=device_node_id,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.VendorID,
-        )
-
-        product_id = await self.read_single_attribute_check_success(
-            node_id=device_node_id,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.ProductID,
-        )
-
-        await self.send_single_cmd(
-            node_id=controller_node_id,
-            cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-                requestId=request_id,
-                vendorId=vendor_id,
-                productId=product_id,
-            ),
-        )
-
-        if not self.is_ci:
-            self.wait_for_user_input("Approve Commissioning Approval Request on DUT using manufacturer specified mechanism")
-
-        resp = await self.send_single_cmd(
-            node_id=controller_node_id,
-            cmd=Clusters.CommissionerControl.Commands.CommissionNode(
-                requestId=request_id,
-                responseTimeoutSeconds=30,
-            ),
-        )
-
-        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
-                             "Incorrect response type")
-
-        await self.send_single_cmd(
-            node_id=device_node_id,
-            cmd=Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
-                commissioningTimeout=3*60,
-                PAKEPasscodeVerifier=resp.PAKEPasscodeVerifier,
-                discriminator=resp.discriminator,
-                iterations=resp.iterations,
-                salt=resp.salt,
-            ),
-            timedRequestTimeoutMs=5000,
-        )
 
     @async_test_body
     async def test_TC_MCORE_FS_1_4(self):
