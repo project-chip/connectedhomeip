@@ -90,6 +90,10 @@ bool ps_requirement_added = false;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
+#if !defined(MIN)
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#endif
+
 WfxRsi_t wfx_rsi;
 
 bool hasNotifiedIPV6 = false;
