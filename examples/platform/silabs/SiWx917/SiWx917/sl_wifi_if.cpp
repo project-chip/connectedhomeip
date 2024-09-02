@@ -533,7 +533,9 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
-        if (wfx_rsi.scan_ssid != NULL && (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) == CMP_SUCCESS))
+        if (wfx_rsi.scan_ssid != NULL &&
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+             CMP_SUCCESS))
         {
             continue;
         }

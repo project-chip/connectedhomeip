@@ -746,7 +746,9 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 scan = &scan_rsp.scan_info[x];
                 // is it a scan all or target scan
-                if (wfx_rsi.scan_ssid != NULL && (strncmp(wfx_rsi.scan_ssid, (char *) scan->ssid, MIN(strlen(wfx_rsi.scan_ssid), sizeof(scan->ssid))) == CMP_SUCCESS))
+                if (wfx_rsi.scan_ssid != NULL &&
+                    (strncmp(wfx_rsi.scan_ssid, (char *) scan->ssid, MIN(strlen(wfx_rsi.scan_ssid), sizeof(scan->ssid))) ==
+                     CMP_SUCCESS))
                 {
                     strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
                     ap.security = static_cast<wfx_sec_t>(scan->security_mode);
