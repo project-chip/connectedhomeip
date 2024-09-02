@@ -55,9 +55,9 @@ async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
             if data:
                 f_out.write(data)
             if not data:
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.1)
         except BlockingIOError:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
 
 async def forward_stdin(f_out: asyncio.StreamWriter):
