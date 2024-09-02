@@ -19,24 +19,23 @@ import contextlib
 import os
 import signal
 import sys
+import typing
 from argparse import ArgumentParser
 from tempfile import TemporaryDirectory
 
-_bridge_commissioned_event = asyncio.Event()
-# Log message which should appear in the fabric-admin output if
-# the bridge is already commissioned.
-_BRIDGE_COMMISSIONED_MSG = b"Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000"
 
+async def forward_f(f_in, f_out: typing.BinaryIO, prefix: bytes, cb=None):
+    """Forward f_in to f_out with a prefix attached.
 
-async def forward_f(f_in, f_out, prefix: str):
-    """Forward f_in to f_out with a prefix attached."""
+    This function can optionally feed received lines to a callback function.
+    """
     while True:
         line = await f_in.readline()
         if not line:
             break
-        if not _bridge_commissioned_event.is_set() and _BRIDGE_COMMISSIONED_MSG in line:
-            _bridge_commissioned_event.set()
-        f_out.buffer.write(prefix.encode())
+        if cb is not None:
+            cb(line)
+        f_out.buffer.write(prefix)
         f_out.buffer.write(line)
         f_out.flush()
 
@@ -69,25 +68,26 @@ async def forward_stdin(f_out: asyncio.StreamWriter):
     while True:
         line = await reader.readline()
         if not line:
+            # Exit on Ctrl-D (EOF).
             sys.exit(0)
         f_out.write(line)
 
 
-async def run(tag, program, *args, stdin=None):
+async def run(tag, program, *args, stdin=None, stdout_cb=None):
     p = await asyncio.create_subprocess_exec(program, *args,
                                              stdout=asyncio.subprocess.PIPE,
                                              stderr=asyncio.subprocess.PIPE,
                                              stdin=stdin)
     # Add the stdout and stderr processing to the event loop.
-    asyncio.create_task(forward_f(p.stderr, sys.stderr, tag))
-    asyncio.create_task(forward_f(p.stdout, sys.stdout, tag))
+    asyncio.create_task(forward_f(p.stderr, sys.stderr, tag.encode()))
+    asyncio.create_task(forward_f(p.stdout, sys.stdout, tag.encode(), cb=stdout_cb))
     return p
 
 
-async def run_admin(program, storage_dir=None, rpc_admin_port=None,
-                    rpc_bridge_port=None, paa_trust_store_path=None,
-                    commissioner_name=None, commissioner_node_id=None,
-                    commissioner_vendor_id=None):
+async def run_admin(program, stdout_cb=None, storage_dir=None,
+                    rpc_admin_port=None, rpc_bridge_port=None,
+                    paa_trust_store_path=None, commissioner_name=None,
+                    commissioner_node_id=None, commissioner_vendor_id=None):
     args = []
     if storage_dir is not None:
         args.extend(["--storage-directory", storage_dir])
@@ -104,7 +104,8 @@ async def run_admin(program, storage_dir=None, rpc_admin_port=None,
     if commissioner_vendor_id is not None:
         args.extend(["--commissioner-vendor-id", str(commissioner_vendor_id)])
     return await run("[FS-ADMIN]", program, "interactive", "start", *args,
-                     stdin=asyncio.subprocess.PIPE)
+                     stdin=asyncio.subprocess.PIPE,
+                     stdout_cb=stdout_cb)
 
 
 async def run_bridge(program, storage_dir=None, rpc_admin_port=None,
@@ -152,9 +153,19 @@ async def main(args):
     signal.signal(signal.SIGINT, terminate)
     signal.signal(signal.SIGTERM, terminate)
 
+    bridge_commissioned_event = asyncio.Event()
+    # Log message which should appear in the fabric-admin output if
+    # the bridge is already commissioned.
+    _BRIDGE_COMMISSIONED_MSG = b"Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000"
+
+    def check_for_commissioned_bridge(line: bytes):
+        if not bridge_commissioned_event.is_set() and _BRIDGE_COMMISSIONED_MSG in line:
+            bridge_commissioned_event.set()
+
     admin, bridge = await asyncio.gather(
         run_admin(
             args.app_admin,
+            stdout_cb=check_for_commissioned_bridge,
             storage_dir=storage_dir,
             rpc_admin_port=args.app_admin_rpc_port,
             rpc_bridge_port=args.app_bridge_rpc_port,
@@ -181,7 +192,7 @@ async def main(args):
         # we will get the response, otherwise we will hit timeout.
         cmd = "descriptor read device-type-list 1 1 --timeout 1"
         admin.stdin.write((cmd + "\n").encode())
-        await asyncio.wait_for(_bridge_commissioned_event.wait(), timeout=1.5)
+        await asyncio.wait_for(bridge_commissioned_event.wait(), timeout=1.5)
     except asyncio.TimeoutError:
         # Commission the bridge to the admin.
         cmd = "fabricsync add-local-bridge 1"
@@ -204,8 +215,6 @@ async def main(args):
     cmd = (f"pairing open-commissioning-window {cwNodeId} {cwEndpointId}"
            f" {cwOption} {cwTimeout} {cwIteration} {cwDiscriminator}")
     admin.stdin.write((cmd + "\n").encode())
-    # Wait some time for the bridge to open the commissioning window.
-    await asyncio.sleep(1)
 
     try:
         await asyncio.gather(
