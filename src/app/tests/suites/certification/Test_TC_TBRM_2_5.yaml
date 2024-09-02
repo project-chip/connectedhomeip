@@ -34,7 +34,7 @@ tests:
           values:
               - name: nodeId
                 value: nodeId
-    
+
     # Step 1
     - label: "TH sends a GetActiveDatasetRequest command to the DUT"
       command: GetActiveDatasetRequest
@@ -52,7 +52,7 @@ tests:
       attribute: MaxNetworks
       response:
           value: 1
-    
+
     # Step 3
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
       command: readAttribute
