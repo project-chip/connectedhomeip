@@ -304,13 +304,13 @@ static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_
 
     jint jPriority = static_cast<jint>(priority);
     jobject jModule;
-    JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(module), jModule);
+    VerifyOrReturn(JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(module), jModule) == CHIP_NO_ERROR);
     VerifyOrReturn(jModule != nullptr);
 
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(buffer, sizeof(buffer), msg, args);
     jobject jMsg;
-    JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(buffer), jMsg);
+    VerifyOrReturn(JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(buffer), jMsg) == CHIP_NO_ERROR);
     VerifyOrReturn(jMsg != nullptr);
 
     env->CallVoidMethod(sJavaLogCallbackObject.ObjectRef(), sOnLogMessageMethod, static_cast<jstring>(jModule), jPriority,
