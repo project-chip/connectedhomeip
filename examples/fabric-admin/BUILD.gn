@@ -84,6 +84,8 @@ static_library("fabric-admin-utils") {
     "device_manager/DeviceManager.h",
     "device_manager/DeviceSubscription.cpp",
     "device_manager/DeviceSubscription.h",
+    "device_manager/DeviceSubscriptionManager.cpp",
+    "device_manager/DeviceSubscriptionManager.h",
     "device_manager/DeviceSynchronization.cpp",
     "device_manager/DeviceSynchronization.h",
   ]

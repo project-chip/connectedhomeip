@@ -423,7 +423,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(CurrentCommissioner(), mNodeId, mDeviceIsICD);
+        // CurrentCommissioner() has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(&CurrentCommissioner(), mNodeId, mDeviceIsICD);
     }
     else
     {
@@ -564,6 +566,8 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
 #if defined(PW_RPC_ENABLED)
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(),
+                                                                                nodeId);
         RemoveSynchronizedDevice(nodeId);
 #endif
     }
