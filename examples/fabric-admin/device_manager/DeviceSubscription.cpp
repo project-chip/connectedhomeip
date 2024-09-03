@@ -207,10 +207,15 @@ CHIP_ERROR DeviceSubscription::StartSubscription(OnDoneCallback onDoneCallback, 
     mCurrentAdministratorCommissioningAttributes.node_id = nodeId;
     mCurrentAdministratorCommissioningAttributes.window_status =
         static_cast<uint32_t>(Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
-    mState          = State::Connecting;
-    mOnDoneCallback = onDoneCallback;
 
-    return controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mOnDoneCallback = onDoneCallback;
+    MoveToState(State::Connecting);
+    CHIP_ERROR err = controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        MoveToState(State::Idle);
+    }
+    return err;
 }
 
 void DeviceSubscription::StopSubscription()

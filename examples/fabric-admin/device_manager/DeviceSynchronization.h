@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include "UidGetter.h"
+
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
@@ -65,14 +67,31 @@ public:
     static DeviceSynchronizer & Instance();
 
 private:
+    enum class State : uint8_t
+    {
+        Idle,             ///< Default state that the object starts out in, where no work has commenced
+        Connecting,       ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        AwaitingResponse, ///< We have started reading BasicInformation cluster attributes
+        ReceivedResponse, ///< We have received a ReportEnd from reading BasicInformation cluster attributes
+        ReceivedError,    ///< We recieved an error while reading of BasicInformation cluster attributes
+        GettingUid,       ///< We are getting UniqueId from the remote fabric sync bridge.
+    };
+
+    void GetUid(chip::EndpointId endpointId);
+    void SynchronizationCompleteAddDevice();
+
+    void MoveToState(const State targetState);
+    const char * GetStateStr() const;
+
     std::unique_ptr<chip::app::ReadClient> mClient;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+    State mState = State::Idle;
     // mController is expected to remain valid throughout the entire device synchronization process (i.e. when
-    // mDeviceSyncInProcess is true).
+    // mState != Idle).
     chip::Controller::DeviceController * mController = nullptr;
-    bool mDeviceSyncInProcess                        = false;
     chip_rpc_SynchronizedDevice mCurrentDeviceData   = chip_rpc_SynchronizedDevice_init_default;
+    UidGetter mUidGetter;
 };
