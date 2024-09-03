@@ -3149,7 +3149,7 @@ MarkAttributeDirty ColorControlServer::SetQuietReportAttribute(QuieterReportingA
  * @brief
  * Function used to set the remaining time based on quiet reporting conditions.
  * It will update the attribute storage and report the attribute if it is determined dirty.
- * The condition on which the attribute must be reported are :
+ * The conditions on which the attribute must be reported are:
  * - When it changes from 0 to any value higher than 10, or
  * - When it changes, with a delta larger than 10, caused by the invoke of a command, or
  * - When it changes to 0.
