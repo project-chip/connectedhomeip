@@ -48,10 +48,9 @@ MCUBoot is an open-source secure bootloader used by RW61x to apply the
 self-upgrade. For more details, please refer to the
 [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
 
-In our use case, the bootloader runs the application residing in the primary
-partition. In order to run the OTA update image, the bootloader will swap the
-content of the primary and the secondary partitions. This type of upgrade is
-called swap-move and is the default upgrade configured by MCUBoot.
+For RW61x platform, the bootloader is configured to use the flash remapping
+mechanism by default, in order to perform the image upgrade. This is achieved by
+using the `MCUBoot DIRECT-XIP` upgrade mode.
 
 ## OTA Software Update process for RW61x example application
 
@@ -86,47 +85,42 @@ J-Link > exec EnableEraseAllFlashBanks
 J-Link > erase 0x8000000, 0x88a0000
 ```
 
--   Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK
-    previously downloaded. The example can be found under the `ota_examples`
-    folder.
-    ![mcuboot_demo](../../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
--   Before building the demo example, it should be specified that the
-    application to be run by the bootloader is monolithic. As a result, only one
-    image will be upgraded by the bootloader. This can be done by defining
-    `MONOLITHIC_APP` as 1 in the settings of the `mcuboot_opensource` project :
+-   MCUBoot application can be built with SDK installed, using instructions
+
+    below.
+
+-   Retrieve the mcuboot directory with :
 
 ```
-Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "MONOLITHIC_APP=1" in the Defined Symbols
+user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc
 ```
 
-![rw610_mcuboot_monolithic](../../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
+`<rw612 board>`: Supported rw612 boards are: `rdrw612bga` or `frdmrw612`
 
--   Build the demo example project.
-
-```
-Right click on the Project -> Build Project
-```
-
--   Program the demo example to the target board.
+-   Build the mcuboot application :
 
 ```
-Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select elf file
+user@ubuntu: chmod +x build_flash_release.sh
+user@ubuntu: export ARMGCC_DIR=/opt/gcc-arm-none-eabi-10.3-2021.10   # with ARMGCC_DIR referencing the compiler path
+user@ubuntu: ./build_flash_release.sh
 ```
 
-Note : The mcuboot binary is loaded in flash at address 0x8000000.
+-   Program the generated binary to the target board.
 
--   To run the flashed demo, either press the reset button of the device or use
-    the debugger IDE of MCUXpresso. If it runs successfully, the following logs
-    will be displayed on the terminal :
+```
+J-Link > loadbin ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc/flash_release/mcuboot_opensource.elf
+```
+
+-   If it runs successfully, the following logs will be displayed on the
+    terminal :
 
 ```
 hello sbl.
-Bootloader Version 1.9.0
-Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
-Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
-Boot source: none
-Swap type: none
-erasing trailer; fa_id=2
+Disabling flash remapping function
+Bootloader Version 2.0.0
+Image 0 Primary slot: Image not found
+Image 0 Secondary slot: Image not found
+No slot to load for image 0
 Unable to find bootable image
 ```
 
@@ -135,7 +129,7 @@ partitions to be the size of 4.4 MB. If the size is to be changed, the partition
 addresses should be modified in the flash_partitioning.h accordingly. For more
 information about the flash partitioning with mcuboot, please refer to the
 dedicated readme.txt located in
-"`SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/`".
+"`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/`".
 
 ### Generating and flashing the signed application image
 
@@ -162,15 +156,15 @@ arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-rw61x-all-cluster-
 
 To sign the image and wrap the raw binary of the application with the header and
 trailer, "`imgtool`" is provided in the SDK and can be found in
-"`/middleware/mcuboot_opensource/scripts/`".
+"`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/middleware/mcuboot_opensource/scripts/`".
 
 The following commands can be run (make sure to replace the /path/to/file/binary
 with the adequate files):
 
 ```
-user@ubuntu: cd ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/scripts
+user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/middleware/mcuboot_opensource/scripts/
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example_SIGNED.bin
 ```
 
 Notes :
@@ -182,7 +176,7 @@ Notes :
     adjusted accordingly.
 -   In this example, the image is signed with the private key provided by the
     SDK as an example
-    (`SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
+    (`<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
     MCUBoot is built with its corresponding public key which would be used to
     verify the integrity of the image. It is possible to generate a new pair of
     keys using the following commands. This procedure should be done prior to
@@ -201,7 +195,7 @@ user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
 
 -   The extracted public key can then be copied to the
-    `SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
+    `<matter_repo_root>/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
     given as a value to the rsa_pub_key[] array.
 
 The resulting output is the signed binary of the application version "1.0".
@@ -221,11 +215,12 @@ application and run it.
 To generate the OTA update image the same procedure can be followed from the
 [Generating and flashing the signed application image](#generating-and-flashing-the-signed-application-image)
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
-(recent version of the update).
+(recent version of the update), without arguments "--pad" "--confirm" when
+running `imgtool` script during OTA Update Image generation.
 
 Note : When building the update image, the build arguments
-`nxp_software_version=2 nxp_sofware_version_string=\"2.0\"` can be added to the
-`gn gen` command in order to specify the upgraded version.
+nxp_software_version=2 nxp_software_version_string=\"2.0\" can be added to the
+gn gen command in order to specify the upgraded version.
 
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be

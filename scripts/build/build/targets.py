@@ -115,6 +115,7 @@ def BuildHostTarget():
         TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER, data_model_interface="disabled"),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
+        TargetPart('light-data-model-no-unique-id', app=HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID),
         TargetPart('lock', app=HostApp.LOCK),
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
@@ -544,7 +545,6 @@ def BuildCC13x4Target():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS),
         TargetPart('lighting', app=TIApp.LIGHTING),
         TargetPart('lock', app=TIApp.LOCK, openthread_ftd=True),
         TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
