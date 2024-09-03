@@ -2615,6 +2615,8 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     colorTempTransitionState->lowLimit       = temperatureMin;
     colorTempTransitionState->highLimit      = temperatureMax;
 
+    SetQuietReportRemainingTime(endpoint, transitionTime, true /* isNewTransition */);
+
     // kick off the state machine
     scheduleTimerCallbackMs(configureTempEventControl(endpoint), transitionTime ? TRANSITION_UPDATE_TIME_MS.count() : 0);
     return Status::Success;
@@ -3167,17 +3169,19 @@ Status ColorControlServer::SetQuietReportRemainingTime(EndpointId endpoint, uint
         [isNewTransition, lastRemainingTime](
             const typename QuieterReportingAttribute<uint16_t>::SufficientChangePredicateCandidate & candidate) -> bool {
         constexpr uint16_t reportDelta = 10;
+        bool isDirty                   = false;
         if (candidate.newValue.Value() == 0 || (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
         {
-            return true;
+            isDirty = true;
         }
         else if (isNewTransition &&
                  (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
-                  static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime))
+                  static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
+                  candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
         {
-            return true;
+            isDirty = true;
         }
-        return false;
+        return isDirty;
     };
 
     if (quietRemainingTime[epIndex].SetValue(newRemainingTime, now, predicate) == AttributeDirtyState::kMustReport)

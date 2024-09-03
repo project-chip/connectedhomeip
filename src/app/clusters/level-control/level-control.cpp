@@ -543,18 +543,20 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bo
         auto predicate = [isNewTransition, lastRemainingTime](
                              const decltype(state->quietRemainingTime)::SufficientChangePredicateCandidate & candidate) -> bool {
             constexpr uint16_t reportDelta = 10;
+            bool isDirty                   = false;
             if (candidate.newValue.Value() == 0 ||
                 (candidate.lastDirtyValue.Value() == 0 && candidate.newValue.Value() > reportDelta))
             {
-                return true;
+                isDirty = true;
             }
             else if (isNewTransition &&
                      (candidate.newValue.Value() > static_cast<uint32_t>(lastRemainingTime + reportDelta) ||
-                      static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime))
+                      static_cast<uint32_t>(candidate.newValue.Value() + reportDelta) < lastRemainingTime ||
+                      candidate.newValue.Value() > static_cast<uint32_t>(candidate.lastDirtyValue.Value() + reportDelta)))
             {
-                return true;
+                isDirty = true;
             }
-            return false;
+            return isDirty;
         };
 
         if (state->quietRemainingTime.SetValue(remainingTimeDs, now, predicate) == AttributeDirtyState::kMustReport)
