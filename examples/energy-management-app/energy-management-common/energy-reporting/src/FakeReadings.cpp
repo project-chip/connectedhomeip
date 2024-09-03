@@ -181,7 +181,6 @@ void FakeReadings::FakeReadingsTimerExpiry(System::Layer * systemLayer, void * m
     mn->FakeReadingsUpdate();
 }
 
-
 void FakeReadings::SetPower(Power_mW aPower_mW)
 {
     mPower_mW = aPower_mW;
