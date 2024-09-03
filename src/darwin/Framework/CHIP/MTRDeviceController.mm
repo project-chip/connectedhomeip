@@ -46,6 +46,7 @@
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -109,9 +110,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
-    // queue used to serialize all work performed by the MTRDeviceController
-    dispatch_queue_t _chipWorkQueue;
-
     chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
     chip::Credentials::DefaultDACVerifier * _defaultDACVerifier;
@@ -132,6 +130,11 @@ using namespace chip::Tracing::DarwinFramework;
     std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
+
+    // Counters to track assertion status and access controlled by the _assertionLock
+    NSUInteger _keepRunningAssertionCounter;
+    BOOL _shutdownPending;
+    os_unfair_lock _assertionLock;
 }
 
 - (os_unfair_lock_t)deviceMapLock
@@ -145,6 +148,11 @@ using namespace chip::Tracing::DarwinFramework;
         // nothing, as superclass of MTRDeviceController is NSObject
     }
     _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
+
+    // Setup assertion variables
+    _keepRunningAssertionCounter = 0;
+    _shutdownPending = NO;
+    _assertionLock = OS_UNFAIR_LOCK_INIT;
     return self;
 }
 
@@ -181,6 +189,12 @@ using namespace chip::Tracing::DarwinFramework;
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
         _uniqueIdentifier = uniqueIdentifier;
+
+        // Setup assertion variables
+        _keepRunningAssertionCounter = 0;
+        _shutdownPending = NO;
+        _assertionLock = OS_UNFAIR_LOCK_INIT;
+
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
                 MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
@@ -298,6 +312,9 @@ using namespace chip::Tracing::DarwinFramework;
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
@@ -314,8 +331,69 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
+{
+    if (!operationalCertificate || !rootCertificate) {
+        return FALSE;
+    }
+    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:operationalCertificate];
+    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:operationalCertificate];
+    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:rootCertificate];
+
+    std::lock_guard lock(_assertionLock);
+
+    // If any of the local above are nil, the return will be false since MTREqualObjects handles them correctly
+    return _keepRunningAssertionCounter > 0 && _shutdownPending && MTREqualObjects(nodeID, self.nodeID) && MTREqualObjects(fabricID, self.fabricID) && MTREqualObjects(publicKey, self.rootPublicKey);
+}
+
+- (void)addRunAssertion
+{
+    std::lock_guard lock(_assertionLock);
+
+    // Only take an assertion if running
+    if ([self isRunning]) {
+        ++_keepRunningAssertionCounter;
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+    }
+}
+
+- (void)removeRunAssertion;
+{
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        --_keepRunningAssertionCounter;
+        MTR_LOG("%@ Removing keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+
+        if ([self isRunning] && _keepRunningAssertionCounter == 0 && _shutdownPending) {
+            MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
+            [self finalShutdown];
+        }
+    }
+}
+
+- (void)clearPendingShutdown
+{
+    std::lock_guard lock(_assertionLock);
+    _shutdownPending = NO;
+}
+
 - (void)shutdown
 {
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+        _shutdownPending = YES;
+        return;
+    }
+    [self finalShutdown];
+}
+
+- (void)finalShutdown
+{
+    os_unfair_lock_assert_owner(&_assertionLock);
+
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
         // Already shut down.
@@ -372,11 +450,16 @@ using namespace chip::Tracing::DarwinFramework;
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
         _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
+
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+    _shutdownPending = NO;
 }
 
 - (void)deinitFromFactory
@@ -612,6 +695,14 @@ using namespace chip::Tracing::DarwinFramework;
 
         self->_storedFabricIndex = fabricIdx;
         self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
+
+        chip::Crypto::P256PublicKey rootPublicKey;
+        if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
+            self.rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
+            self.nodeID = @(_cppCommissioner->GetNodeId());
+            self.fabricID = @(_cppCommissioner->GetFabricId());
+        }
+
         commissionerInitialized = YES;
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());

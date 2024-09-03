@@ -235,6 +235,7 @@ void ButtonEventsSimulator::Next()
         break;
     }
     case ButtonEventsSimulator::State::kEmitStartOfMultiPress: {
+        SetButtonPosition(mEndpointId, mPressedButtonId);
         EmitInitialPress(mEndpointId, mPressedButtonId);
         if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kActionSwitch))
         {
@@ -268,6 +269,7 @@ void ButtonEventsSimulator::Next()
         {
             EmitShortRelease(mEndpointId, mPressedButtonId);
         }
+        SetButtonPosition(mEndpointId, mIdleButtonId);
         StartTimer(mMultiPressReleasedTimeMillis);
         break;
     }

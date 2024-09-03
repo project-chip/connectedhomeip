@@ -108,31 +108,33 @@ MTR_DIRECT_MEMBERS
 
 @interface MTRDevice () {
     // Ivars needed to implement shared MTRDevice functionality.
-    //
-    // Unfortunately, we can't use @protected here, because that exports the
-    // symbols (so that subclasses that are not part of the framework can see
-    // them), but TAPI does not see these declarations, because they are in a
-    // project header.
-    //
-    // Using @package means that the symbols do not need to be exported, but
-    // unfortunately gets treated as @public from inside our framework, which
-    // means random other framework code can access these ivars.  Hopefully the
-    // naming with leading '_' will make it clearer that random other code
-    // should not touch these.
-    //
-    // TODO: Figure out some way of doing @protected but still not exporting the symbol.
-@package
+@protected
     // Lock that protects overall device state, including delegate storage.
     os_unfair_lock _lock;
     NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+
+    // Our node ID, with the ivar declared explicitly so it's accessible to
+    // subclasses.
+    NSNumber * _nodeID;
+
+    // Our controller.  Declared nullable because our property is, though in
+    // practice it does not look like we ever set it to nil.
+    MTRDeviceController * _Nullable _deviceController;
+
+    // Whether this device has been accessed via the public deviceWithNodeID API
+    // (as opposed to just via the internal _deviceWithNodeID).
+    BOOL _accessedViaPublicAPI;
 }
+
+/**
+ * Internal way of creating an MTRDevice that does not flag the device as being
+ * visible to external API consumers.
+ */
++ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID
+                      controller:(MTRDeviceController *)controller;
 
 - (instancetype)initForSubclassesWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
-
-// Called from MTRClusters for writes and commands
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
 // called by controller to clean up and shutdown
 - (void)invalidate;

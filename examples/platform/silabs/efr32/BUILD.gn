@@ -48,8 +48,6 @@ declare_args() {
   sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
 
-silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
-
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check

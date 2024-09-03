@@ -43,6 +43,21 @@
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
 
+- (NSXPCInterface *)_interfaceForServerProtocol
+{
+    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+
+    NSSet * allowedClasses = [NSSet setWithArray:@[
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRCommandPath class], [MTRAttributePath class]
+    ]];
+
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
+            argumentIndex:0
+                  ofReply:YES];
+    return interface;
+}
+
 - (NSXPCInterface *)_interfaceForClientProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
@@ -63,6 +78,11 @@
     return interface;
 }
 
+- (id<NSCopying>)controllerXPCID
+{
+    return [self.uniqueIdentifier UUIDString];
+}
+
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
 {
     if (self = [super initForSubclasses]) {
@@ -79,10 +99,12 @@
 
         self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
+        self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {
-            self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+            self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
 
             self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
             self.xpcConnection.exportedObject = self;
@@ -116,9 +138,9 @@
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {
-            self.xpcConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+            self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
 
-            self.xpcConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+            self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
             self.xpcConnection.exportedObject = self;
 
             MTR_LOG("%s: resuming new XPC connection");
