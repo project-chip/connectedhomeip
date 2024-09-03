@@ -41,33 +41,19 @@ from mobly import asserts
 class TestUnitTestingErrorPath(MatterBaseTest):
 
     @async_test_body
-    async def test_batch_invoke(self):
+    async def test_unit_test_error_read(self):
         endpoint_id = 1
         attributes = Clusters.UnitTesting.Attributes
 
         self.print_step(0, "Commissioning - already done")
 
-        self.print_step(1, "Expect failure on reading")
-        try:
-            data = await self.default_controller.ReadAttribute(
-                self.dut_node_id, [(endpoint_id, attributes.FailureInt32U)]
-            )
-            result = data[endpoint_id][Clusters.UnitTesting][attributes.FailureInt32U]
-
-            asserts.assert_true(
-                isinstance(result, Clusters.Attribute.ValueDecodeFailure)
-            )
-            asserts.assert_true(result.Reason.status, Status.Failure)
-        except InteractionModelError:
-            asserts.fail("Failure reading")
-
-        self.print_step(2, "Set a different error")
+        self.print_step(1, "Set error to failure.")
         await self.default_controller.WriteAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(1, attributes.ReadFailureCode(int(Status.ResourceExhausted)))],
+            attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
-        self.print_step(3, "Expect Updated failure reading")
+        self.print_step(2, "Expect failure on reading")
         try:
             data = await self.default_controller.ReadAttribute(
                 self.dut_node_id, [(endpoint_id, attributes.FailureInt32U)]
@@ -75,13 +61,35 @@ class TestUnitTestingErrorPath(MatterBaseTest):
             result = data[endpoint_id][Clusters.UnitTesting][attributes.FailureInt32U]
 
             asserts.assert_true(
-                isinstance(result, Clusters.Attribute.ValueDecodeFailure)
+                isinstance(result, Clusters.Attribute.ValueDecodeFailure),
+                "Expect a decode error for reading the failure attribute"
             )
-            asserts.assert_true(result.Reason.status, Status.ResourceExhausted)
+            asserts.assert_equal(result.Reason.status, Status.Failure, "Failure state is the default for the failure read.")
         except InteractionModelError:
             asserts.fail("Failure reading")
 
-        self.print_step(4, "Reset error to default")
+        self.print_step(3, "Set a different error")
+        await self.default_controller.WriteAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.ResourceExhausted)))],
+        )
+
+        self.print_step(4, "Expect Updated failure reading")
+        try:
+            data = await self.default_controller.ReadAttribute(
+                self.dut_node_id, [(endpoint_id, attributes.FailureInt32U)]
+            )
+            result = data[endpoint_id][Clusters.UnitTesting][attributes.FailureInt32U]
+
+            asserts.assert_true(
+                isinstance(result, Clusters.Attribute.ValueDecodeFailure),
+                "Expect a decode error for reading the failure attribute"
+            )
+            asserts.assert_true(result.Reason.status, Status.ResourceExhausted, "Set failure is ResourceExhausted")
+        except InteractionModelError:
+            asserts.fail("Failure reading")
+
+        self.print_step(5, "Reset error to default")
         await self.default_controller.WriteAttribute(
             nodeid=self.dut_node_id,
             attributes=[(1, attributes.ReadFailureCode(int(Status.Failure)))],
