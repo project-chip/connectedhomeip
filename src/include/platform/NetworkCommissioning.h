@@ -218,13 +218,6 @@ public:
      */
     virtual CHIP_ERROR RevertConfiguration() = 0;
 
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    /**
-     * @brief Disconnect from network, but maybe it is not connected on media driver.
-     */
-    virtual CHIP_ERROR DisconnectFromNetwork() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#endif
-
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
@@ -254,6 +247,13 @@ public:
      * called inside ConnectNetwork.
      */
     virtual void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) = 0;
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    /**
+     * @brief Disconnect from network, if currently connected.
+     */
+    virtual CHIP_ERROR DisconnectFromNetwork() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#endif
 };
 } // namespace Internal
 
