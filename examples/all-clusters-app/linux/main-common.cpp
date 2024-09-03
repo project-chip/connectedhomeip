@@ -340,8 +340,8 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 
 using chip::Protocols::InteractionModel::Status;
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                               const EmberAfAttributeMetadata * attributeMetadata,
-                                                                               uint8_t * buffer, uint16_t maxReadLength)
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                            uint16_t maxReadLength)
 {
 
     VerifyOrReturnValue(clusterId == Clusters::UnitTesting::Id, Status::Failure);
