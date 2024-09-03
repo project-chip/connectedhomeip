@@ -392,16 +392,16 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
 
 /**
  * Copies a CharSpan into a MutableCharSpan.
- * If the cspan_to_copy does not if in out_buf, cspan_to_copy in truncated to fit in out_buf.
- * @param cspan_to_copy The CharSpan to copy.
- * @param out_buf The MutableCharSpan in which cspan_to_copy is to be copied.
+ * If the span_to_copy does not if in out_span, span_to_copy in truncated to fit in out_span.
+ * @param span_to_copy The CharSpan to copy.
+ * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
  */
-inline void CopyCharSpanToMutableCharSpanTruncate(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
+inline void CopyCharSpanToMutableCharSpanTruncate(CharSpan span_to_copy, MutableCharSpan & out_span)
 {
-    size_t size_to_copy = std::min(cspan_to_copy.size(), out_buf.size());
+    size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
 
-    memcpy(out_buf.data(), cspan_to_copy.data(), size_to_copy);
-    out_buf.reduce_size(size_to_copy);
+    memcpy(out_span.data(), span_to_copy.data(), size_to_copy);
+    out_span.reduce_size(size_to_copy);
 }
 
 } // namespace chip
