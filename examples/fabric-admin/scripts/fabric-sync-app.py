@@ -317,8 +317,8 @@ if __name__ == "__main__":
                         help="passcode to use for the bridge")
     args = parser.parse_args()
     if args.app_admin is None or not os.path.exists(args.app_admin):
-        parser.error("fabric-admin executable not found")
+        parser.error("fabric-admin executable not found in PATH. Use '--app-admin' argument to provide it.")
     if args.app_bridge is None or not os.path.exists(args.app_bridge):
-        parser.error("fabric-bridge-app executable not found")
+        parser.error("fabric-bridge-app executable not found in PATH. Use '--app-bridge' argument to provide it.")
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(main(args))
