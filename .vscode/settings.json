@@ -50,7 +50,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "files.associations": {
-        ".gitmodules": "plaintext",
+        ".gitmodules": "ini",
         "*.mm": "cpp",
         "iostream": "cpp",
         "array": "cpp",
@@ -139,8 +139,7 @@
         "list": "cpp",
         "unordered_set": "cpp"
     },
-
-    "[plaintext]": {
+    "[ini]": {
         "editor.formatOnSave": false
     },
     // Configure paths or glob patterns to exclude from file watching.
