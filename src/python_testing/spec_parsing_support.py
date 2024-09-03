@@ -108,6 +108,7 @@ class XmlCluster:
     unknown_commands: list[XmlCommand]
     events: dict[uint, XmlEvent]
     pics: str
+    is_provisional: bool
 
 
 class ClusterSide(Enum):
@@ -206,6 +207,7 @@ class ClusterParser:
         self._name = name
 
         self._derived = None
+        self._is_provisional = False
         try:
             classification = next(cluster.iter('classification'))
             hierarchy = classification.attrib['hierarchy']
@@ -213,6 +215,9 @@ class ClusterParser:
                 self._derived = classification.attrib['baseCluster']
         except (KeyError, StopIteration):
             self._derived = None
+
+        if list(cluster.iter('provisionalConform')):
+            self._is_provisional = True
 
         try:
             classification = next(cluster.iter('classification'))
@@ -451,7 +456,7 @@ class ClusterParser:
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
                           unknown_commands=self.parse_unknown_commands(),
-                          events=self.parse_events(), pics=self._pics)
+                          events=self.parse_events(), pics=self._pics, is_provisional=self._is_provisional)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -666,11 +671,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
                     generated_commands[cmd.id].conformance = cmd.conformance
                 else:
                     unknown_commands.append(cmd)
+            provisional = c.is_provisional or base.is_provisional
 
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics)
+                             generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics,
+                             is_provisional=provisional)
             xml_clusters[id] = new
 
 

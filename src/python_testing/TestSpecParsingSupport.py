@@ -19,6 +19,7 @@ import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
+import jinja2
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
 from mobly import asserts
@@ -225,6 +226,28 @@ ALIASED_CLUSTERS = (
     '</cluster>'
 )
 
+PROVISIONAL_CLUSTER_TEMPLATE = """
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{{ id }}" name="Test Provisional" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="{{ id }}" name="Test Provisional">
+    {% if provisional %}
+      <provisionalConform/>
+    {% endif %}
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PROVISIONAL" scope="Node"/>
+  <commands>
+    <command id="0x00" name="My command" direction="commandToServer">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
+</cluster>
+"""
+
 
 class TestSpecParsingSupport(MatterBaseTest):
     def setup_class(self):
@@ -412,6 +435,32 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(missing_clusters), 0, f"Missing aliased clusters from DM XML - {missing_clusters}")
         for d in known_derived_clusters:
             asserts.assert_true(self.spec_xml_clusters is not None, "Derived cluster with no base cluster marker")
+
+    def test_provisional_clusters(self):
+        clusters: dict[int, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
+        ids_by_name: dict[str, int] = {}
+        problems: list[ProblemNotice] = []
+        id = 0x0001
+
+        environment = jinja2.Environment()
+        template = environment.from_string(PROVISIONAL_CLUSTER_TEMPLATE)
+
+        provisional = template.render(provisional=True, id=id)
+        cluster_xml = ElementTree.fromstring(provisional)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+
+        asserts.assert_equal(len(problems), 0, "Unexpected problems parsing provisional cluster")
+        asserts.assert_in(id, clusters.keys(), "Provisional cluster not parsed")
+        asserts.assert_true(clusters[id].is_provisional, "Provisional cluster not marked as provisional")
+
+        non_provisional = template.render(provisional=False, id=id)
+        cluster_xml = ElementTree.fromstring(non_provisional)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+
+        asserts.assert_equal(len(problems), 0, "Unexpected problems parsing non-provisional cluster")
+        asserts.assert_in(id, clusters.keys(), "Non-provisional cluster not parsed")
+        asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
 
 
 if __name__ == "__main__":
