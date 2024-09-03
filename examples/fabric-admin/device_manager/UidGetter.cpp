@@ -75,7 +75,7 @@ CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::De
 
 void UidGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
 {
-    VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
+    VerifyOrDie(path.mClusterId == Clusters::BridgedDeviceBasicInformation::Id);
 
     if (!status.IsSuccess())
     {
@@ -85,7 +85,7 @@ void UidGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLV
 
     switch (path.mAttributeId)
     {
-    case Clusters::BasicInformation::Attributes::UniqueID::Id: {
+    case Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::Id: {
         mUniqueIdHasValue = SuccessOrLog(data->GetString(mUniqueId, sizeof(mUniqueId)), "UniqueId");
         break;
     }
@@ -124,7 +124,7 @@ void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, cons
 
     AttributePathParams readPaths[1];
     readPaths[0] =
-        AttributePathParams(kRootEndpointId, Clusters::BasicInformation::Id, Clusters::BasicInformation::Attributes::UniqueID::Id);
+        AttributePathParams(mEndpointId, Clusters::BridgedDeviceBasicInformation::Id, Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::Id);
 
     ReadPrepareParams readParams(sessionHandle);
 
