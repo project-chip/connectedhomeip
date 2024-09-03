@@ -1,9 +1,8 @@
-#include "service-area-delegate.h"
-#include "service-area-server.h"
+#include "service-area-storage-delegate.h"
 
 using namespace chip::app::Clusters::ServiceArea;
 
-bool Delegate::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
+bool StorageDelegate::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
     listIndex = 0;
 
@@ -21,14 +20,20 @@ bool Delegate::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, Area
     return false;
 }
 
-void Delegate::HandleSupportedAreasUpdated()
+bool StorageDelegate::IsSupportedArea(uint32_t aAreaId)
 {
-    mInstance->ClearSelectedAreas();
-    mInstance->SetCurrentArea(DataModel::NullNullable);
-    mInstance->ClearProgress();
+    uint32_t ignoredIndex;
+    AreaStructureWrapper ignoredArea;
+
+    return GetSupportedAreaById(aAreaId, ignoredIndex, ignoredArea);
 }
 
-bool Delegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+bool StorageDelegate::RemoveSupportedAreaRaw(uint32_t areaId)
+{
+    return false;
+}
+
+bool StorageDelegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
     listIndex = 0;
 
@@ -45,7 +50,20 @@ bool Delegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStr
     return false;
 }
 
-bool Delegate::IsSelectedArea(uint32_t aAreaId)
+bool StorageDelegate::IsSupportedMap(uint32_t aMapId)
+{
+    uint32_t ignoredIndex;
+    MapStructureWrapper ignoredMap;
+
+    return GetSupportedMapById(aMapId, ignoredIndex, ignoredMap);
+}
+
+bool StorageDelegate::RemoveSupportedMapRaw(uint32_t mapId)
+{
+    return false;
+}
+
+bool StorageDelegate::IsSelectedArea(uint32_t aAreaId)
 {
     uint32_t listIndex = 0;
     uint32_t selectedArea;
@@ -63,7 +81,8 @@ bool Delegate::IsSelectedArea(uint32_t aAreaId)
     return false;
 }
 
-bool Delegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool StorageDelegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
+                                             Structs::ProgressStruct::Type & aProgressElement)
 {
     listIndex = 0;
 
@@ -81,7 +100,7 @@ bool Delegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, St
     return false;
 }
 
-bool Delegate::IsProgressElement(uint32_t aAreaId)
+bool StorageDelegate::IsProgressElement(uint32_t aAreaId)
 {
     uint32_t index;
     Structs::ProgressStruct::Type progressElement;
@@ -89,5 +108,5 @@ bool Delegate::IsProgressElement(uint32_t aAreaId)
     return GetProgressElementById(aAreaId, index, progressElement);
 }
 
-// todo: Should we add default implementations for the accessor methods of the non-mandatory attributes?
+// todo: Should we add default implementations for the accessor methods of the optional attributes?
 //  This is so that devices that do not support these attributes are not forced to provide an implementation.
