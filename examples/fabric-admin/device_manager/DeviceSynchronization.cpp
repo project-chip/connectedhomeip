@@ -139,54 +139,18 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
         auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
         if (!mCurrentDeviceData.has_unique_id && device)
         {
-            VerifyOrDie(mController);
-            // We shouldn't be able to have found something with FindDeviceByNode, if IsFabricSyncReady is false.
-            VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-            auto remoteBridgeNodeId         = DeviceMgr().GetRemoteBridgeNodeId();
-            auto remoteEndpointIdOfInterest = device->GetEndpointId();
-
-            // TODO callback need to be changed so that we set the UID.
-            CHIP_ERROR err = mUidGetter.GetUid(
-                [this](std::optional<CharSpan> aUniqueId) {
-                    if (aUniqueId.has_value())
-                    {
-                        this->mCurrentDeviceData.has_unique_id = true;
-                        memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
-                    }
-                    this->AddSynchronizedDevice();
-                },
-                *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
-            if (err == CHIP_NO_ERROR)
+            GetUid(device->GetEndpointId());
+            if (mState == State::GettingUid)
             {
-                MoveToState(State::GettingUid);
-                // GetUid was successful and we rely on callback provided to GetUid to be called when result
-                // from getting uid is done.
+                // GetUid was successful and we rely on callback to later on call SynchronizationCompleteAddDevice.
                 return;
             }
         }
-        AddSynchronizedDevice();
+        SynchronizationCompleteAddDevice();
     }
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
 #endif
-    MoveToState(State::Idle);
-}
-
-void DeviceSynchronizer::AddSynchronizedDevice()
-{
-    VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
-    AddSynchronizedDevice(mCurrentDeviceData);
-    // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
-    if (!mCurrentDeviceData.is_icd)
-    {
-        VerifyOrDie(mController);
-        // TODO(#35333) Figure out how we should recover in this circumstance.
-        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed start subscription to ");
-        }
-    }
     MoveToState(State::Idle);
 }
 
@@ -247,9 +211,52 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
     MoveToState(State::Connecting);
 }
 
-void DeviceSynchronizer::MoveToState(const State aTargetState)
+void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
 {
-    mState = aTargetState;
+    VerifyOrDie(mState == State::ReceivedResponse);
+    VerifyOrDie(mController);
+    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
+    auto remoteBridgeNodeId         = DeviceMgr().GetRemoteBridgeNodeId();
+
+    CHIP_ERROR err = mUidGetter.GetUid(
+        [this](std::optional<CharSpan> aUniqueId) {
+            if (aUniqueId.has_value())
+            {
+                this->mCurrentDeviceData.has_unique_id = true;
+                memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+            }
+            this->SynchronizationCompleteAddDevice();
+        },
+        *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
+    
+    if (err == CHIP_NO_ERROR)
+    {
+        MoveToState(State::GettingUid);
+    }
+}
+
+void DeviceSynchronizer::SynchronizationCompleteAddDevice()
+{
+    VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+    AddSynchronizedDevice(mCurrentDeviceData);
+    // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
+    if (!mCurrentDeviceData.is_icd)
+    {
+        VerifyOrDie(mController);
+        // TODO(#35333) Figure out how we should recover in this circumstance.
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed start subscription to ");
+        }
+    }
+    MoveToState(State::Idle);
+}
+
+
+void DeviceSynchronizer::MoveToState(const State targetState)
+{
+    mState = targetState;
     ChipLogDetail(NotSpecified, "DeviceSynchronizer moving to [%10.10s]", GetStateStr());
 }
 

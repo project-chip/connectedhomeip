@@ -177,8 +177,6 @@ public:
 private:
     friend DeviceManager & DeviceMgr();
 
-    void PreOpenRemoteDeviceCommissioningWindowWork(chip::EndpointId remoteEndpointId);
-
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     void RequestCommissioningApproval();

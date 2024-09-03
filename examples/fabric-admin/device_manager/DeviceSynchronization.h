@@ -77,9 +77,10 @@ private:
         GettingUid,       ///<
     };
 
-    void AddSynchronizedDevice();
+    void GetUid(chip::EndpointId endpointId);
+    void SynchronizationCompleteAddDevice();
 
-    void MoveToState(const State aTargetState);
+    void MoveToState(const State targetState);
     const char * GetStateStr() const;
 
     std::unique_ptr<chip::app::ReadClient> mClient;
