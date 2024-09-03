@@ -90,10 +90,11 @@ bool ps_requirement_added = false;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
-WfxRsi_t wfx_rsi;
+#if !defined(MIN)
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#endif
 
-/* Declare a variable to hold the data associated with the created event group. */
-StaticEventGroup_t rsiDriverEventGroup;
+WfxRsi_t wfx_rsi;
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -101,11 +102,6 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
-/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_wifi_disconnection_event = false;
-
-/* Declare a variable to hold connection time intervals */
-uint32_t retryInterval                 = WLAN_MIN_RETRY_TIMER_MS;
 volatile bool scan_results_complete    = false;
 volatile bool bg_scan_results_complete = false;
 extern osSemaphoreId_t sl_rs_ble_init_sem;
@@ -247,12 +243,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         callback_status = *(sl_status_t *) result;
         ChipLogError(DeviceLayer, "join_callback_handler: failed: 0x%lx", static_cast<uint32_t>(callback_status));
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
-        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
-        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
-        {
-            WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
-            WfxPostEvent(&WfxEvent);
-        }
+        wfx_retry_connection(++wfx_rsi.join_retries);
         return SL_STATUS_FAIL;
     }
     /*
@@ -264,10 +255,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     WfxEvent.eventType = WFX_EVT_STA_CONN;
     WfxPostEvent(&WfxEvent);
     wfx_rsi.join_retries = 0;
-    retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    // Once the join passes setting the disconnection event to true to differentiate between the first connection and reconnection
-    is_wifi_disconnection_event = true;
-    callback_status             = SL_STATUS_OK;
+    callback_status      = SL_STATUS_OK;
     return SL_STATUS_OK;
 }
 
@@ -464,7 +452,6 @@ static sl_status_t wfx_rsi_init(void)
     }
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
-    wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
@@ -550,7 +537,9 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
-        if (wfx_rsi.scan_ssid != NULL && strcmp(wfx_rsi.scan_ssid, cur_scan_result.ssid) != CMP_SUCCESS)
+        if (wfx_rsi.scan_ssid != NULL &&
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+             CMP_SUCCESS))
         {
             continue;
         }
@@ -693,12 +682,11 @@ static sl_status_t wfx_rsi_do_join(void)
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
-    VerifyOrReturnError((is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
+    VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: retry attempt %d", wfx_rsi.join_retries);
-    wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
-    wfx_rsi.join_retries++;
+    wfx_retry_connection(++wfx_rsi.join_retries);
     event.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&event);
     return status;

@@ -118,8 +118,8 @@ extern uint32_t SystemCoreClock;
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
-#include "em_assert.h"
 #include "em_device.h"
+#include "sl_assert.h"
 #endif
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)

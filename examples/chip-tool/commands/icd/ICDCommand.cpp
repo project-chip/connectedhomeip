@@ -40,14 +40,17 @@ CHIP_ERROR ICDListCommand::RunCommand()
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | %-88s |\n", "Known ICDs:");
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
-    fprintf(stderr, "  | %20s | %15s | %15s | %16s | %10s |\n", "Fabric Index:Node ID", "Start Counter", "Counter Offset",
-            "MonitoredSubject", "ClientType");
+    fprintf(stderr, "  | %20s | %20s | %15s | %15s | %16s | %10s |\n", "Fabric Index:Peer Node ID", "Fabric Index:CheckIn Node ID",
+            "Start Counter", "Counter Offset", "MonitoredSubject", "ClientType");
 
     while (iter->Next(info))
     {
         fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
-        fprintf(stderr, "  | %3" PRIu32 ":" ChipLogFormatX64 " | %15" PRIu32 " | %15" PRIu32 " | " ChipLogFormatX64 " | %10u |\n",
+        fprintf(stderr,
+                "  | %3" PRIu32 ":" ChipLogFormatX64 " | %3" PRIu32 ":" ChipLogFormatX64 " | %15" PRIu32 " | %15" PRIu32
+                " | " ChipLogFormatX64 " | %10u |\n",
                 static_cast<uint32_t>(info.peer_node.GetFabricIndex()), ChipLogValueX64(info.peer_node.GetNodeId()),
+                static_cast<uint32_t>(info.check_in_node.GetFabricIndex()), ChipLogValueX64(info.check_in_node.GetNodeId()),
                 info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject),
                 static_cast<uint8_t>(info.client_type));
 
