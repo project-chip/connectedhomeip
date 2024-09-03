@@ -30,6 +30,9 @@
 // TODO Fix include order issue #33120
 #include "wfx_host_events.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
@@ -42,10 +45,13 @@
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
 #include "rsi_wlan_non_rom.h"
-#include "silabs_utils.h"
+#ifdef __cplusplus
+}
+#endif
 
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
+#include "silabs_utils.h"
 #include "wfx_rsi.h"
 
 // TODO convert this file to cpp and use CodeUtils.h
@@ -55,14 +61,17 @@
 
 #define WFX_QUEUE_SIZE 10
 
-/* Rsi driver Task will use as its stack */
-StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
-
-/* Structure that will hold the TCB of the wfxRsi Task being created. */
-StaticTask_t driverRsiTaskBuffer;
-
-/* Declare a variable to hold the data associated with the created event group. */
-StaticEventGroup_t rsiDriverEventGroup;
+static osThreadId_t sDrvThread;
+constexpr uint32_t kDrvTaskSize = 1792;
+static uint8_t drvStack[kDrvTaskSize];
+static osThread_t sDrvTaskControlBlock;
+osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
+                                .attr_bits  = osThreadDetached,
+                                .cb_mem     = &sDrvTaskControlBlock,
+                                .cb_size    = osThreadCbSize,
+                                .stack_mem  = drvStack,
+                                .stack_size = kDrvTaskSize,
+                                .priority   = osPriorityHigh };
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -82,6 +91,19 @@ static osMessageQueueId_t sWifiEventQueue = NULL;
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 static wfx_wifi_scan_ext_t temp_reset;
+
+/******************************************************************
+ * @fn   void rsi_wireless_driver_task_wrapper(void * argument)
+ * @brief
+ *       wrapper thread for the driver task
+ * @param[in] argument: argument
+ * @return
+ *       None
+ *********************************************************************/
+static void rsi_wireless_driver_task_wrapper(void * argument)
+{
+    rsi_wireless_driver_task();
+}
 
 static void DHCPTimerEventHandler(void * arg)
 {
@@ -359,11 +381,10 @@ static int32_t wfx_rsi_init(void)
     }
     SILABS_LOG("wfx_rsi_init: start wireless drv task", __func__);
     /*
-     * Create the driver task
+     * Create the driver wrapper thread
      */
-    wfx_rsi.drv_task = xTaskCreateStatic((TaskFunction_t) rsi_wireless_driver_task, "rsi_drv", WFX_RSI_WLAN_TASK_SZ, NULL,
-                                         WLAN_TASK_PRIORITY, driverRsiTaskStack, &driverRsiTaskBuffer);
-    if (NULL == wfx_rsi.drv_task)
+    sDrvThread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
+    if (NULL == sDrvThread)
     {
         SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
         return RSI_ERROR_INVALID_PARAM;
@@ -605,7 +626,8 @@ void HandleDHCPPolling()
     sta_netif = wfx_get_netif(SL_WFX_STA_INTERFACE);
     if (sta_netif == NULL)
     {
-        // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
+        // TODO: Notify the application that the interface is not set up or Chipdie here because we
+        // are in an unkonwn state
         SILABS_LOG("HandleDHCPPolling: failed to get STA netif");
         return;
     }
@@ -664,7 +686,8 @@ void WfxPostEvent(WfxEvent_t * event)
     if (status != osOK)
     {
         SILABS_LOG("WfxPostEvent: failed to post event with status: %d", status);
-        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
+        // TODO: Handle error, requeue event depending on queue size or notify relevant task,
+        // Chipdie, etc.
     }
 }
 
@@ -673,7 +696,7 @@ void ProcessEvent(WfxEvent_t inEvent)
     // Process event
     switch (inEvent.eventType)
     {
-    case WFX_EVT_STA_CONN:
+    case WFX_EVT_STA_CONN: {
         SILABS_LOG("Starting LwIP STA");
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
         ResetDHCPNotificationFlags();
@@ -683,8 +706,9 @@ void ProcessEvent(WfxEvent_t inEvent)
         // of AP connectivity.
         // wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
         // is independant of IP connectivity.
-        break;
-    case WFX_EVT_STA_DISCONN:
+    }
+    break;
+    case WFX_EVT_STA_DISCONN: {
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
         wfx_rsi.dev_state &=
             ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
@@ -697,14 +721,15 @@ void ProcessEvent(WfxEvent_t inEvent)
         wfx_ip_changed_notify(IP_STATUS_FAIL);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
-        break;
+    }
+    break;
     case WFX_EVT_AP_START:
         // TODO: Currently unimplemented
         break;
     case WFX_EVT_AP_STOP:
         // TODO: Currently unimplemented
         break;
-    case WFX_EVT_SCAN:
+    case WFX_EVT_SCAN: {
 #ifdef SL_WFX_CONFIG_SCAN
         rsi_rsp_scan_t scan_rsp = { 0 };
         int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
@@ -721,10 +746,12 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 scan = &scan_rsp.scan_info[x];
                 // is it a scan all or target scan
-                if (!wfx_rsi.scan_ssid || (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
+                if (wfx_rsi.scan_ssid != NULL &&
+                    (strncmp(wfx_rsi.scan_ssid, (char *) scan->ssid, MIN(strlen(wfx_rsi.scan_ssid), sizeof(scan->ssid))) ==
+                     CMP_SUCCESS))
                 {
                     strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
-                    ap.security = scan->security_mode;
+                    ap.security = static_cast<wfx_sec_t>(scan->security_mode);
                     ap.rssi     = (-1) * scan->rssi_val;
                     configASSERT(sizeof(ap.bssid) >= BSSID_LEN);
                     configASSERT(sizeof(scan->bssid) >= BSSID_LEN);
@@ -748,22 +775,28 @@ void ProcessEvent(WfxEvent_t inEvent)
             vPortFree(wfx_rsi.scan_ssid);
             wfx_rsi.scan_ssid = (char *) 0;
         }
-        break;
 #endif /* SL_WFX_CONFIG_SCAN */
-    case WFX_EVT_STA_START_JOIN:
+    }
+    break;
+    case WFX_EVT_STA_START_JOIN: {
         // saving the AP related info
         wfx_rsi_save_ap_info();
         // Joining to the network
         wfx_rsi_do_join();
-        break;
-    case WFX_EVT_STA_DO_DHCP:
+    }
+    break;
+    case WFX_EVT_STA_DO_DHCP: {
         StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
-        break;
-    case WFX_EVT_STA_DHCP_DONE:
+    }
+    break;
+    case WFX_EVT_STA_DHCP_DONE: {
         CancelDHCPTimer();
-        break;
-    case WFX_EVT_DHCP_POLL:
+    }
+    break;
+    case WFX_EVT_DHCP_POLL: {
         HandleDHCPPolling();
+    }
+    break;
     default:
         break;
     }
@@ -893,7 +926,7 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
 int32_t wfx_rsi_send_data(void * p, uint16_t len)
 {
     int32_t status;
-    register uint8_t * host_desc;
+    uint8_t * host_desc;
     rsi_pkt_t * pkt;
 
     pkt       = (rsi_pkt_t *) p;

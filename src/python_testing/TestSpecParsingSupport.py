@@ -236,11 +236,18 @@ class TestSpecParsingSupport(MatterBaseTest):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        in_progress, problems = build_xml_clusters(PrebuiltDataModelDirectory.kInProgress)
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
-                               0, "In progress dir does not contain any clusters not in 1.3")
+                               0, "Master dir does not contain any clusters not in 1.3")
+        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(in_progress.keys())),
+                               0, "Master dir does not contain any clusters not in in_progress")
+        asserts.assert_greater(len(set(in_progress.keys()) - set(one_three_clusters.keys())),
+                               0, "in_progress dir does not contain any clusters not in 1.3")
         # only the pulse width modulation cluster was removed post 1.3
         asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
                              set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
+        asserts.assert_equal(set(in_progress.keys())-set(tot_xml_clusters.keys()),
+                             set(), "There are some in_progress clusters that are not included in the TOT spec")
 
         str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters'))
         string_override_check, problems = build_xml_clusters(str_path)

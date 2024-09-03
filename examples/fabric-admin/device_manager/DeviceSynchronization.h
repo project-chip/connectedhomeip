@@ -40,7 +40,12 @@ public:
     /// Usually called after commissioning is complete, initiates a
     /// read of required data from the remote node ID and then will synchronize
     /// the device towards the fabric bridge
-    void StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId, bool deviceIsIcd);
+    ///
+    /// @param controller Must be a non-null pointer. The DeviceController instance
+    ///        pointed to must out live the entire device synchronization process.
+    /// @param nodeId Node ID of the device we need to syncronize data from.
+    /// @param deviceIsIcd If the device is an ICD device.
+    void StartDeviceSynchronization(chip::Controller::DeviceController * controller, chip::NodeId nodeId, bool deviceIsIcd);
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
@@ -65,6 +70,9 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    bool mDeviceSyncInProcess                      = false;
-    chip_rpc_SynchronizedDevice mCurrentDeviceData = chip_rpc_SynchronizedDevice_init_default;
+    // mController is expected to remain valid throughout the entire device synchronization process (i.e. when
+    // mDeviceSyncInProcess is true).
+    chip::Controller::DeviceController * mController = nullptr;
+    bool mDeviceSyncInProcess                        = false;
+    chip_rpc_SynchronizedDevice mCurrentDeviceData   = chip_rpc_SynchronizedDevice_init_default;
 };
