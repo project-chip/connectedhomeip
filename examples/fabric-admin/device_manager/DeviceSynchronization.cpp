@@ -228,7 +228,7 @@ void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
             this->SynchronizationCompleteAddDevice();
         },
         *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
-    
+
     if (err == CHIP_NO_ERROR)
     {
         MoveToState(State::GettingUid);
