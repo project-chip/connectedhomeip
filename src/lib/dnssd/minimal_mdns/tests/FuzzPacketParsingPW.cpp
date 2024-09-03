@@ -7,10 +7,10 @@
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 
+namespace {
+
 using namespace fuzztest;
 using namespace std;
-
-namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
@@ -57,8 +57,6 @@ private:
     mdns::Minimal::BytesRange mPacketRange;
 };
 
-} // namespace
-
 void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
 {
     BytesRange packet(bytes.data(), bytes.data() + bytes.size());
@@ -66,6 +64,8 @@ void PacketParserFuzz(const std::vector<std::uint8_t> & bytes)
 
     mdns::Minimal::ParsePacket(packet, &delegate);
 }
+
+FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<vector<uint8_t>>());
 
 class TxtRecordAccumulator : public TxtRecordDelegate
 {
@@ -89,7 +89,8 @@ private:
     }
 };
 
-void TxtResponderFuzz2(const std::vector<std::uint8_t> & aRecord)
+// The Property Function
+void TxtResponderFuzz(const std::vector<std::uint8_t> & aRecord)
 {
 
     bool equal_sign_present = false;
@@ -126,5 +127,6 @@ void TxtResponderFuzz2(const std::vector<std::uint8_t> & aRecord)
     }
 }
 
-FUZZ_TEST(MinimalmDNS, TxtResponderFuzz2).WithDomains(Arbitrary<vector<uint8_t>>().WithMaxSize(254));
-FUZZ_TEST(MinimalmDNS, PacketParserFuzz).WithDomains(Arbitrary<vector<uint8_t>>());
+FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<vector<uint8_t>>().WithMaxSize(254));
+
+} // namespace

@@ -9,6 +9,8 @@
 #include <setup_payload/Base38Decode.h>
 #include <setup_payload/Base38Encode.h>
 
+namespace {
+
 using namespace fuzztest;
 using namespace chip;
 
@@ -22,6 +24,9 @@ void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
     // We're just testing that the decoder does not crash on the fuzzer-generated inputs.
     chip::base38Decode(base38EncodedString, decodedData);
 }
+
+// The invocation of the FuzzTest
+FUZZ_TEST(Base38Decoder, Base38DecodeFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
 
 /* The property function for a base38 roundtrip Fuzzer.
  * It starts by encoding the fuzzing value passed
@@ -55,6 +60,10 @@ void Base38RoundTripFuzz(const std::vector<uint8_t> & bytes)
     ASSERT_EQ(decodedData, bytes);
 }
 
+// Max size of the vector is defined as 306 since that will give an outputSizeNeeded of 511 which is less than the required
+// kMaxOutputSize
+FUZZ_TEST(Base38Decoder, Base38RoundTripFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>().WithMaxSize(306));
+
 void FuzzQRCodeSetupPayloadParser(const std::string & s)
 {
     chip::Platform::MemoryInit();
@@ -63,11 +72,6 @@ void FuzzQRCodeSetupPayloadParser(const std::string & s)
     QRCodeSetupPayloadParser(s).populatePayload(payload);
 }
 
-// The invocation of the FuzzTest
-FUZZ_TEST(Base38Decoder, Base38DecodeFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>());
-
-// Max size of the vector is defined as 306 since that will give an outputSizeNeeded of 511 which is less than the required
-// kMaxOutputSize
-FUZZ_TEST(Base38Decoder, Base38RoundTripFuzz).WithDomains(Arbitrary<std::vector<uint8_t>>().WithMaxSize(306));
-
 FUZZ_TEST(Base38Decoder, FuzzQRCodeSetupPayloadParser).WithDomains(Arbitrary<std::string>());
+
+} // namespace

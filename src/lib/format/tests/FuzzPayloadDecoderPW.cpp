@@ -59,7 +59,9 @@ void RunDecodeFuzz(const std::vector<std::uint8_t> & bytes, chip::Protocols::Id 
     }
 }
 
-// This allows us to create a FuzzTest "Input Domain" to fuzz test with all the combinations of protocols.
+// This function allows us to fuzz using one of four protocols; by using FuzzTests's `ElementOf` API, we define an
+// input domain by explicitly enumerating the set of values in it More Info:
+// https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#elementof-domains-element-of
 auto AnyProtocolID()
 {
     return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,
