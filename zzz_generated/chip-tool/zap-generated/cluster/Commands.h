@@ -13842,9 +13842,9 @@ public:
     CommissionerControlRequestCommissioningApproval(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("request-commissioning-approval", credsIssuerConfig)
     {
-        AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("RequestID", 0, UINT64_MAX, &mRequest.requestID);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("ProductID", 0, UINT16_MAX, &mRequest.productID);
         AddArgument("Label", &mRequest.label);
         ClusterCommand::AddArguments();
     }
@@ -13883,7 +13883,7 @@ public:
     CommissionerControlCommissionNode(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("commission-node", credsIssuerConfig)
     {
-        AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
+        AddArgument("RequestID", 0, UINT64_MAX, &mRequest.requestID);
         AddArgument("ResponseTimeoutSeconds", 0, UINT16_MAX, &mRequest.responseTimeoutSeconds);
         ClusterCommand::AddArguments();
     }

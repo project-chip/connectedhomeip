@@ -8299,20 +8299,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_requestId;
-            std::string value_requestIdClassName     = "java/lang/Long";
-            std::string value_requestIdCtorSignature = "(J)V";
-            jlong jnivalue_requestId                 = static_cast<jlong>(cppValue.requestId);
+            jobject value_requestID;
+            std::string value_requestIDClassName     = "java/lang/Long";
+            std::string value_requestIDCtorSignature = "(J)V";
+            jlong jnivalue_requestID                 = static_cast<jlong>(cppValue.requestID);
             chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_requestIdClassName.c_str(), value_requestIdCtorSignature.c_str(), jnivalue_requestId, value_requestId);
+                value_requestIDClassName.c_str(), value_requestIDCtorSignature.c_str(), jnivalue_requestID, value_requestID);
 
-            jobject value_clientNodeId;
-            std::string value_clientNodeIdClassName     = "java/lang/Long";
-            std::string value_clientNodeIdCtorSignature = "(J)V";
-            jlong jnivalue_clientNodeId                 = static_cast<jlong>(cppValue.clientNodeId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_clientNodeIdClassName.c_str(),
-                                                                        value_clientNodeIdCtorSignature.c_str(),
-                                                                        jnivalue_clientNodeId, value_clientNodeId);
+            jobject value_clientNodeID;
+            std::string value_clientNodeIDClassName     = "java/lang/Long";
+            std::string value_clientNodeIDCtorSignature = "(J)V";
+            jlong jnivalue_clientNodeID                 = static_cast<jlong>(cppValue.clientNodeID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_clientNodeIDClassName.c_str(),
+                                                                        value_clientNodeIDCtorSignature.c_str(),
+                                                                        jnivalue_clientNodeID, value_clientNodeID);
 
             jobject value_statusCode;
             std::string value_statusCodeClassName     = "java/lang/Integer";
@@ -8352,7 +8352,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(commissioningRequestResultStructClass, commissioningRequestResultStructCtor,
-                                           value_requestId, value_clientNodeId, value_statusCode, value_fabricIndex);
+                                           value_requestID, value_clientNodeID, value_statusCode, value_fabricIndex);
 
             return value;
         }

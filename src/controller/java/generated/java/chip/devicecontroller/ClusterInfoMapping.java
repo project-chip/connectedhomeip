@@ -29032,14 +29032,14 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> commissionerControlrequestCommissioningApprovalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo commissionerControlrequestCommissioningApprovalrequestIdCommandParameterInfo = new CommandParameterInfo("requestId", Long.class, Long.class);
-    commissionerControlrequestCommissioningApprovalCommandParams.put("requestId",commissionerControlrequestCommissioningApprovalrequestIdCommandParameterInfo);
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalrequestIDCommandParameterInfo = new CommandParameterInfo("requestID", Long.class, Long.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("requestID",commissionerControlrequestCommissioningApprovalrequestIDCommandParameterInfo);
 
-    CommandParameterInfo commissionerControlrequestCommissioningApprovalvendorIdCommandParameterInfo = new CommandParameterInfo("vendorId", Integer.class, Integer.class);
-    commissionerControlrequestCommissioningApprovalCommandParams.put("vendorId",commissionerControlrequestCommissioningApprovalvendorIdCommandParameterInfo);
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("vendorID",commissionerControlrequestCommissioningApprovalvendorIDCommandParameterInfo);
 
-    CommandParameterInfo commissionerControlrequestCommissioningApprovalproductIdCommandParameterInfo = new CommandParameterInfo("productId", Integer.class, Integer.class);
-    commissionerControlrequestCommissioningApprovalCommandParams.put("productId",commissionerControlrequestCommissioningApprovalproductIdCommandParameterInfo);
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalproductIDCommandParameterInfo = new CommandParameterInfo("productID", Integer.class, Integer.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("productID",commissionerControlrequestCommissioningApprovalproductIDCommandParameterInfo);
 
     CommandParameterInfo commissionerControlrequestCommissioningApprovallabelCommandParameterInfo = new CommandParameterInfo("label", Optional.class, String.class);
     commissionerControlrequestCommissioningApprovalCommandParams.put("label",commissionerControlrequestCommissioningApprovallabelCommandParameterInfo);
@@ -29048,11 +29048,11 @@ public class ClusterInfoMapping {
         ((ChipClusters.CommissionerControlCluster) cluster)
         .requestCommissioningApproval((DefaultClusterCallback) callback
         , (Long)
-        commandArguments.get("requestId")
+        commandArguments.get("requestID")
         , (Integer)
-        commandArguments.get("vendorId")
+        commandArguments.get("vendorID")
         , (Integer)
-        commandArguments.get("productId")
+        commandArguments.get("productID")
         , (Optional<String>)
         commandArguments.get("label")
         );
@@ -29064,8 +29064,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> commissionerControlcommissionNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo commissionerControlcommissionNoderequestIdCommandParameterInfo = new CommandParameterInfo("requestId", Long.class, Long.class);
-    commissionerControlcommissionNodeCommandParams.put("requestId",commissionerControlcommissionNoderequestIdCommandParameterInfo);
+    CommandParameterInfo commissionerControlcommissionNoderequestIDCommandParameterInfo = new CommandParameterInfo("requestID", Long.class, Long.class);
+    commissionerControlcommissionNodeCommandParams.put("requestID",commissionerControlcommissionNoderequestIDCommandParameterInfo);
 
     CommandParameterInfo commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo = new CommandParameterInfo("responseTimeoutSeconds", Integer.class, Integer.class);
     commissionerControlcommissionNodeCommandParams.put("responseTimeoutSeconds",commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo);
@@ -29074,7 +29074,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CommissionerControlCluster) cluster)
           .commissionNode((ChipClusters.CommissionerControlCluster.ReverseOpenCommissioningWindowCallback) callback
            , (Long)
-             commandArguments.get("requestId")
+             commandArguments.get("requestID")
 
            , (Integer)
              commandArguments.get("responseTimeoutSeconds")

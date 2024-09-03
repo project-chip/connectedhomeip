@@ -47434,15 +47434,15 @@ class CommissionerControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="vendorId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="productId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="requestID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="vendorID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="productID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Optional[str]),
                     ])
 
-            requestId: 'uint' = 0
-            vendorId: 'uint' = 0
-            productId: 'uint' = 0
+            requestID: 'uint' = 0
+            vendorID: 'uint' = 0
+            productID: 'uint' = 0
             label: 'typing.Optional[str]' = None
 
         @dataclass
@@ -47456,11 +47456,11 @@ class CommissionerControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="requestID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="responseTimeoutSeconds", Tag=1, Type=uint),
                     ])
 
-            requestId: 'uint' = 0
+            requestID: 'uint' = 0
             responseTimeoutSeconds: 'uint' = 0
 
         @dataclass
@@ -47615,14 +47615,14 @@ class CommissionerControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="requestID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="clientNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="statusCode", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            requestId: 'uint' = 0
-            clientNodeId: 'uint' = 0
+            requestID: 'uint' = 0
+            clientNodeID: 'uint' = 0
             statusCode: 'uint' = 0
             fabricIndex: 'uint' = 0
 

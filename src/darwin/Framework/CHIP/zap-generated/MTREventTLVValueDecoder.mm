@@ -4606,13 +4606,13 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestId];
-            value.requestId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestID];
+            value.requestID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeId];
-            value.clientNodeId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeID];
+            value.clientNodeID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;

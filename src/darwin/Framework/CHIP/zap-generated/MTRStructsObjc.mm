@@ -8887,9 +8887,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
-        _clientNodeId = @(0);
+        _clientNodeID = @(0);
 
         _statusCode = @(0);
 
@@ -8902,8 +8902,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterCommissioningRequestResultEvent alloc] init];
 
-    other.requestId = self.requestId;
-    other.clientNodeId = self.clientNodeId;
+    other.requestID = self.requestID;
+    other.clientNodeID = self.clientNodeID;
     other.statusCode = self.statusCode;
     other.fabricIndex = self.fabricIndex;
 
@@ -8912,7 +8912,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; clientNodeId:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestId, _clientNodeId, _statusCode, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; clientNodeID:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestID, _clientNodeID, _statusCode, _fabricIndex];
     return descriptionString;
 }
 
