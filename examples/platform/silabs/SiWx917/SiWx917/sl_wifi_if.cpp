@@ -36,8 +36,11 @@
 #include "task.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
+
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 extern "C" {
@@ -163,8 +166,10 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     sl_status_t status = SL_STATUS_OK;
     int32_t rssi       = 0;
+    ap->ssid_length    = wfx_rsi.sec.ssid_length;
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
+    chip::Platform::CopyString(ap->ssid, ap->ssid_length, wfx_rsi.sec.ssid);
     memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
     ap->rssi = rssi;
@@ -196,14 +201,14 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 }
 
 /******************************************************************
- * @fn   int32_t wfx_rsi_reset_count()
+ * @fn   int32_t wfx_rsi_reset_count(void)
  * @brief
  *       Getting the driver reset count
  * @param[in] None
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_reset_count()
+int32_t wfx_rsi_reset_count(void)
 {
     sl_wifi_statistics_t test = { 0 };
     sl_status_t status        = SL_STATUS_OK;
@@ -220,14 +225,14 @@ int32_t wfx_rsi_reset_count()
 }
 
 /******************************************************************
- * @fn   wfx_rsi_disconnect()
+ * @fn   wfx_rsi_disconnect(void)
  * @brief
  *       Getting the driver disconnect status
  * @param[in] None
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_disconnect()
+int32_t wfx_rsi_disconnect(void)
 {
     return sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
 }
@@ -533,7 +538,10 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     for (int idx = 0; idx < (int) scan_result->scan_count; idx++)
     {
         memset(&cur_scan_result, 0, sizeof(cur_scan_result));
-        strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
+
+        cur_scan_result.ssid_length =
+            strnlen((char *) scan_result->scan_info[idx].ssid, MIN(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
+        chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
         if (wfx_rsi.scan_ssid != NULL && strcmp(wfx_rsi.scan_ssid, cur_scan_result.ssid) != CMP_SUCCESS)
@@ -556,10 +564,10 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     // cleanup and return
     wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
     wfx_rsi.scan_cb((wfx_wifi_scan_result_t *) 0);
-    wfx_rsi.scan_cb = NULL;
+    wfx_rsi.scan_cb = nullptr;
     if (wfx_rsi.scan_ssid)
     {
-        vPortFree(wfx_rsi.scan_ssid);
+        chip::Platform::MemoryFree(wfx_rsi.scan_ssid);
         wfx_rsi.scan_ssid = NULL;
     }
     return SL_STATUS_OK;
@@ -573,14 +581,14 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
     return SL_STATUS_OK;
 }
 /***************************************************************************************
- * @fn   static void wfx_rsi_save_ap_info()
+ * @fn   static void wfx_rsi_save_ap_info(void)
  * @brief
  *       Saving the details of the AP
  * @param[in]  None
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info() // translation
+static void wfx_rsi_save_ap_info(void) // translation
 {
     sl_status_t status = SL_STATUS_OK;
 #ifndef EXP_BOARD
@@ -589,8 +597,8 @@ static void wfx_rsi_save_ap_info() // translation
 #endif
     sl_wifi_ssid_t ssid_arg;
     memset(&ssid_arg, 0, sizeof(ssid_arg));
-    ssid_arg.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
-    strncpy((char *) &ssid_arg.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
+    ssid_arg.length = wfx_rsi.sec.ssid_length;
+    chip::Platform::CopyString((char *) &ssid_arg.value[0], ssid_arg.length, wfx_rsi.sec.ssid);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
     scan_results_complete = false;
 #ifndef EXP_BOARD
@@ -616,7 +624,7 @@ static sl_status_t wfx_rsi_do_join(void)
     sl_status_t status = SL_STATUS_OK;
     sl_wifi_client_configuration_t ap;
     memset(&ap, 0, sizeof(ap));
-    WfxEvent_t event;
+
     switch (wfx_rsi.sec.security)
     {
     case WFX_SEC_WEP:
@@ -659,19 +667,17 @@ static sl_status_t wfx_rsi_do_join(void)
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    size_t psk_length = strlen(wfx_rsi.sec.passkey);
-    VerifyOrReturnError(psk_length <= SL_WIFI_MAX_PSK_LENGTH, SL_STATUS_SI91X_INVALID_PSK_LENGTH);
     sl_net_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
-    status                    = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], psk_length);
+    status                    = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], wfx_rsi.sec.passkey_length);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     uint32_t timeout_ms = 0;
-    ap.ssid.length      = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
+    ap.ssid.length      = wfx_rsi.sec.ssid_length;
     ap.encryption       = SL_WIFI_NO_ENCRYPTION;
     ap.credential_id    = id;
-    memset(&ap.ssid.value, 0, (sizeof(ap.ssid.value) / sizeof(ap.ssid.value[0])));
-    strncpy((char *) &ap.ssid.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
+    memcpy((char *) &ap.ssid.value[0], wfx_rsi.sec.ssid, wfx_rsi.sec.ssid_length);
     ChipLogDetail(DeviceLayer, "wfx_rsi_do_join: SSID: %s, SECURITY: %d(%d)", ap.ssid.value, ap.security, wfx_rsi.sec.security);
+
     status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
     // after the initial scan is done, the scan does not check for SSID
@@ -684,8 +690,11 @@ static sl_status_t wfx_rsi_do_join(void)
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_connection(++wfx_rsi.join_retries);
+
+    WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&event);
+
     return status;
 }
 

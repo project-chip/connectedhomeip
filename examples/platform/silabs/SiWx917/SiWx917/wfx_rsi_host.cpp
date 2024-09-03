@@ -163,7 +163,8 @@ void wfx_clear_wifi_provision(void)
 sl_status_t wfx_connect_to_ap(void)
 {
     VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, SL_STATUS_INVALID_CONFIGURATION);
-    VerifyOrReturnError(strlen(wfx_rsi.sec.ssid) <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
+    VerifyOrReturnError(wfx_rsi.sec.ssid_length, SL_STATUS_INVALID_CREDENTIALS);
+    VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
@@ -345,10 +346,10 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     wfx_rsi.scan_cb = callback;
 
     VerifyOrReturnError(ssid != nullptr, false);
-    size_t ssid_len   = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-    wfx_rsi.scan_ssid = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
+    wfx_rsi.scan_ssid_length = strnlen(ssid, MIN(sizeof(ssid), WFX_MAX_SSID_LENGTH));
+    wfx_rsi.scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(wfx_rsi.scan_ssid_length));
     VerifyOrReturnError(wfx_rsi.scan_ssid != nullptr, false);
-    strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
+    chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
     WfxEvent_t event;
     event.eventType = WFX_EVT_SCAN;

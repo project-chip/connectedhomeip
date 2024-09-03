@@ -110,6 +110,7 @@ static struct scan_result_holder
 static uint8_t scan_count = 0;
 static void (*scan_cb)(wfx_wifi_scan_result_t *); /* user-callback - when scan is done */
 static char * scan_ssid;                          /* Which one are we scanning for */
+size_t scan_ssid_length = 0;
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result);
 static void sl_wfx_scan_complete_callback(uint32_t status);
 #endif /* SL_WFX_CONFIG_SCAN */
@@ -733,7 +734,9 @@ static void wfx_wifi_hw_start(void)
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
-    chip::Platform::CopyString(ap->ssid, sizeof(ap->ssid), ap_info.ssid);
+
+    ap->ssid_length = strnlen(ap_info.ssid, MIN(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
+    chip::Platform::CopyString(ap->ssid, ap->ssid_length, ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
     ap->chan     = ap_info.chan;
@@ -1168,14 +1171,14 @@ void wfx_enable_sta_mode(void)
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     VerifyOrReturnError(scan_cb != nullptr, false);
-    scan_cb = callback;
     if (ssid)
     {
-        size_t ssid_len = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-        scan_ssid       = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
+        scan_ssid_length = strnlen(ssid, MIN(sizeof(ssid), WFX_MAX_SSID_LENGTH));
+        scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(scan_ssid_length));
         VerifyOrReturnError(scan_ssid != nullptr, false);
-        strncpy(scan_ssid, ssid, ssid_len);
+        Platform::CopyString(scan_ssid, scan_ssid_length, ssid);
     }
+    scan_cb = callback;
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
     return true;
 }

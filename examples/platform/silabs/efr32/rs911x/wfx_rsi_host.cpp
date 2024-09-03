@@ -137,7 +137,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
  ***********************************************************************/
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-    VerifyOrReturnError(wifiConfig != NULL, false);
+    VerifyOrReturnError(wifiConfig != nullptr, false);
     VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, false);
     *wifiConfig = wfx_rsi.sec;
     return true;
@@ -166,7 +166,8 @@ void wfx_clear_wifi_provision(void)
 sl_status_t wfx_connect_to_ap(void)
 {
     VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, SL_STATUS_INVALID_CONFIGURATION);
-    VerifyOrReturnError(strlen(wfx_rsi.sec.ssid) <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
+    VerifyOrReturnError(wfx_rsi.sec.ssid_length, SL_STATUS_INVALID_CREDENTIALS);
+    VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
     ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
@@ -191,14 +192,14 @@ sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 }
 #else  // For RS9116
 /*********************************************************************
- * @fn  sl_status_t wfx_power_save()
+ * @fn  sl_status_t wfx_power_save(void)
  * @brief
  *      Implements the power save in sleepy application
  * @param[in]  None
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save()
+sl_status_t wfx_power_save(void)
 {
     return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
@@ -235,14 +236,14 @@ bool wfx_is_sta_connected(void)
 }
 
 /*********************************************************************
- * @fn  wifi_mode_t wfx_get_wifi_mode()
+ * @fn  wifi_mode_t wfx_get_wifi_mode(void)
  * @brief
  *      get the wifi mode
  * @param[in]  None
  * @return  return WIFI_MODE_NULL if successful,
  *          WIFI_MODE_STA otherwise
  ***********************************************************************/
-wifi_mode_t wfx_get_wifi_mode()
+wifi_mode_t wfx_get_wifi_mode(void)
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
         return WIFI_MODE_STA;
@@ -335,14 +336,14 @@ int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 }
 
 /***************************************************************************
- * @fn   int32_t wfx_reset_counts(){
+ * @fn   int32_t wfx_reset_counts()
  * @brief
  *      get the driver reset count
  * @param[in]  None
  * @return
  *      reset count
  *****************************************************************************/
-int32_t wfx_reset_counts()
+int32_t wfx_reset_counts(void)
 {
     return wfx_rsi_reset_count();
 }
@@ -359,14 +360,14 @@ int32_t wfx_reset_counts()
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     // check if already in progress
-    VerifyOrReturnError(wfx_rsi.scan_cb != NULL, false);
+    VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, false);
     wfx_rsi.scan_cb = callback;
 
     VerifyOrReturnError(ssid != NULL, false);
-    size_t ssid_len   = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-    wfx_rsi.scan_ssid = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(ssid_len + 1));
+    wfx_rsi.scan_ssid_length = strnlen(ssid, MIN(sizeof(ssid), WFX_MAX_SSID_LENGTH));
+    wfx_rsi.scan_ssid        = reinterpret_cast<char *>(pvPortMalloc(wfx_rsi.scan_ssid_length));
     VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
-    strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
+    chip::Platform::CopyString(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length, ssid);
 
     WfxEvent_t event;
     event.eventType = WFX_EVT_SCAN;

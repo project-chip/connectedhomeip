@@ -132,7 +132,7 @@ static void StartDHCPTimer(uint32_t timeout)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    int32_t status;
+    int32_t status = RSI_SUCCESS;
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
@@ -161,18 +161,16 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Failed, Error Code : 0x%lX", status);
+        return status;
     }
-    else
-    {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
-        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
-        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
-        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
-        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
-        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
-        extra_info->overrun_count     = test->overrun_count - temp_reset.overrun_count;
-    }
+    rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+    extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
+    extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
+    extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
+    extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
+    extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
+    extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
+    extra_info->overrun_count     = test->overrun_count - temp_reset.overrun_count;
     return status;
 }
 
@@ -192,18 +190,16 @@ int32_t wfx_rsi_reset_count()
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Failed, Error Code : 0x%lX", status);
+        return status;
     }
-    else
-    {
-        rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
-        temp_reset.beacon_lost_count = test->beacon_lost_count;
-        temp_reset.beacon_rx_count   = test->beacon_rx_count;
-        temp_reset.mcast_rx_count    = test->mcast_rx_count;
-        temp_reset.mcast_tx_count    = test->mcast_tx_count;
-        temp_reset.ucast_rx_count    = test->ucast_rx_count;
-        temp_reset.ucast_tx_count    = test->ucast_tx_count;
-        temp_reset.overrun_count     = test->overrun_count;
-    }
+    rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
+    temp_reset.beacon_lost_count = test->beacon_lost_count;
+    temp_reset.beacon_rx_count   = test->beacon_rx_count;
+    temp_reset.mcast_rx_count    = test->mcast_rx_count;
+    temp_reset.mcast_tx_count    = test->mcast_tx_count;
+    temp_reset.ucast_rx_count    = test->ucast_rx_count;
+    temp_reset.ucast_tx_count    = test->ucast_tx_count;
+    temp_reset.overrun_count     = test->overrun_count;
     return status;
 }
 
@@ -217,8 +213,7 @@ int32_t wfx_rsi_reset_count()
  *********************************************************************/
 int32_t wfx_rsi_disconnect()
 {
-    int32_t status = rsi_wlan_disconnect();
-    return status;
+    return rsi_wlan_disconnect();
 }
 
 #if SL_ICD_ENABLED
@@ -275,18 +270,17 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          */
         SILABS_LOG("wfx_rsi_join_cb: failed. retry: %d", wfx_rsi.join_retries);
         wfx_retry_connection(++wfx_rsi.join_retries);
+        return;
     }
-    else
-    {
-        /*
-         * Join was complete - Do the DHCP
-         */
-        SILABS_LOG("wfx_rsi_join_cb: success");
-        memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
-        WfxEvent.eventType = WFX_EVT_STA_CONN;
-        WfxPostEvent(&WfxEvent);
-        wfx_rsi.join_retries = 0;
-    }
+
+    /*
+     * Join was complete - Do the DHCP
+     */
+    SILABS_LOG("wfx_rsi_join_cb: success");
+    memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
+    WfxEvent.eventType = WFX_EVT_STA_CONN;
+    WfxPostEvent(&WfxEvent);
+    wfx_rsi.join_retries = 0;
 }
 
 /******************************************************************
@@ -453,7 +447,7 @@ static int32_t wfx_rsi_init(void)
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info() // translation
+static void wfx_rsi_save_ap_info(void) // translation
 {
     int32_t status;
     rsi_rsp_scan_t rsp;
@@ -707,30 +701,46 @@ void ProcessEvent(WfxEvent_t inEvent)
             SILABS_LOG("rsi_wlan_bgscan failed: %02x ", status);
             return;
         }
+
+        if (wfx_rsi.scan_cb == NULL)
+        {
+            return;
+        }
+
         rsi_scan_info_t * scan;
         wfx_wifi_scan_result_t ap;
+
         for (int x = 0; x < scan_rsp.scan_count[0]; x++)
         {
             scan = &scan_rsp.scan_info[x];
-            // is it a scan all or target scan
-            if (!wfx_rsi.scan_ssid || (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
+            // clear structure and calculate size of SSID
+            memset(&ap, 0, sizeof(ap));
+            ap.ssid_length = strnlen((char *) scan->ssid, MIN(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
+            strncpy(ap.ssid, (char *) scan->ssid, ap.ssid_length);
+            // assure null termination of scanned SSID
+            ap.ssid[ap.ssid_length - 1] = 0;
+
+            // check if the scanned ssid is the one we are looking for
+            if (wfx_rsi.scan_ssid_length != 0 && strcmp(wfx_rsi.scan_ssid, ap.ssid) != CMP_SUCCESS)
             {
-                // clear structure and calculate size of SSID
-                memset(&ap, 0, sizeof(ap));
-                strncpy(ap.ssid, (char *) scan->ssid, strnlen((const char *) scan->ssid, WFX_MAX_SSID_LENGTH));
-                ap.security = scan->security_mode;
-                ap.rssi     = (-1) * scan->rssi_val;
-
-                configASSERT(sizeof(ap.bssid) == BSSID_LEN);
-                configASSERT(sizeof(scan->bssid) == BSSID_LEN);
-                memcpy(ap.bssid, scan->bssid, BSSID_LEN);
-                (*wfx_rsi.scan_cb)(&ap);
-
-                if (wfx_rsi.scan_ssid)
-                {
-                    break; // we found the targeted ssid.
-                }
+                continue; // we found the targeted ssid.
             }
+
+            ap.security = scan->security_mode;
+            ap.rssi     = (-1) * scan->rssi_val;
+
+            configASSERT(sizeof(ap.bssid) == BSSID_LEN);
+            configASSERT(sizeof(scan->bssid) == BSSID_LEN);
+            memcpy(ap.bssid, scan->bssid, BSSID_LEN);
+            (*wfx_rsi.scan_cb)(&ap);
+
+            // no ssid filter set, return all results
+            if (wfx_rsi.scan_ssid_length == 0)
+            {
+                continue;
+            }
+
+            break;
         }
 
         /* Terminate with end of scan which is no ap sent back */
