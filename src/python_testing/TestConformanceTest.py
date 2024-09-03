@@ -31,6 +31,10 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
 
     on_off_device_type_id = 0x0100
     on_off_device_type_revision = 3
+    descriptor_cluster_revision = 3
+    identify_cluster_revision = 5
+    on_off_cluster_revision = 6
+    scenes_cluster_revision = 1
 
     # Descriptor
     attr = Clusters.Descriptor.Attributes
@@ -38,7 +42,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     attrs[attr.FeatureMap.attribute_id] = 0
     attrs[attr.AcceptedCommandList.attribute_id] = []
     attrs[attr.GeneratedCommandList.attribute_id] = []
-    attrs[attr.ClusterRevision.attribute_id] = 3
+    attrs[attr.ClusterRevision.attribute_id] = descriptor_cluster_revision
     attrs[attr.DeviceTypeList.attribute_id] = [Clusters.Descriptor.Structs.DeviceTypeStruct(
         deviceType=on_off_device_type_id, revision=on_off_device_type_revision)]
     attrs[attr.ServerList.attribute_id] = [Clusters.Identify.id,
@@ -56,7 +60,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     attrs[attr.FeatureMap.attribute_id] = 0
     attrs[attr.AcceptedCommandList.attribute_id] = [Clusters.Identify.Commands.Identify.command_id]
     attrs[attr.GeneratedCommandList.attribute_id] = []
-    attrs[attr.ClusterRevision.attribute_id] = 5
+    attrs[attr.ClusterRevision.attribute_id] = identify_cluster_revision
     attrs[attr.IdentifyTime.attribute_id] = 0
     attrs[attr.IdentifyType.attribute_id] = Clusters.Identify.Enums.IdentifyTypeEnum.kNone
     attrs[attr.AttributeList.attribute_id] = []
@@ -73,7 +77,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     attrs[attr.AcceptedCommandList.attribute_id] = [cmd.Off.command_id, cmd.On.command_id, cmd.Toggle.command_id,
                                                     cmd.OffWithEffect.command_id, cmd.OnWithRecallGlobalScene.command_id, cmd.OnWithTimedOff.command_id]
     attrs[attr.GeneratedCommandList.attribute_id] = []
-    attrs[attr.ClusterRevision.attribute_id] = 6
+    attrs[attr.ClusterRevision.attribute_id] = on_off_cluster_revision
     attrs[attr.OnOff.attribute_id] = False
     attrs[attr.GlobalSceneControl.attribute_id] = False
     attrs[attr.OnTime.attribute_id] = 0
@@ -94,7 +98,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     attrs[attr.GeneratedCommandList.attribute_id] = [cmd.AddSceneResponse.command_id, cmd.ViewSceneResponse.command_id,
                                                      cmd.RemoveSceneResponse.command_id, cmd.RemoveAllScenesResponse.command_id,
                                                      cmd.StoreSceneResponse.command_id, cmd.GetSceneMembershipResponse.command_id]
-    attrs[attr.ClusterRevision.attribute_id] = 1
+    attrs[attr.ClusterRevision.attribute_id] = scenes_cluster_revision
     attrs[attr.SceneTableSize.attribute_id] = 16
     attrs[attr.FabricSceneInfo.attribute_id] = []
     attrs[attr.AttributeList.attribute_id] = []
