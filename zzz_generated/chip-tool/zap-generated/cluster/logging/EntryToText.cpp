@@ -4904,6 +4904,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GlobalStruct";
         case chip::app::Clusters::UnitTesting::Attributes::Unsupported::Id:
             return "Unsupported";
+        case chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Id:
+            return "ReadFailureCode";
+        case chip::app::Clusters::UnitTesting::Attributes::FailureInt32U::Id:
+            return "FailureInt32U";
         case chip::app::Clusters::UnitTesting::Attributes::NullableBoolean::Id:
             return "NullableBoolean";
         case chip::app::Clusters::UnitTesting::Attributes::NullableBitmap8::Id:
@@ -4976,10 +4980,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "NullableGlobalEnum";
         case chip::app::Clusters::UnitTesting::Attributes::NullableGlobalStruct::Id:
             return "NullableGlobalStruct";
-        case chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Id:
-            return "ReadFailureCode";
-        case chip::app::Clusters::UnitTesting::Attributes::FailureInt32U::Id:
-            return "FailureInt32U";
         case chip::app::Clusters::UnitTesting::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::UnitTesting::Attributes::AcceptedCommandList::Id:

@@ -65170,6 +65170,8 @@ public class ChipClusters {
     private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
     private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
+    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
+    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
     private static final long NULLABLE_BOOLEAN_ATTRIBUTE_ID = 16384L;
     private static final long NULLABLE_BITMAP8_ATTRIBUTE_ID = 16385L;
     private static final long NULLABLE_BITMAP16_ATTRIBUTE_ID = 16386L;
@@ -65206,8 +65208,6 @@ public class ChipClusters {
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
     private static final long NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID = 16435L;
     private static final long NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID = 16436L;
-    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 16640L;
-    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 16641L;
     private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -68332,6 +68332,76 @@ public class ChipClusters {
         }, UNSUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readReadFailureCodeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeReadFailureCodeAttribute(callback, value, 0);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), READ_FAILURE_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeReadFailureCodeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFailureInt32UAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, true);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value) {
+      writeFailureInt32UAttribute(callback, value, 0);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), FAILURE_INT32_U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFailureInt32UAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readNullableBooleanAttribute(
         NullableBooleanAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_BOOLEAN_ATTRIBUTE_ID);
@@ -69590,76 +69660,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readReadFailureCodeAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, READ_FAILURE_CODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeReadFailureCodeAttribute(callback, value, 0);
-    }
-
-    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), READ_FAILURE_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeReadFailureCodeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, READ_FAILURE_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readFailureInt32UAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FAILURE_INT32_U_ATTRIBUTE_ID, true);
-    }
-
-    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value) {
-      writeFailureInt32UAttribute(callback, value, 0);
-    }
-
-    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), FAILURE_INT32_U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeFailureInt32UAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, FAILURE_INT32_U_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMeiInt8uAttribute(

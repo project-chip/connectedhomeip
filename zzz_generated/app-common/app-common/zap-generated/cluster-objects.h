@@ -46794,6 +46794,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Unsupported
+namespace ReadFailureCode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReadFailureCode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReadFailureCode
+namespace FailureInt32U {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FailureInt32U::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace FailureInt32U
 namespace NullableBoolean {
 struct TypeInfo
 {
@@ -47234,30 +47258,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableGlobalStruct
-namespace ReadFailureCode {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReadFailureCode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReadFailureCode
-namespace FailureInt32U {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FailureInt32U::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace FailureInt32U
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -47368,7 +47368,9 @@ struct TypeInfo
         Attributes::ClusterErrorBoolean::TypeInfo::DecodableType clusterErrorBoolean = static_cast<bool>(0);
         Attributes::GlobalEnum::TypeInfo::DecodableType globalEnum = static_cast<chip::app::Clusters::Globals::TestGlobalEnum>(0);
         Attributes::GlobalStruct::TypeInfo::DecodableType globalStruct;
-        Attributes::Unsupported::TypeInfo::DecodableType unsupported = static_cast<bool>(0);
+        Attributes::Unsupported::TypeInfo::DecodableType unsupported         = static_cast<bool>(0);
+        Attributes::ReadFailureCode::TypeInfo::DecodableType readFailureCode = static_cast<uint8_t>(0);
+        Attributes::FailureInt32U::TypeInfo::DecodableType failureInt32U     = static_cast<uint32_t>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;
         Attributes::NullableBitmap8::TypeInfo::DecodableType nullableBitmap8;
         Attributes::NullableBitmap16::TypeInfo::DecodableType nullableBitmap16;
@@ -47405,8 +47407,6 @@ struct TypeInfo
         Attributes::WriteOnlyInt8u::TypeInfo::DecodableType writeOnlyInt8u = static_cast<uint8_t>(0);
         Attributes::NullableGlobalEnum::TypeInfo::DecodableType nullableGlobalEnum;
         Attributes::NullableGlobalStruct::TypeInfo::DecodableType nullableGlobalStruct;
-        Attributes::ReadFailureCode::TypeInfo::DecodableType readFailureCode = static_cast<uint8_t>(0);
-        Attributes::FailureInt32U::TypeInfo::DecodableType failureInt32U     = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

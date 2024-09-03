@@ -6904,6 +6904,18 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace Unsupported
 
+namespace ReadFailureCode {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace ReadFailureCode
+
+namespace FailureInt32U {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FailureInt32U
+
 namespace NullableBoolean {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<bool> & value); // boolean
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
@@ -7317,18 +7329,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value,
                                         MarkAttributeDirty markDirty);
 } // namespace NullableGlobalEnum
-
-namespace ReadFailureCode {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace ReadFailureCode
-
-namespace FailureInt32U {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FailureInt32U
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
