@@ -80,14 +80,14 @@ source_set("libopenthread-k32w1") {
   ]
 
   if (chip_crypto == "platform") {
-    sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp" ]
+    sources += [ "${openthread_nxp_root}/src/common/crypto/ecdsa_sss.cpp" ]
 
     if (use_hw_sha256) {
-      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp" ]
+      sources += [ "${openthread_nxp_root}/src/common/crypto/sha256_sss.cpp" ]
     }
 
     if (use_hw_aes) {
-      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
+      sources += [ "${openthread_nxp_root}/src/common/crypto/aes_sss.cpp" ]
     }
 
     if (chip_key_storage == "fwk_nvm") {

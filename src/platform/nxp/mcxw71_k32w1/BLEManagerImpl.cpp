@@ -28,7 +28,7 @@ messaging_t gHci2Host_TaskQueue;
 /*! Event for the Host Task Queue */
 OSA_EVENT_HANDLE_DEFINE(gHost_TaskEvent);
 
-#include <platform/nxp/k32w1/BLEManagerImpl.h>
+#include <platform/nxp/mcxw71_k32w1/BLEManagerImpl.h>
 
 extern "C" bleResult_t Hci_Reset(void);
 

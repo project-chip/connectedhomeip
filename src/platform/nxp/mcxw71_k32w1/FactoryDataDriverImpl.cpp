@@ -17,7 +17,7 @@
 
 #include <platform/KeyValueStoreManager.h>
 #include <platform/nxp/common/legacy/FactoryDataProvider.h>
-#include <platform/nxp/k32w1/FactoryDataDriverImpl.h>
+#include <platform/nxp/mcxw71_k32w1/FactoryDataDriverImpl.h>
 
 using namespace chip::DeviceLayer::PersistedStorage;
 

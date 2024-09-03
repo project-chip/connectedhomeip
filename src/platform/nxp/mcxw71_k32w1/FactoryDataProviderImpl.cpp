@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <platform/KeyValueStoreManager.h>
-#include <platform/nxp/k32w1/FactoryDataProviderImpl.h>
+#include <platform/nxp/mcxw71_k32w1/FactoryDataProviderImpl.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "fsl_adapter_flash.h"
