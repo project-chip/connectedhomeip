@@ -17,6 +17,7 @@
 import asyncio
 import contextlib
 import os
+import shutil
 import signal
 import sys
 from argparse import ArgumentParser
@@ -286,10 +287,10 @@ async def main(args):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Fabric-Sync Example Application")
     parser.add_argument("--app-admin", metavar="PATH",
-                        default="out/linux-x64-fabric-admin-rpc/fabric-admin",
+                        default=shutil.which("fabric-admin"),
                         help="path to the fabric-admin executable; default=%(default)s")
     parser.add_argument("--app-bridge", metavar="PATH",
-                        default="out/linux-x64-fabric-bridge-rpc/fabric-bridge-app",
+                        default=shutil.which("fabric-bridge-app"),
                         help="path to the fabric-bridge executable; default=%(default)s")
     parser.add_argument("--app-admin-rpc-port", metavar="PORT", type=int,
                         help="fabric-admin RPC server port")
@@ -314,5 +315,10 @@ if __name__ == "__main__":
                         help="discriminator to use for the bridge")
     parser.add_argument("--passcode", metavar="NUM", type=int,
                         help="passcode to use for the bridge")
+    args = parser.parse_args()
+    if args.app_admin is None or not os.path.exists(args.app_admin):
+        parser.error("fabric-admin executable not found in PATH. Use '--app-admin' argument to provide it.")
+    if args.app_bridge is None or not os.path.exists(args.app_bridge):
+        parser.error("fabric-bridge-app executable not found in PATH. Use '--app-bridge' argument to provide it.")
     with contextlib.suppress(KeyboardInterrupt):
-        asyncio.run(main(parser.parse_args()))
+        asyncio.run(main(args))
