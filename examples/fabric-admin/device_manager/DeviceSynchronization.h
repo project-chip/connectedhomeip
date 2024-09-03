@@ -71,10 +71,10 @@ private:
     {
         Idle,             ///< Default state that the object starts out in, where no work has commenced
         Connecting,       ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
-        AwaitingResponse, ///< We have started a subscription.
-        ReceivedResponse, ///<
-        ReceivedError,    ///<
-        GettingUid,       ///<
+        AwaitingResponse, ///< We have started reading BasicInformation cluster attributes
+        ReceivedResponse, ///< We have received a ReportEnd from reading BasicInformation cluster attributes
+        ReceivedError,    ///< We recieved an error while reading of BasicInformation cluster attributes
+        GettingUid,       ///< We are getting UniqueId from the remote fabric sync bridge.
     };
 
     void GetUid(chip::EndpointId endpointId);

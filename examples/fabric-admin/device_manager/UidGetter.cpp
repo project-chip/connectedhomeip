@@ -68,6 +68,7 @@ CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::De
     CHIP_ERROR err = controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(NotSpecified, "Failed to connect to remote fabric sync bridge %" CHIP_ERROR_FORMAT, err.Format());
         mCurrentlyGettingUid = false;
     }
     return err;
@@ -107,12 +108,7 @@ void UidGetter::OnError(CHIP_ERROR error)
 void UidGetter::OnDone(ReadClient * apReadClient)
 {
     mCurrentlyGettingUid = false;
-    std::optional<CharSpan> returnValue;
-    if (mUniqueIdHasValue)
-    {
-        returnValue = CharSpan(mUniqueId);
-    }
-    mOnDoneCallback(returnValue);
+    mOnDoneCallback(mUniqueIdHasValue ? std::make_optional<CharSpan>(mUniqueId) : std::nullopt);
 }
 
 void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -136,10 +132,7 @@ void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, cons
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue subscription to AdministratorCommissioning data");
-        // After calling mOnDoneCallback we are indicating that `this` is deleted and we shouldn't do anything else with
-        // DeviceSubscription.
-        mCurrentlyGettingUid = false;
-        mOnDoneCallback(std::nullopt);
+        OnDone(nullptr);
         return;
     }
 }
@@ -149,6 +142,5 @@ void UidGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERRO
     VerifyOrDie(mCurrentlyGettingUid);
     ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
-    mCurrentlyGettingUid = false;
-    mOnDoneCallback(std::nullopt);
+    OnDone(nullptr);
 }

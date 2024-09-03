@@ -225,6 +225,10 @@ void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
                 this->mCurrentDeviceData.has_unique_id = true;
                 memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
             }
+            else
+            {
+                ChipLogError(NotSpecified, "We expected to get UniqueId from remote fabric sync bridge");
+            }
             this->SynchronizationCompleteAddDevice();
         },
         *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
@@ -247,7 +251,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
         CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Failed start subscription to ");
+            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mCurrentDeviceData.node_id));
         }
     }
     MoveToState(State::Idle);
