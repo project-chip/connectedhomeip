@@ -57,6 +57,17 @@ bool HasNumericField(Json::Value & jsonValue, const std::string & field)
     return jsonValue.isMember(field) && jsonValue[field].isNumeric();
 }
 
+uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
+{
+    // TODO: Move to using public API of cluster.
+    uint8_t numPositions = 0;
+
+    // On failure, the numPositions won't be changed, so 0 returned.
+    (void) Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+
+    return numPositions;
+}
+
 /**
  * Named pipe handler for simulated long press
  *
@@ -99,6 +110,15 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (buttonId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid ButtonId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
     System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
     uint32_t featureMap  = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
@@ -169,6 +189,15 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (buttonId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid ButtonId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     System::Clock::Milliseconds32 multiPressPressedTimeMillis{ static_cast<unsigned>(
         jsonValue["MultiPressPressedTimeMillis"].asUInt()) };
     System::Clock::Milliseconds32 multiPressReleasedTimeMillis{ static_cast<unsigned>(
@@ -227,6 +256,14 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t positionId    = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
 
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (positionId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid PositionId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     uint8_t previousPositionId                 = 0;
     Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
     VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
@@ -246,6 +283,34 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
         ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u",
                       static_cast<unsigned>(positionId));
     }
+}
+
+/**
+ * Named pipe handler for simulating switch is idle
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateSwitchIdle"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+
+void HandleSimulateSwitchIdle(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+
+    if (!hasEndpointId)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    (void) Switch::Attributes::CurrentPosition::Set(endpointId, 0);
 }
 
 void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
@@ -426,6 +491,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateLatchPosition")
     {
         HandleSimulateLatchPosition(self->mJsonValue);
+    }
+    else if (name == "SimulateSwitchIdle")
+    {
+        HandleSimulateSwitchIdle(self->mJsonValue);
     }
     else if (name == "SetOccupancy")
     {

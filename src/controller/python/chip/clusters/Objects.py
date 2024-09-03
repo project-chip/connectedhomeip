@@ -17551,7 +17551,7 @@ class RvcRunMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
+            kDirectModeChange = 0x10000
 
     class Structs:
         @dataclass
@@ -17795,7 +17795,7 @@ class RvcCleanMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
+            kDirectModeChange = 0x10000
 
     class Structs:
         @dataclass

@@ -17,6 +17,8 @@
  */
 
 #include "DeviceSynchronization.h"
+
+#include "DeviceSubscriptionManager.h"
 #include "rpc/RpcClient.h"
 
 #include <app/InteractionModelEngine.h>
@@ -72,6 +74,12 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
+    if (!status.IsSuccess())
+    {
+        ChipLogError(NotSpecified, "Response Failure: %" CHIP_ERROR_FORMAT, status.ToChipError().Format());
+        return;
+    }
+
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
@@ -124,6 +132,17 @@ void DeviceSynchronizer::OnReportEnd()
     if (!DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
     {
         AddSynchronizedDevice(mCurrentDeviceData);
+        // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
+        if (!mCurrentDeviceData.is_icd)
+        {
+            VerifyOrDie(mController);
+            // TODO(#35333) Figure out how we should recover in this circumstance.
+            CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Failed start subscription to ");
+            }
+        }
     }
 #else
     ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
@@ -171,9 +190,10 @@ void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & pe
     mDeviceSyncInProcess = false;
 }
 
-void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
                                                     bool deviceIsIcd)
 {
+    VerifyOrDie(controller);
     if (mDeviceSyncInProcess)
     {
         ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
@@ -187,5 +207,6 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
 
     mDeviceSyncInProcess = true;
 
-    controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mController = controller;
+    controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

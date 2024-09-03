@@ -34,9 +34,6 @@ constexpr size_t kUniqueLocationIdMaxSize       = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize  = 64;
 constexpr size_t kLocationDescriptorNameMaxSize = 128;
 
-constexpr size_t kDeviceDirectoryMaxSize   = 256;
-constexpr size_t kLocationDirectoryMaxSize = 64;
-
 class AttrAccess : public AttributeAccessInterface
 {
 public:
@@ -264,7 +261,6 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() < kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
 }
@@ -282,7 +278,6 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     EcosystemLocationKey key = { .mUniqueLocationId = aLocationId, .mFabricIndex = aFabricIndex };
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(key) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[key] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
