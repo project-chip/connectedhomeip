@@ -251,7 +251,8 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
         CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mCurrentDeviceData.node_id));
+            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64,
+                         ChipLogValueX64(mCurrentDeviceData.node_id));
         }
     }
     MoveToState(State::Idle);
