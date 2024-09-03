@@ -338,7 +338,6 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     SetDefaultDelegate(endpoint, &delegate);
 }
 
-using namespace chip::app;
 chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,
                                                                                uint8_t * buffer, uint16_t maxReadLength)
