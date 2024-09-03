@@ -81,21 +81,6 @@ Davis, CA 95616, USA
       <item value="4" name="BusyWithOtherAdmin" summary="[[ref_BusyWithOtherAdmin]] Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="RequiredTCNotAccepted" summary="[[ref_RequiredTCNotAccepted]] One or more required TC features from the Enhanced Setup Flow were not accepted.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
-      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet, TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </item>
     </enum>
     <enum name="RegulatoryLocationTypeEnum">
       <item value="0" name="Indoor" summary="Indoor only">
