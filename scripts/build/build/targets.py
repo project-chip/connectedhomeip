@@ -545,7 +545,6 @@ def BuildCC13x4Target():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS),
         TargetPart('lighting', app=TIApp.LIGHTING),
         TargetPart('lock', app=TIApp.LOCK, openthread_ftd=True),
         TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
