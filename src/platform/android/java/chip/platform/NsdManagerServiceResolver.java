@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +45,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
   @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
   private final long timeout;
+
+  private ExecutorService mResolveExecutorService;
 
   /**
    * @param context application context
@@ -69,6 +72,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
     this.timeout = timeout;
+
+    mResolveExecutorService = Executors.newSingleThreadExecutor();
   }
 
   public NsdManagerServiceResolver(Context context) {
@@ -116,7 +121,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
 
-    new Thread(
+    mResolveExecutorService.execute(
             () -> {
               if (nsdManagerResolverAvailState != null) {
                 nsdManagerResolverAvailState.acquireResolver();
@@ -137,8 +142,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                       resolveTimeoutExecutor,
                       nsdManagerResolverAvailState);
               serviceFinderResolver.start();
-            })
-        .start();
+            });
   }
 
   @Override
