@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-silabs_project_dir = "${chip_root}/examples/thermostat/silabs"
+silabs_project_dir = "${chip_root}/examples/refrigerator/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
@@ -128,8 +128,8 @@ if (wifi_soc) {
   }
 }
 
-silabs_executable("thermostat_app") {
-  output_name = "matter-silabs-thermostat-example.out"
+silabs_executable("refrigerator_app") {
+  output_name = "matter-silabs-refrigerator-example.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -153,7 +153,7 @@ silabs_executable("thermostat_app") {
   }
 
   if (!disable_lcd) {
-    sources += [ "src/ThermostatUI.cpp" ]
+    sources += [ "src/RefrigeratorUI.cpp" ]
   }
 
   deps = [
@@ -235,7 +235,7 @@ silabs_executable("thermostat_app") {
 }
 
 group("silabs") {
-  deps = [ ":thermostat_app" ]
+  deps = [ ":refrigerator_app" ]
 }
 
 group("default") {

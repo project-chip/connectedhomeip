@@ -22,23 +22,19 @@
 #include "glib.h"
 #include "lcd.h"
 
-class ThermostatUI
+class RefrigeratorUI
 {
 
 public:
-    // AppCluster Spec Table 85.
-    enum HVACMode
+    enum SUPPORTED_MODES
     {
-        MODE_OFF = 0,
-        HEATING_COOLING,
-        NOT_USED,
-        COOLING,
-        HEATING,
+        NORMAL = 0x0000,
+        ENERGY_SAVE = 0x0004,
+        RAPID_COOL = 0x4000,
+        RAPID_FREEZE = 0x4001,
     };
 
     static void DrawUI(GLIB_Context_t * glibContext);
-    static void SetHeatingSetPoint(int8_t temp);
-    static void SetCoolingSetPoint(int8_t temp);
     static void SetCurrentTemp(int8_t temp);
     static void SetMode(uint8_t mode);
 
