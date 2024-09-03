@@ -340,6 +340,7 @@ datamodel
 DataModelRevision
 dataset
 datasets
+datastore
 DataVersion
 dbf
 DBG
