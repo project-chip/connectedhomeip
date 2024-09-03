@@ -277,7 +277,7 @@ class Efr32Builder(GnBuilder):
             # Generate the list of files by globbing each pattern.
             files = []
             for pattern in patterns:
-                files += list(map(lambda x: os.path.basename(x), glob.glob(pattern)))
+                files.extend([os.path.basename(x) for x in glob.glob(pattern)])
 
             # Create the bundle file.
             with open(flash_bundle_path, 'w') as bundle_file:
@@ -292,7 +292,7 @@ class Efr32Builder(GnBuilder):
             # Efr32 unit-test generates the "tests" subdir with a set of files for each individual unit test source.
             for ext in extensions:
                 pattern = os.path.join(self.output_dir, "tests", f"*.{ext}")
-                for name in map(lambda x: os.path.basename(x), glob.glob(pattern)):
+                for name in [os.path.basename(x) for x in glob.glob(pattern)]:
                     yield BuilderOutput(os.path.join(self.output_dir, "tests", name), name)
         else:
             # All other examples have just one set of files.

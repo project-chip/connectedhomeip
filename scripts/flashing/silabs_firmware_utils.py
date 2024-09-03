@@ -189,11 +189,8 @@ class Flasher(firmware_utils.Flasher):
                 shutil.copy(args.firmware_utils, output_dir)
 
             # Create the flashbundle file.
-            try:
-                with open(args.flashbundle_file, 'w') as flashbundle_file:
-                    flashbundle_file.write(flashbundle_contents.strip())
-            except OSError as exception:
-                print(exception, sys.stderr)
+            with open(args.flashbundle_file, 'w') as flashbundle_file:
+                flashbundle_file.write(flashbundle_contents.strip())
 
     def make_wrapper(self, argv):
         self.parser.add_argument(
