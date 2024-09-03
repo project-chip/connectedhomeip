@@ -216,7 +216,7 @@ public:
     /*
      * @brief   Updates the parameters used to generate fake power and energy readings
      *
-     * @param   Amperage_mA   Maximum Charge current in mA
+     * @param   maximumChargeCurrent   Maximum Charge current in mA
      */
     void UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent);
 

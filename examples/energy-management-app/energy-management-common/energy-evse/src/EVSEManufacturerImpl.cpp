@@ -555,6 +555,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)
 {
     FakeReadings::GetInstance().SetCurrent(maximumChargeCurrent);
+    // Note we have to divide by 1000 to make ma * mv = mW
     FakeReadings::GetInstance().SetPower((FakeReadings::GetInstance().GetVoltage() * maximumChargeCurrent) / 1000);
 }
 

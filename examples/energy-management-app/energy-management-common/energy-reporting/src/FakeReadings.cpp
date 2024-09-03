@@ -181,58 +181,29 @@ void FakeReadings::FakeReadingsTimerExpiry(System::Layer * systemLayer, void * m
     mn->FakeReadingsUpdate();
 }
 
-/**
- * @brief   Sets the fake Power level to use
- *
- * @param   Power in mW
- */
+
 void FakeReadings::SetPower(Power_mW aPower_mW)
 {
     mPower_mW = aPower_mW;
 }
-/**
- * @brief   Gets the fake Power level in use
- *
- * @return  Power in mW
- */
 Power_mW FakeReadings::GetPower()
 {
     return mPower_mW;
 };
-/**
- * @brief   Sets the fake Voltage level to use
- *
- * @param   Voltage in mV
- */
 void FakeReadings::SetVoltage(Voltage_mV aVoltage_mV)
 {
     mVoltage_mV = aVoltage_mV;
 }
-/**
- * @brief   Gets the fake Voltage level in use
- *
- * @return  Voltage in mV
- */
 Voltage_mV FakeReadings::GetVoltage()
 {
     return mVoltage_mV;
 };
 
-/**
- * @brief   Sets the fake Current level to use
- *
- * @param   Current in mA
- */
 void FakeReadings::SetCurrent(Amperage_mA aCurrent_mA)
 {
     mCurrent_mA = aCurrent_mA;
 }
 
-/**
- * @brief   Gets the fake Current level in use
- *
- * @return  Current in mA
- */
 Amperage_mA FakeReadings::GetCurrent()
 {
     return mCurrent_mA;
