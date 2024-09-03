@@ -1714,11 +1714,14 @@ class ChipDeviceControllerBase():
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
         """ Creates a standard flow manual code from the given discriminator and passcode."""
         # 64 bytes is WAY more than required, but let's be safe
-        size = 64
-        buf = create_string_buffer(size)
+        in_size = 64
+        out_size = c_size_t(0)
+        buf = create_string_buffer(in_size)
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_CreateManualCode(discriminator, passcode, buf, size)
+            lambda: self._dmLib.pychip_CreateManualCode(discriminator, passcode, buf, in_size, pointer(out_size))
         ).raise_on_error()
+        if out_size.value == 0 or out_size.value > in_size:
+            raise MemoryError("Invalid output size for manual code")
         return buf.value.decode()
 
     # ----- Private Members -----
@@ -1949,7 +1952,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
 
             self._dmLib.pychip_CreateManualCode.restype = PyChipError
-            self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t]
+            self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
