@@ -122,27 +122,27 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         };
 
     mResolveExecutorService.execute(
-            () -> {
-              if (nsdManagerResolverAvailState != null) {
-                nsdManagerResolverAvailState.acquireResolver();
-              }
+        () -> {
+          if (nsdManagerResolverAvailState != null) {
+            nsdManagerResolverAvailState.acquireResolver();
+          }
 
-              ScheduledFuture<?> resolveTimeoutExecutor =
-                  Executors.newSingleThreadScheduledExecutor()
-                      .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
+          ScheduledFuture<?> resolveTimeoutExecutor =
+              Executors.newSingleThreadScheduledExecutor()
+                  .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
 
-              NsdServiceFinderAndResolver serviceFinderResolver =
-                  new NsdServiceFinderAndResolver(
-                      this.nsdManager,
-                      serviceInfo,
-                      callbackHandle,
-                      contextHandle,
-                      chipMdnsCallback,
-                      multicastLock,
-                      resolveTimeoutExecutor,
-                      nsdManagerResolverAvailState);
-              serviceFinderResolver.start();
-            });
+          NsdServiceFinderAndResolver serviceFinderResolver =
+              new NsdServiceFinderAndResolver(
+                  this.nsdManager,
+                  serviceInfo,
+                  callbackHandle,
+                  contextHandle,
+                  chipMdnsCallback,
+                  multicastLock,
+                  resolveTimeoutExecutor,
+                  nsdManagerResolverAvailState);
+          serviceFinderResolver.start();
+        });
   }
 
   @Override
