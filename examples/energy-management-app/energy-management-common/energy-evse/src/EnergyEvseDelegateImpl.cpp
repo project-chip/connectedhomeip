@@ -672,7 +672,7 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
     if (mState == StateEnum::kNotPluggedIn)
     {
         /* EV was not plugged in - start a new session */
-        // TODO get energy meter readings
+        // TODO get energy meter readings - #35370
         mSession.StartSession(mEndpointId, 0, 0);
         SendEVConnectedEvent();
 
@@ -694,7 +694,7 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
     }
 
-    // TODO get energy meter readings
+    // TODO get energy meter readings - #35370
     mSession.StopSession(mEndpointId, 0, 0);
     SendEVNotDetectedEvent();
     SetState(StateEnum::kNotPluggedIn);
@@ -1627,10 +1627,11 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
 /**
  * @brief This function samples the start-time, and energy meter to hold the session info
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StartSession(EndpointId aEndpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
@@ -1662,13 +1663,13 @@ void EvseSession::StartSession(EndpointId aEndpointId, int64_t chargingMeterValu
     mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
     mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
 
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionID::Id);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionDuration::Id);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionID::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 
     // Write values to persistent storage.
-    ConcreteAttributePath path = ConcreteAttributePath(aEndpointId, EnergyEvse::Id, SessionID::Id);
+    ConcreteAttributePath path = ConcreteAttributePath(endpointId, EnergyEvse::Id, SessionID::Id);
     GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
 
     // TODO persist mStartTime
@@ -1679,22 +1680,25 @@ void EvseSession::StartSession(EndpointId aEndpointId, int64_t chargingMeterValu
 /**
  * @brief This function updates the session information at the unplugged event
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StopSession(EndpointId aEndpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
-    RecalculateSessionDuration(aEndpointId);
-    UpdateEnergyCharged(aEndpointId, chargingMeterValue);
-    UpdateEnergyDischarged(aEndpointId, dischargingMeterValue);
+    RecalculateSessionDuration(endpointId);
+    UpdateEnergyCharged(endpointId, chargingMeterValue);
+    UpdateEnergyDischarged(endpointId, dischargingMeterValue);
 }
 
 /*---------------------- EvseSession functions --------------------------*/
 
 /**
  * @brief This function updates the session attrs to allow read attributes to return latest values
+ *
+ * @param endpointId            - The endpoint to report the update on
  */
-void EvseSession::RecalculateSessionDuration(EndpointId aEndpointId)
+void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
@@ -1710,27 +1714,29 @@ void EvseSession::RecalculateSessionDuration(EndpointId aEndpointId)
 
     uint32_t duration = chipEpoch - mStartTime;
     mSessionDuration  = MakeNullable(duration);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
 }
 
 /**
  * @brief This function updates the EnergyCharged meter value
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
  */
-void EvseSession::UpdateEnergyCharged(EndpointId aEndpointId, int64_t chargingMeterValue)
+void EvseSession::UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue)
 {
     mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
 }
 
 /**
  * @brief This function updates the EnergyDischarged meter value
  *
+ * @param endpointId            - The endpoint to report the update on
  * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
  */
-void EvseSession::UpdateEnergyDischarged(EndpointId aEndpointId, int64_t dischargingMeterValue)
+void EvseSession::UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue)
 {
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
-    MatterReportingAttributeChangeCallback(aEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 }
