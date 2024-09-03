@@ -301,6 +301,10 @@ class EventChangeCallback:
         _ = self.get_last_event()
         return
 
+    def reset(self) -> None:
+        """Resets state as if no events had ever been received."""
+        self.flush_events()
+
     @property
     def event_queue(self) -> queue.Queue:
         return self._q
@@ -356,7 +360,7 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
+def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
     Args:
@@ -418,6 +422,7 @@ class ClusterAttributeChangeAccumulator:
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
+        self._endpoint_id = 0
         self.reset()
 
     def reset(self):
@@ -441,6 +446,7 @@ class ClusterAttributeChangeAccumulator:
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
         )
+        self._endpoint_id = endpoint
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
@@ -512,6 +518,24 @@ class ClusterAttributeChangeAccumulator:
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
+
+    def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
+        """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
+
+        Args:
+          - attribute: attribute to match for reports to check.
+          - sequence: list of attribute values in order that are expected.
+          - timeout_sec: number of seconds to wait for.
+
+        *** WARNING: The queue contains every report since the sub was established. Use
+            self.reset() to make it empty. ***
+
+        This will fail current Mobly test with assertion failure if the data is not as expected in order.
+
+        Returns nothing on success so the test can go on.
+        """
+        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
+                                  attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -2127,7 +2151,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
     def per_endpoint_test_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
-            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=60)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
                 logging.info("No matching endpoints found - skipping test")

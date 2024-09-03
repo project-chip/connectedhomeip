@@ -677,6 +677,81 @@ tests:
                 value: 0x03
 
     - label:
+          "Step 6f: TH sends a StoreScene command to to group G1 with the
+          GroupID field set to G1 and the SceneID field set to 0x03."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      groupId: G1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+
+    - label:
+          "Step 6g: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x03."
+      PICS: S.S.C01.Rsp
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+
+    - label:
+          "Step 6h: TH sends a RemoveScene command to group G1 with the GroupID
+          field set to G1 and the SceneID field set to 0x03."
+      PICS: S.S.C02.Rsp
+      command: "RemoveScene"
+      groupId: G1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+
+    - label: "Wait 1+ s to give CI time to process the RemoveScene command."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1250
+
+    - label:
+          "Step 6i: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x03."
+      PICS: S.S.C01.Rsp
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+      response:
+          values:
+              - name: "Status"
+                value: 0x8b
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x03
+
+    - label:
           "Step 7a: TH sends a CopyScene command to DUT with the mode field set
           to 0x00, the group identifier from field set to G1, the scene
           identifier from field set to 0x01, the group identifier to field set
