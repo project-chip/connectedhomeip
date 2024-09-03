@@ -3,10 +3,10 @@
 -   Fuzz Testing involves providing random and unexpected data as input to
     functions and methods to uncover bugs, security vulnerabilities, or to
     determine if the software crashes.
--   it is often continuous; the function under test is called iteratively with
+-   it is often continuous; the function under test is called in iteration with
     thousands of different inputs.
 -   Fuzz testing is often done with sanitizers enabled; to catch memory errors
-    and undefined behaviour.
+    and undefined behavior.
 -   The most commonly used fuzz testing frameworks for C/C++ are LibFuzzer and
     AFL.
 -   [Google's FuzzTest](https://github.com/google/fuzztest) is a newer framework
@@ -16,7 +16,7 @@
 
 ## `Google's FuzzTest`
 
--   Google FuzzTest is integrated through Pigweed's
+-   Google FuzzTest is integrated through Pigweed
     [pw_fuzzer](https://pigweed.dev/pw_fuzzer/concepts.html).
 
 ### Use cases
@@ -28,7 +28,7 @@
       overflows and use-after-free errors.
 
 2. Find Correctness Bugs using Assertions:
-    - For example, in Roundtrip Fuzzing, fuzzed input is encoded, decoded, and
+    - For example, in Round trip Fuzzing, fuzzed input is encoded, decoded, and
       then verified to match the original input. An example of this can be found
       in src/setup_payload/tests/FuzzBase38PW.cpp.
 
