@@ -142,7 +142,7 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
             VerifyOrDie(mController);
             // We shouldn't be able to have found something with FindDeviceByNode, if IsFabricSyncReady is false.
             VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-            auto remoteBridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
+            auto remoteBridgeNodeId         = DeviceMgr().GetRemoteBridgeNodeId();
             auto remoteEndpointIdOfInterest = device->GetEndpointId();
 
             // TODO callback need to be changed so that we set the UID.

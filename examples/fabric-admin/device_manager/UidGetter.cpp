@@ -53,14 +53,14 @@ UidGetter::UidGetter() :
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                             chip::NodeId nodeId, chip::EndpointId endpointId)
+CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+                             chip::EndpointId endpointId)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDie(!mCurrentlyGettingUid);
 
-    mEndpointId = endpointId;
-    mOnDoneCallback = onDoneCallback;
+    mEndpointId       = endpointId;
+    mOnDoneCallback   = onDoneCallback;
     mUniqueIdHasValue = false;
     memset(mUniqueId, 0, sizeof(mUniqueId));
     mCurrentlyGettingUid = true;
@@ -85,8 +85,7 @@ void UidGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLV
 
     switch (path.mAttributeId)
     {
-    case Clusters::BasicInformation::Attributes::UniqueID::Id:
-    {
+    case Clusters::BasicInformation::Attributes::UniqueID::Id: {
         mUniqueIdHasValue = SuccessOrLog(data->GetString(mUniqueId, sizeof(mUniqueId)), "UniqueId");
         break;
     }
@@ -124,7 +123,8 @@ void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, cons
     VerifyOrDie(mClient);
 
     AttributePathParams readPaths[1];
-    readPaths[0] = AttributePathParams(kRootEndpointId, Clusters::BasicInformation::Id, Clusters::BasicInformation::Attributes::UniqueID::Id);
+    readPaths[0] =
+        AttributePathParams(kRootEndpointId, Clusters::BasicInformation::Id, Clusters::BasicInformation::Attributes::UniqueID::Id);
 
     ReadPrepareParams readParams(sessionHandle);
 

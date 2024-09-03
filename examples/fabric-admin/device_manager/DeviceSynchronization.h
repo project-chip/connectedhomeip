@@ -69,12 +69,12 @@ public:
 private:
     enum class State : uint8_t
     {
-        Idle,                ///< Default state that the object starts out in, where no work has commenced
-        Connecting,          ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
-        AwaitingResponse,    ///< We have started a subscription.
-        ReceivedResponse,    ///<
-        ReceivedError,       ///<
-        GettingUid,          ///<
+        Idle,             ///< Default state that the object starts out in, where no work has commenced
+        Connecting,       ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
+        AwaitingResponse, ///< We have started a subscription.
+        ReceivedResponse, ///<
+        ReceivedError,    ///<
+        GettingUid,       ///<
     };
 
     void AddSynchronizedDevice();

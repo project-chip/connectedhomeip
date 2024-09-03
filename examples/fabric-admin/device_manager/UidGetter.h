@@ -21,8 +21,8 @@
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 
-#include <optional>
 #include <memory>
+#include <optional>
 
 class UidGetter : public chip::app::ReadClient::Callback
 {
@@ -31,8 +31,8 @@ public:
 
     UidGetter();
 
-    CHIP_ERROR GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller,
-                      chip::NodeId nodeId, chip::EndpointId endpointId);
+    CHIP_ERROR GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+                      chip::EndpointId endpointId);
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
@@ -58,7 +58,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     bool mCurrentlyGettingUid = false;
-    bool mUniqueIdHasValue = false;
+    bool mUniqueIdHasValue    = false;
     char mUniqueId[33];
     chip::EndpointId mEndpointId;
 };
