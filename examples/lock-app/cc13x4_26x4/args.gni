@@ -59,12 +59,13 @@ matter_software_ver_str = "1.0.1+1"
 
 # should be maj.min.rev+build with later parts optional for MCUBoot
 
-custom_factory_data = true
+custom_factory_data = false
 
 # ICD Default configurations
 chip_enable_icd_server = false
 chip_persist_subscriptions = false
 chip_subscription_timeout_resumption = false
+chip_enable_icd_lit = false
 
 freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
 
