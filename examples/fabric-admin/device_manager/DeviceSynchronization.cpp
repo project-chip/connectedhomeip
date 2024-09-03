@@ -216,7 +216,7 @@ void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
     VerifyOrDie(mState == State::ReceivedResponse);
     VerifyOrDie(mController);
     VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-    auto remoteBridgeNodeId         = DeviceMgr().GetRemoteBridgeNodeId();
+    auto remoteBridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
 
     CHIP_ERROR err = mUidGetter.GetUid(
         [this](std::optional<CharSpan> aUniqueId) {
@@ -252,7 +252,6 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     }
     MoveToState(State::Idle);
 }
-
 
 void DeviceSynchronizer::MoveToState(const State targetState)
 {
