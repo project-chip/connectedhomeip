@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "ThermostatIcons.h"
+#include "RefrigeratorIcons.h"
 #include "glib.h"
 #include "lcd.h"
 
