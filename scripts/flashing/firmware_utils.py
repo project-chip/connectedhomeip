@@ -413,7 +413,7 @@ class Flasher:
         try:
             self._platform_wrapper_args(args)
         except OSError:
-            traceback.print_last();
+            traceback.print_last()
             return 1
 
         # Find any option values that differ from the class defaults.
@@ -451,6 +451,6 @@ class Flasher:
                                    | stat.S_IXGRP | stat.S_IRGRP
                                    | stat.S_IXOTH | stat.S_IROTH))
         except OSError:
-            traceback.print_last();
+            traceback.print_last()
             return 1
         return 0
