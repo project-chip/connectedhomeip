@@ -24,6 +24,8 @@
 
 #include <set>
 
+constexpr uint32_t kDefaultSetupPinCode    = 20202021;
+constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
 class Device
@@ -61,6 +63,8 @@ public:
 
     void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
 
+    void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
+    void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
     void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
     bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
@@ -125,9 +129,11 @@ public:
 
      * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
      *                          as for the first fabric.
+     * @param setupPINCode      The setup PIN code used to authenticate the pairing process.
      * @param deviceRemoteIp    The IP address of the remote device that is being paired as part of the fabric bridge.
+     * @param deviceRemotePort  The secured device port of the remote device that is being paired as part of the fabric bridge.
      */
-    void PairRemoteFabricBridge(chip::NodeId nodeId, const char * deviceRemoteIp);
+    void PairRemoteFabricBridge(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp, uint16_t deviceRemotePort);
 
     /**
      * @brief Pair a remote Matter device to the current fabric.
@@ -190,6 +196,8 @@ private:
     // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
 
+    uint16_t mLocalBridgePort         = kDefaultLocalBridgePort;
+    uint32_t mLocalBridgeSetupPinCode = kDefaultSetupPinCode;
     // The Node ID of the local bridge used for Fabric-Sync
     // This represents the bridge within its own ecosystem.
     chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;

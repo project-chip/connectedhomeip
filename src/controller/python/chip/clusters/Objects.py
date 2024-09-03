@@ -12168,9 +12168,11 @@ class BridgedDeviceBasicInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="stayActiveDuration", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=1, Type=uint),
                     ])
 
             stayActiveDuration: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -17549,7 +17551,7 @@ class RvcRunMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
+            kDirectModeChange = 0x10000
 
     class Structs:
         @dataclass
@@ -17793,7 +17795,7 @@ class RvcCleanMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
+            kDirectModeChange = 0x10000
 
     class Structs:
         @dataclass
@@ -31358,14 +31360,13 @@ class ServiceArea(Cluster):
         class SelectAreasStatus(MatterIntEnum):
             kSuccess = 0x00
             kUnsupportedArea = 0x01
-            kDuplicatedAreas = 0x02
-            kInvalidInMode = 0x03
-            kInvalidSet = 0x04
+            kInvalidInMode = 0x02
+            kInvalidSet = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 4,
 
         class SkipAreaStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -31392,11 +31393,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.LandmarkTag),
-                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
+                        ClusterObjectFieldDescriptor(Label="relativePositionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
                     ])
 
             landmarkTag: 'Globals.Enums.LandmarkTag' = 0
-            positionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
+            relativePositionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
 
         @dataclass
         class AreaInfoStruct(ClusterObject):
@@ -31419,12 +31420,12 @@ class ServiceArea(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mapID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="areaDesc", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
+                        ClusterObjectFieldDescriptor(Label="areaInfo", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
                     ])
 
             areaID: 'uint' = 0
             mapID: 'typing.Union[Nullable, uint]' = NullValue
-            areaDesc: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
+            areaInfo: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
 
         @dataclass
         class MapStruct(ClusterObject):
@@ -38399,6 +38400,26 @@ class OccupancySensing(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class OccupancyChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000406
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=0, Type=uint),
+                    ])
+
+            occupancy: 'uint' = 0
 
 
 @dataclass
@@ -47186,9 +47207,8 @@ class EcosystemInformation(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="removedOn", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
-                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000002, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
+                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000000, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
+                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -47197,7 +47217,6 @@ class EcosystemInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    removedOn: 'typing.Union[None, Nullable, uint]' = None
     deviceDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]' = None
     locationDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -47265,22 +47284,6 @@ class EcosystemInformation(Cluster):
 
     class Attributes:
         @dataclass
-        class RemovedOn(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000750
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
         class DeviceDirectory(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -47288,7 +47291,7 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -47304,7 +47307,7 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000002
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -47474,14 +47477,10 @@ class CommissionerControl(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="responseTimeoutSeconds", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="ipAddress", Tag=2, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="port", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             requestId: 'uint' = 0
             responseTimeoutSeconds: 'uint' = 0
-            ipAddress: 'typing.Optional[bytes]' = None
-            port: 'typing.Optional[uint]' = None
 
         @dataclass
         class ReverseOpenCommissioningWindow(ClusterCommand):

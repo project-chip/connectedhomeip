@@ -92,7 +92,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 
     [testcase launchTask:_appTask];
 
-    NSLog(@"Started chip-%@-app with arguments %@ stdout=%@ and stderr=%@", name, allArguments, outFile, errorFile);
+    NSLog(@"Started chip-%@-app (%@) with arguments %@ stdout=%@ and stderr=%@", name, _appTask, allArguments, outFile, errorFile);
 
     return self;
 #endif // HAVE_NSTASK

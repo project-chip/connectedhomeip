@@ -1248,7 +1248,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kIdle = 16384;
@@ -1268,7 +1268,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -1307,7 +1307,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kDeepClean = 16384;
@@ -1320,7 +1320,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -1438,9 +1438,8 @@ provisional cluster ServiceArea = 336 {
   enum SelectAreasStatus : enum8 {
     kSuccess = 0;
     kUnsupportedArea = 1;
-    kDuplicatedAreas = 2;
-    kInvalidInMode = 3;
-    kInvalidSet = 4;
+    kInvalidInMode = 2;
+    kInvalidSet = 3;
   }
 
   enum SkipAreaStatus : enum8 {
@@ -1458,7 +1457,7 @@ provisional cluster ServiceArea = 336 {
 
   struct LandmarkInfoStruct {
     LandmarkTag landmarkTag = 0;
-    nullable RelativePositionTag positionTag = 1;
+    nullable RelativePositionTag relativePositionTag = 1;
   }
 
   struct AreaInfoStruct {
@@ -1469,7 +1468,7 @@ provisional cluster ServiceArea = 336 {
   struct AreaStruct {
     int32u areaID = 0;
     nullable int32u mapID = 1;
-    AreaInfoStruct areaDesc = 2;
+    AreaInfoStruct areaInfo = 2;
   }
 
   struct MapStruct {
@@ -1736,7 +1735,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -1750,7 +1749,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
