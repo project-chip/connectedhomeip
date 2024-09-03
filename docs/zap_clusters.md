@@ -87,6 +87,7 @@ Generally regenerate using one of:
 |        155 |       0x9B | EnergyPreference                                        |
 |        156 |       0x9C | PowerTopology                                           |
 |        157 |       0x9D | EnergyEvseMode                                          |
+|        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
@@ -131,6 +132,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |

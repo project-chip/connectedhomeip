@@ -84,7 +84,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="TemperatureUnit" type="TempUnitEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TEMP"/>
       </mandatoryConform>

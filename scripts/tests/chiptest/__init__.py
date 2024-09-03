@@ -157,6 +157,7 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_BR_5.yaml",                 # [TODO] Fabric Sync example app has not been integrated into CI yet.
     }
 
 
@@ -219,6 +220,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
+        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests
     }
 
 
@@ -233,6 +235,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
         "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
+        "Test_TC_BRBINFO_2_1.yaml",          # chip-repl does not support AnyCommands (24/07/2024)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
         "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
@@ -276,6 +279,8 @@ def target_for_name(name: str):
         return TestTarget.TV
     if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
         return TestTarget.LOCK
+    if name.startswith("TestFabricSync"):
+        return TestTarget.FABRIC_SYNC
     if name.startswith("OTA_"):
         return TestTarget.OTA
     if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
@@ -286,6 +291,8 @@ def target_for_name(name: str):
         return TestTarget.MWO
     if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
         return TestTarget.RVC
+    if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
+        return TestTarget.NETWORK_MANAGER
     return TestTarget.ALL_CLUSTERS
 
 

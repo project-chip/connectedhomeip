@@ -68,7 +68,9 @@ Davis, CA 95616, USA
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
-    <clusterId id="0x001C" name="Pulse Width Modulation"/>
+    <clusterId id="0x001C" name="Pulse Width Modulation">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
@@ -120,7 +122,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CurrentLevel" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="MinLevel" to="MaxLevel"/>
     </attribute>
@@ -153,7 +155,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CurrentFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
@@ -184,28 +186,28 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="OnLevel" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="MinLevel" to="MaxLevel"/>
     </attribute>
     <attribute id="0x0012" name="OnTransitionTime" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0013" name="OffTransitionTime" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0014" name="DefaultMoveRate" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x4000" name="StartUpCurrentLevel" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>

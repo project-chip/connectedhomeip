@@ -64,7 +64,9 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Updates to match cluster spec updates"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0098" name="Device Energy Management"/>
+    <clusterId id="0x0098" name="Device Energy Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
@@ -473,6 +475,63 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ESAType" type="ESATypeEnum" default="Other">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="ESACanGenerate" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="ESAState" type="ESAStateEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0003" name="AbsMinPower" type="power-mW" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="PowerAdjustmentCapability" type="list" default="null">
+      <entry type="PowerAdjustStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="8"/>
+    </attribute>
+    <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PFR"/>
+          <feature name="SFR"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="OptOutState" type="OptOutStateEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PA"/>
+          <feature name="STA"/>
+          <feature name="PAU"/>
+          <feature name="FA"/>
+          <feature name="CON"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+  </attributes>
   <commands>
     <command id="0x00" name="PowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>

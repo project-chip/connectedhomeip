@@ -1207,6 +1207,27 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+ *
+ * Defines the maximum number of access restriction list entries per
+ * fabric in the access control code's ARL attribute.
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC 10
+#endif
+
+/**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+ *
+ * Defines the maximum number of access restrictions for each entry
+ * in the ARL attribute (each entry is for a specific cluster on an
+ * endpoint on a fabric).
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY 10
+#endif
+
+/**
  * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
  *
  * @brief
@@ -1369,6 +1390,28 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
 #define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
 #endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+ *
+ * @brief Default minimum lookup time to wait during address resolve for
+ *        additional DNSSD queries even if a reply has already been received, or
+ *        to allow for additional heuristics regarding node choice to succeed, in
+ *        milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS 200
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+ *
+ * @brief Default maximum lookup time to wait during address resolve before
+ *        a TIMEOUT error, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS 45000
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
 
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
@@ -1625,6 +1668,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF
+ *
+ * @brief Default value for the ICD Management cluster MaximumCheckInBackoff attribute, in seconds
+ */
+#ifndef CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC
+#define CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#endif
+
+/**
  *  @name Configuation for resuming subscriptions that timed out
  *
  *  @brief
@@ -1700,6 +1752,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+ *
+ * Defines the number of networks the default ThreadNetworkDirectoryStorage implementation will store.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY (CHIP_CONFIG_MAX_FABRICS * 2)
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+ *
+ * Defines the number of ThreadNetworkDirectoryStorage iterators that can be allocated at any one time.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS 1
 #endif
 
 /**

@@ -56,12 +56,6 @@ extern "C" {
 #elif CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <bl_flash.h>
 #endif
-
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
-#include <rom_freertos_ext.h>
-#include <rom_hal_ext.h>
-#include <rom_lmac154_ext.h>
-#endif
 }
 
 #include <uart.h>
@@ -85,7 +79,6 @@ extern "C" unsigned int sleep(unsigned int seconds)
     return 0;
 }
 
-#if !CHIP_DEVICE_LAYER_TARGET_BL702L
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     printf("Stack Overflow checked. Stack name %s", pcTaskName);
@@ -169,9 +162,7 @@ extern "C" void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
-#if CONF_ENABLE_FRAME_PTR == 0
     taskDISABLE_INTERRUPTS();
-#endif
 
     if (xPortIsInsideInterrupt())
     {
@@ -182,65 +173,14 @@ extern "C" void vAssertCalled(void)
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
     }
 
-#if CONF_ENABLE_FRAME_PTR
     portABORT();
-#endif
-
-    while (true)
-        ;
-}
-#endif
-
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
-extern "C" void __attribute__((weak)) user_vAssertCalled(void)
-{
-    void * ra = (void *) __builtin_return_address(0);
-
-    taskDISABLE_INTERRUPTS();
-
-    if (xPortIsInsideInterrupt())
-    {
-        printf("vAssertCalled, ra = %p in ISR\r\n", (void *) ra);
-    }
-    else
-    {
-        printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, pcTaskGetName(NULL));
-    }
 
     while (true)
         ;
 }
 
-extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
-{
-    puts("Stack Overflow checked\r\n");
-    if (pcTaskName)
-    {
-        printf("Stack name %s\r\n", pcTaskName);
-    }
-    while (1)
-    {
-        /*empty here*/
-    }
-}
-
-extern "C" void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
-{
-    printf("Memory Allocate Failed. Current left size is %d bytes\r\n", xPortGetFreeHeapSize());
-#if defined(CFG_USE_PSRAM)
-    printf("Current psram left size is %d bytes\r\n", xPortGetFreeHeapSizePsram());
-#endif
-    while (1)
-    {
-        /*empty here*/
-    }
-}
-
-extern "C" void bflb_assert(void) __attribute__((weak, alias("user_vAssertCalled")));
-#else
 extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
 extern "C" void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
-#endif
 
 // ================================================================================
 // Main Code
@@ -336,16 +276,8 @@ extern "C" void setup_heap()
 {
     bl_sys_init();
 
-#if CHIP_DEVICE_LAYER_TARGET_BL702
+#if CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
     bl_sys_em_config();
-#elif CHIP_DEVICE_LAYER_TARGET_BL702L
-    bl_sys_em_config();
-
-    // Initialize rom data
-    extern uint8_t _rom_data_run;
-    extern uint8_t _rom_data_load;
-    extern uint8_t _rom_data_size;
-    memcpy((void *) &_rom_data_run, (void *) &_rom_data_load, (size_t) &_rom_data_size);
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_BL702
@@ -376,9 +308,6 @@ extern "C" void app_init(void)
 
 #if CHIP_DEVICE_LAYER_TARGET_BL702L
     bl_flash_init();
-
-    rom_freertos_init(256, 400);
-    rom_hal_init();
 #endif
 
     hosal_uart_init(&uart_stdio);

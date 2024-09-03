@@ -22,14 +22,15 @@
  */
 
 #include <errno.h>
-#include <gtest/gtest.h>
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PairingSession.h>
-#include <stdarg.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 

@@ -22,6 +22,39 @@
 using namespace chip::app::Clusters;
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MyBitmap", indent + 1, value.myBitmap);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MyBitmap'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MyEnum", indent + 1, value.myEnum);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MyEnum'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ModeTagStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -203,6 +236,64 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("LocationName", indent + 1, value.locationName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FloorNumber", indent + 1, value.floorNumber);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FloorNumber'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AreaType", indent + 1, value.areaType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaType'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::DeviceTypeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Revision", indent + 1, value.revision);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Revision'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -219,6 +310,32 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("AttributeID", indent + 1, value.attributeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StatusCode", indent + 1, value.statusCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StatusCode'");
             return err;
         }
     }
@@ -311,31 +428,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Revision", indent + 1, value.revision);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Revision'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -409,6 +501,108 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Type'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Id'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Restrictions", indent + 1, value.restrictions);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Restrictions'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Restrictions", indent + 1, value.restrictions);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Restrictions'");
             return err;
         }
     }
@@ -2391,6 +2585,64 @@ CHIP_ERROR DataModelLogger::LogValue(
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
+    const chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Duration", indent + 1, value.duration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Duration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OneShot", indent + 1, value.oneShot);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OneShot'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EmergencyBoost", indent + 1, value.emergencyBoost);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EmergencyBoost'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TemporarySetpoint", indent + 1, value.temporarySetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TemporarySetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TargetPercentage", indent + 1, value.targetPercentage);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetPercentage'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TargetReheat", indent + 1, value.targetReheat);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetReheat'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3322,30 +3574,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::HomeLocationStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationName", indent + 1, value.locationName);
+        CHIP_ERROR err = LogValue("LandmarkTag", indent + 1, value.landmarkTag);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationName'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkTag'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("FloorNumber", indent + 1, value.floorNumber);
+        CHIP_ERROR err = LogValue("RelativePositionTag", indent + 1, value.relativePositionTag);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FloorNumber'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AreaType", indent + 1, value.areaType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaType'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RelativePositionTag'");
             return err;
         }
     }
@@ -3355,7 +3599,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3367,26 +3611,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("LandmarkTag", indent + 1, value.landmarkTag);
+        CHIP_ERROR err = LogValue("LandmarkInfo", indent + 1, value.landmarkInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkTag'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PositionTag", indent + 1, value.positionTag);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PositionTag'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SurfaceTag", indent + 1, value.surfaceTag);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SurfaceTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkInfo'");
             return err;
         }
     }
@@ -3396,14 +3624,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
+        CHIP_ERROR err = LogValue("AreaID", indent + 1, value.areaID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaID'");
             return err;
         }
     }
@@ -3416,10 +3644,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
+        CHIP_ERROR err = LogValue("AreaInfo", indent + 1, value.areaInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaInfo'");
             return err;
         }
     }
@@ -3458,10 +3686,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
+        CHIP_ERROR err = LogValue("AreaID", indent + 1, value.areaID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaID'");
             return err;
         }
     }
@@ -3700,31 +3928,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("TransitionTimestamp", indent + 1, value.transitionTimestamp);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTimestamp'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3851,6 +4054,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Channel'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ActiveTimestamp", indent + 1, value.activeTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ActiveTimestamp'");
             return err;
         }
     }
@@ -4781,6 +4992,122 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DeviceName", indent + 1, value.deviceName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DeviceNameLastEdit", indent + 1, value.deviceNameLastEdit);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceNameLastEdit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BridgedEndpoint", indent + 1, value.bridgedEndpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BridgedEndpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OriginalEndpoint", indent + 1, value.originalEndpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OriginalEndpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DeviceTypes", indent + 1, value.deviceTypes);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceTypes'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UniqueLocationIDs", indent + 1, value.uniqueLocationIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationIDs'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("UniqueLocationIDsLastEdit", indent + 1, value.uniqueLocationIDsLastEdit);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationIDsLastEdit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("UniqueLocationID", indent + 1, value.uniqueLocationID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LocationDescriptor", indent + 1, value.locationDescriptor);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptor'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LocationDescriptorLastEdit", indent + 1, value.locationDescriptorLastEdit);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptorLastEdit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
@@ -4846,6 +5173,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'H'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("I", indent + 1, value.i);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'I'");
             return err;
         }
     }
@@ -5062,6 +5397,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("D", indent + 1, value.d);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'D'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5255,6 +5598,62 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'LatestValue'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccessControl::Events::AccessRestrictionEntryChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Token", indent + 1, value.token);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Token'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Instruction", indent + 1, value.instruction);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Instruction'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("RedirectURL", indent + 1, value.redirectURL);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RedirectURL'");
             return err;
         }
     }
@@ -5900,6 +6299,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const BridgedDeviceBasicInformation::Events::ActiveChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PromisedActiveDuration", indent + 1, value.promisedActiveDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PromisedActiveDuration'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::SwitchLatched::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -6530,6 +6945,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WaterHeaterManagement::Events::BoostStarted::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("BoostInfo", indent + 1, value.boostInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'BoostInfo'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WaterHeaterManagement::Events::BoostEnded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -7317,14 +7756,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ThreadNetworkDirectory::Events::NetworkChanged::DecodableType & value)
+                                     const OccupancySensing::Events::OccupancyChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ExtendedPanID", indent + 1, value.extendedPanID);
+        CHIP_ERROR err = DataModelLogger::LogValue("Occupancy", indent + 1, value.occupancy);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ExtendedPanID'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Occupancy'");
             return err;
         }
     }
@@ -7658,6 +8097,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("token", indent + 1, value.token));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -7705,6 +8152,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -8024,6 +8479,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WaterHeaterMode::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -8111,7 +8575,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ServiceArea::Commands::SelectLocationsResponse::DecodableType & value)
+                                     const ServiceArea::Commands::SelectAreasResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -8120,7 +8584,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType & value)
+                                     const ServiceArea::Commands::SkipAreaResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -8137,6 +8601,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("transitions", indent + 1, value.transitions));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Commands::AtomicResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusCode", indent + 1, value.statusCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attributeStatus", indent + 1, value.attributeStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeout", indent + 1, value.timeout));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -8444,6 +8918,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::GlobalEchoResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("field1", indent + 1, value.field1));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("field2", indent + 1, value.field2));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -8485,12 +8968,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Identify::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Identify::Id);
         }
         case Identify::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Identify::Id);
         }
         case Identify::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8500,7 +8983,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Identify::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Identify::Id);
         }
         case Identify::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8526,12 +9009,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Groups::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Groups::Id);
         }
         case Groups::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Groups::Id);
         }
         case Groups::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8541,7 +9024,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Groups::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Groups::Id);
         }
         case Groups::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8587,12 +9070,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OnOff::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OnOff::Id);
         }
         case OnOff::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OnOff::Id);
         }
         case OnOff::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8602,7 +9085,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OnOff::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OnOff::Id);
         }
         case OnOff::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8633,12 +9116,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OnOffSwitchConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OnOffSwitchConfiguration::Id);
         }
         case OnOffSwitchConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OnOffSwitchConfiguration::Id);
         }
         case OnOffSwitchConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8648,7 +9131,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OnOffSwitchConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OnOffSwitchConfiguration::Id);
         }
         case OnOffSwitchConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8739,12 +9222,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LevelControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LevelControl::Id);
         }
         case LevelControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LevelControl::Id);
         }
         case LevelControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8754,7 +9237,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LevelControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LevelControl::Id);
         }
         case LevelControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8820,12 +9303,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BinaryInputBasic::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BinaryInputBasic::Id);
         }
         case BinaryInputBasic::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BinaryInputBasic::Id);
         }
         case BinaryInputBasic::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8835,7 +9318,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BinaryInputBasic::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BinaryInputBasic::Id);
         }
         case BinaryInputBasic::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8856,12 +9339,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PulseWidthModulation::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PulseWidthModulation::Id);
         }
         case PulseWidthModulation::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PulseWidthModulation::Id);
         }
         case PulseWidthModulation::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8871,7 +9354,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PulseWidthModulation::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PulseWidthModulation::Id);
         }
         case PulseWidthModulation::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8897,12 +9380,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Descriptor::Attributes::ServerList::Id: {
             chip::app::DataModel::DecodableList<chip::ClusterId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ServerList", 1, value);
+            return DataModelLogger::LogClusterId("ServerList", 1, value);
         }
         case Descriptor::Attributes::ClientList::Id: {
             chip::app::DataModel::DecodableList<chip::ClusterId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClientList", 1, value);
+            return DataModelLogger::LogClusterId("ClientList", 1, value);
         }
         case Descriptor::Attributes::PartsList::Id: {
             chip::app::DataModel::DecodableList<chip::EndpointId> value;
@@ -8917,12 +9400,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Descriptor::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Descriptor::Id);
         }
         case Descriptor::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Descriptor::Id);
         }
         case Descriptor::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8932,7 +9415,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Descriptor::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Descriptor::Id);
         }
         case Descriptor::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -8958,12 +9441,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Binding::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Binding::Id);
         }
         case Binding::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Binding::Id);
         }
         case Binding::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -8973,7 +9456,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Binding::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Binding::Id);
         }
         case Binding::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9020,15 +9503,29 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlEntriesPerFabric", 1, value);
         }
+        case AccessControl::Attributes::CommissioningARL::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CommissioningARL", 1, value);
+        }
+        case AccessControl::Attributes::Arl::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ARL", 1, value);
+        }
         case AccessControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AccessControl::Id);
         }
         case AccessControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AccessControl::Id);
         }
         case AccessControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9038,7 +9535,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AccessControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AccessControl::Id);
         }
         case AccessControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9074,12 +9571,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Actions::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Actions::Id);
         }
         case Actions::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Actions::Id);
         }
         case Actions::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9089,7 +9586,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Actions::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Actions::Id);
         }
         case Actions::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9225,12 +9722,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BasicInformation::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BasicInformation::Id);
         }
         case BasicInformation::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BasicInformation::Id);
         }
         case BasicInformation::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9240,7 +9737,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BasicInformation::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BasicInformation::Id);
         }
         case BasicInformation::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9261,12 +9758,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OtaSoftwareUpdateProvider::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OtaSoftwareUpdateProvider::Id);
         }
         case OtaSoftwareUpdateProvider::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OtaSoftwareUpdateProvider::Id);
         }
         case OtaSoftwareUpdateProvider::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9276,7 +9773,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OtaSoftwareUpdateProvider::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OtaSoftwareUpdateProvider::Id);
         }
         case OtaSoftwareUpdateProvider::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9319,12 +9816,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OtaSoftwareUpdateRequestor::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OtaSoftwareUpdateRequestor::Id);
         }
         case OtaSoftwareUpdateRequestor::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OtaSoftwareUpdateRequestor::Id);
         }
         case OtaSoftwareUpdateRequestor::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9334,7 +9831,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OtaSoftwareUpdateRequestor::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OtaSoftwareUpdateRequestor::Id);
         }
         case OtaSoftwareUpdateRequestor::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9365,12 +9862,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LocalizationConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LocalizationConfiguration::Id);
         }
         case LocalizationConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LocalizationConfiguration::Id);
         }
         case LocalizationConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9380,7 +9877,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LocalizationConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LocalizationConfiguration::Id);
         }
         case LocalizationConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9416,12 +9913,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TimeFormatLocalization::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TimeFormatLocalization::Id);
         }
         case TimeFormatLocalization::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TimeFormatLocalization::Id);
         }
         case TimeFormatLocalization::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9431,7 +9928,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TimeFormatLocalization::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TimeFormatLocalization::Id);
         }
         case TimeFormatLocalization::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9457,12 +9954,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UnitLocalization::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, UnitLocalization::Id);
         }
         case UnitLocalization::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, UnitLocalization::Id);
         }
         case UnitLocalization::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9472,7 +9969,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UnitLocalization::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, UnitLocalization::Id);
         }
         case UnitLocalization::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9498,12 +9995,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerSourceConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PowerSourceConfiguration::Id);
         }
         case PowerSourceConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PowerSourceConfiguration::Id);
         }
         case PowerSourceConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9513,7 +10010,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerSourceConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PowerSourceConfiguration::Id);
         }
         case PowerSourceConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9694,12 +10191,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerSource::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PowerSource::Id);
         }
         case PowerSource::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PowerSource::Id);
         }
         case PowerSource::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9709,7 +10206,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerSource::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PowerSource::Id);
         }
         case PowerSource::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9752,15 +10249,35 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportsConcurrentConnection", 1, value);
         }
+        case GeneralCommissioning::Attributes::TCAcceptedVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcceptedVersion", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCMinRequiredVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCMinRequiredVersion", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCAcknowledgements::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcknowledgements", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcknowledgementsRequired", 1, value);
+        }
         case GeneralCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, GeneralCommissioning::Id);
         }
         case GeneralCommissioning::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, GeneralCommissioning::Id);
         }
         case GeneralCommissioning::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9770,7 +10287,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case GeneralCommissioning::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, GeneralCommissioning::Id);
         }
         case GeneralCommissioning::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9848,12 +10365,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case NetworkCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, NetworkCommissioning::Id);
         }
         case NetworkCommissioning::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, NetworkCommissioning::Id);
         }
         case NetworkCommissioning::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9863,7 +10380,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case NetworkCommissioning::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, NetworkCommissioning::Id);
         }
         case NetworkCommissioning::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9884,12 +10401,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DiagnosticLogs::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DiagnosticLogs::Id);
         }
         case DiagnosticLogs::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DiagnosticLogs::Id);
         }
         case DiagnosticLogs::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9899,7 +10416,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DiagnosticLogs::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DiagnosticLogs::Id);
         }
         case DiagnosticLogs::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -9966,12 +10483,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case GeneralDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, GeneralDiagnostics::Id);
         }
         case GeneralDiagnostics::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, GeneralDiagnostics::Id);
         }
         case GeneralDiagnostics::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -9981,7 +10498,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case GeneralDiagnostics::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, GeneralDiagnostics::Id);
         }
         case GeneralDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10024,12 +10541,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SoftwareDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, SoftwareDiagnostics::Id);
         }
         case SoftwareDiagnostics::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, SoftwareDiagnostics::Id);
         }
         case SoftwareDiagnostics::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10039,7 +10556,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SoftwareDiagnostics::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, SoftwareDiagnostics::Id);
         }
         case SoftwareDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10382,12 +10899,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ThreadNetworkDiagnostics::Id);
         }
         case ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ThreadNetworkDiagnostics::Id);
         }
         case ThreadNetworkDiagnostics::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10397,7 +10914,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ThreadNetworkDiagnostics::Id);
         }
         case ThreadNetworkDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10483,12 +11000,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WiFiNetworkDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WiFiNetworkDiagnostics::Id);
         }
         case WiFiNetworkDiagnostics::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WiFiNetworkDiagnostics::Id);
         }
         case WiFiNetworkDiagnostics::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10498,7 +11015,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WiFiNetworkDiagnostics::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WiFiNetworkDiagnostics::Id);
         }
         case WiFiNetworkDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10564,12 +11081,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EthernetNetworkDiagnostics::Id);
         }
         case EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EthernetNetworkDiagnostics::Id);
         }
         case EthernetNetworkDiagnostics::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10579,7 +11096,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EthernetNetworkDiagnostics::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EthernetNetworkDiagnostics::Id);
         }
         case EthernetNetworkDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10669,12 +11186,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TimeSynchronization::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TimeSynchronization::Id);
         }
         case TimeSynchronization::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TimeSynchronization::Id);
         }
         case TimeSynchronization::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10684,7 +11201,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TimeSynchronization::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TimeSynchronization::Id);
         }
         case TimeSynchronization::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10716,6 +11233,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ProductName", 1, value);
+        }
+        case BridgedDeviceBasicInformation::Attributes::ProductID::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductID", 1, value);
         }
         case BridgedDeviceBasicInformation::Attributes::NodeLabel::Id: {
             chip::CharSpan value;
@@ -10785,12 +11307,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BridgedDeviceBasicInformation::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BridgedDeviceBasicInformation::Id);
         }
         case BridgedDeviceBasicInformation::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BridgedDeviceBasicInformation::Id);
         }
         case BridgedDeviceBasicInformation::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10800,7 +11322,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BridgedDeviceBasicInformation::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BridgedDeviceBasicInformation::Id);
         }
         case BridgedDeviceBasicInformation::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10836,12 +11358,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Switch::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Switch::Id);
         }
         case Switch::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Switch::Id);
         }
         case Switch::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10851,7 +11373,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Switch::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Switch::Id);
         }
         case Switch::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10887,12 +11409,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AdministratorCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AdministratorCommissioning::Id);
         }
         case AdministratorCommissioning::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AdministratorCommissioning::Id);
         }
         case AdministratorCommissioning::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10902,7 +11424,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AdministratorCommissioning::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AdministratorCommissioning::Id);
         }
         case AdministratorCommissioning::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -10956,12 +11478,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OperationalCredentials::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OperationalCredentials::Id);
         }
         case OperationalCredentials::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OperationalCredentials::Id);
         }
         case OperationalCredentials::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -10971,7 +11493,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OperationalCredentials::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OperationalCredentials::Id);
         }
         case OperationalCredentials::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11014,12 +11536,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case GroupKeyManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, GroupKeyManagement::Id);
         }
         case GroupKeyManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, GroupKeyManagement::Id);
         }
         case GroupKeyManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11029,7 +11551,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case GroupKeyManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, GroupKeyManagement::Id);
         }
         case GroupKeyManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11055,12 +11577,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FixedLabel::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, FixedLabel::Id);
         }
         case FixedLabel::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, FixedLabel::Id);
         }
         case FixedLabel::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11070,7 +11592,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FixedLabel::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, FixedLabel::Id);
         }
         case FixedLabel::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11096,12 +11618,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UserLabel::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, UserLabel::Id);
         }
         case UserLabel::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, UserLabel::Id);
         }
         case UserLabel::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11111,7 +11633,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UserLabel::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, UserLabel::Id);
         }
         case UserLabel::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11132,12 +11654,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ProxyConfiguration::Id);
         }
         case ProxyConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ProxyConfiguration::Id);
         }
         case ProxyConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11147,7 +11669,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ProxyConfiguration::Id);
         }
         case ProxyConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11168,12 +11690,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyDiscovery::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ProxyDiscovery::Id);
         }
         case ProxyDiscovery::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ProxyDiscovery::Id);
         }
         case ProxyDiscovery::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11183,7 +11705,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyDiscovery::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ProxyDiscovery::Id);
         }
         case ProxyDiscovery::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11204,12 +11726,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyValid::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ProxyValid::Id);
         }
         case ProxyValid::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ProxyValid::Id);
         }
         case ProxyValid::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11219,7 +11741,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ProxyValid::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ProxyValid::Id);
         }
         case ProxyValid::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11245,12 +11767,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BooleanState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BooleanState::Id);
         }
         case BooleanState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BooleanState::Id);
         }
         case BooleanState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11260,7 +11782,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BooleanState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BooleanState::Id);
         }
         case BooleanState::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11325,15 +11847,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperatingMode", 1, value);
         }
+        case IcdManagement::Attributes::MaximumCheckInBackOff::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaximumCheckInBackOff", 1, value);
+        }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, IcdManagement::Id);
         }
         case IcdManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, IcdManagement::Id);
         }
         case IcdManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11343,7 +11870,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case IcdManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, IcdManagement::Id);
         }
         case IcdManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11379,12 +11906,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Timer::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Timer::Id);
         }
         case Timer::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Timer::Id);
         }
         case Timer::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11394,7 +11921,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Timer::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Timer::Id);
         }
         case Timer::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11447,12 +11974,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OvenCavityOperationalState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OvenCavityOperationalState::Id);
         }
         case OvenCavityOperationalState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OvenCavityOperationalState::Id);
         }
         case OvenCavityOperationalState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11462,7 +11989,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OvenCavityOperationalState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OvenCavityOperationalState::Id);
         }
         case OvenCavityOperationalState::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11503,12 +12030,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OvenMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OvenMode::Id);
         }
         case OvenMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OvenMode::Id);
         }
         case OvenMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11518,7 +12045,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OvenMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OvenMode::Id);
         }
         case OvenMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11549,12 +12076,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryDryerControls::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LaundryDryerControls::Id);
         }
         case LaundryDryerControls::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LaundryDryerControls::Id);
         }
         case LaundryDryerControls::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11564,7 +12091,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryDryerControls::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LaundryDryerControls::Id);
         }
         case LaundryDryerControls::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11615,12 +12142,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ModeSelect::Id);
         }
         case ModeSelect::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ModeSelect::Id);
         }
         case ModeSelect::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11630,7 +12157,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ModeSelect::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ModeSelect::Id);
         }
         case ModeSelect::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11672,12 +12199,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryWasherMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LaundryWasherMode::Id);
         }
         case LaundryWasherMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LaundryWasherMode::Id);
         }
         case LaundryWasherMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11687,7 +12214,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryWasherMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LaundryWasherMode::Id);
         }
         case LaundryWasherMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11730,12 +12257,14 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          RefrigeratorAndTemperatureControlledCabinetMode::Id);
         }
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value,
+                                                         RefrigeratorAndTemperatureControlledCabinetMode::Id);
         }
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11745,7 +12274,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RefrigeratorAndTemperatureControlledCabinetMode::Id);
         }
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11786,12 +12315,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryWasherControls::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LaundryWasherControls::Id);
         }
         case LaundryWasherControls::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LaundryWasherControls::Id);
         }
         case LaundryWasherControls::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11801,7 +12330,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LaundryWasherControls::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LaundryWasherControls::Id);
         }
         case LaundryWasherControls::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11832,12 +12361,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcRunMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RvcRunMode::Id);
         }
         case RvcRunMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RvcRunMode::Id);
         }
         case RvcRunMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11847,7 +12376,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcRunMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RvcRunMode::Id);
         }
         case RvcRunMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11878,12 +12407,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcCleanMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RvcCleanMode::Id);
         }
         case RvcCleanMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RvcCleanMode::Id);
         }
         case RvcCleanMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11893,7 +12422,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcCleanMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RvcCleanMode::Id);
         }
         case RvcCleanMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11944,12 +12473,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TemperatureControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TemperatureControl::Id);
         }
         case TemperatureControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TemperatureControl::Id);
         }
         case TemperatureControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -11959,7 +12488,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TemperatureControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TemperatureControl::Id);
         }
         case TemperatureControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -11995,12 +12524,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RefrigeratorAlarm::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RefrigeratorAlarm::Id);
         }
         case RefrigeratorAlarm::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RefrigeratorAlarm::Id);
         }
         case RefrigeratorAlarm::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12010,7 +12539,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RefrigeratorAlarm::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RefrigeratorAlarm::Id);
         }
         case RefrigeratorAlarm::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12052,12 +12581,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DishwasherMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DishwasherMode::Id);
         }
         case DishwasherMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DishwasherMode::Id);
         }
         case DishwasherMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12067,7 +12596,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DishwasherMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DishwasherMode::Id);
         }
         case DishwasherMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12093,12 +12622,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AirQuality::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AirQuality::Id);
         }
         case AirQuality::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AirQuality::Id);
         }
         case AirQuality::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12108,7 +12637,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AirQuality::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AirQuality::Id);
         }
         case AirQuality::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12194,12 +12723,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SmokeCoAlarm::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, SmokeCoAlarm::Id);
         }
         case SmokeCoAlarm::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, SmokeCoAlarm::Id);
         }
         case SmokeCoAlarm::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12209,7 +12738,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SmokeCoAlarm::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, SmokeCoAlarm::Id);
         }
         case SmokeCoAlarm::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12250,12 +12779,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DishwasherAlarm::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DishwasherAlarm::Id);
         }
         case DishwasherAlarm::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DishwasherAlarm::Id);
         }
         case DishwasherAlarm::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12265,7 +12794,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DishwasherAlarm::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DishwasherAlarm::Id);
         }
         case DishwasherAlarm::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12297,12 +12826,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MicrowaveOvenMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, MicrowaveOvenMode::Id);
         }
         case MicrowaveOvenMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, MicrowaveOvenMode::Id);
         }
         case MicrowaveOvenMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12312,7 +12841,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MicrowaveOvenMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, MicrowaveOvenMode::Id);
         }
         case MicrowaveOvenMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12378,12 +12907,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MicrowaveOvenControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, MicrowaveOvenControl::Id);
         }
         case MicrowaveOvenControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, MicrowaveOvenControl::Id);
         }
         case MicrowaveOvenControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12393,7 +12922,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MicrowaveOvenControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, MicrowaveOvenControl::Id);
         }
         case MicrowaveOvenControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12446,12 +12975,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OperationalState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OperationalState::Id);
         }
         case OperationalState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OperationalState::Id);
         }
         case OperationalState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12461,7 +12990,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OperationalState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OperationalState::Id);
         }
         case OperationalState::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12514,12 +13043,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcOperationalState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RvcOperationalState::Id);
         }
         case RvcOperationalState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RvcOperationalState::Id);
         }
         case RvcOperationalState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12529,7 +13058,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RvcOperationalState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RvcOperationalState::Id);
         }
         case RvcOperationalState::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12566,12 +13095,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ScenesManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ScenesManagement::Id);
         }
         case ScenesManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ScenesManagement::Id);
         }
         case ScenesManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12581,7 +13110,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ScenesManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ScenesManagement::Id);
         }
         case ScenesManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12634,12 +13163,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case HepaFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, HepaFilterMonitoring::Id);
         }
         case HepaFilterMonitoring::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, HepaFilterMonitoring::Id);
         }
         case HepaFilterMonitoring::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12649,7 +13178,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case HepaFilterMonitoring::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, HepaFilterMonitoring::Id);
         }
         case HepaFilterMonitoring::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12702,12 +13231,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ActivatedCarbonFilterMonitoring::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ActivatedCarbonFilterMonitoring::Id);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ActivatedCarbonFilterMonitoring::Id);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12717,7 +13246,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ActivatedCarbonFilterMonitoring::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ActivatedCarbonFilterMonitoring::Id);
         }
         case ActivatedCarbonFilterMonitoring::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12778,12 +13307,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BooleanStateConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BooleanStateConfiguration::Id);
         }
         case BooleanStateConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BooleanStateConfiguration::Id);
         }
         case BooleanStateConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12793,7 +13322,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BooleanStateConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BooleanStateConfiguration::Id);
         }
         case BooleanStateConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -12869,12 +13398,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ValveConfigurationAndControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ValveConfigurationAndControl::Id);
         }
         case ValveConfigurationAndControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ValveConfigurationAndControl::Id);
         }
         case ValveConfigurationAndControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -12884,7 +13413,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ValveConfigurationAndControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ValveConfigurationAndControl::Id);
         }
         case ValveConfigurationAndControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13008,12 +13537,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalPowerMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalPowerMeasurement::Id);
         }
         case ElectricalPowerMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalPowerMeasurement::Id);
         }
         case ElectricalPowerMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13023,7 +13552,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalPowerMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalPowerMeasurement::Id);
         }
         case ElectricalPowerMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13084,12 +13613,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalEnergyMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalEnergyMeasurement::Id);
         }
         case ElectricalEnergyMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalEnergyMeasurement::Id);
         }
         case ElectricalEnergyMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13099,7 +13628,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalEnergyMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalEnergyMeasurement::Id);
         }
         case ElectricalEnergyMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13118,12 +13647,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WaterHeaterManagement::Attributes::HeaterTypes::Id: {
-            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value;
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HeaterTypes", 1, value);
         }
         case WaterHeaterManagement::Attributes::HeatDemand::Id: {
-            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value;
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HeatDemand", 1, value);
         }
@@ -13150,12 +13679,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WaterHeaterManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WaterHeaterManagement::Id);
         }
         case WaterHeaterManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WaterHeaterManagement::Id);
         }
         case WaterHeaterManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13165,7 +13694,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WaterHeaterManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WaterHeaterManagement::Id);
         }
         case WaterHeaterManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13232,12 +13761,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DemandResponseLoadControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DemandResponseLoadControl::Id);
         }
         case DemandResponseLoadControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DemandResponseLoadControl::Id);
         }
         case DemandResponseLoadControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13247,7 +13776,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DemandResponseLoadControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DemandResponseLoadControl::Id);
         }
         case DemandResponseLoadControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13278,12 +13807,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Messages::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Messages::Id);
         }
         case Messages::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Messages::Id);
         }
         case Messages::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13293,7 +13822,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Messages::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Messages::Id);
         }
         case Messages::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13357,12 +13886,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DeviceEnergyManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DeviceEnergyManagement::Id);
         }
         case DeviceEnergyManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DeviceEnergyManagement::Id);
         }
         case DeviceEnergyManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13372,7 +13901,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DeviceEnergyManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DeviceEnergyManagement::Id);
         }
         case DeviceEnergyManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13508,12 +14037,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyEvse::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EnergyEvse::Id);
         }
         case EnergyEvse::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EnergyEvse::Id);
         }
         case EnergyEvse::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13523,7 +14052,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyEvse::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EnergyEvse::Id);
         }
         case EnergyEvse::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13569,12 +14098,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyPreference::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EnergyPreference::Id);
         }
         case EnergyPreference::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EnergyPreference::Id);
         }
         case EnergyPreference::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13584,7 +14113,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyPreference::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EnergyPreference::Id);
         }
         case EnergyPreference::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13615,12 +14144,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerTopology::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PowerTopology::Id);
         }
         case PowerTopology::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PowerTopology::Id);
         }
         case PowerTopology::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13630,7 +14159,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PowerTopology::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PowerTopology::Id);
         }
         case PowerTopology::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13672,12 +14201,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyEvseMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EnergyEvseMode::Id);
         }
         case EnergyEvseMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EnergyEvseMode::Id);
         }
         case EnergyEvseMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13687,7 +14216,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyEvseMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EnergyEvseMode::Id);
         }
         case EnergyEvseMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13695,6 +14224,63 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case EnergyEvseMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case WaterHeaterMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case WaterHeaterMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::WaterHeaterMode::Structs::ModeOptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case WaterHeaterMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case WaterHeaterMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case WaterHeaterMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case WaterHeaterMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WaterHeaterMode::Id);
+        }
+        case WaterHeaterMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WaterHeaterMode::Id);
+        }
+        case WaterHeaterMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case WaterHeaterMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WaterHeaterMode::Id);
+        }
+        case WaterHeaterMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case WaterHeaterMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -13730,12 +14316,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DeviceEnergyManagementMode::Id);
         }
         case DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DeviceEnergyManagementMode::Id);
         }
         case DeviceEnergyManagementMode::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -13745,7 +14331,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DeviceEnergyManagementMode::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DeviceEnergyManagementMode::Id);
         }
         case DeviceEnergyManagementMode::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -13991,12 +14577,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DoorLock::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, DoorLock::Id);
         }
         case DoorLock::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, DoorLock::Id);
         }
         case DoorLock::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14006,7 +14592,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case DoorLock::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, DoorLock::Id);
         }
         case DoorLock::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14137,12 +14723,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WindowCovering::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WindowCovering::Id);
         }
         case WindowCovering::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WindowCovering::Id);
         }
         case WindowCovering::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14152,7 +14738,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WindowCovering::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WindowCovering::Id);
         }
         case WindowCovering::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14223,12 +14809,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BarrierControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BarrierControl::Id);
         }
         case BarrierControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BarrierControl::Id);
         }
         case BarrierControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14238,7 +14824,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BarrierControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BarrierControl::Id);
         }
         case BarrierControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14256,27 +14842,25 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ServiceArea::Id: {
         switch (path.mAttributeId)
         {
-        case ServiceArea::Attributes::SupportedLocations::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType> value;
+        case ServiceArea::Attributes::SupportedAreas::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedLocations", 1, value);
+            return DataModelLogger::LogValue("SupportedAreas", 1, value);
         }
         case ServiceArea::Attributes::SupportedMaps::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedMaps", 1, value);
         }
-        case ServiceArea::Attributes::SelectedLocations::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
+        case ServiceArea::Attributes::SelectedAreas::Id: {
+            chip::app::DataModel::DecodableList<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SelectedLocations", 1, value);
+            return DataModelLogger::LogValue("SelectedAreas", 1, value);
         }
-        case ServiceArea::Attributes::CurrentLocation::Id: {
+        case ServiceArea::Attributes::CurrentArea::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentLocation", 1, value);
+            return DataModelLogger::LogValue("CurrentArea", 1, value);
         }
         case ServiceArea::Attributes::EstimatedEndTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
@@ -14284,21 +14868,19 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EstimatedEndTime", 1, value);
         }
         case ServiceArea::Attributes::Progress::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Progress", 1, value);
         }
         case ServiceArea::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ServiceArea::Id);
         }
         case ServiceArea::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ServiceArea::Id);
         }
         case ServiceArea::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14308,7 +14890,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ServiceArea::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ServiceArea::Id);
         }
         case ServiceArea::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14444,12 +15026,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PumpConfigurationAndControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PumpConfigurationAndControl::Id);
         }
         case PumpConfigurationAndControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PumpConfigurationAndControl::Id);
         }
         case PumpConfigurationAndControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14459,7 +15041,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PumpConfigurationAndControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PumpConfigurationAndControl::Id);
         }
         case PumpConfigurationAndControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14488,7 +15070,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OutdoorTemperature", 1, value);
         }
         case Thermostat::Attributes::Occupancy::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Occupancy", 1, value);
         }
@@ -14523,7 +15105,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PIHeatingDemand", 1, value);
         }
         case Thermostat::Attributes::HVACSystemTypeConfiguration::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HVACSystemTypeConfiguration", 1, value);
         }
@@ -14772,35 +15354,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Schedules", 1, value);
         }
-        case Thermostat::Attributes::PresetsSchedulesEditable::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PresetsSchedulesEditable", 1, value);
-        }
-        case Thermostat::Attributes::TemperatureSetpointHoldPolicy::Id: {
-            chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("TemperatureSetpointHoldPolicy", 1, value);
-        }
         case Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SetpointHoldExpiryTimestamp", 1, value);
         }
-        case Thermostat::Attributes::QueuedPreset::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("QueuedPreset", 1, value);
-        }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Thermostat::Id);
         }
         case Thermostat::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Thermostat::Id);
         }
         case Thermostat::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14810,7 +15377,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Thermostat::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Thermostat::Id);
         }
         case Thermostat::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14891,12 +15458,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FanControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, FanControl::Id);
         }
         case FanControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, FanControl::Id);
         }
         case FanControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14906,7 +15473,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FanControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, FanControl::Id);
         }
         case FanControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -14942,12 +15509,13 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          ThermostatUserInterfaceConfiguration::Id);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ThermostatUserInterfaceConfiguration::Id);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14957,7 +15525,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThermostatUserInterfaceConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ThermostatUserInterfaceConfiguration::Id);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15001,7 +15569,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentY", 1, value);
         }
         case ColorControl::Attributes::DriftCompensation::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::DriftCompensationEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DriftCompensation", 1, value);
         }
@@ -15016,12 +15584,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ColorTemperatureMireds", 1, value);
         }
         case ColorControl::Attributes::ColorMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::ColorModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ColorMode", 1, value);
         }
         case ColorControl::Attributes::Options::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Options", 1, value);
         }
@@ -15181,7 +15749,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EnhancedCurrentHue", 1, value);
         }
         case ColorControl::Attributes::EnhancedColorMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::EnhancedColorModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedColorMode", 1, value);
         }
@@ -15211,7 +15779,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ColorLoopStoredEnhancedHue", 1, value);
         }
         case ColorControl::Attributes::ColorCapabilities::Id: {
-            uint16_t value;
+            chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ColorCapabilities", 1, value);
         }
@@ -15238,12 +15806,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ColorControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ColorControl::Id);
         }
         case ColorControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ColorControl::Id);
         }
         case ColorControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15253,7 +15821,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ColorControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ColorControl::Id);
         }
         case ColorControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15344,12 +15912,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BallastConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, BallastConfiguration::Id);
         }
         case BallastConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, BallastConfiguration::Id);
         }
         case BallastConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15359,7 +15927,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case BallastConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, BallastConfiguration::Id);
         }
         case BallastConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15405,12 +15973,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case IlluminanceMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, IlluminanceMeasurement::Id);
         }
         case IlluminanceMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, IlluminanceMeasurement::Id);
         }
         case IlluminanceMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15420,7 +15988,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case IlluminanceMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, IlluminanceMeasurement::Id);
         }
         case IlluminanceMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15461,12 +16029,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TemperatureMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TemperatureMeasurement::Id);
         }
         case TemperatureMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TemperatureMeasurement::Id);
         }
         case TemperatureMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15476,7 +16044,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TemperatureMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TemperatureMeasurement::Id);
         }
         case TemperatureMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15542,12 +16110,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PressureMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, PressureMeasurement::Id);
         }
         case PressureMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, PressureMeasurement::Id);
         }
         case PressureMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15557,7 +16125,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case PressureMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, PressureMeasurement::Id);
         }
         case PressureMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15598,12 +16166,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FlowMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, FlowMeasurement::Id);
         }
         case FlowMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, FlowMeasurement::Id);
         }
         case FlowMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15613,7 +16181,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FlowMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, FlowMeasurement::Id);
         }
         case FlowMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15654,12 +16222,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RelativeHumidityMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RelativeHumidityMeasurement::Id);
         }
         case RelativeHumidityMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RelativeHumidityMeasurement::Id);
         }
         case RelativeHumidityMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15669,7 +16237,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RelativeHumidityMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RelativeHumidityMeasurement::Id);
         }
         case RelativeHumidityMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15760,12 +16328,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OccupancySensing::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OccupancySensing::Id);
         }
         case OccupancySensing::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OccupancySensing::Id);
         }
         case OccupancySensing::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15775,7 +16343,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OccupancySensing::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OccupancySensing::Id);
         }
         case OccupancySensing::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15851,12 +16419,14 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CarbonMonoxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          CarbonMonoxideConcentrationMeasurement::Id);
         }
         case CarbonMonoxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value,
+                                                         CarbonMonoxideConcentrationMeasurement::Id);
         }
         case CarbonMonoxideConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15866,7 +16436,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CarbonMonoxideConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, CarbonMonoxideConcentrationMeasurement::Id);
         }
         case CarbonMonoxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -15942,12 +16512,14 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CarbonDioxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          CarbonDioxideConcentrationMeasurement::Id);
         }
         case CarbonDioxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value,
+                                                         CarbonDioxideConcentrationMeasurement::Id);
         }
         case CarbonDioxideConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -15957,7 +16529,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CarbonDioxideConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, CarbonDioxideConcentrationMeasurement::Id);
         }
         case CarbonDioxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16033,12 +16605,14 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case NitrogenDioxideConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          NitrogenDioxideConcentrationMeasurement::Id);
         }
         case NitrogenDioxideConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value,
+                                                         NitrogenDioxideConcentrationMeasurement::Id);
         }
         case NitrogenDioxideConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16048,7 +16622,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case NitrogenDioxideConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, NitrogenDioxideConcentrationMeasurement::Id);
         }
         case NitrogenDioxideConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16124,12 +16698,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OzoneConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, OzoneConcentrationMeasurement::Id);
         }
         case OzoneConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, OzoneConcentrationMeasurement::Id);
         }
         case OzoneConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16139,7 +16713,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case OzoneConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, OzoneConcentrationMeasurement::Id);
         }
         case OzoneConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16215,12 +16789,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm25ConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Pm25ConcentrationMeasurement::Id);
         }
         case Pm25ConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Pm25ConcentrationMeasurement::Id);
         }
         case Pm25ConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16230,7 +16804,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm25ConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Pm25ConcentrationMeasurement::Id);
         }
         case Pm25ConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16306,12 +16880,13 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FormaldehydeConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          FormaldehydeConcentrationMeasurement::Id);
         }
         case FormaldehydeConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, FormaldehydeConcentrationMeasurement::Id);
         }
         case FormaldehydeConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16321,7 +16896,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FormaldehydeConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, FormaldehydeConcentrationMeasurement::Id);
         }
         case FormaldehydeConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16397,12 +16972,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm1ConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Pm1ConcentrationMeasurement::Id);
         }
         case Pm1ConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Pm1ConcentrationMeasurement::Id);
         }
         case Pm1ConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16412,7 +16987,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm1ConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Pm1ConcentrationMeasurement::Id);
         }
         case Pm1ConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16488,12 +17063,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm10ConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Pm10ConcentrationMeasurement::Id);
         }
         case Pm10ConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Pm10ConcentrationMeasurement::Id);
         }
         case Pm10ConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16503,7 +17078,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Pm10ConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Pm10ConcentrationMeasurement::Id);
         }
         case Pm10ConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16579,12 +17154,14 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value,
+                                                          TotalVolatileOrganicCompoundsConcentrationMeasurement::Id);
         }
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value,
+                                                         TotalVolatileOrganicCompoundsConcentrationMeasurement::Id);
         }
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16594,7 +17171,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value,
+                                                   TotalVolatileOrganicCompoundsConcentrationMeasurement::Id);
         }
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16670,12 +17248,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RadonConcentrationMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, RadonConcentrationMeasurement::Id);
         }
         case RadonConcentrationMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, RadonConcentrationMeasurement::Id);
         }
         case RadonConcentrationMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16685,7 +17263,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case RadonConcentrationMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, RadonConcentrationMeasurement::Id);
         }
         case RadonConcentrationMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16708,15 +17286,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SSID", 1, value);
         }
+        case WiFiNetworkManagement::Attributes::PassphraseSurrogate::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PassphraseSurrogate", 1, value);
+        }
         case WiFiNetworkManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WiFiNetworkManagement::Id);
         }
         case WiFiNetworkManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WiFiNetworkManagement::Id);
         }
         case WiFiNetworkManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16726,7 +17309,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WiFiNetworkManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WiFiNetworkManagement::Id);
         }
         case WiFiNetworkManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16769,15 +17352,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
         }
+        case ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PendingDatasetTimestamp", 1, value);
+        }
         case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ThreadBorderRouterManagement::Id);
         }
         case ThreadBorderRouterManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ThreadBorderRouterManagement::Id);
         }
         case ThreadBorderRouterManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16787,7 +17375,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadBorderRouterManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ThreadBorderRouterManagement::Id);
         }
         case ThreadBorderRouterManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16806,7 +17394,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PreferredExtendedPanID", 1, value);
         }
@@ -16825,12 +17413,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDirectory::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ThreadNetworkDirectory::Id);
         }
         case ThreadNetworkDirectory::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ThreadNetworkDirectory::Id);
         }
         case ThreadNetworkDirectory::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16840,7 +17428,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDirectory::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ThreadNetworkDirectory::Id);
         }
         case ThreadNetworkDirectory::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16871,12 +17459,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WakeOnLan::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, WakeOnLan::Id);
         }
         case WakeOnLan::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, WakeOnLan::Id);
         }
         case WakeOnLan::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16886,7 +17474,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WakeOnLan::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, WakeOnLan::Id);
         }
         case WakeOnLan::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16922,12 +17510,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Channel::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, Channel::Id);
         }
         case Channel::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, Channel::Id);
         }
         case Channel::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16937,7 +17525,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Channel::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, Channel::Id);
         }
         case Channel::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -16969,12 +17557,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TargetNavigator::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, TargetNavigator::Id);
         }
         case TargetNavigator::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, TargetNavigator::Id);
         }
         case TargetNavigator::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -16984,7 +17572,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case TargetNavigator::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, TargetNavigator::Id);
         }
         case TargetNavigator::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17065,12 +17653,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MediaPlayback::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, MediaPlayback::Id);
         }
         case MediaPlayback::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, MediaPlayback::Id);
         }
         case MediaPlayback::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17080,7 +17668,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MediaPlayback::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, MediaPlayback::Id);
         }
         case MediaPlayback::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17111,12 +17699,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MediaInput::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, MediaInput::Id);
         }
         case MediaInput::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, MediaInput::Id);
         }
         case MediaInput::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17126,7 +17714,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case MediaInput::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, MediaInput::Id);
         }
         case MediaInput::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17147,12 +17735,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LowPower::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LowPower::Id);
         }
         case LowPower::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LowPower::Id);
         }
         case LowPower::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17162,7 +17750,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case LowPower::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LowPower::Id);
         }
         case LowPower::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17183,12 +17771,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case KeypadInput::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, KeypadInput::Id);
         }
         case KeypadInput::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, KeypadInput::Id);
         }
         case KeypadInput::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17198,7 +17786,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case KeypadInput::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, KeypadInput::Id);
         }
         case KeypadInput::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17229,12 +17817,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentLauncher::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ContentLauncher::Id);
         }
         case ContentLauncher::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ContentLauncher::Id);
         }
         case ContentLauncher::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17244,7 +17832,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentLauncher::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ContentLauncher::Id);
         }
         case ContentLauncher::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17275,12 +17863,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AudioOutput::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AudioOutput::Id);
         }
         case AudioOutput::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AudioOutput::Id);
         }
         case AudioOutput::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17290,7 +17878,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AudioOutput::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AudioOutput::Id);
         }
         case AudioOutput::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17322,12 +17910,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ApplicationLauncher::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ApplicationLauncher::Id);
         }
         case ApplicationLauncher::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ApplicationLauncher::Id);
         }
         case ApplicationLauncher::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17337,7 +17925,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ApplicationLauncher::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ApplicationLauncher::Id);
         }
         case ApplicationLauncher::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17398,12 +17986,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ApplicationBasic::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ApplicationBasic::Id);
         }
         case ApplicationBasic::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ApplicationBasic::Id);
         }
         case ApplicationBasic::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17413,7 +18001,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ApplicationBasic::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ApplicationBasic::Id);
         }
         case ApplicationBasic::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17434,12 +18022,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AccountLogin::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AccountLogin::Id);
         }
         case AccountLogin::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AccountLogin::Id);
         }
         case AccountLogin::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17449,7 +18037,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case AccountLogin::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AccountLogin::Id);
         }
         case AccountLogin::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17512,12 +18100,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ContentControl::Id);
         }
         case ContentControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ContentControl::Id);
         }
         case ContentControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17527,7 +18115,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ContentControl::Id);
         }
         case ContentControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17548,12 +18136,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentAppObserver::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ContentAppObserver::Id);
         }
         case ContentAppObserver::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ContentAppObserver::Id);
         }
         case ContentAppObserver::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17563,7 +18151,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ContentAppObserver::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ContentAppObserver::Id);
         }
         case ContentAppObserver::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -17571,6 +18159,56 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case ContentAppObserver::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case EcosystemInformation::Id: {
+        switch (path.mAttributeId)
+        {
+        case EcosystemInformation::Attributes::DeviceDirectory::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceDirectory", 1, value);
+        }
+        case EcosystemInformation::Attributes::LocationDirectory::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LocationDirectory", 1, value);
+        }
+        case EcosystemInformation::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EcosystemInformation::Id);
+        }
+        case EcosystemInformation::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EcosystemInformation::Id);
+        }
+        case EcosystemInformation::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case EcosystemInformation::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EcosystemInformation::Id);
+        }
+        case EcosystemInformation::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case EcosystemInformation::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -17589,12 +18227,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CommissionerControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, CommissionerControl::Id);
         }
         case CommissionerControl::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, CommissionerControl::Id);
         }
         case CommissionerControl::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -17604,7 +18242,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case CommissionerControl::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, CommissionerControl::Id);
         }
         case CommissionerControl::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -18265,12 +18903,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalMeasurement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ElectricalMeasurement::Id);
         }
         case ElectricalMeasurement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ElectricalMeasurement::Id);
         }
         case ElectricalMeasurement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -18280,7 +18918,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ElectricalMeasurement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ElectricalMeasurement::Id);
         }
         case ElectricalMeasurement::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -18536,6 +19174,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("cluster_error_boolean", 1, value);
         }
+        case UnitTesting::Attributes::GlobalEnum::Id: {
+            chip::app::Clusters::Globals::TestGlobalEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("global_enum", 1, value);
+        }
+        case UnitTesting::Attributes::GlobalStruct::Id: {
+            chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("global_struct", 1, value);
+        }
         case UnitTesting::Attributes::Unsupported::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -18711,15 +19359,25 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("write_only_int8u", 1, value);
         }
+        case UnitTesting::Attributes::NullableGlobalEnum::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_global_enum", 1, value);
+        }
+        case UnitTesting::Attributes::NullableGlobalStruct::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("nullable_global_struct", 1, value);
+        }
         case UnitTesting::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, UnitTesting::Id);
         }
         case UnitTesting::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, UnitTesting::Id);
         }
         case UnitTesting::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -18729,7 +19387,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case UnitTesting::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, UnitTesting::Id);
         }
         case UnitTesting::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -18755,12 +19413,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FaultInjection::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, FaultInjection::Id);
         }
         case FaultInjection::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, FaultInjection::Id);
         }
         case FaultInjection::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -18770,7 +19428,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case FaultInjection::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, FaultInjection::Id);
         }
         case FaultInjection::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -18796,12 +19454,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SampleMei::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, SampleMei::Id);
         }
         case SampleMei::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, SampleMei::Id);
         }
         case SampleMei::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -18811,7 +19469,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case SampleMei::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, SampleMei::Id);
         }
         case SampleMei::Attributes::FeatureMap::Id: {
             uint32_t value;
@@ -18866,6 +19524,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case AccessControl::Id: {
+        switch (path.mCommandId)
+        {
+        case AccessControl::Commands::ReviewFabricRestrictionsResponse::Id: {
+            AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReviewFabricRestrictionsResponse", 1, value);
+        }
+        }
+        break;
+    }
     case OtaSoftwareUpdateProvider::Id: {
         switch (path.mCommandId)
         {
@@ -18899,6 +19568,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CommissioningCompleteResponse", 1, value);
+        }
+        case GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::Id: {
+            GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetTCAcknowledgementsResponse", 1, value);
         }
         }
         break;
@@ -19187,6 +19861,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case WaterHeaterMode::Id: {
+        switch (path.mCommandId)
+        {
+        case WaterHeaterMode::Commands::ChangeToModeResponse::Id: {
+            WaterHeaterMode::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
+        }
+        }
+        break;
+    }
     case DeviceEnergyManagementMode::Id: {
         switch (path.mCommandId)
         {
@@ -19237,15 +19922,15 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     case ServiceArea::Id: {
         switch (path.mCommandId)
         {
-        case ServiceArea::Commands::SelectLocationsResponse::Id: {
-            ServiceArea::Commands::SelectLocationsResponse::DecodableType value;
+        case ServiceArea::Commands::SelectAreasResponse::Id: {
+            ServiceArea::Commands::SelectAreasResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SelectLocationsResponse", 1, value);
+            return DataModelLogger::LogValue("SelectAreasResponse", 1, value);
         }
-        case ServiceArea::Commands::SkipCurrentLocationResponse::Id: {
-            ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType value;
+        case ServiceArea::Commands::SkipAreaResponse::Id: {
+            ServiceArea::Commands::SkipAreaResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SkipCurrentLocationResponse", 1, value);
+            return DataModelLogger::LogValue("SkipAreaResponse", 1, value);
         }
         }
         break;
@@ -19257,6 +19942,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
+        }
+        case Thermostat::Commands::AtomicResponse::Id: {
+            Thermostat::Commands::AtomicResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AtomicResponse", 1, value);
         }
         }
         break;
@@ -19498,6 +20188,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StringEchoResponse", 1, value);
         }
+        case UnitTesting::Commands::GlobalEchoResponse::Id: {
+            UnitTesting::Commands::GlobalEchoResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GlobalEchoResponse", 1, value);
+        }
         case UnitTesting::Commands::TestDifferentVendorMeiResponse::Id: {
             UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -19564,6 +20259,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
+        }
+        case AccessControl::Events::AccessRestrictionEntryChanged::Id: {
+            chip::app::Clusters::AccessControl::Events::AccessRestrictionEntryChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AccessRestrictionEntryChanged", 1, value);
+        }
+        case AccessControl::Events::FabricRestrictionReviewUpdate::Id: {
+            chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FabricRestrictionReviewUpdate", 1, value);
         }
         }
         break;
@@ -19779,6 +20484,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
+        }
+        case BridgedDeviceBasicInformation::Events::ActiveChanged::Id: {
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveChanged", 1, value);
         }
         }
         break;
@@ -20025,6 +20735,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
+    case WaterHeaterManagement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case WaterHeaterManagement::Events::BoostStarted::Id: {
+            chip::app::Clusters::WaterHeaterManagement::Events::BoostStarted::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BoostStarted", 1, value);
+        }
+        case WaterHeaterManagement::Events::BoostEnded::Id: {
+            chip::app::Clusters::WaterHeaterManagement::Events::BoostEnded::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BoostEnded", 1, value);
+        }
+        }
+        break;
+    }
     case DemandResponseLoadControl::Id: {
         switch (header.mPath.mEventId)
         {
@@ -20241,13 +20967,13 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case ThreadNetworkDirectory::Id: {
+    case OccupancySensing::Id: {
         switch (header.mPath.mEventId)
         {
-        case ThreadNetworkDirectory::Events::NetworkChanged::Id: {
-            chip::app::Clusters::ThreadNetworkDirectory::Events::NetworkChanged::DecodableType value;
+        case OccupancySensing::Events::OccupancyChanged::Id: {
+            chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NetworkChanged", 1, value);
+            return DataModelLogger::LogValue("OccupancyChanged", 1, value);
         }
         }
         break;

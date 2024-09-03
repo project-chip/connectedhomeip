@@ -27,6 +27,7 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -91,6 +92,12 @@ public:
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
+
+        if (ec->HasSessionHandle() && ec->GetSessionHolder()->IsSecureSession())
+        {
+            mLastSubjectDescriptor = ec->GetSessionHolder()->AsSecureSession()->GetSubjectDescriptor();
+        }
+
         if (payloadHeader.IsAckMsg())
         {
             mReceivedPiggybackAck = true;
@@ -124,6 +131,7 @@ public:
 
         EXPECT_EQ(buffer->TotalLength(), sizeof(PAYLOAD));
         EXPECT_EQ(memcmp(buffer->Start(), PAYLOAD, buffer->TotalLength()), 0);
+
         return CHIP_NO_ERROR;
     }
 
@@ -149,6 +157,8 @@ public:
             mTestReliableMessageProtocol.GetExchangeManager().GetReliableMessageMgr()->StartTimer();
         }
     }
+
+    Access::SubjectDescriptor mLastSubjectDescriptor{};
 
     bool IsOnMessageReceivedCalled = false;
     bool mReceivedPiggybackAck     = false;
@@ -1829,8 +1839,11 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     EXPECT_EQ(loopback.mSentMessageCount, kMaxMRPTransmits);
     EXPECT_EQ(loopback.mDroppedMessageCount, kMaxMRPTransmits - 1);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);        // We have no ack yet.
-    EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled); // Other side got the message.
+    ASSERT_TRUE(mockReceiver.IsOnMessageReceivedCalled); // Other side got the message.
     EXPECT_FALSE(mockSender.IsOnMessageReceivedCalled);  // We did not get a response.
+
+    // It was not a commissioning CASE session so that is lined-up properly.
+    EXPECT_FALSE(mockReceiver.mLastSubjectDescriptor.isCommissioning);
 
     // Ensure there will be no more weirdness with acks and that our MRP timer is restarted properly.
     mockReceiver.SetDropAckResponse(false);

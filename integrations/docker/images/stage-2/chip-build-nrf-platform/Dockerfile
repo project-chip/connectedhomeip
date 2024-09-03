@@ -7,7 +7,7 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v2.6.0
+ARG NCS_REVISION=v2.7.0
 
 # Requirements to clone SDKs in temporary container
 RUN set -x \

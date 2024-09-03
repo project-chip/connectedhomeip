@@ -402,6 +402,7 @@ DevKitM
 devtype
 df
 dfe
+DFILE
 dfu
 DgDxsfHx
 dhclient
@@ -453,6 +454,7 @@ DS
 duplicative
 DUT
 DUTS
+DUT's
 DV
 DVK
 dynload
@@ -561,6 +563,7 @@ forkpty
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FS
 fsl
 fstab
 fsync
@@ -649,6 +652,7 @@ href
 HSM
 hsm
 HTTPS
+Humidistat
 HW
 hwadr
 HydrogenConcentrationMeasurement
@@ -852,6 +856,7 @@ MbedNewTarget
 mbedos
 mbedTarget
 mbedTLS
+MCORE
 mcu
 MCUboot
 mcumgr
@@ -1354,6 +1359,7 @@ SVR
 SWD
 SWU
 symlinks
+sysbuild
 sysconfdir
 SysConfig
 sysctl

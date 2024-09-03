@@ -23,7 +23,7 @@ import logging
 import pathlib
 import sys
 import typing
-from pprint import pprint
+from pprint import pformat, pprint
 from typing import Any, Optional
 
 import chip.clusters.ClusterObjects
@@ -99,19 +99,26 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 class BasicCompositionTests:
     async def connect_over_pase(self, dev_ctrl):
-        setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
-        asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
-        await dev_ctrl.FindOrEstablishPASESession(setupCode, self.dut_node_id)
+        asserts.assert_true(self.matter_test_config.qr_code_content == [] or self.matter_test_config.manual_code == [],
+                            "Cannot have both QR and manual code specified")
+        setupCode = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code
+        asserts.assert_equal(len(setupCode), 1, "Require one of either --qr-code or --manual-code.")
+        await dev_ctrl.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
 
-    def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]):
+    def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
+        """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
+            Returns the json and txt as strings.
+        """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
-        logging.debug(f"Raw TLV contents of Node: {json.dumps(node_dump_dict, indent=2)}")
+        json_dump_string = json.dumps(node_dump_dict, indent=2)
+        logging.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
                 json.dump(node_dump_dict, outfile, indent=2)
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
+        return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
     async def setup_class_helper(self, default_to_pase: bool = True):
         dev_ctrl = self.default_controller

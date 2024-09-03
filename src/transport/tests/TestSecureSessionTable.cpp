@@ -24,11 +24,12 @@
 #include <errno.h>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
-#include "system/SystemClock.h"
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionHolder.h>
 

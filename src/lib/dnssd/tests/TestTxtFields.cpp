@@ -22,9 +22,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/Resolver.h>
 
 using namespace chip;
 using namespace chip::Dnssd;

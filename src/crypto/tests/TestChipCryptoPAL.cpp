@@ -35,10 +35,12 @@
 #include "SPAKE2P_POINT_VALID_test_vectors.h"
 #include "SPAKE2P_RFC_test_vectors.h"
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 

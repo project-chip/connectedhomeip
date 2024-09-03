@@ -121,7 +121,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
-             rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
+             rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
         matterBootCause = BootReasonType::kBrownOutReset;
     }
@@ -260,6 +260,18 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+/// @brief Helper to erase Thread info from device
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -272,13 +284,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GetDefaultInstance().ClearThreadStack();
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 

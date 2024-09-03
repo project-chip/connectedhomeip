@@ -112,6 +112,8 @@ class QuieterReportingAttribute
 {
 public:
     explicit QuieterReportingAttribute(const Nullable<T> & initialValue) : mValue(initialValue), mLastDirtyValue(initialValue) {}
+    // constructor that works with arrays of QuieterReportingAttribute
+    explicit QuieterReportingAttribute() : mValue(DataModel::NullNullable), mLastDirtyValue(DataModel::NullNullable) {}
 
     struct SufficientChangePredicateCandidate
     {
@@ -142,15 +144,6 @@ public:
         };
     }
 
-    /**
-     * @brief Factory to generate a functor that forces reportable now.
-     * @return a functor usable for the `changedPredicate` arg of `SetValue()`
-     */
-    static SufficientChangePredicate GetForceReportablePredicate()
-    {
-        return [](const SufficientChangePredicateCandidate & candidate) -> bool { return true; };
-    }
-
     Nullable<T> value() const { return mValue; }
     QuieterReportingPolicyFlags & policy() { return mPolicyFlags; }
     const QuieterReportingPolicyFlags & policy() const { return mPolicyFlags; }
@@ -163,6 +156,7 @@ public:
      * - The policies from `QuieterReportingPolicyEnum` and set via `SetPolicy()` are self-explanatory by name.
      * - The changedPredicate will be called with last dirty <timestamp, value> and new <timestamp value> and may override
      *   the dirty state altogether when it returns true. Use sparingly and default to a functor returning false.
+     *   The changedPredicate is only called on change.
      *
      * Internal recording will be done about last dirty value and last dirty timestamp based on the policies having applied.
      *
@@ -172,15 +166,15 @@ public:
      * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
      * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now,
-                                 SufficientChangePredicate changedPredicate)
+    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now, SufficientChangePredicate changedPredicate)
     {
-        bool isChangeOfNull       = newValue.IsNull() ^ mValue.IsNull();
-        bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
+        bool isChangeOfNull         = newValue.IsNull() != mValue.IsNull();
+        bool areBothValuesNonNull   = !newValue.IsNull() && !mValue.IsNull();
+        bool areBothValuesDifferent = areBothValuesNonNull && (newValue.Value() != mValue.Value());
 
-        bool changeToFromZero = areBothValuesNonNull && (*newValue == 0 || *mValue == 0);
-        bool isIncrement      = areBothValuesNonNull && (*newValue > *mValue);
-        bool isDecrement      = areBothValuesNonNull && (*newValue < *mValue);
+        bool changeToFromZero = areBothValuesNonNull && areBothValuesDifferent && (newValue.Value() == 0 || mValue.Value() == 0);
+        bool isIncrement      = areBothValuesNonNull && (newValue.Value() > mValue.Value());
+        bool isDecrement      = areBothValuesNonNull && (newValue.Value() < mValue.Value());
 
         bool isNewlyDirty = isChangeOfNull;
         isNewlyDirty =
@@ -188,13 +182,17 @@ public:
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement) && isDecrement);
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement) && isIncrement);
 
-        SufficientChangePredicateCandidate candidate{
-            mLastDirtyTimestampMillis, // lastDirtyTimestamp
-            now,                       // nowTimestamp
-            mLastDirtyValue,           // lastDirtyValue
-            newValue                   // newValue
-        };
-        isNewlyDirty = isNewlyDirty || changedPredicate(candidate);
+        // Only execute predicate on value change from last marked dirty.
+        if (newValue != mLastDirtyValue)
+        {
+            SufficientChangePredicateCandidate candidate{
+                mLastDirtyTimestampMillis, // lastDirtyTimestamp
+                now,                       // nowTimestamp
+                mLastDirtyValue,           // lastDirtyValue
+                newValue                   // newValue
+            };
+            isNewlyDirty = isNewlyDirty || changedPredicate(candidate);
+        }
 
         mValue = newValue;
 
@@ -217,20 +215,20 @@ public:
      * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
      * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
+    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now)
     {
         return SetValue(newValue, now, [](const SufficientChangePredicateCandidate &) -> bool { return false; });
     }
 
 protected:
     // Current value of the attribute.
-    chip::app::DataModel::Nullable<T> mValue;
+    DataModel::Nullable<T> mValue;
     // Last value that was marked as dirty (to use in comparisons for change, e.g. by SufficientChangePredicate).
-    chip::app::DataModel::Nullable<T> mLastDirtyValue;
+    DataModel::Nullable<T> mLastDirtyValue;
     // Enabled internal change detection policies.
     QuieterReportingPolicyFlags mPolicyFlags{ 0 };
     // Timestamp associated with the last time the attribute was marked dirty (to use in comparisons for change).
-    chip::System::Clock::Milliseconds64 mLastDirtyTimestampMillis{};
+    chip::System::Clock::Timestamp mLastDirtyTimestampMillis{};
 };
 
 } // namespace detail

@@ -122,18 +122,18 @@ public:
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.has_value())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", *retryInterval);
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval->count());
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
         if (retryInterval.has_value())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", *retryInterval);
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval->count());
 
         auto activeThreshold = nodeData.GetMrpRetryActiveThreshold();
 
         if (activeThreshold.has_value())
         {
-            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", *activeThreshold);
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", activeThreshold->count());
         }
 
         streamer_printf(streamer_get(), "   Supports TCP Client: %s\r\n", nodeData.supportsTcpClient ? "yes" : "no");
@@ -214,13 +214,23 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     case 'C':
         filterType = Dnssd::DiscoveryFilterType::kCommissioningMode;
         break;
+    case 'I':
+        filterType = Dnssd::DiscoveryFilterType::kCompressedFabricId;
+        break;
     default:
         return false;
     }
 
-    uint16_t code;
-    VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
-
+    uint64_t code = 0;
+    if (filterType == Dnssd::DiscoveryFilterType::kCompressedFabricId)
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code, 16), false);
+        VerifyOrReturnValue(code != 0, false);
+    }
+    else
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
+    }
     filter = Dnssd::DiscoveryFilter(filterType, code);
     return true;
 }

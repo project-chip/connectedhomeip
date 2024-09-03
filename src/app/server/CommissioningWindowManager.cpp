@@ -72,6 +72,12 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+        args.enable  = false;
+        args.ExtCmds = nullptr;
+        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -215,7 +221,8 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex,
+                                          System::Clock::Seconds16(CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");

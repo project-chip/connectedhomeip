@@ -21,11 +21,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace {

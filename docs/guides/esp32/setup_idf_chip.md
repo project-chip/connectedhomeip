@@ -13,25 +13,25 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.1.2/esp32/get-started/linux-macos-setup.html#for-linux-users)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.1.2/esp32/get-started/linux-macos-setup.html#for-macos-users)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v5.1.2
+### Get ESP-IDF v5.3
 
--   Clone ESP-IDF [v5.1.2
-    release](https://github.com/espressif/esp-idf/releases/tag/v5.1.2
+-   Clone ESP-IDF [v5.3
+    release](https://github.com/espressif/esp-idf/releases/tag/v5.3
 
     ```
-    git clone -b v5.1.2 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
+    git clone -b v5.3 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
     cd esp-idf
     ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v5.1.2:
+-   To update an existing esp-idf toolchain to v5.3:
 
     ```
     cd path/to/esp-idf
-    git fetch --depth 1 origin v5.1.2
+    git fetch --depth 1 origin v5.3
     git reset --hard FETCH_HEAD
     git submodule update --depth 1 --recursive --init
 

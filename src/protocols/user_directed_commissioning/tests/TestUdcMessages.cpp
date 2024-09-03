@@ -1,8 +1,9 @@
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
