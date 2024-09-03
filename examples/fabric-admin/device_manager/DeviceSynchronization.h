@@ -72,9 +72,9 @@ private:
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         Connecting,          ///< We are waiting for OnDeviceConnected or OnDeviceConnectionFailure callbacks to be called
         AwaitingResponse,    ///< We have started a subscription.
-        ReceivedResponse,    ///< 
-        ReceivedError,       ///< 
-        GettingUid,          ///< 
+        ReceivedResponse,    ///<
+        ReceivedError,       ///<
+        GettingUid,          ///<
     };
 
     void AddSynchronizedDevice();
