@@ -67,7 +67,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                         "CommissionerDeclarationHandler");
         // Set the callback for handling CommissionerDeclaration messages.
         matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
-            connectionCallbacks.mCommissionerDeclarationCallback, mTargetCastingPlayer);
+            connectionCallbacks.mCommissionerDeclarationCallback);
         mClientProvidedCommissionerDeclarationCallback = true;
     }
     else
@@ -75,10 +75,6 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
         ChipLogProgress(
             AppServer,
             "CastingPlayer::VerifyOrEstablishConnection() CommissionerDeclarationCallback not provided in ConnectionCallbacks");
-        // Still set the target casting player in the CommissionerDeclarationHandler in case the we receive a Commissioner
-        // Delaration message with CancelPasscode.
-        matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
-            nullptr, mTargetCastingPlayer);
         mClientProvidedCommissionerDeclarationCallback = false;
     }
 
@@ -236,6 +232,10 @@ CHIP_ERROR CastingPlayer::StopConnecting()
         ChipLogError(AppServer,
                      "CastingPlayer::StopConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should only "
                      "be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
+    // Calling the internal StopConnecting() API with the shouldSendIdentificationDeclarationMessage set to true to notify the
+    // CastingPlayer/Commissioner that the commissioning session was cancelled by the Casting Client/Commissionee user. This will
+    // result in the Casting Client/Commissionee sending a CancelPasscode IdentificationDeclaration message to the CastingPlayer.
+    // shouldSendIdentificationDeclarationMessage is true when StopConnecting() is called by the Client.
     return this->StopConnecting(true);
 }
 
@@ -253,24 +253,13 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     mTargetCastingPlayer.reset();
     CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
 
-    // shouldSendIdentificationDeclarationMessage is false only when StopConnecting() is called by the casting library.
     if (!shouldSendIdentificationDeclarationMessage)
     {
         ChipLogProgress(AppServer,
-                        "CastingPlayer::StopConnecting() shouldSendIdentificationDeclarationMessage: %s, User Directed "
-                        "Commissioning stopped by CastingPlayer/Commissioner user",
-                        shouldSendIdentificationDeclarationMessage ? "true" : "false");
-        // If the client has not provided the (Optional) ConnectionCallbacks mCommissionerDeclarationCallback, we can call the
-        // ConnectionCallbacks mOnConnectionComplete callback with CHIP_ERROR_CONNECTION_ABORTED, to alert the client that the
-        // commissioning session was cancelled by the CastingPlayer/Commissioner user. For example, in the scenario where user 1 is
-        // controlling the casting Client/Commissionee and user 2 is controlling the CastingPlayer/Commissioner.
-        if (!mClientProvidedCommissionerDeclarationCallback)
-        {
-            ChipLogProgress(AppServer,
-                            "CastingPlayer::StopConnecting() CommissionerDeclarationCallback not provided by client, calling "
-                            "mOnConnectionComplete with CHIP_ERROR_CONNECTION_ABORTED");
-            mOnCompleted(CHIP_ERROR_CONNECTION_ABORTED, nullptr);
-        }
+                        "CastingPlayer::StopConnecting() shouldSendIdentificationDeclarationMessage: %d, User Directed "
+                        "Commissioning aborted by the CastingPlayer/Commissioner user.",
+                        shouldSendIdentificationDeclarationMessage);
+        resetState(CHIP_ERROR_CONNECTION_ABORTED);
         return err;
     }
 
