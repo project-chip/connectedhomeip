@@ -198,12 +198,10 @@ Voltage_mV FakeReadings::GetVoltage()
 {
     return mVoltage_mV;
 };
-
 void FakeReadings::SetCurrent(Amperage_mA aCurrent_mA)
 {
     mCurrent_mA = aCurrent_mA;
 }
-
 Amperage_mA FakeReadings::GetCurrent()
 {
     return mCurrent_mA;
