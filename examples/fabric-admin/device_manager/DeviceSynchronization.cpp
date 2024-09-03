@@ -142,7 +142,7 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
             GetUid(device->GetEndpointId());
             if (mState == State::GettingUid)
             {
-                // GetUid was successful and we rely on callback to later on call SynchronizationCompleteAddDevice.
+                // GetUid was successful and we rely on callback to call SynchronizationCompleteAddDevice.
                 return;
             }
         }

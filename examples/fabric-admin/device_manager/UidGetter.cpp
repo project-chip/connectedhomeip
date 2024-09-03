@@ -118,7 +118,7 @@ void UidGetter::OnDone(ReadClient * apReadClient)
 void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     VerifyOrDie(mCurrentlyGettingUid);
-    mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
+    mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr,
                                            *this /* callback */, ReadClient::InteractionType::Read);
     VerifyOrDie(mClient);
 
