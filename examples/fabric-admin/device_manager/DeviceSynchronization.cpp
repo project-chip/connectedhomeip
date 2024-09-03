@@ -74,6 +74,12 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
+    if (!status.IsSuccess())
+    {
+        ChipLogError(NotSpecified, "Response Failure: %" CHIP_ERROR_FORMAT, status.ToChipError().Format());
+        return;
+    }
+
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
