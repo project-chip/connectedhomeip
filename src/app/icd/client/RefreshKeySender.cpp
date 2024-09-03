@@ -80,7 +80,7 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
     registerClientCommand.checkInNodeID    = mICDClientInfo.check_in_node.GetNodeId();
     registerClientCommand.monitoredSubject = mICDClientInfo.monitored_subject;
     registerClientCommand.key              = mNewKey.Span();
-    registerClientCommand.clientType       = mICDClientInfo.client_type
+    registerClientCommand.clientType       = mICDClientInfo.client_type;
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, endpointId, registerClientCommand, onSuccess, onFailure);
 }
 
