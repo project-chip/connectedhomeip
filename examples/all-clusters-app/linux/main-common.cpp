@@ -338,27 +338,28 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     SetDefaultDelegate(endpoint, &delegate);
 }
 
-chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+using chip::Protocols::InteractionModel::Status;
+Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,
                                                                                uint8_t * buffer, uint16_t maxReadLength)
 {
 
-    VerifyOrReturnValue(clusterId == Clusters::UnitTesting::Id, chip::Protocols::InteractionModel::Status::Failure);
-    VerifyOrReturnValue(attributeMetadata != nullptr, chip::Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(clusterId == Clusters::UnitTesting::Id, Status::Failure);
+    VerifyOrReturnValue(attributeMetadata != nullptr, Status::Failure);
 
     if (attributeMetadata->attributeId == Clusters::UnitTesting::Attributes::FailureInt32U::Id)
     {
         uint8_t forced_code = 0;
-        chip::Protocols::InteractionModel::Status status;
+        Status status;
 
         status = Clusters::UnitTesting::Attributes::ReadFailureCode::Get(endpoint, &forced_code);
-        if (status == chip::Protocols::InteractionModel::Status::Success)
+        if (status == Status::Success)
         {
-            status = static_cast<chip::Protocols::InteractionModel::Status>(forced_code);
+            status = static_cast<Status>(forced_code);
         }
         return status;
     }
 
     // Finally we just do not support external attributes in all-clusters at this point
-    return chip::Protocols::InteractionModel::Status::Failure;
+    return Status::Failure;
 }
