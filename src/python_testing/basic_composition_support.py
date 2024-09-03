@@ -100,8 +100,8 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 class BasicCompositionTests:
     def get_code(self, dev_ctrl):
         created_codes = []
-        for idx, d in enumerate(self.matter_test_config.discriminators):
-            created_codes.append(dev_ctrl.CreateManualCode(d, self.matter_test_config.setup_passcodes[idx]))
+        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
 
         setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
         asserts.assert_equal(len(setup_codes), 1,
