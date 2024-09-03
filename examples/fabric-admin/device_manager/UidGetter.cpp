@@ -123,8 +123,8 @@ void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, cons
     VerifyOrDie(mClient);
 
     AttributePathParams readPaths[1];
-    readPaths[0] =
-        AttributePathParams(mEndpointId, Clusters::BridgedDeviceBasicInformation::Id, Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::Id);
+    readPaths[0] = AttributePathParams(mEndpointId, Clusters::BridgedDeviceBasicInformation::Id,
+                                       Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::Id);
 
     ReadPrepareParams readParams(sessionHandle);
 
