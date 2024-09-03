@@ -853,7 +853,8 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     case DeviceEventType::kThreadConnectivityChange:
     case DeviceEventType::kInternetConnectivityChange: {
 #ifdef DIC_ENABLE
-        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established) {
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+        {
             if (DIC_OK != dic_init(dic::control::subscribeCB))
             {
                 ChipLogError(AppServer, "dic_init failed");
@@ -864,7 +865,8 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         SilabsLCD::Screen_e screen;
         AppTask::GetLCD().GetScreen(screen);
         // Update the LCD screen with SSID and connected state
-        if (screen == SilabsLCD::Screen_e::StatusScreen) {
+        if (screen == SilabsLCD::Screen_e::StatusScreen)
+        {
             BaseApplication::UpdateLCDStatusScreen(false);
             AppTask::GetLCD().SetScreen(screen);
         }
