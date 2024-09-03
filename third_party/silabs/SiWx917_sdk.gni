@@ -335,7 +335,10 @@ template("siwx917_sdk") {
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
-    cflags += [ "-Wno-shadow" ]
+    cflags += [ 
+      "-Wno-shadow",
+      "-Wno-unused-parameter",
+    ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
