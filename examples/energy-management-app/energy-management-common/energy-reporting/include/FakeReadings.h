@@ -22,7 +22,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <system/SystemLayer.h>
 
-using namespace ::chip;
 class FakeReadings
 {
 public:
@@ -60,14 +59,14 @@ public:
      */
     void FakeReadingsUpdate();
 
-    void SetPower(Power_mW power_mW);
-    Power_mW GetPower();
+    void SetPower(chip::Power_mW power_mW);
+    chip::Power_mW GetPower();
 
-    void SetVoltage(Voltage_mV voltage_mV);
-    Voltage_mV GetVoltage();
+    void SetVoltage(chip::Voltage_mV voltage_mV);
+    chip::Voltage_mV GetVoltage();
 
-    void SetCurrent(Amperage_mA current_mA);
-    Amperage_mA GetCurrent();
+    void SetCurrent(chip::Amperage_mA current_mA);
+    chip::Amperage_mA GetCurrent();
 
     /**
      * @brief   Timer expiry callback to handle fake load
