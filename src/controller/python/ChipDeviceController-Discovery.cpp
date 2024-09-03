@@ -211,7 +211,7 @@ PyChipError pychip_CreateManualCode(uint16_t longDiscriminator, uint32_t passcod
         *outBufSize = span.size();
         if (*outBufSize == 0)
         {
-            err == CHIP_ERROR_NO_MEMORY;
+            err = CHIP_ERROR_NO_MEMORY;
         }
     }
 
