@@ -249,6 +249,7 @@ typedef enum
     WFX_SEC_WPA         = 3,
     WFX_SEC_WPA2        = 4,
     WFX_SEC_WPA3        = 5,
+    WPA_WPA2_MIXED      = 6,
 } wfx_sec_t;
 
 typedef struct
