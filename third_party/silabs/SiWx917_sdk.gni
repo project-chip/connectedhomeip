@@ -337,7 +337,7 @@ template("siwx917_sdk") {
 
     cflags += [
       "-Wno-shadow",
-      "-Wno-unused-parameter",
+      "-Wno-unknown-warning-option",
     ]
 
     foreach(include_dir, _include_dirs) {
