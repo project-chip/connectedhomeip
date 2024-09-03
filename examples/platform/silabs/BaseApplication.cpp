@@ -802,6 +802,8 @@ void BaseApplication::ScheduleFactoryReset()
         {
             Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
+        // Delete all fabrics.
+        chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
                                                   // basic information cluster it seems. And triggers and Event flush, which is not
                                                   // relevant when there are no fabrics left
@@ -851,19 +853,21 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     case DeviceEventType::kThreadConnectivityChange:
     case DeviceEventType::kInternetConnectivityChange: {
 #ifdef DIC_ENABLE
-        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == kConnectivity_Established);
-        if (DIC_OK != dic_init(dic::control::subscribeCB))
-        {
-            ChipLogError(AppServer, "dic_init failed");
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established) {
+            if (DIC_OK != dic_init(dic::control::subscribeCB))
+            {
+                ChipLogError(AppServer, "dic_init failed");
+            }
         }
 #endif // DIC_ENABLE
 #ifdef DISPLAY_ENABLED
         SilabsLCD::Screen_e screen;
         AppTask::GetLCD().GetScreen(screen);
         // Update the LCD screen with SSID and connected state
-        VerifyOrReturn(screen == SilabsLCD::Screen_e::StatusScreen);
-        BaseApplication::UpdateLCDStatusScreen(false);
-        AppTask::GetLCD().SetScreen(screen);
+        if (screen == SilabsLCD::Screen_e::StatusScreen) {
+            BaseApplication::UpdateLCDStatusScreen(false);
+            AppTask::GetLCD().SetScreen(screen);
+        }
 #endif // DISPLAY_ENABLED
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
