@@ -246,7 +246,7 @@ limitations under the License.
     <attribute side="server" code="0x4034" define="NULLABLE_GLOBAL_STRUCT" type="TestGlobalStruct" isNullable="true" writable="true">nullable_global_struct</attribute>
 
     <!-- These attributes are intended to return internal failures when read.
-         They are internal SDK-test code that are intended to only run trhrough EMBER interfaces instead of
+         They are internal SDK-test code that are intended to only run through EMBER interfaces instead of
          code-backed support (to be able to test ember-based error paths)
       -->
     <attribute side="server" code="0x4100" define="INT8U" type="int8u" writable="true" min="1" max="0xcb" default="1" optional="true">readFailureCode</attribute>
