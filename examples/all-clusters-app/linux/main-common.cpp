@@ -352,7 +352,7 @@ chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(E
         uint8_t forced_code = 0;
         chip::Protocols::InteractionModel::Status status;
 
-        status = chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Get(endpoint, &forced_code);
+        status = Clusters::UnitTesting::Attributes::ReadFailureCode::Get(endpoint, &forced_code);
         if (status == chip::Protocols::InteractionModel::Status::Success)
         {
             status = static_cast<chip::Protocols::InteractionModel::Status>(forced_code);
