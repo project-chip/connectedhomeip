@@ -68,11 +68,6 @@ details.
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test Echo protocol, please enable Echo handler
->
->     gn gen out/debug --args='chip_app_use_echo=true'
->     ninja -C out/debug
-
 -   Prerequisites
 
     1. A Raspberry Pi 4 board
