@@ -26,13 +26,13 @@ gcc_toolchain("chip_pw_fuzztest") {
   forward_variables_from(pw_target_toolchain_host.clang_fuzz, "*", [ "name" ])
 
   toolchain_args = {
-    #This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
+    # This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
     forward_variables_from(defaults, "*")
 
     pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
     pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
 
-    # below three lines are needed by gcc_toolchain template
+    # The next three lines are needed by the gcc_toolchain template
     current_os = host_os
     current_cpu = host_cpu
     is_clang = true
@@ -43,7 +43,7 @@ gcc_toolchain("chip_pw_fuzztest") {
     # discussion on: https://discord.com/channels/691686718377558037/1275092695764959232
     remove_default_configs = [ "$dir_pw_toolchain/host_clang:linux_sysroot" ]
 
-    #when is_debug = True, we pass -O0 to cflags and ldflags, while upstream pw_fuzzer toolchain defines "optimize_speed" config that passes -O2.
+    # when is_debug = true, we pass -O0 to cflags and ldflags, while upstream pw_fuzzer toolchain defines "optimize_speed" config that passes -O2.
     # This condition was added to prevent mixing the flags
     if (is_debug) {
       remove_default_configs += [ "$dir_pw_build:optimize_speed" ]
@@ -63,8 +63,8 @@ gcc_toolchain("chip_pw_fuzztest") {
     dir_pw_third_party_fuzztest = "//third_party/fuzztest"
     dir_pw_third_party_googletest = "//third_party/googletest"
 
-    # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is giving warning
-    #Remove if re2 is indeed not needed
+    # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering warning
+    # Remove if re2 is indeed not needed
     # dir_pw_third_party_re2 = "//third_party/re2/src"
   }
 }

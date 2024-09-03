@@ -392,8 +392,8 @@ executed manually.
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
 ```
 
-NOTE: `asan` is enabled by default in FuzzTest, so adding to build_examples
-target does not make a difference.
+NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
+build_examples.py invocation.
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where

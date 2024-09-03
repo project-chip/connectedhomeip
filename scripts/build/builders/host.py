@@ -381,7 +381,7 @@ class HostBuilder(GnBuilder):
         elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
             self.extra_gn_options.append('oss_fuzz=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
-            self.extra_gn_options.append('is_pw_fuzz=true pw_enable_fuzz_test_targets=true')
+            self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')

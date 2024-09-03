@@ -332,12 +332,16 @@
 [submodule "third_party/abseil-cpp/src"]
 	path = third_party/abseil-cpp/src
 	url = https://github.com/abseil/abseil-cpp.git
+	platforms = linux,darwin
 [submodule "third_party/fuzztest"]
 	path = third_party/fuzztest
 	url = https://github.com/google/fuzztest.git
+	platforms = linux,darwin
 [submodule "third_party/googletest"]
 	path = third_party/googletest
 	url = https://github.com/google/googletest
+	platforms = linux,darwin
 [submodule "third_party/re2/src"]
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
+	platforms = linux,darwin

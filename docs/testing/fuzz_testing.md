@@ -98,7 +98,7 @@ FUZZ_TEST(MinimalmDNS, TxtResponderFuzz).WithDomains(Arbitrary<vector<uint8_t>>(
     invocation. Example:
 
 ```cpp
-AnyProtocolID()
+auto AnyProtocolID()
 {
     return ElementOf({ chip::Protocols::SecureChannel::Id, chip::Protocols::InteractionModel::Id, chip::Protocols::BDX::Id,
                        chip::Protocols::UserDirectedCommissioning::Id });

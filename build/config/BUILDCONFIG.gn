@@ -47,8 +47,6 @@ _chip_defaults = {
 declare_args() {
   # Toolchain to use for host. This is usually set by default.
   host_toolchain = ""
-
-  is_pw_fuzz = false
 }
 
 if (host_toolchain == "") {

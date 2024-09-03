@@ -56,7 +56,7 @@ void ChipCertFuzzer(const std::vector<std::uint8_t> & bytes)
     }
 
     {
-        // TODO: #34352 To Move this to a Fixture once Errors related to FuzzTest Fixtures are resolved
+        // TODO: #35369 Move this to a Fixture once Errors related to FuzzTest Fixtures are resolved
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         ValidateChipRCAC(span);
         chip::Platform::MemoryShutdown();
