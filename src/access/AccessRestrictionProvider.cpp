@@ -197,13 +197,19 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> & entries
                 if (requestPath.requestType == RequestType::kAttributeReadRequest ||
                     requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    if (!IsGlobalAttribute(requestPath.entityId.value()))
+                    {
+                        return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    }
                 }
                 break;
             case Type::kAttributeWriteForbidden:
                 if (requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    if (!IsGlobalAttribute(requestPath.entityId.value()))
+                    {
+                        return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    }
                 }
                 break;
             case Type::kCommandForbidden:

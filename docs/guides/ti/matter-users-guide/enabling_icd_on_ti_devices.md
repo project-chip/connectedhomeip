@@ -17,6 +17,13 @@ and set the following parameter to true:
 chip_enable_icd_server = true
 ```
 
+To enable LIT ICD behavior, Check In Protocol Support and User Active Mode
+Trigger Support, set the following parameter to true:
+
+```
+chip_enable_icd_lit = true
+```
+
 TI examples have only been tested with the ICD Server configuration. To enable
 the client configuration, set `chip_enable_icd_client` to true.
 
@@ -43,17 +50,25 @@ mode threshold, and polling intervals can be configured in
 #define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(100)
 ```
 
+To enable LIT ICD behavior, set the polling period to be greater than 15
+seconds, and the active mode threshold to at least 5000 milliseconds.
+
 ## ZAP File Changes
 
 Open up the ZAP file (in `examples/<example-name>/<example-name>-common`) for
 the example being configured as an ICD. Add the ICD Management Cluster for
-Endpoint 0.
+Endpoint 0 as either a Server or Client, depending on your configuration.
 
-Open up the .matter file (in `examples/<example-name>/<example-name>-common`)
-corresponding to the example and add in the ICDManagement cluster.
+To enable LIT ICD behavior, set the FeatureMap to 0x0007 to enable Check-In
+Protocol Support, User Active Mode Trigger Support, and Long Idle Time Support.
+In addition, enable the UserActiveModeTriggerHint,
+UserActiveModeTriggerInstruction, and MaximumCheckInBackOff attributes.
 
-In addition, each endpoint has a list of clusters that it supports. Add the
-ICDManagement cluster to this list.
+After making the desired changes in the zap file, generate the .matter file by
+running the following commands:
 
-The lock-app example's .matter file can be used as a reference. These additions
-allow the ICDManagement cluster's callbacks to be accessed.
+```
+$ cd /connectedhomeip/scripts/tools/zap
+$ ./generate.py examples/<example>/<example>-common/<example>-app.zap
+
+```

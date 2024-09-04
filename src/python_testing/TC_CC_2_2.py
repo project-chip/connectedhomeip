@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -33,7 +33,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, per_endpoint_test)
+                                    has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 from test_plan_support import commission_if_required, if_feature_supported, read_attribute, verify_success
 
@@ -125,7 +125,7 @@ class TC_CC_2_3(MatterBaseTest):
                          "The third entry in _reportedRemainingTimeValuesList_ is equal to 0")
                 ]
 
-    @per_endpoint_test(has_cluster(Clusters.ColorControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.ColorControl))
     async def test_TC_CC_2_2(self):
         gather_time = 20
 

@@ -35,55 +35,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition: Create new user"
-      command: "SetUser"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-
-    - label: "Precondition: Read the user back and verify its fields"
-      command: "GetUser"
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-      response:
-          values:
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-              - name: "Credentials"
-                value: []
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextUserIndex"
-                value: null
-
     - label:
           "Step 1: TH reads NumberOfYearDay SchedulesSupportedPerUser attribute
           and saves for future use"
@@ -109,9 +60,34 @@ tests:
               maxValue: 65534
 
     - label:
-          "Step 3: TH sends Set Year Day Schedule Command to DUT with the
-          following values: a)YearDayIndex as 1 b)UserIndex as 1
-          c)LocalStartTime as 960 Seconds d)LocalEndTime as 1980 Seconds"
+          "Step 3a: TH sends SetUser Command to DUT with the following values:
+          a)OperationType as 0, b)UserIndex as 1, c)UserName as xxx,
+          c)UserUniqueID as 6452, d)UserStatus as 1, e)UserType as 0,
+          f)CredentialRule as 0"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label:
+          "Step 3b: TH sends SetYearDaySchedule Command to DUT with the
+          following values: a)YearDayIndex as 1, b)UserIndex as 1,
+          c)LocalStartTime as 960 Seconds, d)LocalEndTime as 1980 Seconds"
       PICS: DRLK.S.F0a && DRLK.S.C0e.Rsp
       command: "SetYearDaySchedule"
       arguments:
@@ -196,9 +172,8 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label:
-          "Step 7a: Create a new user with UserIndex as 5 then TH sends Get Year
-          Day Schedule Command to DUT with"
+    - label: "Step 7a: Create a new user with UserIndex as 5"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -219,8 +194,9 @@ tests:
                 value: 0
 
     - label:
-          "Step 7b: YearDayIndex as 10 (value is in the the range of step 1 but
-          YearDay Schedule entry not available) : UserIndex as 5"
+          "Step 7b: TH sends Get Year Day Schedule Command to DUT with
+          YearDayIndex as 10 (value is in the the range of step 1 but YearDay
+          Schedule entry not available) : UserIndex as 5"
       PICS: DRLK.S.F0a && DRLK.S.C0f.Rsp && DRLK.S.C0f.Tx
       command: "GetYearDaySchedule"
       arguments:
@@ -367,28 +343,11 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Clear a year day schedule for the first user"
-      PICS: DRLK.S.F0a && DRLK.S.C10.Rsp
-      command: "ClearYearDaySchedule"
-      arguments:
-          values:
-              - name: "YearDayIndex"
-                value: 1
-              - name: "UserIndex"
-                value: 1
-
-    - label: "Cleanup the created user with UserIndex 1"
-      command: "ClearUser"
+    - label: "Step 14:TH sends ClearUser Command to DUT with the UserIndex as 1"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
       timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-
-    - label: "Cleanup the created user with UserIndex 5"
       command: "ClearUser"
-      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "UserIndex"
-                value: 5
+                value: 0xFFFE

@@ -37,6 +37,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AFL
 AIDL
 algs
 alloc
@@ -570,6 +571,7 @@ fsync
 ftd
 fullclean
 fuzzer
+fuzztest
 FW
 gbl
 gcloud
@@ -1008,6 +1010,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+OSS
 OTA
 OTADownloader
 otaDownloadPath

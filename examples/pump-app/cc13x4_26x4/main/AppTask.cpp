@@ -56,6 +56,10 @@
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+#include "app/icd/server/ICDNotifier.h"
+#endif
+
 /* syscfg */
 #include <ti_drivers_config.h>
 
@@ -460,6 +464,12 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             {
                 PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
             }
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+            PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+#endif
         }
         break;
 
