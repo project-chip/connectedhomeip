@@ -245,7 +245,6 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
 
         nim_id = self._get_device_type_id('network infrastructure manager')
         root_node_id = self._get_device_type_id('root node')
-        on_off_id = self._get_device_type_id('On/Off Light')
 
         root = self._create_minimal_dt(device_type_id=root_node_id)
         nim = self._create_minimal_dt(device_type_id=nim_id)
