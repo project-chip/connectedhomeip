@@ -1062,6 +1062,8 @@ class ChipDeviceControllerBase():
                 self._future = future
 
             def _deviceAvailable(self):
+                if self._future.cancelled():
+                    return
                 if self._returnDevice.value is not None:
                     self._future.set_result(self._returnDevice)
                 else:
