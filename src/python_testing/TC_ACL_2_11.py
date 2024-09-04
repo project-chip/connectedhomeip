@@ -74,6 +74,9 @@ class TC_ACL_2_11(MatterBaseTest):
         Clusters.Descriptor.Attributes.EventList.attribute_id
     ]
 
+    def pics_TC_ACL_2_11(self) -> list[str]:
+        return ['ACL.S.F01']
+
     def desc_TC_ACL_2_11(self) -> str:
         return "[TC-ACL-2.11] Verification of Managed Device feature"
 
