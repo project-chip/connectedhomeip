@@ -317,7 +317,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
  *********************************************************************/
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
-    ChipLogError(DeviceLayer, "wfx_rsi_join_fail_cb: status: %02x", status);
+    ChipLogError(DeviceLayer, "wfx_rsi_join_fail_cb: status: %d", status);
     WfxEvent_t WfxEvent;
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
@@ -362,13 +362,13 @@ static int32_t wfx_rsi_init(void)
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_driver_init failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_driver_init failed: %ld", status);
         return status;
     }
     /* ! Redpine module intialisation */
     if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_device_init failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_device_init failed: %ld", status);
         return status;
     }
     /*
@@ -388,7 +388,7 @@ static int32_t wfx_rsi_init(void)
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
     {
 #endif
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wireless_init failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wireless_init failed: %ld", status);
         return status;
     }
 
@@ -397,7 +397,7 @@ static int32_t wfx_rsi_init(void)
      */
     if (rsi_wlan_get(RSI_FW_VERSION, buf, sizeof(buf)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_FW_VERSION) failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_FW_VERSION) failed: %ld", status);
         return status;
     }
 
@@ -406,7 +406,7 @@ static int32_t wfx_rsi_init(void)
     //! Send feature frame
     if ((status = rsi_send_feature_frame()) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "error: rsi_send_feature_frame failed: %02x", status);
+        ChipLogError(DeviceLayer, "error: rsi_send_feature_frame failed: %ld", status);
         return status;
     }
 
@@ -415,7 +415,7 @@ static int32_t wfx_rsi_init(void)
     (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
     if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_MAC_ADDRESS) failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
         return status;
     }
 
@@ -443,12 +443,12 @@ static int32_t wfx_rsi_init(void)
      */
     if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
     if ((status = rsi_wlan_register_callbacks(RSI_WLAN_DATA_RECEIVE_NOTIFY_CB, wfx_rsi_wlan_pkt_cb)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
 
@@ -486,7 +486,7 @@ static void wfx_rsi_save_ap_info(void) // translation
 #else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-        ChipLogProgress(DeviceLayer, "warn: scan failed: %02x", status);
+        ChipLogProgress(DeviceLayer, "warn: scan failed: %ld", status);
         return;
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -522,7 +522,7 @@ static void wfx_rsi_save_ap_info(void) // translation
         break;
     }
 
-    ChipLogProgress(DeviceLayer, "wfx_rsi_save_ap_info: connecting to %s, sec=%d, status=%02x", &wfx_rsi.sec.ssid[0],
+    ChipLogProgress(DeviceLayer, "wfx_rsi_save_ap_info: connecting to %s, sec=%d, status=%ld", &wfx_rsi.sec.ssid[0],
                     wfx_rsi.sec.security, status);
 }
 
@@ -578,7 +578,7 @@ static void wfx_rsi_do_join(void)
 
     if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_register_callbacks failed: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_register_callbacks failed: %ld", status);
     }
 
     /* Try to connect Wifi with given Credentials
@@ -588,8 +588,7 @@ static void wfx_rsi_do_join(void)
                                          wfx_rsi_join_cb)) != RSI_SUCCESS)
     {
         wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
-        ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_connect_async failed: %02x on try %d", status,
-                        wfx_rsi.join_retries);
+        ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_connect_async failed: %ld on try %d", status, wfx_rsi.join_retries);
         wfx_retry_connection(++wfx_rsi.join_retries);
     }
 }
@@ -674,7 +673,7 @@ void WfxPostEvent(WfxEvent_t * event)
 
     if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "WfxPostEvent: failed to post event with status: %d", status);
+        ChipLogError(DeviceLayer, "WfxPostEvent: failed to post event with status: %ld", status);
         // TODO: Handle error, requeue event depending on queue size or notify relevant task,
         // Chipdie, etc.
     }
@@ -734,7 +733,7 @@ void ProcessEvent(WfxEvent_t inEvent)
 
         if (status != RSI_SUCCESS)
         {
-            ChipLogError(DeviceLayer, "rsi_wlan_bgscan failed: %02x ", status);
+            ChipLogError(DeviceLayer, "rsi_wlan_bgscan failed: %ld ", status);
             return;
         }
 
@@ -762,8 +761,8 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 continue; // we found the targeted ssid.
             }
-
-            ap.security = scan->security_mode;
+            // TODO: Add support to convert security mode from RSI to WFX
+            ap.security = static_cast<wfx_sec_t>(scan->security_mode);
             ap.rssi     = (-1) * scan->rssi_val;
 
             configASSERT(sizeof(ap.bssid) == BSSID_LEN);
@@ -833,7 +832,7 @@ void wfx_rsi_task(void * arg)
     uint32_t rsi_status = wfx_rsi_init();
     if (rsi_status != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_task: wfx_rsi_init failed: %02x", rsi_status);
+        ChipLogError(DeviceLayer, "wfx_rsi_task: wfx_rsi_init failed: %ld", rsi_status);
         return;
     }
     WfxEvent_t wfxEvent;
