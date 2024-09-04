@@ -106,16 +106,6 @@ RUN set -x \
     telnet \
     srecord \
     openjdk-8-jdk \
-    git vim emacs sudo \
-    apt-utils dialog zsh \
-    iproute2 procps lsb-release \
-    bash-completion \
-    build-essential cmake cppcheck valgrind \
-    wget curl telnet \
-    docker.io \
-    iputils-ping net-tools \
-    locales \
-    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
@@ -152,6 +142,10 @@ ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.16.5
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
+
+# Places bootstrap files there instead of the default one which is `.environment`.
+# NOTE: This directory is NOT persistent.
+ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
 ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
