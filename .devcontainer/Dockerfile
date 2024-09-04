@@ -24,18 +24,17 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ENV LANG en_US.utf8
 
-# TODO: remove these apt installs in the future as they will be in the base image from version 75+.
+
 RUN apt-get update \
     && apt-get install -y locales \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
-    && apt-get -fy install git vim emacs sudo \
+    && apt-get -fy install vim emacs sudo \
     apt-utils dialog zsh \
-    iproute2 procps lsb-release \
+    lsb-release \
     bash-completion \
-    build-essential cmake cppcheck valgrind \
-    wget curl telnet \
+    valgrind \
     docker.io \
-    iputils-ping net-tools \
+    iputils-ping \
     && :
 
 RUN groupadd -g $USER_GID $USERNAME \
