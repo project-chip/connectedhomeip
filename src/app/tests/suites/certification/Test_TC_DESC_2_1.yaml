@@ -363,7 +363,7 @@ tests:
     - label: "Step 4: TH reads 'PartsList' attribute."
       PICS: DESC.S.A0003
       verification: |
-          ./chip-tool descriptor read  parts-list 1 0
+          ./chip-tool descriptor read parts-list 1 0
 
            Verify PartsList response  greater than 0 and  Endpoint is in the range of 1 to 65534 on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
