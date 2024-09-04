@@ -8,7 +8,7 @@ the current directory. This can generally be manually built using an existing
 Raspberry Pi device (or equivalent qemu) and a convenience copy was created in
 CIPD
 
-#### Creating a Sysroot (qemu VM)
+#### Creating a Sysroot (qemu virtual emulator)
 
 NOTE: this approach is slower due to emulation usage, however has the advantage
 of not requiring separate hardware.
@@ -35,7 +35,7 @@ virsh console sysrootsrv
 Once installation completed, you can also login as `ubuntu/1234` or use
 `ssh ubuntu@localhost -p 5555`
 
-The current image is based on ubunt 24.04, so you can create an image via:
+The current image is based on Ubuntu 24.04, so you can create an image via:
 
 ```
 rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot

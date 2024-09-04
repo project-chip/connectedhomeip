@@ -95,7 +95,7 @@ packages:
   - unzip
 
 runcmd:
-  # Ubuntu cloud-init merges with a locked ubuntu, so the $(lock_passwd) option does
+  # Ubuntu cloud-init merges with a locked ubuntu, so the "lock_passwd" option does
   # not actually work. Unlock it here to make console work
   - [ passwd, --unlock, ubuntu ]
   # A marker saying that initial install is done. Installing all the packages above is VERY slow
