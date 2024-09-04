@@ -4543,7 +4543,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+        }public enum KeepActiveCommandField {StayActiveDuration(0),TimeoutMs(1),;
                     private final int id;
                     KeepActiveCommandField(int id) {
                         this.id = id;
@@ -17238,9 +17238,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            RemovedOn(0L),
-            DeviceDirectory(1L),
-            LocationDirectory(2L),
+            DeviceDirectory(0L),
+            LocationDirectory(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -17425,7 +17424,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),IpAddress(2),Port(3),;
+                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),;
                     private final int id;
                     CommissionNodeCommandField(int id) {
                         this.id = id;

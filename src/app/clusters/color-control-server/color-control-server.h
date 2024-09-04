@@ -43,8 +43,10 @@ static constexpr uint16_t TRANSITION_STEPS_PER_1S                              =
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
-static constexpr uint16_t MIN_TEMPERATURE_VALUE = 0;
-static constexpr uint16_t MAX_TEMPERATURE_VALUE = 0xfeff;
+// Logically relevant color temperatures are between 1000K and 9000K at the very most (and this is still
+// not frequent). Our implementation can default to those reasonable maxima to avoid issues related to range.
+static constexpr uint16_t MIN_TEMPERATURE_VALUE = 111u;  // 111 mireds == 9000K
+static constexpr uint16_t MAX_TEMPERATURE_VALUE = 1000u; // 1000 mireds == 1000K
 
 static constexpr uint8_t MIN_HUE_VALUE = 0;
 static constexpr uint8_t MAX_HUE_VALUE = 254;
@@ -201,27 +203,16 @@ public:
 
     template <typename Q, typename V>
     chip::app::MarkAttributeDirty SetQuietReportAttribute(chip::app::QuieterReportingAttribute<Q> & quietReporter, V newValue,
-                                                          bool isStartOrEndOfTransition, uint16_t transitionTime);
-    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime);
+                                                          bool isEndOfTransition, uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime,
+                                                                          bool isNewTransition = false);
 
 private:
     /**********************************************************
      * Functions Definitions
      *********************************************************/
 
-    ColorControlServer()
-    {
-        for (size_t i = 0; i < kColorControlClusterServerMaxEndpointCount; i++)
-        {
-            // Set the quiet report policies for the RemaininTime Attribute on all endpoint
-            // - kMarkDirtyOnChangeToFromZero : When the value changes from 0 to any other value and vice versa, or
-            // - kMarkDirtyOnIncrement : When the value increases.
-            quietRemainingTime[i]
-                .policy()
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
-        }
-    }
+    ColorControlServer() {}
 
     bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask,
                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
@@ -310,6 +301,7 @@ private:
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietTemperatureMireds[kColorControlClusterServerMaxEndpointCount];
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
