@@ -153,16 +153,23 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabledDiagnostics)
 
         self.step("8")
-        await self.send_test_event_trigger_evse_diagnostics_complete()
+        await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current,
+                                              max_charge=max_charge_current, expected_status=Status.Failure)
 
         self.step("8a")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabledDiagnostics)
+
+        self.step("9")
+        await self.send_test_event_trigger_evse_diagnostics_complete()
+
+        self.step("9a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
 
-        self.step("8b")
+        self.step("9b")
         # It should stay disabled after a diagnostics session
         await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
 
-        self.step("9")
+        self.step("10")
         await self.send_test_event_trigger_basic_clear()
 
 
