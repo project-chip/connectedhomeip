@@ -9171,6 +9171,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Unsupported";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeReadFailureCodeID:
+            result = @"ReadFailureCode";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeFailureInt32UID:
+            result = @"FailureInt32U";
+            break;
+
         case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID:
             result = @"NullableBoolean";
             break;

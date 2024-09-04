@@ -14222,6 +14222,8 @@ private:
 | * GlobalEnum                                                        | 0x0033 |
 | * GlobalStruct                                                      | 0x0034 |
 | * Unsupported                                                       | 0x00FF |
+| * ReadFailureCode                                                   | 0x3000 |
+| * FailureInt32U                                                     | 0x3001 |
 | * NullableBoolean                                                   | 0x4000 |
 | * NullableBitmap8                                                   | 0x4001 |
 | * NullableBitmap16                                                  | 0x4002 |
@@ -27702,6 +27704,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
@@ -27856,6 +27860,10 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
             Id, "global-struct", Attributes::GlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "read-failure-code", 0, UINT8_MAX, Attributes::ReadFailureCode::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "failure-int32u", 0, UINT32_MAX, Attributes::FailureInt32U::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<bool>>>(
             Id, "nullable-boolean", 0, 1, Attributes::NullableBoolean::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<
@@ -28021,6 +28029,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //

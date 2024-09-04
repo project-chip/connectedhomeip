@@ -17775,6 +17775,8 @@ public class ClusterIDMapping {
             GlobalEnum(51L),
             GlobalStruct(52L),
             Unsupported(255L),
+            ReadFailureCode(12288L),
+            FailureInt32U(12289L),
             NullableBoolean(16384L),
             NullableBitmap8(16385L),
             NullableBitmap16(16386L),

@@ -7307,6 +7307,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
   attribute optional boolean unsupported = 255;
+  attribute optional int8u readFailureCode = 12288;
+  attribute optional int32u failureInt32U = 12289;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
@@ -9546,6 +9548,8 @@ endpoint 1 {
     callback attribute clusterErrorBoolean;
     ram      attribute globalEnum;
     callback attribute globalStruct;
+    ram      attribute readFailureCode default = 1;
+    callback attribute failureInt32U default = 0;
     ram      attribute nullableBoolean default = false;
     ram      attribute nullableBitmap8 default = 0;
     ram      attribute nullableBitmap16 default = 0;

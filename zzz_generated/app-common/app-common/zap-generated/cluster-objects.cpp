@@ -31889,6 +31889,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, globalStruct);
     case Attributes::Unsupported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, unsupported);
+    case Attributes::ReadFailureCode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, readFailureCode);
+    case Attributes::FailureInt32U::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, failureInt32U);
     case Attributes::NullableBoolean::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, nullableBoolean);
     case Attributes::NullableBitmap8::TypeInfo::GetAttributeId():

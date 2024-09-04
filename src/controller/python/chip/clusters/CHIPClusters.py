@@ -14837,6 +14837,20 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00003000: {
+                "attributeName": "ReadFailureCode",
+                "attributeId": 0x00003000,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00003001: {
+                "attributeName": "FailureInt32U",
+                "attributeId": 0x00003001,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00004000: {
                 "attributeName": "NullableBoolean",
                 "attributeId": 0x00004000,

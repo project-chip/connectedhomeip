@@ -50211,6 +50211,8 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="globalEnum", Tag=0x00000033, Type=Globals.Enums.TestGlobalEnum),
                 ClusterObjectFieldDescriptor(Label="globalStruct", Tag=0x00000034, Type=Globals.Structs.TestGlobalStruct),
                 ClusterObjectFieldDescriptor(Label="unsupported", Tag=0x000000FF, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="readFailureCode", Tag=0x00003000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="failureInt32U", Tag=0x00003001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="nullableBoolean", Tag=0x00004000, Type=typing.Union[Nullable, bool]),
                 ClusterObjectFieldDescriptor(Label="nullableBitmap8", Tag=0x00004001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="nullableBitmap16", Tag=0x00004002, Type=typing.Union[Nullable, uint]),
@@ -50306,6 +50308,8 @@ class UnitTesting(Cluster):
     globalEnum: 'Globals.Enums.TestGlobalEnum' = None
     globalStruct: 'Globals.Structs.TestGlobalStruct' = None
     unsupported: 'typing.Optional[bool]' = None
+    readFailureCode: 'typing.Optional[uint]' = None
+    failureInt32U: 'typing.Optional[uint]' = None
     nullableBoolean: 'typing.Union[Nullable, bool]' = None
     nullableBitmap8: 'typing.Union[Nullable, uint]' = None
     nullableBitmap16: 'typing.Union[Nullable, uint]' = None
@@ -52150,6 +52154,38 @@ class UnitTesting(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ReadFailureCode(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00003000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class FailureInt32U(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00003001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class NullableBoolean(ClusterAttributeDescriptor):
