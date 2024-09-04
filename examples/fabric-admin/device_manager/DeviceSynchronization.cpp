@@ -223,7 +223,7 @@ void DeviceSynchronizer::GetUniqueId()
     // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
     // connection to the remote Fabric Sync Aggregator.
     VerifyOrDie(DeviceMgr().IsFabricSyncReady());
-    auto remoteBridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
+    auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
     CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
