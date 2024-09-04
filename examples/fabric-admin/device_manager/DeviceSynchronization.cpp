@@ -212,13 +212,13 @@ void DeviceSynchronizer::GetUniqueId()
     VerifyOrDie(mState == State::ReceivedResponse);
     VerifyOrDie(mController);
 
+    // If we have a UniqueId we can return leaving state in ReceivedResponse.
+    VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
+
     auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
-    if (mCurrentDeviceData.has_unique_id || !device)
-    {
-        // We already have a UniqueId, or this device is not assoicated with a remote Fabric Sync Administrator,
-        // so we can just return leaving the state in ReceivedResponse.
-        return;
-    }
+    // If there is no associated remote Fabric Sync Aggregator there is no other places for us to try
+    // getting the UniqueId fron and can return leaving the state in ReceivedResponse.
+    VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
 
     // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
     // connection to the remote Fabric Sync Aggregator.
@@ -226,6 +226,7 @@ void DeviceSynchronizer::GetUniqueId()
     auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote")
     CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
         [this](std::optional<CharSpan> aUniqueId) {
             if (aUniqueId.has_value())
@@ -235,7 +236,7 @@ void DeviceSynchronizer::GetUniqueId()
             }
             else
             {
-                ChipLogError(NotSpecified, "We expected to get UniqueId from remote fabric sync bridge");
+                ChipLogError(NotSpecified, "We expected to get UniqueId from Remote Fabric Sync Aggregator");
             }
             this->SynchronizationCompleteAddDevice();
         },
@@ -244,6 +245,8 @@ void DeviceSynchronizer::GetUniqueId()
     if (err == CHIP_NO_ERROR)
     {
         MoveToState(State::GettingUid);
+    } else {
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
     }
 }
 
