@@ -39,7 +39,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x2]
+              hasMasksSet: [0x4]
 
     - label:
           "Step 2: TH sends On command to the On/Off Cluster of DUT on

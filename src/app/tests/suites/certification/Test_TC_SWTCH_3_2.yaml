@@ -28,7 +28,7 @@ tests:
     - label: "Note"
       verification: |
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
-          
+
           Execute the below mentioned command to put TH(Reference app) into a commissionable state in RPI platform, Pls use equivalent command on the respective platform
           ./chip-all-clusters-app --trace_decode 1
 
@@ -106,6 +106,14 @@ tests:
           "Step 0g: FAIL the test - at least one of SWTCH.C.M.SwitchStatePolling
           and SWTCH.C.M.SwitchStateEventing must be supported"
       PICS: "!SWTCH.C.M.SwitchStatePolling && !SWTCH.C.M.SwitchStateEventing"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0h: FAIL the test - when supporting SWTCH.C.F02(MSR) the
+          SWTCH.C.F05(AS) must not be supported"
+      PICS: SWTCH.C.F02 && SWTCH.C.F05
       verification: |
           no messages needed, TH checks consistency of PICS flags
       disabled: true
