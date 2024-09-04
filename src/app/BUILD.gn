@@ -78,6 +78,7 @@ buildconfig_header("app_buildconfig") {
     "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
+    "CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE=${chip_data_model_check_die_on_failure}",
   ]
 
   if (chip_use_data_model_interface == "disabled") {
@@ -234,8 +235,8 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/codegen-data-model:instance-header",
-    "${chip_root}/src/app/data-model-interface",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
@@ -265,13 +266,13 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "reporting/Read-DataModel.cpp",
       "reporting/Read-DataModel.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   }
 
   if (chip_enable_read_client) {
@@ -491,14 +492,14 @@ static_library("app") {
       "AttributePathExpandIterator-Ember.h",
       "AttributePathExpandIterator.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "AttributePathExpandIterator-DataModel.cpp",
       "AttributePathExpandIterator-DataModel.h",
       "AttributePathExpandIterator.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   }
 
   if (chip_enable_read_client) {

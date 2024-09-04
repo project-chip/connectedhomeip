@@ -39,18 +39,18 @@ Structs::HoldTimeLimitsStruct::Type
 uint16_t sHoldTime[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 } // namespace
 
-CHIP_ERROR OccupancySensingAttrAccess::Init()
+CHIP_ERROR Instance::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
-void OccupancySensingAttrAccess::Shutdown()
+void Instance::Shutdown()
 {
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
 
@@ -88,7 +88,36 @@ CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-bool OccupancySensingAttrAccess::HasFeature(Feature aFeature) const
+CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
+        uint16_t newHoldTime;
+
+        ReturnErrorOnFailure(aDecoder.Decode(newHoldTime));
+
+        Structs::HoldTimeLimitsStruct::Type * currHoldTimeLimits = GetHoldTimeLimitsForEndpoint(aPath.mEndpointId);
+        VerifyOrReturnError(currHoldTimeLimits != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(newHoldTime >= currHoldTimeLimits->holdTimeMin, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(newHoldTime <= currHoldTimeLimits->holdTimeMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        return SetHoldTime(aPath.mEndpointId, newHoldTime);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool Instance::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
@@ -146,16 +175,26 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
     return &sHoldTime[index];
 }
 
-CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
+CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
 {
     VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t * holdTimeForEndpoint = GetHoldTimeForEndpoint(endpointId);
     VerifyOrReturnError(holdTimeForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    *holdTimeForEndpoint = holdTime;
+    uint16_t previousHoldTime = *holdTimeForEndpoint;
+    *holdTimeForEndpoint      = newHoldTime;
 
-    MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    if (previousHoldTime != newHoldTime)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    }
+
+    // Blindly try to write RAM-backed legacy attributes (will fail silently if absent)
+    // to keep them in sync.
+    (void) Attributes::PIROccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
+    (void) Attributes::UltrasonicOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
+    (void) Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
 
     return CHIP_NO_ERROR;
 }

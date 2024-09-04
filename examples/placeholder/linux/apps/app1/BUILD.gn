@@ -30,6 +30,7 @@ source_set("app1") {
     "../../resource-monitoring-delegates.cpp",
     "../../src/bridged-actions-stub.cpp",
     "../../static-supported-modes-manager.cpp",
+    "../../thread-border-router-management.cpp",
   ]
 
   public_deps = [ ":configuration" ]

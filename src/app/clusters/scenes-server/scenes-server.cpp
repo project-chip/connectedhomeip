@@ -74,6 +74,11 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
         {
             resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
         }
+        else if (CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) == err)
+        {
+            // TODO: Confirm if we need to add UnsupportedAttribute status as a return for Scene Commands
+            resp.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
+        }
         else
         {
             resp.status = to_underlying(StatusIB(err).mStatus);
@@ -339,8 +344,8 @@ CHIP_ERROR ScenesServer::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
@@ -353,7 +358,7 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
-    chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;

@@ -443,6 +443,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+namespace Events {
+
+namespace BoostStarted {
+static constexpr EventId Id = 0x00000000;
+} // namespace BoostStarted
+
+namespace BoostEnded {
+static constexpr EventId Id = 0x00000001;
+} // namespace BoostEnded
+
+} // namespace Events
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Events {
 
@@ -622,6 +636,16 @@ static constexpr EventId Id = 0x00000010;
 
 } // namespace Events
 } // namespace PumpConfigurationAndControl
+
+namespace OccupancySensing {
+namespace Events {
+
+namespace OccupancyChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace OccupancyChanged
+
+} // namespace Events
+} // namespace OccupancySensing
 
 namespace TargetNavigator {
 namespace Events {

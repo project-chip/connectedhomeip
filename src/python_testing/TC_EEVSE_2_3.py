@@ -22,7 +22,7 @@
 # test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
@@ -134,6 +134,9 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify Command response is Success and event EEVSE.S.E01(EVNotDetected) sent"),
             TestStep("21", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear.",
                      "Verify Command response is Success"),
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for for EVSE TimeOfUse Mode Test Event Clear.",
+                     "Verify Command response is Success"),
+
         ]
 
         return steps
@@ -448,6 +451,9 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("21")
         await self.send_test_event_trigger_basic_clear()
+
+        self.step("22")
+        await self.send_test_event_trigger_time_of_use_mode_clear()
 
 
 if __name__ == "__main__":

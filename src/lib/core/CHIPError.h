@@ -453,6 +453,16 @@ using CHIP_ERROR = ::chip::ChipError;
 //
 #define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
+// Defines a runtime-value for a chip-error that contains a cluster-specific error status.
+// Must not be used with cluster-specific success status codes.
+#if CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
+    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value, __FILE__, __LINE__)
+#else
+#define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
+    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value)
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
 // clang-format off
 
 /**
@@ -1474,7 +1484,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_VERSION_MISMATCH                            CHIP_CORE_ERROR(0xa7)
 
-// AVAILABLE: 0xa8
+/**
+ *  @def CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL
+ *
+ *  @brief
+ *    The CHIP message is not granted access for further processing due to Access Restriction List.
+ */
+#define CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL                    CHIP_CORE_ERROR(0xa8)
+
 // AVAILABLE: 0xa9
 // AVAILABLE: 0xaa
 

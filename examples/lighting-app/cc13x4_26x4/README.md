@@ -45,6 +45,15 @@ the Texas Instruments devices.
 | Green LED Blinking State                         | Identify Trigger Effect in progress    |
 | Green LED Off State                              | No Identify Trigger Effect in progress |
 
+When the device has LIT ICD functionality enabled (`chip_enable_icd_lit` set to
+true in args.gni), the functionality of the short button presses changes as
+described below:
+
+| Action                                           | Functionality            |
+| ------------------------------------------------ | ------------------------ |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | User Active Mode Trigger |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Light is toggled         |
+
 ## Building
 
 ### Preparation
@@ -108,7 +117,7 @@ Ninja to build the executable.
     to the GN call.
 
     ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"] chip_generate_link_map_file=true"
     ```
 
 ## Programming

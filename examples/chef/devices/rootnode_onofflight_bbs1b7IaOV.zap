@@ -3473,7 +3473,7 @@
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
-      "endpointId": 1,
+      "endpointId": 13,
       "networkId": 0,
       "parentEndpointIdentifier": null
     }

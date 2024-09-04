@@ -29,7 +29,6 @@ IGNORE: Set[str] = {
     '/java/',
     '/Jni',
     '/mock/',
-    '/pybindings/',
     '/python/',
     '/Test',
     '/tests/',
@@ -186,4 +185,5 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
+    'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
 }

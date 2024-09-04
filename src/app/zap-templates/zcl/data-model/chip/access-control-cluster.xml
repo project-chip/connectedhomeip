@@ -130,7 +130,7 @@ limitations under the License.
     <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true">
       <description>This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.</description>
        <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ARL" array="true" type="AccessRestrictionStruct"/>
+      <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct"/>
      </command>
 
     <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">

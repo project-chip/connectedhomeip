@@ -37,6 +37,7 @@
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
+#include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -46,6 +47,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
@@ -56,6 +58,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
@@ -78,6 +81,7 @@ AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 
@@ -244,6 +248,7 @@ void ApplicationInit()
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
@@ -280,7 +285,6 @@ void ApplicationShutdown()
     Clusters::WaterHeaterMode::Shutdown();
 
     Clusters::WaterHeaterManagement::WhmApplicationShutdown();
-    Clusters::WaterHeaterMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
@@ -322,4 +326,13 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+
+using namespace chip::app::Clusters::Thermostat;
+void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // Register the delegate for the Thermostat
+    auto & delegate = ThermostatDelegate::GetInstance();
+
+    SetDefaultDelegate(endpoint, &delegate);
 }
