@@ -138,8 +138,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 7a: TH waits until T0+ 2 minutes and 45 seconds and confirms that
-          the DUT is still sending ADVs."
+          "Step 7a: TH waits until T0+ 2 minutes and 45 seconds and confirms
+          that the DUT is still sending ADVs."
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -192,8 +192,8 @@ tests:
 
     - label:
           "Step 8b: TH is configured to perform commissioning on Channel 44 in
-          5GHz band if it is in non-ETSI regulatory domains and on Channel 149 in
-          5GHz band if it is in ETSI regulatory domains."
+          5GHz band if it is in non-ETSI regulatory domains and on Channel 149
+          in 5GHz band if it is in ETSI regulatory domains."
       PICS: MCORE.COM.WIFI && !MCORE.COM.BLE && MCORE.DD.DISCOVERY_PAF
       verification: |
           [Configuration command to be filled by NXP]
