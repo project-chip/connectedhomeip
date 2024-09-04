@@ -211,7 +211,7 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         root = self._create_minimal_dt(device_type_id=root_node_id)
         nim = self._create_minimal_dt(device_type_id=nim_id)
         self.endpoints_tlv = {0: root, 1: nim}
-        asserts.assert_true(self._has_nim(), "Did not find NIM in generated device")
+        asserts.assert_true(self._has_device_type_supporting_macl(), "Did not find supported device in generated device")
 
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
         self.problems.extend(problems)

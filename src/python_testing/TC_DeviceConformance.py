@@ -56,12 +56,14 @@ class DeviceConformanceTests(BasicCompositionTests):
             self.fail_current_test(f"Unable to find {device_type_name} device type")
         return id[0]
 
-    def _has_nim(self):
-        nim_id = self._get_device_type_id('network infrastructure manager')
+    def _has_device_type_supporting_macl(self):
+        # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
+        # but these are not currently exposed directly by the device.
+        allowed_ids = [self._get_device_type_id('network infrastructure manager')]
         for endpoint in self.endpoints_tlv.values():
             desc = Clusters.Descriptor
             device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
-            if nim_id in device_types:
+            if set(allowed_ids).intersection(set(device_types)):
                 # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
                 return True
         return False
@@ -138,9 +140,9 @@ class DeviceConformanceTests(BasicCompositionTests):
                                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                     if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
                         # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
-                        if not self._has_nim():
+                        if not self._has_device_type_supporting_macl():
                             record_error(
-                                location=location, problem="MACL feature is disallowed if the Network Infrastructure Manager device type is not present")
+                                location=location, problem="MACL feature is disallowed if the a supported device type is not present")
                         continue
 
                     if f not in self.xml_clusters[cluster_id].features.keys():
