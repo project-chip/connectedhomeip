@@ -152,7 +152,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 7b: TH waits untilT0+ 15 minutes and checks if the DUT is
+          "Step 7b: TH waits until T0+ 15 minutes and checks if the DUT is
           sending ADVs."
       PICS: MCORE.COM.BLE
       verification: |
