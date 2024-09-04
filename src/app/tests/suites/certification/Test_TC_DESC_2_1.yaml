@@ -166,7 +166,7 @@ tests:
           [1724250131.543] [2998254:2998256] [TOO]       Revision: 3
           [1724250131.543] [2998254:2998256] [TOO]      }
 
-          ./chip-tool descriptor read  parts-list 1 4
+          ./chip-tool descriptor read parts-list 1 4
 
           Verify parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
