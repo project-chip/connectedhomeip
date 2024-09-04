@@ -82,17 +82,20 @@ class DRLK_COMMON:
     async def cleanup_users_and_credentials(self, user_clear_step, clear_credential_step, credentials, userIndex):
         if (self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
                 and self.check_pics("DRLK.S.C26.Rsp")):
-            self.print_step(clear_credential_step, "TH sends ClearCredential Command to DUT")
+            if clear_credential_step:
+                self.print_step(clear_credential_step, "TH sends ClearCredential Command to DUT")
             await self.send_clear_credential_cmd(credentials)
         if self.check_pics("DRLK.S.C1d.Rsp") and self.check_pics("DRLK.S.F08"):
-            self.print_step(user_clear_step, "TH sends ClearUser Command to DUT with the UserIndex as 1")
+            if user_clear_step:
+                self.print_step(user_clear_step, "TH sends ClearUser Command to DUT with the UserIndex as 1")
             await self.send_drlk_cmd_expect_success(
                 command=Clusters.Objects.DoorLock.Commands.ClearUser(userIndex=userIndex))
+        self.clear_credential_and_user_flag = False
 
     async def set_user_command(self):
         await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
             operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
-            userIndex=1,
+            userIndex=self.user_index,
             userName="xxx",
             userUniqueID=6452,
             userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
@@ -112,14 +115,18 @@ class DRLK_COMMON:
         length_of_pincode = random.randint(minPincodeLength, maxPincodeLength)
         return ''.join(random.choices(string.digits, k=length_of_pincode))
 
+    async def teardown(self):
+        if self.clear_credential_and_user_flag:
+            await self.cleanup_users_and_credentials(user_clear_step=None, clear_credential_step=None,
+                                                     credentials=self.createdCredential, userIndex=self.user_index)
+
     async def run_drlk_test_common(self, lockUnlockCommand, lockUnlockCmdRspPICS, lockUnlockText, doAutoRelockTest):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-
-        self.createdCredential = None
-
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.clear_credential_and_user_flag = True
 
         # Allow for user overrides of these values
+        self.user_index = self.user_params.get("user_index", 1)
+        self.endpoint = self.user_params.get("endpoint", 1)
         credentialIndex = self.user_params.get("credential_index", 1)
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
@@ -134,6 +141,7 @@ class DRLK_COMMON:
         invalidPincode = None
         credential = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                       credentialType=Clusters.DoorLock.Enums.CredentialTypeEnum.kPin)
+        self.createdCredential = credential
         self.print_step(0, "Commissioning, already done")
         requirePinForRemoteOperation_dut = False
         if self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F07"):
@@ -188,7 +196,7 @@ class DRLK_COMMON:
             credential_data_generated = await self.generate_pincode(max_pin_code_length, min_pin_code_length)
             pin_code = bytes(credential_data_generated, "ascii")
             if self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx"):
-                set_cred_response = await self.send_set_credential_cmd(userIndex=1,
+                set_cred_response = await self.send_set_credential_cmd(userIndex=self.user_index,
                                                                        operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
                                                                        credential=credential,
                                                                        credentialData=pin_code,
@@ -291,7 +299,7 @@ class DRLK_COMMON:
                 await self.send_drlk_cmd_expect_success(command=command)
 
                 await self.cleanup_users_and_credentials(user_clear_step="17", clear_credential_step="16",
-                                                         credentials=credentials, userIndex=1)
+                                                         credentials=credentials, userIndex=self.user_index)
 
         if doAutoRelockTest:
             if self.check_pics("DRLK.S.A0023"):
