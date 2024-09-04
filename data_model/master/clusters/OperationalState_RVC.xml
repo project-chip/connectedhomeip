@@ -108,10 +108,10 @@ Davis, CA 95616, USA
   <commands>
     <command id="0x00" name="Pause"/>
     <command id="0x01" name="Stop">
-      <deprecateConform/>
+      <disallowConform/>
     </command>
     <command id="0x02" name="Start">
-      <deprecateConform/>
+      <disallowConform/>
     </command>
     <command id="0x03" name="Resume"/>
     <command id="0x04" name="OperationalCommandResponse"/>

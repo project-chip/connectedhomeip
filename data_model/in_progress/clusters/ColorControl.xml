@@ -65,8 +65,10 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
-    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, EnhancedCurrentHue and RemainingTime attributes +
-             and added clarifications for behavior related to Step values"/>
+    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, ColorTemperatureMireds,
+             EnhancedCurrentHue and RemainingTime attributes.
+             Added clarifications for behavior related to Step values.
+             Added constraints on minimum acceptable color temperature values in mireds."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -291,7 +293,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250 (4000K)">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
@@ -666,14 +668,14 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="max" value="0x001F"/>
     </attribute>
-    <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
+    <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint type="between" from="1" to="65279"/>
     </attribute>
-    <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16" default="65279">
+    <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -699,7 +701,7 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint type="between" from="1" to="65279"/>
     </attribute>
   </attributes>
   <commands>

@@ -67,7 +67,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="EEVSEM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster is disallowed for this cluster">
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
       <disallowConform/>
     </feature>
   </features>
