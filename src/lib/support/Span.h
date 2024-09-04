@@ -392,7 +392,7 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
 
 /**
  * Copies a CharSpan into a MutableCharSpan.
- * If the span_to_copy does not fit in out_span, span_to_copy in truncated to fit in out_span.
+ * If the span_to_copy does not fit in out_span, span_to_copy is truncated to fit in out_span.
  * @param span_to_copy The CharSpan to copy.
  * @param out_span The MutableCharSpan in which span_to_copy is to be copied.
  */
