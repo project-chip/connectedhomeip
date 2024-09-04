@@ -138,7 +138,7 @@ public:
 
         if (isNullable)
         {
-            // Smallest negative value is excluded for nullable types.
+            // Smallest negative value is excluded for nullable signed types.
             return static_cast<WorkingType>(std::numeric_limits<WorkingType>::min() + 1);
         }
 
@@ -154,7 +154,7 @@ public:
 
         if (isNullable)
         {
-            // Largest value is excluded for nullable types.
+            // Largest value is excluded for nullable unsigned types.
             return static_cast<WorkingType>(std::numeric_limits<WorkingType>::max() - 1);
         }
 

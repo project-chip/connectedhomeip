@@ -221,7 +221,7 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
         constexpr WorkingType signedMin = -(static_cast<WorkingType>(1) << (8 * ByteSize - 1));
         if (isNullable)
         {
-            // We have one fewer value.
+            // Smallest negative value is excluded for nullable signed types.
             return signedMin + 1;
         }
 
@@ -237,10 +237,10 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
             return (static_cast<WorkingType>(1) << (8 * ByteSize - 1)) - 1;
         }
 
-        constexpr WorkingType unsignedMax = (static_cast<WorkingType>(1) << (8 * ByteSize));
+        constexpr WorkingType unsignedMax = (static_cast<WorkingType>(1) << (8 * ByteSize)) - 1;
         if (isNullable)
         {
-            // Largest value is excluded for nullable types.
+            // Largest value is excluded for nullable unsigned types.
             return unsignedMax - 1;
         }
 
