@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,8 +25,8 @@ import matter.tlv.TlvWriter
 
 class AccessControlClusterFabricRestrictionReviewUpdateEvent(
   val token: ULong,
-  val instruction: String?,
-  val redirectURL: String?,
+  val instruction: Optional<String>,
+  val redirectURL: Optional<String>,
   val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
@@ -41,15 +42,13 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TOKEN), token)
-      if (instruction != null) {
-        put(ContextSpecificTag(TAG_INSTRUCTION), instruction)
-      } else {
-        putNull(ContextSpecificTag(TAG_INSTRUCTION))
+      if (instruction.isPresent) {
+        val optinstruction = instruction.get()
+        put(ContextSpecificTag(TAG_INSTRUCTION), optinstruction)
       }
-      if (redirectURL != null) {
-        put(ContextSpecificTag(TAG_REDIRECT_URL), redirectURL)
-      } else {
-        putNull(ContextSpecificTag(TAG_REDIRECT_URL))
+      if (redirectURL.isPresent) {
+        val optredirectURL = redirectURL.get()
+        put(ContextSpecificTag(TAG_REDIRECT_URL), optredirectURL)
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -69,18 +68,16 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
       tlvReader.enterStructure(tlvTag)
       val token = tlvReader.getULong(ContextSpecificTag(TAG_TOKEN))
       val instruction =
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INSTRUCTION))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION)))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_INSTRUCTION))
-          null
+          Optional.empty()
         }
       val redirectURL =
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_REDIRECT_URL))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_REDIRECT_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_REDIRECT_URL)))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_REDIRECT_URL))
-          null
+          Optional.empty()
         }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 

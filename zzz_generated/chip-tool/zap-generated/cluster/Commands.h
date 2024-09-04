@@ -1273,8 +1273,7 @@ private:
 | Events:                                                             |        |
 | * AccessControlEntryChanged                                         | 0x0000 |
 | * AccessControlExtensionChanged                                     | 0x0001 |
-| * AccessRestrictionEntryChanged                                     | 0x0002 |
-| * FabricRestrictionReviewUpdate                                     | 0x0003 |
+| * FabricRestrictionReviewUpdate                                     | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -16283,16 +16282,12 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadEvent>(Id, "access-control-entry-changed", Events::AccessControlEntryChanged::Id, credsIssuerConfig), //
         make_unique<ReadEvent>(Id, "access-control-extension-changed", Events::AccessControlExtensionChanged::Id,
                                credsIssuerConfig), //
-        make_unique<ReadEvent>(Id, "access-restriction-entry-changed", Events::AccessRestrictionEntryChanged::Id,
-                               credsIssuerConfig), //
         make_unique<ReadEvent>(Id, "fabric-restriction-review-update", Events::FabricRestrictionReviewUpdate::Id,
                                credsIssuerConfig),          //
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "access-control-entry-changed", Events::AccessControlEntryChanged::Id,
                                     credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "access-control-extension-changed", Events::AccessControlExtensionChanged::Id,
-                                    credsIssuerConfig), //
-        make_unique<SubscribeEvent>(Id, "access-restriction-entry-changed", Events::AccessRestrictionEntryChanged::Id,
                                     credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "fabric-restriction-review-update", Events::FabricRestrictionReviewUpdate::Id,
                                     credsIssuerConfig), //

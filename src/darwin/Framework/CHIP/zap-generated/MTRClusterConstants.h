@@ -7141,8 +7141,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster AccessControl events
     MTREventIDTypeClusterAccessControlEventAccessControlEntryChangedID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
     MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
-    MTREventIDTypeClusterAccessControlEventAccessRestrictionEntryChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster Actions deprecated event names
     MTRClusterActionsEventStateChangedID

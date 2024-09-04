@@ -3096,7 +3096,7 @@ class AccessControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000001F
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[str] = 'ReviewFabricRestrictionsResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3388,7 +3388,7 @@ class AccessControl(Cluster):
             fabricIndex: 'uint' = 0
 
         @dataclass
-        class AccessRestrictionEntryChanged(ClusterEvent):
+        class FabricRestrictionReviewUpdate(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0000001F
@@ -3401,34 +3401,15 @@ class AccessControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            fabricIndex: 'uint' = 0
-
-        @dataclass
-        class FabricRestrictionReviewUpdate(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0000001F
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000003
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
                         ClusterObjectFieldDescriptor(Label="token", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="instruction", Tag=1, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="redirectURL", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="instruction", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="redirectURL", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             token: 'uint' = 0
-            instruction: 'typing.Union[Nullable, str]' = NullValue
-            redirectURL: 'typing.Union[Nullable, str]' = NullValue
+            instruction: 'typing.Optional[str]' = None
+            redirectURL: 'typing.Optional[str]' = None
             fabricIndex: 'uint' = 0
 
 

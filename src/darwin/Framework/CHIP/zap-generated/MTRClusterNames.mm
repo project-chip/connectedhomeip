@@ -9507,10 +9507,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"AccessControlExtensionChanged";
             break;
 
-        case MTREventIDTypeClusterAccessControlEventAccessRestrictionEntryChangedID:
-            result = @"AccessRestrictionEntryChanged";
-            break;
-
         case MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID:
             result = @"FabricRestrictionReviewUpdate";
             break;
