@@ -124,7 +124,7 @@ static void DHCPTimerEventHandler(void * arg)
     WfxPostEvent(&event);
 }
 
-static void CancelDHCPTimer()
+static void CancelDHCPTimer(void)
 {
     osStatus_t status;
 
@@ -267,7 +267,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
 // Required to invoke button press event during sleep as falling edge is not detected
-void sl_si91x_invoke_btn_press_event()
+void sl_si91x_invoke_btn_press_event(void)
 {
     // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
     if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
@@ -303,12 +303,12 @@ void sl_si91x_invoke_btn_press_event()
 #endif // SLI_SI91X_MCU_INTERFACE
 
 /******************************************************************
- * @fn   wfx_rsi_power_save()
+ * @fn   wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
  * @brief
  *       Setting the RS911x in DTIM sleep based mode
  *
  * @param[in] sl_si91x_ble_state : State to set for the BLE
-              sl_si91x_wifi_state : State to set for the WiFi
+ * @param[in] sl_si91x_wifi_state : State to set for the WiFi
  * @return
  *        None
  *********************************************************************/
@@ -704,14 +704,14 @@ static sl_status_t wfx_rsi_do_join(void)
 /// NotifyConnectivity
 /// @brief Notify the application about the connectivity status if it has not been notified yet.
 ///        Helper function for HandleDHCPPolling.
-void NotifyConnectivity()
+void NotifyConnectivity(void)
 {
     VerifyOrReturn(!hasNotifiedWifiConnectivity);
     wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
     hasNotifiedWifiConnectivity = true;
 }
 
-void HandleDHCPPolling()
+void HandleDHCPPolling(void)
 {
     struct netif * sta_netif;
     WfxEvent_t event;
@@ -769,7 +769,7 @@ void WfxPostEvent(WfxEvent_t * event)
 /// ResetDHCPNotificationFlags
 /// @brief Reset the flags that are used to notify the application about DHCP connectivity
 ///        and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
-void ResetDHCPNotificationFlags()
+void ResetDHCPNotificationFlags(void)
 {
     WfxEvent_t outEvent;
 
@@ -886,7 +886,7 @@ void ProcessEvent(WfxEvent_t inEvent)
 /*********************************************************************************
  * @fn  void wfx_rsi_task(void *arg)
  * @brief
- * The main WLAN task - started by wfx_wifi_start () that interfaces with RSI.
+ * The main WLAN task - started by wfx_wifi_start() that interfaces with RSI.
  * The rest of RSI stuff come in call-backs.
  * The initialization has been already done.
  * @param[in] arg:

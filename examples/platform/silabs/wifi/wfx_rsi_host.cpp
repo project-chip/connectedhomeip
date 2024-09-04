@@ -182,7 +182,8 @@ sl_status_t wfx_connect_to_ap(void)
 #if SL_ICD_ENABLED
 #if SLI_SI917
 /*********************************************************************
- * @fn  sl_status_t wfx_power_save()
+ * @fn  sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t
+ sl_si91x_wifi_state)
  * @brief
  *      Implements the power save in sleepy application
  * @param[in]  sl_si91x_ble_state : State to set for the BLE
@@ -196,14 +197,14 @@ sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 }
 #else  // For RS9116
 /*********************************************************************
- * @fn  sl_status_t wfx_power_save()
+ * @fn  sl_status_t wfx_power_save(void)
  * @brief
  *      Implements the power save in sleepy application
  * @param[in]  None
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save()
+sl_status_t wfx_power_save(void)
 {
     return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
@@ -240,14 +241,14 @@ bool wfx_is_sta_connected(void)
 }
 
 /*********************************************************************
- * @fn  wifi_mode_t wfx_get_wifi_mode()
+ * @fn  wifi_mode_t wfx_get_wifi_mode(void)
  * @brief
  *      get the wifi mode
  * @param[in]  None
  * @return  return WIFI_MODE_NULL if successful,
  *          WIFI_MODE_STA otherwise
  ***********************************************************************/
-wifi_mode_t wfx_get_wifi_mode()
+wifi_mode_t wfx_get_wifi_mode(void)
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY)
         return WIFI_MODE_STA;
@@ -340,14 +341,14 @@ int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 }
 
 /***************************************************************************
- * @fn   int32_t wfx_reset_counts(){
+ * @fn   int32_t wfx_reset_counts(void)
  * @brief
  *      get the driver reset count
  * @param[in]  None
  * @return
  *      reset count
  *****************************************************************************/
-int32_t wfx_reset_counts()
+int32_t wfx_reset_counts(void)
 {
     return wfx_rsi_reset_count();
 }

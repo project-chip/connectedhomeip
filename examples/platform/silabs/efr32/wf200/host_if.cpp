@@ -137,7 +137,7 @@ extern uint32_t gOverrunCount;
  * @brief
  * Creates WFX events processing task.
  ******************************************************************************/
-static void wfx_events_task_start()
+static void wfx_events_task_start(void)
 {
     /* create an event group to track Wi-Fi events */
     sl_wfx_event_group = xEventGroupCreateStatic(&wfxEventGroup);
@@ -854,7 +854,7 @@ error_handler:
  *    reset the count
  * @return returns -1
  **************************************************************************/
-int32_t wfx_reset_counts()
+int32_t wfx_reset_counts(void)
 {
     /* TODO */
     return -1;
@@ -1117,7 +1117,7 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif) {}
  * @return returns WIFI_MODE_NULL if sucessful,
  *         WIFI_MODE_STA otherwise
  *****************************************************************************/
-wifi_mode_t wfx_get_wifi_mode()
+wifi_mode_t wfx_get_wifi_mode(void)
 {
     if (wifiContext.state & SL_WFX_STARTED)
         return WIFI_MODE_STA;
