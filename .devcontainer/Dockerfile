@@ -51,13 +51,22 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN mkdir -p /opt/sdk/sdks/ \
     && chown -R $USERNAME:$USERNAME \
     /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
-    /opt/NordicSemiconductor/nrfconnect/ `# $USERNAME needs to own west configuration to build nRF Connect examples` \
-    $IDF_PATH `# $USERNAME needs to own the esp-idf and tools for the examples to build` \
+    $ANDROID_HOME \
     $IDF_TOOLS_PATH \
-    $SYSROOT_AARCH64 `# allow read/write access to header and libraries` \
-    $ANDROID_HOME `# allow licenses to be accepted` \
-    $AMEBA_PATH `# AmebaD requires access to change build_info.h` \
-    $IMX_SDK_ROOT \
+    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
+    && chmod -R +x \
+    $ANDROID_HOME/tools/bin `# sdkmanager for accepting licenses`\
+    && chmod -R +w \
+    $IDF_TOOLS_PATH \
+    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chmod -R +w \
+    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chmod -R +w \
+    # Safe directory is preffered over chown.
+    && git config --global --add safe.directory "*" \
     && :
 
 # Fix Tizen SDK paths for new user
