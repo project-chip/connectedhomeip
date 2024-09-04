@@ -41,6 +41,7 @@
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 extern "C" {
@@ -539,8 +540,8 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     {
         memset(&cur_scan_result, 0, sizeof(cur_scan_result));
 
-        cur_scan_result.ssid_length =
-            strnlen((char *) scan_result->scan_info[idx].ssid, MIN(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
+        cur_scan_result.ssid_length = strnlen((char *) scan_result->scan_info[idx].ssid,
+                                              chip::min<size_t>(sizeof(scan_result->scan_info[idx].ssid), WFX_MAX_SSID_LENGTH));
         chip::Platform::CopyString(cur_scan_result.ssid, cur_scan_result.ssid_length, (char *) scan_result->scan_info[idx].ssid);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid

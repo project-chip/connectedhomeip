@@ -43,6 +43,7 @@
 #include "dhcp_client.h"
 #include "ethernetif.h"
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -735,7 +736,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t signal_strength;
 
-    ap->ssid_length = strnlen(ap_info.ssid, MIN(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
+    ap->ssid_length = strnlen(ap_info.ssid, chip::min<size_t>(sizeof(ap_info.ssid), WFX_MAX_SSID_LENGTH));
     chip::Platform::CopyString(ap->ssid, ap->ssid_length, ap_info.ssid);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
@@ -1173,7 +1174,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(scan_cb != nullptr, false);
     if (ssid)
     {
-        scan_ssid_length = strnlen(ssid, MIN(sizeof(ssid), WFX_MAX_SSID_LENGTH));
+        scan_ssid_length = strnlen(ssid, chip::min<size_t>(sizeof(ssid), WFX_MAX_SSID_LENGTH));
         scan_ssid        = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(scan_ssid_length));
         VerifyOrReturnError(scan_ssid != nullptr, false);
         Platform::CopyString(scan_ssid, scan_ssid_length, ssid);
