@@ -802,8 +802,10 @@ void BaseApplication::ScheduleFactoryReset()
         {
             Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
-        // Delete all fabrics.
+#if SL_WIFI
+        // Delete all fabrics and clear wifi provision.
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+#endif
         PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
                                                   // basic information cluster it seems. And triggers and Event flush, which is not
                                                   // relevant when there are no fabrics left
