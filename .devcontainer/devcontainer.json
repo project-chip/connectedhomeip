@@ -17,6 +17,9 @@
     "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 74",
     "image": "matter-dev-environment:local",
     "remoteUser": "vscode",
+    "containerEnv": {
+        "PW_ENVIRONMENT_ROOT": "/workspaces/connectedhomeip/.environment-vscode"
+    },
     "customizations": {
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created in the array below.

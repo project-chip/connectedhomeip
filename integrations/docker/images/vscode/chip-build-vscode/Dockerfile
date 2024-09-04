@@ -130,7 +130,6 @@ ENV NXP_K32W0_SDK_ROOT=/opt/k32w/core
 ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
 ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
-ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
