@@ -36,7 +36,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif
 }
 
-- (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
+- (instancetype)initInternalWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase isCrossTest:(BOOL)isCrossTest
 {
 #if !HAVE_NSTASK
     XCTFail("Unable to start server app when we do not have NSTask");
@@ -75,6 +75,8 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
         [NSString stringWithFormat:@"%llu", passcode.unsignedLongLongValue],
         @"--KVS",
         [NSString stringWithFormat:@"/tmp/chip-%@-kvs%u", name, _uniqueIndex],
+        @"--product-id",
+        [NSString stringWithFormat:@"%u", parsedPayload.productID.unsignedShortValue],
     ];
 
     __auto_type * allArguments = [forcedArguments arrayByAddingObjectsFromArray:arguments];
@@ -90,12 +92,26 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
     _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
 
-    [testcase launchTask:_appTask];
+    if (isCrossTest) {
+        [testcase launchCrossTestTask:_appTask];
+    } else {
+        [testcase launchTask:_appTask];
+    }
 
-    NSLog(@"Started chip-%@-app with arguments %@ stdout=%@ and stderr=%@", name, allArguments, outFile, errorFile);
+    NSLog(@"Started chip-%@-app (%@) with arguments %@ stdout=%@ and stderr=%@", name, _appTask, allArguments, outFile, errorFile);
 
     return self;
 #endif // HAVE_NSTASK
+}
+
+- (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
+{
+    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:NO];
+}
+
+- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
+{
+    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:YES];
 }
 
 + (unsigned)nextUniqueIndex

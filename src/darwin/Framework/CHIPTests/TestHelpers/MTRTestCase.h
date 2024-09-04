@@ -47,6 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
  * tearDown happens.
  */
 - (void)launchTask:(NSTask *)task;
+
+/**
+ * Launch a cross-test task.  The task will be automatically terminated when the testsuite
+ * tearDown happens.
+ */
+- (void)launchCrossTestTask:(NSTask *)task;
 #endif // HAVE_NSTASK
 
 /**

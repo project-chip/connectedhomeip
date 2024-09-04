@@ -38,12 +38,6 @@ namespace ServiceArea {
 class RvcServiceAreaDelegate : public Delegate
 {
 private:
-    // containers for array attributes.
-    std::vector<ServiceArea::AreaStructureWrapper> mSupportedAreas;
-    std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
-    std::vector<uint32_t> mSelectedAreas;
-    std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
-
     RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
     IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
     RvcDevice * mHandleSkipAreaDeviceInstance;
@@ -84,81 +78,9 @@ public:
 
     bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
-    //*************************************************************************
-    // Supported Areas accessors
-
     bool IsSupportedAreasChangeAllowed() override;
 
-    uint32_t GetNumberOfSupportedAreas() override;
-
-    bool GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & supportedArea) override;
-
-    bool GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & supportedArea) override;
-
-    bool AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex) override;
-
-    bool ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea) override;
-
-    bool ClearSupportedAreas() override;
-
-    /**
-     * This is a more sophisticated way of ensuring that we all attributes are still valid when a supported area is removed.
-     * Rather than clearing all the attributes that depend on the supported aeras, we only remove the elements that point to
-     * the removed supported areas.
-     */
-    void HandleSupportedAreasUpdated() override;
-
-    /**
-     * Note: Call the HandleSupportedAreasUpdated() method when finished removing supported areas.
-     */
-    bool RemoveSupportedArea(uint32_t areaId);
-
-    //*************************************************************************
-    // Supported Maps accessors
-
     bool IsSupportedMapChangeAllowed() override;
-
-    uint32_t GetNumberOfSupportedMaps() override;
-
-    bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
-
-    bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
-
-    bool ClearSupportedMaps() override;
-
-    bool RemoveSupportedMap(uint32_t mapId);
-
-    //*************************************************************************
-    // Selected Areas accessors
-
-    uint32_t GetNumberOfSelectedAreas() override;
-
-    bool GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea) override;
-
-    bool AddSelectedArea(uint32_t aAreaId, uint32_t & listIndex) override;
-
-    bool ClearSelectedAreas() override;
-
-    //*************************************************************************
-    // Progress accessors
-
-    uint32_t GetNumberOfProgressElements() override;
-
-    bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
-
-    bool ModifyProgressElement(uint32_t listIndex,
-                               const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
-
-    bool ClearProgress() override;
 
     //*************************************************************************
     // RVC device callback setters

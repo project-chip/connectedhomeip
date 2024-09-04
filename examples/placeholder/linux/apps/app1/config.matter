@@ -2704,6 +2704,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   request struct KeepActiveRequest {
     int32u stayActiveDuration = 0;
+    int32u timeoutMs = 1;
   }
 
   /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
@@ -6651,7 +6652,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
+/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -6689,6 +6690,10 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeDefault = 2;
   }
 
+  info event OccupancyChanged = 0 {
+    OccupancyBitmap occupancy = 0;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
@@ -6709,6 +6714,50 @@ cluster OccupancySensing = 1030 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Manage the Thread network of Thread Border Router */
+provisional cluster ThreadBorderRouterManagement = 1106 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kPANChange = 0x1;
+  }
+
+  provisional readonly attribute char_string<63> borderRouterName = 0;
+  provisional readonly attribute octet_string<254> borderAgentID = 1;
+  provisional readonly attribute int16u threadVersion = 2;
+  provisional readonly attribute boolean interfaceEnabled = 3;
+  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct DatasetResponse = 2 {
+    octet_string<254> dataset = 0;
+  }
+
+  request struct SetActiveDatasetRequestRequest {
+    octet_string<254> activeDataset = 0;
+    optional int64u breadcrumb = 1;
+  }
+
+  request struct SetPendingDatasetRequestRequest {
+    octet_string<254> pendingDataset = 0;
+  }
+
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
 }
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
@@ -9570,10 +9619,10 @@ endpoint 1 {
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x00;
     ram      attribute colorCapabilities default = 0x00;
-    ram      attribute colorTempPhysicalMinMireds default = 0x00;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xfeff;
+    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
+    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
+    ram      attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 7;
 
@@ -9613,6 +9662,27 @@ endpoint 1 {
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     callback attribute featureMap;
     callback attribute clusterRevision default = 5;
+  }
+
+  server cluster ThreadBorderRouterManagement {
+    callback attribute borderRouterName;
+    callback attribute borderAgentID;
+    callback attribute threadVersion;
+    callback attribute interfaceEnabled;
+    callback attribute activeDatasetTimestamp;
+    callback attribute pendingDatasetTimestamp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command GetActiveDatasetRequest;
+    handle command GetPendingDatasetRequest;
+    handle command DatasetResponse;
+    handle command SetActiveDatasetRequest;
+    handle command SetPendingDatasetRequest;
   }
 }
 

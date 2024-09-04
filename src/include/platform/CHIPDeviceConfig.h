@@ -147,6 +147,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ *
+ * The maximum value of time in milliseconds that the sleepy end device can use as an idle interval in the SIT mode.
+ * The Matter spec does not allow this value to exceed 15s (spec 9.16.1.5).
+ * For the SIT device, the usability of this value is arguable, as slow poll interval can be configured using
+ * CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL. This value can be used for the LIT device, to limit the slow poll interval used while
+ * temporarily working in the SIT mode.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#define CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT System::Clock::Milliseconds32(15000)
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.

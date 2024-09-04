@@ -103,7 +103,7 @@ public:
      * @return CHIP_NO_ERROR if the preset was appended to the list successfully.
      * @return CHIP_ERROR if there was an error adding the preset to the list.
      */
-    virtual CHIP_ERROR AppendToPendingPresetList(const Structs::PresetStruct::Type & preset) = 0;
+    virtual CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) = 0;
 
     /**
      * @brief Get the Preset at a given index in the pending presets list.

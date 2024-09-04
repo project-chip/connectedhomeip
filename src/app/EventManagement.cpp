@@ -556,14 +556,16 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
-                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest,
+                                     .requestType = Access::RequestType::kEventReadRequest,
                                      .entityId    = event.mEventId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);
+        ReturnErrorCodeIf((accessControlError != CHIP_ERROR_ACCESS_DENIED) &&
+                              (accessControlError != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
+                          accessControlError);
         ret = CHIP_ERROR_UNEXPECTED_EVENT;
     }
 

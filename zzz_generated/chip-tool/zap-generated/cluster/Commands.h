@@ -3528,6 +3528,7 @@ public:
         ClusterCommand("keep-active", credsIssuerConfig)
     {
         AddArgument("StayActiveDuration", 0, UINT32_MAX, &mRequest.stayActiveDuration);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ClusterCommand::AddArguments();
     }
 
@@ -10994,6 +10995,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * OccupancyChanged                                                  | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -13800,9 +13802,8 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * RemovedOn                                                         | 0x0000 |
-| * DeviceDirectory                                                   | 0x0001 |
-| * LocationDirectory                                                 | 0x0002 |
+| * DeviceDirectory                                                   | 0x0000 |
+| * LocationDirectory                                                 | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -13885,8 +13886,6 @@ public:
     {
         AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
         AddArgument("ResponseTimeoutSeconds", 0, UINT16_MAX, &mRequest.responseTimeoutSeconds);
-        AddArgument("IpAddress", &mRequest.ipAddress);
-        AddArgument("Port", 0, UINT16_MAX, &mRequest.port);
         ClusterCommand::AddArguments();
     }
 
@@ -24520,8 +24519,10 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadEvent>(Id, "occupancy-changed", Events::OccupancyChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeEvent>(Id, "occupancy-changed", Events::OccupancyChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -26803,7 +26804,6 @@ void registerClusterEcosystemInformation(Commands & commands, CredentialIssuerCo
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "removed-on", Attributes::RemovedOn::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "device-directory", Attributes::DeviceDirectory::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "location-directory", Attributes::LocationDirectory::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -26813,8 +26813,6 @@ void registerClusterEcosystemInformation(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(
-            Id, "removed-on", 0, UINT64_MAX, Attributes::RemovedOn::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>>>(
             Id, "device-directory", Attributes::DeviceDirectory::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -26835,7 +26833,6 @@ void registerClusterEcosystemInformation(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "removed-on", Attributes::RemovedOn::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "device-directory", Attributes::DeviceDirectory::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "location-directory", Attributes::LocationDirectory::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //

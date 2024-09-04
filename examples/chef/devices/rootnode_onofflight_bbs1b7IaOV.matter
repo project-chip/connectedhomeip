@@ -2032,7 +2032,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-endpoint 1 {
+endpoint 13 {
   device type ma_onofflight = 256, version 1;
 
   binding cluster Binding;

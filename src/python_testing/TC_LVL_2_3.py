@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -33,7 +33,7 @@ import time
 import chip.clusters as Clusters
 import test_plan_support
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, per_endpoint_test)
+                                    has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -57,8 +57,8 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(7, f"{THcommand} MoveToLevelWithOnOff with Level field set to maxLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(8, "TH stores the reported values of CurrentLevel in all incoming reports for CurrentLevel attribute, that contains data in reportedCurrentLevelValuesList, over a period of 30 seconds."),
-                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 10 entries for CurrentLevel",
-                         "reportedCurrentLevelValuesList has 10 or less entries in the list"),
+                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 12 entries for CurrentLevel",
+                         "reportedCurrentLevelValuesList has 12 or fewer entries in the list"),
                 TestStep(10, "If reportedCurrentLevelValuesList only contain a single entry, TH verifies the value of the entry is equal to maxLevel",
                          "The entry in reportedCurrentLevelValuesList is equal to maxLevel"),
                 TestStep(11, "If reportedCurrentLevelValuesList contains two or more entries, TH verifies the value of the first entry is larger than startCurrentLevel",
@@ -84,7 +84,7 @@ class TC_LVL_2_3(MatterBaseTest):
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
 
-    @per_endpoint_test(has_cluster(Clusters.LevelControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
     async def test_TC_LVL_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -133,7 +133,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(9)
         count = sub_handler.attribute_report_counts[lvl.Attributes.CurrentLevel]
-        asserts.assert_less_equal(count, 10, "Received more than 10 reports for CurrentLevel")
+        asserts.assert_less_equal(count, 12, "Received more than 12 reports for CurrentLevel")
         asserts.assert_greater(count, 0, "Did not receive any reports for CurrentLevel")
 
         self.step(10)
