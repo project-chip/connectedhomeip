@@ -216,8 +216,8 @@ void DeviceSynchronizer::GetUniqueId()
     VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
 
     auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
-    // If there is no associated remote Fabric Sync Aggregator there is no other places for us to try
-    // getting the UniqueId fron and can return leaving the state in ReceivedResponse.
+    // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
+    // getting the UniqueId from and can return leaving the state in ReceivedResponse.
     VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
 
     // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
@@ -236,7 +236,7 @@ void DeviceSynchronizer::GetUniqueId()
                 }
                 else
                 {
-                    ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator");
+                    ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
                 }
                 this->SynchronizationCompleteAddDevice();
             },
