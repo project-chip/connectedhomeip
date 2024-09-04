@@ -44,7 +44,7 @@ tests:
           Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
           Make a note of all the items(Endpoint id’s) in the list. In the below example there are 4 endpoint id's listed [1, 2, 3, 4]
 
-          ./chip-tool descriptor read  parts-list 1 0
+          ./chip-tool descriptor read parts-list 1 0
 
           Verify "PartsList" attribute is not empty (use this list of endpoints in step 1b) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
