@@ -36,7 +36,7 @@ The state feedback is provided through LED effects:
 | RGB LED | on | The `OnOff` attribute of the `On/Off` cluster is `true` (simulating device turned on). |
 | RGB LED | off | The `OnOff` attribute of the `On/Off` cluster is `false` (simulating device turned off). |
 
-NOTE: `LED2` will be disabled when OTA is used. On K32W1 EVK board, `PTB0` is
+NOTE: `LED2` will be disabled when OTA is used. On `FRDM-MCXW71` board, `PTB0` is
 wired to both `LED2` and CS (Chip Select) of the External Flash Memory.
 Since the OTA image is stored in external memory, `LED2` operations will affect
 OTA operation by corrupting packages and OTA will not work.
@@ -78,8 +78,8 @@ from `NBU` domain.
 
 Note: These instances and global variables are placed in `SMU2` memory through name
 matching in the application linker script. They should not be changed or, if
-changed, the names must be updated in `k32w1_app.ld`. See
-[k32w1_app.ld](../../../platform/nxp/mcxw71_k32w1/app/ldscripts/k32w1_app.ld)
+changed, the names must be updated in `app.ld`. See
+[app.ld](../../../platform/nxp/mcxw71_k32w1/app/ldscripts/app.ld)
 for names and `SMU2` memory range size.
 
 When compiling the application as an OT Full Thread Device (`chip_openthread_ftd=true`), using `use_smu2_static=true` gn arg will cause the following symbols to be moved to `SMU2` area:
@@ -119,16 +119,45 @@ path -
 
 ### Flashing the `NBU` image
 
-`NBU` image should be written only when a new NXP-SDK is released.
+`NBU` image should be written only when a new NXP SDK is released.
 
-[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK)
-can be used for updating the `NBU/radio` core:
+1. Install [Secure Provisioning SDK tool](https://www.nxp.com/design/design-center/software/development-software/secure-provisioning-sdk-spsdk:SPSDK) using Python:
 
--   Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command
-    Line Tool)
--   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
-    .sb3 file found in the SDK package at path
-    `middleware\wireless\ieee-802.15.4\bin\k32w1\`
+    ```
+    pip install spsdk
+    ```
+
+    Note: There might be some dependencies that cause conflicts with
+    already installed Python modules. However, `blhost` tool is still
+    installed and can be used.
+
+2. Updating `NBU` for Wireless examples
+
+    It is necessary to work with the matching NBU image for the SDK
+    version of the application you are working with. This means that
+    when you download your SDK, prior to loading any wireless SDK example,
+    update your NBU image with the SDK provided binaries. For `FRDM` users,
+    please write the following binary:
+
+    `middleware\wireless\ieee-802.15.4\bin\mcxw71\mcxw71_nbu_ble_15_4_dyn_matter_<nbu_version>.sb3`
+
+    Please note that `<nbu_version>` may vary depending on the SDK version.
+
+    1. Place your device in `ISP` mode.
+        - Make sure a jumper is placed on `JP25`
+        - Press and hold `SW4`, press and release Reset, then release `SW4`
+
+    2. Once the device is connected, you may find the assigned port by running:
+
+        ```
+        nxpdevscan
+        ```
+
+    3. Run the `blhost` command to write the `sb3` file:
+
+        ```
+        blhost -p <assigned_port> receive-sb-file <path_to_SDK>\middleware\wireless\ieee-802.15.4\bin\mcxw71\mcxw71_nbu_ble_15_4_dyn_matter_<nbu_version>.sb3
+        ```
 
 ### Flashing the host image
 
@@ -164,7 +193,7 @@ One option for debugging would be to use MCUXpresso IDE.
 -   Drag-and-drop the zip file containing the NXP SDK in the "Installed SDKs"
     tab:
 
-![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/installed_sdks.jpg)
+![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_installed_sdks.jpg)
 
 -   Import any demo application from the installed SDK:
 
@@ -200,7 +229,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 Run -> Debug Configurations... -> C/C++ Application
 ```
 
-![Debug MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/debug_k32w1.jpg)
+![Debug MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_debug.jpg)
 
 ## Running RPC console
 
