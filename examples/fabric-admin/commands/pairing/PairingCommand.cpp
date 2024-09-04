@@ -21,15 +21,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <commands/common/DeviceScanner.h>
 #include <commands/interactive/InteractiveCommands.h>
-#include <commands/pairing/DeviceSynchronization.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <device_manager/DeviceSynchronization.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
 
 #include <string>
 
@@ -39,6 +40,28 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+
+namespace {
+
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
+{
+    VerifyOrReturnValue(setUpCode, CHIP_ERROR_INVALID_ARGUMENT);
+    bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -105,10 +128,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-    if (mBypassAttestationVerifier.ValueOr(false))
-    {
-        params.SetDeviceAttestationDelegate(this);
-    }
+    params.SetDeviceAttestationDelegate(this);
 
     switch (mNetworkType)
     {
@@ -403,7 +423,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(CurrentCommissioner(), mNodeId, mDeviceIsICD);
+        // CurrentCommissioner() has a lifetime that is the entire life of the application itself
+        // so it is safe to provide to StartDeviceSynchronization.
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(&CurrentCommissioner(), mNodeId, mDeviceIsICD);
     }
     else
     {
@@ -464,7 +486,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
+    clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -544,6 +566,8 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
 #if defined(PW_RPC_ENABLED)
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(command->CurrentCommissioner().GetFabricIndex(),
+                                                                                nodeId);
         RemoveSynchronizedDevice(nodeId);
 #endif
     }
@@ -564,8 +588,19 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
 chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
 {
-    // We don't need to set additional failsafe timeout as we don't ask the final user if he wants to continue
+    // No manual input, so do not need to extend.
     return chip::Optional<uint16_t>();
+}
+
+bool PairingCommand::ShouldWaitAfterDeviceAttestation()
+{
+    // If there is a vendor ID and product ID, request OnDeviceAttestationCompleted().
+    // Currently this is added in the case that the example is performing reverse commissioning,
+    // but it would be an improvement to store that explicitly.
+    // TODO: Issue #35297 - [Fabric Sync] Improve where we get VID and PID when validating CCTRL CommissionNode command
+    SetupPayload payload;
+    CHIP_ERROR err = GetPayload(mOnboardingPayload, payload);
+    return err == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0);
 }
 
 void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
@@ -573,9 +608,62 @@ void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommis
                                                   const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                                   chip::Credentials::AttestationVerificationResult attestationResult)
 {
-    // Bypass attestation verification, continue with success
-    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
-        device, chip::Credentials::AttestationVerificationResult::kSuccess);
+    SetupPayload payload;
+    CHIP_ERROR parse_error = GetPayload(mOnboardingPayload, payload);
+    if (parse_error == CHIP_NO_ERROR && (payload.vendorID != 0 || payload.productID != 0))
+    {
+        if (payload.vendorID == 0 || payload.productID == 0)
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation: vendorID or productID must not be 0."
+                            "Requested VID: %u, Requested PID: %u.",
+                            payload.vendorID, payload.productID);
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device, chip::Credentials::AttestationVerificationResult::kInvalidArgument);
+            return;
+        }
+
+        if (payload.vendorID != info.BasicInformationVendorId() || payload.productID != info.BasicInformationProductId())
+        {
+            ChipLogProgress(NotSpecified,
+                            "Failed validation of vendorID or productID."
+                            "Requested VID: %u, Requested PID: %u,"
+                            "Detected VID: %u, Detected PID %u.",
+                            payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
+            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+                device,
+                payload.vendorID == info.BasicInformationVendorId()
+                    ? chip::Credentials::AttestationVerificationResult::kDacProductIdMismatch
+                    : chip::Credentials::AttestationVerificationResult::kDacVendorIdMismatch);
+            return;
+        }
+
+        // NOTE: This will log errors even if the attestion was successful.
+        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
+        if (CHIP_NO_ERROR != err)
+        {
+            SetCommandExitStatus(err);
+        }
+        return;
+    }
+
+    // OnDeviceAttestationCompleted() is called if ShouldWaitAfterDeviceAttestation() returns true
+    // or if there is an attestation error. The conditions for ShouldWaitAfterDeviceAttestation() have
+    // already been checked, so the call to OnDeviceAttestationCompleted() was an error.
+    if (mBypassAttestationVerifier.ValueOr(false))
+    {
+        // Bypass attestation verification, continue with success
+        auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            device, chip::Credentials::AttestationVerificationResult::kSuccess);
+        if (CHIP_NO_ERROR != err)
+        {
+            SetCommandExitStatus(err);
+        }
+        return;
+    }
+
+    // Don't bypass attestation, continue with error.
+    auto err = deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, attestationResult);
     if (CHIP_NO_ERROR != err)
     {
         SetCommandExitStatus(err);

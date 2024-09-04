@@ -24,7 +24,6 @@ from typing import Any, Optional, Tuple
 
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
-import stringcase  # type: ignore
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
 from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
@@ -32,6 +31,7 @@ from chip.clusters.Attribute import (AttributeStatus, EventReadResult, Subscript
 from chip.exceptions import ChipStackError
 from chip.yaml.data_model_lookup import DataModelLookup
 from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
+from matter_idl.generators.filters import to_pascal_case, to_snake_case
 from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
 from .data_model_lookup import PreDefinedDataModelLookup
@@ -150,7 +150,7 @@ class InvokeAction(BaseAction):
         '''
         super().__init__(test_step)
         self._busy_wait_ms = test_step.busy_wait_ms
-        self._command_name = stringcase.pascalcase(test_step.command)
+        self._command_name = to_pascal_case(test_step.command)
         self._cluster = cluster
         self._interation_timeout_ms = test_step.timed_interaction_timeout_ms
         self._request_object = None
@@ -217,7 +217,7 @@ class ReadAttributeAction(BaseAction):
           UnexpectedActionCreationError: Raised if there is an unexpected parsing error.
         '''
         super().__init__(test_step)
-        self._attribute_name = stringcase.pascalcase(test_step.attribute)
+        self._attribute_name = to_pascal_case(test_step.attribute)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
         self._node_id = test_step.node_id
@@ -294,7 +294,7 @@ class ReadEventAction(BaseAction):
           UnexpectedActionCreationError: Raised if there is an unexpected parsing error.
         '''
         super().__init__(test_step)
-        self._event_name = stringcase.pascalcase(test_step.event)
+        self._event_name = to_pascal_case(test_step.event)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
         self._node_id = test_step.node_id
@@ -531,7 +531,7 @@ class WriteAttributeAction(BaseAction):
           UnexpectedActionCreationError: Raised if there is an unexpected parsing error.
         '''
         super().__init__(test_step)
-        self._attribute_name = stringcase.pascalcase(test_step.attribute)
+        self._attribute_name = to_pascal_case(test_step.attribute)
         self._busy_wait_ms = test_step.busy_wait_ms
         self._cluster = cluster
         self._endpoint = test_step.endpoint
@@ -609,9 +609,9 @@ class WaitForReportAction(BaseAction):
         '''
         super().__init__(test_step)
         if test_step.attribute is not None:
-            queue_name = stringcase.pascalcase(test_step.attribute)
+            queue_name = to_pascal_case(test_step.attribute)
         elif test_step.event is not None:
-            queue_name = stringcase.pascalcase(test_step.event)
+            queue_name = to_pascal_case(test_step.event)
         else:
             raise UnexpectedActionCreationError(
                 'WaitForReport needs to wait on either attribute or event, neither were provided')
@@ -650,7 +650,7 @@ class CommissionerCommandAction(BaseAction):
         if test_step.command == 'GetCommissionerNodeId':
             # Just setting the self._command is enough for run_action below.
             pass
-        elif test_step.command == 'PairWithCode':
+        elif test_step.command in ('PairWithCode', 'EstablishPASESession'):
             args = test_step.arguments['values']
             request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
             self._setup_payload = request_data_as_dict['payload']
@@ -663,7 +663,10 @@ class CommissionerCommandAction(BaseAction):
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
         try:
-            await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            if self._command == 'PairWithCode':
+                await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            elif self._command == 'EstablishPASESession':
+                await dev_ctrl.EstablishPASESession(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
         except ChipStackError:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
@@ -832,7 +835,8 @@ class ReplTestRunner:
     def _default_pseudo_cluster(self, test_step):
         try:
             return DefaultPseudoCluster(test_step)
-        except ActionCreationError:
+        except ActionCreationError as e:
+            logger.warn(f"Failed create default pseudo cluster: {e}")
             return None
 
     def encode(self, request) -> Optional[BaseAction]:
@@ -886,12 +890,12 @@ class ReplTestRunner:
             return response
 
         if isinstance(response, chip.interaction_model.InteractionModelError):
-            decoded_response['error'] = stringcase.snakecase(response.status.name).upper()
+            decoded_response['error'] = to_snake_case(response.status.name).upper()
             decoded_response['clusterError'] = response.clusterStatus
             return decoded_response
 
         if isinstance(response, chip.interaction_model.Status):
-            decoded_response['error'] = stringcase.snakecase(response.name).upper()
+            decoded_response['error'] = to_snake_case(response.name).upper()
             return decoded_response
 
         if isinstance(response, _GetCommissionerNodeIdResult):
@@ -936,7 +940,7 @@ class ReplTestRunner:
             decoded_response = []
             for event in response.event_result_list:
                 if event.Status != chip.interaction_model.Status.Success:
-                    error_message = stringcase.snakecase(event.Status.name).upper()
+                    error_message = to_snake_case(event.Status.name).upper()
                     decoded_response.append({'error': error_message})
                     continue
                 cluster_id = event.Header.ClusterId

@@ -22,16 +22,22 @@
 #include <commands/pairing/OpenCommissioningWindowCommand.h>
 #include <commands/pairing/PairingCommand.h>
 
+// Constants
+constexpr uint32_t kCommissionPrepareTimeMs = 500;
+constexpr uint16_t kMaxManualCodeLength     = 21;
+
 class FabricSyncAddBridgeCommand : public CHIPCommand, public CommissioningDelegate
 {
 public:
     FabricSyncAddBridgeCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("add-bridge", credIssuerCommands)
     {
-        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
-        AddArgument("device-remote-ip", &mRemoteAddr);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("setup-pin-code", 0, 0x7FFFFFF, &mSetupPINCode, "Setup PIN code for the remote bridge device.");
+        AddArgument("device-remote-ip", &mRemoteAddr, "The IP address of the remote bridge device.");
+        AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort, "The secured device port of the remote bridge device.");
     }
 
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override { return RunCommand(mNodeId); }
@@ -41,7 +47,9 @@ public:
 private:
     chip::NodeId mNodeId;
     chip::NodeId mBridgeNodeId;
+    uint32_t mSetupPINCode;
     chip::ByteSpan mRemoteAddr;
+    uint16_t mRemotePort;
 
     CHIP_ERROR RunCommand(NodeId remoteId);
 };
@@ -61,6 +69,51 @@ public:
 
 private:
     chip::NodeId mBridgeNodeId;
+};
+
+class FabricSyncAddLocalBridgeCommand : public CHIPCommand, public CommissioningDelegate
+{
+public:
+    FabricSyncAddLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("add-local-bridge", credIssuerCommands)
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("setup-pin-code", 0, 0x7FFFFFF, &mSetupPINCode, "Setup PIN code for the local bridge device.");
+        AddArgument("local-port", 0, UINT16_MAX, &mLocalPort, "The secured device port of the local bridge device.");
+    }
+
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override { return RunCommand(mNodeId); }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::NodeId mNodeId;
+    chip::Optional<uint32_t> mSetupPINCode;
+    chip::Optional<uint16_t> mLocalPort;
+    chip::NodeId mLocalBridgeNodeId;
+
+    CHIP_ERROR RunCommand(chip::NodeId deviceId);
+};
+
+class FabricSyncRemoveLocalBridgeCommand : public CHIPCommand, public PairingDelegate
+{
+public:
+    FabricSyncRemoveLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("remove-local-bridge", credIssuerCommands)
+    {}
+
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::NodeId mLocalBridgeNodeId;
 };
 
 class FabricSyncDeviceCommand : public CHIPCommand, public CommissioningWindowDelegate, public CommissioningDelegate

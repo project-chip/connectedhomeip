@@ -58,8 +58,6 @@
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
 
-@property (nonatomic, readwrite, copy) NSNumber * nodeID;
-@property (nonatomic, readwrite, nullable) MTRDeviceController * deviceController;
 @property (nonatomic, readwrite) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @property (nonatomic, readwrite) MTRDeviceState state;
 @property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
@@ -73,84 +71,6 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
-
-// Consider moving utility classes to their own file
-#pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo_ConcreteCopy : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
-@implementation MTRDeviceDelegateInfo_ConcreteCopy
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-        _delegatePointerValue = (__bridge void *) delegate;
-        _queue = queue;
-        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
-        _interestedPathsForEvents = [interestedPathsForEvents copy];
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
-}
-
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-    dispatch_async(_queue, ^{
-        block(strongDelegate);
-    });
-    return YES;
-}
-
-#ifdef DEBUG
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-
-    block(strongDelegate);
-
-    return YES;
-}
-#endif
-@end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 
@@ -281,7 +201,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice_Concrete ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
 // update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
@@ -412,8 +331,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // System time change observer reference
     id _systemTimeChangeObserverToken;
 
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * _delegates;
-
     // Protects mutable state used by our description getter.  This is a separate lock from "lock"
     // so that we don't need to worry about getting our description while holding "lock" (e.g due to
     // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
@@ -437,8 +354,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // synthesize superclass property readwrite accessors
-@synthesize nodeID = _nodeID;
-@synthesize deviceController = _deviceController;
 @synthesize queue = _queue;
 @synthesize asyncWorkQueue = _asyncWorkQueue;
 @synthesize state = _state;
@@ -450,13 +365,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // `super` was NSObject, is now MTRDevice.  MTRDevice hides its `init`
-    if (self = [super initForSubclasses]) {
-        _lock = OS_UNFAIR_LOCK_INIT;
+    if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _descriptionLock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
-        _deviceController = controller;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
@@ -482,8 +394,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 [self _resetStorageBehaviorState];
             }];
         }
-
-        _delegates = [NSMutableSet set];
 
         MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
@@ -551,12 +461,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
-}
-
-+ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    return [controller deviceForNodeID:nodeID];
+        stringWithFormat:@"<MTRDevice: %p, XPC: NO, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Time Synchronization
@@ -792,49 +697,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
-- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)_delegateAdded
 {
-    MTR_LOG("%@ setDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
-}
-
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
-{
-    MTR_LOG("%@ addDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
-}
-
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    MTR_LOG("%@ addDelegate %@ with interested attribute paths %@ event paths %@", self, delegate, interestedPathsForAttributes, interestedPathsForEvents);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
-}
-
-- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    std::lock_guard lock(_lock);
-
-    // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (!strongDelegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
-        } else if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
-        }
-    }
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
-
-    MTRDeviceDelegateInfo_ConcreteCopy * newDelegateInfo = [[MTRDeviceDelegateInfo_ConcreteCopy alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
-    [_delegates addObject:newDelegateInfo];
-    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+    os_unfair_lock_assert_owner(&self->_lock);
 
     __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
 
@@ -866,27 +731,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 }
 
-- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
-{
-    MTR_LOG("%@ removeDelegate %@", self, delegate);
-
-    std::lock_guard lock(_lock);
-
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
-        }
-    }];
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
-}
-
 - (void)invalidate
 {
     MTR_LOG("%@ invalidate", self);
@@ -900,8 +744,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_lock(&self->_lock);
 
     _state = MTRDeviceStateUnknown;
-
-    [_delegates removeAllObjects];
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
@@ -928,6 +770,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _stopConnectivityMonitoring];
 
     os_unfair_lock_unlock(&self->_lock);
+
+    [super invalidate];
 }
 
 - (void)nodeMayBeAdvertisingOperational
@@ -1051,79 +895,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
                                      errorHandler:nil];
 }
-
-- (BOOL)_delegateExists
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-    return [self _iterateDelegatesWithBlock:nil];
-}
-
-// Returns YES if any non-null delegates were found
-- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo)_Nullable)block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    if (!_delegates.count) {
-        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
-        return NO;
-    }
-
-    // Opportunistically remove defunct delegate references on every iteration
-    NSMutableSet * delegatesToRemove = nil;
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate) {
-            if (block) {
-                @autoreleasepool {
-                    block(delegateInfo);
-                }
-            }
-            (void) strongDelegate; // ensure it stays alive
-        } else {
-            if (!delegatesToRemove) {
-                delegatesToRemove = [NSMutableSet set];
-            }
-            [delegatesToRemove addObject:delegateInfo];
-        }
-    }
-
-    if (delegatesToRemove.count) {
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
-    }
-
-    return (_delegates.count > 0);
-}
-
-- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    __block NSUInteger delegatesCalled = 0;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
-        if ([delegateInfo callDelegateWithBlock:block]) {
-            delegatesCalled++;
-        }
-    }];
-
-    return (delegatesCalled > 0);
-}
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
-// Returns YES if a delegate is called
-- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
-            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
-            return;
-        }
-    }
-}
-#endif
 
 - (void)_callDelegateDeviceCachePrimed
 {
@@ -1944,7 +1715,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (attributes.count) {
-        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
+        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
             // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered attributes reports don't bloat memory
             NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedPathsForAttributes];
             if (filteredAttributes.count) {
@@ -2123,7 +1894,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     __block BOOL delegatesCalled = NO;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
         // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered event reports don't bloat memory
         NSArray<NSDictionary<NSString *, id> *> * filteredEvents = [self _filteredEvents:reportToReturn forInterestedPaths:delegateInfo.interestedPathsForEvents];
         if (filteredEvents.count) {
@@ -2658,20 +2429,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _unitTestAttributesReportedSinceLastCheck = 0;
     return attributesReportedSinceLastCheck;
 }
-
-- (NSUInteger)unitTestNonnullDelegateCount
-{
-    std::lock_guard lock(self->_lock);
-
-    NSUInteger nonnullDelegateCount = 0;
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        if (delegateInfo.delegate) {
-            nonnullDelegateCount++;
-        }
-    }
-
-    return nonnullDelegateCount;
-}
 #endif
 
 #pragma mark Device Interactions
@@ -2831,7 +2588,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
-    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
+    //
+    // But all this only happens if this device has been accessed via the public
+    // API.  If it's a device we just created internally, don't do read-throughs.
+    BOOL readThroughsAllowed;
+    {
+        std::lock_guard lock(_lock);
+        readThroughsAllowed = _accessedViaPublicAPI;
+    }
+    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
@@ -3073,59 +2838,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
 }
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    if (commandFields == nil) {
-        commandFields = @{
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        };
-    }
-
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:nil
-                                queue:queue
-                           completion:completion];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    // We don't have a way to communicate a non-default invoke timeout
-    // here for now.
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:nil
-                                 queue:queue
-                            completion:completion];
-}
-
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
@@ -3221,58 +2933,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               }];
     }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue];
-}
-
-- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID
-                           commandPayload:(id)commandPayload
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
-              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
-                            responseClass:(Class _Nullable)responseClass
-                                    queue:(dispatch_queue_t)queue
-                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
-{
-    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
-        dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-        });
-        return;
-    }
-
-    NSError * encodingError;
-    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
-    if (commandFields == nil) {
-        dispatch_async(queue, ^{
-            completion(nil, encodingError);
-        });
-        return;
-    }
-
-    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        id _Nullable response = nil;
-        if (error == nil) {
-            if (values.count != 1) {
-                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
-            } else if (responseClass != nil) {
-                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
-            }
-        }
-        completion(response, error);
-    };
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:serverSideProcessingTimeout
-                                 queue:queue
-                            completion:responseHandler];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -3987,11 +3647,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values expectedValueInterval:(NSNumber *)expectedValueInterval
-{
-    [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
-}
-
 // expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
@@ -4308,27 +3963,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 + (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:timeout
-                                queue:queue
-                           completion:completion];
 }
 
 @end

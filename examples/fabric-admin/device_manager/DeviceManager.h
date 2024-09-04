@@ -24,6 +24,8 @@
 
 #include <set>
 
+constexpr uint32_t kDefaultSetupPinCode    = 20202021;
+constexpr uint16_t kDefaultLocalBridgePort = 5540;
 constexpr uint16_t kResponseTimeoutSeconds = 30;
 
 class Device
@@ -55,19 +57,36 @@ public:
 
     chip::NodeId GetRemoteBridgeNodeId() const { return mRemoteBridgeNodeId; }
 
+    chip::NodeId GetLocalBridgeNodeId() const { return mLocalBridgeNodeId; }
+
     void UpdateLastUsedNodeId(chip::NodeId nodeId);
 
-    void SetRemoteBridgeNodeId(chip::NodeId remoteBridgeNodeId) { mRemoteBridgeNodeId = remoteBridgeNodeId; }
+    void SetRemoteBridgeNodeId(chip::NodeId nodeId) { mRemoteBridgeNodeId = nodeId; }
+
+    void SetLocalBridgePort(uint16_t port) { mLocalBridgePort = port; }
+    void SetLocalBridgeSetupPinCode(uint32_t pinCode) { mLocalBridgeSetupPinCode = pinCode; }
+    void SetLocalBridgeNodeId(chip::NodeId nodeId) { mLocalBridgeNodeId = nodeId; }
 
     bool IsAutoSyncEnabled() const { return mAutoSyncEnabled; }
 
     bool IsFabricSyncReady() const { return mRemoteBridgeNodeId != chip::kUndefinedNodeId; }
+
+    bool IsLocalBridgeReady() const { return mLocalBridgeNodeId != chip::kUndefinedNodeId; }
 
     void EnableAutoSync(bool state) { mAutoSyncEnabled = state; }
 
     void AddSyncedDevice(const Device & device);
 
     void RemoveSyncedDevice(chip::NodeId nodeId);
+
+    /**
+     * @brief Determines whether a given nodeId corresponds to the "current bridge device," either local or remote.
+     *
+     * @param nodeId            The ID of the node being checked.
+     *
+     * @return true if the nodeId matches either the local or remote bridge device; otherwise, false.
+     */
+    bool IsCurrentBridgeDevice(chip::NodeId nodeId) const { return nodeId == mLocalBridgeNodeId || nodeId == mRemoteBridgeNodeId; }
 
     /**
      * @brief Open the commissioning window for a specific device within its own fabric.
@@ -110,9 +129,11 @@ public:
 
      * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
      *                          as for the first fabric.
+     * @param setupPINCode      The setup PIN code used to authenticate the pairing process.
      * @param deviceRemoteIp    The IP address of the remote device that is being paired as part of the fabric bridge.
+     * @param deviceRemotePort  The secured device port of the remote device that is being paired as part of the fabric bridge.
      */
-    void PairRemoteFabricBridge(chip::NodeId nodeId, const char * deviceRemoteIp);
+    void PairRemoteFabricBridge(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp, uint16_t deviceRemotePort);
 
     /**
      * @brief Pair a remote Matter device to the current fabric.
@@ -126,36 +147,68 @@ public:
      */
     void PairRemoteDevice(chip::NodeId nodeId, const char * payload);
 
+    /**
+     * @brief Pair a local fabric bridge with a given node ID.
+     *
+     * This function initiates the pairing process for the local fabric bridge using the specified parameters.
+
+     * @param nodeId            The user-defined ID for the node being commissioned. It doesn’t need to be the same ID,
+     *                          as for the first fabric.
+     */
+    void PairLocalFabricBridge(chip::NodeId nodeId);
+
     void UnpairRemoteFabricBridge();
+
+    void UnpairLocalFabricBridge();
 
     void SubscribeRemoteFabricBridge();
 
-    void StartReverseCommissioning();
-
     void ReadSupportedDeviceCategories();
 
-    void CommissionApprovedRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
-    void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader & data);
 
-    void HandleEventData(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
+    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    Device * FindDeviceByNode(chip::NodeId nodeId);
 
 private:
     friend DeviceManager & DeviceMgr();
 
+    void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
+
+    void RequestCommissioningApproval();
+
+    void HandleReadSupportedDeviceCategories(chip::TLV::TLVReader & data);
+
+    void HandleCommissioningRequestResult(chip::TLV::TLVReader & data);
+
+    void HandleAttributePartsListUpdate(chip::TLV::TLVReader & data);
+
+    void SendCommissionNodeRequest(uint64_t requestId, uint16_t responseTimeoutSeconds);
+
+    void HandleReverseOpenCommissioningWindow(chip::TLV::TLVReader & data);
+
     static DeviceManager sInstance;
 
-    chip::NodeId mLastUsedNodeId     = 0;
+    chip::NodeId mLastUsedNodeId = 0;
+
+    // The Node ID of the remote bridge used for Fabric-Sync
+    // This represents the bridge on the other ecosystem.
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
+
+    uint16_t mLocalBridgePort         = kDefaultLocalBridgePort;
+    uint32_t mLocalBridgeSetupPinCode = kDefaultSetupPinCode;
+    // The Node ID of the local bridge used for Fabric-Sync
+    // This represents the bridge within its own ecosystem.
+    chip::NodeId mLocalBridgeNodeId = chip::kUndefinedNodeId;
+
     std::set<Device> mSyncedDevices;
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
     uint64_t mRequestId   = 0;
-
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
 };
 
 /**

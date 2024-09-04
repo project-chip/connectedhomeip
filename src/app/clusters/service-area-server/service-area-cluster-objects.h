@@ -27,8 +27,13 @@ namespace Clusters {
 namespace ServiceArea {
 
 // These limits are defined in the spec.
-inline constexpr size_t kAreaNameMaxSize = 128u;
-inline constexpr size_t kMapNameMaxSize  = 64u;
+inline constexpr size_t kMaxNumSupportedAreas   = 255;
+inline constexpr size_t kMaxNumSupportedMaps    = 255;
+inline constexpr size_t kMaxNumSelectedAreas    = 255;
+inline constexpr size_t kMaxNumProgressElements = 255;
+inline constexpr size_t kMaxSizeStatusText      = 256;
+inline constexpr size_t kAreaNameMaxSize        = 128u;
+inline constexpr size_t kMapNameMaxSize         = 64u;
 
 /**
  * This class is used to wrap the AreaStruct object and provide a more user-friendly interface for the data.
@@ -68,8 +73,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     {
         areaID = aOther.areaID;
         mapID  = aOther.mapID;
-        SetLocationInfo(aOther.areaDesc.locationInfo);
-        SetLandmarkInfo(aOther.areaDesc.landmarkInfo);
+        SetLocationInfo(aOther.areaInfo.locationInfo);
+        SetLandmarkInfo(aOther.areaInfo.landmarkInfo);
 
         return *this;
     }
@@ -95,7 +100,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
 
     AreaStructureWrapper & SetLocationInfoNull()
     {
-        areaDesc.locationInfo.SetNull();
+        areaInfo.locationInfo.SetNull();
         return *this;
     }
 
@@ -108,13 +113,15 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper & SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
                                            const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
     {
-        areaDesc.locationInfo.SetNonNull();
-        // Copy the name
-        auto sizeToCopy = std::min(sizeof(mAreaNameBuffer), locationName.size());
+        areaInfo.locationInfo.SetNonNull();
+
+        // Copy the name. If the name is larger than kAreaNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kAreaNameMaxSize, locationName.size());
         memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
-        areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
-        areaDesc.locationInfo.Value().floorNumber  = floorNumber;
-        areaDesc.locationInfo.Value().areaType     = areaType;
+        areaInfo.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
+
+        areaInfo.locationInfo.Value().floorNumber = floorNumber;
+        areaInfo.locationInfo.Value().areaType    = areaType;
 
         return *this;
     }
@@ -136,7 +143,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
 
     AreaStructureWrapper & SetLandmarkInfoNull()
     {
-        areaDesc.landmarkInfo.SetNull();
+        areaInfo.landmarkInfo.SetNull();
         return *this;
     }
 
@@ -148,9 +155,9 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper & SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag,
                                            const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
     {
-        areaDesc.landmarkInfo.SetNonNull();
-        areaDesc.landmarkInfo.Value().landmarkTag = landmarkTag;
-        areaDesc.landmarkInfo.Value().positionTag = relativePositionTag;
+        areaInfo.landmarkInfo.SetNonNull();
+        areaInfo.landmarkInfo.Value().landmarkTag         = landmarkTag;
+        areaInfo.landmarkInfo.Value().relativePositionTag = relativePositionTag;
 
         return *this;
     }
@@ -165,7 +172,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             return SetLandmarkInfoNull();
         }
 
-        return SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().positionTag);
+        return SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().relativePositionTag);
     }
 
     /**
@@ -176,9 +183,9 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      */
     bool IsNameEqual(const CharSpan & aAreaName) const
     {
-        if (!areaDesc.locationInfo.IsNull())
+        if (!areaInfo.locationInfo.IsNull())
         {
-            return areaDesc.locationInfo.Value().locationName.data_equal(aAreaName);
+            return areaInfo.locationInfo.Value().locationName.data_equal(aAreaName);
         }
 
         return false;
@@ -213,43 +220,43 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             return false;
         }
 
-        if (areaDesc.locationInfo.IsNull() != aOther.areaDesc.locationInfo.IsNull())
+        if (areaInfo.locationInfo.IsNull() != aOther.areaInfo.locationInfo.IsNull())
         {
             return false;
         }
 
-        if (!areaDesc.locationInfo.IsNull())
+        if (!areaInfo.locationInfo.IsNull())
         {
 
-            if (!IsNameEqual(aOther.areaDesc.locationInfo.Value().locationName))
+            if (!IsNameEqual(aOther.areaInfo.locationInfo.Value().locationName))
             {
                 return false;
             }
 
-            if (areaDesc.locationInfo.Value().floorNumber != aOther.areaDesc.locationInfo.Value().floorNumber)
+            if (areaInfo.locationInfo.Value().floorNumber != aOther.areaInfo.locationInfo.Value().floorNumber)
             {
                 return false;
             }
 
-            if (areaDesc.locationInfo.Value().areaType != aOther.areaDesc.locationInfo.Value().areaType)
+            if (areaInfo.locationInfo.Value().areaType != aOther.areaInfo.locationInfo.Value().areaType)
             {
                 return false;
             }
         }
 
-        if (areaDesc.landmarkInfo.IsNull() != aOther.areaDesc.landmarkInfo.IsNull())
+        if (areaInfo.landmarkInfo.IsNull() != aOther.areaInfo.landmarkInfo.IsNull())
         {
             return false;
         }
 
-        if (!areaDesc.landmarkInfo.IsNull())
+        if (!areaInfo.landmarkInfo.IsNull())
         {
-            if (areaDesc.landmarkInfo.Value().landmarkTag != aOther.areaDesc.landmarkInfo.Value().landmarkTag)
+            if (areaInfo.landmarkInfo.Value().landmarkTag != aOther.areaInfo.landmarkInfo.Value().landmarkTag)
             {
                 return false;
             }
 
-            if (areaDesc.landmarkInfo.Value().positionTag != aOther.areaDesc.landmarkInfo.Value().positionTag)
+            if (areaInfo.landmarkInfo.Value().relativePositionTag != aOther.areaInfo.landmarkInfo.Value().relativePositionTag)
             {
                 return false;
             }
@@ -263,12 +270,12 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      */
     CharSpan GetName()
     {
-        if (areaDesc.locationInfo.IsNull())
+        if (areaInfo.locationInfo.IsNull())
         {
             return { mAreaNameBuffer, 0 };
         }
 
-        return areaDesc.locationInfo.Value().locationName;
+        return areaInfo.locationInfo.Value().locationName;
     }
 
 private:
@@ -321,23 +328,10 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
         mapID = aMapId;
-
-        if (aMapName.empty())
-        {
-            name = CharSpan(mMapNameBuffer, 0);
-        }
-        else if (aMapName.size() > sizeof(mMapNameBuffer))
-        {
-            // Save the truncated name that fits into available size.
-            memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
-            name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
-        }
-        else
-        {
-            // Save full name.
-            memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
-            name = CharSpan(mMapNameBuffer, aMapName.size());
-        }
+        // Copy the name. If the name is larger than kMapNameMaxSize, truncate it to fit.
+        auto sizeToCopy = std::min(kMapNameMaxSize, aMapName.size());
+        memcpy(mMapNameBuffer, aMapName.data(), sizeToCopy);
+        name = CharSpan(mMapNameBuffer, sizeToCopy);
     }
 
     /**

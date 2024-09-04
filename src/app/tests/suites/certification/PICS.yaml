@@ -6494,6 +6494,13 @@ PICS:
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051
 
+    - label: "Does the device implement the Schedules attribute?"
+      id: TSTAT.S.A0051
+
+    - label:
+          "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
+      id: TSTAT.S.A0052
+
     #
     # server / commandsReceived
     #
@@ -6516,6 +6523,11 @@ PICS:
     - label:
           "Does the device implement receiving the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
+
+    - label:
+          "Does the device implement receiving the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.S.C05.Rsp
 
     - label:
           "Does the device implement receiving the SetActivePresetRequest
@@ -6541,7 +6553,7 @@ PICS:
       id: TSTAT.S.C01.Tx
 
     - label: "Does the device implement sending the AtomicResponse command?"
-      id: TSTAT.S.CFD.Tx
+      id: TSTAT.S.Cfd.Tx
 
     #
     # server / features
@@ -6613,6 +6625,11 @@ PICS:
 
     - label: "Does the device implement sending the GetRelayStatusLog command?"
       id: TSTAT.C.C04.Tx
+
+    - label:
+          "Does the device implement sending the SetActiveScheduleRequest
+          command?"
+      id: TSTAT.C.C05.Tx
 
     - label:
           "Does the device implement sending the SetActivePresetRequest command?"
@@ -9740,7 +9757,7 @@ PICS:
       id: RVCOPSTATE.S.C03.Rsp
 
     - label: "Does the device implement receiving the GoHome command?"
-      id: RVCOPSTATE.S.C128.Rsp
+      id: RVCOPSTATE.S.C80.Rsp
 
     #Commands generated
     - label:

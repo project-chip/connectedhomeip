@@ -3,6 +3,7 @@
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
 #include "rvc-service-area-delegate.h"
+#include "rvc-service-area-storage-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
@@ -27,6 +28,7 @@ private:
     RvcOperationalState::Instance mOperationalStateInstance;
 
     ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
+    ServiceArea::RvcServiceAreaStorageDelegate mStorageDelegate;
     ServiceArea::Instance mServiceAreaInstance;
 
     bool mDocked   = false;
@@ -44,7 +46,7 @@ public:
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
-        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint,
+        mServiceAreaInstance(&mStorageDelegate, &mServiceAreaDelegate, aRvcClustersEndpoint,
                              BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
         // set the current-mode at start-up
@@ -61,7 +63,7 @@ public:
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
 
         mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
-        mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
+        mServiceAreaDelegate.SetHandleSkipAreaCallback(&RvcDevice::SaHandleSkipArea, this);
         mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
         mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
     }
@@ -104,7 +106,7 @@ public:
 
     bool SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText);
 
-    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+    bool SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText);
 
     bool SaIsSupportedAreasChangeAllowed();
 
@@ -126,6 +128,14 @@ public:
     void HandleActivityCompleteEvent();
 
     void HandleAreaCompletedEvent();
+
+    void HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName);
+
+    void HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area);
+
+    void HandleRemoveServiceAreaMap(uint32_t mapId);
+
+    void HandleRemoveServiceAreaArea(uint32_t areaId);
 
     /**
      * Sets the device to an error state with the error state ID matching the error name given.

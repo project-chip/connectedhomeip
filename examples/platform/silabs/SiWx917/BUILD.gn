@@ -50,8 +50,6 @@ declare_args() {
 
 # Sanity check
 assert(chip_enable_wifi)
-
-silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
 import("${silabs_common_plat_dir}/args.gni")
 
@@ -115,12 +113,6 @@ source_set("siwx917-matter-shell") {
 
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
-  if (sl_si91x_crypto_flavor == "psa") {
-    libs =
-        [ "${sdk_support_root}/matter/provision/lib/libProvisionPSA_si917.a" ]
-  } else {
-    libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
-  }
 
   if (!disable_lcd) {
     include_dirs = [ "${silabs_common_plat_dir}/display" ]
@@ -177,7 +169,7 @@ config("silabs-wifi-config") {
 }
 
 source_set("siwx917-common") {
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
   defines = []
   public_deps = []
   public_configs = [
@@ -197,16 +189,14 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorageFlash.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
+    "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
+    "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
     "${silabs_plat_si91x_wifi_dir}/dhcp_client.cpp",
     "${silabs_plat_si91x_wifi_dir}/ethernetif.cpp",
     "${silabs_plat_si91x_wifi_dir}/lwip_netif.cpp",
-    "${silabs_plat_si91x_wifi_dir}/wfx_notify.cpp",
     "SiWx917/sl_wifi_if.cpp",
-    "SiWx917/wfx_rsi_host.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {

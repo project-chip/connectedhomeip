@@ -49,6 +49,7 @@ public:
         Builder & SetOriginalEndpoint(EndpointId aOriginalEndpoint);
         Builder & AddDeviceType(Structs::DeviceTypeStruct::Type aDeviceType);
         Builder & AddUniqueLocationId(std::string aUniqueLocationId, uint64_t aUniqueLocationIdsLastEditEpochUs);
+        Builder & SetFabricIndex(FabricIndex aFabricIndex);
 
         // Upon success this object will have moved all ownership of underlying
         // types to EcosystemDeviceStruct and should not be used afterwards.
@@ -62,21 +63,25 @@ public:
         std::vector<Structs::DeviceTypeStruct::Type> mDeviceTypes;
         std::vector<std::string> mUniqueLocationIds;
         uint64_t mUniqueLocationIdsLastEditEpochUs = 0;
+        FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
         bool mIsAlreadyBuilt                       = false;
     };
 
-    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const FabricIndex & aFabricIndex);
+    CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
     explicit EcosystemDeviceStruct(std::string && aDeviceName, uint64_t aDeviceNameLastEditEpochUs, EndpointId aBridgedEndpoint,
                                    EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> && aDeviceTypes,
-                                   std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs) :
+                                   std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs,
+                                   FabricIndex aFabricIndex) :
         mDeviceName(std::move(aDeviceName)),
         mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs), mBridgedEndpoint(aBridgedEndpoint),
         mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
-        mUniqueLocationIds(std::move(aUniqueLocationIds)), mUniqueLocationIdsLastEditEpochUs(aUniqueLocationIdsLastEditEpochUs)
+        mUniqueLocationIds(std::move(aUniqueLocationIds)), mUniqueLocationIdsLastEditEpochUs(aUniqueLocationIdsLastEditEpochUs),
+        mFabricIndex(aFabricIndex)
+
     {}
 
     const std::string mDeviceName;
@@ -86,10 +91,7 @@ private:
     std::vector<Structs::DeviceTypeStruct::Type> mDeviceTypes;
     std::vector<std::string> mUniqueLocationIds;
     uint64_t mUniqueLocationIdsLastEditEpochUs;
-    // TODO(#33223) This structure needs to contain fabric index to be spec compliant.
-    // To keep initial PR smaller, we are going to assume that all entries
-    // here are for any fabric. This will allow follow up PR introducing
-    // fabric scoped to be more throughly reviewed with focus on fabric scoping.
+    FabricIndex mFabricIndex;
 };
 
 struct LocationDescriptorStruct
@@ -134,15 +136,11 @@ private:
         mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.
-    // Because UniqueLocationId is manditory when an entry exist, and
-    // it is unique, we use it as a key to the key-value pair and is why it is
+    // Because UniqueLocationId and FabricIndex are mandatory when an entry exist,
+    // and needs to be unique, we use it as a key to the key-value pair and is why it is
     // not explicitly in this struct.
     LocationDescriptorStruct mLocationDescriptor;
     uint64_t mLocationDescriptorLastEditEpochUs;
-    // TODO(#33223) This structure needs to contain fabric index to be spec compliant.
-    // To keep initial PR smaller, we are going to assume that all entries
-    // here are for any fabric. This will allow follow up PR introducing
-    // fabric scoped to be more throughly reviewed with focus on fabric scoping.
 };
 
 class EcosystemInformationServer
@@ -186,32 +184,30 @@ public:
      * @return #CHIP_NO_ERROR on success.
      * @return Other CHIP_ERROR associated with issue.
      */
-    CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId,
+    CHIP_ERROR AddLocationInfo(EndpointId aEndpoint, const std::string & aLocationId, FabricIndex aFabricIndex,
                                std::unique_ptr<EcosystemLocationStruct> aLocation);
-
-    /**
-     * @brief Removes device at the provided endpoint.
-     *
-     * @param aEndpoint Endpoint of the associated device that has been removed.
-     * @param aEpochUs Epoch time in micro seconds assoicated with when device was removed.
-     * @return #CHIP_NO_ERROR on success.
-     * @return Other CHIP_ERROR associated with issue.
-     */
-    CHIP_ERROR RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs);
     // TODO(#33223) Add removal and update counterparts to AddDeviceInfo and AddLocationInfo.
 
     CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 
 private:
-    struct DeviceInfo
+    struct EcosystemLocationKey
     {
-        Optional<uint64_t> mRemovedOn = NullOptional;
-        std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
-        // Map key is using the UniqueLocationId
-        std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
+        bool operator<(const EcosystemLocationKey & other) const
+        {
+            return mUniqueLocationId < other.mUniqueLocationId ||
+                (mUniqueLocationId == other.mUniqueLocationId && mFabricIndex < other.mFabricIndex);
+        }
+        std::string mUniqueLocationId;
+        FabricIndex mFabricIndex;
     };
 
-    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    struct DeviceInfo
+    {
+        std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
+        std::map<EcosystemLocationKey, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
+    };
+
     CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
 

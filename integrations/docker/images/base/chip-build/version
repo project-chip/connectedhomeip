@@ -1,1 +1,1 @@
-70 : [NXP] Update k32w1 SDK
+75 : remove workaround for bloaty build, workaround involved cloning and installing abseil

@@ -25,51 +25,51 @@ import matter.tlv.TlvWriter
 class ServiceAreaClusterAreaStruct(
   val areaID: UInt,
   val mapID: UInt?,
-  val areaDesc: ServiceAreaClusterAreaInfoStruct,
+  val areaInfo: ServiceAreaClusterAreaInfoStruct,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaStruct {\n")
     append("\tareaID : $areaID\n")
     append("\tmapID : $mapID\n")
-    append("\tareaDesc : $areaDesc\n")
+    append("\tareaInfo : $areaInfo\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_AREA_I_D), areaID)
+      put(ContextSpecificTag(TAG_AREA_ID), areaID)
       if (mapID != null) {
-        put(ContextSpecificTag(TAG_MAP_I_D), mapID)
+        put(ContextSpecificTag(TAG_MAP_ID), mapID)
       } else {
-        putNull(ContextSpecificTag(TAG_MAP_I_D))
+        putNull(ContextSpecificTag(TAG_MAP_ID))
       }
-      areaDesc.toTlv(ContextSpecificTag(TAG_AREA_DESC), this)
+      areaInfo.toTlv(ContextSpecificTag(TAG_AREA_INFO), this)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_AREA_I_D = 0
-    private const val TAG_MAP_I_D = 1
-    private const val TAG_AREA_DESC = 2
+    private const val TAG_AREA_ID = 0
+    private const val TAG_MAP_ID = 1
+    private const val TAG_AREA_INFO = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaStruct {
       tlvReader.enterStructure(tlvTag)
-      val areaID = tlvReader.getUInt(ContextSpecificTag(TAG_AREA_I_D))
+      val areaID = tlvReader.getUInt(ContextSpecificTag(TAG_AREA_ID))
       val mapID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_MAP_I_D))
+          tlvReader.getUInt(ContextSpecificTag(TAG_MAP_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_MAP_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
           null
         }
-      val areaDesc =
-        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_DESC), tlvReader)
+      val areaInfo =
+        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_INFO), tlvReader)
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterAreaStruct(areaID, mapID, areaDesc)
+      return ServiceAreaClusterAreaStruct(areaID, mapID, areaInfo)
     }
   }
 }

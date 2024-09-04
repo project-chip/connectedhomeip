@@ -43,8 +43,10 @@ static constexpr uint16_t TRANSITION_STEPS_PER_1S                              =
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
-static constexpr uint16_t MIN_TEMPERATURE_VALUE = 0;
-static constexpr uint16_t MAX_TEMPERATURE_VALUE = 0xfeff;
+// Logically relevant color temperatures are between 1000K and 9000K at the very most (and this is still
+// not frequent). Our implementation can default to those reasonable maxima to avoid issues related to range.
+static constexpr uint16_t MIN_TEMPERATURE_VALUE = 111u;  // 111 mireds == 9000K
+static constexpr uint16_t MAX_TEMPERATURE_VALUE = 1000u; // 1000 mireds == 1000K
 
 static constexpr uint8_t MIN_HUE_VALUE = 0;
 static constexpr uint8_t MAX_HUE_VALUE = 254;
@@ -71,18 +73,10 @@ public:
     /**********************************************************
      * Enums
      *********************************************************/
-    using HueStepMode  = chip::app::Clusters::ColorControl::HueStepMode;
-    using HueMoveMode  = chip::app::Clusters::ColorControl::HueMoveMode;
-    using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
-    using Feature      = chip::app::Clusters::ColorControl::Feature;
-
-    enum EnhancedColorMode : uint8_t
-    {
-        kCurrentHueAndCurrentSaturation         = 0,
-        kCurrentXAndCurrentY                    = 1,
-        kColorTemperature                       = 2,
-        kEnhancedCurrentHueAndCurrentSaturation = 3,
-    };
+    using StepModeEnum  = chip::app::Clusters::ColorControl::StepModeEnum;
+    using MoveModeEnum  = chip::app::Clusters::ColorControl::MoveModeEnum;
+    using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
+    using Feature       = chip::app::Clusters::ColorControl::Feature;
 
     enum Conversion
     {
@@ -150,20 +144,27 @@ public:
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                             uint8_t optionsMask, uint8_t optionsOverride);
+                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        HueMoveMode moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
+                        MoveModeEnum moveMode, uint16_t rate,
+                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool moveToHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t hue,
-                          HueDirection moveDirection, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
-                          bool isEnhanced);
+                          DirectionEnum moveDirection, uint16_t transitionTime,
+                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool moveToHueAndSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                       uint8_t optionsOverride, bool isEnhanced);
+                                       uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
+                                       bool isEnhanced);
     bool stepHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
-                        uint8_t optionsOverride, bool isEnhanced);
+                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime,
+                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool moveSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
     bool moveToSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -202,30 +203,20 @@ public:
 
     template <typename Q, typename V>
     chip::app::MarkAttributeDirty SetQuietReportAttribute(chip::app::QuieterReportingAttribute<Q> & quietReporter, V newValue,
-                                                          bool isStartOrEndOfTransition, uint16_t transitionTime);
-    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime);
+                                                          bool isEndOfTransition, uint16_t transitionTime);
+    chip::Protocols::InteractionModel::Status SetQuietReportRemainingTime(chip::EndpointId endpoint, uint16_t newRemainingTime,
+                                                                          bool isNewTransition = false);
 
 private:
     /**********************************************************
      * Functions Definitions
      *********************************************************/
 
-    ColorControlServer()
-    {
-        for (size_t i = 0; i < kColorControlClusterServerMaxEndpointCount; i++)
-        {
-            // Set the quiet report policies for the RemaininTime Attribute on all endpoint
-            // - kMarkDirtyOnChangeToFromZero : When the value changes from 0 to any other value and vice versa, or
-            // - kMarkDirtyOnIncrement : When the value increases.
-            quietRemainingTime[i]
-                .policy()
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-                .Set(chip::app::QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
-        }
-    }
+    ColorControlServer() {}
 
-    bool shouldExecuteIfOff(chip::EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
-    void handleModeSwitch(chip::EndpointId endpoint, uint8_t newColorMode);
+    bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask,
+                            chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
+    void handleModeSwitch(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     void computePwmFromHsv(chip::EndpointId endpoint);
@@ -310,6 +301,7 @@ private:
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietTemperatureMireds[kColorControlClusterServerMaxEndpointCount];
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];

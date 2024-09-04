@@ -206,6 +206,16 @@ tests:
               - name: "NextUserIndex"
                 value: null
 
+    - label: "Step 6c: TH sends Get User Command to DUT with UserIndex as 0"
+      PICS: DRLK.S.C1a.Rsp && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
     - label:
           "Step 7: TH sends Set User Command to DUT with the following values:
           OperationType as 2 UserIndex as 2 UserName as NULL UserUniqueID as
