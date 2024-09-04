@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include <lib/support/TypeTraits.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -79,6 +81,50 @@ using MoveMode            = MoveModeEnum;
 using StepMode            = StepModeEnum;
 using LevelControlOptions = OptionsBitmap;
 } // namespace LevelControl
+
+namespace ColorControl {
+// https://github.com/project-chip/connectedhomeip/pull/33612 renamed this
+enum class ColorMode : uint8_t
+{
+    kCurrentHueAndCurrentSaturation = to_underlying(ColorModeEnum::kCurrentHueAndCurrentSaturation),
+    kCurrentXAndCurrentY            = to_underlying(ColorModeEnum::kCurrentXAndCurrentY),
+    kColorTemperature               = to_underlying(ColorModeEnum::kColorTemperatureMireds),
+    kUnknownEnumValue               = to_underlying(ColorModeEnum::kUnknownEnumValue)
+};
+
+enum class HueDirection : uint8_t
+{
+    ShortestDistance  = to_underlying(DirectionEnum::kShortest),
+    LongestDistance   = to_underlying(DirectionEnum::kLongest),
+    Up                = to_underlying(DirectionEnum::kUp),
+    Down              = to_underlying(DirectionEnum::kDown),
+    kUnknownEnumValue = to_underlying(DirectionEnum::kUnknownEnumValue)
+};
+
+enum class ColorCapabilities : uint16_t
+{
+    ColorLoopSupported        = to_underlying(ColorCapabilitiesBitmap::kColorLoop),
+    ColorTemperatureSupported = to_underlying(ColorCapabilitiesBitmap::kColorTemperature),
+    EnhancedHueSupported      = to_underlying(ColorCapabilitiesBitmap::kEnhancedHue),
+    HueSaturationSupported    = to_underlying(ColorCapabilitiesBitmap::kHueSaturation),
+    XYAttributesSupported     = to_underlying(ColorCapabilitiesBitmap::kXy)
+};
+
+enum class ColorLoopDirection : uint8_t
+{
+    DecrementHue      = to_underlying(ColorLoopDirectionEnum::kDecrement),
+    IncrementHue      = to_underlying(ColorLoopDirectionEnum::kIncrement),
+    kUnknownEnumValue = to_underlying(ColorLoopDirectionEnum::kUnknownEnumValue)
+};
+
+using EnhancedColorMode    = EnhancedColorModeEnum;
+using ColorLoopUpdateFlags = UpdateFlagsBitmap;
+using ColorLoopAction      = ColorLoopActionEnum;
+using HueMoveMode          = MoveModeEnum;
+using HueStepMode          = StepModeEnum;
+using SaturationMoveMode   = MoveModeEnum;
+using SaturationStepMode   = StepModeEnum;
+} // namespace ColorControl
 
 namespace RefrigeratorAlarm {
 // https://github.com/project-chip/connectedhomeip/pull/31517 renamed this

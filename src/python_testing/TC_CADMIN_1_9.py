@@ -31,6 +31,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
+from chip.native import PyChipError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -74,7 +75,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             await self.th2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=setup_code,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        errcode = ctx.exception.chip_error
+        errcode = PyChipError.from_code(ctx.exception.err)
         return errcode
 
     async def CommissionAttempt(

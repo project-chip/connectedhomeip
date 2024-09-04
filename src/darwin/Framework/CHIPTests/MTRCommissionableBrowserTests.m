@@ -17,25 +17,21 @@
 
 #import <Matter/Matter.h>
 
-// system dependencies
-#import <XCTest/XCTest.h>
-
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
+#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // Fixture 1: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
-// Fixture 2: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1 \
-    --dac_provider credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json \
-    --product-id 32768 --discriminator 3839
 
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
-static const uint16_t kTestProductId1 = 0x8000u;
-static const uint16_t kTestProductId2 = 0x8001u;
-static const uint16_t kTestDiscriminator1 = 3840u;
-static const uint16_t kTestDiscriminator2 = 3839u;
+static const __auto_type kTestProductIds = @[ @(0x8000u), @(0x8001u) ];
+static const __auto_type kTestDiscriminators = @[ @(2000), @(3839u), @(3840u) ];
 static const uint16_t kDiscoverDeviceTimeoutInSeconds = 10;
-static const uint16_t kExpectedDiscoveredDevicesCount = 2;
+static const uint16_t kExpectedDiscoveredDevicesCount = 3;
+
+static bool sHelperAppsStarted = false;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
@@ -96,8 +92,8 @@ static MTRDeviceController * sController = nil;
 
     XCTAssertEqual(instanceName.length, 16); // The  instance name is random, so just ensure the len is right.
     XCTAssertEqualObjects(vendorId, @(kTestVendorId));
-    XCTAssertTrue([productId isEqual:@(kTestProductId1)] || [productId isEqual:@(kTestProductId2)]);
-    XCTAssertTrue([discriminator isEqual:@(kTestDiscriminator1)] || [discriminator isEqual:@(kTestDiscriminator2)]);
+    XCTAssertTrue([kTestProductIds containsObject:productId]);
+    XCTAssertTrue([kTestDiscriminators containsObject:discriminator]);
     XCTAssertEqual(commissioningMode, YES);
 
     NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);
@@ -115,7 +111,7 @@ static MTRDeviceController * sController = nil;
 }
 @end
 
-@interface MTRCommissionableBrowserTests : XCTestCase
+@interface MTRCommissionableBrowserTests : MTRTestCase
 @end
 
 @implementation MTRCommissionableBrowserTests
@@ -161,6 +157,21 @@ static MTRDeviceController * sController = nil;
 - (void)setUp
 {
     [super setUp];
+
+    if (!sHelperAppsStarted) {
+        for (NSString * payload in @[
+                 @"MT:Y.K90SO527JA0648G00",
+                 @"MT:-24J0AFN00I40648G00",
+             ]) {
+            __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initCrossTestWithAppName:@"all-clusters"
+                                                                                     arguments:@[]
+                                                                                       payload:payload
+                                                                                      testcase:self];
+            XCTAssertNotNil(appRunner);
+        }
+        sHelperAppsStarted = true;
+    }
+
     [self setContinueAfterFailure:NO];
 }
 

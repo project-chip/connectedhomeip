@@ -64,13 +64,16 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
 
         DeviceMgr().SubscribeRemoteFabricBridge();
 
-        // After successful commissioning of the Commissionee, initiate Reverse Commissioning
-        // via the Commissioner Control Cluster. However, we must first verify that the
-        // remote Fabric-Bridge supports Fabric Synchronization.
-        //
-        // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
-        // if the remote Fabric-Bridge lacks Fabric Synchronization support.
-        DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+        if (DeviceMgr().IsLocalBridgeReady())
+        {
+            // After successful commissioning of the Commissionee, initiate Reverse Commissioning
+            // via the Commissioner Control Cluster. However, we must first verify that the
+            // remote Fabric-Bridge supports Fabric Synchronization.
+            //
+            // Note: The Fabric-Admin MUST NOT send the RequestCommissioningApproval command
+            // if the remote Fabric-Bridge lacks Fabric Synchronization support.
+            DeviceLayer::PlatformMgr().ScheduleWork(CheckFabricBridgeSynchronizationSupport, 0);
+        }
     }
     else
     {
@@ -101,7 +104,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     pairingCommand->RegisterCommissioningDelegate(this);
     mBridgeNodeId = remoteId;
 
-    DeviceMgr().PairRemoteFabricBridge(remoteId, reinterpret_cast<const char *>(mRemoteAddr.data()));
+    DeviceMgr().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()), mRemotePort);
 
     return CHIP_NO_ERROR;
 }
@@ -203,6 +206,15 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
 
     pairingCommand->RegisterCommissioningDelegate(this);
     mLocalBridgeNodeId = deviceId;
+
+    if (mSetupPINCode.HasValue())
+    {
+        DeviceMgr().SetLocalBridgeSetupPinCode(mSetupPINCode.Value());
+    }
+    if (mLocalPort.HasValue())
+    {
+        DeviceMgr().SetLocalBridgePort(mLocalPort.Value());
+    }
 
     DeviceMgr().PairLocalFabricBridge(deviceId);
 

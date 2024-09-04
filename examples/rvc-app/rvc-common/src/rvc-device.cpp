@@ -174,7 +174,7 @@ bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
     return true;
 }
 
-bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+bool RvcDevice::SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
 {
     if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
     {
@@ -339,12 +339,12 @@ void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & are
 
 void RvcDevice::HandleRemoveServiceAreaMap(uint32_t mapId)
 {
-    mServiceAreaDelegate.RemoveSupportedMap(mapId);
+    mServiceAreaInstance.RemoveSupportedMap(mapId);
 }
 
 void RvcDevice::HandleRemoveServiceAreaArea(uint32_t areaId)
 {
-    mServiceAreaDelegate.RemoveSupportedArea(areaId);
+    mServiceAreaInstance.RemoveSupportedArea(areaId);
 }
 
 void RvcDevice::HandleErrorEvent(const std::string & error)
@@ -439,7 +439,7 @@ void RvcDevice::UpdateServiceAreaProgressOnExit()
 
     uint32_t i = 0;
     ServiceArea::Structs::ProgressStruct::Type progressElement;
-    while (mServiceAreaDelegate.GetProgressElementByIndex(i, progressElement))
+    while (mServiceAreaInstance.GetProgressElementByIndex(i, progressElement))
     {
         if (progressElement.status == ServiceArea::OperationalStatusEnum::kOperating ||
             progressElement.status == ServiceArea::OperationalStatusEnum::kPending)

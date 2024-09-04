@@ -16,8 +16,13 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
+#include <sys/ioctl.h>
+#include <thread>
+
 #include <AppMain.h>
 
+#include "BridgedAdministratorCommissioning.h"
 #include "BridgedDevice.h"
 #include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
@@ -27,14 +32,12 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
+#include <lib/support/CHIPArgParser.hpp>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
 #include "RpcServer.h"
 #endif
-
-#include <sys/ioctl.h>
-#include <thread>
 
 // This is declared here and not in a header because zap/embr assumes all clusters
 // are defined in a static endpoint in the .zap file. From there, the codegen will
@@ -58,7 +61,47 @@ constexpr uint16_t kPollIntervalMs = 100;
 constexpr uint16_t kRetryIntervalS = 3;
 #endif
 
+uint16_t gFabricAdminServerPort = 33001;
+uint16_t gLocalServerPort       = 33002;
+
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
+
+constexpr uint16_t kOptionFabricAdminServerPortNumber = 0xFF01;
+constexpr uint16_t kOptionLocalServerPortNumber       = 0xFF02;
+
+ArgParser::OptionDef sProgramCustomOptionDefs[] = {
+    { "fabric-admin-server-port", ArgParser::kArgumentRequired, kOptionFabricAdminServerPortNumber },
+    { "local-server-port", ArgParser::kArgumentRequired, kOptionLocalServerPortNumber },
+    {},
+};
+
+const char sProgramCustomOptionHelp[] = "  --fabric-admin-server-port <port>\n"
+                                        "       The fabric-admin RPC port number to connect to (default: 33001).\n"
+                                        "  --local-server-port <port>\n"
+                                        "       The port number for local RPC server (default: 33002).\n"
+                                        "\n";
+
+bool HandleCustomOption(const char * aProgram, ArgParser::OptionSet * aOptions, int aIdentifier, const char * aName,
+                        const char * aValue)
+{
+    switch (aIdentifier)
+    {
+    case kOptionFabricAdminServerPortNumber:
+        gFabricAdminServerPort = atoi(aValue);
+        break;
+    case kOptionLocalServerPortNumber:
+        gLocalServerPort = atoi(aValue);
+        break;
+    default:
+        ArgParser::PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        return false;
+    }
+
+    return true;
+}
+
+ArgParser::OptionSet sProgramCustomOptions = { HandleCustomOption, sProgramCustomOptionDefs, "GENERAL OPTIONS",
+                                               sProgramCustomOptionHelp };
 
 bool KeyboardHit()
 {
@@ -82,7 +125,7 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                CHIP_ERROR err = OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams()
+                CHIP_ERROR err = OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
                                                              .SetNodeId(0x1234)
                                                              .SetTimeout(300)
                                                              .SetDiscriminator(3840)
@@ -104,7 +147,7 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
-    if (InitRpcClient(kFabricAdminServerPort) == CHIP_NO_ERROR)
+    if (StartRpcClient() == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Connected to Fabric-Admin");
     }
@@ -157,7 +200,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
-        OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams()
+        OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
                                     .SetNodeId(device->GetNodeId())
                                     .SetTimeout(commandData.commissioningTimeout)
                                     .SetDiscriminator(commandData.discriminator)
@@ -198,15 +241,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
     ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
 
-    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
-
     handlerContext.SetCommandHandled();
-
-    if (device == nullptr || !device->IsIcd())
-    {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
-        return;
-    }
 
     BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType commandData;
     if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
@@ -215,10 +250,25 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
         return;
     }
 
+    const uint32_t kMinTimeoutMs = 30 * 1000;
+    const uint32_t kMaxTimeoutMs = 60 * 60 * 1000;
+    if (commandData.timeoutMs < kMinTimeoutMs || commandData.timeoutMs > kMaxTimeoutMs)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
+    if (device == nullptr || !device->IsIcd())
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Failure);
+        return;
+    }
+
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration) == CHIP_NO_ERROR)
+    if (KeepActive(device->GetNodeId(), commandData.stayActiveDuration, commandData.timeoutMs) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "KeepActive successfully processed");
         status = Status::Success;
@@ -234,6 +284,7 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
@@ -249,7 +300,8 @@ void ApplicationInit()
     AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    InitRpcServer(kFabricBridgeServerPort);
+    SetRpcRemoteServerPort(gFabricAdminServerPort);
+    InitRpcServer(gLocalServerPort);
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
 #endif
 
@@ -258,6 +310,7 @@ void ApplicationInit()
     pollingThread.detach();
 
     BridgeDeviceMgr().Init();
+    VerifyOrDie(gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
 
     VerifyOrDieWithMsg(CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");
@@ -275,7 +328,7 @@ void ApplicationShutdown()
 
 int main(int argc, char * argv[])
 {
-    if (ChipLinuxAppInit(argc, argv) != 0)
+    if (ChipLinuxAppInit(argc, argv, &sProgramCustomOptions) != 0)
     {
         return -1;
     }

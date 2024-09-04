@@ -25,13 +25,13 @@ import matter.tlv.TlvWriter
 class ServiceAreaClusterAreaStruct(
   val areaID: UInt,
   val mapID: UInt?,
-  val areaDesc: ServiceAreaClusterAreaInfoStruct,
+  val areaInfo: ServiceAreaClusterAreaInfoStruct,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaStruct {\n")
     append("\tareaID : $areaID\n")
     append("\tmapID : $mapID\n")
-    append("\tareaDesc : $areaDesc\n")
+    append("\tareaInfo : $areaInfo\n")
     append("}\n")
   }
 
@@ -44,7 +44,7 @@ class ServiceAreaClusterAreaStruct(
       } else {
         putNull(ContextSpecificTag(TAG_MAP_ID))
       }
-      areaDesc.toTlv(ContextSpecificTag(TAG_AREA_DESC), this)
+      areaInfo.toTlv(ContextSpecificTag(TAG_AREA_INFO), this)
       endStructure()
     }
   }
@@ -52,7 +52,7 @@ class ServiceAreaClusterAreaStruct(
   companion object {
     private const val TAG_AREA_ID = 0
     private const val TAG_MAP_ID = 1
-    private const val TAG_AREA_DESC = 2
+    private const val TAG_AREA_INFO = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaStruct {
       tlvReader.enterStructure(tlvTag)
@@ -64,12 +64,12 @@ class ServiceAreaClusterAreaStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
           null
         }
-      val areaDesc =
-        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_DESC), tlvReader)
+      val areaInfo =
+        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_AREA_INFO), tlvReader)
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterAreaStruct(areaID, mapID, areaDesc)
+      return ServiceAreaClusterAreaStruct(areaID, mapID, areaInfo)
     }
   }
 }

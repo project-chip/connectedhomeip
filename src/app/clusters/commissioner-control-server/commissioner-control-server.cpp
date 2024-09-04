@@ -64,25 +64,25 @@ void AddReverseOpenCommissioningWindowResponse(CommandHandler * commandObj, cons
 
 void RunDeferredCommissionNode(intptr_t commandArg)
 {
-    auto * info = reinterpret_cast<Clusters::CommissionerControl::CommissionNodeInfo *>(commandArg);
+    auto * params = reinterpret_cast<Clusters::CommissionerControl::CommissioningWindowParams *>(commandArg);
 
     Clusters::CommissionerControl::Delegate * delegate =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
+        CHIP_ERROR err = delegate->HandleCommissionNode(*params);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ChipLogError(Zcl, "No delegate available for ReverseCommissionNode");
+        ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
     }
 
-    delete info;
+    delete params;
 }
 
 } // namespace
@@ -234,31 +234,27 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     auto requestId = commandData.requestId;
 
-    auto commissionNodeInfo = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
+    auto commissioningWindowParams = std::make_unique<Clusters::CommissionerControl::CommissioningWindowParams>();
 
     Clusters::CommissionerControl::Delegate * delegate =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
 
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    // Set IP address and port in the CommissionNodeInfo struct
-    commissionNodeInfo->port = commandData.port;
-    err                      = commissionNodeInfo->ipAddress.SetIPAddress(commandData.ipAddress);
-    SuccessOrExit(err);
-
     // Validate the commission node command.
     err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
     SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
-    err = delegate->GetCommissioningWindowParams(commissionNodeInfo->params);
+    err = delegate->GetCommissioningWindowParams(*commissioningWindowParams);
     SuccessOrExit(err);
 
     // Add the response for the commissioning window.
-    AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, commissionNodeInfo->params);
+    AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, *commissioningWindowParams);
 
     // Schedule the deferred reverse commission node task
-    DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode, reinterpret_cast<intptr_t>(commissionNodeInfo.release()));
+    DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode,
+                                            reinterpret_cast<intptr_t>(commissioningWindowParams.release()));
 
 exit:
     if (err != CHIP_NO_ERROR)

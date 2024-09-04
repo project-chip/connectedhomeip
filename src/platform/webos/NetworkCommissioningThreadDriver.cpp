@@ -211,9 +211,9 @@ ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t LinuxThreadDriver::GetThreadVersion()
 {
-    // TODO https://github.com/project-chip/connectedhomeip/issues/30602
-    // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
-    return 0;
+    uint16_t version = 0;
+    ThreadStackMgrImpl().GetThreadVersion(version);
+    return version;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

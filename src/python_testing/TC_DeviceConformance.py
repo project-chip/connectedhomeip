@@ -50,7 +50,25 @@ class DeviceConformanceTests(BasicCompositionTests):
         self.xml_device_types, problems = build_xml_device_types()
         self.problems.extend(problems)
 
-    def check_conformance(self, ignore_in_progress: bool, is_ci: bool):
+    def _get_device_type_id(self, device_type_name: str) -> int:
+        id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+        if len(id) != 1:
+            self.fail_current_test(f"Unable to find {device_type_name} device type")
+        return id[0]
+
+    def _has_device_type_supporting_macl(self):
+        # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
+        # but these are not currently exposed directly by the device.
+        allowed_ids = [self._get_device_type_id('network infrastructure manager')]
+        for endpoint in self.endpoints_tlv.values():
+            desc = Clusters.Descriptor
+            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            if set(allowed_ids).intersection(set(device_types)):
+                # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
+                return True
+        return False
+
+    def check_conformance(self, ignore_in_progress: bool, is_ci: bool, allow_provisional: bool):
         problems = []
         success = True
 
@@ -87,32 +105,27 @@ class DeviceConformanceTests(BasicCompositionTests):
             ignore_attributes.update(ci_ignore_attributes)
 
         success = True
-        allow_provisional = self.user_params.get("allow_provisional", False)
-        # TODO: automate this once https://github.com/csa-data-model/projects/issues/454 is done.
-        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id, Clusters.BallastConfiguration.id,
-                                   Clusters.EnergyPreference.id, Clusters.DeviceEnergyManagement.id, Clusters.DeviceEnergyManagementMode.id, Clusters.PulseWidthModulation.id,
-                                   Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id]
-        # TODO: Remove this once the latest 1.3 lands with the clusters removed from the DM XML and change the warning below about missing DM XMLs into a proper error
-        # These are clusters that weren't part of the 1.3 spec that landed in the SDK before the branch cut
+        provisional_cluster_ids = []
+        # TODO: Remove this once we have a scrape without items not going to the test events
+        # These are clusters that weren't part of the 1.3 or 1.4 spec that landed in the SDK before the branch cut
+        # They're not marked provisional, but are present in the ToT spec under an ifdef.
         provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
-        # These clusters are zigbee only. I don't even know why they're part of the codegen, but we should get rid of them.
-        provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id,
-                                       Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
+
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
-
-                if not allow_provisional and cluster_id in provisional_cluster_ids:
-                    record_error(location=cluster_location, problem='Provisional cluster found on device')
-                    continue
 
                 if cluster_id not in self.xml_clusters.keys():
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
-                    # TODO: update this from a warning once we have all the data
-                    record_warning(location=cluster_location,
-                                   problem='Standard cluster found on device, but is not present in spec data')
+                    record_error(location=cluster_location,
+                                 problem='Standard cluster found on device, but is not present in spec data')
+                    continue
+
+                is_provisional = cluster_id in provisional_cluster_ids or self.xml_clusters[cluster_id].is_provisional
+                if not allow_provisional and is_provisional:
+                    record_error(location=cluster_location, problem='Provisional cluster found on device')
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
@@ -125,6 +138,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                 for f in feature_masks:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
+                    if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
+                        # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
+                        if not self._has_device_type_supporting_macl():
+                            record_error(
+                                location=location, problem="MACL feature is disallowed if the a supported device type is not present")
+                        continue
+
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
@@ -136,7 +156,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
-                            location=location, problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
+                            location=location, problem=f'Required feature with mask 0x{feature_mask:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
                 # Attribute conformance checking
                 for attribute_id, attribute in cluster.items():
@@ -340,7 +360,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         # https://github.com/project-chip/connectedhomeip/issues/34615
         ignore_in_progress = self.user_params.get("ignore_in_progress", True)
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        success, problems = self.check_conformance(ignore_in_progress, is_ci)
+        allow_provisional = self.user_params.get("allow_provisional", False)
+        success, problems = self.check_conformance(ignore_in_progress, is_ci, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
@@ -354,7 +375,8 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
 
     def test_TC_IDM_10_5(self):
         fail_on_extra_clusters = self.user_params.get("fail_on_extra_clusters", True)
-        success, problems = self.check_device_type(fail_on_extra_clusters)
+        allow_provisional = self.user_params.get("allow_provisional", False)
+        success, problems = self.check_device_type(fail_on_extra_clusters, allow_provisional)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")

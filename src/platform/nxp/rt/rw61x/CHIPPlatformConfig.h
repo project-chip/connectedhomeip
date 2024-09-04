@@ -35,7 +35,7 @@
 /* In src/crypto/CHIPCryptoPALmbedTLS.cpp we verify kMAX_Hash_SHA256_Context_Size >= sizeof(mbedtls_sha256_context)
  * sizeof(mbedtls_sha256_context) is 392 bytes with els_pkc mbedtls port
  */
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 98)
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 120)
 
 // ==================== Security Adaptations ====================
 

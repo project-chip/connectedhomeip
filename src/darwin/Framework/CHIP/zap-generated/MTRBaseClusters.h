@@ -11910,7 +11910,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Occupancy Sensing
  *
- * Attributes and commands for configuring occupancy sensing, and reporting occupancy status.
+ * The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterOccupancySensing : MTRGenericBaseCluster
@@ -15113,12 +15113,6 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterEcosystemInformation : MTRGenericBaseCluster
-
-- (void)readAttributeRemovedOnWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeRemovedOnWithParams:(MTRSubscribeParams *)params
-                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeRemovedOnWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeDeviceDirectoryWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeDeviceDirectoryWithParams:(MTRSubscribeParams *)params
@@ -18589,7 +18583,7 @@ typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCRunModeFeature) {
-    MTRRVCRunModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
+    MTRRVCRunModeFeatureDirectModeChange MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
@@ -18603,7 +18597,7 @@ typedef NS_ENUM(uint8_t, MTRRVCCleanModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeFeature) {
-    MTRRVCCleanModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
+    MTRRVCCleanModeFeatureDirectModeChange MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
@@ -19787,9 +19781,8 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaOperationalStatus) {
 typedef NS_ENUM(uint8_t, MTRServiceAreaSelectAreasStatus) {
     MTRServiceAreaSelectAreasStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRServiceAreaSelectAreasStatusUnsupportedArea MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSelectAreasStatusDuplicatedAreas MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRServiceAreaSelectAreasStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRServiceAreaSelectAreasStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRServiceAreaSelectAreasStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaSelectAreasStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRServiceAreaSkipAreaStatus) {
@@ -20209,59 +20202,123 @@ typedef NS_ENUM(uint8_t, MTRColorControlColorLoopAction) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRColorControlColorLoopDirection) {
-    MTRColorControlColorLoopDirectionDecrementHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRColorControlColorLoopDirectionIncrementHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRColorControlColorLoopDirectionDecrement MTR_NEWLY_AVAILABLE = 0x00,
+    MTRColorControlColorLoopDirectionDecrementHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorLoopDirectionDecrement")
+    = 0x00,
+    MTRColorControlColorLoopDirectionIncrement MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlColorLoopDirectionIncrementHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorLoopDirectionIncrement")
+    = 0x01,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRColorControlColorMode) {
     MTRColorControlColorModeCurrentHueAndCurrentSaturation MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRColorControlColorModeCurrentXAndCurrentY MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlColorModeColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+    MTRColorControlColorModeColorTemperatureMireds MTR_NEWLY_AVAILABLE = 0x02,
+    MTRColorControlColorModeColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorModeColorTemperatureMireds")
+    = 0x02,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRColorControlDirection) {
+    MTRColorControlDirectionShortest MTR_NEWLY_AVAILABLE = 0x00,
+    MTRColorControlDirectionLongest MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlDirectionUp MTR_NEWLY_AVAILABLE = 0x02,
+    MTRColorControlDirectionDown MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRColorControlHueDirection) {
-    MTRColorControlHueDirectionShortestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRColorControlHueDirectionLongestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlHueDirectionUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRColorControlHueDirectionDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRColorControlHueDirectionShortestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlDirectionShortest")
+    = 0x00,
+    MTRColorControlHueDirectionLongestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlDirectionLongest")
+    = 0x01,
+    MTRColorControlHueDirectionUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlDirectionUp")
+    = 0x02,
+    MTRColorControlHueDirectionDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlDirectionDown")
+    = 0x03,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlDirection");
+
+typedef NS_ENUM(uint8_t, MTRColorControlDriftCompensation) {
+    MTRColorControlDriftCompensationNone MTR_NEWLY_AVAILABLE = 0x00,
+    MTRColorControlDriftCompensationOtherOrUnknown MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlDriftCompensationTemperatureMonitoring MTR_NEWLY_AVAILABLE = 0x02,
+    MTRColorControlDriftCompensationOpticalLuminanceMonitoringAndFeedback MTR_NEWLY_AVAILABLE = 0x03,
+    MTRColorControlDriftCompensationOpticalColorMonitoringAndFeedback MTR_NEWLY_AVAILABLE = 0x04,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRColorControlEnhancedColorMode) {
+    MTRColorControlEnhancedColorModeCurrentHueAndCurrentSaturation MTR_NEWLY_AVAILABLE = 0x00,
+    MTRColorControlEnhancedColorModeCurrentXAndCurrentY MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlEnhancedColorModeColorTemperatureMireds MTR_NEWLY_AVAILABLE = 0x02,
+    MTRColorControlEnhancedColorModeEnhancedCurrentHueAndCurrentSaturation MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRColorControlMoveMode) {
+    MTRColorControlMoveModeStop MTR_NEWLY_AVAILABLE = 0x00,
+    MTRColorControlMoveModeUp MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlMoveModeDown MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRColorControlHueMoveMode) {
-    MTRColorControlHueMoveModeStop MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRColorControlHueMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlHueMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRColorControlHueMoveModeStop MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeStop")
+    = 0x00,
+    MTRColorControlHueMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeUp")
+    = 0x01,
+    MTRColorControlHueMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeDown")
+    = 0x03,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveMode");
+
+typedef NS_ENUM(uint8_t, MTRColorControlStepMode) {
+    MTRColorControlStepModeUp MTR_NEWLY_AVAILABLE = 0x01,
+    MTRColorControlStepModeDown MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRColorControlHueStepMode) {
-    MTRColorControlHueStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlHueStepModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRColorControlHueStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeUp")
+    = 0x01,
+    MTRColorControlHueStepModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeDown")
+    = 0x03,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepMode");
 
-typedef NS_ENUM(uint8_t, MTRColorControlSaturationMoveMode) {
-    MTRColorControlSaturationMoveModeStop MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRColorControlSaturationMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlSaturationMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRColorControlSaturationStepMode) {
-    MTRColorControlSaturationStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRColorControlSaturationStepModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilitiesBitmap) {
+    MTRColorControlColorCapabilitiesBitmapHueSaturation MTR_NEWLY_AVAILABLE = 0x1,
+    MTRColorControlColorCapabilitiesBitmapEnhancedHue MTR_NEWLY_AVAILABLE = 0x2,
+    MTRColorControlColorCapabilitiesBitmapColorLoop MTR_NEWLY_AVAILABLE = 0x4,
+    MTRColorControlColorCapabilitiesBitmapXY MTR_NEWLY_AVAILABLE = 0x8,
+    MTRColorControlColorCapabilitiesBitmapColorTemperature MTR_NEWLY_AVAILABLE = 0x10,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilities) {
-    MTRColorControlColorCapabilitiesHueSaturationSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRColorControlColorCapabilitiesEnhancedHueSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRColorControlColorCapabilitiesColorLoopSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRColorControlColorCapabilitiesXYAttributesSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRColorControlColorCapabilitiesColorTemperatureSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_OPTIONS(uint8_t, MTRColorControlColorLoopUpdateFlags) {
-    MTRColorControlColorLoopUpdateFlagsUpdateAction MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRColorControlColorLoopUpdateFlagsUpdateDirection MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRColorControlColorLoopUpdateFlagsUpdateTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRColorControlColorLoopUpdateFlagsUpdateStartHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRColorControlColorCapabilitiesHueSaturationSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmapHueSaturation")
+    = 0x1,
+    MTRColorControlColorCapabilitiesEnhancedHueSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmapEnhancedHue")
+    = 0x2,
+    MTRColorControlColorCapabilitiesColorLoopSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmapColorLoop")
+    = 0x4,
+    MTRColorControlColorCapabilitiesXYAttributesSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmapXY")
+    = 0x8,
+    MTRColorControlColorCapabilitiesColorTemperatureSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmapColorTemperature")
+    = 0x10,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlColorCapabilitiesBitmap");
 
 typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {
     MTRColorControlFeatureHueAndSaturation MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
@@ -20270,6 +20327,33 @@ typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {
     MTRColorControlFeatureXY MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
     MTRColorControlFeatureColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint8_t, MTRColorControlOptionsBitmap) {
+    MTRColorControlOptionsBitmapExecuteIfOff MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRColorControlUpdateFlagsBitmap) {
+    MTRColorControlUpdateFlagsBitmapUpdateAction MTR_NEWLY_AVAILABLE = 0x1,
+    MTRColorControlUpdateFlagsBitmapUpdateDirection MTR_NEWLY_AVAILABLE = 0x2,
+    MTRColorControlUpdateFlagsBitmapUpdateTime MTR_NEWLY_AVAILABLE = 0x4,
+    MTRColorControlUpdateFlagsBitmapUpdateStartHue MTR_NEWLY_AVAILABLE = 0x8,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRColorControlColorLoopUpdateFlags) {
+    MTRColorControlColorLoopUpdateFlagsUpdateAction MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlUpdateFlagsBitmapUpdateAction")
+    = 0x1,
+    MTRColorControlColorLoopUpdateFlagsUpdateDirection MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlUpdateFlagsBitmapUpdateDirection")
+    = 0x2,
+    MTRColorControlColorLoopUpdateFlagsUpdateTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlUpdateFlagsBitmapUpdateTime")
+    = 0x4,
+    MTRColorControlColorLoopUpdateFlagsUpdateStartHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlUpdateFlagsBitmapUpdateStartHue")
+    = 0x8,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlUpdateFlagsBitmap");
 
 typedef NS_OPTIONS(uint8_t, MTRBallastConfigurationBallastStatusBitmap) {
     MTRBallastConfigurationBallastStatusBitmapBallastNonOperational MTR_PROVISIONALLY_AVAILABLE = 0x1,

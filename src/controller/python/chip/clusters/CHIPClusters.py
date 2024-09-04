@@ -3302,6 +3302,7 @@ class ChipClusters:
                 "commandName": "KeepActive",
                 "args": {
                     "stayActiveDuration": "int",
+                    "timeoutMs": "int",
                 },
             },
         },
@@ -13319,20 +13320,14 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "RemovedOn",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "DeviceDirectory",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "LocationDirectory",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
             },
@@ -13394,8 +13389,6 @@ class ChipClusters:
                 "args": {
                     "requestId": "int",
                     "responseTimeoutSeconds": "int",
-                    "ipAddress": "bytes",
-                    "port": "int",
                 },
             },
         },

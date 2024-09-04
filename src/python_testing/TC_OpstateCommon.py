@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import json
 import logging
 import queue
 import time
@@ -112,12 +111,7 @@ class TC_OPSTATE_BASE():
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-    # Sends and out-of-band command to test-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-
-    def send_raw_manual_or_pipe_command(self, command):
+    def send_raw_manual_or_pipe_command(self, command: dict):
         if self.is_ci:
             self.write_to_app_pipe(command)
             time.sleep(0.1)
@@ -134,7 +128,7 @@ class TC_OPSTATE_BASE():
         if param is not None:
             command["Param"] = param
 
-        self.send_raw_manual_or_pipe_command(json.dumps(command))
+        self.send_raw_manual_or_pipe_command(command)
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):
         logging.info(f"##### Command {cmd}")
@@ -1264,8 +1258,8 @@ class TC_OPSTATE_BASE():
         sub_handler = ClusterAttributeChangeAccumulator(cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(3)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.step(3)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start")

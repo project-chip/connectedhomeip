@@ -32,7 +32,10 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceControllerXPCParameters.h"
 #import "MTRDeviceController_Concrete.h"
+#import "MTRDeviceController_XPC.h"
+#import "MTRDeviceController_XPC_Internal.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -79,8 +82,6 @@
 #include <dns_sd.h>
 #include <string>
 
-#import <os/lock.h>
-
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
@@ -100,8 +101,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readwrite) NSUUID * uniqueIdentifier;
 @property (nonatomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (nonatomic, readonly, nullable) MTRDeviceControllerFactory * factory;
-@property (nonatomic, readonly, nullable) NSMapTable * nodeIDToDeviceMap;
-@property (nonatomic, readonly) os_unfair_lock deviceMapLock;
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 @property (nonatomic, readonly, nullable) MTRCommissionableBrowser * commissionableBrowser;
@@ -134,44 +133,52 @@ using namespace chip::Tracing::DarwinFramework;
 @synthesize concurrentSubscriptionPool = _concurrentSubscriptionPool;
 @synthesize storageBehaviorConfiguration = _storageBehaviorConfiguration;
 
-- (nullable MTRDeviceController_Concrete *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                                        error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                      error:(NSError * __autoreleasing *)error
 {
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+    /// IF YOU ARE ALARMED BY TYPES:  You are right to be alarmed, but do not panic.
+    /// _ORDER MATTERS HERE:_ XPC parameters are a subclass of `MTRDeviceControllerParameters`
+    /// because of the enormous overlap of params.
+    if ([parameters isKindOfClass:MTRDeviceControllerXPCParameters.class]) {
+        if ([parameters isKindOfClass:MTRDeviceControllerMachServiceXPCParameters.class]) {
+            MTRDeviceControllerMachServiceXPCParameters * xpcParameters = (MTRDeviceControllerMachServiceXPCParameters *) parameters;
+            MTR_LOG_DEBUG("%s: got XPC parameters, getting XPC device controller", __PRETTY_FUNCTION__);
+
+            NSString * machServiceName = xpcParameters.machServiceName;
+            MTR_LOG_DEBUG("%s: machServiceName %@", __PRETTY_FUNCTION__, machServiceName);
+
+            MTRDeviceController * xpcDeviceController = [[MTRDeviceController_XPC alloc] initWithMachServiceName:machServiceName options:xpcParameters.connectionOptions];
+
+            /// Being of sound mind, I willfully and voluntarily make this static cast.
+            return static_cast<MTRDeviceController_Concrete *>(xpcDeviceController);
+        } else {
+            MTR_LOG_ERROR("%s: unrecognized XPC parameters class %@", __PRETTY_FUNCTION__, NSStringFromClass(parameters.class));
+
+            // TODO:  there's probably a more appropriate error here.
+            if (error) {
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_IMPLEMENTED];
+            }
+
+            return nil;
+        }
+    } else if ([parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_DEBUG("%s: got standard parameters, getting standard device controller from factory", __PRETTY_FUNCTION__);
+        auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+        // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+        MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
+        id controller = [factory initializeController:self
+                                       withParameters:controllerParameters
+                                                error:error];
+        return controller;
+    } else {
+        // way out of our league
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
-    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    id controller = [factory initializeController:self
-                                   withParameters:controllerParameters
-                                            error:error];
-    return controller;
-}
-
-- (nullable MTRDeviceController *)bogusWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                                error:(NSError * __autoreleasing *)error
-{
-    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
-        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
-        return nil;
-    }
-    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
-    MTRDeviceController * controller = [factory initializeController:self
-                                                      withParameters:controllerParameters
-                                                               error:error];
-    return controller;
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -259,11 +266,9 @@ using namespace chip::Tracing::DarwinFramework;
 
         _otaProviderDelegate = otaProviderDelegate;
         _otaProviderDelegateQueue = otaProviderDelegateQueue;
-
         _chipWorkQueue = queue;
         _factory = factory;
-        _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
+        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
@@ -312,7 +317,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceController: %p uuid %@>", self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
 }
 
 - (BOOL)isRunning
@@ -328,7 +333,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
 
-    MTR_LOG("Shutting down MTRDeviceController: %@", self);
+    MTR_LOG("Shutting down %@: %@", NSStringFromClass(self.class), self);
     [self cleanupAfterStartup];
 }
 
@@ -340,11 +345,11 @@ using namespace chip::Tracing::DarwinFramework;
     // do the secure session shutdowns.  Since we don't want to hold the lock
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
-    MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
-    os_unfair_lock_lock(&_deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
-    [_nodeIDToDeviceMap removeAllObjects];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
+    os_unfair_lock_lock(self.deviceMapLock);
+    NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+    [self.nodeIDToDeviceMap removeAllObjects];
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     for (MTRDevice * device in devices) {
         [device invalidate];
@@ -358,7 +363,7 @@ using namespace chip::Tracing::DarwinFramework;
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
-    MTR_LOG("shutDownCppController MTRDeviceController: %p", self);
+    MTR_LOG("%s: %p", __PRETTY_FUNCTION__, self);
     assertChipStackLockedByCurrentThread();
 
     // Shut down all our endpoints.
@@ -643,7 +648,7 @@ using namespace chip::Tracing::DarwinFramework;
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
             MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
 
-            std::lock_guard lock(self->_deviceMapLock);
+            std::lock_guard lock(*self.deviceMapLock);
             NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
@@ -663,7 +668,7 @@ using namespace chip::Tracing::DarwinFramework;
             });
         }];
     }
-    MTR_LOG("MTRDeviceController startup: %@", self);
+    MTR_LOG("%s: startup: %@", __PRETTY_FUNCTION__, self);
 
     return YES;
 }
@@ -1013,15 +1018,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    os_unfair_lock_assert_owner(&_deviceMapLock);
+    os_unfair_lock_assert_owner(self.deviceMapLock);
 
-    MTRDevice * deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+    MTRDevice * deviceToReturn = [[MTRDevice_Concrete alloc] initWithNodeID:nodeID controller:self];
     // If we're not running, don't add the device to our map.  That would
     // create a cycle that nothing would break.  Just return the device,
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
 
     if (prefetchedClusterData) {
@@ -1052,8 +1057,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
-    std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
+    std::lock_guard lock(*self.deviceMapLock);
+    MTRDevice * deviceToReturn = [self.nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
@@ -1063,12 +1068,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)removeDevice:(MTRDevice *)device
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
+    MTRDevice * deviceToRemove = [self.nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
         [deviceToRemove invalidate];
-        [_nodeIDToDeviceMap removeObjectForKey:nodeID];
+        [self.nodeIDToDeviceMap removeObjectForKey:nodeID];
     } else {
         MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
     }
@@ -1077,10 +1082,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 #ifdef DEBUG
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
-    std::lock_guard lock(_deviceMapLock);
+    std::lock_guard lock(*self.deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
-    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
+    for (NSNumber * nodeID in self.nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([[self.nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1178,7 +1183,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (![endpoint associateWithController:self]) {
-        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with MTRDeviceController", self);
+        MTR_LOG_ERROR("%@ Failed to associate MTRServerEndpoint with %@", self, NSStringFromClass(self.class));
         [_factory removeServerEndpoint:endpoint];
         return NO;
     }
@@ -1298,7 +1303,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return YES;
     }
 
-    MTR_LOG_ERROR("MTRDeviceController: %@ Error: %s", self, [kDeviceControllerErrorNotRunning UTF8String]);
+    MTR_LOG_ERROR("%@: %@ Error: %s", NSStringFromClass(self.class), self, [kDeviceControllerErrorNotRunning UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -1529,9 +1534,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    os_unfair_lock_lock(self.deviceMapLock);
+    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:@(nodeID)];
+    os_unfair_lock_unlock(self.deviceMapLock);
 
     if (device == nil) {
         return;

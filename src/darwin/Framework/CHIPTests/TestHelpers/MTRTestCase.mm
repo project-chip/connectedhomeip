@@ -19,10 +19,40 @@
 
 #import "MTRTestCase.h"
 
+#if HAVE_NSTASK
+// Tasks that are not scoped to a specific test, but rather to a specific test suite.
+static NSMutableSet<NSTask *> * runningCrossTestTasks;
+
+static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
+{
+    for (NSTask * task in tasks) {
+        NSLog(@"Terminating task %@", task);
+        [task terminate];
+    }
+    tasks = nil;
+}
+#endif // HAVE_NSTASK
+
 @implementation MTRTestCase {
 #if HAVE_NSTASK
     NSMutableSet<NSTask *> * _runningTasks;
 #endif // NSTask
+}
+
++ (void)setUp
+{
+    [super setUp];
+
+#if HAVE_NSTASK
+    runningCrossTestTasks = [[NSMutableSet alloc] init];
+#endif // HAVE_NSTASK
+}
+
++ (void)tearDown
+{
+#if HAVE_NSTASK
+    ClearTaskSet(runningCrossTestTasks);
+#endif // HAVE_NSTASK
 }
 
 - (void)setUp
@@ -32,10 +62,6 @@
 #endif // HAVE_NSTASK
 }
 
-/**
- * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
- * does not trigger a test failure even if the XCTAssertEqual fails.
- */
 - (void)tearDown
 {
 #if defined(ENABLE_LEAK_DETECTION) && ENABLE_LEAK_DETECTION
@@ -43,15 +69,16 @@
         int pid = getpid();
         __auto_type * cmd = [NSString stringWithFormat:@"leaks %d", pid];
         int ret = system(cmd.UTF8String);
+        /**
+         * Unfortunately, doing this in "+ (void)tearDown" (the global suite teardown)
+         * does not trigger a test failure even if the XCTAssertEqual fails.
+         */
         XCTAssertEqual(ret, 0, "LEAKS DETECTED");
     }
 #endif
 
 #if HAVE_NSTASK
-    for (NSTask * task in _runningTasks) {
-        [task terminate];
-    }
-    _runningTasks = nil;
+    ClearTaskSet(_runningTasks);
 #endif // HAVE_NSTASK
 
     [super tearDown];
@@ -75,13 +102,25 @@
     XCTAssertEqual([task terminationStatus], 0);
 }
 
-- (void)launchTask:(NSTask *)task
+- (void)doLaunchTask:(NSTask *)task
 {
     NSError * launchError;
     [task launchAndReturnError:&launchError];
     XCTAssertNil(launchError);
+}
+
+- (void)launchTask:(NSTask *)task
+{
+    [self doLaunchTask:task];
 
     [_runningTasks addObject:task];
+}
+
+- (void)launchCrossTestTask:(NSTask *)task
+{
+    [self doLaunchTask:task];
+
+    [runningCrossTestTasks addObject:task];
 }
 #endif // HAVE_NSTASK
 

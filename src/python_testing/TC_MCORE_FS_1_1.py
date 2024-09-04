@@ -36,7 +36,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: confirm whether we can open processes like this on the TH
         self.app_process = None
         app = self.user_params.get("th_server_app_path", None)
         if not app:
@@ -46,11 +45,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.port = 5543
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting application to acts mock a server portion of TH_FSA")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("Started application to acts mock a server portion of TH_FSA")
         time.sleep(3)
 
@@ -93,7 +95,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.step(1)
         self.step(2)
         self.step(3)
-        th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         th_fsa_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
 
@@ -138,7 +140,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         if not self.is_ci:
             time.sleep(30)
 
-        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        th_fsa_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         # TODO: this should be mocked too.
         if not self.is_ci:
             asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),

@@ -113,7 +113,7 @@ public:
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
-
+    CHIP_ERROR _GetThreadVersion(uint16_t & version);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     void _ResetThreadNetworkDiagnosticsCounts();
