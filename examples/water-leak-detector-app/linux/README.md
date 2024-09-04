@@ -29,7 +29,7 @@ details.
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/water-leak-detector-app-app/linux
+          $ cd ~/connectedhomeip/examples/water-leak-detector-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -37,12 +37,12 @@ details.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/water-leak-detector-app-app/linux
+          $ cd ~/connectedhomeip/examples/water-leak-detector-app/linux
           $ rm -rf out/
 
 -   Build the example with pigweed RPC
 
-          $ cd ~/connectedhomeip/examples/water-leak-detector-app-app/linux
+          $ cd ~/connectedhomeip/examples/water-leak-detector-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
@@ -104,10 +104,10 @@ details.
 
         -   Run Linux Water Leak DetectorApp
 
-                  $ cd ~/connectedhomeip/examples/water-leak-detector-app-app/linux
-                  $ sudo out/debug/chip-water-leak-detector-app-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/water-leak-detector-app/linux
+                  $ sudo out/debug/chip-water-leak-detector-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-water-leak-detector-app-app --ble-device 1
+                  $ sudo out/debug/chip-water-leak-detector-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
