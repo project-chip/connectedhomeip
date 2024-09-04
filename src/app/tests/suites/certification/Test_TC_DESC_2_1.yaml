@@ -85,7 +85,7 @@ tests:
           For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer, convert to hex before comparing.
 
-          ./chip-tool descriptor read  parts-list 1 1
+          ./chip-tool descriptor read parts-list 1 1
 
           Verify  parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
