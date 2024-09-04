@@ -104,6 +104,8 @@ class BasicCompositionTests:
             created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
 
         setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
+        if not setup_codes:
+            return None
         asserts.assert_equal(len(setup_codes), 1,
                              "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
         return setup_codes[0]
@@ -132,7 +134,7 @@ class BasicCompositionTests:
         node_id = self.dut_node_id
 
         task_list = []
-        if allow_pase:
+        if allow_pase and self.get_code(dev_ctrl):
             setup_code = self.get_code(dev_ctrl)
             pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
