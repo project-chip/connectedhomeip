@@ -190,8 +190,6 @@ static MTRTestKeys * sTestKeys = nil;
                                                                     arguments:@[
                                                                         @"--dac_provider",
                                                                         [self absolutePathFor:@"credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json"],
-                                                                        @"--product-id",
-                                                                        @"32768",
                                                                     ]
                                                                       payload:kOnboardingPayload
                                                                      testcase:self];
