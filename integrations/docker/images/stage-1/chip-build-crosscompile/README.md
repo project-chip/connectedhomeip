@@ -8,6 +8,46 @@ the current directory. This can generally be manually built using an existing
 Raspberry Pi device (or equivalent qemu) and a convenience copy was created in
 CIPD
 
+
+#### Creating a Sysroot (qemu VM)
+
+NOTE: this approach is slower due to emulation usage, however has the advantage
+      of not requiring separate hardware.
+
+Ensure `qemu` and `virt-install` prerequisites are met:
+
+```
+apt-get install qemu-system-arm virtinst libvirt-daemon
+```
+
+Start up the sysroot virtual machine. This will be named `sysrootsrv`:
+
+```
+./start-sysroot-vm.sh
+```
+
+Connect to a console to monitor progress. The VM is configured to pre-install
+packages based on CHIP BUILDING.md documentation plus any additional
+packages.
+
+```
+virsh console sysrootsrv
+```
+
+Once installation completed, you can also login as `ubuntu/1234` or 
+use `ssh ubuntu@localhost -p 5555`
+
+The current image is based on ubunt 24.04, so you can create an image via:
+
+```
+rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot
+rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/usr/lib ubuntu-24.04-aarch64-sysroot/usr
+rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/include/lib ubuntu-24.04-aarch64-sysroot/usr
+```
+
+At this point you have a sysroot in `ubuntu-24.04-aarch64-sysroot`
+
+
 #### Creating a Sysroot
 
 Start with a fresh Raspberry PI image:
@@ -64,3 +104,5 @@ and can be downloaded using the `cipd` script from
 echo 'experimental/matter/sysroot/ubuntu-21.04-aarch64 latest' > ensure_file.txt
 cipd ensure -ensure-file ensure_file.txt -root ./
 ```
+
+

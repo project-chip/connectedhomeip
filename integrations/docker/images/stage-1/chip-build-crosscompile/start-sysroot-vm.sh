@@ -82,7 +82,6 @@ package_upgrade: true
 packages:
   - g++
   - gcc
-  - git
   - libavahi-client-dev
   - libcairo2-dev
   - libdbus-1-dev
@@ -93,9 +92,6 @@ packages:
   - libssl-dev
   - ninja-build
   - pkg-config
-  - python3-dev
-  - python3-pip
-  - python3-venv
   - unzip
 
 runcmd:
