@@ -521,6 +521,7 @@ void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricI
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
+
     event.instruction = instruction;
     event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
