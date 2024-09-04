@@ -47,13 +47,13 @@ class TestUnitTestingErrorPath(MatterBaseTest):
 
         self.print_step(0, "Commissioning - already done")
 
-        self.print_step(1, "Set error to failure.")
+        self.print_step(1, "Set error to 'Failure' for all subsequent reads of FailureInt32U.")
         await self.default_controller.WriteAttribute(
             nodeid=self.dut_node_id,
             attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
-        self.print_step(2, "Expect failure on reading")
+        self.print_step(2, "Expect that reading FailureInt32U returns the previously set 'Failure' code.")
         try:
             data = await self.default_controller.ReadAttribute(
                 self.dut_node_id, [(endpoint_id, attributes.FailureInt32U)]
@@ -68,13 +68,13 @@ class TestUnitTestingErrorPath(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Failure reading")
 
-        self.print_step(3, "Set a different error")
+        self.print_step(3, "Set error to 'ResourceExhausted' for all subsequent reads of FailureInt32U.")
         await self.default_controller.WriteAttribute(
             nodeid=self.dut_node_id,
             attributes=[(endpoint_id, attributes.ReadFailureCode(int(Status.ResourceExhausted)))],
         )
 
-        self.print_step(4, "Expect Updated failure reading")
+        self.print_step(4, "Expect that reading FailureInt32U returns the previously set 'ResourceExhausted' code.")
         try:
             data = await self.default_controller.ReadAttribute(
                 self.dut_node_id, [(endpoint_id, attributes.FailureInt32U)]
@@ -89,7 +89,7 @@ class TestUnitTestingErrorPath(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Failure reading")
 
-        self.print_step(5, "Reset error to default")
+        self.print_step(5, "Reset ReadFailureCode error to default 'Failure' code.")
         await self.default_controller.WriteAttribute(
             nodeid=self.dut_node_id,
             attributes=[(1, attributes.ReadFailureCode(int(Status.Failure)))],
