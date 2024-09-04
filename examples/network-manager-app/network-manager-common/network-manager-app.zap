@@ -2393,7 +2393,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             }
           ],
           "attributes": [
