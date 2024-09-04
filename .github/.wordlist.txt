@@ -950,8 +950,6 @@ NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
 nltest
-NLUnitTest
-NLUnitTests
 nmcli
 nmtui
 noc
