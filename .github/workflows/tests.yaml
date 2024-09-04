@@ -476,7 +476,6 @@ jobs:
 
             - name: Build Python REPL and example apps
               # NOTE: the data-mode-check + check-failure-die is not 100% perfect as different
-              #
               #       encoding sizes for data that keeps changing may alter over time (e.g. anything relating to time
               #       or resources such as packet counts or other similar counters)
               #
