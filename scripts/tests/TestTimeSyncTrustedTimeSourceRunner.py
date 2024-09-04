@@ -88,7 +88,7 @@ def main():
     args = parser.parse_args()
 
     driver = TestDriver(
-        all_clusters=args.app_clusters,
+        all_clusters=args.all_clusters,
         test_runner=args.test_runner,
         test_script=args.test_script,
     )
