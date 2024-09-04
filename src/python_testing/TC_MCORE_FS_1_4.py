@@ -238,6 +238,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
 
+        # Wait for TH_SERVER_NO_UID get initialized.
+        try:
+            asyncio.run(self.wait_for_server_initialization(self.th_server_port))
+        except TimeoutError:
+            asserts.fail(f"TH_SERVER_NO_UID server failed to open port {self.th_server_port}")
+
     def teardown_class(self):
         if self.th_fsa_controller is not None:
             self.th_fsa_controller.stop()
@@ -296,9 +302,6 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.step(1)
 
         th_server_th_node_id = 1
-
-        # Wait for TH_SERVER_NO_UID get initialized.
-        await self.wait_for_server_initialization(self.th_server_port)
 
         await self.default_controller.CommissionOnNetwork(
             nodeId=th_server_th_node_id,
