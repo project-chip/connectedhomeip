@@ -192,7 +192,7 @@ tests:
 
     - label:
           "Step 8b: TH is configured to perform commissioning on Channel 44 in
-          5GH band if it is in non-ETSI regulatory domains and on Channel 149 in
+          5GHz band if it is in non-ETSI regulatory domains and on Channel 149 in
           5GHz band if it is in ETSI regulatory domains."
       PICS: MCORE.COM.WIFI && !MCORE.COM.BLE && MCORE.DD.DISCOVERY_PAF
       verification: |
