@@ -102,16 +102,11 @@ public:
      */
     static CastingPlayer * GetTargetCastingPlayer()
     {
-        ChipLogProgress(AppServer, "CastingPlayer::GetTargetCastingPlayer() called");
         std::shared_ptr<CastingPlayer> sharedPtr = mTargetCastingPlayer.lock();
         CastingPlayer * rawPtr                   = nullptr;
         if (sharedPtr)
         {
             rawPtr = sharedPtr.get();
-            ChipLogProgress(
-                AppServer,
-                "CastingPlayer::GetTargetCastingPlayer() Got rawPtr from mTargetCastingPlayer, sharedPtr reference count: %lu",
-                sharedPtr.use_count());
             sharedPtr.reset();
         }
         else
