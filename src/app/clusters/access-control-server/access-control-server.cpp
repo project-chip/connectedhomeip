@@ -522,15 +522,8 @@ void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricI
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
 
-    if (instruction.HasValue())
-    {
-        event.instruction.SetNonNull(instruction.Value());
-    }
-
-    if (redirectUrl.HasValue())
-    {
-        event.redirectURL.SetNonNull(redirectUrl.Value());
-    }
+    event.instruction = instruction;
+    event.redirectURL = redirectUrl;
 
     EventNumber eventNumber;
     SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
