@@ -16,7 +16,7 @@
  *
  */
 
-#include "UidGetter.h"
+#include "UniqueIdGetter.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -26,12 +26,12 @@ namespace {
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    reinterpret_cast<UidGetter *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
+    reinterpret_cast<UniqueIdGetter *>(context)->OnDeviceConnected(exchangeMgr, sessionHandle);
 }
 
 void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    reinterpret_cast<UidGetter *>(context)->OnDeviceConnectionFailure(peerId, error);
+    reinterpret_cast<UniqueIdGetter *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
 bool SuccessOrLog(CHIP_ERROR err, const char * name)
@@ -48,12 +48,12 @@ bool SuccessOrLog(CHIP_ERROR err, const char * name)
 
 } // namespace
 
-UidGetter::UidGetter() :
+UniqueIdGetter::UniqueIdGetter() :
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this)
 {}
 
-CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+CHIP_ERROR UniqueIdGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
                              chip::EndpointId endpointId)
 {
     assertChipStackLockedByCurrentThread();
@@ -74,7 +74,7 @@ CHIP_ERROR UidGetter::GetUid(OnDoneCallback onDoneCallback, chip::Controller::De
     return err;
 }
 
-void UidGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
+void UniqueIdGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
 {
     VerifyOrDie(path.mClusterId == Clusters::BridgedDeviceBasicInformation::Id);
 
@@ -95,23 +95,23 @@ void UidGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLV
     }
 }
 
-void UidGetter::OnReportEnd()
+void UniqueIdGetter::OnReportEnd()
 {
     // We will call mOnDoneCallback in OnDone.
 }
 
-void UidGetter::OnError(CHIP_ERROR error)
+void UniqueIdGetter::OnError(CHIP_ERROR error)
 {
     ChipLogProgress(NotSpecified, "Error Getting UID: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void UidGetter::OnDone(ReadClient * apReadClient)
+void UniqueIdGetter::OnDone(ReadClient * apReadClient)
 {
     mCurrentlyGettingUid = false;
     mOnDoneCallback(mUniqueIdHasValue ? std::make_optional<CharSpan>(mUniqueId) : std::nullopt);
 }
 
-void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void UniqueIdGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     VerifyOrDie(mCurrentlyGettingUid);
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr, *this /* callback */,
@@ -137,7 +137,7 @@ void UidGetter::OnDeviceConnected(Messaging::ExchangeManager & exchangeMgr, cons
     }
 }
 
-void UidGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
+void UniqueIdGetter::OnDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     VerifyOrDie(mCurrentlyGettingUid);
     ChipLogError(NotSpecified, "DeviceSubscription failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));

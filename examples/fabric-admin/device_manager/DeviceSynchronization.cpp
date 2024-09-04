@@ -136,15 +136,11 @@ void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 #if defined(PW_RPC_ENABLED)
     if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
     {
-        auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
-        if (!mCurrentDeviceData.has_unique_id && device)
+        GetUniqueId();
+        if (mState == State::GettingUid)
         {
-            GetUid(device->GetEndpointId());
-            if (mState == State::GettingUid)
-            {
-                // GetUid was successful and we rely on callback to call SynchronizationCompleteAddDevice.
-                return;
-            }
+            // GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.
+            return;
         }
         SynchronizationCompleteAddDevice();
     }
@@ -211,14 +207,26 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
     MoveToState(State::Connecting);
 }
 
-void DeviceSynchronizer::GetUid(EndpointId remoteEndpointIdOfInterest)
+void DeviceSynchronizer::GetUniqueId()
 {
     VerifyOrDie(mState == State::ReceivedResponse);
     VerifyOrDie(mController);
+
+    auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
+    if (mCurrentDeviceData.has_unique_id || !device)
+    {
+        // We already have a UniqueId, or this device is not assoicated with a remote Fabric Sync Administrator,
+        // so we can just return leaving the state in ReceivedResponse.
+        return;
+    }
+
+    // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
+    // connection to the remote Fabric Sync Aggregator.
     VerifyOrDie(DeviceMgr().IsFabricSyncReady());
     auto remoteBridgeNodeId = DeviceMgr().GetRemoteBridgeNodeId();
+    EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
-    CHIP_ERROR err = mUidGetter.GetUid(
+    CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
         [this](std::optional<CharSpan> aUniqueId) {
             if (aUniqueId.has_value())
             {

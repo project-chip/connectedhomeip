@@ -24,15 +24,27 @@
 #include <memory>
 #include <optional>
 
-class UidGetter : public chip::app::ReadClient::Callback
+/**
+ * @brief Class used to get UniqueID from Bridged Device Basic Information Cluster
+ *
+ * When syncing a device from another fabric that does not have a UniqueID, spec
+ * dictates:
+ *    When a Fabric Synchronizing Administrator commissions a Synchronized Device,
+ *    it SHALL persist and maintain an association with the UniqueID in the Bridged
+ *    Device Basic Information Cluster exposed by another Fabric Synchronizing
+ *    Administrator.
+ *
+ * This class assists in retrieving the UniqueId in the above situation.
+ */
+class UniqueIdGetter : public chip::app::ReadClient::Callback
 {
 public:
     using OnDoneCallback = std::function<void(std::optional<chip::CharSpan>)>;
 
-    UidGetter();
+    UniqueIdGetter();
 
-    CHIP_ERROR GetUid(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
-                      chip::EndpointId endpointId);
+    CHIP_ERROR GetUniqueId(OnDoneCallback onDoneCallback, chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+                           chip::EndpointId endpointId);
 
     ///////////////////////////////////////////////////////////////
     // ReadClient::Callback implementation
