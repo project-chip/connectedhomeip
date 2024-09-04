@@ -3233,10 +3233,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kToken       = 0,
-    kInstruction = 1,
-    kRedirectURL = 2,
-    kFabricIndex = 254,
+    kToken             = 0,
+    kInstruction       = 1,
+    kARLRequestFlowUrl = 2,
+    kFabricIndex       = 254,
 };
 
 struct Type
@@ -3249,7 +3249,7 @@ public:
 
     uint64_t token = static_cast<uint64_t>(0);
     Optional<chip::CharSpan> instruction;
-    Optional<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     auto GetFabricIndex() const { return fabricIndex; }
@@ -3266,7 +3266,7 @@ public:
 
     uint64_t token = static_cast<uint64_t>(0);
     Optional<chip::CharSpan> instruction;
-    Optional<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

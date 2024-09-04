@@ -527,17 +527,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 chip::JniReferences::GetInstance().CreateOptional(value_instructionInsideOptional, value_instruction);
             }
 
-            jobject value_redirectURL;
-            if (!cppValue.redirectURL.HasValue())
+            jobject value_ARLRequestFlowUrl;
+            if (!cppValue.ARLRequestFlowUrl.HasValue())
             {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_redirectURL);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_ARLRequestFlowUrl);
             }
             else
             {
-                jobject value_redirectURLInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.redirectURL.Value(),
-                                                                                     value_redirectURLInsideOptional));
-                chip::JniReferences::GetInstance().CreateOptional(value_redirectURLInsideOptional, value_redirectURL);
+                jobject value_ARLRequestFlowUrlInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.ARLRequestFlowUrl.Value(),
+                                                                                     value_ARLRequestFlowUrlInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_ARLRequestFlowUrlInsideOptional, value_ARLRequestFlowUrl);
             }
 
             jobject value_fabricIndex;
@@ -571,7 +571,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(fabricRestrictionReviewUpdateStructClass, fabricRestrictionReviewUpdateStructCtor,
-                                           value_token, value_instruction, value_redirectURL, value_fabricIndex);
+                                           value_token, value_instruction, value_ARLRequestFlowUrl, value_fabricIndex);
 
             return value;
         }

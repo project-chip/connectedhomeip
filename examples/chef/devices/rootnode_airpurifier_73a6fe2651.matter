@@ -484,7 +484,7 @@ cluster AccessControl = 31 {
   fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
     optional long_char_string instruction = 1;
-    optional long_char_string redirectURL = 2;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 

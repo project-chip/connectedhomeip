@@ -88,7 +88,7 @@ public:
     void MarkRestrictionListChanged(FabricIndex fabricIndex) override;
 
     void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
-                                         Optional<CharSpan> redirectUrl) override;
+                                         Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
 
 private:
@@ -517,13 +517,13 @@ void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
 }
 
 void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
-                                                             Optional<CharSpan> instruction, Optional<CharSpan> redirectUrl)
+                                                             Optional<CharSpan> instruction, Optional<CharSpan> arlRequestFlowUrl)
 {
     CHIP_ERROR err;
     ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
 
     event.instruction = instruction;
-    event.redirectURL = redirectUrl;
+    event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
     EventNumber eventNumber;
     SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));

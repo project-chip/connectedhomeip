@@ -26,14 +26,14 @@ import matter.tlv.TlvWriter
 class AccessControlClusterFabricRestrictionReviewUpdateEvent(
   val token: ULong,
   val instruction: Optional<String>,
-  val redirectURL: Optional<String>,
+  val ARLRequestFlowUrl: Optional<String>,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n")
     append("\ttoken : $token\n")
     append("\tinstruction : $instruction\n")
-    append("\tredirectURL : $redirectURL\n")
+    append("\tARLRequestFlowUrl : $ARLRequestFlowUrl\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -46,9 +46,9 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
         val optinstruction = instruction.get()
         put(ContextSpecificTag(TAG_INSTRUCTION), optinstruction)
       }
-      if (redirectURL.isPresent) {
-        val optredirectURL = redirectURL.get()
-        put(ContextSpecificTag(TAG_REDIRECT_URL), optredirectURL)
+      if (ARLRequestFlowUrl.isPresent) {
+        val optARLRequestFlowUrl = ARLRequestFlowUrl.get()
+        put(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL), optARLRequestFlowUrl)
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -58,7 +58,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
   companion object {
     private const val TAG_TOKEN = 0
     private const val TAG_INSTRUCTION = 1
-    private const val TAG_REDIRECT_URL = 2
+    private const val TAG_ARL_REQUEST_FLOW_URL = 2
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
@@ -73,9 +73,9 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
         } else {
           Optional.empty()
         }
-      val redirectURL =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_REDIRECT_URL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_REDIRECT_URL)))
+      val ARLRequestFlowUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL)))
         } else {
           Optional.empty()
         }
@@ -86,7 +86,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
       return AccessControlClusterFabricRestrictionReviewUpdateEvent(
         token,
         instruction,
-        redirectURL,
+        ARLRequestFlowUrl,
         fabricIndex,
       )
     }

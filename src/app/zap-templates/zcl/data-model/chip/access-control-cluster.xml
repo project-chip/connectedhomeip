@@ -160,7 +160,7 @@ limitations under the License.
       <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
       <field id="0" name="Token" type="int64u"/>
       <field id="1" name="Instruction" type="long_char_string" optional="true" length="512"/>
-      <field id="2" name="RedirectURL" type="long_char_string" optional="true" length="256"/>
+      <field id="2" name="ARLRequestFlowUrl" type="long_char_string" optional="true" length="256"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

@@ -5634,10 +5634,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("RedirectURL", indent + 1, value.redirectURL);
+        CHIP_ERROR err = DataModelLogger::LogValue("ARLRequestFlowUrl", indent + 1, value.ARLRequestFlowUrl);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RedirectURL'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ARLRequestFlowUrl'");
             return err;
         }
     }

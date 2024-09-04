@@ -3403,13 +3403,13 @@ class AccessControl(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="token", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="instruction", Tag=1, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="redirectURL", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="ARLRequestFlowUrl", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             token: 'uint' = 0
             instruction: 'typing.Optional[str]' = None
-            redirectURL: 'typing.Optional[str]' = None
+            ARLRequestFlowUrl: 'typing.Optional[str]' = None
             fabricIndex: 'uint' = 0
 
 

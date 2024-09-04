@@ -334,8 +334,8 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
         } while (0);
         do {
             NSString * _Nullable memberValue;
-            if (cppValue.redirectURL.HasValue()) {
-                memberValue = AsString(cppValue.redirectURL.Value());
+            if (cppValue.ARLRequestFlowUrl.HasValue()) {
+                memberValue = AsString(cppValue.ARLRequestFlowUrl.Value());
                 if (memberValue == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
@@ -344,7 +344,7 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
             } else {
                 memberValue = nil;
             }
-            value.redirectURL = memberValue;
+            value.arlRequestFlowUrl = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
