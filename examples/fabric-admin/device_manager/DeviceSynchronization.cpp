@@ -226,7 +226,7 @@ void DeviceSynchronizer::GetUniqueId()
     auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
     EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
 
-    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote")
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator")
     CHIP_ERROR err = mUniqueIdGetter.GetUniqueId(
         [this](std::optional<CharSpan> aUniqueId) {
             if (aUniqueId.has_value())
@@ -236,7 +236,7 @@ void DeviceSynchronizer::GetUniqueId()
             }
             else
             {
-                ChipLogError(NotSpecified, "We expected to get UniqueId from Remote Fabric Sync Aggregator");
+                ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator");
             }
             this->SynchronizationCompleteAddDevice();
         },
