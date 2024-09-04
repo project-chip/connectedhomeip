@@ -306,6 +306,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-a
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app chip-rvc-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/examples/fabric-admin/scripts/fabric-sync-app.py fabric-sync-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-bridge-app fabric-bridge-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/fabric-admin fabric-admin
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-model-no-unique-id-app chip-lighting-data-model-no-unique-id-app

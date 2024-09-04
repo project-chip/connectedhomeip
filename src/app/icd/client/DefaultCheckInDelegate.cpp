@@ -41,7 +41,8 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 
 CHIP_ERROR DefaultCheckInDelegate::GenerateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey)
 {
-    return Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity());
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity()));
+    return newKey.SetLength(newKey.Capacity());
 }
 
 RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)

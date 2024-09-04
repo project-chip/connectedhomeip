@@ -40,6 +40,7 @@
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
+
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -55,7 +56,6 @@
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
-#include <new>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
@@ -72,6 +72,8 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -338,7 +340,6 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     SetDefaultDelegate(endpoint, &delegate);
 }
 
-using chip::Protocols::InteractionModel::Status;
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                             uint16_t maxReadLength)
