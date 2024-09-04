@@ -1,7 +1,8 @@
 .cipd
+cidata.iso
 ensure_file.txt
+meta-data
+sysrootsrv.img
 ubuntu-21.04-aarch64-sysroot.tar.xz
 ubuntu-24.04-server-cloudimg-arm64.img
 user-data
-meta-data
-cidata.iso
