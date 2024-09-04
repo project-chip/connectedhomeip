@@ -138,7 +138,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 7a: TH waits untilT0+ 2 minutes and 45 seconds and confirms that
+          "Step 7a: TH waits until T0+ 2 minutes and 45 seconds and confirms that
           the DUT is still sending ADVs."
       PICS: MCORE.COM.BLE
       verification: |
