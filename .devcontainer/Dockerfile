@@ -37,9 +37,6 @@ RUN apt-get update \
     wget curl telnet \
     docker.io \
     iputils-ping net-tools \
-    libncurses5 \
-    libncursesw5 \
-    libpython2.7 \
     && :
 
 RUN groupadd -g $USER_GID $USERNAME \
