@@ -105,9 +105,9 @@ details.
         -   Run Linux Water Leak DetectorApp
 
                   $ cd ~/connectedhomeip/examples/water-leak-detector-app/linux
-                  $ sudo out/debug/chip-water-leak-detector-app --ble-device [bluetooth device number]
+                  $ sudo out/debug/water-leak-detector-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-water-leak-detector-app --ble-device 1
+                  $ sudo out/debug/water-leak-detector-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
