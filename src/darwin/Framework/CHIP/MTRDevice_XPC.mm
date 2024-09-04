@@ -100,7 +100,7 @@
     // subscription attempt wait (does that apply to us?) queued work (do we
     // have any?), last report, last subscription failure (does that apply to us?).
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+            stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
