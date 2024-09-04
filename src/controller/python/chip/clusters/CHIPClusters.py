@@ -13389,8 +13389,6 @@ class ChipClusters:
                 "args": {
                     "requestId": "int",
                     "responseTimeoutSeconds": "int",
-                    "ipAddress": "bytes",
-                    "port": "int",
                 },
             },
         },

@@ -196,7 +196,7 @@ private:
     void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
-    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void BleAdvTimeoutHandler(void * arg);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)

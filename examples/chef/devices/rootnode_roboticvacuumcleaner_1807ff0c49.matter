@@ -1584,7 +1584,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kIdle = 16384;
@@ -1604,7 +1604,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -1643,7 +1643,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kDeepClean = 16384;
@@ -1656,7 +1656,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -2010,7 +2010,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -2024,7 +2024,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
