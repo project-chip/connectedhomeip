@@ -119,6 +119,14 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         return steps
 
+    # TODO(#35229) Once optimization has been completed, we should no longer need to wait for 4
+    # minutes and can drop this to something lower.
+    # This test has some manual steps and also multiple sleeps for 30 seconds. Test typically runs
+    # under 2 mins, so 4 minutes is more than enough.
+    @property
+    def default_timeout(self) -> int:
+        return 4*60
+
     @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_2(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')

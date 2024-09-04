@@ -117,9 +117,11 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                  TestStep(10, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
         return steps
 
+    # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 2 mins should
+    # be enough time for test to run
     @property
     def default_timeout(self) -> int:
-        return self.user_params.get("report_waiting_timeout_delay_sec", 10)*2 + 60
+        return 2*60
 
     @async_test_body
     async def test_TC_MCORE_FS_1_5(self):

@@ -87,6 +87,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
                  TestStep("3c", "DUT_FSA commissions TH_FSA")]
         return steps
 
+    # TODO(#35229) Once optimization has been completed, we should no longer need to wait for 3
+    # minutes and can drop this to something lower.
+    # This test has some manual steps and one sleep for 30 seconds. Test typically
+    # runs under 1 mins, so 3 minutes is more than enough.
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
+
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
