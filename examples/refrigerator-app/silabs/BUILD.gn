@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-silabs_project_dir = "${chip_root}/examples/refrigerator/silabs"
+silabs_project_dir = "${chip_root}/examples/refrigerator-app/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
@@ -136,8 +136,7 @@ silabs_executable("refrigerator_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
-    "src/SensorManager.cpp",
-    "src/TemperatureManager.cpp",
+    "src/RefrigeratorManager.cpp",
     "src/ZclCallbacks.cpp",
   ]
 

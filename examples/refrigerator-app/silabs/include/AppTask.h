@@ -26,6 +26,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef DISPLAY_ENABLED
+#include "RefrigeratorUI.h"
+#endif
+
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "RefrigeratorManager.h"
@@ -66,7 +70,8 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
-    
+
+    /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
      *
@@ -103,7 +108,7 @@ private:
      */
     static void RefrigeratorActionEventHandler(AppEvent * aEvent);
 
-    static void ActionInitiated(OperationalStateEnum action);
-    static void ActionCompleted();
-    static void UpdateClusterState(intptr_t context);
+    // static void ActionInitiated(OperationalStateEnum action);
+    // static void ActionCompleted();
+    // static void UpdateClusterState(intptr_t context);
 };

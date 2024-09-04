@@ -77,16 +77,17 @@ void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
-void ThermostatUI::SetCurrentTemp(int8_t temp)
+void RefrigeratorUI::SetCurrentTemp(int8_t temp)
 {
     mCurrentTempCelsius = temp;
 }
-void ThermostatUI::SetMode(uint8_t mode)
+
+void RefrigeratorUI::SetMode(uint8_t mode)
 {
     mMode = mode;
 }
 
-void ThermostatUI::DrawHeader(GLIB_Context_t * glibContext)
+void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
 {
     // Draw Silabs Corner icon
     GLIB_drawBitmap(glibContext, SILABS_ICON_POSITION_X, STATUS_ICON_LINE, SILABS_LOGO_WIDTH, SILABS_LOGO_HEIGHT, silabsLogo);
@@ -106,26 +107,26 @@ void ThermostatUI::DrawHeader(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
-void ThermostatUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
+void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
 {
     switch (static_cast<RefrigeratorUI::SUPPORTED_MODES>(mMode))
     {
-    case HVACMode::RAPID_COOL:
+    case SUPPORTED_MODES::RAPID_COOL:
         GLIB_drawStringOnLine(glibContext, "Mode : Rapid Cool", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_bits);
         DrawSetPoint(glibContext, mCurrentTempCelsius, false);
         break;
-    case HVACMode::RAPID_FREEZE:
+    case SUPPORTED_MODES::RAPID_FREEZE:
         GLIB_drawStringOnLine(glibContext, "Mode : Rapid Freeze", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, cooling_bits);
         DrawSetPoint(glibContext, mCurrentTempCelsius, false);
         break;
-    case HVACMode::NORMAL:
+    case SUPPORTED_MODES::NORMAL:
         GLIB_drawStringOnLine(glibContext, "Mode : Normal", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_cooling_bits);
         DrawSetPoint(glibContext, mCurrentTempCelsius, false);
         break;
-    case HVACMode::ENERGY_SAVE:
+    case SUPPORTED_MODES::ENERGY_SAVE:
         DrawSetPoint(glibContext, 0, false);
         GLIB_drawStringOnLine(glibContext, "Mode : Energy save", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         DrawSetPoint(glibContext, mCurrentTempCelsius, false);
@@ -150,7 +151,7 @@ void ThermostatUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
  * @param int8_t setPoint in Celsius
  * @param bool isCelsius By default set to True. For future development
  */
-void ThermostatUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bool isCelsius)
+void RefrigeratorUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bool isCelsius)
 {
     uint8_t tempArray[2];
     uint8_t position_x = 10;
@@ -203,7 +204,7 @@ void ThermostatUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bo
     }
 }
 
-void ThermostatUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
+void RefrigeratorUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
                             uint32_t size)
 {
     uint8_t x = initial_x, y = initial_y;
@@ -231,7 +232,7 @@ void ThermostatUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uin
     }
 }
 
-void ThermostatUI::DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint, bool secondLine)
+void RefrigeratorUI::DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint, bool secondLine)
 {
     char setPointLine[] = { '-', 'X', 'X', '\0' };
 
@@ -241,7 +242,7 @@ void ThermostatUI::DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint, b
     }
 
     // Update SetPoint string
-    if (static_cast<ThermostatUI::HVACMode>(mMode) == ThermostatUI::HVACMode::MODE_OFF)
+    if (static_cast<RefrigeratorUI::SUPPORTED_MODES>(mMode) == RefrigeratorUI::SUPPORTED_MODES::ENERGY_SAVE)
     {
         setPointLine[0] = '-';
         setPointLine[1] = '-';

@@ -28,7 +28,7 @@
 #include "LEDWidget.h"
 
 #ifdef DISPLAY_ENABLED
-#include "ThermostatUI.h"
+#include "RefrigeratorUI.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -54,9 +54,8 @@
  *********************************************************/
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_THERMOSTAT 1
+#define APP_REFRIGERATOR 1
 
-#define MODE_TIMER 1000 // 1s timer period
 
 using namespace chip;
 using namespace chip::app;
@@ -79,8 +78,7 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Thermostat-App");
-    GetLCD().SetCustomUI(ThermostatUI::DrawUI);
+    GetLCD().Init((uint8_t *) "Refrigrator-App");
 #endif
 
     err = BaseApplication::Init();
@@ -89,16 +87,10 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
-    err = SensorMgr().Init();
+    err = RefrigeratorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("SensorMgr::Init() failed");
-        appError(err);
-    }
-    err = TempMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("TempMgr::Init() failed");
+        SILABS_LOG("RefrigeratorMgr::Init() failed");
         appError(err);
     }
 
@@ -136,28 +128,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
-}
-
-void AppTask::UpdateThermoStatUI()
-{
-#ifdef DISPLAY_ENABLED
-    ThermostatUI::SetMode(TempMgr().GetMode());
-    ThermostatUI::SetHeatingSetPoint(TempMgr().GetHeatingSetPoint());
-    ThermostatUI::SetCoolingSetPoint(TempMgr().GetCoolingSetPoint());
-    ThermostatUI::SetCurrentTemp(TempMgr().GetCurrentTemp());
-
-#ifdef SL_WIFI
-    if (ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-    if (ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
-    {
-        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't Matter
-    }
-#else
-    SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
-               TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
-#endif // DISPLAY_ENABLED
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)

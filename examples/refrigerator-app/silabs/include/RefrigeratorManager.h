@@ -17,20 +17,25 @@
  */
 
 #pragma once
+#include "AppEvent.h"
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
-#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
-
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <examples/refrigerator-app/refrigerator-common/include/static-supported-temperature-levels.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "AppEvent.h"
-
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
+/**********************************************************
+ * Defines and Constants
+ *********************************************************/
+
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAlarm;
 using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
 using namespace chip::app::Clusters::TemperatureControl;

@@ -26,15 +26,13 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
-using namespace ::chip::app::Clusters::RefrigeratorAlarm;
-using namespace ::chip::app::Clusters::TemperatureControl;
 
 namespace RefAndTempAttr = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes;
 namespace RefAlarmAttr = chip::app::Clusters::RefrigeratorAlarm::Attributes;
@@ -46,7 +44,7 @@ EndpointId kColdCabinetEndpointId   = 2;
 EndpointId kFreezeCabinetEndpointId = 3;
 
 namespace {
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+    chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
     // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
     constexpr const uint8_t kNamespaceRefrigerator = 0x41;
@@ -71,6 +69,7 @@ CHIP_ERROR RefrigeratorManager::Init()
     SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    return CHIP_NO_ERROR;
 }
 
 int8_t RefrigeratorManager::ConvertToPrintableTemp(int16_t temperature)
