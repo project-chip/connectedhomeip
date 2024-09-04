@@ -182,7 +182,7 @@ tests:
 
     - label:
           "Step 8a: TH is configured to perform commissioning on Channel 6 in
-          2.4GH band."
+          2.4GHz band."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
           [Configuration command to be filled by NXP]
