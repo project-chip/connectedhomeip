@@ -106,6 +106,16 @@ RUN set -x \
     telnet \
     srecord \
     openjdk-8-jdk \
+    git vim emacs sudo \
+    apt-utils dialog zsh \
+    iproute2 procps lsb-release \
+    bash-completion \
+    build-essential cmake cppcheck valgrind \
+    wget curl telnet \
+    docker.io \
+    iputils-ping net-tools \
+    locales \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

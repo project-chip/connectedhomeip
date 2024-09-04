@@ -24,8 +24,7 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ENV LANG en_US.utf8
 
-# these are installed for terminal/dev convenience.  If more tooling for build is required, please
-#  add them to chip-build (in integrations/docker/images/chip-build)
+# TODO: remove these apt installs in the future as they will be in the base image from version 75+.
 RUN apt-get update \
     && apt-get install -y locales \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
