@@ -11,18 +11,20 @@ PACKAGE=experimental/matter/sysroot/ubuntu-24.04-aarch64
 echo "Copying a sysroot in $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-echo "COPYING /lib ..."
-rsync -ahl --info=progress2 --info=name0 -e 'ssh -p 5555' \
-  --exclude='/lib/aarch64-linux-gnu/dri' \
-  --exclude='/lib/firmware' \
-  --exclude='/lib/git-core' \
-  --exclude='/lib/modules' \
-  --exclude='/lib/ssl/private' \
-  --exclude='/lib/systemd' \
-  ubuntu@localhost:/lib "$OUTPUT_DIR"
+RSYNC_RSH="ssh -p 5555"
+RSYNC_OPTIONS="
+--archive
+--human-readable
+--links
+--delete-during
+--delete-excluded
+--safe-links
+--info=progress2
+--info=name0
+"
 
 echo "COPYING /usr/lib ..."
-rsync -ahl --info=progress2 --info=name0 -e 'ssh -p 5555' \
+rsync $RSYNC_OPTIONS \
   --exclude='lib/aarch64-linux-gnu/dri' \
   --exclude='lib/firmware' \
   --exclude='lib/git-core' \
@@ -32,9 +34,12 @@ rsync -ahl --info=progress2 --info=name0 -e 'ssh -p 5555' \
   ubuntu@localhost:/usr/lib "$OUTPUT_DIR"
 
 echo "COPYING /usr/include ..."
-rsync -ahl --info=progress2 --info=name0 -e 'ssh -p 5555' \
+rsync $RSYNC_OPTIONS \
   ubuntu@localhost:/usr/include "$OUTPUT_DIR"
 
+# lib is just a symlink in ubuntu-24.04
+echo "CREATING /lib symbolic link ..."
+ln -s usr/lib $OUTPUT_DIR/lib 
 
 TODAY=$(date '+%Y.%m.%d')
 
