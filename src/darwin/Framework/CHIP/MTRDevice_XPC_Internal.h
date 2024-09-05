@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import <Matter/Matter.h>
 #import "MTRDevice_XPC.h"
+#import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

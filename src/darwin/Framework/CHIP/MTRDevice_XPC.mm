@@ -44,6 +44,7 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -58,7 +59,6 @@
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
-#import "MTRDevice_XPC_Internal.h"
 
 #include <atomic>
 #include <dns_sd.h>
@@ -96,8 +96,9 @@
     return self;
 }
 
-- (void)dealloc {
-    [self _setInternalState: nil];
+- (void)dealloc
+{
+    [self _setInternalState:nil];
 }
 
 - (NSString *)description
