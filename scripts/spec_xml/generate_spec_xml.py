@@ -24,7 +24,7 @@ import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import click
-from paths import get_chip_root, get_data_model_path, get_spec_xml_output_path, get_documentation_file_path, get_python_testing_path, Branch, get_in_progress_defines
+from paths import get_chip_root, get_data_model_path, get_documentation_file_path, Branch, get_in_progress_defines
 
 # Use the get_in_progress_defines() function to fetch the in-progress defines
 CURRENT_IN_PROGRESS_DEFINES = get_in_progress_defines()
