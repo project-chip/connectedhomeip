@@ -1,5 +1,6 @@
 .cipd
 cidata.iso
+cipd.yaml
 ensure_file.txt
 meta-data
 sysrootsrv.img

@@ -5,7 +5,7 @@
 
 set -e
 
-echo "COPYING /lib"
+echo "COPYING /lib ..."
 rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
   --exclude='/lib/firmware' \
   --exclude='/lib/git-core' \
@@ -14,28 +14,29 @@ rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
   --exclude='/lib/systemd' \
   ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot
 
-echo "COPYING /usr/lib"
+echo "COPYING /usr/lib ..."
 rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
-  --exclude='/usr/lib/firmware' \
-  --exclude='/usr/lib/git-core' \
+  --exclude='lib/firmware' \
+  --exclude='lib/git-core' \
+  --exclude='lib/modules' \
+  --exclude='lib/ssl/private' \
+  --exclude='lib/systemd' \
   ubuntu@localhost:/usr/lib ubuntu-24.04-aarch64-sysroot/usr
 
-echo "COPYING /usr/include"
+echo "COPYING /usr/include ..."
 rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
-  --exclude='/usr/lib/modules' \
   ubuntu@localhost:/usr/include ubuntu-24.04-aarch64-sysroot/usr
 
 
-tar cvfJ ubuntu-24.04-aarch64-sysroot.tar.xz ubuntu-24.04-aarch64-sysroot
-
 TODAY=$(date '+%Y.%m.%d')
 
+echo "Creating cipd definition"
 cat >cipd.yaml <<TEXTEND
 package: experimental/matter/sysroot/ubuntu-24.04-aarch64
 description: AArch64 sysroot for cross-compiling matter SDK examples
 install_mode: copy
 data:
-  - file: ubuntu-24.04-aarch64-sysroot.tar.xz
+  - dir: ubuntu-24.04-aarch64-sysroot
 TEXTEND
 
 # NOTE: sufficient permissions are required to be able to upload this.
@@ -43,5 +44,6 @@ TEXTEND
 #
 #    cipd auth-login
 #
+echo "Uploading package tagged 'v$TODAY' ..."
 cipd create -pkg-def=cipd.yaml -tag "version:v$TODAY"
 
