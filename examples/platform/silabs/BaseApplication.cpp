@@ -803,8 +803,8 @@ void BaseApplication::ScheduleFactoryReset()
             Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
 #if SL_WIFI
-        // Delete all fabrics and clear wifi provision.
-        chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+        // Removing the matter services on factory reset
+        chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
 #endif
         PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
                                                   // basic information cluster it seems. And triggers and Event flush, which is not

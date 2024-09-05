@@ -294,6 +294,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     {
         ChipLogError(DeviceLayer, "wfx_sta_discon() failed: %lx", status);
     }
+    ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+    wfx_clear_wifi_provision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.
