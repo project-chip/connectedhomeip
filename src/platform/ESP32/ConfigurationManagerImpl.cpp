@@ -53,6 +53,20 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+uint32_t ConfigurationManagerImpl::mTotalOperationalHours = 0;
+
+void ConfigurationManagerImpl::TotalOperationalHoursTimerCallback(TimerHandle_t timer)
+{
+    mTotalOperationalHours++;
+
+    CHIP_ERROR err = ConfigurationMgrImpl().StoreTotalOperationalHours(mTotalOperationalHours);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to store total operational hours: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
@@ -161,10 +175,28 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ESP32Config::ConfigValueExists(ESP32Config::kCounterKey_TotalOperationalHours))
+    if (CHIP_NO_ERROR != GetTotalOperationalHours(mTotalOperationalHours))
     {
-        err = StoreTotalOperationalHours(0);
+        err = StoreTotalOperationalHours(mTotalOperationalHours);
         SuccessOrExit(err);
+    }
+
+    {
+        // Start a timer which reloads every one hour and bumps the total operational hours
+        TickType_t reloadPeriod = (1000 * 60 * 60) / portTICK_PERIOD_MS;
+        TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
+        if (timerHandle == nullptr)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer creation failed"));
+        }
+
+        BaseType_t timerStartStatus = xTimerStart(timerHandle, 0);
+        if (timerStartStatus == pdFAIL)
+        {
+            err = CHIP_ERROR_INTERNAL;
+            ExitNow(ChipLogError(DeviceLayer, "total operational hours Timer start failed"));
+        }
     }
 
     // Initialize the generic implementation base class.
