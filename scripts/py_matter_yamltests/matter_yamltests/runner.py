@@ -225,7 +225,7 @@ class TestRunner(TestRunnerBase):
                 if config.options.delay_in_ms:
                     await asyncio.sleep(config.options.delay_in_ms / 1000)
 
-            hooks.test_stop(round(test_duration))
+            hooks.test_stop(exception=None, duration=round(test_duration))
 
         except Exception as exception:
             status = exception
