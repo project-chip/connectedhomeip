@@ -24,8 +24,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-// Private Internal State keys
-extern NSString * const kMTRDeviceInternalPropertyKeyVendorID;
-extern NSString * const kMTRDeviceInternalPropertyKeyProductID;
-
 NS_ASSUME_NONNULL_END
