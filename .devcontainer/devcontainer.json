@@ -18,7 +18,7 @@
     "image": "matter-dev-environment:local",
     "remoteUser": "vscode",
     "containerEnv": {
-        "PW_ENVIRONMENT_ROOT": "/workspaces/connectedhomeip/.environment-vscode"
+        "PW_ENVIRONMENT_ROOT": "${containerWorkspaceFolder}/.environment-vscode"
     },
     "customizations": {
         "vscode": {
