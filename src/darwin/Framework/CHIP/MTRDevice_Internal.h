@@ -204,6 +204,12 @@ MTR_DIRECT_MEMBERS
 
 @end
 
+
+#pragma mark - MTRDevice internal state monitoring
+@protocol MTRDeviceInternalStateDelegate
+- (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
+@end
+
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";

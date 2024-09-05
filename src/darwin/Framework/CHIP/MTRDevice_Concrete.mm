@@ -254,6 +254,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) ReadClient * currentReadClient;
 @property (nonatomic) SubscriptionCallback * currentSubscriptionCallback; // valid when and only when currentReadClient is valid
 
+@property (nonatomic, weak) id<MTRXPCClientProtocol_MTRDevice> privateInternalStateDelegate;
+
 @end
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -471,13 +473,31 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
 // TODO:  more internal properties
 
 - (NSDictionary *)_internalProperties {
-    id vidOrUnknown = _vid ?: @"Unknown";
-    id pidOrUnknown = _pid ?: @"Unknown";
+    id vidOrUnknown, pidOrUnknown;
+
+    {
+        std::lock_guard lock(_descriptionLock);
+
+        vidOrUnknown = _vid ?: @"Unknown";
+        pidOrUnknown = _pid ?: @"Unknown";
+        //    id networkFeatures = _allNetworkFeatures;
+        //    id internalDeviceState = _internalDeviceStateForDescription;
+        //    id lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
+        //    id mostRecentReportTime = _mostRecentReportTimeForDescription;
+        //    id lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
+    }
 
     return @ {
         kMTRDeviceInternalPropertyKeyVendorID: vidOrUnknown,
         kMTRDeviceInternalPropertyKeyProductID: pidOrUnknown,
     };
+}
+
+- (oneway void)notifyPrivateInternalPropertiesDelegateOfChanges
+{
+    if ([self.privateInternalStateDelegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
+        [self.privateInternalStateDelegate device:self.nodeID internalStateUpdated:[self _internalProperties]];
+    }
 }
 
 #pragma mark - Time Synchronization
@@ -967,6 +987,8 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
             }
         }];
         /* END DRAGONS */
+
+        [self notifyPrivateInternalPropertiesDelegateOfChanges];
     }
 }
 
@@ -1167,7 +1189,7 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
     deviceUsesThread = [self _deviceUsesThread];
 
     // If a previous resubscription failed, remove the item from the subscription pool.
@@ -1213,8 +1235,12 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
     os_unfair_lock_assert_owner(&_lock);
     _lastSubscriptionAttemptWait = lastSubscriptionAttemptWait;
 
-    std::lock_guard lock(_descriptionLock);
-    _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+    }
+
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
 }
 
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
@@ -1230,6 +1256,7 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1480,8 +1507,11 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
 {
     _mostRecentReportTimes = mostRecentReportTimes;
 
-    std::lock_guard lock(_descriptionLock);
-    _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
+    }
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
 }
 #endif
 
@@ -1540,6 +1570,7 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
     }
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -1610,6 +1641,8 @@ static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalSt
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = nil;
     }
+    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
