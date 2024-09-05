@@ -131,6 +131,8 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
 
+    BOOL _suspended;
+
     // Counters to track assertion status and access controlled by the _assertionLock
     NSUInteger _keepRunningAssertionCounter;
     BOOL _shutdownPending;
@@ -142,7 +144,7 @@ using namespace chip::Tracing::DarwinFramework;
     return &_underlyingDeviceMapLock;
 }
 
-- (instancetype)initForSubclasses
+- (instancetype)initForSubclasses:(BOOL)startSuspended
 {
     if (self = [super init]) {
         // nothing, as superclass of MTRDeviceController is NSObject
@@ -153,15 +155,17 @@ using namespace chip::Tracing::DarwinFramework;
     _keepRunningAssertionCounter = 0;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
+
+    _suspended = startSuspended;
+
     return self;
 }
 
 - (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
     if ([parameters isKindOfClass:MTRXPCDeviceControllerParameters.class]) {
-        MTRXPCDeviceControllerParameters * resolvedParameters = (MTRXPCDeviceControllerParameters *) parameters;
         MTR_LOG("Starting up with XPC Device Controller Parameters: %@", parameters);
-        return [[MTRDeviceController_XPC alloc] initWithUniqueIdentifier:resolvedParameters.uniqueIdentifier xpConnectionBlock:resolvedParameters.xpcConnectionBlock];
+        return [[MTRDeviceController_XPC alloc] initWithParameters:parameters error:error];
     } else if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
         if (error) {
@@ -184,6 +188,7 @@ using namespace chip::Tracing::DarwinFramework;
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
       storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                    startSuspended:(BOOL)startSuspended
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -194,6 +199,8 @@ using namespace chip::Tracing::DarwinFramework;
         _keepRunningAssertionCounter = 0;
         _shutdownPending = NO;
         _assertionLock = OS_UNFAIR_LOCK_INIT;
+
+        _suspended = startSuspended;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -329,6 +336,34 @@ using namespace chip::Tracing::DarwinFramework;
 - (BOOL)isRunning
 {
     return _cppCommissioner != nullptr;
+}
+
+#pragma mark - Suspend/resume support
+
+- (BOOL)isSuspended
+{
+    return _suspended;
+}
+
+- (void)suspend
+{
+    _suspended = YES;
+
+    // TODO: In the concrete class (which is unused so far!), iterate our
+    // MTRDevices, tell them to tear down subscriptions.  Possibly close all
+    // CASE sessions for our identity.  Possibly try to see whether we can
+    // change our fabric entry to not advertise and restart advertising.
+
+    // TODO: What should happen with active commissioning sessions?  Presumably
+    // close them?
+}
+
+- (void)resume
+{
+    _suspended = NO;
+
+    // TODO: In the concrete class (which is unused so far!), iterate our
+    // MTRDevices, tell them to restart subscriptions.
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate

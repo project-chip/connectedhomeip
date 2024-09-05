@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 MTR_TESTABLE
 @interface MTRDeviceController_XPC : MTRDeviceController <MTRXPCClientProtocol>
-- (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock;
 #ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 #endif
