@@ -92,12 +92,10 @@ if (wifi_soc) {
     ]
 
     if (use_wf200) {
-      # TODO efr32_sdk should not need a header from this location
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
     if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
       include_dirs += [
         "${chip_root}/src/platform/silabs/efr32/rs911x",
         "${examples_plat_dir}/rs911x",
@@ -130,10 +128,14 @@ if (wifi_soc) {
 
 silabs_executable("refrigerator_app") {
   output_name = "matter-silabs-refrigerator-example.out"
-  include_dirs = [ "include" ]
   defines = []
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/refrigerator-app/refrigerator-common/include",
+  ]
 
   sources = [
+    "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/RefrigeratorManager.cpp",

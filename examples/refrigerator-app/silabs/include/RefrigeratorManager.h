@@ -24,15 +24,10 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <examples/refrigerator-app/refrigerator-common/include/static-supported-temperature-levels.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
-
-/**********************************************************
- * Defines and Constants
- *********************************************************/
 
 using namespace chip;
 using namespace chip::app;

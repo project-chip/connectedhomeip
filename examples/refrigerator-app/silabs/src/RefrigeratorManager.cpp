@@ -22,6 +22,7 @@
  *********************************************************/
 
 #include "RefrigeratorManager.h"
+#include <static-supported-temperature-levels.h>
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
@@ -43,8 +44,10 @@ EndpointId kRefEndpointId           = 1;
 EndpointId kColdCabinetEndpointId   = 2;
 EndpointId kFreezeCabinetEndpointId = 3;
 
+RefrigeratorManager RefrigeratorManager::sRefrigeratorMgr;
+
 namespace {
-    chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
     // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
     constexpr const uint8_t kNamespaceRefrigerator = 0x41;
