@@ -3982,11 +3982,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
       reviewFabricRestrictions(callback, arl, 0);
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -3998,8 +3998,22 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long tokenFieldID = 0L;
+          Long token = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == tokenFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                token = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(token);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface ReviewFabricRestrictionsResponseCallback extends BaseClusterCallback {
+      void onSuccess(Long token);
     }
 
     public interface AclAttributeCallback extends BaseAttributeCallback {
@@ -61055,25 +61069,25 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestId, Integer vendorId, Integer productId, Optional<String> label) {
-      requestCommissioningApproval(callback, requestId, vendorId, productId, label, 0);
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label) {
+      requestCommissioningApproval(callback, requestID, vendorID, productID, label, 0);
     }
 
-    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestId, Integer vendorId, Integer productId, Optional<String> label, int timedInvokeTimeoutMs) {
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long requestIdFieldID = 0L;
-      BaseTLVType requestIdtlvValue = new UIntType(requestId);
-      elements.add(new StructElement(requestIdFieldID, requestIdtlvValue));
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
-      final long vendorIdFieldID = 1L;
-      BaseTLVType vendorIdtlvValue = new UIntType(vendorId);
-      elements.add(new StructElement(vendorIdFieldID, vendorIdtlvValue));
+      final long vendorIDFieldID = 1L;
+      BaseTLVType vendorIDtlvValue = new UIntType(vendorID);
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      final long productIdFieldID = 2L;
-      BaseTLVType productIdtlvValue = new UIntType(productId);
-      elements.add(new StructElement(productIdFieldID, productIdtlvValue));
+      final long productIDFieldID = 2L;
+      BaseTLVType productIDtlvValue = new UIntType(productID);
+      elements.add(new StructElement(productIDFieldID, productIDtlvValue));
 
       final long labelFieldID = 3L;
       BaseTLVType labeltlvValue = label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType());
@@ -61087,17 +61101,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds) {
-      commissionNode(callback, requestId, responseTimeoutSeconds, 0);
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds) {
+      commissionNode(callback, requestID, responseTimeoutSeconds, 0);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long requestIdFieldID = 0L;
-      BaseTLVType requestIdtlvValue = new UIntType(requestId);
-      elements.add(new StructElement(requestIdFieldID, requestIdtlvValue));
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
       final long responseTimeoutSecondsFieldID = 1L;
       BaseTLVType responseTimeoutSecondstlvValue = new UIntType(responseTimeoutSeconds);
@@ -65170,6 +65184,8 @@ public class ChipClusters {
     private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
     private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
+    private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
+    private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
     private static final long NULLABLE_BOOLEAN_ATTRIBUTE_ID = 16384L;
     private static final long NULLABLE_BITMAP8_ATTRIBUTE_ID = 16385L;
     private static final long NULLABLE_BITMAP16_ATTRIBUTE_ID = 16386L;
@@ -68328,6 +68344,76 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, UNSUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readReadFailureCodeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeReadFailureCodeAttribute(callback, value, 0);
+    }
+
+    public void writeReadFailureCodeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), READ_FAILURE_CODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeReadFailureCodeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, READ_FAILURE_CODE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, READ_FAILURE_CODE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFailureInt32UAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, true);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value) {
+      writeFailureInt32UAttribute(callback, value, 0);
+    }
+
+    public void writeFailureInt32UAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), FAILURE_INT32_U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFailureInt32UAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAILURE_INT32_U_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FAILURE_INT32_U_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNullableBooleanAttribute(
