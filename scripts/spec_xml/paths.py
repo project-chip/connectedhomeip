@@ -26,7 +26,10 @@ class Branch(Enum):
 
 
 def get_chip_root():
-    """Returns the CHIP root directory, trying the environment variable first and falling back if necessary."""
+    """
+    Returns the CHIP root directory, trying the environment variable first 
+    and falling back if necessary.
+    """
     chip_root = os.getenv('PW_PROJECT_ROOT')
     if chip_root:
         return chip_root
@@ -40,24 +43,65 @@ def get_chip_root():
 
 
 def get_data_model_path(branch: Branch):
-    """Returns the path to the data model directory for a given branch."""
+    """
+    Returns the path to the data model directory for a given branch.
+    """
     chip_root = get_chip_root()
-    return os.path.join(chip_root, 'data_model', branch.value)
+    data_model_path = os.path.join(chip_root, 'data_model', branch.value)
+    if not os.path.exists(data_model_path):
+        raise FileNotFoundError(f"Data model path for branch {branch} does not exist: {data_model_path}")
+    return data_model_path
 
 
 def get_spec_xml_output_path():
-    """Returns the path to the output directory for generated XML files."""
+    """
+    Returns the path to the output directory for generated XML files.
+    """
     chip_root = get_chip_root()
-    return os.path.join(chip_root, 'out', 'spec_xml')
+    output_dir = os.path.join(chip_root, 'out', 'spec_xml')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)  # Automatically create the directory if it doesn't exist
+    return output_dir
 
 
 def get_documentation_file_path():
-    """Returns the path to the documentation file."""
+    """
+    Returns the path to the documentation file.
+    """
     chip_root = get_chip_root()
-    return os.path.join(chip_root, 'docs', 'spec_clusters.md')
+    documentation_file = os.path.join(chip_root, 'docs', 'spec_clusters.md')
+    if not os.path.exists(documentation_file):
+        raise FileNotFoundError(f"Documentation file does not exist: {documentation_file}")
+    return documentation_file
 
 
 def get_python_testing_path():
-    """Returns the path to the python_testing directory."""
+    """
+    Returns the path to the python_testing directory.
+    """
     chip_root = get_chip_root()
-    return os.path.join(chip_root, 'src', 'python_testing')
+    python_testing_path = os.path.join(chip_root, 'src', 'python_testing')
+    if not os.path.exists(python_testing_path):
+        raise FileNotFoundError(f"Python testing directory does not exist: {python_testing_path}")
+    return python_testing_path
+
+
+def get_in_progress_defines():
+    """
+    Returns a list of defines that are currently in progress.
+    This can be updated dynamically as needed.
+    """
+    return [
+        'aliro', 'atomicwrites', 'battery-storage', 'device-location', 'e2e-jf',
+        'energy-calendar', 'energy-drlc', 'energy-management', 'heat-pump', 'hrap-1',
+        'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
+        'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup'
+    ]
+
+
+def get_available_branches():
+    """
+    Return a list of available branches for the data model.
+    This can be expanded or dynamically fetched if necessary.
+    """
+    return [Branch.MASTER, Branch.V1_3]
