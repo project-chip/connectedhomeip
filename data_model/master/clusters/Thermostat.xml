@@ -63,8 +63,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
-    <revision revision="7" summary="Added Q quality for LocalTemperature, OutdoorTemperature and ACCoilTemperature,
-             update constraints on local temperature calibration and minimum setpoint deadband and introduced
+    <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced
              Presets and MatterScheduleConfiguration features"/>
     <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation."/>
   </revisionHistory>
@@ -653,12 +652,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LocalTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="OutdoorTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0002" name="Occupancy" type="OccupancyBitmap" default="1">
@@ -996,7 +995,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0046" name="ACCoilTemperature" type="temperature" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0047" name="ACCapacityFormat" type="ACCapacityFormatEnum" default="0">

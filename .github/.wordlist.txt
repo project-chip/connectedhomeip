@@ -341,6 +341,7 @@ datamodel
 DataModelRevision
 dataset
 datasets
+datastore
 DataVersion
 dbf
 DBG
@@ -950,8 +951,6 @@ NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
 nltest
-NLUnitTest
-NLUnitTests
 nmcli
 nmtui
 noc

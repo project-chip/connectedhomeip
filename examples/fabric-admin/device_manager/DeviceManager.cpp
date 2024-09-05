@@ -282,7 +282,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
         return;
     }
 
-    if (value.requestId != mRequestId)
+    if (value.requestID != mRequestId)
     {
         ChipLogError(NotSpecified, "The RequestId does not match the RequestId provided to RequestCommissioningApproval");
         return;
@@ -296,7 +296,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
 
     // The server is ready to begin commissioning the requested device, request the Commissioner Control Server to begin
     // commissioning a previously approved request.
-    SendCommissionNodeRequest(value.requestId, kResponseTimeoutSeconds);
+    SendCommissionNodeRequest(value.requestID, kResponseTimeoutSeconds);
 }
 
 void DeviceManager::HandleAttributePartsListUpdate(chip::TLV::TLVReader & data)

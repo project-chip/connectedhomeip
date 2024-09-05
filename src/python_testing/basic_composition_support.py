@@ -26,10 +26,28 @@ import typing
 from pprint import pformat, pprint
 from typing import Any, Optional
 
+import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
+
+
+def arls_populated(tlv_data: dict[int, Any]) -> tuple[bool, bool]:
+    """ Returns a tuple indicating if the ARL and CommissioningARL are populated.
+        Requires a wildcard read of the device TLV.
+    """
+    # ACL is always on endpoint 0
+    if 0 not in tlv_data or Clusters.AccessControl.id not in tlv_data[0]:
+        return (False, False)
+    # Both attributes are mandatory for this feature, so if one doesn't exist, neither should the other.
+    if Clusters.AccessControl.Attributes.Arl.attribute_id not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]:
+        return (False, False)
+
+    have_arl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.Arl.attribute_id]
+    have_carl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.CommissioningARL.attribute_id]
+
+    return (have_arl, have_carl)
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -104,6 +122,8 @@ class BasicCompositionTests:
             created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
 
         setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
+        if not setup_codes:
+            return None
         asserts.assert_equal(len(setup_codes), 1,
                              "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
         return setup_codes[0]
@@ -132,7 +152,7 @@ class BasicCompositionTests:
         node_id = self.dut_node_id
 
         task_list = []
-        if allow_pase:
+        if allow_pase and self.get_code(dev_ctrl):
             setup_code = self.get_code(dev_ctrl)
             pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
@@ -166,6 +186,12 @@ class BasicCompositionTests:
         logging.info("###########################################################")
         logging.info("Start of actual tests")
         logging.info("###########################################################")
+
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(
+            have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+        asserts.assert_false(
+            have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""
