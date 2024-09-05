@@ -128,7 +128,7 @@
 
 - (nullable NSNumber *)_pid
 {
-    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyVendorID];
+    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyProductID];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
