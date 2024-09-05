@@ -83,17 +83,30 @@
     return [self.uniqueIdentifier UUIDString];
 }
 
-- (id)initWithUniqueIdentifier:(NSUUID *)UUID xpConnectionBlock:(NSXPCConnection * (^)(void) )connectionBlock
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                      error:(NSError * __autoreleasing *)error
 {
-    if (self = [super initForSubclasses]) {
+    if (![parameters isKindOfClass:MTRXPCDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Expected MTRXPCDeviceControllerParameters but got: %@", parameters);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
+    if (self = [super initForSubclasses:parameters.startSuspended]) {
+        auto * xpcParameters = static_cast<MTRXPCDeviceControllerParameters *>(parameters);
+        auto connectionBlock = xpcParameters.xpcConnectionBlock;
+        auto * UUID = xpcParameters.uniqueIdentifier;
+
         MTR_LOG("Setting up XPC Controller for UUID: %@ with connection block: %p", UUID, connectionBlock);
 
         if (UUID == nil) {
-            MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil UUID");
+            MTR_LOG_ERROR("MTRDeviceController_XPC initWithParameters failed, nil UUID");
             return nil;
         }
         if (connectionBlock == nil) {
-            MTR_LOG_ERROR("MTRDeviceController_XPC initWithUniqueIdentifier failed, nil connectionBlock");
+            MTR_LOG_ERROR("MTRDeviceController_XPC initWithParameters failed, nil connectionBlock");
             return nil;
         }
 
@@ -131,7 +144,9 @@
 #ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 - (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
 {
-    if (self = [super initForSubclasses]) {
+    // TODO: Presumably this should end up doing some sort of
+    // MTRDeviceControllerAbstractParameters thing eventually?
+    if (self = [super initForSubclasses:NO]) {
         MTR_LOG("Setting up XPC Controller for UUID: %@  with machServiceName: %s options: %d", UUID, machServiceName, options);
         self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
         self.uniqueIdentifier = UUID;
@@ -154,13 +169,6 @@
     return self;
 }
 #endif // MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
-
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error
-{
-    MTR_LOG_ERROR("%s: unimplemented method called", __PRETTY_FUNCTION__);
-    return nil;
-}
 
 // If prefetchedClusterData is not provided, load attributes individually from controller data store
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
