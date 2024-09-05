@@ -250,7 +250,7 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for cluster {
+        logging.info(f"Waiting {timeout_sec: .1f} seconds for no more events for cluster {
                      expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
