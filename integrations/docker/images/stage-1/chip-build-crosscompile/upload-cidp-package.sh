@@ -5,7 +5,8 @@
 
 set -e
 
-rsync -avL -e 'ssh -p 5555' \
+echo "COPYING /lib"
+rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
   --exclude='/lib/firmware' \
   --exclude='/lib/git-core' \
   --exclude='/lib/modules' \
@@ -13,12 +14,14 @@ rsync -avL -e 'ssh -p 5555' \
   --exclude='/lib/systemd' \
   ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot
 
-rsync -avL -e 'ssh -p 5555' \
+echo "COPYING /usr/lib"
+rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
   --exclude='/usr/lib/firmware' \
   --exclude='/usr/lib/git-core' \
   ubuntu@localhost:/usr/lib ubuntu-24.04-aarch64-sysroot/usr
 
-rsync -avL -e 'ssh -p 5555' \
+echo "COPYING /usr/include"
+rsync -ahL --info=progress2 --info=name0 -e 'ssh -p 5555' \
   --exclude='/usr/lib/modules' \
   ubuntu@localhost:/usr/include ubuntu-24.04-aarch64-sysroot/usr
 
