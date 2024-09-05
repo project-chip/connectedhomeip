@@ -36,7 +36,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif
 }
 
-- (instancetype)initInternalWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase isCrossTest:(BOOL)isCrossTest
+- (instancetype)initInternalWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload
 {
 #if !HAVE_NSTASK
     XCTFail("Unable to start server app when we do not have NSTask");
@@ -61,7 +61,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     NSNumber * passcode = parsedPayload.setupPasscode;
 
     __auto_type * executable = [NSString stringWithFormat:@"out/debug/%@-app/chip-%@-app", name, name];
-    _appTask = [testcase createTaskForPath:executable];
+    _appTask = [MTRTestCase createTaskForPath:executable];
 
     __auto_type * forcedArguments = @[
         // Make sure we only advertise on the local interface.
@@ -92,12 +92,6 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
     _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
 
-    if (isCrossTest) {
-        [testcase launchCrossTestTask:_appTask];
-    } else {
-        [testcase launchTask:_appTask];
-    }
-
     NSLog(@"Started chip-%@-app (%@) with arguments %@ stdout=%@ and stderr=%@", name, _appTask, allArguments, outFile, errorFile);
 
     return self;
@@ -106,12 +100,29 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 
 - (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
 {
-    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:NO];
+    if (!(self = [self initInternalWithAppName:name arguments:arguments payload:payload])) {
+        return nil;
+    }
+
+    [testcase launchTask:_appTask];
+
+    return self;
 }
 
-- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
+- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testsuite:(Class)testsuite
 {
-    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:YES];
+    if (![testsuite isSubclassOfClass:MTRTestCase.class]) {
+        NSLog(@"%@ is not a subclass of MTRTestCase", testsuite);
+        return nil;
+    }
+
+    if (!(self = [self initInternalWithAppName:name arguments:arguments payload:payload])) {
+        return nil;
+    }
+
+    [MTRTestCase launchCrossTestTask:_appTask];
+
+    return self;
 }
 
 + (unsigned)nextUniqueIndex

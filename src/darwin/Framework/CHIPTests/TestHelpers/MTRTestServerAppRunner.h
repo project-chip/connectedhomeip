@@ -48,8 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Same thing, but initialize as a "cross test" helper, which is not killed at
  * the end of the current test (but is killed at the end of the current suite).
+ *
+ * The passed-in testsuite must be a subclass of MTRTestCase.
  */
-- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase;
+- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testsuite:(Class)testsuite;
 
 /**
  * Get the unique index that will be used for the next initialization.  This
