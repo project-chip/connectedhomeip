@@ -64,6 +64,7 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/config",
 
       "${chip_root}/src/platform/silabs/rs911x",
+      "${chip_root}/src/platform/silabs/wifi",
 
       # ble component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
