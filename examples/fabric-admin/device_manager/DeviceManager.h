@@ -171,6 +171,9 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
+    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
+    Device * FindDeviceByNode(chip::NodeId nodeId);
+
 private:
     friend DeviceManager & DeviceMgr();
 
@@ -206,9 +209,6 @@ private:
     bool mAutoSyncEnabled = false;
     bool mInitialized     = false;
     uint64_t mRequestId   = 0;
-
-    Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
-    Device * FindDeviceByNode(chip::NodeId nodeId);
 };
 
 /**

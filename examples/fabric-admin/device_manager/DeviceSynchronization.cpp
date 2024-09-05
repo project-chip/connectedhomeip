@@ -128,35 +128,31 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 void DeviceSynchronizer::OnReportEnd()
 {
     // Report end is at the end of all attributes (success)
-#if defined(PW_RPC_ENABLED)
-    if (!DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
-    {
-        AddSynchronizedDevice(mCurrentDeviceData);
-        // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
-        if (!mCurrentDeviceData.is_icd)
-        {
-            VerifyOrDie(mController);
-            // TODO(#35333) Figure out how we should recover in this circumstance.
-            CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(NotSpecified, "Failed start subscription to ");
-            }
-        }
-    }
-#else
-    ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
-#endif
+    MoveToState(State::ReceivedResponse);
 }
 
 void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 {
-    // Nothing to do: error reported on OnError or report ended called.
-    mDeviceSyncInProcess = false;
+#if defined(PW_RPC_ENABLED)
+    if (mState == State::ReceivedResponse && !DeviceMgr().IsCurrentBridgeDevice(mCurrentDeviceData.node_id))
+    {
+        GetUniqueId();
+        if (mState == State::GettingUid)
+        {
+            // GetUniqueId was successful and we rely on callback to call SynchronizationCompleteAddDevice.
+            return;
+        }
+        SynchronizationCompleteAddDevice();
+    }
+#else
+    ChipLogError(NotSpecified, "Cannot synchronize device with fabric bridge: RPC not enabled");
+#endif
+    MoveToState(State::Idle);
 }
 
 void DeviceSynchronizer::OnError(CHIP_ERROR error)
 {
+    MoveToState(State::ReceivedError);
     ChipLogProgress(NotSpecified, "Error fetching device data: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
@@ -180,21 +176,22 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to issue read for BasicInformation data");
-        mDeviceSyncInProcess = false;
+        MoveToState(State::Idle);
     }
+    MoveToState(State::AwaitingResponse);
 }
 
 void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    mDeviceSyncInProcess = false;
+    MoveToState(State::Idle);
 }
 
 void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController * controller, chip::NodeId nodeId,
                                                     bool deviceIsIcd)
 {
     VerifyOrDie(controller);
-    if (mDeviceSyncInProcess)
+    if (mState != State::Idle)
     {
         ChipLogError(NotSpecified, "Device Sync NOT POSSIBLE: another sync is in progress");
         return;
@@ -205,8 +202,102 @@ void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceCont
     mCurrentDeviceData.has_is_icd = true;
     mCurrentDeviceData.is_icd     = deviceIsIcd;
 
-    mDeviceSyncInProcess = true;
-
+    ReturnOnFailure(controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback));
     mController = controller;
-    controller->GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    MoveToState(State::Connecting);
+}
+
+void DeviceSynchronizer::GetUniqueId()
+{
+    VerifyOrDie(mState == State::ReceivedResponse);
+    VerifyOrDie(mController);
+
+    // If we have a UniqueId we can return leaving state in ReceivedResponse.
+    VerifyOrReturn(!mCurrentDeviceData.has_unique_id, ChipLogDetail(NotSpecified, "We already have UniqueId"));
+
+    auto * device = DeviceMgr().FindDeviceByNode(mCurrentDeviceData.node_id);
+    // If there is no associated remote Fabric Sync Aggregator there is no other place for us to try
+    // getting the UniqueId from and can return leaving the state in ReceivedResponse.
+    VerifyOrReturn(device, ChipLogDetail(NotSpecified, "No remote Fabric Sync Aggregator to get UniqueId from"));
+
+    // Because device is not-null we expect IsFabricSyncReady to be true. IsFabricSyncReady indicates we have a
+    // connection to the remote Fabric Sync Aggregator.
+    VerifyOrDie(DeviceMgr().IsFabricSyncReady());
+    auto remoteBridgeNodeId               = DeviceMgr().GetRemoteBridgeNodeId();
+    EndpointId remoteEndpointIdOfInterest = device->GetEndpointId();
+
+    ChipLogDetail(NotSpecified, "Attempting to get UniqueId from remote Fabric Sync Aggregator") CHIP_ERROR err =
+        mUniqueIdGetter.GetUniqueId(
+            [this](std::optional<CharSpan> aUniqueId) {
+                if (aUniqueId.has_value())
+                {
+                    this->mCurrentDeviceData.has_unique_id = true;
+                    memcpy(this->mCurrentDeviceData.unique_id, aUniqueId.value().data(), aUniqueId.value().size());
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "We expected to get UniqueId from remote Fabric Sync Aggregator, but failed");
+                }
+                this->SynchronizationCompleteAddDevice();
+            },
+            *mController, remoteBridgeNodeId, remoteEndpointIdOfInterest);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        MoveToState(State::GettingUid);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Failed to get UniqueId from remote Fabric Sync Aggregator")
+    }
+}
+
+void DeviceSynchronizer::SynchronizationCompleteAddDevice()
+{
+    VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
+    AddSynchronizedDevice(mCurrentDeviceData);
+    // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
+    if (!mCurrentDeviceData.is_icd)
+    {
+        VerifyOrDie(mController);
+        // TODO(#35333) Figure out how we should recover in this circumstance.
+        CHIP_ERROR err = DeviceSubscriptionManager::Instance().StartSubscription(*mController, mCurrentDeviceData.node_id);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64,
+                         ChipLogValueX64(mCurrentDeviceData.node_id));
+        }
+    }
+    MoveToState(State::Idle);
+}
+
+void DeviceSynchronizer::MoveToState(const State targetState)
+{
+    mState = targetState;
+    ChipLogDetail(NotSpecified, "DeviceSynchronizer moving to [%10.10s]", GetStateStr());
+}
+
+const char * DeviceSynchronizer::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::Connecting:
+        return "Connecting";
+
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
+
+    case State::ReceivedResponse:
+        return "ReceivedResponse";
+
+    case State::ReceivedError:
+        return "ReceivedError";
+
+    case State::GettingUid:
+        return "GettingUid";
+    }
+    return "N/A";
 }

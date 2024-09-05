@@ -427,9 +427,14 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
             for (auto & endpointAttributes : endpointAttributesList)
             {
                 std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(castingPlayer, endpointAttributes));
+                ChipLogProgress(AppServer, "CastingStore::ReadAll() endpointServerListMap[endpointAttributes.mId].size(): %d",
+                                static_cast<int>(endpointServerListMap[endpointAttributes.mId].size()));
                 endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
                 castingPlayer->RegisterEndpoint(endpoint);
+                ChipLogProgress(AppServer, "CastingStore::ReadAll() Registered endpointID: %d", endpoint->GetId());
             }
+            ChipLogProgress(AppServer, "CastingStore::ReadAll() Created CastingPlayer with deviceName: %s",
+                            castingPlayer->GetDeviceName());
             castingPlayers.push_back(*castingPlayer);
             continue;
         }
@@ -453,7 +458,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
 CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayers)
 {
-    ChipLogProgress(AppServer, "CastingStore::WriteAll called");
+    ChipLogProgress(AppServer, "CastingStore::WriteAll() called");
 
     chip::TLV::TLVWriter tlvWriter;
     uint8_t castingStoreData[kCastingStoreDataMaxBytes];
@@ -470,6 +475,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     for (auto & castingPlayer : castingPlayers)
     {
+        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing castingPlayer:");
         chip::TLV::TLVType castingPlayerContainerType;
         // CastingPlayer container starts
         ReturnErrorOnFailure(
@@ -502,6 +508,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
         for (auto & endpoint : endpoints)
         {
+            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint with endpointId: %d",
+                            endpoint->GetId());
             chip::TLV::TLVType endpointContainerType;
             // Endpoint container starts
             ReturnErrorOnFailure(
@@ -539,8 +547,10 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
             ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointServerListContainerTag),
                                                           chip::TLV::kTLVType_Structure, serverListContainerType));
             std::vector<chip::ClusterId> serverList = endpoint->GetServerList();
+            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint ServerList:");
             for (chip::ClusterId clusterId : serverList)
             {
+                ChipLogProgress(AppServer, "CastingStore::WriteAll() clusterId: %d", clusterId);
                 ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointServerClusterIdTag), clusterId));
             }
             // ServerList container ends
@@ -562,7 +572,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     ReturnErrorOnFailure(tlvWriter.Finalize());
     ChipLogProgress(AppServer,
-                    "CastingStore::WriteAll TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
+                    "CastingStore::WriteAll() TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
                     "and version: %d",
                     tlvWriter.GetLengthWritten(), static_cast<unsigned long>(castingPlayers.size()),
                     kCurrentCastingStoreDataVersion);

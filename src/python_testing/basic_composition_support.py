@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-
+import asyncio
 import base64
 import copy
 import json
@@ -26,10 +26,28 @@ import typing
 from pprint import pformat, pprint
 from typing import Any, Optional
 
+import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
+
+
+def arls_populated(tlv_data: dict[int, Any]) -> tuple[bool, bool]:
+    """ Returns a tuple indicating if the ARL and CommissioningARL are populated.
+        Requires a wildcard read of the device TLV.
+    """
+    # ACL is always on endpoint 0
+    if 0 not in tlv_data or Clusters.AccessControl.id not in tlv_data[0]:
+        return (False, False)
+    # Both attributes are mandatory for this feature, so if one doesn't exist, neither should the other.
+    if Clusters.AccessControl.Attributes.Arl.attribute_id not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]:
+        return (False, False)
+
+    have_arl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.Arl.attribute_id]
+    have_carl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.CommissioningARL.attribute_id]
+
+    return (have_arl, have_carl)
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -98,12 +116,17 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    async def connect_over_pase(self, dev_ctrl):
-        asserts.assert_true(self.matter_test_config.qr_code_content == [] or self.matter_test_config.manual_code == [],
-                            "Cannot have both QR and manual code specified")
-        setupCode = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code
-        asserts.assert_equal(len(setupCode), 1, "Require one of either --qr-code or --manual-code.")
-        await dev_ctrl.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
+    def get_code(self, dev_ctrl):
+        created_codes = []
+        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
+
+        setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
+        if not setup_codes:
+            return None
+        asserts.assert_equal(len(setup_codes), 1,
+                             "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
+        return setup_codes[0]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
@@ -120,19 +143,34 @@ class BasicCompositionTests:
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
         return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
-    async def setup_class_helper(self, default_to_pase: bool = True):
+    async def setup_class_helper(self, allow_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        do_test_over_pase = self.user_params.get("use_pase_only", default_to_pase)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
-        if do_test_over_pase:
-            await self.connect_over_pase(dev_ctrl)
-            node_id = self.dut_node_id
-        else:
-            # Using the already commissioned node
-            node_id = self.dut_node_id
+        node_id = self.dut_node_id
+
+        task_list = []
+        if allow_pase and self.get_code(dev_ctrl):
+            setup_code = self.get_code(dev_ctrl)
+            pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
+            task_list.append(asyncio.create_task(pase_future))
+
+        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        task_list.append(asyncio.create_task(case_future))
+
+        for task in task_list:
+            asyncio.ensure_future(task)
+
+        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending:
+            try:
+                task.cancel()
+                await task
+            except asyncio.CancelledError:
+                pass
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))
 
@@ -148,6 +186,12 @@ class BasicCompositionTests:
         logging.info("###########################################################")
         logging.info("Start of actual tests")
         logging.info("###########################################################")
+
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(
+            have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+        asserts.assert_false(
+            have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""

@@ -18,13 +18,35 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
+# test-runner-runs: run1 run2 run3 run4
+#
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+# test-runner-run/run1/script-args: --endpoint 1 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+#
+# test-runner-run/run2/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run2/factoryreset: True
+# test-runner-run/run2/quiet: True
+# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run2/script-args: --endpoint 2 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+#
+# test-runner-run/run3/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run3/factoryreset: True
+# test-runner-run/run3/quiet: True
+# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run3/script-args: --endpoint 3 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+#
+# test-runner-run/run4/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run4/factoryreset: True
+# test-runner-run/run4/quiet: True
+# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run4/script-args: --endpoint 4 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+#
 # === END CI TEST ARGUMENTS ===
+#
+# These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 
 import json
 import logging
@@ -39,7 +61,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
 from chip.tlv import uint
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature, per_endpoint_test)
+                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+                                    run_if_endpoint_matches)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -277,7 +300,7 @@ class TC_SwitchTests(MatterBaseTest):
                          "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
+    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Switch
@@ -387,7 +410,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -465,7 +488,7 @@ class TC_SwitchTests(MatterBaseTest):
                 """)
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
@@ -639,7 +662,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kActionSwitch)
         return msm(wildcard, endpoint) and not asf(wildcard, endpoint)
 
-    @per_endpoint_test(should_run_SWTCH_2_5)
+    @run_if_endpoint_matches(should_run_SWTCH_2_5)
     async def test_TC_SWTCH_2_5(self):
         # Commissioning - already done
         self.step(1)
@@ -818,7 +841,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, 0x20)
         return msm(wildcard, endpoint) and asf(wildcard, endpoint)
 
-    @per_endpoint_test(should_run_SWTCH_2_6)
+    @run_if_endpoint_matches(should_run_SWTCH_2_6)
     async def test_TC_SWTCH_2_6(self):
         # Commissioning - already done
         self.step(1)

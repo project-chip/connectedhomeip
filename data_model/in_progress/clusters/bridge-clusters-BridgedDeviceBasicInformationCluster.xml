@@ -69,7 +69,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <features>
-    <feature bit="20" code="BIS" name="BridgedICDSupport" summary="A set of features that support Bridged ICD Devices.">
+    <feature bit="20" code="BIS" name="BridgedICDSupport" summary="Support bridged ICDs.">
       <optionalConform/>
     </feature>
   </features>
@@ -153,6 +153,10 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StayActiveDuration" type="uint32">
         <mandatoryConform/>
+      </field>
+      <field id="1" name="TimeoutMs" type="uint32">
+        <mandatoryConform/>
+        <constraint type="between" from="30000" to="3600000"/>
       </field>
     </command>
   </commands>
