@@ -532,33 +532,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
-
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
 - (instancetype)init
 {
@@ -568,7 +541,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _instruction = nil;
 
-        _redirectURL = nil;
+        _arlRequestFlowUrl = nil;
 
         _fabricIndex = @(0);
     }
@@ -581,7 +554,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.token = self.token;
     other.instruction = self.instruction;
-    other.redirectURL = self.redirectURL;
+    other.arlRequestFlowUrl = self.arlRequestFlowUrl;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -589,7 +562,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; arlRequestFlowUrl:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _arlRequestFlowUrl, _fabricIndex];
     return descriptionString;
 }
 

@@ -5614,22 +5614,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AccessControl::Events::AccessRestrictionEntryChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5650,10 +5634,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("RedirectURL", indent + 1, value.redirectURL);
+        CHIP_ERROR err = DataModelLogger::LogValue("ARLRequestFlowUrl", indent + 1, value.ARLRequestFlowUrl);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RedirectURL'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ARLRequestFlowUrl'");
             return err;
         }
     }
@@ -20269,11 +20253,6 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
-        }
-        case AccessControl::Events::AccessRestrictionEntryChanged::Id: {
-            chip::app::Clusters::AccessControl::Events::AccessRestrictionEntryChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AccessRestrictionEntryChanged", 1, value);
         }
         case AccessControl::Events::FabricRestrictionReviewUpdate::Id: {
             chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType value;

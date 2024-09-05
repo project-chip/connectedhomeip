@@ -173,17 +173,8 @@ class TC_ACL_2_11(MatterBaseTest):
         arru_cb = EventChangeCallback(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, arru_queue)
 
         urgent = 1
-        subscription_arru = await dev_ctrl.ReadEvent(dut_node_id, events=[(0, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, urgent)], reportInterval=(1, 5), keepSubscriptions=True, autoResubscribe=False)
+        subscription_arru = await dev_ctrl.ReadEvent(dut_node_id, events=[(0, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, urgent)], reportInterval=(0, 30), keepSubscriptions=True, autoResubscribe=False)
         subscription_arru.SetEventUpdateCallback(callback=arru_cb)
-        # end
-
-        # Belongs to step 7, but needs to be subscribed before executing step 5: begin
-        arec_queue = queue.Queue()
-        arec_cb = EventChangeCallback(Clusters.AccessControl.Events.AccessRestrictionEntryChanged, arec_queue)
-
-        urgent = 1
-        subscription_arec = await dev_ctrl.ReadEvent(dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessRestrictionEntryChanged, urgent)], reportInterval=(1, 5), keepSubscriptions=True, autoResubscribe=False)
-        subscription_arec.SetEventUpdateCallback(callback=arec_cb)
         # end
 
         self.step(5)

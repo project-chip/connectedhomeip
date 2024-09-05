@@ -2928,7 +2928,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -3228,50 +3228,15 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace AccessControlExtensionChanged
-namespace AccessRestrictionEntryChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kFabricIndex = 254,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AccessRestrictionEntryChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr bool kIsFabricScoped = true;
-
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AccessRestrictionEntryChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AccessRestrictionEntryChanged
 namespace FabricRestrictionReviewUpdate {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kToken       = 0,
-    kInstruction = 1,
-    kRedirectURL = 2,
-    kFabricIndex = 254,
+    kToken             = 0,
+    kInstruction       = 1,
+    kARLRequestFlowUrl = 2,
+    kFabricIndex       = 254,
 };
 
 struct Type
@@ -3283,8 +3248,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     uint64_t token = static_cast<uint64_t>(0);
-    DataModel::Nullable<chip::CharSpan> instruction;
-    DataModel::Nullable<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> instruction;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     auto GetFabricIndex() const { return fabricIndex; }
@@ -3300,8 +3265,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     uint64_t token = static_cast<uint64_t>(0);
-    DataModel::Nullable<chip::CharSpan> instruction;
-    DataModel::Nullable<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> instruction;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

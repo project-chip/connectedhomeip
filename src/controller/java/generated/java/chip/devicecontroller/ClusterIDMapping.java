@@ -1717,8 +1717,7 @@ public class ClusterIDMapping {
         public enum Event {
             AccessControlEntryChanged(0L),
             AccessControlExtensionChanged(1L),
-            AccessRestrictionEntryChanged(2L),
-            FabricRestrictionReviewUpdate(3L),;
+            FabricRestrictionReviewUpdate(2L),;
             private final long id;
             Event(long id) {
                 this.id = id;
