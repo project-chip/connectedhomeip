@@ -27,6 +27,7 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 from dataclasses import dataclass
 
@@ -36,11 +37,11 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
-cluster = Clusters.Objects.IcdManagement
-commands = cluster.Commands
-attributes = cluster.Attributes
-modes = cluster.Enums.OperatingModeEnum
-ClientTypeEnum = cluster.Enums.ClientTypeEnum
+Cluster = Clusters.Objects.IcdManagement
+Commands = Cluster.Commands
+Attributes = Cluster.Attributes
+OperatingModeEnum = Cluster.Enums.OperatingModeEnum
+ClientTypeEnum = Cluster.Enums.ClientTypeEnum
 
 
 @dataclass
@@ -68,34 +69,22 @@ class TC_ICDM_5_1(MatterBaseTest):
     # Class Helper functions
     #
 
-    async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+    async def _read_icdm_attribute_expect_success(self, attribute) -> OperatingModeEnum:
+        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=Cluster, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
-    async def _get_icd_txt_record(self):
+    async def _get_icd_txt_record(self) -> OperatingModeEnum:
         discovery = mdns_discovery.MdnsDiscovery()
-        localCompressedNodeId = hex(self.default_controller.GetCompressedFabricId())
-        dutNodeId = hex(self.dut_node_id)
+        service = await discovery.get_operational_service(
+            node_id=self.dut_node_id,
+            compressed_fabric_id=self.default_controller.GetCompressedFabricId(),
+            log_output=True, discovery_timeout_sec=240)
 
-        services = await discovery.get_all_services(log_output=True, discovery_timeout_sec=240)
-        icdTxtRecord = modes.kUnknownEnumValue.value
-        print("debugging mdns")
-        print(services)
-        asserts.assert_true(mdns_discovery.MdnsServiceType.OPERATIONAL.value in services,
-                            "Could not find ICD operational service information.")
-
-        for service in services[mdns_discovery.MdnsServiceType.OPERATIONAL.value]:
-
-            # Generate hex for the compressedFabric and NodeId
-            serviceName = service.instance_name.split("-")
-            compressedFabric = hex(int(serviceName[0], 16))
-            nodeId = hex(int(serviceName[1], 16))
-
-            # Find the correct MdnsServiceEntry
-            if localCompressedNodeId == compressedFabric and dutNodeId == nodeId:
-                icdTxtRecord = service.txt_record['ICD']
+        icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
+        if icdTxtRecord.value != int(service.txt_record['ICD']):
+            raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
 
         return icdTxtRecord
 
@@ -143,60 +132,62 @@ class TC_ICDM_5_1(MatterBaseTest):
         try:
             self.step(1)
             registeredClients = await self._read_icdm_attribute_expect_success(
-                attributes.RegisteredClients)
+                Attributes.RegisteredClients)
 
             for client in registeredClients:
                 try:
-                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                    await self._send_single_icdm_command(Commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, "Unexpected error returned")
 
             self.step("2a")
-            operatingMode = await self._read_icdm_attribute_expect_success(attributes.OperatingMode)
-            asserts.assert_equal(operatingMode, modes.kSit.value)
+            operatingMode = await self._read_icdm_attribute_expect_success(Attributes.OperatingMode)
+            asserts.assert_equal(operatingMode, OperatingModeEnum.kSit)
 
             self.step("2b")
             icdTxtRecord = await self._get_icd_txt_record()
-            asserts.assert_equal(int(icdTxtRecord), modes.kSit.value, "OperatingMode Is not in SIT mode.")
+            asserts.assert_equal(icdTxtRecord, OperatingModeEnum.kSit, "OperatingMode Is not in SIT mode.")
 
             self.step("3a")
             try:
-                await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=client1.checkInNodeID, monitoredSubject=client1.subjectId, key=client1.key, clientType=client1.clientType))
+                await self._send_single_icdm_command(Commands.RegisterClient(checkInNodeID=client1.checkInNodeID, monitoredSubject=client1.subjectId, key=client1.key, clientType=client1.clientType))
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
 
             self.step("3b")
-            operatingMode = await self._read_icdm_attribute_expect_success(attributes.OperatingMode)
-            asserts.assert_equal(operatingMode, modes.kLit.value)
+            operatingMode = await self._read_icdm_attribute_expect_success(Attributes.OperatingMode)
+            asserts.assert_equal(operatingMode, OperatingModeEnum.kLit)
+
+            # await asyncio.sleep(1)
 
             self.step("3c")
             icdTxtRecord = await self._get_icd_txt_record()
-            asserts.assert_equal(int(icdTxtRecord), modes.kLit.value, "OperatingMode Is not in Lit mode.")
+            asserts.assert_equal(icdTxtRecord, OperatingModeEnum.kLit, "OperatingMode Is not in Lit mode.")
 
             self.step(4)
             try:
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client1.checkInNodeID))
+                await self._send_single_icdm_command(Commands.UnregisterClient(checkInNodeID=client1.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
 
             self.step("5a")
-            operatingMode = await self._read_icdm_attribute_expect_success(attributes.OperatingMode)
-            asserts.assert_equal(operatingMode, modes.kSit.value)
+            operatingMode = await self._read_icdm_attribute_expect_success(Attributes.OperatingMode)
+            asserts.assert_equal(operatingMode, OperatingModeEnum.kSit)
 
             self.step("5b")
             icdTxtRecord = await self._get_icd_txt_record()
-            asserts.assert_equal(int(icdTxtRecord), modes.kSit.value, "OperatingMode Is not in SIT mode.")
+            asserts.assert_equal(icdTxtRecord, OperatingModeEnum.kSit, "OperatingMode Is not in SIT mode.")
 
         finally:
             registeredClients = await self._read_icdm_attribute_expect_success(
-                attributes.RegisteredClients)
+                Attributes.RegisteredClients)
 
             for client in registeredClients:
                 try:
-                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                    await self._send_single_icdm_command(Commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, "Unexpected error returned")

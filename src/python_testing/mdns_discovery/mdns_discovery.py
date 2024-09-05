@@ -99,6 +99,9 @@ class MdnsDiscovery:
         # A list of service types
         self._service_types = []
 
+        # Filtering to apply for received data items
+        self._name_filter = None
+
         # An asyncio Event to signal when a service has been discovered
         self._event = asyncio.Event()
 
@@ -116,6 +119,7 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONER, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
@@ -131,10 +135,12 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONABLE, log_output, discovery_timeout_sec)
 
-    async def get_operational_service(self, service_name: str = None,
-                                      service_type: str = None,
+    async def get_operational_service(self,
+                                      node_id: Optional[int] = None,
+                                      compressed_fabric_id: Optional[int] = None,
                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                       log_output: bool = False
                                       ) -> Optional[MdnsServiceInfo]:
@@ -144,35 +150,16 @@ class MdnsDiscovery:
         Args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
-            service_name (str): The unique name of the mDNS service. Defaults to None.
-            service_type (str): The service type of the service. Defaults to None.
+            node_id: the node id to create the service name from 
+            compressed_fabric_id: the fabric id to create the service name from 
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
         # Validation to ensure both or none of the parameters are provided
-        if (service_name is None) != (service_type is None):
-            raise ValueError("Both service_name and service_type must be provided together or not at all.")
 
-        mdns_service_info = None
-
-        if service_name is None and service_type is None:
-            mdns_service_info = await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
-        else:
-            print(f"Looking for MDNS service type '{service_type}',  service name '{service_name}'")
-
-            # Get service info
-            service_info = AsyncServiceInfo(service_type, service_name)
-            is_discovered = await service_info.async_request(self._zc, 3000)
-            if is_discovered:
-                mdns_service_info = self._to_mdns_service_info_class(service_info)
-            self._discovered_services = {}
-            self._discovered_services[service_type] = [mdns_service_info]
-
-            if log_output:
-                self._log_output()
-
-        return mdns_service_info
+        self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
+        return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
 
     async def get_border_router_service(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -276,13 +263,18 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        if state_change.value == ServiceStateChange.Added.value:
-            self._event.set()
-            asyncio.ensure_future(self._query_service_info(
-                zeroconf,
-                service_type,
-                name)
-            )
+        if state_change.value == ServiceStateChange.Removed.value:
+            return
+
+        if self._name_filter is not None and name.upper() != self._name_filter:
+            return
+
+        self._event.set()
+        asyncio.ensure_future(self._query_service_info(
+            zeroconf,
+            service_type,
+            name)
+        )
 
     async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
         """
