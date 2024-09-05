@@ -488,7 +488,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     };
 }
 
-- (oneway void)notifyPrivateInternalPropertiesDelegateOfChanges
+- (void)_notifyPrivateInternalPropertiesDelegateOfChanges
 {
     if ([self.privateInternalStateDelegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
         [self.privateInternalStateDelegate device:self.nodeID internalStateUpdated:[self _internalProperties]];
@@ -983,7 +983,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }];
         /* END DRAGONS */
 
-        [self notifyPrivateInternalPropertiesDelegateOfChanges];
+        [self _notifyPrivateInternalPropertiesDelegateOfChanges];
     }
 }
 
@@ -1184,7 +1184,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
     deviceUsesThread = [self _deviceUsesThread];
 
     // If a previous resubscription failed, remove the item from the subscription pool.
@@ -1235,7 +1235,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
     }
 
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 }
 
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
@@ -1251,7 +1251,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1506,7 +1506,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
     }
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 }
 #endif
 
@@ -1565,7 +1565,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
     }
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -1636,7 +1636,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = nil;
     }
-    [self notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
