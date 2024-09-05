@@ -58,6 +58,8 @@ constexpr int kSoftwareVersionSize = 64;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 constexpr int kDescriptorAttributeArraySize = 254;
 
+#define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
+
 // ENDPOINT DEFINITIONS:
 // =================================================================================
 //
@@ -125,6 +127,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(AdministratorCommissioningAttrs)
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::WindowStatus::Id, ENUM8, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminFabricIndex::Id, FABRIC_IDX, 1, 0),
   DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::AdminVendorId::Id, VENDOR_ID, 2, 0),
+  DECLARE_DYNAMIC_ATTRIBUTE(AdministratorCommissioning::Attributes::ClusterRevision::Id, INT16U, ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION, 0),
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 // clang-format on
 

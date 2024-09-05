@@ -48,10 +48,11 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
 
-    # Override default timeout to support a 60 min wait
+    # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
+    # so 6 minutes is more than enough.
     @property
     def default_timeout(self) -> int:
-        return 63*60
+        return 6*60
 
     def desc_TC_BRBINFO_4_1(self) -> str:
         """Returns a description of this test"""
@@ -130,14 +131,16 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             asserts.fail('This test requires a TH_ICD_SERVER app. Specify app path with --string-arg th_icd_server_app_path:<path_to_app>')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
-        self.port = 5543
         discriminator = 3850
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} '
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
 
         logging.info("Starting ICD Server App")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("ICD started")
         time.sleep(3)
 

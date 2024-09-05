@@ -117,9 +117,11 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
                  TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA")]
         return steps
 
+    # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
+    # be enough time for test to run
     @property
     def default_timeout(self) -> int:
-        return self.user_params.get("report_waiting_timeout_delay_sec", 10)*2 + 60
+        return 3*60
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):

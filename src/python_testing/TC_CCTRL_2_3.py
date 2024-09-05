@@ -52,11 +52,14 @@ class TC_CCTRL_2_3(MatterBaseTest):
         self.port = 5543
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
-        cmd = f'{app} {app_args}'
+        cmd = [app]
+        cmd.extend(['--secured-device-port', str(5543)])
+        cmd.extend(['--discriminator', str(discriminator)])
+        cmd.extend(['--passcode', str(passcode)])
+        cmd.extend(['--KVS', self.kvs])
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting TH_SERVER")
-        self.app_process = subprocess.Popen(cmd, bufsize=0, shell=True)
+        self.app_process = subprocess.Popen(cmd)
         logging.info("TH_SERVER started")
         time.sleep(3)
 
@@ -99,6 +102,12 @@ class TC_CCTRL_2_3(MatterBaseTest):
                  TestStep(12, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER")]
 
         return steps
+
+    # This test has some manual steps and one sleep for up to 30 seconds. Test typically
+    # runs under 1 mins, so 3 minutes is more than enough.
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
 
     @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):

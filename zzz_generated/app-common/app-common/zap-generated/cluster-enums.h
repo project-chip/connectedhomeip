@@ -2155,7 +2155,7 @@ enum class StatusCode : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kNoFeatures = 0x0,
+    kDirectModeChange = 0x10000,
 };
 } // namespace RvcRunMode
 
@@ -2188,7 +2188,7 @@ enum class StatusCode : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kNoFeatures = 0x0,
+    kDirectModeChange = 0x10000,
 };
 } // namespace RvcCleanMode
 

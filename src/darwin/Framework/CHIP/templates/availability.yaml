@@ -9681,16 +9681,6 @@
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
-          RVCRunMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
-          RVCCleanMode:
-              Feature:
-                  # Not really part of the spec, need to think about whether to
-                  # expose this.
-                  - NoFeatures
 
 - release: "Future"
   versions: "future"
@@ -9842,6 +9832,9 @@
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - ActiveChanged
+          OccupancySensing:
+              # Targeting 1.4
+              - OccupancyChanged
       enums:
           AccessControl:
               # Targeting 1.4
@@ -9890,6 +9883,14 @@
               Feature:
                   # Targeting 1.4
                   - ActionSwitch
+          RVCCleanMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
+          RVCRunMode:
+              Feature:
+                  # Targeting 1.4
+                  - DirectModeChange
   renames:
       enums:
           ColorControl:

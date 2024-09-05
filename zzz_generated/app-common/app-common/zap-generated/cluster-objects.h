@@ -2928,7 +2928,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -3228,50 +3228,15 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace AccessControlExtensionChanged
-namespace AccessRestrictionEntryChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kFabricIndex = 254,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AccessRestrictionEntryChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-    static constexpr bool kIsFabricScoped = true;
-
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AccessRestrictionEntryChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AccessRestrictionEntryChanged
 namespace FabricRestrictionReviewUpdate {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kToken       = 0,
-    kInstruction = 1,
-    kRedirectURL = 2,
-    kFabricIndex = 254,
+    kToken             = 0,
+    kInstruction       = 1,
+    kARLRequestFlowUrl = 2,
+    kFabricIndex       = 254,
 };
 
 struct Type
@@ -3283,8 +3248,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     uint64_t token = static_cast<uint64_t>(0);
-    DataModel::Nullable<chip::CharSpan> instruction;
-    DataModel::Nullable<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> instruction;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     auto GetFabricIndex() const { return fabricIndex; }
@@ -3300,8 +3265,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     uint64_t token = static_cast<uint64_t>(0);
-    DataModel::Nullable<chip::CharSpan> instruction;
-    DataModel::Nullable<chip::CharSpan> redirectURL;
+    Optional<chip::CharSpan> instruction;
+    Optional<chip::CharSpan> ARLRequestFlowUrl;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41973,9 +41938,9 @@ namespace Commands {
 namespace RequestCommissioningApproval {
 enum class Fields : uint8_t
 {
-    kRequestId = 0,
-    kVendorId  = 1,
-    kProductId = 2,
+    kRequestID = 0,
+    kVendorID  = 1,
+    kProductID = 2,
     kLabel     = 3,
 };
 
@@ -41986,9 +41951,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId      = static_cast<uint64_t>(0);
-    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
-    uint16_t productId      = static_cast<uint16_t>(0);
+    uint64_t requestID      = static_cast<uint64_t>(0);
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    uint16_t productID      = static_cast<uint16_t>(0);
     Optional<chip::CharSpan> label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -42004,9 +41969,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId      = static_cast<uint64_t>(0);
-    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
-    uint16_t productId      = static_cast<uint16_t>(0);
+    uint64_t requestID      = static_cast<uint64_t>(0);
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    uint16_t productID      = static_cast<uint16_t>(0);
     Optional<chip::CharSpan> label;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -42014,10 +41979,8 @@ public:
 namespace CommissionNode {
 enum class Fields : uint8_t
 {
-    kRequestId              = 0,
+    kRequestID              = 0,
     kResponseTimeoutSeconds = 1,
-    kIpAddress              = 2,
-    kPort                   = 3,
 };
 
 struct Type
@@ -42027,10 +41990,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint64_t requestID              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> ipAddress;
-    Optional<uint16_t> port;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -42045,10 +42006,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint64_t requestID              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> ipAddress;
-    Optional<uint16_t> port;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommissionNode
@@ -42174,8 +42133,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kRequestId    = 0,
-    kClientNodeId = 1,
+    kRequestID    = 0,
+    kClientNodeID = 1,
     kStatusCode   = 2,
     kFabricIndex  = 254,
 };
@@ -42188,8 +42147,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    uint64_t requestId            = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t requestID            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID     = static_cast<chip::NodeId>(0);
     uint8_t statusCode            = static_cast<uint8_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -42205,8 +42164,8 @@ public:
     static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId            = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t requestID            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID     = static_cast<chip::NodeId>(0);
     uint8_t statusCode            = static_cast<uint8_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -46800,6 +46759,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Unsupported
+namespace ReadFailureCode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReadFailureCode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReadFailureCode
+namespace FailureInt32U {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FailureInt32U::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace FailureInt32U
 namespace NullableBoolean {
 struct TypeInfo
 {
@@ -47350,7 +47333,9 @@ struct TypeInfo
         Attributes::ClusterErrorBoolean::TypeInfo::DecodableType clusterErrorBoolean = static_cast<bool>(0);
         Attributes::GlobalEnum::TypeInfo::DecodableType globalEnum = static_cast<chip::app::Clusters::Globals::TestGlobalEnum>(0);
         Attributes::GlobalStruct::TypeInfo::DecodableType globalStruct;
-        Attributes::Unsupported::TypeInfo::DecodableType unsupported = static_cast<bool>(0);
+        Attributes::Unsupported::TypeInfo::DecodableType unsupported         = static_cast<bool>(0);
+        Attributes::ReadFailureCode::TypeInfo::DecodableType readFailureCode = static_cast<uint8_t>(0);
+        Attributes::FailureInt32U::TypeInfo::DecodableType failureInt32U     = static_cast<uint32_t>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;
         Attributes::NullableBitmap8::TypeInfo::DecodableType nullableBitmap8;
         Attributes::NullableBitmap16::TypeInfo::DecodableType nullableBitmap16;
