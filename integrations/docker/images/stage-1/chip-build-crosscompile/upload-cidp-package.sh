@@ -49,7 +49,6 @@ TEXTEND
 TODAY=$(date '+%Y.%m.%d')
 PACKAGE_VERSION="build-$TODAY"
 
-
 # NOTE: sufficient permissions are required to be able to upload this.
 #       Login is a prerequisite:
 #
@@ -59,4 +58,4 @@ echo "Uploading package tagged '$PACKAGE_VERSION' to $PACKAGE ..."
 cipd create -pkg-def=cipd.yaml -tag "version:$PACKAGE_VERSION"
 
 echo "Updating version to latest"
-cipd set-ref $PACKAGE -version "version:$PACKAGE_VERSION" -ref latest
+cipd set-ref "$PACKAGE" -version "version:$PACKAGE_VERSION" -ref latest
