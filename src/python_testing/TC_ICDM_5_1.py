@@ -27,7 +27,6 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 from dataclasses import dataclass
 
@@ -159,8 +158,6 @@ class TC_ICDM_5_1(MatterBaseTest):
             self.step("3b")
             operatingMode = await self._read_icdm_attribute_expect_success(Attributes.OperatingMode)
             asserts.assert_equal(operatingMode, OperatingModeEnum.kLit)
-
-            # await asyncio.sleep(1)
 
             self.step("3c")
             icdTxtRecord = await self._get_icd_txt_record()
