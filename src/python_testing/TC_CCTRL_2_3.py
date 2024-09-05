@@ -103,6 +103,12 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         return steps
 
+    # This test has some manual steps and one sleep for up to 30 seconds. Test typically
+    # runs under 1 mins, so 3 minutes is more than enough.
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
+
     @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
