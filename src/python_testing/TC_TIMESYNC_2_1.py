@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --endpoint 0 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import ipaddress
@@ -32,7 +32,7 @@ from datetime import timedelta
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, per_endpoint_test,
+from matter_testing_support import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, run_if_endpoint_matches,
                                     utc_time_in_matter_epoch)
 from mobly import asserts
 
@@ -42,7 +42,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
-    @per_endpoint_test(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
+    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
     async def test_TC_TIMESYNC_2_1(self):
         attributes = Clusters.TimeSynchronization.Attributes
         features = await self.read_ts_attribute_expect_success(attribute=attributes.FeatureMap)

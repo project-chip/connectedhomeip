@@ -42,6 +42,7 @@ class HostFuzzingType(Enum):
     NONE = auto()
     LIB_FUZZER = auto()
     OSS_FUZZ = auto()
+    PW_FUZZTEST = auto()
 
 
 class HostApp(Enum):
@@ -219,7 +220,7 @@ class HostApp(Enum):
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
-            yield 'chip_nl_test_runner_wheels'
+            yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
@@ -322,6 +323,7 @@ class HostBuilder(GnBuilder):
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
                  data_model_interface: Optional[bool] = None,
+                 chip_data_model_check_die_on_failure: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -379,6 +381,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
             self.extra_gn_options.append('oss_fuzz=true')
+        elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -418,6 +422,11 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_build_tests=true')
             self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
+        elif chip_data_model_check_die_on_failure is not None:
+            if chip_data_model_check_die_on_failure:
+                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
+            else:
+                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
@@ -467,6 +476,9 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'
+
+        if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.build_command = 'pw_fuzz_tests'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

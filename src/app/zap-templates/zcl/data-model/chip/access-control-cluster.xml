@@ -127,7 +127,7 @@ limitations under the License.
     <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">CommissioningARL</attribute>
     <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">ARL</attribute>
 
-    <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true">
+    <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true" response="ReviewFabricRestrictionsResponse">
       <description>This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.</description>
        <access op="invoke" privilege="administer"/>
       <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct"/>
@@ -156,16 +156,11 @@ limitations under the License.
       <access op="read" privilege="administer"/>
     </event>
 
-    <event code="0x0002" name="AccessRestrictionEntryChanged" priority="info" side="server" isFabricSensitive="true" optional="true">
-      <description>The cluster SHALL send AccessRestrictionEntryChanged events whenever its ARL attribute data is changed by the device maker.</description>
-      <access op="read" privilege="administer"/>
-    </event>
-
-    <event code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" side="server" isFabricSensitive="true" optional="true">
+    <event side="server" code="0x0002" name="FabricRestrictionReviewUpdate" priority="info" isFabricSensitive="true" optional="true">
       <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
       <field id="0" name="Token" type="int64u"/>
-      <field id="1" name="Instruction" type="long_char_string" isNullable="true" length="512"/>
-      <field id="2" name="RedirectURL" type="long_char_string" isNullable="true" length="256"/>
+      <field id="1" name="Instruction" type="long_char_string" optional="true" length="512"/>
+      <field id="2" name="ARLRequestFlowUrl" type="long_char_string" optional="true" length="256"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

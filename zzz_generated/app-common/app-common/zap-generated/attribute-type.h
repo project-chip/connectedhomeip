@@ -20,6 +20,8 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <cstdint>
+
 // ZCL attribute types
 enum
 {
@@ -99,3 +101,42 @@ enum
     ZCL_HWADR_ATTRIBUTE_TYPE             = 0xF6, // Hardware Address
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
+
+namespace chip {
+namespace app {
+inline bool IsSignedAttributeType(uint8_t attributeType)
+{
+    switch (attributeType)
+    {
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT16S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_POWER_MW_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:
+        return true;
+    default:
+        return false;
+    }
+}
+} // namespace app
+} // namespace chip
