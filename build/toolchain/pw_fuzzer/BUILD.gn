@@ -63,7 +63,7 @@ gcc_toolchain("chip_pw_fuzztest") {
     dir_pw_third_party_fuzztest = "//third_party/fuzztest"
     dir_pw_third_party_googletest = "//third_party/googletest"
 
-    # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering warning
+    # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering a warning
     # Remove if re2 is indeed not needed
     # dir_pw_third_party_re2 = "//third_party/re2/src"
   }

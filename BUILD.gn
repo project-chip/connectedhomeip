@@ -65,6 +65,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (pw_enable_fuzz_test_targets) {
     group("pw_fuzz_tests") {
       deps = [
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/credentials/tests:fuzz-chip-cert-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
