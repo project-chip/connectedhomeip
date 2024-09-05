@@ -45,8 +45,6 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-// TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
@@ -202,8 +200,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ESP32Config>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here (#1266)
 
     err = CHIP_NO_ERROR;
 
