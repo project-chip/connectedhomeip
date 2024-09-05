@@ -92,7 +92,6 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
 // 3. Using rename() to overwrite the existing file
 CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 {
-
     TemporaryFileStream tmpFile(configFile + "-XXXXXX");
     VerifyOrReturnError(
         tmpFile.IsOpen(), CHIP_ERROR_OPEN_FAILED,
