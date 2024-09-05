@@ -204,6 +204,10 @@ echo "Look out for a message of 'Initial installation DONE' in the console. "
 echo ""
 
 if [ "$start_console" -eq 1 ]; then
+    echo "Delaying console start to have final message visible."
+    echo "Don't worry, vm startup takes a while anyway..."
+    sleep 10
+    echo "Starting console ..."
     virsh console sysrootsrv
 else
     echo "Console is not auto-started."
@@ -213,4 +217,3 @@ else
     echo ""
     echo "And you can exit that console using 'CTRL + ]'"
 fi
-
