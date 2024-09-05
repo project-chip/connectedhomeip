@@ -12,34 +12,27 @@ echo "Copying a sysroot in $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 RSYNC_RSH="ssh -p 5555"
-RSYNC_OPTIONS="
---archive
---human-readable
---links
---delete-during
---delete-excluded
---safe-links
---info=progress2
---info=name0
-"
 
-echo "COPYING /usr/lib ..."
-rsync $RSYNC_OPTIONS \
+echo "COPYING from VM (ubuntu@localhost on port 5555) ..."
+rsync \
+  --archive \
+  --human-readable \
+  --links \
+  --delete-during \
+  --delete-excluded \
+  --safe-links \
+  --info=progress2 \
+  --info=name0 \
   --exclude='lib/aarch64-linux-gnu/dri' \
   --exclude='lib/firmware' \
   --exclude='lib/git-core' \
   --exclude='lib/modules' \
   --exclude='lib/ssl/private' \
   --exclude='lib/systemd' \
-  ubuntu@localhost:/usr/lib "$OUTPUT_DIR"
-
-echo "COPYING /usr/include ..."
-rsync $RSYNC_OPTIONS \
-  ubuntu@localhost:/usr/include "$OUTPUT_DIR"
-
-# lib is just a symlink in ubuntu-24.04
-echo "CREATING /lib symbolic link ..."
-ln -s usr/lib $OUTPUT_DIR/lib 
+  ubuntu@localhost:/lib \
+  ubuntu@localhost:/usr/include \
+  ubuntu@localhost:/usr/lib \
+  "$OUTPUT_DIR"
 
 TODAY=$(date '+%Y.%m.%d')
 
