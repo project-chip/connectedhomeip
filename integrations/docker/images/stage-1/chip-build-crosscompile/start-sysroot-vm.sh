@@ -97,16 +97,11 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - $SSH_KEY
-    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
     groups: sudo,admin,users
     shell: /bin/bash
     lock_passwd: false
     passwd: $PASSWORD_HASH
-
-system_info:
-  default_user:
-    name: ubuntu
-    home: /home/ubuntu
 
 hostname: sysrootsrv
 
