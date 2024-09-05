@@ -7,8 +7,29 @@
 #
 #   sudo apt install qemu-system-arm virtinst libvirt-daemon
 #
-
 set -e
+
+while getopts "hi" opt; do
+  case $opt in
+    h)
+      echo "Usage: $0 [-h] [-i]"
+      echo "    -h    Displays this help message"
+      echo "    -i    Attempt to 'sudo apt-get install' required packages"
+      exit 0
+      ;;
+    i)
+      echo "Installing required packages ..."
+      sudo apt-get install \
+        genisoimage \
+        libvirt-daemon \
+        qemu-system-arm \
+        qemu-utils \
+        virtinst \
+        whois \
+        ;
+      ;;
+  esac
+done
 
 if ! which qemu-system-aarch64 >/dev/null; then
     echo "Cannot find 'qemu-system-aarch64'. Did you 'sudo apt-get install qemu-system-arm' ?"
