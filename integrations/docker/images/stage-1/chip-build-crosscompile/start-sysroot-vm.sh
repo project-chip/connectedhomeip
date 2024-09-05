@@ -175,6 +175,7 @@ virt-install \
     --name sysrootsrv \
     --memory 8192 \
     --arch aarch64 \
+    --vcpus 8 \
     --import \
     --disk path=sysrootsrv.img,format=qcow2 \
     --disk path=cidata.iso,device=cdrom \
