@@ -166,11 +166,7 @@ struct EmberAfAttributeMetadata
     /**
      * Check wether this attribute is signed based on its type according to the spec.
      */
-    bool IsSignedIntegerAttribute() const
-    {
-        return (attributeType >= ZCL_INT8S_ATTRIBUTE_TYPE && attributeType <= ZCL_INT64S_ATTRIBUTE_TYPE) ||
-            attributeType == ZCL_TEMPERATURE_ATTRIBUTE_TYPE;
-    }
+    bool IsSignedIntegerAttribute() const { return chip::app::IsSignedAttributeType(attributeType); }
 
     /**
      * Check whether this attribute has a define min and max.

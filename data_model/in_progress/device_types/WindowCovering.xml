@@ -84,36 +84,6 @@ Davis, CA 95616, USA
           </mandatoryConform>
         </feature>
       </features>
-      <commands>
-        <command id="" name="GoToLiftPercentage.LiftPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercentageValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToLiftPercentage.LiftPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-        <command id="" name="GoToTiltPercentage.TiltPercent100thsValue">
-          <field>
-            <mandatoryConform>
-              <condition name="Matter"/>
-            </mandatoryConform>
-          </field>
-        </command>
-      </commands>
     </cluster>
   </clusters>
 </deviceType>

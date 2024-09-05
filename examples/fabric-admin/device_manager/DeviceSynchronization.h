@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include "UidGetter.h"
+#include "UniqueIdGetter.h"
 
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
@@ -77,7 +77,7 @@ private:
         GettingUid,       ///< We are getting UniqueId from the remote fabric sync bridge.
     };
 
-    void GetUid(chip::EndpointId endpointId);
+    void GetUniqueId();
     void SynchronizationCompleteAddDevice();
 
     void MoveToState(const State targetState);
@@ -93,5 +93,5 @@ private:
     // mState != Idle).
     chip::Controller::DeviceController * mController = nullptr;
     chip_rpc_SynchronizedDevice mCurrentDeviceData   = chip_rpc_SynchronizedDevice_init_default;
-    UidGetter mUidGetter;
+    UniqueIdGetter mUniqueIdGetter;
 };

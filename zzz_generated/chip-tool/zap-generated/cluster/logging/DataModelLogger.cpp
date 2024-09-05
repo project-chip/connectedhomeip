@@ -5614,22 +5614,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AccessControl::Events::AccessRestrictionEntryChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5650,10 +5634,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("RedirectURL", indent + 1, value.redirectURL);
+        CHIP_ERROR err = DataModelLogger::LogValue("ARLRequestFlowUrl", indent + 1, value.ARLRequestFlowUrl);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RedirectURL'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ARLRequestFlowUrl'");
             return err;
         }
     }
@@ -7912,18 +7896,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("RequestId", indent + 1, value.requestId);
+        CHIP_ERROR err = DataModelLogger::LogValue("RequestID", indent + 1, value.requestID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestId'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ClientNodeId", indent + 1, value.clientNodeId);
+        CHIP_ERROR err = DataModelLogger::LogValue("ClientNodeID", indent + 1, value.clientNodeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ClientNodeId'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ClientNodeID'");
             return err;
         }
     }
@@ -19189,6 +19173,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("unsupported", 1, value);
         }
+        case UnitTesting::Attributes::ReadFailureCode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("readFailureCode", 1, value);
+        }
+        case UnitTesting::Attributes::FailureInt32U::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("failureInt32U", 1, value);
+        }
         case UnitTesting::Attributes::NullableBoolean::Id: {
             chip::app::DataModel::Nullable<bool> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -20259,11 +20253,6 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
-        }
-        case AccessControl::Events::AccessRestrictionEntryChanged::Id: {
-            chip::app::Clusters::AccessControl::Events::AccessRestrictionEntryChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AccessRestrictionEntryChanged", 1, value);
         }
         case AccessControl::Events::FabricRestrictionReviewUpdate::Id: {
             chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::DecodableType value;
