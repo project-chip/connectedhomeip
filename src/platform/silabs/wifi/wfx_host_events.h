@@ -352,12 +352,14 @@ void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_ipv6_notify(int got_ip);
 
+#ifdef RS911X_WIFI
 #if !(EXP_BOARD)
 void * wfx_rsi_alloc_pkt(void);
 /* RSI for LWIP */
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
-#endif
+#endif //!(EXP_BOARD)
+#endif // RS911X_WIFI
 
 #ifdef RS911X_WIFI
 /* RSI Power Save */
