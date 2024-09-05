@@ -26,6 +26,7 @@
 #include "task.h"
 #include "timers.h"
 
+#define WLAN_TASK_PRIORITY (1)
 typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
 {
     uint32_t status;
@@ -108,7 +109,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #include "sl_wifi_device.h"
 
 #define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
-#endif
+#endif //(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 /* Wi-Fi events*/
 #define SL_WFX_STARTUP_IND_ID (1)
@@ -117,7 +118,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_SCAN_COMPLETE_ID (4)
 #endif /* WF200 */
 
-#if SLI_SI91X_MCU_INTERFACE
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 // MAX SSID LENGTH excluding NULL character
 #define WFX_MAX_SSID_LENGTH (32)
 // MAX PASSKEY LENGTH including NULL character
@@ -288,17 +289,6 @@ typedef struct wfx_wifi_scan_ext
     uint32_t ucast_tx_count;
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
-
-#if WF200_WIFI
-#define WLAN_TASK_PRIORITY (1)
-#elif (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-// #define WLAN_DRIVER_TASK_PRIORITY (2)
-// #define BLE_DRIVER_TASK_PRIORITY (2)
-#else // RS9116
-#define WLAN_TASK_PRIORITY (1)
-#define WLAN_DRIVER_TASK_PRIORITY (1)
-#define BLE_DRIVER_TASK_PRIORITY (1)
-#endif // WF200_WIFI
 
 #ifdef RS911X_WIFI
 /*
