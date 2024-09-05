@@ -468,8 +468,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 
 // TODO:  extern string these for the other side
-static NSString * kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
-static NSString * kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
 // TODO:  more internal properties
 
 - (NSDictionary *)_internalProperties {
