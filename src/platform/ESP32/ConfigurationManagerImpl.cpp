@@ -181,7 +181,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     {
         // Start a timer which reloads every one hour and bumps the total operational hours
-        TickType_t reloadPeriod = (1000 * 60 * 60) / portTICK_PERIOD_MS;
+        TickType_t reloadPeriod   = (1000 * 60 * 60) / portTICK_PERIOD_MS;
         TimerHandle_t timerHandle = xTimerCreate("tOpHrs", reloadPeriod, pdPASS, nullptr, TotalOperationalHoursTimerCallback);
         if (timerHandle == nullptr)
         {
