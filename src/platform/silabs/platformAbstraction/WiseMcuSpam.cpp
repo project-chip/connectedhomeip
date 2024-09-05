@@ -46,6 +46,10 @@ void soc_pll_config(void);
 #include "SEGGER_SYSVIEW.h"
 #endif
 
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL
+#include "uart.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -73,6 +77,10 @@ CHIP_ERROR SilabsPlatform::Init(void)
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
+#endif
+
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL
+    uartConsoleInit();
 #endif
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
