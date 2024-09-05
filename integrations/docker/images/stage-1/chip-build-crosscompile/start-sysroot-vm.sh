@@ -30,14 +30,13 @@ if ! which mkpasswd >/dev/null; then
   exit 1
 fi
 
-
 if ! which qemu-img >/dev/null; then
-    echo "Cannot find 'qemu-img'."
+    echo "Cannot find 'qemu-img'. Did you 'sudo apt-get install qemu-utis' ?"
     exit 1
 fi
 
 if ! which genisoimage >/dev/null; then
-    echo "Cannot find 'genisoimage'."
+    echo "Cannot find 'genisoimage'. Did you 'sudo apt-get install genisoimage' ?"
     exit 1
 fi
 
