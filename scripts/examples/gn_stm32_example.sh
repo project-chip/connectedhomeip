@@ -122,49 +122,49 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
-            --wifi)
-                if [ -z "$2" ]; then
-                    echo "--wifi requires mxchip"
-                    exit 1
-                fi
-                if [ "$2" = "mxchip" ]; then
-                    optArgs+="use_mxchip=true"
-                else
-                    echo "Wifi usage: --wifi mxchip"
-                    exit 1
-                fi
+        --wifi)
+            if [ -z "$2" ]; then
+                echo "--wifi requires mxchip"
+                exit 1
+            fi
+            if [ "$2" = "mxchip" ]; then
+                optArgs+="use_mxchip=true"
+            else
+                echo "Wifi usage: --wifi mxchip"
+                exit 1
+            fi
+            USE_WIFI=true
+            shift
+            shift
+            ;;
+        --sed)
+            optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+            shift
+            ;;
+        --chip_enable_wifi_ipv4)
+            optArgs+="chip_enable_wifi_ipv4=true "
+            shift
+            ;;
+        --additional_data_advertising)
+            optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
+            shift
+            ;;
+        --use_ot_lib)
+            optArgs+="use_st_thread_lib=true chip_openthread_target=$ST_THREAD_TARGET openthread_external_platform=\"""\" "
+            shift
+            ;;
+        --use_ot_coap_lib)
+            optArgs+="use_st_thread_lib=true chip_openthread_target=$ST_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
+            shift
+            ;;
+        *)
+            if [ "$1" =~ *"use_mxchip=true"* ]; then
                 USE_WIFI=true
-                shift
-                shift
-                ;;
-            --sed)
-                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
-                shift
-                ;;
-            --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
-                shift
-                ;;
-            --additional_data_advertising)
-                optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
-                shift
-                ;;
-            --use_ot_lib)
-                optArgs+="use_st_thread_lib=true chip_openthread_target=$ST_THREAD_TARGET openthread_external_platform=\"""\" "
-                shift
-                ;;
-            --use_ot_coap_lib)
-                optArgs+="use_st_thread_lib=true chip_openthread_target=$ST_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
-                shift
-                ;;
-            *)
-                if [ "$1" =~ *"use_mxchip=true"* ]; then
-                    USE_WIFI=true
-                fi
+            fi
 
-                optArgs+=$1" "
-                shift
-                ;;
+            optArgs+=$1" "
+            shift
+            ;;
         esac
     done
 
@@ -176,14 +176,14 @@ else
     BUILD_DIR=$OUTDIR/$STM32_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --add-export-compile-commands="*" --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --add-export-compile-commands="*" --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --add-export-compile-commands="*" --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/

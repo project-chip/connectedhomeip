@@ -244,7 +244,7 @@ class NxpBuilder(GnBuilder):
                     elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
             # add empty space at the end to avoid concatenation issue when there is no --args
-            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
+            cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands="*" --root=%s ' % self.root
 
             extra_args = []
 

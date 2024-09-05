@@ -197,7 +197,7 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --add-export-compile-commands="*"
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Ensure codegen is done for sanitize
@@ -415,7 +415,7 @@ jobs:
                           # clang.
                           "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
                       esac
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --add-export-compile-commands="*"
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
