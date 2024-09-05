@@ -92,7 +92,13 @@ private:
 
 // TODO: This could be guarded by a separate multi-interface condition instead
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    static IntrusiveList<InstanceListNode> sInstances;
+    class NetworkInstanceList : public IntrusiveList<InstanceListNode>
+    {
+    public:
+        ~NetworkInstanceList() { this->Clear(); }
+    };
+
+    static NetworkInstanceList sInstances;
 #endif
 
     EndpointId mEndpointId = kInvalidEndpointId;
@@ -125,8 +131,10 @@ private:
     void SetLastNetworkId(ByteSpan lastNetworkId);
     void ReportNetworksListChanged() const;
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     // Disconnect if the current connection is not in the Networks list
     void DisconnectLingeringConnection();
+#endif
 
     // Commits the breadcrumb value saved in mCurrentOperationBreadcrumb to the breadcrumb attribute in GeneralCommissioning
     // cluster. Will set mCurrentOperationBreadcrumb to NullOptional.
@@ -150,8 +158,16 @@ public:
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate);
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate);
-    virtual ~Instance() = default;
-}; // namespace NetworkCommissioning
+    virtual ~Instance()
+    {
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (IsInList())
+        {
+            sInstances.Remove(this);
+        }
+#endif
+    }
+};
 
 // NetworkDriver for the devices that don't have / don't need a real network driver.
 class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver

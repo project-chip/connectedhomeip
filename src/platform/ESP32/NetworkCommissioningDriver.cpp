@@ -236,6 +236,7 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
 {
     if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
@@ -245,6 +246,7 @@ CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
     }
     return CHIP_NO_ERROR;
 }
+#endif
 
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {

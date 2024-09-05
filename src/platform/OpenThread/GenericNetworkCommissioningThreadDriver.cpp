@@ -277,6 +277,7 @@ void GenericThreadDriver::CheckInterfaceEnabled()
 #endif
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
 {
     if (ThreadStackMgrImpl().IsThreadProvisioned())
@@ -287,6 +288,7 @@ CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
     }
     return CHIP_NO_ERROR;
 }
+#endif
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()
 {

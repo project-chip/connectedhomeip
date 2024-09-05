@@ -337,7 +337,7 @@ CHIP_ERROR ThreadScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag t
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-IntrusiveList<InstanceListNode> Instance::sInstances;
+Instance::NetworkInstanceList Instance::sInstances;
 #endif
 
 Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
@@ -370,7 +370,10 @@ CHIP_ERROR Instance::Init()
     mLastConnectErrorValue.SetNull();
     mLastNetworkIDLen = 0;
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    sInstances.PushBack(this);
+    if (!sInstances.Contains(this))
+    {
+        sInstances.PushBack(this);
+    }
 #endif
     return CHIP_NO_ERROR;
 }
@@ -378,7 +381,10 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    sInstances.Remove(this);
+    if (sInstances.Contains(this))
+    {
+        sInstances.Remove(this);
+    }
 #endif
     mpBaseDriver->Shutdown();
 }
@@ -1170,6 +1176,7 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 void Instance::DisconnectLingeringConnection()
 {
     bool haveConnectedNetwork = false;
@@ -1190,6 +1197,7 @@ void Instance::DisconnectLingeringConnection()
         LogErrorOnFailure(mpWirelessDriver->DisconnectFromNetwork());
     }
 }
+#endif
 
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
