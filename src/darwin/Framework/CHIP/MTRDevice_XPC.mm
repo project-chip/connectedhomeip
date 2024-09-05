@@ -58,6 +58,7 @@
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+#import "MTRDevice_XPC_Internal.h"
 
 #include <atomic>
 #include <dns_sd.h>
@@ -82,6 +83,8 @@
 
 @implementation MTRDevice_XPC
 
+@synthesize _internalState;
+
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // TODO: Verify that this is a valid MTRDeviceController_XPC?
@@ -91,6 +94,10 @@
     }
 
     return self;
+}
+
+- (void)dealloc {
+    [self _setInternalState: nil];
 }
 
 - (NSString *)description
