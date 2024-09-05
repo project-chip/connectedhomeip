@@ -15,10 +15,8 @@
  *    limitations under the License.
  */
 
-
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
-
 
 #include "AppMain.h"
 #include <app/server/Server.h>
@@ -37,7 +35,7 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 }
 
-//TODO #35369: move this to a test fixture once Test Fixture issues within FuzzTest are resolved.
+// TODO #35369: move this to a test fixture once Test Fixture issues within FuzzTest are resolved.
 void CleanShutdown()
 {
     Server::GetInstance().Shutdown();
@@ -88,7 +86,6 @@ void AllClustersFuzzer(const std::vector<std::uint8_t> & Bytes)
 
     // Too big; we couldn't represent this as a packetbuffer to start with.
     ASSERT_FALSE(buf.IsNull());
-
 
     // Ignoring the return value from OnMessageReceived, because we might be
     // passing it all sorts of garbage that will cause it to fail.
