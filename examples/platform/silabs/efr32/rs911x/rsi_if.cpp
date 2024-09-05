@@ -751,17 +751,16 @@ void ProcessEvent(WfxEvent_t inEvent)
             scan = &scan_rsp.scan_info[x];
             // clear structure and calculate size of SSID
             memset(&ap, 0, sizeof(ap));
-            ap.ssid_length = strnlen((char *) scan->ssid, chip::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
-            strncpy(ap.ssid, (char *) scan->ssid, ap.ssid_length);
-            // assure null termination of scanned SSID
-            ap.ssid[ap.ssid_length - 1] = 0;
+            ap.ssid_length =
+                strnlen(reinterpret_cast<char *>(scan->ssid), chip::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
+            chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
 
             // check if the scanned ssid is the one we are looking for
-            if (wfx_rsi.scan_ssid_length != 0 && strcmp(wfx_rsi.scan_ssid, ap.ssid) != CMP_SUCCESS)
+            if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != CMP_SUCCESS)
             {
                 continue; // we found the targeted ssid.
             }
-            // TODO: Add support to convert security mode from RSI to WFX
+            // TODO: convert security mode from RSI to WFX
             ap.security = static_cast<wfx_sec_t>(scan->security_mode);
             ap.rssi     = (-1) * scan->rssi_val;
 
