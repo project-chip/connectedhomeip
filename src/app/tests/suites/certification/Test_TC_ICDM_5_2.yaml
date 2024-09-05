@@ -25,6 +25,19 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Use the below commands to provision the DUT with 2 TH's
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          ./lit-icd-app
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH's respectively. Pls use equivalent command on the respective DUT
+
+          Provision the device using chip tool on first controller(TH1)
+          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3840
+      disabled: true
+      
     - label:
           "Step 1a: TH1 reads from the DUT the RegisteredClients attribute.
           RegisteredClients is empty."
