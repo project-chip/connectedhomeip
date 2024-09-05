@@ -15,24 +15,24 @@ RSYNC_RSH="ssh -p 5555"
 
 echo "COPYING from VM (ubuntu@localhost on port 5555) ..."
 rsync \
-  --archive \
-  --human-readable \
-  --links \
-  --delete-during \
-  --delete-excluded \
-  --safe-links \
-  --info=progress2 \
-  --info=name0 \
-  --exclude='lib/aarch64-linux-gnu/dri' \
-  --exclude='lib/firmware' \
-  --exclude='lib/git-core' \
-  --exclude='lib/modules' \
-  --exclude='lib/ssl/private' \
-  --exclude='lib/systemd' \
-  ubuntu@localhost:/lib \
-  ubuntu@localhost:/usr/include \
-  ubuntu@localhost:/usr/lib \
-  "$OUTPUT_DIR"
+    --archive \
+    --human-readable \
+    --links \
+    --delete-during \
+    --delete-excluded \
+    --safe-links \
+    --info=progress2 \
+    --info=name0 \
+    --exclude='lib/aarch64-linux-gnu/dri' \
+    --exclude='lib/firmware' \
+    --exclude='lib/git-core' \
+    --exclude='lib/modules' \
+    --exclude='lib/ssl/private' \
+    --exclude='lib/systemd' \
+    ubuntu@localhost:/lib \
+    ubuntu@localhost:/usr/include \
+    ubuntu@localhost:/usr/lib \
+    "$OUTPUT_DIR"
 
 TODAY=$(date '+%Y.%m.%d')
 
@@ -52,4 +52,3 @@ TEXTEND
 #
 echo "Uploading package tagged 'v$TODAY' to $PACKAGE ..."
 cipd create -pkg-def=cipd.yaml -tag "version:v$TODAY"
-

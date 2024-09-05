@@ -45,12 +45,12 @@ rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/usr/include ubuntu-24.04-aarch64-s
 
 At this point you have a sysroot in `ubuntu-24.04-aarch64-sysroot`
 
-To create/upload a CIPD package tagged with the current date, a script is provided:
+To create/upload a CIPD package tagged with the current date, a script is
+provided:
 
 ```
 upload-cipd-package.sh
 ```
-
 
 #### Creating a Sysroot
 
