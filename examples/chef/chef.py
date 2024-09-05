@@ -791,7 +791,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
                         """
-                    ))
+                                            ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
