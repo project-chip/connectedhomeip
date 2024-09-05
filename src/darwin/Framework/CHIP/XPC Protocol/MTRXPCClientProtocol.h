@@ -30,7 +30,7 @@ MTR_NEWLY_AVAILABLE
 
 @optional
 // temporarily optional to avoid lockstep needs
-- (oneway void)deviceInternalStateUpdated:(NSDictionary *)dictionary;
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary;
 @end
 
 MTR_NEWLY_AVAILABLE
