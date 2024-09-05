@@ -329,6 +329,21 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     }
 
     // Read attribute using Ember, if it doesn't have an override.
+
+    EmberAfAttributeSearchRecord record;
+    record.endpoint    = aPath.mEndpointId;
+    record.clusterId   = aPath.mClusterId;
+    record.attributeId = aPath.mAttributeId;
+    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(),
+                                                  static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+                                                  /* write = */ false);
+
+    if (status != Status::Success)
+    {
+        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+    }
+
+    // data available, return the corresponding record
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
 
@@ -348,19 +363,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
                          .Attribute(aPath.mAttributeId)
                          .EndOfAttributePathIB();
     ReturnErrorOnFailure(err);
-
-    EmberAfAttributeSearchRecord record;
-    record.endpoint    = aPath.mEndpointId;
-    record.clusterId   = aPath.mClusterId;
-    record.attributeId = aPath.mAttributeId;
-    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(),
-                                                  static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-                                                  /* write = */ false);
-
-    if (status != Status::Success)
-    {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
-    }
 
     TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
