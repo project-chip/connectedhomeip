@@ -5,19 +5,23 @@
 
 set -e
 
-rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot
-rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/usr/lib ubuntu-24.04-aarch64-sysroot/usr
-rsync -avL -e 'ssh -p 5555' ubuntu@localhost:/usr/include ubuntu-24.04-aarch64-sysroot/usr
+rsync -avL -e 'ssh -p 5555' \
+  --exclude='/lib/firmware' \
+  --exclude='/lib/git-core' \
+  --exclude='/lib/modules' \
+  --exclude='/lib/ssl/private' \
+  --exclude='/lib/systemd' \
+  ubuntu@localhost:/lib ubuntu-24.04-aarch64-sysroot
 
-# some cleanup of things not needed by our build anyway
-rm -rf \
-  ubuntu-24.04-aarch64-sysroot/lib/firmware \
-  ubuntu-24.04-aarch64-sysroot/lib/git-core \
-  ubuntu-24.04-aarch64-sysroot/lib/modules \
-  ubuntu-24.04-aarch64-sysroot/usr/lib/firmware \
-  ubuntu-24.04-aarch64-sysroot/usr/lib/git-core \
-  ubuntu-24.04-aarch64-sysroot/usr/lib/modules \
-  ;
+rsync -avL -e 'ssh -p 5555' \
+  --exclude='/usr/lib/firmware' \
+  --exclude='/usr/lib/git-core' \
+  ubuntu@localhost:/usr/lib ubuntu-24.04-aarch64-sysroot/usr
+
+rsync -avL -e 'ssh -p 5555' \
+  --exclude='/usr/lib/modules' \
+  ubuntu@localhost:/usr/include ubuntu-24.04-aarch64-sysroot/usr
+
 
 tar cvfJ ubuntu-24.04-aarch64-sysroot.tar.xz ubuntu-24.04-aarch64-sysroot
 
