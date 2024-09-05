@@ -10,25 +10,25 @@
 set -e
 
 while getopts "hi" opt; do
-  case $opt in
-    h)
-      echo "Usage: $0 [-h] [-i]"
-      echo "    -h    Displays this help message"
-      echo "    -i    Attempt to 'sudo apt-get install' required packages"
-      exit 0
-      ;;
-    i)
-      echo "Installing required packages ..."
-      sudo apt-get install \
-        genisoimage \
-        libvirt-daemon \
-        qemu-system-arm \
-        qemu-utils \
-        virtinst \
-        whois \
-        ;
-      ;;
-  esac
+    case $opt in
+        h)
+            echo "Usage: $0 [-h] [-i]"
+            echo "    -h    Displays this help message"
+            echo "    -i    Attempt to 'sudo apt-get install' required packages"
+            exit 0
+            ;;
+        i)
+            echo "Installing required packages ..."
+            sudo apt-get install \
+                genisoimage \
+                libvirt-daemon \
+                qemu-system-arm \
+                qemu-utils \
+                virtinst \
+                whois \
+                ;
+            ;;
+    esac
 done
 
 if ! which qemu-system-aarch64 >/dev/null; then
@@ -47,8 +47,8 @@ if ! [ -f /usr/sbin/libvirtd ]; then
 fi
 
 if ! which mkpasswd >/dev/null; then
-  echo "Cannot find 'mkpasswd'. Did you 'sudo apt-get install whois' ?"
-  exit 1
+    echo "Cannot find 'mkpasswd'. Did you 'sudo apt-get install whois' ?"
+    exit 1
 fi
 
 if ! which qemu-img >/dev/null; then
