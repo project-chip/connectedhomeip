@@ -79,7 +79,7 @@ public:
     void Open(std::string nameTemplate)
     {
         mFileName = std::move(nameTemplate);
-        mFd       = FileDescriptor(mkstemp(&mFileName[0]));
+        mFd       = FileDescriptor(mkstemp(mFileName.data()));
         mBuf      = FileDescriptorStreamBuf(mFd.Get());
     }
 
