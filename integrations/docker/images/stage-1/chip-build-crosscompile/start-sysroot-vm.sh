@@ -9,12 +9,15 @@
 #
 set -e
 
-while getopts "hi" opt; do
+start_console=1
+
+while getopts "hin" opt; do
     case $opt in
         h)
             echo "Usage: $0 [-h] [-i]"
             echo "    -h    Displays this help message"
             echo "    -i    Attempt to 'sudo apt-get install' required packages"
+            echo "    -n    Do not start a console after vm is created"
             exit 0
             ;;
         i)
@@ -27,6 +30,10 @@ while getopts "hi" opt; do
                 virtinst \
                 whois \
                 ;
+            ;;
+        n)
+            echo "Console will not be started after virtual machine startup."
+            start_console=0
             ;;
     esac
 done
@@ -185,3 +192,25 @@ virt-install \
 # Allow ssh via:
 #   ssh ubuntu@localhost -p 5555
 virsh qemu-monitor-command --hmp sysrootsrv 'hostfwd_add ::5555-:22'
+
+echo -e "\e[32mDONE\e[0m"
+echo ""
+echo "To delete the VM use:"
+echo ""
+echo "  virsh destroy sysrootsrv && virsh undefine --nvram sysrootsrv"
+echo ""
+echo "VM will auto-install packages via cloud-init. "
+echo "Look out for a message of 'Initial installation DONE' in the console. "
+echo ""
+
+if [ "$start_console" -eq 1 ]; then
+    virsh console sysrootsrv
+else
+    echo "Console is not auto-started."
+    echo "To monitor VM startup/status you can open a console using: "
+    echo ""
+    echo "  virsh console sysrootsrv"
+    echo ""
+    echo "And you can exit that console using 'CTRL + ]'"
+fi
+
