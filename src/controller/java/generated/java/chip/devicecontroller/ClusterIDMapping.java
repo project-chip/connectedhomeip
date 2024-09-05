@@ -17406,7 +17406,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum RequestCommissioningApprovalCommandField {RequestId(0),VendorId(1),ProductId(2),Label(3),;
+        }public enum RequestCommissioningApprovalCommandField {RequestID(0),VendorID(1),ProductID(2),Label(3),;
                     private final int id;
                     RequestCommissioningApprovalCommandField(int id) {
                         this.id = id;
@@ -17423,7 +17423,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),;
+                }public enum CommissionNodeCommandField {RequestID(0),ResponseTimeoutSeconds(1),;
                     private final int id;
                     CommissionNodeCommandField(int id) {
                         this.id = id;

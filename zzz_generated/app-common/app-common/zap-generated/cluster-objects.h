@@ -41938,9 +41938,9 @@ namespace Commands {
 namespace RequestCommissioningApproval {
 enum class Fields : uint8_t
 {
-    kRequestId = 0,
-    kVendorId  = 1,
-    kProductId = 2,
+    kRequestID = 0,
+    kVendorID  = 1,
+    kProductID = 2,
     kLabel     = 3,
 };
 
@@ -41951,9 +41951,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId      = static_cast<uint64_t>(0);
-    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
-    uint16_t productId      = static_cast<uint16_t>(0);
+    uint64_t requestID      = static_cast<uint64_t>(0);
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    uint16_t productID      = static_cast<uint16_t>(0);
     Optional<chip::CharSpan> label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -41969,9 +41969,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId      = static_cast<uint64_t>(0);
-    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
-    uint16_t productId      = static_cast<uint16_t>(0);
+    uint64_t requestID      = static_cast<uint64_t>(0);
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    uint16_t productID      = static_cast<uint16_t>(0);
     Optional<chip::CharSpan> label;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -41979,7 +41979,7 @@ public:
 namespace CommissionNode {
 enum class Fields : uint8_t
 {
-    kRequestId              = 0,
+    kRequestID              = 0,
     kResponseTimeoutSeconds = 1,
 };
 
@@ -41990,7 +41990,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint64_t requestID              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -42006,7 +42006,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint64_t requestID              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -42133,8 +42133,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kRequestId    = 0,
-    kClientNodeId = 1,
+    kRequestID    = 0,
+    kClientNodeID = 1,
     kStatusCode   = 2,
     kFabricIndex  = 254,
 };
@@ -42147,8 +42147,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    uint64_t requestId            = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t requestID            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID     = static_cast<chip::NodeId>(0);
     uint8_t statusCode            = static_cast<uint8_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -42164,8 +42164,8 @@ public:
     static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId            = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t requestID            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID     = static_cast<chip::NodeId>(0);
     uint8_t statusCode            = static_cast<uint8_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 

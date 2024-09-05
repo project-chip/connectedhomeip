@@ -9422,9 +9422,9 @@ provisional cluster CommissionerControl = 1873 {
   }
 
   fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
-    int64u requestId = 0;
-    node_id clientNodeId = 1;
-    enum8 statusCode = 2;
+    int64u requestID = 0;
+    node_id clientNodeID = 1;
+    status statusCode = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -9437,14 +9437,14 @@ provisional cluster CommissionerControl = 1873 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct RequestCommissioningApprovalRequest {
-    int64u requestId = 0;
-    vendor_id vendorId = 1;
-    int16u productId = 2;
+    int64u requestID = 0;
+    vendor_id vendorID = 1;
+    int16u productID = 2;
     optional char_string<64> label = 3;
   }
 
   request struct CommissionNodeRequest {
-    int64u requestId = 0;
+    int64u requestID = 0;
     int16u responseTimeoutSeconds = 1;
   }
 

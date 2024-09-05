@@ -6188,8 +6188,8 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
   }
 }
 public static class CommissionerControlClusterCommissioningRequestResultEvent {
-  public Long requestId;
-  public Long clientNodeId;
+  public Long requestID;
+  public Long clientNodeID;
   public Integer statusCode;
   public Integer fabricIndex;
   private static final long REQUEST_ID_ID = 0L;
@@ -6198,21 +6198,21 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
   private static final long FABRIC_INDEX_ID = 254L;
 
   public CommissionerControlClusterCommissioningRequestResultEvent(
-    Long requestId,
-    Long clientNodeId,
+    Long requestID,
+    Long clientNodeID,
     Integer statusCode,
     Integer fabricIndex
   ) {
-    this.requestId = requestId;
-    this.clientNodeId = clientNodeId;
+    this.requestID = requestID;
+    this.clientNodeID = clientNodeID;
     this.statusCode = statusCode;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestId)));
-    values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeId)));
+    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestID)));
+    values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeID)));
     values.add(new StructElement(STATUS_CODE_ID, new UIntType(statusCode)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
@@ -6223,20 +6223,20 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long requestId = null;
-    Long clientNodeId = null;
+    Long requestID = null;
+    Long clientNodeID = null;
     Integer statusCode = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == REQUEST_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          requestId = castingValue.value(Long.class);
+          requestID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == CLIENT_NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          clientNodeId = castingValue.value(Long.class);
+          clientNodeID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == STATUS_CODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6251,8 +6251,8 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
       }
     }
     return new CommissionerControlClusterCommissioningRequestResultEvent(
-      requestId,
-      clientNodeId,
+      requestID,
+      clientNodeID,
       statusCode,
       fabricIndex
     );
@@ -6262,11 +6262,11 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("CommissionerControlClusterCommissioningRequestResultEvent {\n");
-    output.append("\trequestId: ");
-    output.append(requestId);
+    output.append("\trequestID: ");
+    output.append(requestID);
     output.append("\n");
-    output.append("\tclientNodeId: ");
-    output.append(clientNodeId);
+    output.append("\tclientNodeID: ");
+    output.append(clientNodeID);
     output.append("\n");
     output.append("\tstatusCode: ");
     output.append(statusCode);

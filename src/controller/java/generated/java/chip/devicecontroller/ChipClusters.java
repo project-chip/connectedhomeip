@@ -61069,25 +61069,25 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestId, Integer vendorId, Integer productId, Optional<String> label) {
-      requestCommissioningApproval(callback, requestId, vendorId, productId, label, 0);
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label) {
+      requestCommissioningApproval(callback, requestID, vendorID, productID, label, 0);
     }
 
-    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestId, Integer vendorId, Integer productId, Optional<String> label, int timedInvokeTimeoutMs) {
+    public void requestCommissioningApproval(DefaultClusterCallback callback, Long requestID, Integer vendorID, Integer productID, Optional<String> label, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long requestIdFieldID = 0L;
-      BaseTLVType requestIdtlvValue = new UIntType(requestId);
-      elements.add(new StructElement(requestIdFieldID, requestIdtlvValue));
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
-      final long vendorIdFieldID = 1L;
-      BaseTLVType vendorIdtlvValue = new UIntType(vendorId);
-      elements.add(new StructElement(vendorIdFieldID, vendorIdtlvValue));
+      final long vendorIDFieldID = 1L;
+      BaseTLVType vendorIDtlvValue = new UIntType(vendorID);
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      final long productIdFieldID = 2L;
-      BaseTLVType productIdtlvValue = new UIntType(productId);
-      elements.add(new StructElement(productIdFieldID, productIdtlvValue));
+      final long productIDFieldID = 2L;
+      BaseTLVType productIDtlvValue = new UIntType(productID);
+      elements.add(new StructElement(productIDFieldID, productIDtlvValue));
 
       final long labelFieldID = 3L;
       BaseTLVType labeltlvValue = label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType());
@@ -61101,17 +61101,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds) {
-      commissionNode(callback, requestId, responseTimeoutSeconds, 0);
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds) {
+      commissionNode(callback, requestID, responseTimeoutSeconds, 0);
     }
 
-    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestId, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
+    public void commissionNode(ReverseOpenCommissioningWindowCallback callback, Long requestID, Integer responseTimeoutSeconds, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long requestIdFieldID = 0L;
-      BaseTLVType requestIdtlvValue = new UIntType(requestId);
-      elements.add(new StructElement(requestIdFieldID, requestIdtlvValue));
+      final long requestIDFieldID = 0L;
+      BaseTLVType requestIDtlvValue = new UIntType(requestID);
+      elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
       final long responseTimeoutSecondsFieldID = 1L;
       BaseTLVType responseTimeoutSecondstlvValue = new UIntType(responseTimeoutSeconds);

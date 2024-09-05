@@ -7896,18 +7896,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("RequestId", indent + 1, value.requestId);
+        CHIP_ERROR err = DataModelLogger::LogValue("RequestID", indent + 1, value.requestID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestId'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ClientNodeId", indent + 1, value.clientNodeId);
+        CHIP_ERROR err = DataModelLogger::LogValue("ClientNodeID", indent + 1, value.clientNodeID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ClientNodeId'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ClientNodeID'");
             return err;
         }
     }

@@ -13377,9 +13377,9 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "RequestCommissioningApproval",
                 "args": {
-                    "requestId": "int",
-                    "vendorId": "int",
-                    "productId": "int",
+                    "requestID": "int",
+                    "vendorID": "int",
+                    "productID": "int",
                     "label": "str",
                 },
             },
@@ -13387,7 +13387,7 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "CommissionNode",
                 "args": {
-                    "requestId": "int",
+                    "requestID": "int",
                     "responseTimeoutSeconds": "int",
                 },
             },

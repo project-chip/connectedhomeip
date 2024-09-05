@@ -28887,9 +28887,9 @@ namespace RequestCommissioningApproval {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kRequestId), requestId);
-    encoder.Encode(to_underlying(Fields::kVendorId), vendorId);
-    encoder.Encode(to_underlying(Fields::kProductId), productId);
+    encoder.Encode(to_underlying(Fields::kRequestID), requestID);
+    encoder.Encode(to_underlying(Fields::kVendorID), vendorID);
+    encoder.Encode(to_underlying(Fields::kProductID), productID);
     encoder.Encode(to_underlying(Fields::kLabel), label);
     return encoder.Finalize();
 }
@@ -28908,17 +28908,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kRequestId))
+        if (__context_tag == to_underlying(Fields::kRequestID))
         {
-            err = DataModel::Decode(reader, requestId);
+            err = DataModel::Decode(reader, requestID);
         }
-        else if (__context_tag == to_underlying(Fields::kVendorId))
+        else if (__context_tag == to_underlying(Fields::kVendorID))
         {
-            err = DataModel::Decode(reader, vendorId);
+            err = DataModel::Decode(reader, vendorID);
         }
-        else if (__context_tag == to_underlying(Fields::kProductId))
+        else if (__context_tag == to_underlying(Fields::kProductID))
         {
-            err = DataModel::Decode(reader, productId);
+            err = DataModel::Decode(reader, productID);
         }
         else if (__context_tag == to_underlying(Fields::kLabel))
         {
@@ -28936,7 +28936,7 @@ namespace CommissionNode {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kRequestId), requestId);
+    encoder.Encode(to_underlying(Fields::kRequestID), requestID);
     encoder.Encode(to_underlying(Fields::kResponseTimeoutSeconds), responseTimeoutSeconds);
     return encoder.Finalize();
 }
@@ -28955,9 +28955,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kRequestId))
+        if (__context_tag == to_underlying(Fields::kRequestID))
         {
-            err = DataModel::Decode(reader, requestId);
+            err = DataModel::Decode(reader, requestID);
         }
         else if (__context_tag == to_underlying(Fields::kResponseTimeoutSeconds))
         {
@@ -29058,8 +29058,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kRequestId), requestId));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kClientNodeId), clientNodeId));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kRequestID), requestID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kClientNodeID), clientNodeID));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStatusCode), statusCode));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFabricIndex), fabricIndex));
     return aWriter.EndContainer(outer);
@@ -29079,13 +29079,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kRequestId))
+        if (__context_tag == to_underlying(Fields::kRequestID))
         {
-            err = DataModel::Decode(reader, requestId);
+            err = DataModel::Decode(reader, requestID);
         }
-        else if (__context_tag == to_underlying(Fields::kClientNodeId))
+        else if (__context_tag == to_underlying(Fields::kClientNodeID))
         {
-            err = DataModel::Decode(reader, clientNodeId);
+            err = DataModel::Decode(reader, clientNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kStatusCode))
         {
