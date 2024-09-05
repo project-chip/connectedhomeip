@@ -107,7 +107,27 @@
     // subscription attempt wait (does that apply to us?) queued work (do we
     // have any?), last report, last subscription failure (does that apply to us?).
     return [NSString
-        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, [self _vid], [self _pid], _deviceController.uniqueIdentifier];
+}
+
+- (nullable NSNumber *)_internalStateNumberOrNilForKey:(NSString *)key
+{
+    if ([_internalState[key] isKindOfClass:NSNumber.class]) {
+        NSNumber * number = _internalState[key];
+        return number;
+    } else {
+        return nil;
+    }
+}
+
+- (nullable NSNumber *)_vid
+{
+    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyVendorID];
+}
+
+- (nullable NSNumber *)_pid
+{
+    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyVendorID];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
