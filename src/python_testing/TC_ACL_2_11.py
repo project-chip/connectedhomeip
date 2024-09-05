@@ -31,6 +31,7 @@ import logging
 import queue
 
 import chip.clusters as Clusters
+from basic_composition_support import arls_populated
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
 from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
 from chip.clusters.Objects import AccessControl
@@ -82,7 +83,7 @@ class TC_ACL_2_11(MatterBaseTest):
 
     def steps_TC_ACL_2_11(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done"),
+            TestStep(1, "Commissioning (already done) and precondition checks", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 AccessControl cluster CommissioningARL attribute"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ARL attribute"),
             TestStep(4, "For each entry in ARL, iterate over each restriction and attempt access the restriction's ID on the Endpoint and Cluster in the ARL entry.",
@@ -102,6 +103,14 @@ class TC_ACL_2_11(MatterBaseTest):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
         self.step(1)
+
+        wildcard_read = (await dev_ctrl.Read(self.dut_node_id, [()]))
+        has_arl, has_carl = arls_populated(wildcard_read.tlvAttributes)
+        asserts.assert_true(
+            has_arl, "ARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+        asserts.assert_true(
+            has_carl, "CommissioningARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+
         self.step(2)
         await self.read_single_attribute_check_success(
             endpoint=0,

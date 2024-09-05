@@ -18,6 +18,7 @@
 from typing import Any
 
 import chip.clusters as Clusters
+from basic_composition_support import arls_populated
 from conformance_support import ConformanceDecision
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
@@ -191,7 +192,7 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         endpoint_tlv[Clusters.Descriptor.id] = attrs
         return endpoint_tlv
 
-    def add_macl(self, root_endpoint: dict[int, dict[int, Any]]):
+    def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
         ac = Clusters.AccessControl
         root_endpoint[ac.id][ac.Attributes.FeatureMap.attribute_id] = ac.Bitmaps.Feature.kManagedDevice
         root_endpoint[ac.id][ac.Attributes.Arl.attribute_id] = []
@@ -201,6 +202,14 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         root_endpoint[ac.id][ac.Attributes.AcceptedCommandList.attribute_id].append(ac.Commands.ReviewFabricRestrictions.command_id)
         root_endpoint[ac.id][ac.Attributes.GeneratedCommandList.attribute_id].append(
             ac.Commands.ReviewFabricRestrictionsResponse.command_id)
+
+        generic_restriction = ac.Structs.AccessRestrictionStruct(
+            type=ac.Enums.AccessRestrictionTypeEnum.kAttributeAccessForbidden, id=1)
+        entry = ac.Structs.CommissioningAccessRestrictionEntryStruct(endpoint=1, cluster=2, restrictions=generic_restriction)
+        if populate_arl:
+            root_endpoint[ac.id][ac.Attributes.Arl.attribute_id] = [entry]
+        if populate_commissioning_arl:
+            root_endpoint[ac.id][ac.Attributes.CommissioningARL.attribute_id] = [entry]
 
     @async_test_body
     async def test_macl_handling(self):
@@ -230,6 +239,45 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         asserts.assert_false(success, "Unexpected success with On/Off and MACL")
 
         # TODO: what happens if there is a NIM and a non-NIM endpoint?
+
+    @async_test_body
+    async def test_macl_restrictions(self):
+
+        nim_id = self._get_device_type_id('network infrastructure manager')
+        root_node_id = self._get_device_type_id('root node')
+
+        root = self._create_minimal_dt(device_type_id=root_node_id)
+        nim = self._create_minimal_dt(device_type_id=nim_id)
+        self.endpoints_tlv = {0: root, 1: nim}
+
+        # device with no macl
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(have_arl, "Unexpected ARL found")
+        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+
+        # device with unpopulated macl
+        self.add_macl(root)
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(have_arl, "Unexpected ARL found")
+        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+
+        # device with populated ARL
+        self.add_macl(root, populate_arl=True)
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_true(have_arl, "Did not find expected ARL")
+        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+
+        # device with populated commissioning ARL
+        self.add_macl(root, populate_commissioning_arl=True)
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(have_arl, "Unexpected ARL found")
+        asserts.assert_true(have_carl, "Did not find expected Commissioning ARL")
+
+        # device with both
+        self.add_macl(root, populate_arl=True, populate_commissioning_arl=True)
+        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        asserts.assert_true(have_arl, "Did not find expected ARL")
+        asserts.assert_true(have_carl, "Did not find expected Commissioning ARL")
 
 
 if __name__ == "__main__":
