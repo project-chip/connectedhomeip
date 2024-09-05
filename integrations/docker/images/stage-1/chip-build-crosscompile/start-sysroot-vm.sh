@@ -25,6 +25,12 @@ if ! [ -f /usr/sbin/libvirtd ]; then
     exit 1
 fi
 
+if ! which mkpasswd >/dev/null; then
+  echo "Cannot find 'mkpasswd'. Did you 'sudo apt-get install whois' ?"
+  exit 1
+fi
+
+
 if ! which qemu-img >/dev/null; then
     echo "Cannot find 'qemu-img'."
     exit 1
