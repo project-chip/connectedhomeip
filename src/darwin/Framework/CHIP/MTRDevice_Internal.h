@@ -223,8 +223,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 // Concrete to XPC internal state property dictionary keys
-NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
-NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
 // TODO:  more internal properties
 
 NS_ASSUME_NONNULL_END
