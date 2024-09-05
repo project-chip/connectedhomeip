@@ -2,11 +2,7 @@
 
 # This script is intended to build a SYSROOT that can be used as a base to cross-compile
 # CHIP for aarch64 (i.e. that runs on a RaspberryPi) from a arm64 linux machine
-#
-# This requires:
-#
-#   sudo apt install qemu-system-arm virtinst libvirt-daemon
-#
+
 set -e
 
 start_console=1
