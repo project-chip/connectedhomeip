@@ -32,6 +32,7 @@
 
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
@@ -312,6 +313,16 @@ enum class MarkAttributeDirty
     // reporting needs to be triggered (e.g. because QuieterReportingAttribute
     // indicated that).
     kYes,
+};
+
+/// Notification object of a specific path being changed
+class ChangedPathListener
+{
+public:
+    virtual ~ChangedPathListener() = default;
+
+    /// Called when a specific path is to be considered dirty.
+    virtual void MarkDirty(const chip::app::AttributePathParams & path) = 0;
 };
 
 } // namespace app

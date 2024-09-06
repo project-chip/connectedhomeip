@@ -17,10 +17,46 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+struct EmberAfWriteDataInput
+{
+    // where the input data originates from. NOTE: at this time there is no information regarding
+    // input buffer size and it is assumed "correct" for the given data type
+    uint8_t * dataPtr;
+
+    // The data type that dataPtr points to
+    EmberAfAttributeType dataType;
+
+    // Controls when `changeListener` is called to flag an attribute dirty. It allows for things like:
+    //     kIfChanged - only if the dataPrt contains a different value than what currenty exists
+    //     kNo - never called
+    //     kYes - always called
+    chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::kIfChanged;
+
+    // Listener called when when the written data is consided changed/dirty.
+    // This being called depends on settings of `markDirty` combined with the actual contents of dataPtr
+    // vs the contents of the current attribute storage.
+    chip::app::ChangedPathListener * changeListener = nullptr;
+
+    EmberAfWriteDataInput(uint8_t * data, EmberAfAttributeType type) : dataPtr(data), dataType(type) {}
+
+    EmberAfWriteDataInput & SetMarkDirty(chip::app::MarkAttributeDirty value)
+    {
+        markDirty = value;
+        return *this;
+    }
+
+    EmberAfWriteDataInput & SetChangeListener(chip::app::ChangedPathListener * listener)
+    {
+        changeListener = listener;
+        return *this;
+    }
+};
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -41,20 +77,16 @@
  * data type (as Accessors.h/cpp have this correct by default).
  * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path,
+                                                                const EmberAfWriteDataInput & input);
 
 /**
- * A version of emberAfWriteAttribute that allows controlling when the attribute
- * should be marked dirty.  This is an overload, not an optional argument, to
- * reduce codesize at all the callsites that want to write without doing
- * anything special to control the dirty marking.
+ * Override of emberAfWriteAttribute to reduce code size for calls that default
+ * markDirty/changeListener and any other future customization calls.
  */
 chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                 chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                EmberAfAttributeType dataType,
-                                                                chip::app::MarkAttributeDirty markDirty);
+                                                                EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.

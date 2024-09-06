@@ -30,32 +30,16 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    // Increase cluster data path
-    DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
-    if (version == nullptr)
-    {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!", endpoint,
-                     ChipLogValueMEI(clusterId));
-    }
-    else
-    {
-        (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32, endpoint,
-                      ChipLogValueMEI(clusterId), *(version));
-    }
-
-    // ensure reporting engine reports the changes
-    AttributePathParams info;
-    info.mClusterId   = clusterId;
-    info.mAttributeId = attributeId;
-    info.mEndpointId  = endpoint;
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelChangePathListener());
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
-    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, emberAfGlobalInteractionModelChangePathListener());
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -64,10 +48,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    AttributePathParams info;
-    info.mEndpointId = endpoint;
-
-    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelChangePathListener());
 }

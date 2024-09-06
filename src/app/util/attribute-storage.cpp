@@ -918,7 +918,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         if (enable)
         {
             initializeEndpoint(&(emAfEndpoints[index]));
-            MatterReportingAttributeChangeCallback(endpoint);
+            emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelChangePathListener());
         }
         else
         {
@@ -929,8 +929,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
         while (parentEndpointId != kInvalidEndpointId)
         {
-            MatterReportingAttributeChangeCallback(parentEndpointId, app::Clusters::Descriptor::Id,
-                                                   app::Clusters::Descriptor::Attributes::PartsList::Id);
+            emberAfAttributeChanged(parentEndpointId, app::Clusters::Descriptor::Id,
+                                    app::Clusters::Descriptor::Attributes::PartsList::Id,
+                                    emberAfGlobalInteractionModelChangePathListener());
             uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
             if (parentIndex == kEmberInvalidEndpointIndex)
             {
@@ -940,8 +941,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
         }
 
-        MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
-                                               app::Clusters::Descriptor::Attributes::PartsList::Id);
+        emberAfAttributeChanged(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
+                                app::Clusters::Descriptor::Attributes::PartsList::Id,
+                                emberAfGlobalInteractionModelChangePathListener());
     }
 
     return true;
@@ -1461,4 +1463,49 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     }
 
     return ep.dataVersions + clusterIndex;
+}
+
+namespace {
+class GlobalInteractionModelEngineChangedpathListener : public chip::app::ChangedPathListener
+{
+public:
+    ~GlobalInteractionModelEngineChangedpathListener() = default;
+
+    void MarkDirty(const chip::app::AttributePathParams & path) override
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+};
+
+} // namespace
+
+chip::app::ChangedPathListener * emberAfGlobalInteractionModelChangePathListener()
+{
+    static GlobalInteractionModelEngineChangedpathListener listener;
+    return &listener;
+}
+
+void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                             chip::app::ChangedPathListener * listener)
+{
+    // Increase cluster data path
+    DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!", endpoint,
+                     ChipLogValueMEI(clusterId));
+    }
+    else
+    {
+        (*(version))++;
+        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32, endpoint,
+                      ChipLogValueMEI(clusterId), *(version));
+    }
+
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::ChangedPathListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint, kInvalidClusterId));
 }

@@ -159,28 +159,39 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
  *           the attribute
  * - Status::Success: if the attribute was found and successfully written
  */
-Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty);
+Status emAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
+                          bool overrideReadOnlyAndDataType);
+
 } // anonymous namespace
 
 Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                   EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */,
-                              MarkAttributeDirty::kIfChanged);
+    return emAfWriteAttribute(
+        ConcreteAttributePath(endpoint, cluster, attributeID),
+        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelChangePathListener()),
+        false /* overrideReadOnlyAndDataType */);
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                              EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */,
-                              MarkAttributeDirty::kIfChanged);
+
+    return emberAfWriteAttribute(
+        ConcreteAttributePath(endpoint, cluster, attributeID),
+        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelChangePathListener()));
 }
 
-Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType, MarkAttributeDirty markDirty)
+Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty);
+    EmberAfWriteDataInput completeInput = input;
+
+    if (completeInput.changeListener == nullptr)
+    {
+        completeInput.SetChangeListener(emberAfGlobalInteractionModelChangePathListener());
+    }
+
+    return emAfWriteAttribute(path, completeInput, true /* overrideReadOnlyAndDataType */);
 }
 
 //------------------------------------------------------------------------------
@@ -312,14 +323,14 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
     return Status::Success;
 }
 
-Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty)
+Status emAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
+                          bool overrideReadOnlyAndDataType)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
-    record.endpoint    = endpoint;
-    record.clusterId   = cluster;
-    record.attributeId = attributeID;
+    record.endpoint    = path.mEndpointId;
+    record.clusterId   = path.mClusterId;
+    record.attributeId = path.mAttributeId;
     Status status      = emAfReadOrWriteAttribute(&record, &metadata,
                                                   nullptr, // buffer
                                                   0,       // buffer size
@@ -328,15 +339,15 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     // if we dont support that attribute
     if (metadata == nullptr)
     {
-        ChipLogProgress(Zcl, "%p ep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
-                        ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
+        ChipLogProgress(Zcl, "%p ep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
+                        "WRITE ERR: ", path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         return status;
     }
 
     // if the data type specified by the caller is incorrect
     if (!(overrideReadOnlyAndDataType))
     {
-        if (dataType != metadata->attributeType)
+        if (input.dataType != metadata->attributeType)
         {
             ChipLogProgress(Zcl, "%p invalid data type", "WRITE ERR: ");
             return Status::InvalidDataType;
@@ -380,12 +391,12 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
         }
 
         bool isAttributeSigned = metadata->IsSignedIntegerAttribute();
-        bool isOutOfRange      = emberAfCompareValues(minBytes, data, dataLen, isAttributeSigned) == 1 ||
-            emberAfCompareValues(maxBytes, data, dataLen, isAttributeSigned) == -1;
+        bool isOutOfRange      = emberAfCompareValues(minBytes, input.dataPtr, dataLen, isAttributeSigned) == 1 ||
+            emberAfCompareValues(maxBytes, input.dataPtr, dataLen, isAttributeSigned) == -1;
 
         if (isOutOfRange &&
             // null value is always in-range for a nullable attribute.
-            (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
+            (!metadata->IsNullable() || !IsNullValue(input.dataPtr, dataLen, isAttributeSigned)))
         {
             return Status::ConstraintError;
         }
@@ -393,7 +404,8 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
 
     // Check whether anything is actually changing, before we do any work here.
     bool valueChanging;
-    Status imStatus = AttributeValueIsChanging(endpoint, cluster, attributeID, metadata, data, &valueChanging);
+    Status imStatus =
+        AttributeValueIsChanging(path.mEndpointId, path.mClusterId, path.mAttributeId, metadata, input.dataPtr, &valueChanging);
     if (imStatus != Status::Success)
     {
         return imStatus;
@@ -402,19 +414,19 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     if (!valueChanging)
     {
         // Just do nothing, except triggering reporting if forced.
-        if (markDirty == MarkAttributeDirty::kYes)
+        if (input.markDirty == MarkAttributeDirty::kYes)
         {
-            MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+            emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, input.changeListener);
         }
 
         return Status::Success;
     }
 
-    const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
+    const app::ConcreteAttributePath attributePath(path.mEndpointId, path.mClusterId, path.mAttributeId);
 
     // Pre write attribute callback for all attribute changes,
     // regardless of cluster.
-    imStatus = MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    imStatus = MatterPreAttributeChangeCallback(attributePath, input.dataType, emberAfAttributeSize(metadata), input.dataPtr);
     if (imStatus != Protocols::InteractionModel::Status::Success)
     {
         return imStatus;
@@ -422,7 +434,7 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
 
     // Pre-write attribute callback specific
     // to the cluster that the attribute lives in.
-    status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    status = emAfClusterPreAttributeChangedCallback(attributePath, input.dataType, emberAfAttributeSize(metadata), input.dataPtr);
 
     // Ignore the following write operation and return success
     if (status == Status::WriteIgnored)
@@ -438,7 +450,7 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     // write the attribute
     status = emAfReadOrWriteAttribute(&record,
                                       nullptr, // metadata
-                                      data,
+                                      input.dataPtr,
                                       0,     // buffer size - unused
                                       true); // write?
 
@@ -449,16 +461,16 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
 
     // Save the attribute to persistent storage if needed
     // The callee will weed out attributes that do not need to be stored.
-    emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
+    emAfSaveAttributeToStorageIfNeeded(input.dataPtr, path.mEndpointId, path.mClusterId, metadata);
 
-    if (markDirty != MarkAttributeDirty::kNo)
+    if (input.markDirty != MarkAttributeDirty::kNo)
     {
-        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, input.changeListener);
     }
 
     // Post write attribute callback for all attributes changes, regardless
     // of cluster.
-    MatterPostAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    MatterPostAttributeChangeCallback(attributePath, input.dataType, emberAfAttributeSize(metadata), input.dataPtr);
 
     // Post-write attribute callback specific
     // to the cluster that the attribute lives in.

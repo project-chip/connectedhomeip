@@ -109,7 +109,13 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
       Encoding::LittleEndian::Put16(zclString, length);
     {{/if}}
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+      chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+      EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}});
+    {{/if}}
     {{else}}
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
@@ -119,7 +125,13 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    {{#if passMarkDirty}}
+    return emberAfWriteAttribute(
+      chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id)
+      EmberAfWriteDataInput(writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+    {{else}}
     return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    {{/if}}
     {{/if}}
 {{/inline}}
 
