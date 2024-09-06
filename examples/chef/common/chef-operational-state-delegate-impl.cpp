@@ -190,10 +190,9 @@ void OperationalState::Shutdown()
     }
 }
 
-chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip::EndpointId endpointId,
-                                                                               chip::ClusterId clusterId,
-                                                                               const EmberAfAttributeMetadata * attributeMetadata,
-                                                                               uint8_t * buffer)
+chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                            const EmberAfAttributeMetadata * attributeMetadata,
+                                                                            uint8_t * buffer)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
@@ -244,8 +243,8 @@ chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip
 }
 
 chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                              const EmberAfAttributeMetadata * attributeMetadata,
-                                                                              uint8_t * buffer, uint16_t maxReadLength)
+                                                                           const EmberAfAttributeMetadata * attributeMetadata,
+                                                                           uint8_t * buffer, uint16_t maxReadLength)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
@@ -287,6 +286,5 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateInstance->Init();
 }
-
 
 #endif

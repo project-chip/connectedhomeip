@@ -92,8 +92,8 @@ void DishwasherMode::Shutdown()
 }
 
 chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer)
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
     VerifyOrDie(gDishwasherModeInstance != nullptr);
@@ -121,8 +121,8 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::
 }
 
 chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength)
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
     buffer[0] = gDishwasherModeInstance->GetCurrentMode();
@@ -152,8 +152,8 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gDishwasherModeDelegate && !gDishwasherModeInstance);
 
     gDishwasherModeDelegate = std::make_unique<DishwasherModeDelegate>();
-    gDishwasherModeInstance =
-        std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
+    gDishwasherModeInstance = std::make_unique<ModeBase::Instance>(gDishwasherModeDelegate.get(), endpointId, DishwasherMode::Id,
+                                                                   chip::to_underlying(Feature::kOnOff));
     gDishwasherModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER

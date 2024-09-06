@@ -17,7 +17,6 @@
  */
 #include <app-common/zap-generated/cluster-objects.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -25,7 +24,6 @@ using namespace chip::app::Clusters;
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 #include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
 using namespace chip::app::Clusters::DishwasherAlarm;
-
 
 class DishwasherAlarmDelegate : public Delegate
 {
@@ -90,7 +88,7 @@ void MatterDishwasherAlarmServerInit()
     supported.SetField(AlarmMap::kDrainError, 1);
     supported.SetField(AlarmMap::kDoorError, 1);
     supported.SetField(AlarmMap::kTempTooLow, 1);
-	supported.SetField(AlarmMap::kTempTooHigh, 1);
+    supported.SetField(AlarmMap::kTempTooHigh, 1);
     supported.SetField(AlarmMap::kWaterLevelError, 1);
     DishwasherAlarmServer::Instance().SetSupportedValue(kDemoEndpointId, supported);
 
@@ -107,7 +105,7 @@ void MatterDishwasherAlarmServerInit()
     mask.SetField(AlarmMap::kDrainError, 0);
     mask.SetField(AlarmMap::kDoorError, 0);
     mask.SetField(AlarmMap::kTempTooLow, 0);
-	mask.SetField(AlarmMap::kTempTooHigh, 0);
+    mask.SetField(AlarmMap::kTempTooHigh, 0);
     mask.SetField(AlarmMap::kWaterLevelError, 0);
     DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, mask);
 
@@ -122,10 +120,10 @@ void MatterDishwasherAlarmServerInit()
     BitMask<AlarmMap> latch;
     latch.SetField(AlarmMap::kInflowError, 1);
     latch.SetField(AlarmMap::kDrainError, 1);
-	latch.SetField(AlarmMap::kDoorError, 0);
-	latch.SetField(AlarmMap::kTempTooLow, 0);
-	latch.SetField(AlarmMap::kTempTooHigh, 0);
-	latch.SetField(AlarmMap::kWaterLevelError, 0);
+    latch.SetField(AlarmMap::kDoorError, 0);
+    latch.SetField(AlarmMap::kTempTooLow, 0);
+    latch.SetField(AlarmMap::kTempTooHigh, 0);
+    latch.SetField(AlarmMap::kWaterLevelError, 0);
     DishwasherAlarmServer::Instance().SetLatchValue(kDemoEndpointId, latch);
 
     // Set State attribute = 0x00
@@ -140,10 +138,10 @@ void MatterDishwasherAlarmServerInit()
     state.SetField(AlarmMap::kInflowError, 0);
     state.SetField(AlarmMap::kDrainError, 0);
     state.SetField(AlarmMap::kDoorError, 0);
-	state.SetField(AlarmMap::kTempTooLow, 0);
-	state.SetField(AlarmMap::kTempTooHigh, 0);
-	state.SetField(AlarmMap::kWaterLevelError, 0);
+    state.SetField(AlarmMap::kTempTooLow, 0);
+    state.SetField(AlarmMap::kTempTooHigh, 0);
+    state.SetField(AlarmMap::kWaterLevelError, 0);
     DishwasherAlarmServer::Instance().SetStateValue(kDemoEndpointId, state);
 }
 
-#endif //MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
+#endif // MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
