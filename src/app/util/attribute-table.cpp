@@ -164,13 +164,17 @@ Status emAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const E
 
 } // anonymous namespace
 
-Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                  EmberAfAttributeType dataType)
+chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
+                                                                     const EmberAfWriteDataInput & input)
 {
-    return emAfWriteAttribute(
-        ConcreteAttributePath(endpoint, cluster, attributeID),
-        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelChangePathListener()),
-        false /* overrideReadOnlyAndDataType */);
+    EmberAfWriteDataInput completeInput = input;
+
+    if (completeInput.changeListener == nullptr)
+    {
+        completeInput.SetChangeListener(emberAfGlobalInteractionModelChangePathListener());
+    }
+
+    return emAfWriteAttribute(path, completeInput, false /* overrideReadOnlyAndDataType */);
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,

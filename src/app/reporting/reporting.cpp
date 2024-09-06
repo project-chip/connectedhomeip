@@ -39,7 +39,8 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, emberAfGlobalInteractionModelChangePathListener());
+    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                            emberAfGlobalInteractionModelChangePathListener());
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
