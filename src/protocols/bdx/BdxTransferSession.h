@@ -167,6 +167,24 @@ public:
 
     /**
      * @brief
+     *   Gets the pending output event from the transfer session in the event param passed in by the caller.
+     *   The output event may contain some data for the caller to act upon.
+     *
+     *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
+     *   TransferSession object and so we need to call this until we get an event of type - OutputEventType::kNone
+     *
+     *   Note that if the event type is kMsgToSend, the caller is expected to send the message immediately over the
+     *   exchange otherwise the caller is expected to pass the event to HandleTransferSessionOutput to handle the BDX
+     *   message or any other TransferSession event.
+     *
+     *   See OutputEventType for all possible output event types.
+     *
+     * @param event     Reference to an OutputEvent struct that will be filled out with any pending output event data
+     */
+    void GetNextAction(OutputEvent & event);
+
+    /**
+     * @brief
      *   Initializes the TransferSession object and prepares a TransferInit message (emitted via PollOutput()).
      *
      *   A TransferSession object must be initialized with either StartTransfer() or WaitForTransfer().
