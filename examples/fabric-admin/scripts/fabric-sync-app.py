@@ -20,30 +20,13 @@ import os
 import shutil
 import signal
 import sys
+import typing
 from argparse import ArgumentParser
 from tempfile import TemporaryDirectory
 
 
-async def asyncio_stdin() -> asyncio.StreamReader:
-    """Wrap sys.stdin in an asyncio StreamReader."""
-    loop = asyncio.get_event_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-    return reader
-
-
-async def asyncio_stdout(file=sys.stdout) -> asyncio.StreamWriter:
-    """Wrap an IO stream in an asyncio StreamWriter."""
-    loop = asyncio.get_event_loop()
-    transport, protocol = await loop.connect_write_pipe(
-        lambda: asyncio.streams.FlowControlMixin(loop=loop),
-        os.fdopen(file.fileno(), 'wb'))
-    return asyncio.streams.StreamWriter(transport, protocol, None, loop)
-
-
 async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
-                    f_out: asyncio.StreamWriter, cb=None):
+                    f_out: typing.BinaryIO, cb=None):
     """Forward f_in to f_out with a prefix attached.
 
     This function can optionally feed received lines to a callback function.
@@ -54,9 +37,9 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
             break
         if cb is not None:
             cb(line)
-        f_out.write(prefix)
-        f_out.write(line)
-        await f_out.drain()
+        f_out.buffer.write(prefix)
+        f_out.buffer.write(line)
+        f_out.flush()
 
 
 async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
@@ -72,6 +55,7 @@ async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
             data = os.read(fd, 1024)
             if data:
                 f_out.write(data)
+                await f_out.drain()
             if not data:
                 await asyncio.sleep(0.1)
         except BlockingIOError:
@@ -80,13 +64,17 @@ async def forward_pipe(pipe_path: str, f_out: asyncio.StreamWriter):
 
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
-    reader = await asyncio_stdin()
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
     while True:
         line = await reader.readline()
         if not line:
             # Exit on Ctrl-D (EOF).
             sys.exit(0)
         f_out.write(line)
+        await f_out.drain()
 
 
 class Subprocess:
@@ -109,15 +97,9 @@ class Subprocess:
                                                       stdout=asyncio.subprocess.PIPE,
                                                       stderr=asyncio.subprocess.PIPE)
         # Add the stdout and stderr processing to the event loop.
-        asyncio.create_task(forward_f(
-            self.tag,
-            self.p.stderr,
-            await asyncio_stdout(sys.stderr)))
-        asyncio.create_task(forward_f(
-            self.tag,
-            self.p.stdout,
-            await asyncio_stdout(sys.stdout),
-            cb=self._check_output))
+        asyncio.create_task(forward_f(self.tag, self.p.stderr, sys.stderr))
+        asyncio.create_task(forward_f(self.tag, self.p.stdout, sys.stdout,
+                                      cb=self._check_output))
 
     async def send(self, message: str, expected_output: str = None, timeout: float = None):
         """Send a message to a process and optionally wait for a response."""
@@ -206,14 +188,6 @@ async def main(args):
     if pipe and not os.path.exists(pipe):
         os.mkfifo(pipe)
 
-    def terminate(signum, frame):
-        admin.terminate()
-        bridge.terminate()
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, terminate)
-    signal.signal(signal.SIGTERM, terminate)
-
     admin, bridge = await asyncio.gather(
         run_admin(
             args.app_admin,
@@ -234,6 +208,15 @@ async def main(args):
             discriminator=args.discriminator,
             passcode=args.passcode,
         ))
+
+    def terminate():
+        admin.terminate()
+        bridge.terminate()
+        sys.exit(0)
+
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, terminate)
+    loop.add_signal_handler(signal.SIGTERM, terminate)
 
     # Wait a bit for apps to start.
     await asyncio.sleep(1)
