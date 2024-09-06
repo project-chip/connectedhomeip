@@ -75,7 +75,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
     async def _get_icd_txt_record(self) -> OperatingModeEnum:
-        discovery = mdns_discovery.MdnsDiscovery()
+        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
         service = await discovery.get_operational_service(
             node_id=self.dut_node_id,
             compressed_fabric_id=self.default_controller.GetCompressedFabricId(),
