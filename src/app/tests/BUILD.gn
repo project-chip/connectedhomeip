@@ -154,6 +154,20 @@ source_set("thread-border-router-management-test-srcs") {
   ]
 }
 
+source_set("valve-configuration-and-control-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.cpp",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -220,6 +234,7 @@ chip_test_suite("tests") {
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
+    "TestValveConfigurationAndControl.cpp",
     "TestWriteInteraction.cpp",
   ]
 
@@ -233,6 +248,7 @@ chip_test_suite("tests") {
     ":power-cluster-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
+    ":valve-configuration-and-control-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
