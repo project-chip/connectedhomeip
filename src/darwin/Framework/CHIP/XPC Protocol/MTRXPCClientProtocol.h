@@ -27,6 +27,9 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID;
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID;
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID;
+
+@optional
+// temporarily optional to avoid lockstep needs
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary;
 @end
 
