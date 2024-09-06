@@ -288,8 +288,6 @@ using namespace chip::Tracing::DarwinFramework;
         _otaProviderDelegateQueue = otaProviderDelegateQueue;
         _chipWorkQueue = queue;
         _factory = factory;
-        // TODO: Shouldn't nodeIDToDeviceMap just be set up by initForSubclasses?
-        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
@@ -1416,6 +1414,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // TODO: Figure out whether the synchronization here makes sense.  What
+    // happens if this call happens mid-suspend or mid-resume?
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't get session for node %016llX-%016llx (%llu)", self, self.compressedFabricID.unsignedLongLongValue, nodeID, nodeID);
+        // TODO: Can we do a better error here?
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
     // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
     MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
@@ -1440,6 +1447,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // TODO: Figure out whether the synchronization here makes sense.  What
+    // happens if this call happens mid-suspend or mid-resume?
+    if (self.suspended) {
+        MTR_LOG_ERROR("%@ suspended: can't get session for node %016llX-%016llx (%llu)", self, self.compressedFabricID.unsignedLongLongValue, nodeID, nodeID);
+        // TODO: Can we do a better error here?
+        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
     [self
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);

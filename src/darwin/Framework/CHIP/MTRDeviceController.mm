@@ -120,7 +120,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
-    NSMapTable * _nodeIDToDeviceMap;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
@@ -135,6 +134,7 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
 
     BOOL _suspended;
+    os_unfair_lock _suspensionLock;
 
     // Counters to track assertion status and access controlled by the _assertionLock
     NSUInteger _keepRunningAssertionCounter;
@@ -160,6 +160,12 @@ using namespace chip::Tracing::DarwinFramework;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
     _suspended = startSuspended;
+    // All synchronous suspend/resume activity has to be protected by
+    // _suspensionLock, so that parts of suspend/resume can't interleave with
+    // each other.
+    _suspensionLock = OS_UNFAIR_LOCK_INIT;
+
+    _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
     return self;
 }
@@ -204,6 +210,7 @@ using namespace chip::Tracing::DarwinFramework;
         _assertionLock = OS_UNFAIR_LOCK_INIT;
 
         _suspended = startSuspended;
+        _suspensionLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -350,23 +357,46 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)suspend
 {
+    MTR_LOG("%@ suspending", self);
+
+    std::lock_guard lock(_suspensionLock);
+
     _suspended = YES;
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to tear down subscriptions.  Possibly close all
-    // CASE sessions for our identity.  Possibly try to see whether we can
-    // change our fabric entry to not advertise and restart advertising.
+    NSEnumerator * devices;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        devices = [self.nodeIDToDeviceMap objectEnumerator];
+    }
 
-    // TODO: What should happen with active commissioning sessions?  Presumably
-    // close them?
+    for (MTRDevice * device in devices) {
+        [device controllerSuspended];
+    }
+
+    // TODO: In the concrete class, consider what should happen with:
+    //
+    // * Active commissioning sessions (presumably close them?)
+    // * CASE sessions in general.
+    // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
 }
 
 - (void)resume
 {
+    MTR_LOG("%@ resuming", self);
+
+    std::lock_guard lock(_suspensionLock);
+
     _suspended = NO;
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to restart subscriptions.
+    NSEnumerator * devices;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        devices = [self.nodeIDToDeviceMap objectEnumerator];
+    }
+
+    for (MTRDevice * device in devices) {
+        [device controllerResumed];
+    }
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
