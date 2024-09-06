@@ -67,7 +67,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Identify::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -113,7 +114,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Identify::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum value)
@@ -158,7 +160,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Identify::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -203,7 +206,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Identify::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -256,7 +260,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -302,7 +307,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -347,7 +353,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -398,7 +405,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -443,7 +451,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -488,7 +497,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -533,7 +543,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -583,7 +594,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
@@ -669,7 +681,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -714,7 +727,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOff::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -766,8 +780,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -813,8 +827,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -860,8 +874,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -907,8 +921,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -963,7 +977,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1048,7 +1063,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1094,7 +1110,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1140,7 +1157,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1186,7 +1204,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1232,7 +1251,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1278,7 +1298,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1326,7 +1347,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -1373,7 +1395,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1422,7 +1445,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1510,7 +1534,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1598,7 +1623,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1686,7 +1712,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1774,7 +1801,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -1859,7 +1887,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -1905,7 +1934,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LevelControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -1958,8 +1988,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -2005,8 +2035,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -2052,8 +2082,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -2098,7 +2128,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -2144,7 +2175,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -2190,7 +2222,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -2236,7 +2269,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -2282,7 +2316,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -2328,7 +2363,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2374,7 +2410,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2420,7 +2457,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BinaryInputBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -2472,8 +2510,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PulseWidthModulation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2519,7 +2557,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PulseWidthModulation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -2574,7 +2613,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Binding::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Binding::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2619,7 +2659,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Binding::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Binding::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -2671,7 +2712,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AccessControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AccessControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2724,7 +2766,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Actions::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -2768,7 +2811,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Actions::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -2813,7 +2857,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Actions::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -2866,8 +2911,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -2912,7 +2957,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -2958,7 +3004,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -3004,7 +3051,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3050,7 +3098,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3102,8 +3151,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3149,8 +3198,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3202,8 +3251,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -3251,8 +3300,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -3302,8 +3351,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -3389,8 +3438,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3436,8 +3485,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3490,8 +3539,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LocalizationConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -3536,8 +3585,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LocalizationConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3583,8 +3632,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LocalizationConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3638,7 +3687,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Hour
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeFormatLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -3687,7 +3737,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Cale
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeFormatLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -3734,8 +3785,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeFormatLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3781,8 +3832,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeFormatLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3835,7 +3886,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
@@ -3881,7 +3933,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -3927,7 +3980,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitLocalization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -3979,8 +4033,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSourceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4026,8 +4080,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSourceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -4080,7 +4134,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
@@ -4126,7 +4181,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -4173,7 +4229,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -4221,7 +4278,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4309,7 +4367,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -4395,7 +4454,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
@@ -4444,7 +4504,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4529,7 +4590,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4575,7 +4637,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4621,7 +4684,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -4670,7 +4734,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4758,7 +4823,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -4846,7 +4912,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -4932,7 +4999,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
@@ -4978,7 +5046,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -5025,7 +5094,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
@@ -5071,7 +5141,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -5118,7 +5189,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -5165,7 +5237,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
@@ -5212,7 +5285,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -5258,7 +5332,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -5305,7 +5380,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
@@ -5351,7 +5427,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -5397,7 +5474,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -5444,7 +5522,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
@@ -5493,7 +5572,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -5578,7 +5658,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -5627,7 +5708,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -5712,7 +5794,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -5758,7 +5841,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerSource::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -5810,7 +5894,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -5856,7 +5941,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -5902,7 +5988,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -5948,8 +6035,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -5995,7 +6082,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -6041,8 +6129,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -6088,7 +6176,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -6140,7 +6229,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -6186,7 +6276,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -6232,7 +6323,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -6278,7 +6370,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -6331,7 +6424,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -6430,8 +6524,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -6513,7 +6607,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -6601,8 +6696,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -6649,7 +6744,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -6695,8 +6791,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -6742,7 +6838,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::NetworkCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -6794,7 +6891,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DiagnosticLogs::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -6840,7 +6938,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DiagnosticLogs::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -6892,7 +6991,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::GeneralDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -6944,7 +7044,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SoftwareDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -6996,8 +7097,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -7043,8 +7144,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7096,8 +7197,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -7143,8 +7244,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7196,8 +7297,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -7243,8 +7344,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7297,7 +7398,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
@@ -7345,7 +7447,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeZon
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -7392,7 +7495,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -7438,7 +7542,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -7484,7 +7589,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -7530,7 +7636,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TimeSynchronization::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7583,8 +7690,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -7630,8 +7737,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
@@ -7678,8 +7785,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -7725,8 +7832,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7773,8 +7880,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -7820,8 +7927,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -7868,8 +7975,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -7915,8 +8022,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -7963,8 +8070,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8011,8 +8118,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8059,8 +8166,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8107,8 +8214,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8155,8 +8262,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8203,8 +8310,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8250,8 +8357,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -8298,8 +8405,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
-                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -8345,8 +8452,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -8392,8 +8499,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -8444,7 +8551,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Switch::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -8489,7 +8597,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Switch::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -8534,7 +8643,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Switch::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -8579,7 +8689,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Switch::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -8624,7 +8735,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Switch::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -8676,8 +8788,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AdministratorCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -8723,8 +8835,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AdministratorCommissioning::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -8776,8 +8888,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OperationalCredentials::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -8823,8 +8935,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OperationalCredentials::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -8880,7 +8992,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FixedLabel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FixedLabel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -8926,7 +9039,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FixedLabel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FixedLabel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -8978,7 +9092,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UserLabel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UserLabel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9024,7 +9139,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UserLabel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UserLabel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9076,7 +9192,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9122,7 +9239,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9174,7 +9292,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyDiscovery::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9220,7 +9339,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyDiscovery::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9272,7 +9392,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyValid::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyValid::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9318,7 +9439,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ProxyValid::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ProxyValid::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9370,7 +9492,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -9416,7 +9539,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9462,7 +9586,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9517,7 +9642,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IcdManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -9565,7 +9691,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IcdManagement::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -9611,7 +9738,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IcdManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value)
@@ -9657,7 +9785,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IcdManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9703,7 +9832,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IcdManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9754,7 +9884,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Timer::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9799,7 +9930,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Timer::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9845,7 +9977,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Timer::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerStatusEnum value)
@@ -9890,7 +10023,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Timer::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -9935,7 +10069,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Timer::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -9987,8 +10122,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenCavityOperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -10034,8 +10169,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenCavityOperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -10086,7 +10221,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10134,7 +10270,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10221,7 +10358,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10305,7 +10443,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -10350,7 +10489,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -10407,7 +10547,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerControls::Drynes
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryDryerControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -10497,8 +10638,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryDryerControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -10544,7 +10685,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryDryerControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -10597,7 +10739,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -10645,7 +10788,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -10730,7 +10874,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10779,7 +10924,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10867,7 +11013,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -10952,7 +11099,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -10998,7 +11146,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ModeSelect::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11050,7 +11199,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryWasherMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11102,8 +11252,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(
+        chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id),
+        EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11159,7 +11310,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryWasherControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -11246,7 +11398,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::Numbe
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryWasherControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -11293,8 +11446,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryWasherControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -11340,7 +11493,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LaundryWasherControls::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11392,7 +11546,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RvcRunMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RvcRunMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11444,7 +11599,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RvcCleanMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RvcCleanMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11496,8 +11652,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -11543,8 +11699,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -11590,8 +11746,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -11637,8 +11793,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -11684,7 +11840,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -11730,7 +11887,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -11776,7 +11934,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -11831,7 +11990,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -11881,7 +12041,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -11931,7 +12092,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -11978,7 +12140,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -12024,7 +12187,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RefrigeratorAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -12076,7 +12240,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -12128,7 +12293,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AirQuality::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -12181,7 +12347,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value)
@@ -12228,7 +12395,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
@@ -12275,7 +12443,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
@@ -12322,7 +12491,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
@@ -12369,7 +12539,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value)
@@ -12415,7 +12586,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -12461,7 +12633,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -12508,7 +12681,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value)
@@ -12555,7 +12729,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
@@ -12602,7 +12777,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
@@ -12650,7 +12826,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value)
@@ -12697,7 +12874,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value)
@@ -12743,7 +12921,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -12789,7 +12968,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -12835,7 +13015,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SmokeCoAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -12889,7 +13070,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -12938,7 +13120,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -12987,7 +13170,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13036,7 +13220,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13083,7 +13268,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -13129,7 +13315,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DishwasherAlarm::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13181,7 +13368,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MicrowaveOvenMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MicrowaveOvenMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13233,7 +13421,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MicrowaveOvenControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MicrowaveOvenControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13285,7 +13474,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -13331,7 +13521,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13383,7 +13574,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RvcOperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -13429,7 +13621,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RvcOperationalState::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13484,7 +13677,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId 
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ScenesManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_NODE_ID_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId value)
@@ -13569,7 +13763,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ScenesManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13615,7 +13810,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ScenesManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -13661,7 +13857,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ScenesManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13713,7 +13910,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::HepaFilterMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::HepaFilterMonitoring::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13765,8 +13963,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -13818,8 +14016,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -13865,8 +14063,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -13915,8 +14113,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13966,8 +14164,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14017,8 +14215,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14068,8 +14266,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14119,8 +14317,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14167,8 +14365,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -14214,8 +14412,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BooleanStateConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -14270,8 +14468,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -14360,8 +14558,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -14450,8 +14648,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -14543,8 +14741,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14641,8 +14839,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -14736,8 +14934,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -14826,8 +15024,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -14913,8 +15111,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -14963,8 +15161,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -15011,8 +15209,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15058,8 +15256,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -15105,8 +15303,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ValveConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15158,8 +15356,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15211,8 +15409,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15268,8 +15466,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15315,8 +15513,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15362,8 +15560,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15409,8 +15607,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15456,8 +15654,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15503,8 +15701,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -15550,8 +15748,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DemandResponseLoadControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15602,7 +15800,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Messages::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -15647,7 +15846,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Messages::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15699,8 +15899,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DeviceEnergyManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15752,7 +15952,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvse::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyEvse::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15804,7 +16005,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyPreference::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15850,7 +16052,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyPreference::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -15896,7 +16099,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyPreference::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -15942,7 +16146,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyPreference::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -15994,7 +16199,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerTopology::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PowerTopology::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -16049,7 +16255,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyEvseMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16137,7 +16344,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyEvseMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16222,7 +16430,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EnergyEvseMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -16277,7 +16486,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WaterHeaterMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WaterHeaterMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16365,7 +16575,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WaterHeaterMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WaterHeaterMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16450,7 +16661,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WaterHeaterMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WaterHeaterMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -16505,8 +16717,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16595,8 +16807,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -16682,8 +16894,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -16739,7 +16951,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockState value)
@@ -16826,7 +17039,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType value)
@@ -16871,7 +17085,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -16921,7 +17136,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value)
@@ -17007,7 +17223,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -17052,7 +17269,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -17097,7 +17315,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -17142,7 +17361,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -17187,7 +17407,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -17232,7 +17453,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -17277,7 +17499,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17322,7 +17545,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17367,7 +17591,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17412,7 +17637,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17457,7 +17683,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17502,7 +17729,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17547,7 +17775,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17595,7 +17824,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -17641,7 +17871,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17688,7 +17919,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -17732,7 +17964,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17777,7 +18010,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -17822,7 +18056,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -17868,7 +18103,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value)
@@ -17916,7 +18152,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -17965,7 +18202,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -18011,7 +18249,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18056,7 +18295,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18101,7 +18341,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18146,7 +18387,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18194,7 +18436,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -18240,7 +18483,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -18285,7 +18529,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -18330,7 +18575,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18375,7 +18621,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -18420,7 +18667,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18465,7 +18713,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -18510,7 +18759,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::DoorLock::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18563,7 +18813,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Type value)
@@ -18609,7 +18860,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18655,7 +18907,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18704,7 +18957,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18792,7 +19046,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18877,7 +19132,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18923,7 +19179,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -18971,7 +19228,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -19021,7 +19279,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -19109,7 +19368,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -19197,7 +19457,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -19247,7 +19508,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
@@ -19336,7 +19598,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
@@ -19423,7 +19686,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType value)
@@ -19472,7 +19736,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
@@ -19561,7 +19826,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
@@ -19647,7 +19913,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -19693,7 +19960,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -19739,7 +20007,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -19785,7 +20054,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -19832,7 +20102,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
@@ -19880,7 +20151,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -19927,7 +20199,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -19973,7 +20246,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WindowCovering::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20025,7 +20299,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -20071,7 +20346,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20117,7 +20393,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -20163,7 +20440,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20209,7 +20487,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20255,7 +20534,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20301,7 +20581,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20347,7 +20628,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20393,7 +20675,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20439,7 +20722,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -20485,7 +20769,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -20531,7 +20816,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BarrierControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20583,7 +20869,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ServiceArea::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ServiceArea::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20638,8 +20925,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -20728,8 +21015,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20818,8 +21105,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -20908,8 +21195,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -20998,8 +21285,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -21088,8 +21375,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -21178,8 +21465,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -21268,8 +21555,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -21358,8 +21645,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -21448,8 +21735,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -21538,8 +21825,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -21628,8 +21915,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -21718,8 +22005,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -21808,8 +22095,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -21859,8 +22146,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -21910,8 +22197,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -21961,8 +22248,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22051,8 +22338,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -22141,8 +22428,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -22231,8 +22518,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -22321,8 +22608,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -22411,8 +22698,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -22462,8 +22749,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -22510,8 +22797,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -22557,8 +22844,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PumpConfigurationAndControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -22613,7 +22900,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22701,7 +22989,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22788,7 +23077,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::Oc
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -22835,7 +23125,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22881,7 +23172,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22927,7 +23219,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -22973,7 +23266,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23019,7 +23313,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -23065,7 +23360,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -23114,7 +23410,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -23161,7 +23458,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -23207,7 +23505,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23253,7 +23552,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23299,7 +23599,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23345,7 +23646,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23391,7 +23693,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23437,7 +23740,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23483,7 +23787,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23529,7 +23834,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -23575,7 +23881,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -23624,7 +23931,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -23673,7 +23981,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceO
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -23721,7 +24030,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value)
@@ -23769,7 +24079,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value)
@@ -23816,7 +24127,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum value)
@@ -23862,7 +24174,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -23908,7 +24221,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -23956,7 +24270,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::TemperatureSetpo
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -24006,7 +24321,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -24094,7 +24410,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -24143,7 +24460,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::Re
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -24192,7 +24510,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum value)
@@ -24241,7 +24560,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -24326,7 +24646,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -24375,7 +24696,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24463,7 +24785,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24551,7 +24874,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24639,7 +24963,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24727,7 +25052,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24815,7 +25141,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24900,7 +25227,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -24947,7 +25275,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum value)
@@ -24993,7 +25322,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -25040,7 +25370,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum value)
@@ -25087,7 +25418,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum value)
@@ -25136,7 +25468,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -25184,7 +25517,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum value)
@@ -25233,7 +25567,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -25319,7 +25654,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value)
@@ -25365,7 +25701,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -25411,7 +25748,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -25457,7 +25795,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -25506,7 +25845,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -25600,7 +25940,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -25687,7 +26028,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -25768,7 +26110,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -25853,7 +26196,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -25899,7 +26243,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Thermostat::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -25952,7 +26297,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum value)
@@ -25999,7 +26345,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
@@ -26048,7 +26395,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -26133,7 +26481,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_PERCENT_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
@@ -26179,7 +26528,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -26228,7 +26578,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -26313,7 +26664,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -26361,7 +26713,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
@@ -26409,7 +26762,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
@@ -26457,7 +26811,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
@@ -26505,7 +26860,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
@@ -26552,7 +26908,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum value)
@@ -26598,7 +26955,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -26644,7 +27002,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FanControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -26699,8 +27058,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
-                                 ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -26751,8 +27110,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
-                                 ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -26805,8 +27164,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfi
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
-                                 ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status
@@ -26855,8 +27214,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
-                                 ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -26903,8 +27262,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -26957,7 +27316,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -27003,7 +27363,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -27049,7 +27410,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27095,7 +27457,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27141,7 +27504,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27188,7 +27552,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value)
@@ -27235,7 +27600,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -27280,7 +27646,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27327,7 +27694,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum value)
@@ -27375,7 +27743,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -27425,7 +27794,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -27510,7 +27880,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27556,7 +27927,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27605,7 +27977,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -27690,7 +28063,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27736,7 +28110,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27785,7 +28160,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -27870,7 +28246,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27916,7 +28293,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -27965,7 +28343,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -28050,7 +28429,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28096,7 +28476,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28145,7 +28526,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -28230,7 +28612,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28276,7 +28659,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28325,7 +28709,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -28410,7 +28795,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28456,7 +28842,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28505,7 +28892,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -28590,7 +28978,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28636,7 +29025,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28682,7 +29072,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28728,7 +29119,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28777,7 +29169,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -28862,7 +29255,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28908,7 +29302,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -28957,7 +29352,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -29042,7 +29438,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29088,7 +29485,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29137,7 +29535,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -29222,7 +29621,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29269,7 +29669,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value)
@@ -29315,7 +29716,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -29361,7 +29763,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -29407,7 +29810,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29453,7 +29857,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29499,7 +29904,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29548,7 +29954,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -29595,7 +30002,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29641,7 +30049,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29687,7 +30096,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29736,7 +30146,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29821,7 +30232,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -29867,7 +30279,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -29919,7 +30332,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -29965,7 +30379,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30014,7 +30429,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -30061,7 +30477,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30107,7 +30524,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30156,7 +30574,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30244,7 +30663,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30329,7 +30749,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -30376,8 +30797,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -30423,8 +30844,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -30472,7 +30893,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -30560,7 +30982,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -30648,7 +31071,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -30698,7 +31122,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -30783,8 +31208,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -30830,7 +31255,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::BallastConfiguration::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -30885,8 +31311,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -30975,8 +31401,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31065,8 +31491,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31152,8 +31578,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31204,7 +31630,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::IlluminanceMeasurement::Ligh
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -31294,8 +31721,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -31341,8 +31768,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::IlluminanceMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31397,8 +31824,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -31487,8 +31914,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -31577,8 +32004,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -31664,8 +32091,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31711,8 +32138,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -31758,8 +32185,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TemperatureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -31814,7 +32241,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -31902,7 +32330,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -31990,7 +32419,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -32075,7 +32505,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32124,7 +32555,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -32212,7 +32644,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -32300,7 +32733,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -32385,7 +32819,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32431,7 +32866,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -32477,7 +32913,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -32523,7 +32960,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::PressureMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32578,7 +33016,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32666,7 +33105,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32754,7 +33194,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32839,7 +33280,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32885,7 +33327,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -32931,7 +33374,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FlowMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -32986,8 +33430,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33076,8 +33520,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33166,8 +33610,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33253,8 +33697,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33300,8 +33744,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -33347,8 +33791,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33403,7 +33847,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -33452,7 +33897,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensing::OccupancyS
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -33502,7 +33948,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -33549,7 +33996,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33595,7 +34043,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33641,7 +34090,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -33687,7 +34137,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33733,7 +34184,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33779,7 +34231,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -33825,7 +34278,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33871,7 +34325,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -33917,7 +34372,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -33963,7 +34419,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OccupancySensing::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34015,8 +34472,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(
+        chip::app::ConcreteAttributePath(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id),
+        EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34069,8 +34527,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(
+        chip::app::ConcreteAttributePath(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id),
+        EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34123,8 +34582,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(
+        chip::app::ConcreteAttributePath(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id),
+        EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34177,8 +34637,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34230,8 +34690,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34283,8 +34743,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34337,8 +34797,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34390,8 +34850,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34443,8 +34903,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(
+        chip::app::ConcreteAttributePath(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id),
+        EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34497,8 +34958,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34550,8 +35011,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WiFiNetworkManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -34597,7 +35058,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WiFiNetworkManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34649,8 +35111,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34702,8 +35164,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDirectory::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThreadNetworkDirectory::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -34749,8 +35211,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDirectory::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ThreadNetworkDirectory::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34803,7 +35265,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WakeOnLan::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -34849,7 +35312,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WakeOnLan::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -34894,7 +35358,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WakeOnLan::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -34940,7 +35405,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::WakeOnLan::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -34991,7 +35457,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Channel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -35036,7 +35503,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::Channel::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -35088,7 +35556,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TargetNavigator::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -35134,7 +35603,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TargetNavigator::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -35180,7 +35650,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::TargetNavigator::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -35233,7 +35704,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
@@ -35282,7 +35754,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -35370,7 +35843,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -35455,7 +35929,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_SINGLE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
@@ -35504,7 +35979,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -35592,7 +36068,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -35677,7 +36154,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -35723,7 +36201,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaPlayback::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -35775,7 +36254,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaInput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -35821,7 +36301,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaInput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -35867,7 +36348,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::MediaInput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -35918,7 +36400,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LowPower::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LowPower::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -35963,7 +36446,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LowPower::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::LowPower::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36015,7 +36499,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::KeypadInput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36061,7 +36546,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::KeypadInput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36116,7 +36602,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentLauncher::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -36163,7 +36650,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentLauncher::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36209,7 +36697,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentLauncher::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36261,7 +36750,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AudioOutput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -36307,7 +36797,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AudioOutput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36353,7 +36844,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AudioOutput::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36405,7 +36897,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationLauncher::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36451,7 +36944,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationLauncher::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36504,8 +36998,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -36550,7 +37044,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
@@ -36597,8 +37092,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -36643,7 +37138,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36691,7 +37187,8 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Applicatio
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -36739,8 +37236,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -36785,7 +37282,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36831,7 +37329,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ApplicationBasic::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36883,7 +37382,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AccountLogin::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -36929,7 +37429,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::AccountLogin::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -36981,7 +37482,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -37028,7 +37530,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -37074,7 +37577,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -37119,7 +37623,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37165,7 +37670,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37211,7 +37717,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -37257,7 +37764,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37303,7 +37811,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -37355,7 +37864,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentAppObserver::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37401,7 +37911,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ContentAppObserver::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -37453,8 +37964,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EcosystemInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37500,7 +38011,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EcosystemInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::EcosystemInformation::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -37555,7 +38067,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerCo
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommissionerControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::CommissionerControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status
@@ -37602,7 +38115,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommissionerControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::CommissionerControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37648,7 +38162,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommissionerControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::CommissionerControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -37700,8 +38215,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -37747,7 +38262,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -37793,7 +38309,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -37839,7 +38356,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -37885,7 +38403,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -37931,7 +38450,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -37977,7 +38497,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38023,7 +38544,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38069,7 +38591,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38115,7 +38638,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38161,7 +38685,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38207,7 +38732,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38253,7 +38779,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38299,7 +38826,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38345,7 +38873,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38391,7 +38920,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38437,7 +38967,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38483,7 +39014,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38529,7 +39061,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38575,7 +39108,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -38621,7 +39155,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -38667,7 +39202,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -38713,7 +39249,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -38759,7 +39296,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38805,7 +39343,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38851,7 +39390,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38897,7 +39437,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38943,7 +39484,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -38989,7 +39531,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39035,7 +39578,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39081,7 +39625,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39127,7 +39672,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39173,7 +39719,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39219,7 +39766,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39265,7 +39813,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39311,7 +39860,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39357,7 +39907,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39403,7 +39954,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -39449,7 +40001,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -39495,7 +40048,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -39541,7 +40095,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -39587,7 +40142,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39633,7 +40189,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39679,7 +40236,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39725,7 +40283,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39771,7 +40330,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -39817,7 +40377,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39863,7 +40424,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39909,7 +40471,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -39955,7 +40518,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40001,7 +40565,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40047,7 +40612,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40093,7 +40659,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -40139,7 +40706,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -40185,7 +40753,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -40231,7 +40800,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -40277,7 +40847,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40323,7 +40894,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -40369,7 +40941,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40415,7 +40988,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40461,7 +41035,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40507,7 +41082,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40553,7 +41129,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40599,7 +41176,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40645,7 +41223,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40691,7 +41270,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40737,7 +41317,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40783,7 +41364,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40829,7 +41411,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40875,7 +41458,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -40921,8 +41505,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -40968,7 +41552,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41014,7 +41599,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41060,8 +41646,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41107,7 +41693,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41153,7 +41740,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41199,7 +41787,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41245,7 +41834,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41291,7 +41881,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41337,7 +41928,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41383,7 +41975,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41429,7 +42022,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41475,7 +42069,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41521,7 +42116,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41567,7 +42163,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41613,7 +42210,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41659,7 +42257,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -41705,7 +42304,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41751,7 +42351,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41797,7 +42398,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41843,7 +42445,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41889,7 +42492,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41935,7 +42539,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -41981,7 +42586,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42027,7 +42633,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42073,7 +42680,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42119,7 +42727,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42165,7 +42774,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42211,7 +42821,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -42257,7 +42868,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42303,7 +42915,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42349,7 +42962,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42395,7 +43009,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42441,7 +43056,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42487,7 +43103,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42533,7 +43150,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42579,7 +43197,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42625,7 +43244,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42671,7 +43291,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -42717,7 +43338,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42763,7 +43385,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42809,7 +43432,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42855,7 +43479,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42901,7 +43526,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42947,7 +43573,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -42993,7 +43620,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -43039,7 +43667,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -43085,7 +43714,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -43131,7 +43761,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -43177,7 +43808,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43223,7 +43855,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -43269,7 +43902,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43315,7 +43949,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43361,7 +43996,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43407,7 +44043,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43453,7 +44090,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43499,7 +44137,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43545,7 +44184,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43591,8 +44231,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -43638,7 +44278,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::ElectricalMeasurement::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -43690,7 +44331,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -43738,7 +44380,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -43787,7 +44430,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -43836,7 +44480,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -43885,7 +44530,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP64_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -43932,7 +44578,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -43978,7 +44625,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -44024,7 +44672,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -44070,7 +44719,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -44116,7 +44766,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT40U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -44162,7 +44813,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT48U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -44208,7 +44860,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT56U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -44254,7 +44907,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -44300,7 +44954,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -44346,7 +45001,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -44392,7 +45048,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -44438,7 +45095,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -44484,7 +45142,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT40S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -44530,7 +45189,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT48S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -44576,7 +45236,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT56S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -44622,7 +45283,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -44668,7 +45330,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -44714,7 +45377,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -44760,7 +45424,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_SINGLE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
@@ -44806,7 +45471,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_DOUBLE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
@@ -44853,7 +45519,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -44899,8 +45566,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -44946,7 +45613,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -44992,8 +45660,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE,
-                                 markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -45038,7 +45706,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -45084,7 +45753,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -45130,7 +45800,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
@@ -45177,7 +45848,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
@@ -45223,7 +45895,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -45269,7 +45942,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -45315,7 +45989,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -45361,7 +46036,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -45407,7 +46083,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -45454,7 +46131,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value)
@@ -45500,7 +46178,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -45546,7 +46225,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -45592,7 +46272,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -45641,7 +46322,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -45731,7 +46413,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -45826,7 +46509,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -45921,7 +46605,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -46016,7 +46701,8 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP64_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -46109,7 +46795,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -46197,7 +46884,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -46285,7 +46973,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -46373,7 +47062,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -46461,7 +47151,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT40U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -46549,7 +47240,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT48U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -46637,7 +47329,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT56U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -46725,7 +47418,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
@@ -46813,7 +47507,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -46901,7 +47596,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -46989,7 +47685,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT24S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -47077,7 +47774,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
@@ -47165,7 +47863,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT40S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -47253,7 +47952,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT48S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -47341,7 +48041,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT56S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -47429,7 +48130,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT64S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
@@ -47517,7 +48219,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -47605,7 +48308,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -47693,7 +48397,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_SINGLE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
@@ -47781,7 +48486,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_DOUBLE_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
@@ -47875,7 +48581,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
@@ -47962,7 +48669,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
@@ -48045,7 +48753,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
@@ -48135,7 +48844,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -48223,7 +48933,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
@@ -48311,7 +49022,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -48399,7 +49111,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
@@ -48484,7 +49197,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -48535,7 +49249,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value)
@@ -48622,7 +49337,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -48668,7 +49384,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -48714,7 +49431,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::UnitTesting::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
@@ -48766,7 +49484,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FaultInjection::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FaultInjection::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -48812,7 +49531,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FaultInjection::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::FaultInjection::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
@@ -48864,7 +49584,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
@@ -48910,7 +49631,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
@@ -48956,7 +49678,8 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(chip::app::ConcreteAttributePath(endpoint, Clusters::SampleMei::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
