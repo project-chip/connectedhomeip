@@ -17,9 +17,8 @@
 
 
 import asyncio
-import logging
 import json
-
+import logging
 from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List, Optional
@@ -28,6 +27,7 @@ from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class MdnsServiceInfo:
@@ -82,7 +82,7 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    def __init__(self, verbose_logging:bool=False):
+    def __init__(self, verbose_logging: bool = False):
         """
         Initializes the MdnsDiscovery instance.
 
@@ -377,7 +377,6 @@ class MdnsDiscovery:
             return self._discovered_services[service_type.value][0]
         else:
             return None
-
 
     def _log_output(self) -> str:
         """
