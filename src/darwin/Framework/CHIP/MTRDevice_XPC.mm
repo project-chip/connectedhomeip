@@ -106,7 +106,7 @@
     NSString * wifi;
     NSString * thread;
     NSNumber * networkFeatures = [self._internalState objectForKey: kMTRDeviceInternalPropertyNetworkFeatures];
-    
+
     if (networkFeatures == nil) {
         wifi = @"NO";
         thread = @"NO";
