@@ -3092,6 +3092,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
     std::lock_guard lock(_lock);
+    return [self _lockedAttributeValueDictionaryForAttributePath:attributePath];
+}
+
+- (NSDictionary<NSString *, id> *)_lockedAttributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -3476,6 +3482,27 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return attributesToReport;
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+    std::lock_guard lock(_lock);
+
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+        MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+        for (NSNumber * attributeID in clusterData.attributes) {
+            auto * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint
+                                                                       clusterID:clusterPath.cluster
+                                                                     attributeID:attributeID];
+
+            // Using _lockedAttributeValueDictionaryForAttributePath because it takes into consideration expected values too
+            [attributeReport addObject:[self _lockedAttributeValueDictionaryForAttributePath:attributePath]];
+        }
+    }
+
+    return attributeReport;
 }
 
 #ifdef DEBUG
