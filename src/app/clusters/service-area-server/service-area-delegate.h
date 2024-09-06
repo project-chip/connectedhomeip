@@ -55,9 +55,9 @@ public:
      * @brief Can the selected locations be set by the client in the current operating mode?
      * @param[out] statusText text describing why the selected locations cannot be set (if return is false).
      * Max size kMaxSizeStatusText.
-     * Note: statusText must be successfully set if the return is false. Use CopyCharSpanToMutableCharSpanWithTruncation to 
+     * Note: statusText must be successfully set if the return is false. Use CopyCharSpanToMutableCharSpanWithTruncation to
      * ensure that a message is copied successfully. Otherwise, ensure that if setting the statusText can fail (e.g., due
-     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using 
+     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using
      * un-initialized memory.
      * @return true if the current device state allows selected locations to be set by user.
      *
@@ -78,9 +78,9 @@ public:
      * @param[in] selectedAreas List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see description above). Max size kMaxSizeStatusText.
-     * Note: statusText must be successfully set if the return is false. Use CopyCharSpanToMutableCharSpanWithTruncation to 
+     * Note: statusText must be successfully set if the return is false. Use CopyCharSpanToMutableCharSpanWithTruncation to
      * ensure that a message is copied successfully. Otherwise, ensure that if setting the statusText can fail (e.g., due
-     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using 
+     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using
      * un-initialized memory.
      * @return true if success.
      *
@@ -97,7 +97,7 @@ public:
      * @param[out] skipStatusText text describing why the current location cannot be skipped. Max size kMaxSizeStatusText.
      * Note: skipStatusText must be successfully set if the return is false. Use CopyCharSpanToMutableCharSpanWithTruncation to
      * ensure that a message is copied successfully. Otherwise, ensure that if setting the skipStatusText can fail (e.g., due
-     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using 
+     * to exceeding kMaxSizeStatusText) the size of this value is set to 0 with .reduce_size(0) to avoid callers using
      * un-initialized memory.
      * @return true if command is successful, false if the received skip request cannot be handled due to the current mode of the
      * device.
