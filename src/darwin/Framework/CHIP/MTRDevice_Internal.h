@@ -204,6 +204,11 @@ MTR_DIRECT_MEMBERS
 
 @end
 
+#pragma mark - MTRDevice internal state monitoring
+@protocol MTRDeviceInternalStateDelegate
+- (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
+@end
+
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
@@ -216,5 +221,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 // Declared inside platform, but noting here for reference
 // static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
+// Concrete to XPC internal state property dictionary keys
+static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
+static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
+static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
+static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
+static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 
 NS_ASSUME_NONNULL_END

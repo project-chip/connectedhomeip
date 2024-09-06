@@ -135,8 +135,8 @@ void EndpointListLoader::Complete()
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
             std::shared_ptr<Endpoint> endpoint =
                 std::make_shared<Endpoint>(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes);
-            ChipLogProgress(AppServer, "EndpointListLoader::Complete() mEndpointServerLists[i].size: %lu ",
-                            mEndpointServerLists[i].size());
+            ChipLogProgress(AppServer, "EndpointListLoader::Complete() mEndpointServerLists[i].size: %lu",
+                            static_cast<unsigned long>(mEndpointServerLists[i].size()));
             endpoint->RegisterClusters(mEndpointServerLists[i]);
             CastingPlayer::GetTargetCastingPlayer()->RegisterEndpoint(endpoint);
         }

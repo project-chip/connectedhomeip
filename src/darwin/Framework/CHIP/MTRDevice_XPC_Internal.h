@@ -14,21 +14,13 @@
  *    limitations under the License.
  */
 
-#import "MTRDefines_Internal.h" // MTR_TESTABLE
-#import "MTRDeviceController.h"
-#import "MTRXPCClientProtocol.h" // MTRXPCClientProtocol_MTRDeviceController
-#import <Foundation/Foundation.h>
+#import "MTRDevice_XPC.h"
+#import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_TESTABLE
-@interface MTRDeviceController_XPC : MTRDeviceController <MTRXPCClientProtocol>
-#ifdef MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
-- (id)initWithUniqueIdentifier:(NSUUID *)UUID machServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options
-#endif
-
-    @property(nullable, atomic, retain, readwrite)NSXPCConnection * xpcConnection;
-
+@interface MTRDevice_XPC ()
+@property (nullable, atomic, readwrite, retain, getter=_internalState, setter=_setInternalState:) NSDictionary * _internalState;
 @end
 
 NS_ASSUME_NONNULL_END
