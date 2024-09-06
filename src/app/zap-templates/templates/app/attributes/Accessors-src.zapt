@@ -114,7 +114,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
       chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
       EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
     {{else}}
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}});
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{/if}}
     {{else}}
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
@@ -130,7 +130,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
       chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id)
       EmberAfWriteDataInput(writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
     {{else}}
-    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE{{#if passMarkDirty}}, markDirty{{/if}});
+    return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{/if}}
     {{/if}}
 {{/inline}}
