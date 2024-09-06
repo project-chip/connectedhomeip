@@ -105,7 +105,7 @@
 {
     NSString * wifi;
     NSString * thread;
-    NSNumber * networkFeatures = [self._internalState objectForKey: kMTRDeviceInternalPropertyNetworkFeatures];
+    NSNumber * networkFeatures = [self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures];
 
     if (networkFeatures == nil) {
         wifi = @"NO";
@@ -123,15 +123,15 @@
 
     return [NSString
         stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@>",
-            NSStringFromClass(self.class), self,
-            _deviceController.compressedFabricID.unsignedLongLongValue,
-            _nodeID.unsignedLongLongValue,
-            _nodeID.unsignedLongLongValue,
-            [self._internalState objectForKey: kMTRDeviceInternalPropertyKeyVendorID],
-            [self._internalState objectForKey: kMTRDeviceInternalPropertyKeyProductID],
-            wifi,
-            thread,
-            _deviceController.uniqueIdentifier];
+        NSStringFromClass(self.class), self,
+        _deviceController.compressedFabricID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID],
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID],
+        wifi,
+        thread,
+        _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
