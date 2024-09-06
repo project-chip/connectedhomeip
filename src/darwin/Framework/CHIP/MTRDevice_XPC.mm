@@ -103,32 +103,35 @@
 
 - (NSString *)description
 {
-    // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
-    // internalDeviceState (do we even have such a thing here?), last
-    // subscription attempt wait (does that apply to us?) queued work (do we
-    // have any?), last report, last subscription failure (does that apply to us?).
-    return [NSString
-        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, [self _vid], [self _pid], _deviceController.uniqueIdentifier];
-}
+    NSString * wifi;
+    NSString * thread;
+    NSNumber * networkFeatures = [self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures];
 
-- (nullable NSNumber *)_internalStateNumberOrNilForKey:(NSString *)key
-{
-    if ([_internalState[key] isKindOfClass:NSNumber.class]) {
-        NSNumber * number = _internalState[key];
-        return number;
+    if (networkFeatures == nil) {
+        wifi = @"NO";
+        thread = @"NO";
     } else {
-        return nil;
+        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
     }
-}
 
-- (nullable NSNumber *)_vid
-{
-    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyVendorID];
-}
+    // TODO: Add these to the description
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, _internalDeviceStateForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, _lastSubscriptionAttemptWaitForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
-- (nullable NSNumber *)_pid
-{
-    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyProductID];
+    return [NSString
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@>",
+        NSStringFromClass(self.class), self,
+        _deviceController.compressedFabricID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID],
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID],
+        wifi,
+        thread,
+        _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
@@ -185,6 +188,12 @@
             [delegate deviceConfigurationChanged:self];
         }
     }];
+}
+
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    [self _setInternalState:dictionary];
+    MTR_LOG("%@ internal state updated", self);
 }
 
 #pragma mark - Remote Commands
