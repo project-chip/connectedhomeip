@@ -81,6 +81,9 @@ class TC_ICDM_5_1(MatterBaseTest):
             compressed_fabric_id=self.default_controller.GetCompressedFabricId(),
             log_output=True, discovery_timeout_sec=240)
 
+        asserts.assert_is_not_none(
+            service, f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+
         icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
         if icdTxtRecord.value != int(service.txt_record['ICD']):
             raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
