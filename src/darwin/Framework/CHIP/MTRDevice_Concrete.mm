@@ -1519,6 +1519,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
     }
+    std::lock_guard lock(_lock);
     [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 #endif
