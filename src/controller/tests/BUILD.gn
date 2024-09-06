@@ -23,7 +23,8 @@ chip_test_suite("tests") {
 
   test_sources = []
 
-  #+++++x TODO: Add comment about why it fails.
+  #+++++x TODO: Add issue about this.
+  # undefined reference to chip::Controller::CommissionableNodeController::*
   if (chip_device_platform != "efr32") {
     test_sources += [ "TestCommissionableNodeController.cpp" ]
   }
@@ -36,7 +37,8 @@ chip_test_suite("tests") {
     test_sources += [ "TestWriteChunking.cpp" ]
     test_sources += [ "TestEventNumberCaching.cpp" ]
 
-    #+++++x TODO: Add comment about why it fails.
+    #+++++x TODO: Add issue about this.
+    # undefined reference to chip::Controller::CommissioningWindowOpener::*
     if (chip_device_platform != "efr32") {
       test_sources += [ "TestCommissioningWindowOpener.cpp" ]
     }
