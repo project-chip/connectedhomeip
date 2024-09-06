@@ -2437,11 +2437,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // Start our helper apps.
     __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
     for (NSNumber * deviceID in sortedKeys) {
-        __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initWithAppName:@"all-clusters"
-                                                                        arguments:@[]
-                                                                          payload:deviceOnboardingPayloads[deviceID]
-                                                                         testcase:self];
-        XCTAssertNotNil(appRunner);
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:deviceOnboardingPayloads[deviceID]];
+        XCTAssertTrue(started);
     }
 
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];

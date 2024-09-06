@@ -184,11 +184,10 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
              @"MT:Y.K90SO527JA0648G00",
              @"MT:-24J0AFN00I40648G00",
          ]) {
-        __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initCrossTestWithAppName:@"all-clusters"
-                                                                                 arguments:@[]
-                                                                                   payload:payload
-                                                                                 testsuite:self];
-        XCTAssertNotNil(appRunner);
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:payload];
+        XCTAssertTrue(started);
     }
 }
 

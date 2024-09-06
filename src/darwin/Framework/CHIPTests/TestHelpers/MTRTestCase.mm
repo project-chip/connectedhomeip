@@ -85,16 +85,16 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 }
 
 #if HAVE_NSTASK
+- (NSTask *)createTaskForPath:(NSString *)path
+{
+    return [self.class createTaskForPath:path];
+}
+
 + (NSTask *)createTaskForPath:(NSString *)path
 {
     NSTask * task = [[NSTask alloc] init];
     [task setLaunchPath:[self absolutePathFor:path]];
     return task;
-}
-
-- (NSTask *)createTaskForPath:(NSString *)path
-{
-    return [self.class createTaskForPath:path];
 }
 
 - (void)runTask:(NSTask *)task
@@ -121,13 +121,18 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     [_runningTasks addObject:task];
 }
 
-+ (void)launchCrossTestTask:(NSTask *)task
++ (void)launchTask:(NSTask *)task
 {
     [self doLaunchTask:task];
 
     [runningCrossTestTasks addObject:task];
 }
 #endif // HAVE_NSTASK
+
+- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
+{
+    return [self.class absolutePathFor:matterRootRelativePath];
+}
 
 + (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
 {
@@ -140,8 +145,4 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     return [NSString pathWithComponents:pathComponents];
 }
 
-- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
-{
-    return [self.class absolutePathFor:matterRootRelativePath];
-}
 @end
