@@ -46,11 +46,41 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
+void CommissionerControlDelegate::ResetDelegateState()
+{
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Resetting delegate state");
+
+    // Reset the step to the initial state
+    mNextStep = Step::kIdle;
+
+    // Reset identifiers and product information
+    mRequestId    = 0;
+    mClientNodeId = kUndefinedNodeId;
+    mVendorId     = VendorId::Unspecified;
+    mProductId    = 0;
+
+    // Clear the label buffer and optional label
+    memset(mLabelBuffer, 0, sizeof(mLabelBuffer));
+    mLabel.ClearValue();
+
+    // Reset PBKDF salt and PAKE passcode verifier buffers
+    mPBKDFSalt = ByteSpan();
+    memset(mPBKDFSaltBuffer, 0, sizeof(mPBKDFSaltBuffer));
+
+    mPAKEPasscodeVerifier = ByteSpan();
+    memset(mPAKEPasscodeVerifierBuffer, 0, sizeof(mPAKEPasscodeVerifierBuffer));
+}
+
 CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request)
 {
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissioningApprovalRequest, current state: %s",
+                    GetStateString(mNextStep));
+
+    VerifyOrReturnError(mNextStep == Step::kIdle, CHIP_ERROR_INCORRECT_STATE);
+
     CommissionerControl::Events::CommissioningRequestResult::Type result;
-    result.requestId    = request.requestId;
-    result.clientNodeId = request.clientNodeId;
+    result.requestID    = request.requestId;
+    result.clientNodeID = request.clientNodeId;
     result.fabricIndex  = request.fabricIndex;
     result.statusCode   = static_cast<uint8_t>(Protocols::InteractionModel::Status::Success);
 
@@ -86,18 +116,38 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    return CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
+    CHIP_ERROR err = CommissionerControlServer::Instance().GenerateCommissioningRequestResultEvent(result);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mNextStep = Step::kWaitCommissionNodeRequest;
+        ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
+    }
+    else
+    {
+        ResetDelegateState();
+    }
+
+    return err;
 }
 
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
 {
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering ValidateCommissionNodeCommand, current state: %s",
+                    GetStateString(mNextStep));
+
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mNextStep == Step::kWaitCommissionNodeRequest, CHIP_ERROR_INCORRECT_STATE);
 
     // Verify if the CommissionNode command is sent from the same NodeId as the RequestCommissioningApproval.
     VerifyOrExit(mClientNodeId == clientNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
 
     // Verify if the provided RequestId matches the value provided to the RequestCommissioningApproval.
     VerifyOrExit(mRequestId == requestId, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mNextStep = Step::kStartCommissionNode;
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
 
 exit:
     return err;
@@ -126,23 +176,32 @@ CHIP_ERROR CommissionerControlDelegate::GetCommissioningWindowParams(Commissioni
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params,
-                                                             const Optional<ByteSpan> & ipAddress, const Optional<uint16_t> & port)
+CHIP_ERROR CommissionerControlDelegate::HandleCommissionNode(const CommissioningWindowParams & params)
 {
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate::HandleCommissionNode");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: Entering HandleCommissionNode, current state: %s",
+                    GetStateString(mNextStep));
+
+    VerifyOrReturnError(mNextStep == Step::kStartCommissionNode, CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    return CommissionNode(Controller::CommissioningWindowPasscodeParams()
-                              .SetSetupPIN(kSetupPinCode)
-                              .SetTimeout(params.commissioningTimeout)
-                              .SetDiscriminator(params.discriminator)
-                              .SetIteration(params.iterations)
-                              .SetSalt(params.salt),
-                          mVendorId, mProductId);
+    err = CommissionNode(Controller::CommissioningWindowPasscodeParams()
+                             .SetSetupPIN(kSetupPinCode)
+                             .SetTimeout(params.commissioningTimeout)
+                             .SetDiscriminator(params.discriminator)
+                             .SetIteration(params.iterations)
+                             .SetSalt(params.salt),
+                         mVendorId, mProductId);
 #else
     ChipLogProgress(NotSpecified, "Failed to reverse commission bridge: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    // Reset the delegate's state to prepare for a new commissioning sequence.
+    ResetDelegateState();
+
+    return err;
 }
 
 } // namespace CommissionerControl

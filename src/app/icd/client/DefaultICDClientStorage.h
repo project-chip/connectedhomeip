@@ -124,13 +124,14 @@ protected:
     enum class ClientInfoTag : uint8_t
     {
         kPeerNodeId       = 1,
-        kFabricIndex      = 2,
-        kStartICDCounter  = 3,
-        kOffset           = 4,
-        kMonitoredSubject = 5,
-        kAesKeyHandle     = 6,
-        kHmacKeyHandle    = 7,
-        kClientType       = 8,
+        kCheckInNodeId    = 2,
+        kFabricIndex      = 3,
+        kStartICDCounter  = 4,
+        kOffset           = 5,
+        kMonitoredSubject = 6,
+        kAesKeyHandle     = 7,
+        kHmacKeyHandle    = 8,
+        kClientType       = 9,
     };
 
     enum class CounterTag : uint8_t
@@ -158,8 +159,9 @@ protected:
     {
         // All the fields added together
         return TLV::EstimateStructOverhead(
-            sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/, sizeof(uint32_t) /*offset*/,
-            sizeof(uint64_t) /*monitored_subject*/, sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+            sizeof(NodeId), sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/,
+            sizeof(uint32_t) /*offset*/, sizeof(uint64_t) /*monitored_subject*/,
+            sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
             sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/, sizeof(uint8_t) /*client_type*/);
     }
 

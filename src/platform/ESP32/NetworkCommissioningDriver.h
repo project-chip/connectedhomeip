@@ -136,8 +136,8 @@ public:
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
+    CHIP_ERROR BackupConfiguration();
 
-    WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;

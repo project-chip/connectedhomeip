@@ -474,6 +474,7 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -483,6 +484,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
+        startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -545,7 +547,8 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
-                storageBehaviorConfiguration:storageBehaviorConfiguration];
+                storageBehaviorConfiguration:storageBehaviorConfiguration
+                              startSuspended:startSuspended];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -658,6 +661,12 @@ MTR_DIRECT_MEMBERS
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
         }
         return nil;
+    }
+
+    // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
+    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:startupParams.operationalCertificate andRootCertificate:startupParams.rootCertificate];
+    if (existingController) {
+        return existingController;
     }
 
     return [self _startDeviceController:[MTRDeviceController alloc]
@@ -1133,11 +1142,11 @@ MTR_DIRECT_MEMBERS
     }
 }
 
-- (nullable MTRDeviceController *)_findControllerWithPendingShutdownMatchingParams:(MTRDeviceControllerParameters *)parameters
+- (nullable MTRDeviceController *)_findPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
 {
     std::lock_guard lock(_controllersLock);
     for (MTRDeviceController * controller in _controllers) {
-        if ([controller matchesPendingShutdownWithParams:parameters]) {
+        if ([controller matchesPendingShutdownControllerWithOperationalCertificate:operationalCertificate andRootCertificate:rootCertificate]) {
             MTR_LOG("%@ Found existing controller %@ that is pending shutdown and matching parameters, re-using it", self, controller);
             [controller clearPendingShutdown];
             return controller;
@@ -1153,7 +1162,7 @@ MTR_DIRECT_MEMBERS
     [self _assertCurrentQueueIsNotMatterQueue];
 
     // If there is a controller already running with matching parameters that is conceptually shut down from the API consumer's viewpoint, re-use it.
-    MTRDeviceController * existingController = [self _findControllerWithPendingShutdownMatchingParams:parameters];
+    MTRDeviceController * existingController = [self _findPendingShutdownControllerWithOperationalCertificate:parameters.operationalCertificate andRootCertificate:parameters.rootCertificate];
     if (existingController) {
         return existingController;
     }

@@ -46,6 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase;
 
 /**
+ * Same thing, but initialize as a "cross test" helper, which is not killed at
+ * the end of the current test (but is killed at the end of the current suite).
+ */
+- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase;
+
+/**
  * Get the unique index that will be used for the next initialization.  This
  * allows including that index in the arguments provided.
  *

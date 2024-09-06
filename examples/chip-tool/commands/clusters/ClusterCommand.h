@@ -60,7 +60,7 @@ public:
                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
-        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        mPeerNodeId = chip::ScopedNodeId(device->GetDeviceId(), device->GetSecureSession().Value()->GetFabricIndex());
         return CHIP_NO_ERROR;
     }
 
@@ -69,7 +69,8 @@ public:
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClient::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
-        mScopedNodeId     = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        mPeerNodeId       = chip::ScopedNodeId(device->GetDeviceId(), device->GetSecureSession().Value()->GetFabricIndex());
+        mCheckInNodeId    = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
         mMonitoredSubject = value.monitoredSubject;
         mClientType       = value.clientType;
         memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
@@ -147,7 +148,9 @@ public:
                     return;
                 }
                 chip::app::ICDClientInfo clientInfo;
-                clientInfo.peer_node         = mScopedNodeId;
+
+                clientInfo.peer_node         = mPeerNodeId;
+                clientInfo.check_in_node     = mCheckInNodeId;
                 clientInfo.monitored_subject = mMonitoredSubject;
                 clientInfo.start_icd_counter = value.ICDCounter;
                 clientInfo.client_type       = mClientType;
@@ -159,7 +162,7 @@ public:
         if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
             (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
         {
-            ClearICDEntry(mScopedNodeId);
+            ClearICDEntry(mPeerNodeId);
         }
     }
 
@@ -260,9 +263,21 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-    chip::ScopedNodeId mScopedNodeId;
-    uint64_t mMonitoredSubject                                     = static_cast<uint64_t>(0);
+    // The scoped node ID to which RegisterClient and UnregisterClient command will be sent.  Not set for other commands.
+    chip::ScopedNodeId mPeerNodeId;
+    // The scoped node ID to which a Check-In message will be sent.  Only set for the RegisterClient command.
+    chip::ScopedNodeId mCheckInNodeId;
+
+    // Used to determine if a particular client has an active subscription for the given entry.
+    // The MonitoredSubject, when it is a NodeID, MAY be the same as the CheckInNodeID.
+    // The MonitoredSubject gives the registering client the flexibility of having a different
+    // CheckInNodeID from the MonitoredSubject.
+    uint64_t mMonitoredSubject = static_cast<uint64_t>(0);
+
+    // Client type of the client registering
     chip::app::Clusters::IcdManagement::ClientTypeEnum mClientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+
+    // Shared secret between the client and the ICD to encrypt the Check-In message.
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     CHIP_ERROR mError = CHIP_NO_ERROR;

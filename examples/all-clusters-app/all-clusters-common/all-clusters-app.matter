@@ -811,14 +811,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -845,7 +841,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
@@ -3235,7 +3231,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kIdle = 16384;
@@ -3255,7 +3251,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -3294,7 +3290,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kDeepClean = 16384;
@@ -3307,7 +3303,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -6301,7 +6297,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
+/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -6337,6 +6333,10 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeMin = 0;
     int16u holdTimeMax = 1;
     int16u holdTimeDefault = 2;
+  }
+
+  info event OccupancyChanged = 0 {
+    OccupancyBitmap occupancy = 0;
   }
 
   readonly attribute OccupancyBitmap occupancy = 0;
@@ -7303,6 +7303,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
   attribute optional boolean unsupported = 255;
+  attribute optional int8u readFailureCode = 12288;
+  attribute optional int32u failureInt32U = 12289;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
@@ -8485,7 +8487,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -8499,7 +8501,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -9164,10 +9166,10 @@ endpoint 1 {
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
     ram      attribute colorCapabilities default = 0x1F;
-    ram      attribute colorTempPhysicalMinMireds default = 0x0000;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
+    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
+    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 7;
 
@@ -9542,6 +9544,8 @@ endpoint 1 {
     callback attribute clusterErrorBoolean;
     ram      attribute globalEnum;
     callback attribute globalStruct;
+    ram      attribute readFailureCode default = 1;
+    callback attribute failureInt32U default = 0;
     ram      attribute nullableBoolean default = false;
     ram      attribute nullableBitmap8 default = 0;
     ram      attribute nullableBitmap16 default = 0;

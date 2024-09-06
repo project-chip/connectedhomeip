@@ -18,6 +18,4 @@
 
 #pragma once
 
-constexpr uint16_t kFabricBridgeServerPort = 33002;
-
 void InitRpcServer(uint16_t rpcServerPort);

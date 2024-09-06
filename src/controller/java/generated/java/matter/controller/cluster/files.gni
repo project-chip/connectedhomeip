@@ -164,7 +164,6 @@ matter_structs_sources = [
 matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlExtensionChangedEvent.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessRestrictionEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterFabricRestrictionReviewUpdateEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccountLoginClusterLoggedOutEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ActionsClusterActionFailedEvent.kt",
@@ -205,6 +204,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageCompleteEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessagePresentedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageQueuedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/OccupancySensingClusterOccupancyChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/OperationalStateClusterOperationalErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/OperationalStateClusterOperationCompletionEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/OtaSoftwareUpdateRequestorClusterDownloadErrorEvent.kt",

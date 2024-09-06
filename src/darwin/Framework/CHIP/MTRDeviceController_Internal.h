@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 // (moved here so subclasses can initialize differently)
 @property (readwrite, retain) dispatch_queue_t chipWorkQueue;
 
-- (instancetype)initForSubclasses;
+- (instancetype)initForSubclasses:(BOOL)startSuspended;
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -146,7 +146,8 @@ NS_ASSUME_NONNULL_BEGIN
           otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
+                    startSuspended:(BOOL)startSuspended;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -322,7 +323,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This method returns TRUE if this controller matches the fabric reference and node ID as listed in the parameters.
  */
-- (BOOL)matchesPendingShutdownWithParams:(MTRDeviceControllerParameters *)parameters;
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate;
 
 /**
  * Clear any pending shutdown request.

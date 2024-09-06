@@ -18,6 +18,7 @@
 
 #include "CommissionerDeclarationHandler.h"
 
+#include "CastingPlayer.h"
 #include "Types.h"
 #include "support/ChipDeviceEventHandler.h"
 #include <app/server/Server.h>
@@ -50,6 +51,39 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     support::ChipDeviceEventHandler::SetUdcStatus(false);
 
+    // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
+    if (cd.GetCancelPasscode())
+    {
+        ChipLogProgress(AppServer,
+                        "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), Got CancelPasscode parameter, "
+                        "CastingPlayer/Commissioner user has decided to exit the commissioning attempt. Connection aborted.");
+        // Since the CastingPlayer/Commissioner user has decided to exit the commissioning process, we cancel the ongoing
+        // connection attempt without notifying the CastingPlayer/Commissioner. Therefore the
+        // shouldSendIdentificationDeclarationMessage flag in the internal StopConnecting() API call is set to false. The
+        // CastingPlayer/Commissioner user and the Casting Client/Commissionee user are not necessarily the same user. For example,
+        // in an enviroment with multiple CastingPlayer/Commissioner TVs, one user 1 might be controlling the Client/Commissionee
+        // and user 2 might be controlling the CastingPlayer/Commissioner TV.
+        CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+        // Avoid crashing if we recieve this CommissionerDeclaration message when targetCastingPlayer is nullptr.
+        if (targetCastingPlayer == nullptr)
+        {
+            ChipLogError(AppServer,
+                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() targetCastingPlayer is nullptr");
+        }
+        else
+        {
+            CHIP_ERROR err = targetCastingPlayer->StopConnecting(false);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(
+                    AppServer,
+                    "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() StopConnecting() failed due to error: "
+                    "%" CHIP_ERROR_FORMAT,
+                    err.Format());
+            }
+        }
+    }
+
     if (mCmmissionerDeclarationCallback_)
     {
         mCmmissionerDeclarationCallback_(source, cd);
@@ -65,7 +99,10 @@ void CommissionerDeclarationHandler::SetCommissionerDeclarationCallback(
     matter::casting::core::CommissionerDeclarationCallback callback)
 {
     ChipLogProgress(AppServer, "CommissionerDeclarationHandler::SetCommissionerDeclarationCallback()");
-    mCmmissionerDeclarationCallback_ = std::move(callback);
+    if (callback != nullptr)
+    {
+        mCmmissionerDeclarationCallback_ = std::move(callback);
+    }
 }
 
 } // namespace core
