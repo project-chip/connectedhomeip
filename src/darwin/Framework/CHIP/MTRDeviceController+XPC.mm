@@ -34,13 +34,7 @@ static NSString * const kMaxIntervalKey = @"maxInterval";
 static NSSet * GetXPCAllowedClasses()
 {
     static NSSet * const sXPCAllowedClasses = [NSSet setWithArray:@[
-        [NSString class],
-        [NSNumber class],
-        [NSData class],
-        [NSArray class],
-        [NSDictionary class],
-        [NSError class],
-        [NSDate class],
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class]
     ]];
     return sXPCAllowedClasses;
 }
