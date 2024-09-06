@@ -582,7 +582,7 @@ TEST_F(TestReadChunking, TestListChunking)
     {
         TestReadCallback readCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", packetSize);
+        ChipLogDetail(DataManagement, "Running iteration %d\n", (int)packetSize);
 
         gIterationCount = packetSize;
 
