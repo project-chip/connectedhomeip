@@ -28,6 +28,7 @@
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDiagnosticLogsDownloader.h"
 #import "MTRError_Internal.h"
@@ -669,7 +670,7 @@ MTR_DIRECT_MEMBERS
         return existingController;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -741,7 +742,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {

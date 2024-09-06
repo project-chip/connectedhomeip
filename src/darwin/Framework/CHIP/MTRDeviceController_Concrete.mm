@@ -26,7 +26,6 @@
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
-#import "MTRDeviceController.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -50,6 +49,7 @@
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -80,7 +80,10 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <optional>
 #include <string>
+
+#import <os/lock.h>
 
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
@@ -114,19 +117,29 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @implementation MTRDeviceController_Concrete {
-    // queue used to serialize all work performed by the MTRDeviceController
     std::atomic<chip::FabricIndex> _storedFabricIndex;
     std::atomic<std::optional<uint64_t>> _storedCompressedFabricID;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
+
+    // Counters to track assertion status and access controlled by the _assertionLock
+    // TODO: Figure out whether they should live here or in the base class (or
+    // go away completely!), which depends on how the shutdown codepaths get set up.
+    NSUInteger _keepRunningAssertionCounter;
+    BOOL _shutdownPending;
+    os_unfair_lock _assertionLock;
 }
 
-// MTRDeviceController ivar internal access
+// TODO: Figure out whether uniqueIdentifier storage should live in the superclass.  It
+// probably should!
 @synthesize uniqueIdentifier = _uniqueIdentifier;
+// TODO: Figure out whether the work queue storage lives here or in the superclass
+// Right now we seem to have both?
 @synthesize chipWorkQueue = _chipWorkQueue;
 @synthesize controllerDataStore = _controllerDataStore;
+// TODO: For these remaining ivars, figure out whether they should live here or
+// on the superclass. Should not be both.
 @synthesize factory = _factory;
-@synthesize deviceMapLock = _deviceMapLock;
 @synthesize otaProviderDelegate = _otaProviderDelegate;
 @synthesize otaProviderDelegateQueue = _otaProviderDelegateQueue;
 @synthesize commissionableBrowser = _commissionableBrowser;
@@ -165,7 +178,7 @@ using namespace chip::Tracing::DarwinFramework;
         MTR_LOG_DEBUG("%s: got standard parameters, getting standard device controller from factory", __PRETTY_FUNCTION__);
         auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
-        // or, if necessary, MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+        // Start us up normally. MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary.
         MTRDeviceControllerFactory * factory = MTRDeviceControllerFactory.sharedInstance;
         id controller = [factory initializeController:self
                                        withParameters:controllerParameters
@@ -196,6 +209,12 @@ using namespace chip::Tracing::DarwinFramework;
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
         _uniqueIdentifier = uniqueIdentifier;
+
+        // Setup assertion variables
+        _keepRunningAssertionCounter = 0;
+        _shutdownPending = NO;
+        _assertionLock = OS_UNFAIR_LOCK_INIT;
+
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
                 MTR_LOG_ERROR("storageDelegate provided without storageDelegateQueue");
@@ -269,6 +288,7 @@ using namespace chip::Tracing::DarwinFramework;
         _otaProviderDelegateQueue = otaProviderDelegateQueue;
         _chipWorkQueue = queue;
         _factory = factory;
+        // TODO: Shouldn't nodeIDToDeviceMap just be set up by initForSubclasses?
         self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
@@ -310,6 +330,10 @@ using namespace chip::Tracing::DarwinFramework;
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
 
         _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
@@ -326,8 +350,68 @@ using namespace chip::Tracing::DarwinFramework;
     return _cppCommissioner != nullptr;
 }
 
+- (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
+{
+    if (!operationalCertificate || !rootCertificate) {
+        return FALSE;
+    }
+    NSNumber * nodeID = [MTRDeviceControllerParameters nodeIDFromNOC:operationalCertificate];
+    NSNumber * fabricID = [MTRDeviceControllerParameters fabricIDFromNOC:operationalCertificate];
+    NSData * publicKey = [MTRDeviceControllerParameters publicKeyFromCertificate:rootCertificate];
+
+    std::lock_guard lock(_assertionLock);
+
+    // If any of the local above are nil, the return will be false since MTREqualObjects handles them correctly
+    return _keepRunningAssertionCounter > 0 && _shutdownPending && MTREqualObjects(nodeID, self.nodeID) && MTREqualObjects(fabricID, self.fabricID) && MTREqualObjects(publicKey, self.rootPublicKey);
+}
+
+- (void)addRunAssertion
+{
+    std::lock_guard lock(_assertionLock);
+
+    // Only take an assertion if running
+    if ([self isRunning]) {
+        ++_keepRunningAssertionCounter;
+        MTR_LOG("%@ Adding keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+    }
+}
+
+- (void)removeRunAssertion;
+{
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        --_keepRunningAssertionCounter;
+        MTR_LOG("%@ Removing keep running assertion, total %lu", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+
+        if ([self isRunning] && _keepRunningAssertionCounter == 0 && _shutdownPending) {
+            MTR_LOG("%@ All assertions removed and shutdown is pending, shutting down", self);
+            [self finalShutdown];
+        }
+    }
+}
+
+- (void)clearPendingShutdown
+{
+    std::lock_guard lock(_assertionLock);
+    _shutdownPending = NO;
+}
+
 - (void)shutdown
 {
+    std::lock_guard lock(_assertionLock);
+
+    if (_keepRunningAssertionCounter > 0) {
+        MTR_LOG("%@ Pending shutdown since %lu assertions are present", self, static_cast<unsigned long>(_keepRunningAssertionCounter));
+        _shutdownPending = YES;
+        return;
+    }
+    [self finalShutdown];
+}
+
+- (void)finalShutdown
+{
+    os_unfair_lock_assert_owner(&_assertionLock);
     MTR_LOG("%@ shutdown called", self);
     if (_cppCommissioner == nullptr) {
         // Already shut down.
@@ -383,11 +467,17 @@ using namespace chip::Tracing::DarwinFramework;
         // shutdown completes, in case it wants to write to storage as it
         // shuts down.
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+        _storedCompressedFabricID = std::nullopt;
+        self.nodeID = nil;
+        self.fabricID = nil;
+        self.rootPublicKey = nil;
+
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
             _operationalCredentialsDelegate->SetDeviceCommissioner(nullptr);
         }
     }
+    _shutdownPending = NO;
 }
 
 - (void)deinitFromFactory
@@ -622,6 +712,15 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         self->_storedFabricIndex = fabricIdx;
+        self->_storedCompressedFabricID = _cppCommissioner->GetCompressedFabricId();
+
+        chip::Crypto::P256PublicKey rootPublicKey;
+        if (_cppCommissioner->GetRootPublicKey(rootPublicKey) == CHIP_NO_ERROR) {
+            self.rootPublicKey = [NSData dataWithBytes:rootPublicKey.Bytes() length:rootPublicKey.Length()];
+            self.nodeID = @(_cppCommissioner->GetNodeId());
+            self.fabricID = @(_cppCommissioner->GetFabricId());
+        }
+
         commissionerInitialized = YES;
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
@@ -669,7 +768,7 @@ using namespace chip::Tracing::DarwinFramework;
             });
         }];
     }
-    MTR_LOG("%s: startup: %@", __PRETTY_FUNCTION__, self);
+    MTR_LOG("%@ startup: %@", NSStringFromClass(self.class), self);
 
     return YES;
 }
@@ -1279,6 +1378,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return YES;
 }
 
+// TODO: Figure out whether this should live here or in superclass; we shouldn't
+// have two copies of this thing.  Probably after removing code from the
+// superclass that should not be there.
 + (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
 {
     if (CHIP_NO_ERROR == errorCode) {
@@ -1472,20 +1574,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (nullable NSNumber *)compressedFabricID
 {
-    assertChipStackLockedByCurrentThread();
-
-    if (!_cppCommissioner) {
-        return nil;
-    }
-
-    return @(_cppCommissioner->GetCompressedFabricId());
-}
-
-- (NSNumber * _Nullable)syncGetCompressedFabricID
-{
-    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
-        return [self compressedFabricID];
-    } error:nil];
+    auto storedValue = _storedCompressedFabricID.load();
+    return storedValue.has_value() ? @(storedValue.value()) : nil;
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
