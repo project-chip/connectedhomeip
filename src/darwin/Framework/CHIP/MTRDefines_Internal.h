@@ -132,7 +132,6 @@ typedef struct {} variable_hidden_by_mtr_hide;
 #endif
 #endif
 
-
 #ifndef MTR_REMOVE_ATTRIBUTE
 #define MTR_REMOVE_ATTRIBUTE(ATTRIBUTE, DICTIONARY)                                            \
     if (ATTRIBUTE != nil && DICTIONARY) {                                                      \
