@@ -14,7 +14,9 @@ DEFAULT_BRIDGE_CHOICES=(
     "./fabric-bridge-app"
     "out/debug/standalone/fabric-bridge-app"
     "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/linux-x64-fabric-bridge-rpc-no-ble/fabric-bridge-app"    
     "out/darwin-arm64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/darwin-arm64-fabric-bridge-rpc-no-ble/fabric-bridge-app"    
 )
 FABRIC_ADMIN_LOG="/tmp/fabric_admin.log"
 FABRIC_BRIDGE_APP_LOG="/tmp/fabric_bridge_app.log"
