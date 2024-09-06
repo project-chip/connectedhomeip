@@ -96,6 +96,9 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
+
+    static uint32_t mTotalOperationalHours;
+    static void TotalOperationalHoursTimerCallback(TimerHandle_t timer);
 };
 
 /**
