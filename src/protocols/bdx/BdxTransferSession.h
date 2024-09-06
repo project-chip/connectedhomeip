@@ -168,16 +168,14 @@ public:
     /**
      * @brief
      *   Gets the pending output event from the transfer session in the event param passed in by the caller.
-     *   The output event may contain some data for the caller to act upon.
+     *   The output event may contain some data for the caller to act upon. If there is no pending output event,
+     *   the caller will get an event of type - OutputEventType::kNone.
      *
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
-     *   TransferSession object and so we need to call this until we get an event of type - OutputEventType::kNone
+     *   TransferSession object and the caller needs to call this until we get an event of type - OutputEventType::kNone
      *
      *   If the output event type is kMsgToSend, the caller is expected to send the message immediately on the
      *   relevant exchange.  In this case the BDX session timeout timer will start when GetNextAction is called.
-     *
-     *   For all other event types, the caller is expected to pass the event to HandleTransferSessionOutput to handle the BDX
-     *   message or any other TransferSession event.
      *
      *   See OutputEventType for all possible output event types.
      *
