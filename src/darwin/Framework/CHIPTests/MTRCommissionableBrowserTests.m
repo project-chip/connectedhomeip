@@ -17,9 +17,9 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // Fixture 1: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
@@ -30,8 +30,6 @@ static const __auto_type kTestProductIds = @[ @(0x8000u), @(0x8001u) ];
 static const __auto_type kTestDiscriminators = @[ @(2000), @(3839u), @(3840u) ];
 static const uint16_t kDiscoverDeviceTimeoutInSeconds = 10;
 static const uint16_t kExpectedDiscoveredDevicesCount = 3;
-
-static bool sHelperAppsStarted = false;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
@@ -180,6 +178,17 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     XCTAssertNotNil(controller);
 
     sController = controller;
+
+    // Start the helper apps our tests use.
+    for (NSString * payload in @[
+             @"MT:Y.K90SO527JA0648G00",
+             @"MT:-24J0AFN00I40648G00",
+         ]) {
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:payload];
+        XCTAssertTrue(started);
+    }
 }
 
 + (void)tearDown
@@ -197,21 +206,6 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 - (void)setUp
 {
     [super setUp];
-
-    if (!sHelperAppsStarted) {
-        for (NSString * payload in @[
-                 @"MT:Y.K90SO527JA0648G00",
-                 @"MT:-24J0AFN00I40648G00",
-             ]) {
-            __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initCrossTestWithAppName:@"all-clusters"
-                                                                                     arguments:@[]
-                                                                                       payload:payload
-                                                                                      testcase:self];
-            XCTAssertNotNil(appRunner);
-        }
-        sHelperAppsStarted = true;
-    }
-
     [self setContinueAfterFailure:NO];
 }
 
