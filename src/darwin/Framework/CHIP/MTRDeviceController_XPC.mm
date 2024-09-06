@@ -52,7 +52,7 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
 
     NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRCommandPath class], [MTRAttributePath class]
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRCommandPath class], [MTRAttributePath class], [NSDate class],
     ]];
 
     [interface setClasses:allowedClasses
@@ -66,7 +66,7 @@
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRAttributePath class]
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRAttributePath class], [NSDate class],
     ]];
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedAttributeReport:)

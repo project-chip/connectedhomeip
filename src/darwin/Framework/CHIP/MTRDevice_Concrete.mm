@@ -98,8 +98,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -466,24 +466,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSDictionary *)_internalProperties
 {
-    id vidOrUnknown, pidOrUnknown;
+    NSMutableDictionary * properties = [NSMutableDictionary dictionary];
+    std::lock_guard lock(_descriptionLock);
 
-    {
-        std::lock_guard lock(_descriptionLock);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger: _internalDeviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt: _lastSubscriptionAttemptWaitForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
-        vidOrUnknown = _vid ?: @"Unknown";
-        pidOrUnknown = _pid ?: @"Unknown";
-        //    id networkFeatures = _allNetworkFeatures;
-        //    id internalDeviceState = _internalDeviceStateForDescription;
-        //    id lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
-        //    id mostRecentReportTime = _mostRecentReportTimeForDescription;
-        //    id lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
-    }
-
-    return @{
-        kMTRDeviceInternalPropertyKeyVendorID : vidOrUnknown,
-        kMTRDeviceInternalPropertyKeyProductID : pidOrUnknown,
-    };
+    return properties;
 }
 
 - (void)_notifyDelegateOfPrivateInternalPropertiesChanges
