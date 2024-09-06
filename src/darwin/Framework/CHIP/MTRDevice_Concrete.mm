@@ -254,8 +254,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) ReadClient * currentReadClient;
 @property (nonatomic) SubscriptionCallback * currentSubscriptionCallback; // valid when and only when currentReadClient is valid
 
-@property (nonatomic, weak) id<MTRXPCClientProtocol_MTRDevice> privateInternalStateDelegate;
-
 @end
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -468,31 +466,28 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSDictionary *)_internalProperties
 {
-    id vidOrUnknown, pidOrUnknown;
+    NSMutableDictionary * properties = [NSMutableDictionary dictionary];
+    std::lock_guard lock(_descriptionLock);
 
-    {
-        std::lock_guard lock(_descriptionLock);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWaitForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
 
-        vidOrUnknown = _vid ?: @"Unknown";
-        pidOrUnknown = _pid ?: @"Unknown";
-        //    id networkFeatures = _allNetworkFeatures;
-        //    id internalDeviceState = _internalDeviceStateForDescription;
-        //    id lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
-        //    id mostRecentReportTime = _mostRecentReportTimeForDescription;
-        //    id lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
-    }
-
-    return @{
-        kMTRDeviceInternalPropertyKeyVendorID : vidOrUnknown,
-        kMTRDeviceInternalPropertyKeyProductID : pidOrUnknown,
-    };
+    return properties;
 }
 
-- (void)_notifyPrivateInternalPropertiesDelegateOfChanges
+- (void)_notifyDelegateOfPrivateInternalPropertiesChanges
 {
-    if ([self.privateInternalStateDelegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
-        [self.privateInternalStateDelegate device:self.nodeID internalStateUpdated:[self _internalProperties]];
-    }
+    os_unfair_lock_assert_owner(&self->_lock);
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
+            [delegate performSelector:@selector(device:internalStateUpdated:) withObject:self withObject:[self _internalProperties]];
+        }
+    }];
 }
 
 #pragma mark - Time Synchronization
@@ -769,6 +764,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
         }
     }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)invalidate
@@ -992,7 +989,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }];
         /* END DRAGONS */
 
-        [self _notifyPrivateInternalPropertiesDelegateOfChanges];
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
 }
 
@@ -1194,7 +1191,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     deviceUsesThread = [self _deviceUsesThread];
 
     // If a previous resubscription failed, remove the item from the subscription pool.
@@ -1245,7 +1242,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
     }
 
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
@@ -1266,7 +1263,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1324,6 +1321,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
     }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
@@ -1521,7 +1519,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
     }
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 #endif
 
@@ -1580,7 +1578,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
     }
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
@@ -1627,6 +1624,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
 
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+
     // Do not schedule persistence if device is reporting excessively
     if ([self _deviceIsReportingExcessively]) {
         return;
@@ -1651,7 +1650,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = nil;
     }
-    [self _notifyPrivateInternalPropertiesDelegateOfChanges];
 
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
@@ -1660,6 +1658,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if ([self _dataStoreExists]) {
         [self _persistClusterData];
     }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
@@ -1713,6 +1713,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }];
 #endif
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesAttributePath:(MTRAttributePath *)attributePath
