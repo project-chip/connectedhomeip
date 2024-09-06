@@ -173,8 +173,10 @@ public:
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
      *   TransferSession object and so we need to call this until we get an event of type - OutputEventType::kNone
      *
-     *   Note that if the event type is kMsgToSend, the caller is expected to send the message immediately over the
-     *   exchange otherwise the caller is expected to pass the event to HandleTransferSessionOutput to handle the BDX
+     *   If the output event type is kMsgToSend, the caller is expected to send the message immediately on the
+     *   relevant exchange.  In this case the BDX session timeout timer will start when GetNextAction is called.
+     *
+     *   For all other event types, the caller is expected to pass the event to HandleTransferSessionOutput to handle the BDX
      *   message or any other TransferSession event.
      *
      *   See OutputEventType for all possible output event types.
