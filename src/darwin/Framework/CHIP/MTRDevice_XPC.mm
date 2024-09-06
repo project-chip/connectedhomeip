@@ -44,6 +44,7 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -82,6 +83,8 @@
 
 @implementation MTRDevice_XPC
 
+@synthesize _internalState;
+
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // TODO: Verify that this is a valid MTRDeviceController_XPC?
@@ -93,6 +96,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [self _setInternalState:nil];
+}
+
 - (NSString *)description
 {
     // TODO: Figure out whether, and if so how, to log: VID, PID, WiFi, Thread,
@@ -100,7 +108,27 @@
     // subscription attempt wait (does that apply to us?) queued work (do we
     // have any?), last report, last subscription failure (does that apply to us?).
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, XPC: YES, node: %016llX-%016llX (%llu), controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _deviceController.uniqueIdentifier];
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, [self _vid], [self _pid], _deviceController.uniqueIdentifier];
+}
+
+- (nullable NSNumber *)_internalStateNumberOrNilForKey:(NSString *)key
+{
+    if ([_internalState[key] isKindOfClass:NSNumber.class]) {
+        NSNumber * number = _internalState[key];
+        return number;
+    } else {
+        return nil;
+    }
+}
+
+- (nullable NSNumber *)_vid
+{
+    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyVendorID];
+}
+
+- (nullable NSNumber *)_pid
+{
+    return [self _internalStateNumberOrNilForKey:kMTRDeviceInternalPropertyKeyProductID];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)

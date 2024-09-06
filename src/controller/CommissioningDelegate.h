@@ -79,9 +79,10 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
-    kPrimaryOperationalNetworkFailed, ///< Indicate that the primary operational network (on root endpoint) failed, should disable
-                                      ///< the primary network interface later.
-    kDisablePrimaryNetworkInterface,  ///< Send InterfaceEnabled write request to the device to disable network interface.
+    kPrimaryOperationalNetworkFailed, ///< Indicate that the primary operational network (on root endpoint) failed, should remove
+                                      ///< the primary network config later.
+    kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
+    kRemoveThreadNetworkConfig        ///< Remove Thread network config.
 };
 
 enum class ICDRegistrationStrategy : uint8_t
