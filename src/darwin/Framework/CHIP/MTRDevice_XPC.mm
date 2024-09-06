@@ -187,8 +187,9 @@
     }];
 }
 
-- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary {
-    [self _setInternalState: dictionary];
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    [self _setInternalState:dictionary];
     MTR_LOG("%@ internal state updated", self);
 }
 
