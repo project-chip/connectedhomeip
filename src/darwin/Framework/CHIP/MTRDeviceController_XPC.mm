@@ -193,15 +193,8 @@
             }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
         }
 
-        __block BOOL barrierComplete = NO;
-
-        [self.xpcConnection scheduleSendBarrierBlock:^{
-            barrierComplete = YES;
-            MTR_LOG("%@: Barrier complete: %d", self, barrierComplete);
-        }];
-
-        MTR_LOG("%@ Done existing NodeID Registration, barrierComplete: %d", self, barrierComplete);
-        self.xpcConnectedOrConnecting = barrierComplete;
+        MTR_LOG("%@ Done existing NodeID Registration", self);
+        self.xpcConnectedOrConnecting = YES;
     } else {
         MTR_LOG_ERROR("%@ Failed to set up XPC Connection", self);
         self.xpcConnectedOrConnecting = NO;
