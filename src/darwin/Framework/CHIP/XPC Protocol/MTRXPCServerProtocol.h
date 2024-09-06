@@ -70,9 +70,6 @@ MTR_NEWLY_AVAILABLE
 //- (oneway void)deviceController:(NSUUID *)controller removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
 - (oneway void)deviceController:(NSUUID *)controller shutdownDeviceController:(NSUUID *)controller;
-
-@optional
-// register / unregister temporarily optional to avoid lockstep needs
 - (oneway void)deviceController:(NSUUID *)controller registerNodeID:(NSNumber *)nodeID;
 - (oneway void)deviceController:(NSUUID *)controller unregisterNodeID:(NSNumber *)nodeID;
 

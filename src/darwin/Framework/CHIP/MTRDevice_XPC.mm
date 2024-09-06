@@ -187,6 +187,11 @@
     }];
 }
 
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary {
+    [self _setInternalState: dictionary];
+    MTR_LOG("%@ internal state updated", self);
+}
+
 #pragma mark - Remote Commands
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
