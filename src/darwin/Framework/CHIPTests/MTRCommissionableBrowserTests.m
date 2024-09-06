@@ -17,9 +17,9 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // Fixture 1: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1

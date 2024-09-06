@@ -24,12 +24,12 @@
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
-#import "MTRTestServerAppRunner.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;

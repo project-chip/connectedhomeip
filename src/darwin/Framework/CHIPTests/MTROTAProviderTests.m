@@ -20,10 +20,10 @@
 
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // system dependencies

@@ -16,7 +16,7 @@
 
 #import <Matter/Matter.h>
 
-#import "MTRTestServerAppRunner.h"
+#import "MTRTestCase+ServerAppRunner.h"
 
 static unsigned sAppRunnerIndex = 1;
 

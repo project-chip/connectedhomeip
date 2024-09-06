@@ -19,9 +19,9 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
