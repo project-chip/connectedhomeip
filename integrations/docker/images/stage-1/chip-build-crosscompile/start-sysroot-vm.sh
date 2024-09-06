@@ -80,7 +80,13 @@ qemu-img create -b "$CLOUD_IMAGE_FILE" -f qcow2 -F qcow2 sysrootsrv.img 10G
 # local user allowed to SSH in to the host directly without a password
 SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
 
-# set a login password
+# set a login password.
+# NOTE: this is a VERY WEAK password, however this should be ok because
+#       this is a local and temporary virtual machine that is NOT accessible
+#       anywhere except through the redirected port 5555 on localhost or
+#       via "virsh console" (which is the primary purpose for it: debugging)
+#
+# This is NOT meant as a persistent vm and should be deleted after use.
 PASSWORD_HASH=$(mkpasswd 1234)
 
 # Create cloud init files
