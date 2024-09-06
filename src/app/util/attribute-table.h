@@ -61,6 +61,10 @@ struct EmberAfWriteDataInput
 /**
  * @brief write an attribute, performing all the checks.
  *
+ * TODO: what are "all the checks"? There are limitations below
+ *       and generally input data pointer does not even have a size,
+ *       hence data validity check capabilities seem limited.
+ *
  * This function will attempt to write the attribute value from
  * the provided pointer. This function will only check that the
  * attribute exists. If it does it will write the value into
