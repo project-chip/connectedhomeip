@@ -34,6 +34,17 @@ class NxpOsUsed(Enum):
         else:
             raise Exception('Unknown OS type: %r' % self)
 
+class NxpBuildSystem(Enum):
+    GN = auto()
+    CMAKE = auto()
+
+    def BuildSystem(self):
+        if self == NxpBuildSystem.GN:
+            return 'gn'
+        elif self == NxpBuildSystem.CMAKE:
+            return 'cmake'
+        else:
+            raise Exception('Unknown build system: %r' % self)
 
 class NxpBoard(Enum):
     K32W0 = auto()
@@ -128,6 +139,7 @@ class NxpBuilder(GnBuilder):
                  app: NxpApp = NxpApp.LIGHTING,
                  board: NxpBoard = NxpBoard.K32W0,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
+                 build_system: NxpBuildSystem = NxpBuildSystem.GN,
                  low_power: bool = False,
                  smu2: bool = False,
                  enable_factory_data: bool = False,
@@ -153,6 +165,7 @@ class NxpBuilder(GnBuilder):
         self.app = app
         self.board = board
         self.os_env = os_env
+        self.build_system = build_system
         self.low_power = low_power
         self.smu2 = smu2
         self.enable_factory_data = enable_factory_data
@@ -227,6 +240,7 @@ class NxpBuilder(GnBuilder):
 
     def CmakeBuildFlags(self):
         flags = []
+
         if self.enable_factory_data:
             if self.os_env == NxpOsUsed.ZEPHYR:
                 flags.append('-DFILE_SUFFIX=fdata')
@@ -314,7 +328,7 @@ class NxpBuilder(GnBuilder):
                     elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
 
-            if self.board == NxpBoard.RW61X:
+            if self.build_system == NxpBuildSystem.CMAKE:
                 cmd += '''
                 cmake -GNinja {build_flags} -H{example_folder} -B{out_folder}
                 '''.format(
@@ -323,7 +337,7 @@ class NxpBuilder(GnBuilder):
                     out_folder=self.output_dir).strip()
                 self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
-            else:
+            elif self.build_system == NxpBuildSystem.GN:
                 # add empty space at the end to avoid concatenation issue when there is no --args
                 cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
 
@@ -359,10 +373,19 @@ class NxpBuilder(GnBuilder):
                     os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
                     f'{name}.map')
         else:
-            yield BuilderOutput(
-                os.path.join(self.output_dir, name),
-                f'{name}.elf')
-            if self.options.enable_link_map_file:
+            if self.build_system == NxpBuildSystem.GN:
                 yield BuilderOutput(
-                    os.path.join(self.output_dir, f'{name}.map'),
-                    f'{name}.map')
+                    os.path.join(self.output_dir, name),
+                    f'{name}.elf')
+                if self.options.enable_link_map_file:
+                    yield BuilderOutput(
+                        os.path.join(self.output_dir, f'{name}.map'),
+                        f'{name}.map')
+            elif self.build_system == NxpBuildSystem.CMAKE:
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, 'out/debug', name),
+                    f'{name}.elf')
+                if self.options.enable_link_map_file:
+                    yield BuilderOutput(
+                        os.path.join(self.output_dir, 'out/debug', f'{name}.map'),
+                        f'{name}.map')
