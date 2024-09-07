@@ -122,13 +122,7 @@ template("pkg_config") {
     }
 
     # pkgresult = [present, includes, cflags, libs, lib_dirs]
-    args += [ "--static" ]
     pkgresult = exec_script(pkg_config_script, args, "value")
-    print(" ")
-    print("target_name $target_name")
-    print("pkgresult $pkgresult")
-    print(" ")
-
     if (pkgresult[0]) {
       cflags = pkgresult[2]
 
@@ -141,22 +135,15 @@ template("pkg_config") {
         lib_dirs = pkgresult[4]
       }
 
-      pkgresult_static = exec_script(pkg_config_script, args, "value")
-      print(" ")
-      print("target_name $target_name")
-      print("pkgresult_static $pkgresult_static")
-      print(" ")
-
       # Link libraries statically for OSS-Fuzz fuzzer build
       if (oss_fuzz) {
+        #outputs libs needed for static linking (direct + transitive/non-direct libs), we will re-execute the script to get those libs
+        args += [ "--static" ]
         pkgresult_static = exec_script(pkg_config_script, args, "value")
-        print(" ")
-        print("target_name $target_name")
-        print("pkgresult_static $pkgresult_static")
-        print(" ")
         libs = []
         ldflags = [ "-Wl,-Bstatic" ]
         foreach(lib, pkgresult_static[3]) {
+          #dl(dynamic loading) lib is not needed for linking statically and its presence triggers errors.
           if (lib != "dl") {
             ldflags += [ "-l$lib" ]
           }
