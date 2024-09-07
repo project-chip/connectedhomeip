@@ -720,7 +720,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
     // We should not allow a subscription for suspended controllers or device controllers over XPC.
-    return _deviceController.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
@@ -1249,7 +1249,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&_lock);
 
-    if (_deviceController.suspended) {
+    if (_deviceController.isSuspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
         return;
     }

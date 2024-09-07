@@ -134,7 +134,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
 
     BOOL _suspended;
-    os_unfair_lock _suspensionLock;
 
     // Counters to track assertion status and access controlled by the _assertionLock
     NSUInteger _keepRunningAssertionCounter;
@@ -159,11 +158,11 @@ using namespace chip::Tracing::DarwinFramework;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
-    _suspended = startSuspended;
     // All synchronous suspend/resume activity has to be protected by
-    // _suspensionLock, so that parts of suspend/resume can't interleave with
-    // each other.
-    _suspensionLock = OS_UNFAIR_LOCK_INIT;
+    // @synchronized(self), so that parts of suspend/resume can't
+    // interleave with each other. Using @synchronized here because
+    // MTRDevice may call isSuspended.
+    _suspended = startSuspended;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
@@ -210,7 +209,6 @@ using namespace chip::Tracing::DarwinFramework;
         _assertionLock = OS_UNFAIR_LOCK_INIT;
 
         _suspended = startSuspended;
-        _suspensionLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -352,51 +350,44 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
-    std::lock_guard lock(_suspensionLock);
-    return _suspended;
+    @synchronized (self) {
+        return _suspended;
+    }
 }
 
 - (void)suspend
 {
     MTR_LOG("%@ suspending", self);
 
-    std::lock_guard lock(_suspensionLock);
+    @synchronized (self) {
+        _suspended = YES;
 
-    _suspended = YES;
-
-    NSEnumerator * devices;
-    {
         std::lock_guard lock(*self.deviceMapLock);
-        devices = [self.nodeIDToDeviceMap objectEnumerator];
-    }
+        NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+        for (MTRDevice * device in devices) {
+            [device controllerSuspended];
+        }
 
-    for (MTRDevice * device in devices) {
-        [device controllerSuspended];
+        // TODO: In the concrete class, consider what should happen with:
+        //
+        // * Active commissioning sessions (presumably close them?)
+        // * CASE sessions in general.
+        // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
     }
-
-    // TODO: In the concrete class, consider what should happen with:
-    //
-    // * Active commissioning sessions (presumably close them?)
-    // * CASE sessions in general.
-    // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
 }
 
 - (void)resume
 {
     MTR_LOG("%@ resuming", self);
 
-    std::lock_guard lock(_suspensionLock);
+    @synchronized (self) {
+        _suspended = NO;
 
-    _suspended = NO;
-
-    NSEnumerator * devices;
-    {
         std::lock_guard lock(*self.deviceMapLock);
-        devices = [self.nodeIDToDeviceMap objectEnumerator];
-    }
-
-    for (MTRDevice * device in devices) {
-        [device controllerResumed];
+        NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+        for (MTRDevice * device in devices) {
+            [device controllerResumed];
+        }
     }
 }
 
