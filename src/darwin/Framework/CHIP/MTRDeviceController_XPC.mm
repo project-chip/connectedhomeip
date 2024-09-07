@@ -45,7 +45,8 @@
 
 @implementation MTRDeviceController_XPC
 
-+ (NSMutableSet *)_allowedClasses {
++ (NSMutableSet *)_allowedClasses
+{
     static NSArray * sBaseAllowedClasses = @[
         [NSString class],
         [NSNumber class],
@@ -56,7 +57,7 @@
         [NSDate class],
     ];
 
-    return [NSMutableSet setWithArray: sBaseAllowedClasses];
+    return [NSMutableSet setWithArray:sBaseAllowedClasses];
 }
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
@@ -66,7 +67,7 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
 
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
         [MTRAttributePath class]
     ]];
@@ -83,7 +84,7 @@
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTRAttributePath class]
     ]];
 
@@ -93,7 +94,7 @@
                   ofReply:NO];
 
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTREventPath class]
     ]];
 
