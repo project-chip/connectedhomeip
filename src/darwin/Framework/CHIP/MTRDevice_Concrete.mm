@@ -724,11 +724,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for device controllers over XPC.
-    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription for suspended controllers or device controllers over XPC.
+    return _deviceController.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateAdded];
+
+    [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
+}
+
+- (void)_ensureSubscriptionForExistingDelegates:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -754,10 +763,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
+            [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
         }
     }
 }
@@ -1242,6 +1251,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     os_unfair_lock_assert_owner(&_lock);
+
+    if (_deviceController.suspended) {
+        MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        return;
+    }
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
@@ -4000,6 +4014,34 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return result;
+}
+
+- (void)controllerSuspended
+{
+    [super controllerSuspended];
+
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Controller suspended"];
+
+    // Ensure that any pre-existing resubscribe attempts we control don't try to
+    // do anything.
+    _reattemptingSubscription = NO;
+}
+
+- (void)controllerResumed
+{
+    [super controllerResumed];
+
+    std::lock_guard lock(self->_lock);
+
+    if (![self _delegateExists]) {
+        MTR_LOG("%@ ignoring controller resume: no delegates", self);
+        return;
+    }
+
+    // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
+    // will go through the pool as needed, not necessarily happen immediately.
+    [self _ensureSubscriptionForExistingDelegates:@"Controller resumed"];
 }
 
 @end
