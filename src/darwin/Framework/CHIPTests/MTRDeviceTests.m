@@ -4323,11 +4323,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ gotReportEnd ] timeout:60];
 
-    XCTAssertEqual(attributesReceived, 36);
-
     NSArray * allAttributesReport = [device getAllAttributesReport];
 
-    XCTAssertEqual(allAttributesReport.count, 36);
+    XCTAssertEqual(allAttributesReport.count, attributeReport.count);
+
+    for (NSDictionary<NSString *, id> *newResponseValueDict in allAttributesReport) {
+        MTRAttributePath *newPath = newResponseValueDict[MTRAttributePathKey];
+        NSDictionary<NSString *, id> *newDataValueDict = newResponseValueDict[MTRDataKey];
+        NSNumber *newValue = newDataValueDict[MTRValueKey];
+        XCTAssertNotNil(newValue);
+
+        for (NSDictionary<NSString *, id> *originalResponseValueDict in attributeReport) {
+            MTRAttributePath *originalPath = originalResponseValueDict[MTRAttributePathKey];
+            // Find same attribute path and compare value
+            if ([newPath isEqual:originalPath]) {
+                NSDictionary<NSString *, id> *originalDataValueDict = originalResponseValueDict[MTRDataKey];
+                NSNumber *originalValue = originalDataValueDict[MTRValueKey];
+                XCTAssertNotNil(originalValue);
+                XCTAssertEqualObjects(newValue, originalValue);
+                continue;
+            }
+        }
+    }
 }
 
 @end
