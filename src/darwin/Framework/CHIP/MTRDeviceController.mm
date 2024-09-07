@@ -350,7 +350,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
-    @synchronized (self) {
+    @synchronized(self) {
         return _suspended;
     }
 }
@@ -359,10 +359,10 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_LOG("%@ suspending", self);
 
-    @synchronized (self) {
+    @synchronized(self) {
         _suspended = YES;
 
-        NSMutableArray *devicesToSuspend = [NSMutableArray array];
+        NSMutableArray * devicesToSuspend = [NSMutableArray array];
         {
             std::lock_guard lock(*self.deviceMapLock);
             NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
@@ -387,10 +387,10 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_LOG("%@ resuming", self);
 
-    @synchronized (self) {
+    @synchronized(self) {
         _suspended = NO;
 
-        NSMutableArray *devicesToResume = [NSMutableArray array];
+        NSMutableArray * devicesToResume = [NSMutableArray array];
         {
             std::lock_guard lock(*self.deviceMapLock);
             NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
