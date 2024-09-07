@@ -4327,18 +4327,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTAssertEqual(allAttributesReport.count, attributeReport.count);
 
-    for (NSDictionary<NSString *, id> *newResponseValueDict in allAttributesReport) {
-        MTRAttributePath *newPath = newResponseValueDict[MTRAttributePathKey];
-        NSDictionary<NSString *, id> *newDataValueDict = newResponseValueDict[MTRDataKey];
-        NSNumber *newValue = newDataValueDict[MTRValueKey];
+    for (NSDictionary<NSString *, id> * newResponseValueDict in allAttributesReport) {
+        MTRAttributePath * newPath = newResponseValueDict[MTRAttributePathKey];
+        NSDictionary<NSString *, id> * newDataValueDict = newResponseValueDict[MTRDataKey];
+        NSNumber * newValue = newDataValueDict[MTRValueKey];
         XCTAssertNotNil(newValue);
 
-        for (NSDictionary<NSString *, id> *originalResponseValueDict in attributeReport) {
-            MTRAttributePath *originalPath = originalResponseValueDict[MTRAttributePathKey];
+        for (NSDictionary<NSString *, id> * originalResponseValueDict in attributeReport) {
+            MTRAttributePath * originalPath = originalResponseValueDict[MTRAttributePathKey];
             // Find same attribute path and compare value
             if ([newPath isEqual:originalPath]) {
-                NSDictionary<NSString *, id> *originalDataValueDict = originalResponseValueDict[MTRDataKey];
-                NSNumber *originalValue = originalDataValueDict[MTRValueKey];
+                NSDictionary<NSString *, id> * originalDataValueDict = originalResponseValueDict[MTRDataKey];
+                NSNumber * originalValue = originalDataValueDict[MTRValueKey];
                 XCTAssertNotNil(originalValue);
                 XCTAssertEqualObjects(newValue, originalValue);
                 continue;

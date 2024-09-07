@@ -3500,8 +3500,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Construct response-value dictionary with the data-value dictionary returned by
             // _lockedAttributeValueDictionaryForAttributePath, to takes into consideration expected values as well.
             [attributeReport addObject:@{
-                MTRAttributePathKey: attributePath,
-                MTRDataKey: [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
             }];
         }
     }
