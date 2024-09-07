@@ -17,7 +17,6 @@
  */
 #include <app-common/zap-generated/cluster-objects.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -25,7 +24,6 @@ using namespace chip::app::Clusters;
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 #include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
 using namespace chip::app::Clusters::DishwasherAlarm;
-
 
 class DishwasherAlarmDelegate : public Delegate
 {
@@ -146,4 +144,4 @@ void MatterDishwasherAlarmServerInit()
     DishwasherAlarmServer::Instance().SetStateValue(kDemoEndpointId, state);
 }
 
-#endif //MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
+#endif // MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER

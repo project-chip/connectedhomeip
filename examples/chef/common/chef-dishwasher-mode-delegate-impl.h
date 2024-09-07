@@ -82,9 +82,9 @@ void Shutdown();
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
 chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer);
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer);
 chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength);
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength);
 #endif
