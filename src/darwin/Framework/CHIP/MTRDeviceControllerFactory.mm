@@ -961,6 +961,10 @@ MTR_DIRECT_MEMBERS
             _otaProviderDelegateBridge->ControllerShuttingDown(controller);
         }
 
+        if (_diagnosticLogsDownloader != nil) {
+            [_diagnosticLogsDownloader abortDownloadsForController:controller];
+        }
+
         [controller shutDownCppController];
 
         self->_controllerBeingShutDown = nil;
