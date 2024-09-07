@@ -362,9 +362,16 @@ using namespace chip::Tracing::DarwinFramework;
     @synchronized (self) {
         _suspended = YES;
 
-        std::lock_guard lock(*self.deviceMapLock);
-        NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
-        for (MTRDevice * device in devices) {
+        NSMutableArray *devicesToSuspend = [NSMutableArray array];
+        {
+            std::lock_guard lock(*self.deviceMapLock);
+            NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+            for (MTRDevice * device in devices) {
+                [devicesToSuspend addObject:device];
+            }
+        }
+
+        for (MTRDevice * device in devicesToSuspend) {
             [device controllerSuspended];
         }
 
@@ -383,9 +390,16 @@ using namespace chip::Tracing::DarwinFramework;
     @synchronized (self) {
         _suspended = NO;
 
-        std::lock_guard lock(*self.deviceMapLock);
-        NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
-        for (MTRDevice * device in devices) {
+        NSMutableArray *devicesToResume = [NSMutableArray array];
+        {
+            std::lock_guard lock(*self.deviceMapLock);
+            NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+            for (MTRDevice * device in devices) {
+                [devicesToResume addObject:device];
+            }
+        }
+
+        for (MTRDevice * device in devicesToResume) {
             [device controllerResumed];
         }
     }
