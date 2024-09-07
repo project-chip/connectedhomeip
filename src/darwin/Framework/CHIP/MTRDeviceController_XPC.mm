@@ -55,7 +55,7 @@
         [NSError class],
         [NSDate class],
     ];
-    
+
     return [NSMutableSet setWithArray: sBaseAllowedClasses];
 }
 
@@ -64,7 +64,7 @@
 - (NSXPCInterface *)_interfaceForServerProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-    
+
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray: @[
         [MTRCommandPath class],
@@ -75,7 +75,7 @@
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
-    
+
     return interface;
 }
 
@@ -91,7 +91,7 @@
               forSelector:@selector(device:receivedAttributeReport:)
             argumentIndex:1
                   ofReply:NO];
-    
+
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray: @[
         [MTREventPath class]
@@ -101,7 +101,7 @@
               forSelector:@selector(device:receivedEventReport:)
             argumentIndex:1
                   ofReply:NO];
-    
+
     return interface;
 }
 
