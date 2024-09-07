@@ -45,55 +45,63 @@
 
 @implementation MTRDeviceController_XPC
 
-@synthesize uniqueIdentifier = _uniqueIdentifier;
-
-- (NSXPCInterface *)_interfaceForServerProtocol
-{
-    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-
-    NSSet * allowedClasses = [NSSet setWithArray:@[
++ (NSMutableSet *)_allowedClasses {
+    static NSArray * sBaseAllowedClasses = @[
         [NSString class],
         [NSNumber class],
         [NSData class],
         [NSArray class],
         [NSDictionary class],
         [NSError class],
-        [MTRCommandPath class],
-        [MTRAttributePath class],
         [NSDate class],
+    ];
+    
+    return [NSMutableSet setWithArray: sBaseAllowedClasses];
+}
+
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+
+- (NSXPCInterface *)_interfaceForServerProtocol
+{
+    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray: @[
+        [MTRCommandPath class],
+        [MTRAttributePath class]
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
+    
     return interface;
 }
 
 - (NSXPCInterface *)_interfaceForClientProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
-    NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class],
-        [NSNumber class],
-        [NSData class],
-        [NSArray class],
-        [NSDictionary class],
-        [NSError class],
-        [MTRAttributePath class],
-        [NSDate class],
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray: @[
+        [MTRAttributePath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedAttributeReport:)
             argumentIndex:1
                   ofReply:NO];
-    allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTREventPath class]
+    
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray: @[
+        [MTREventPath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedEventReport:)
             argumentIndex:1
                   ofReply:NO];
+    
     return interface;
 }
 
