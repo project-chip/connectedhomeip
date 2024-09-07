@@ -45,7 +45,8 @@
 
 @implementation MTRDeviceController_XPC
 
-+ (NSMutableSet *)_allowedClasses {
++ (NSMutableSet *)_allowedClasses
+{
     static NSArray * sBaseAllowedClasses = @[
         [NSString class],
         [NSNumber class],
@@ -55,8 +56,8 @@
         [NSError class],
         [NSDate class],
     ];
-    
-    return [NSMutableSet setWithArray: sBaseAllowedClasses];
+
+    return [NSMutableSet setWithArray:sBaseAllowedClasses];
 }
 
 @synthesize uniqueIdentifier = _uniqueIdentifier;
@@ -64,9 +65,9 @@
 - (NSXPCInterface *)_interfaceForServerProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-    
+
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
         [MTRAttributePath class]
     ]];
@@ -75,7 +76,7 @@
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
-    
+
     return interface;
 }
 
@@ -83,7 +84,7 @@
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTRAttributePath class]
     ]];
 
@@ -91,9 +92,9 @@
               forSelector:@selector(device:receivedAttributeReport:)
             argumentIndex:1
                   ofReply:NO];
-    
+
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
-    [allowedClasses addObjectsFromArray: @[
+    [allowedClasses addObjectsFromArray:@[
         [MTREventPath class]
     ]];
 
@@ -101,7 +102,7 @@
               forSelector:@selector(device:receivedEventReport:)
             argumentIndex:1
                   ofReply:NO];
-    
+
     return interface;
 }
 
