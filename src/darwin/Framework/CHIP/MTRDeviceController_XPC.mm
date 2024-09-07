@@ -34,7 +34,6 @@
 
 @interface MTRDeviceController_XPC ()
 
-@property (nonatomic, readwrite, retain) NSUUID * uniqueIdentifier;
 @property (nonnull, atomic, readwrite, retain) MTRXPCDeviceControllerParameters * xpcParameters;
 @property (atomic, readwrite, assign) NSTimeInterval xpcRetryTimeInterval;
 @property (atomic, readwrite, assign) BOOL xpcConnectedOrConnecting;
@@ -59,8 +58,6 @@
 
     return [NSMutableSet setWithArray:sBaseAllowedClasses];
 }
-
-@synthesize uniqueIdentifier = _uniqueIdentifier;
 
 - (NSXPCInterface *)_interfaceForServerProtocol
 {
