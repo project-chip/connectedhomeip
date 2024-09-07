@@ -4022,6 +4022,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // For unit test no real data is needed, but timestamp is required
     };
 }
+
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4272,6 +4273,61 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual(eventsReceived3, 9);
     XCTAssertEqual(attributesReceived4, 36);
     XCTAssertEqual(eventsReceived4, 36);
+}
+
+- (void)test039_GetAllAttributesReport
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportEnd = [self expectationWithDescription:@"Report end for delegate"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    __weak __auto_type weakdelegate = delegate;
+    __block NSUInteger attributesReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived += data.count;
+    };
+    delegate.onReportEnd = ^{
+        [gotReportEnd fulfill];
+        __strong __auto_type strongDelegate = weakdelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device addDelegate:delegate queue:queue];
+
+    // Now inject attributes and check that each delegate gets the right set of attributes
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    // Construct 36 attributes with endpoints 1~4, clusters 11 ~ 33, and attributes 111~333
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int attributeID = i * 100 + j * 10 + k;
+                int value = attributeID + 10000;
+                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+            }
+        }
+    }
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    [self waitForExpectations:@[ gotReportEnd ] timeout:60];
+
+    XCTAssertEqual(attributesReceived, 36);
+
+    NSArray * allAttributesReport = [device getAllAttributesReport];
+
+    XCTAssertEqual(allAttributesReport.count, 36);
 }
 
 @end

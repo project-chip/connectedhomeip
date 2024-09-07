@@ -202,6 +202,9 @@ MTR_DIRECT_MEMBERS
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
 
+// Used to generate attribute report that contains all known attributes, taking into consideration expected values
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport;
+
 @end
 
 #pragma mark - MTRDevice internal state monitoring

@@ -1459,6 +1459,17 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+#define MTRDeviceErrorStr "MTRDevice getAllAttributesReport must be handled by subclasses that support it"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return nil;
+}
+
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount
 {
