@@ -272,15 +272,15 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
 
-    uint16_t mRemotePort = 0;
+    uint16_t mRemotePort    = 0;
     uint16_t mDiscriminator = 0;
-    uint32_t mSetupPINCode = 0;
-    uint16_t mIndex = 0;
+    uint32_t mSetupPINCode  = 0;
+    uint16_t mIndex         = 0;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
-    char * mOnboardingPayload = nullptr;
-    uint64_t mDiscoveryFilterCode = 0;
+    char * mOnboardingPayload           = nullptr;
+    uint64_t mDiscoveryFilterCode       = 0;
     char * mDiscoveryFilterInstanceName = nullptr;
 
     bool mDeviceIsICD = false;
