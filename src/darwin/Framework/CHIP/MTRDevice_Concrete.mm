@@ -3511,8 +3511,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                                                        clusterID:clusterPath.cluster
                                                                      attributeID:attributeID];
 
-            // Using _lockedAttributeValueDictionaryForAttributePath because it takes into consideration expected values too
-            [attributeReport addObject:[self _lockedAttributeValueDictionaryForAttributePath:attributePath]];
+            // Construct response-value dictionary with the data-value dictionary returned by
+            // _lockedAttributeValueDictionaryForAttributePath, to takes into consideration expected values as well.
+            [attributeReport addObject:@{
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
+            }];
         }
     }
 
