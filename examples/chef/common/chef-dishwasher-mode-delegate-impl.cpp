@@ -122,7 +122,7 @@ chip::Protocols::InteractionModel::Status chefDishwasherModeWriteCallback(chip::
 
 chip::Protocols::InteractionModel::Status chefDishwasherModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
-                                                                         uint8_t * buffer, uint16_t maxReadLength) 
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
     buffer[0] = gDishwasherModeInstance->GetCurrentMode();
