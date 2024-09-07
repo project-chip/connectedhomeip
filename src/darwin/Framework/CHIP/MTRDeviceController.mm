@@ -352,6 +352,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
+    std::lock_guard lock(_suspensionLock);
     return _suspended;
 }
 
