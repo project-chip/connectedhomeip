@@ -36,16 +36,96 @@ public:
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
-class TestDelegate : public Delegate
+class TestDelegateLevel : public LevelControlDelegate
 {
 public:
-    TestDelegate() {}
-    DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override
+    TestDelegateLevel() {}
+    CHIP_ERROR HandleOpenValve(const Percent targetLevel, Percent & currentLevel, BitMask<ValveFaultBitmap> & valveFault) override
     {
-        return DataModel::NullNullable;
+        lastRequestedLevel = targetLevel;
+        ++numHandleOpenValveCalls;
+        if (simulateAsyncOpen)
+        {
+            currentLevel = targetLevel / 2;
+        }
+        else
+        {
+            currentLevel = targetLevel;
+        }
+        level  = currentLevel;
+        target = targetLevel;
+        if (simulateFailure || simulateValveFaultNoFailure)
+        {
+            valveFault = simulatedFailureBitMask;
+        }
+        if (simulateFailure)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
     }
+    Percent GetCurrentValveLevel() override
+    {
+        // TODO: maybe want to ramp this.
+        level = target;
+        return level;
+    }
+
+    BitMask<ValveFaultBitmap> simulatedFailureBitMask =
+        BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kBlocked) | to_underlying(ValveFaultBitmap::kGeneralFault));
     CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
-    void HandleRemainingDurationTick(uint32_t duration) override {}
+    Percent lastRequestedLevel       = 0;
+    bool simulateFailure             = false;
+    bool simulateValveFaultNoFailure = false;
+    bool simulateAsyncOpen           = false;
+    int numHandleOpenValveCalls      = 0;
+    Percent level                    = 0;
+    Percent target                   = 0;
+};
+
+class TestDelegateNoLevel : public NonLevelControlDelegate
+{
+public:
+    TestDelegateNoLevel() {}
+    CHIP_ERROR HandleOpenValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
+    {
+        ++numHandleOpenValveCalls;
+        if (simulateAsyncOpen)
+        {
+            currentState = ValveStateEnum::kTransitioning;
+        }
+        else
+        {
+            currentState = ValveStateEnum::kOpen;
+        }
+        state  = currentState;
+        target = ValveStateEnum::kOpen;
+        if (simulateFailure || simulateValveFaultNoFailure)
+        {
+            valveFault = simulatedFailureBitMask;
+        }
+        if (simulateFailure)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
+    }
+    ValveStateEnum GetCurrentValveState() override
+    {
+        // Might want to have called more than one time before hitting the target.
+        state = target;
+        return state;
+    }
+
+    BitMask<ValveFaultBitmap> simulatedFailureBitMask =
+        BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kBlocked) | to_underlying(ValveFaultBitmap::kGeneralFault));
+    CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
+    bool simulateFailure             = false;
+    bool simulateValveFaultNoFailure = false;
+    bool simulateAsyncOpen           = false;
+    int numHandleOpenValveCalls      = 0;
+    ValveStateEnum state             = ValveStateEnum::kUnknownEnumValue;
+    ValveStateEnum target            = ValveStateEnum::kUnknownEnumValue;
 };
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestConformanceValid)
@@ -117,7 +197,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestConformanceValid)
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeatures)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     MatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
@@ -173,7 +253,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeature
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures)
 {
-    TestDelegate delegate;
+    TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     MatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
@@ -222,7 +302,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingState)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     MatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
@@ -291,7 +371,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitialized)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     MatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
@@ -319,7 +399,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitiali
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
     MatterContext context(endpoint, storageDelegate);
@@ -411,7 +491,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
     MatterContext context(endpoint, storageDelegate);
@@ -507,7 +587,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWithLevelStep)
 {
-    TestDelegate delegate;
+    TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
     MatterContext context(endpoint, storageDelegate);
@@ -546,6 +626,434 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWith
     EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
     EXPECT_EQ(val8, testVal);
 }
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestWrongDelegates)
+{
+    TestDelegateLevel delegateLevel;
+    TestDelegateNoLevel delegateNoLevel;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logicLevel(delegateLevel, context);
+    ClusterLogic logicNoLevel(delegateNoLevel, context);
+    ClusterConformance conformanceLevel   = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                              .supportsDefaultOpenLevel = true,
+                                              .supportsValveFault       = true,
+                                              .supportsLevelStep        = true };
+    ClusterConformance conformanceNoLevel = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
+    };
+
+    EXPECT_EQ(logicLevel.Init(conformanceNoLevel), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(logicNoLevel.Init(conformanceLevel), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenDuration)
+{
+
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    // Fall back to default
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    DataModel::Nullable<ElapsedS> defaultOpenDuration;
+    defaultOpenDuration.SetNonNull(12u);
+    EXPECT_EQ(logic.SetDefaultOpenDuration(defaultOpenDuration), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, defaultOpenDuration);
+
+    // Set from command parameters
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNull();
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    openDuration.SetNonNull(12u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable.ValueOr(0), 12u);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelFeatureUnsupported)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+
+    // Should get an error when this is called with target level set since the feature is unsupported.
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(50u)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNotSuppliedNoDefaultSupported)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = false,
+                                       .supportsValveFault       = false,
+                                       .supportsLevelStep        = false };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 100u);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNotSuppliedDefaultSupported)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = false,
+                                       .supportsLevelStep        = false };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 100u);
+
+    EXPECT_EQ(logic.SetDefaultOpenLevel(50u), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 50u);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelSupplied)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = false,
+                                       .supportsLevelStep        = true };
+    ClusterState state             = ClusterState();
+    state.levelStep                = 33;
+    EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
+
+    // 33, 66, 99 and 100 should all work, nothing else should
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(33u)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 33u);
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(66u)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 66u);
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(99u)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 99u);
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(100u)), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.lastRequestedLevel, 100u);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 4);
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(32u)), CHIP_ERROR_INVALID_ARGUMENT);
+    // Ensure this wasn't called again.
+    EXPECT_EQ(delegate.lastRequestedLevel, 100u);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 4);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelSupported)
+{
+    // Testing that current level, target level, target state and current state are set correctly
+    // If the delegate is able to open the valve fully during the handler call
+    // then the current level and current state should indicate open and the appropriate level.
+    // TargetLevel and TargetState should be NULL.
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure   = false;
+    delegate.simulateAsyncOpen = false;
+
+    DataModel::Nullable<uint8_t> level;
+    DataModel::Nullable<ValveStateEnum> state;
+    uint8_t targetLevel;
+
+    targetLevel = 100u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state, DataModel::NullNullable);
+
+    targetLevel = 50u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state, DataModel::NullNullable);
+
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelNotSupported)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure   = false;
+    delegate.simulateAsyncOpen = false;
+
+    DataModel::Nullable<ValveStateEnum> state;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state, DataModel::NullNullable);
+
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelSupported)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure   = false;
+    delegate.simulateAsyncOpen = true;
+
+    DataModel::Nullable<uint8_t> level;
+    DataModel::Nullable<ValveStateEnum> state;
+    uint8_t targetLevel;
+
+    targetLevel = 100u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel / 2);
+    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+
+    targetLevel = 50u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel / 2);
+    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
+    EXPECT_EQ(level.ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelNotSupported)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap               = 0,
+        .supportsDefaultOpenLevel = false,
+        .supportsValveFault       = false,
+        .supportsLevelStep        = false,
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure   = false;
+    delegate.simulateAsyncOpen = true;
+
+    DataModel::Nullable<ValveStateEnum> state;
+
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
+    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
+    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedNoErrorLevel)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    BitMask<ValveFaultBitmap> valveFault;
+
+    delegate.simulateValveFaultNoFailure = true;
+    delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
+    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedNoErrorNoLevel)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap               = 0,
+        .supportsDefaultOpenLevel = false,
+        .supportsValveFault       = true,
+        .supportsLevelStep        = false,
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    BitMask<ValveFaultBitmap> valveFault;
+
+    delegate.simulateValveFaultNoFailure = true;
+    delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
+    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorLevel)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    BitMask<ValveFaultBitmap> valveFault;
+
+    delegate.simulateFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
+    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorNoLevel)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint   = 0;
+    MatterContext context = MatterContext(endpoint, storageDelegate);
+    ClusterLogic logic    = ClusterLogic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap               = 0,
+        .supportsDefaultOpenLevel = false,
+        .supportsValveFault       = true,
+        .supportsLevelStep        = false,
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    BitMask<ValveFaultBitmap> valveFault;
+
+    delegate.simulateFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
+    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+}
+
+// Clock::ClockBase * const savedClock = &SystemClock();
+// Clock::Internal::MockClock mockClock;
+// Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+// Test that the cluster logic doesn't balk if error is returned, but valve fault isn't supported
+// Test that the auto close time is set appropriately for open duration - add in prior test?
+// Test setter for valve fault
+// Test attribute change notifications are sent out and not sent out when the attribute is change do the same value - add in prior
+// tests? Test events are generated
+
+// Init providing the wrong delegate type
+
+// TODO: Should the cluster logic query the current level and curent state from the driver at startup?
 
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters

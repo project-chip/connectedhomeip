@@ -75,7 +75,7 @@ class ClusterLogic
 public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
-    ClusterLogic(Delegate & clusterDriver, MatterContext & matterContext) :
+    ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
         mClusterDriver(clusterDriver), mMatterContext(matterContext)
     {
         // TODO: remove these once the fields are used properly
@@ -131,12 +131,25 @@ public:
     // Current state
     // Current level
 
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range or the targetLevel is supplied when LVL is not
+    // supported.
+    // Calls delegate HandleOpen function after validating the parameters
+    CHIP_ERROR HandleOpenCommand(std::optional<DataModel::Nullable<ElapsedS>> openDuration, std::optional<Percent> targetLevel);
+
 private:
     // Determines if the level value is allowed per the level step.
     bool ValueCompliesWithLevelStep(const uint8_t value);
+    // Returns the target level to send to the delegate based on the targetLevel command field, the device conformance and the
+    // defaults. Returns error if the supplied target level is invalid.
+    CHIP_ERROR GetRealTargetLevel(const std::optional<Percent> & targetLevel, Percent & realTargetLevel);
+    // Internal function call to handle open commands for devices that support the LVL feature.
+    CHIP_ERROR HandleOpenLevel(const std::optional<Percent> & targetLevel);
+    // Internal function call to handle open commands for devices that do not support the LVL feature.
+    CHIP_ERROR HandleOpenNoLevel();
     bool mInitialized = false;
 
-    Delegate & mClusterDriver;
+    DelegateBase & mClusterDriver;
     MatterContext & mMatterContext;
 
     ClusterConformance mConformance;
