@@ -236,6 +236,7 @@
             return nil;
         }
 
+        self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
         self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
@@ -285,6 +286,13 @@
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
+
+    mtr_weakify(self);
+    [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        mtr_strongify(self);
+        MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
+    }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
+
     return deviceToReturn;
 }
 

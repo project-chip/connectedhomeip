@@ -142,6 +142,8 @@ using namespace chip::Tracing::DarwinFramework;
     os_unfair_lock _assertionLock;
 }
 
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+
 - (os_unfair_lock_t)deviceMapLock
 {
     return &_underlyingDeviceMapLock;
@@ -340,7 +342,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
 }
 
 - (BOOL)isRunning

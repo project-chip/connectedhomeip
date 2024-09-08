@@ -101,7 +101,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly) MTRDeviceControllerDelegateBridge * deviceControllerDelegateBridge;
 @property (nonatomic, readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (nonatomic, readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
-@property (nonatomic, readwrite) NSUUID * uniqueIdentifier;
 @property (nonatomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (nonatomic, readonly, nullable) MTRDeviceControllerFactory * factory;
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
@@ -130,9 +129,6 @@ using namespace chip::Tracing::DarwinFramework;
     os_unfair_lock _assertionLock;
 }
 
-// TODO: Figure out whether uniqueIdentifier storage should live in the superclass.  It
-// probably should!
-@synthesize uniqueIdentifier = _uniqueIdentifier;
 // TODO: Figure out whether the work queue storage lives here or in the superclass
 // Right now we seem to have both?
 @synthesize chipWorkQueue = _chipWorkQueue;
@@ -208,7 +204,7 @@ using namespace chip::Tracing::DarwinFramework;
     if (self = [super initForSubclasses:startSuspended]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        _uniqueIdentifier = uniqueIdentifier;
+        self.uniqueIdentifier = uniqueIdentifier;
 
         // Setup assertion variables
         _keepRunningAssertionCounter = 0;
@@ -340,7 +336,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
 }
 
 - (BOOL)isRunning
@@ -744,7 +740,7 @@ using namespace chip::Tracing::DarwinFramework;
     if (_controllerDataStore) {
         // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
-            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
+            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self.uniqueIdentifier);
 
             std::lock_guard lock(*self.deviceMapLock);
             NSMutableArray * deviceList = [NSMutableArray array];
@@ -1290,7 +1286,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         [self->_serverEndpoints addObject:endpoint];
         [endpoint registerMatterEndpoint];
         MTR_LOG("%@ Added server endpoint %u to controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
-            self->_uniqueIdentifier);
+            self.uniqueIdentifier);
     }
         errorHandler:^(NSError * error) {
             MTR_LOG_ERROR("%@ Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint, adding endpoint %u", self,
@@ -1317,8 +1313,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // tearing it down.
     [self asyncDispatchToMatterQueue:^() {
         [self removeServerEndpointOnMatterQueue:endpoint];
-        MTR_LOG("%@ Removed server endpoint %u from controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
-            self->_uniqueIdentifier);
+        MTR_LOG("%@ Removed server endpoint %u from controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue), self.uniqueIdentifier);
         if (queue != nil && completion != nil) {
             dispatch_async(queue, completion);
         }
