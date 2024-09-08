@@ -1778,6 +1778,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
+        if (_strongDelegateForSetDelegateAPI) {
+            MTR_LOG("%@ setDeviceControllerDelegate: replacing %p with %p", self, _strongDelegateForSetDelegateAPI, delegate);
+            [self removeDeviceControllerDelegate:_strongDelegateForSetDelegateAPI];
+        }
         _strongDelegateForSetDelegateAPI = delegate;
         [self addDeviceControllerDelegate:delegate queue:queue];
     }
