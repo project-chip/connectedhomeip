@@ -134,10 +134,10 @@ static MTRTestKeys * sTestKeys = nil;
 @end
 
 @interface MTRPairingTestMonitoringControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property(nonatomic, readonly) BOOL statusUpdateCalled;
-@property(nonatomic, readonly) BOOL commissioningSessionEstablishmentDoneCalled;
-@property(nonatomic, readonly) BOOL commissioningCompleteCalled;
-@property(nonatomic, readonly) BOOL readCommissioningInfoCalled;
+@property (nonatomic, readonly) BOOL statusUpdateCalled;
+@property (nonatomic, readonly) BOOL commissioningSessionEstablishmentDoneCalled;
+@property (nonatomic, readonly) BOOL commissioningCompleteCalled;
+@property (nonatomic, readonly) BOOL readCommissioningInfoCalled;
 @end
 
 @implementation MTRPairingTestMonitoringControllerDelegate
