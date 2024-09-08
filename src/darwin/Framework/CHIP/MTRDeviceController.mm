@@ -114,8 +114,8 @@ using namespace chip::Tracing::DarwinFramework;
 
 @interface MTRDeviceControllerDelegateInfo : NSObject
 - (instancetype)initWithDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
-@property(nonatomic, weak, readonly) id<MTRDeviceControllerDelegate> delegate;
-@property(nonatomic, readonly) dispatch_queue_t queue;
+@property (nonatomic, weak, readonly) id<MTRDeviceControllerDelegate> delegate;
+@property (nonatomic, readonly) dispatch_queue_t queue;
 @end
 
 @implementation MTRDeviceControllerDelegateInfo
@@ -161,7 +161,7 @@ using namespace chip::Tracing::DarwinFramework;
     BOOL _shutdownPending;
     os_unfair_lock _assertionLock;
 
-    NSMutableSet<MTRDeviceControllerDelegateInfo *> *_delegates;
+    NSMutableSet<MTRDeviceControllerDelegateInfo *> * _delegates;
     id<MTRDeviceControllerDelegate> _strongDelegateForSetDelegateAPI;
 }
 
@@ -593,7 +593,7 @@ using namespace chip::Tracing::DarwinFramework;
     if (_deviceControllerDelegateBridge) {
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
-        @synchronized (self) {
+        @synchronized(self) {
             _strongDelegateForSetDelegateAPI = nil;
             [_delegates removeAllObjects];
         }
@@ -1777,7 +1777,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 // Note these are implemented in the base class so that XPC subclass can use it as well when it
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    @synchronized (self) {
+    @synchronized(self) {
         _strongDelegateForSetDelegateAPI = delegate;
         [self addDeviceControllerDelegate:delegate queue:queue];
     }
@@ -1785,8 +1785,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    @synchronized (self) {
-        MTRDeviceControllerDelegateInfo *newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
+    @synchronized(self) {
+        MTRDeviceControllerDelegateInfo * newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
         [_delegates addObject:newDelegateInfo];
         MTR_LOG("%@ addDeviceControllerDelegate: added %p total %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
     }
@@ -1794,9 +1794,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
 {
-    @synchronized (self) {
-        __block MTRDeviceControllerDelegateInfo *delegateInfoToRemove = nil;
-        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo *delegateInfo) {
+    @synchronized(self) {
+        __block MTRDeviceControllerDelegateInfo * delegateInfoToRemove = nil;
+        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
             if (delegateInfo.delegate == delegate) {
                 delegateInfoToRemove = delegateInfo;
             }
@@ -1816,17 +1816,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 // Iterates the delegates, and remove delegate info objects if the delegate object has dealloc'ed
 // Returns number of delegates called
-- (NSUInteger)_iterateDelegateInfoWithBlock:(void(^ _Nullable)(MTRDeviceControllerDelegateInfo * delegateInfo))block
+- (NSUInteger)_iterateDelegateInfoWithBlock:(void (^_Nullable)(MTRDeviceControllerDelegateInfo * delegateInfo))block
 {
-    @synchronized (self) {
+    @synchronized(self) {
         if (!_delegates.count) {
             MTR_LOG("%@ No delegates to iterate", self);
             return 0;
         }
 
         // Opportunistically remove defunct delegate references on every iteration
-        NSMutableSet *delegatesToRemove = nil;
-        for (MTRDeviceControllerDelegateInfo *delegateInfo in _delegates) {
+        NSMutableSet * delegatesToRemove = nil;
+        for (MTRDeviceControllerDelegateInfo * delegateInfo in _delegates) {
             id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
             if (strongDelegate) {
                 if (block) {
@@ -1849,9 +1849,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 }
 
-- (void)_callDelegatesWithBlock:(void(^ _Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString;
+- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString;
 {
-    NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo *delegateInfo) {
+    NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
         id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
         dispatch_async(delegateInfo.queue, ^{
             block(strongDelegate);
@@ -1880,9 +1880,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 
 - (void)controller:(MTRDeviceController *)controller
-commissioningComplete:(NSError * _Nullable)error
-            nodeID:(NSNumber * _Nullable)nodeID
-           metrics:(MTRMetrics *)metrics
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
