@@ -2073,33 +2073,35 @@
       "deviceTypeRef": {
         "code": 17,
         "profileId": 259,
-        "label": "MA-powersource",
-        "name": "MA-powersource"
+        "label": "MA-water-leak-detector",
+        "name": "MA-water-leak-detector"
       },
       "deviceTypes": [
-        {
-          "code": 17,
-          "profileId": 259,
-          "label": "MA-powersource",
-          "name": "MA-powersource"
-        },
         {
           "code": 67,
           "profileId": 259,
           "label": "MA-water-leak-detector",
           "name": "MA-water-leak-detector"
+        },
+        {
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource"
         }
+        
       ],
       "deviceVersions": [
         1,
         1
       ],
       "deviceIdentifiers": [
-        17,
-        67
+        67,
+        17
+        
       ],
-      "deviceTypeName": "MA-powersource",
-      "deviceTypeCode": 17,
+      "deviceTypeName": "MA-water-leak-detector",
+      "deviceTypeCode": 67,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
