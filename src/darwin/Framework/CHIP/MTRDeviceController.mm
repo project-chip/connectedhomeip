@@ -1779,6 +1779,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     @synchronized(self) {
         if (_strongDelegateForSetDelegateAPI) {
+            if (_strongDelegateForSetDelegateAPI == delegate) {
+                MTR_LOG("%@ setDeviceControllerDelegate: delegate %p is already set", self, delegate);
+                return;
+            }
+
             MTR_LOG("%@ setDeviceControllerDelegate: replacing %p with %p", self, _strongDelegateForSetDelegateAPI, delegate);
             [self removeDeviceControllerDelegate:_strongDelegateForSetDelegateAPI];
         }
@@ -1799,6 +1804,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
 {
     @synchronized(self) {
+        if (_strongDelegateForSetDelegateAPI == delegate) {
+            _strongDelegateForSetDelegateAPI = nil;
+        }
+
         __block MTRDeviceControllerDelegateInfo * delegateInfoToRemove = nil;
         [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
             if (delegateInfo.delegate == delegate) {
@@ -1864,6 +1873,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     MTR_LOG("%@ %lu delegates called for %s", self, static_cast<unsigned long>(delegatesCalled), logString);
 }
+
+#if DEBUG
+- (NSUInteger)unitTestDelegateCount
+{
+    return [self _iterateDelegateInfoWithBlock:nil];
+}
+#endif
 
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
