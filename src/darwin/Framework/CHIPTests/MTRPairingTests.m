@@ -134,10 +134,10 @@ static MTRTestKeys * sTestKeys = nil;
 @end
 
 @interface MTRPairingTestMonitoringControllerDelegate : NSObject <MTRDeviceControllerDelegate>
-@property (nonatomic, readonly) BOOL statusUpdateCalled;
-@property (nonatomic, readonly) BOOL commissioningSessionEstablishmentDoneCalled;
-@property (nonatomic, readonly) BOOL commissioningCompleteCalled;
-@property (nonatomic, readonly) BOOL readCommissioningInfoCalled;
+@property (atomic, readwrite) BOOL statusUpdateCalled;
+@property (atomic, readwrite) BOOL commissioningSessionEstablishmentDoneCalled;
+@property (atomic, readwrite) BOOL commissioningCompleteCalled;
+@property (atomic, readwrite) BOOL readCommissioningInfoCalled;
 @end
 
 @implementation MTRPairingTestMonitoringControllerDelegate
@@ -147,12 +147,12 @@ static MTRTestKeys * sTestKeys = nil;
 }
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
-    _statusUpdateCalled = YES;
+    self.statusUpdateCalled = YES;
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
-    _commissioningSessionEstablishmentDoneCalled = YES;
+    self.commissioningSessionEstablishmentDoneCalled = YES;
 }
 
 - (void)controller:(MTRDeviceController *)controller
@@ -160,12 +160,12 @@ static MTRTestKeys * sTestKeys = nil;
                    nodeID:(NSNumber * _Nullable)nodeID
                   metrics:(MTRMetrics *)metrics
 {
-    _commissioningCompleteCalled = YES;
+    self.commissioningCompleteCalled = YES;
 }
 
 - (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
 {
-    _readCommissioningInfoCalled = YES;
+    self.readCommissioningInfoCalled = YES;
 }
 @end
 
