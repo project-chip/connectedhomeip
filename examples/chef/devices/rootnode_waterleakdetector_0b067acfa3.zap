@@ -2098,7 +2098,6 @@
       "deviceIdentifiers": [
         67,
         17
-        
       ],
       "deviceTypeName": "MA-water-leak-detector",
       "deviceTypeCode": 67,
