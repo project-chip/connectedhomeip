@@ -1670,6 +1670,72 @@ cluster BooleanStateConfiguration = 128 {
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
+/** This cluster is used to configure a valve. */
+cluster ValveConfigurationAndControl = 129 {
+  revision 1;
+
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
+  enum ValveStateEnum : enum8 {
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTimeSync = 0x1;
+    kLevel = 0x2;
+  }
+
+  bitmap ValveFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+    kBlocked = 0x2;
+    kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
+  }
+
+  info event ValveStateChanged = 0 {
+    ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
+  }
+
+  info event ValveFault = 1 {
+    ValveFaultBitmap valveFault = 0;
+  }
+
+  readonly attribute nullable elapsed_s openDuration = 0;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
+  readonly attribute optional nullable percent currentLevel = 6;
+  readonly attribute optional nullable percent targetLevel = 7;
+  attribute optional percent defaultOpenLevel = 8;
+  readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenRequest {
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
+  }
+
+  /** This command is used to set the valve to its open position. */
+  command Open(OpenRequest): DefaultSuccess = 0;
+  /** This command is used to set the valve to its closed position. */
+  command Close(): DefaultSuccess = 1;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1856,8 +1922,8 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_powersource = 17, version 1;
-  device type ma_water_leak_detector = 67, version 1;
+  device type ma_powersource = 66, version 1;
+  device type ma_water_valve = 17, version 1;
 
 
   server cluster Identify {
@@ -1948,6 +2014,23 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ValveConfigurationAndControl {
+    ram      attribute openDuration;
+    ram      attribute defaultOpenDuration;
+    callback attribute remainingDuration;
+    ram      attribute currentState;
+    ram      attribute targetState;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Open;
+    handle command Close;
   }
 }
 
