@@ -2071,7 +2071,7 @@
       "id": 2,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "code": 17,
+        "code": 67,
         "profileId": 259,
         "label": "MA-water-leak-detector",
         "name": "MA-water-leak-detector"
