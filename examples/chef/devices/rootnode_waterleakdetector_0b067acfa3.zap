@@ -2089,7 +2089,6 @@
           "label": "MA-powersource",
           "name": "MA-powersource"
         }
-        
       ],
       "deviceVersions": [
         1,
