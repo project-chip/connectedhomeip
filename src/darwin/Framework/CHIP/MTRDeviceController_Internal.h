@@ -66,8 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
 
-@property (nonatomic, readwrite, nullable) NSMapTable * nodeIDToDeviceMap;
+@property (nonatomic, readonly) NSMapTable<NSNumber *, MTRDevice *> * nodeIDToDeviceMap;
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
+
+@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
 
 // queue used to serialize all work performed by the MTRDeviceController
 // (moved here so subclasses can initialize differently)

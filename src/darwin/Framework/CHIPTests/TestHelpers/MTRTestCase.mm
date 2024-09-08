@@ -87,6 +87,11 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #if HAVE_NSTASK
 - (NSTask *)createTaskForPath:(NSString *)path
 {
+    return [self.class createTaskForPath:path];
+}
+
++ (NSTask *)createTaskForPath:(NSString *)path
+{
     NSTask * task = [[NSTask alloc] init];
     [task setLaunchPath:[self absolutePathFor:path]];
     return task;
@@ -102,7 +107,7 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     XCTAssertEqual([task terminationStatus], 0);
 }
 
-- (void)doLaunchTask:(NSTask *)task
++ (void)doLaunchTask:(NSTask *)task
 {
     NSError * launchError;
     [task launchAndReturnError:&launchError];
@@ -111,12 +116,12 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 
 - (void)launchTask:(NSTask *)task
 {
-    [self doLaunchTask:task];
+    [self.class doLaunchTask:task];
 
     [_runningTasks addObject:task];
 }
 
-- (void)launchCrossTestTask:(NSTask *)task
++ (void)launchTask:(NSTask *)task
 {
     [self doLaunchTask:task];
 
@@ -125,6 +130,11 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #endif // HAVE_NSTASK
 
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
+{
+    return [self.class absolutePathFor:matterRootRelativePath];
+}
+
++ (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
 {
     // Start with the absolute path to our file, then remove the suffix that
     // comes after the path to the Matter SDK root.

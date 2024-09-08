@@ -19,6 +19,7 @@
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_XPC.h"
+#import "MTRDevice_XPC_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
@@ -33,7 +34,9 @@
 
 @interface MTRDeviceController_XPC ()
 
-@property (nonatomic, retain, readwrite) NSUUID * uniqueIdentifier;
+@property (nonnull, atomic, readwrite, retain) MTRXPCDeviceControllerParameters * xpcParameters;
+@property (atomic, readwrite, assign) NSTimeInterval xpcRetryTimeInterval;
+@property (atomic, readwrite, assign) BOOL xpcConnectedOrConnecting;
 
 @end
 
@@ -41,46 +44,169 @@
 
 @implementation MTRDeviceController_XPC
 
-@synthesize uniqueIdentifier = _uniqueIdentifier;
++ (NSMutableSet *)_allowedClasses
+{
+    static NSArray * sBaseAllowedClasses = @[
+        [NSString class],
+        [NSNumber class],
+        [NSData class],
+        [NSArray class],
+        [NSDictionary class],
+        [NSError class],
+        [NSDate class],
+    ];
+
+    return [NSMutableSet setWithArray:sBaseAllowedClasses];
+}
 
 - (NSXPCInterface *)_interfaceForServerProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
 
-    NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRCommandPath class], [MTRAttributePath class]
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRCommandPath class],
+        [MTRAttributePath class]
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
+
     return interface;
 }
 
 - (NSXPCInterface *)_interfaceForClientProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
-    NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTRAttributePath class]
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributePath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedAttributeReport:)
             argumentIndex:1
                   ofReply:NO];
-    allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTREventPath class]
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTREventPath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedEventReport:)
             argumentIndex:1
                   ofReply:NO];
+
     return interface;
 }
 
 - (id<NSCopying>)controllerXPCID
 {
     return [self.uniqueIdentifier UUIDString];
+}
+
+- (void)_startXPCConnectionRetry
+{
+    if (!self.xpcConnectedOrConnecting) {
+        MTR_LOG("%@: XPC Connection retry - Starting retry for XPC Connection", self);
+        self.xpcRetryTimeInterval = 0.5;
+        mtr_weakify(self);
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            mtr_strongify(self);
+            [self _xpcConnectionRetry];
+        });
+    } else {
+        MTR_LOG("%@: XPC Connection retry - Not starting retry for XPC Connection, already trying", self);
+    }
+}
+
+- (void)_xpcConnectionRetry
+{
+    MTR_LOG("%@: XPC Connection retry - timer hit", self);
+    if (!self.xpcConnectedOrConnecting) {
+        if (![self _setupXPCConnection]) {
+#if 0 // FIXME: Not sure why this retry is not working, but I will fix this later
+            MTR_LOG("%@: XPC Connection retry - Scheduling another retry", self);
+            self.xpcRetryTimeInterval = self.xpcRetryTimeInterval >= 1 ? self.xpcRetryTimeInterval * 2 : 1;
+            self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
+            mtr_weakify(self);
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                mtr_strongify(self);
+                [self _xpcConnectionRetry];
+            });
+#else
+            MTR_LOG("%@: XPC Connection failed retry - bailing", self);
+#endif
+        } else {
+            MTR_LOG("%@: XPC Connection retry - connection attempt successful", self);
+        }
+    } else {
+        MTR_LOG("%@: XPC Connection retry - Mid retry, or connected, stopping retry timer", self);
+    }
+}
+
+- (BOOL)_setupXPCConnection
+{
+    self.xpcConnection = self.xpcParameters.xpcConnectionBlock();
+
+    MTR_LOG("%@ Set up XPC Connection: %@", self, self.xpcConnection);
+    if (self.xpcConnection) {
+        mtr_weakify(self);
+        self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
+
+        self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
+        self.xpcConnection.exportedObject = self;
+
+        self.xpcConnection.interruptionHandler = ^{
+            mtr_strongify(self);
+            MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", self.xpcParameters.uniqueIdentifier);
+            self.xpcConnectedOrConnecting = NO;
+            self.xpcConnection = nil;
+            [self _startXPCConnectionRetry];
+        };
+
+        self.xpcConnection.invalidationHandler = ^{
+            mtr_strongify(self);
+            MTR_LOG_ERROR("XPC Connection for device controller invalidated: %@", self.xpcParameters.uniqueIdentifier);
+            self.xpcConnectedOrConnecting = NO;
+            self.xpcConnection = nil;
+            [self _startXPCConnectionRetry];
+        };
+
+        MTR_LOG("%@ Activating new XPC connection", self);
+        [self.xpcConnection activate];
+
+        [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("Checkin error: %@", error);
+        }] deviceController:self.uniqueIdentifier checkInWithContext:[NSDictionary dictionary]];
+
+        // FIXME: Trying to kick all the MTRDevices attached to this controller to re-establish connections
+        //        This state needs to be stored properly and re-established at connnection time
+
+        MTR_LOG("%@ Starting existing NodeID Registration", self);
+        for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
+            MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
+            mtr_weakify(self);
+
+            [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+                mtr_strongify(self);
+                MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
+            }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
+        }
+
+        MTR_LOG("%@ Done existing NodeID Registration", self);
+        self.xpcConnectedOrConnecting = YES;
+    } else {
+        MTR_LOG_ERROR("%@ Failed to set up XPC Connection", self);
+        self.xpcConnectedOrConnecting = NO;
+    }
+
+    return (self.xpcConnectedOrConnecting);
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
@@ -110,30 +236,11 @@
             return nil;
         }
 
-        self.xpcConnection = connectionBlock();
         self.uniqueIdentifier = UUID;
+        self.xpcParameters = xpcParameters;
         self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
-        MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
-        if (self.xpcConnection) {
-            self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
-
-            self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
-            self.xpcConnection.exportedObject = self;
-
-            self.xpcConnection.interruptionHandler = ^{
-                MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", UUID);
-            };
-
-            self.xpcConnection.invalidationHandler = ^{
-                MTR_LOG_ERROR("XPC Connection for device controller invalidated: %@", UUID);
-            };
-
-            MTR_LOG("Activating new XPC connection");
-            [self.xpcConnection activate];
-        } else {
-            MTR_LOG_ERROR("Failed to set up XPC Connection");
+        if (![self _setupXPCConnection]) {
             return nil;
         }
     }
@@ -159,7 +266,7 @@
             self.xpcConnection.exportedObject = self;
 
             MTR_LOG("%s: resuming new XPC connection");
-            [self.xpcConnection resume];
+            [self.xpcConnection activate];
         } else {
             MTR_LOG_ERROR("Failed to set up XPC Connection");
             return nil;
@@ -177,14 +284,15 @@
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
-    // If we're not running, don't add the device to our map.  That would
-    // create a cycle that nothing would break.  Just return the device,
-    // which will be in exactly the state it would be in if it were created
-    // while we were running and then we got shut down.
-    if ([self isRunning]) {
-        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
-    }
+    [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
+
+    mtr_weakify(self);
+    [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        mtr_strongify(self);
+        MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
+    }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
+
     return deviceToReturn;
 }
 
@@ -253,6 +361,14 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(shutdown, shutdownDeviceControlle
     MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
 
     [device deviceConfigurationChanged:nodeID];
+}
+
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTR_LOG("Received internalStateUpdated: %@ found device: %@", nodeID, device);
+
+    [device device:nodeID internalStateUpdated:dictionary];
 }
 
 #pragma mark - MTRDeviceController Protocol Client
