@@ -1518,81 +1518,6 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** This cluster provides an interface to a boolean state called StateValue. */
-cluster BooleanState = 69 {
-  revision 1;
-
-  info event StateChange = 0 {
-    boolean stateValue = 0;
-  }
-
-  readonly attribute boolean stateValue = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** This cluster is used to configure a boolean sensor. */
-cluster BooleanStateConfiguration = 128 {
-  revision 1;
-
-  bitmap AlarmModeBitmap : bitmap8 {
-    kVisual = 0x1;
-    kAudible = 0x2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kVisual = 0x1;
-    kAudible = 0x2;
-    kAlarmSuppress = 0x4;
-    kSensitivityLevel = 0x8;
-  }
-
-  bitmap SensorFaultBitmap : bitmap16 {
-    kGeneralFault = 0x1;
-  }
-
-  info event AlarmsStateChanged = 0 {
-    AlarmModeBitmap alarmsActive = 0;
-    optional AlarmModeBitmap alarmsSuppressed = 1;
-  }
-
-  info event SensorFault = 1 {
-    SensorFaultBitmap sensorFault = 0;
-  }
-
-  attribute optional int8u currentSensitivityLevel = 0;
-  readonly attribute optional int8u supportedSensitivityLevels = 1;
-  readonly attribute optional int8u defaultSensitivityLevel = 2;
-  readonly attribute optional AlarmModeBitmap alarmsActive = 3;
-  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 4;
-  readonly attribute optional AlarmModeBitmap alarmsEnabled = 5;
-  readonly attribute optional AlarmModeBitmap alarmsSupported = 6;
-  readonly attribute optional SensorFaultBitmap sensorFault = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SuppressAlarmRequest {
-    AlarmModeBitmap alarmsToSuppress = 0;
-  }
-
-  request struct EnableDisableAlarmRequest {
-    AlarmModeBitmap alarmsToEnableDisable = 0;
-  }
-
-  /** This command is used to suppress the specified alarm mode. */
-  command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
-  command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
-}
-
 /** This cluster is used to configure a valve. */
 cluster ValveConfigurationAndControl = 129 {
   revision 1;
@@ -1891,25 +1816,6 @@ endpoint 1 {
     ram      attribute batChargeState default = 4;
     ram      attribute batFunctionalWhileCharging default = 1;
     callback attribute endpointList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster BooleanState {
-    ram      attribute stateValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster BooleanStateConfiguration {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
