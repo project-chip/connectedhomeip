@@ -34,6 +34,15 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     }
     mConformance = conformance;
     mState       = initialState;
+
+    // Overwrite default initial state with stored persisted values if set.
+    uint32_t defaultOpenDuration;
+    if (mMatterContext.GetDefaultOpenDuration(defaultOpenDuration) == CHIP_NO_ERROR)
+    {
+        mState.defaultOpenDuration.SetNonNull(defaultOpenDuration);
+    }
+    mMatterContext.GetDefaultOpenLevel(mState.defaultOpenLevel);
+
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -115,6 +124,54 @@ CHIP_ERROR ClusterLogic::GetLevelStep(uint8_t & levelStep)
     VerifyOrReturnError(mConformance.supportsLevelStep, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     levelStep = mState.levelStep;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetDefaultOpenDuration(const DataModel::Nullable<ElapsedS> & defaultOpenDuration)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    if (!defaultOpenDuration.IsNull() && defaultOpenDuration.Value() < 1)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    ReturnErrorOnFailure(mMatterContext.StoreDefaultOpenDuration(defaultOpenDuration));
+    mState.defaultOpenDuration = defaultOpenDuration;
+    return CHIP_NO_ERROR;
+}
+
+bool ClusterLogic::ValueCompliesWithLevelStep(const uint8_t value)
+{
+    if (mConformance.supportsLevelStep)
+    {
+        if ((value != 100u) && ((value % mState.levelStep) != 0))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+CHIP_ERROR ClusterLogic::SetDefaultOpenLevel(const uint8_t defaultOpenLevel)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConformance.supportsDefaultOpenLevel, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (defaultOpenLevel < 1 || defaultOpenLevel > 100)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(mMatterContext.StoreDefaultOpenLevel(defaultOpenLevel));
+    mState.defaultOpenLevel = defaultOpenLevel;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::SetValveFault(const ValveFaultBitmap valveFault)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR ClusterLogic::ClearValveFault(const ValveFaultBitmap valveFault)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace ValveConfigurationAndControl

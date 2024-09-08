@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
-// #include <src/lib/core/DataModelTypes.h>
-#include <app-common/zap-generated/cluster-enums.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -35,10 +36,25 @@ class MatterContext
 public:
     // TODO: remove touch on mEndpoint once this is used. I am apparently unable to locate the proper place to turn this off in the
     // build file, so whatever, compiler, you win. I've touched it. You happy now?
-    MatterContext(EndpointId endpoint) : mEndpoint(endpoint) { (void) mEndpoint; }
+    MatterContext(EndpointId endpoint, PersistentStorageDelegate & persistentStorageDelegate) :
+        mEndpoint(endpoint), mPersistentStorageDelegate(persistentStorageDelegate)
+    {}
+
+    // All Set functions:
+    // Return CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not be stored.
+    // Return CHIP_NO_ERROR if the value was successfully stored. Clear the storage on a NullNullable.
+    CHIP_ERROR StoreDefaultOpenDuration(const DataModel::Nullable<uint32_t> & val);
+    CHIP_ERROR StoreDefaultOpenLevel(const uint8_t val);
+
+    // All Get functions
+    // Return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if there is no value in storage.
+    // Return CHIP_NO_ERROR and fill return value if the value is found.
+    CHIP_ERROR GetDefaultOpenDuration(uint32_t & returnVal);
+    CHIP_ERROR GetDefaultOpenLevel(uint8_t & returnVal);
 
 private:
     EndpointId mEndpoint;
+    PersistentStorageDelegate & mPersistentStorageDelegate;
 };
 
 } // namespace ValveConfigurationAndControl

@@ -22,6 +22,7 @@
 
 #include "valve-configuration-and-control-delegate.h"
 #include "valve-configuration-and-control-matter-context.h"
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
@@ -79,7 +80,6 @@ public:
     {
         // TODO: remove these once the fields are used properly
         (void) mClusterDriver;
-        (void) mMatterContext;
     }
 
     // Validates the conformance and performs initialization.
@@ -105,7 +105,35 @@ public:
     CHIP_ERROR GetValveFault(BitMask<ValveFaultBitmap> & valveFault);
     CHIP_ERROR GetLevelStep(uint8_t & levelStep);
 
+    // All Set functions
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
+    // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
+    // Returns CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not not be stored in persistent storage.
+    // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
+    // Set functions are supplied for any values that can be set either internally by the device or externally
+    // through a direct attribute write. Changes to attributes that happen as a side effect of cluster commands
+    // are handled by the cluster command handlers.
+
+    // DefaultOpenDuration can be set by the client using attribute write
+    CHIP_ERROR SetDefaultOpenDuration(const DataModel::Nullable<ElapsedS> & defaultOpenDuration);
+
+    // DefaultOpenLevel can be set by the client using attribute write
+    CHIP_ERROR SetDefaultOpenLevel(const uint8_t defaultOpenLevel);
+
+    // ValveFault can be set internally by the device.
+    // Use the Set function to add a specific valve fault and the clear function to clear it.
+    // Q: Should we push these through the delegate?
+    CHIP_ERROR SetValveFault(const ValveFaultBitmap valveFault);
+    CHIP_ERROR ClearValveFault(const ValveFaultBitmap valveFault);
+
+    // Other ones that are set internally?
+    // Current state
+    // Current level
+
 private:
+    // Determines if the level value is allowed per the level step.
+    bool ValueCompliesWithLevelStep(const uint8_t value);
     bool mInitialized = false;
 
     Delegate & mClusterDriver;

@@ -159,6 +159,7 @@ source_set("valve-configuration-and-control-test-srcs") {
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.cpp",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-matter-context.h",
   ]
   public_deps = [
