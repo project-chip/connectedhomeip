@@ -207,7 +207,7 @@ exit:
 
 void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         attrOverride->OnListWriteBegin(aPath);
     }
@@ -215,7 +215,7 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 
 void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful)
 {
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         attrOverride->OnListWriteEnd(aPath, writeWasSuccessful);
     }
@@ -575,26 +575,26 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
-    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
     boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
     err       = writeRequestParser.GetTimedRequest(&boolValue);
-    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
     boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
-    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
 
     if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
         (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))

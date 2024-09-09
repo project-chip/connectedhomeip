@@ -41,7 +41,7 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_SESSION_I_D), sessionID)
+      put(ContextSpecificTag(TAG_SESSION_ID), sessionID)
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_MAXIMUM_CURRENT), maximumCurrent)
       if (maximumDischargeCurrent.isPresent) {
@@ -53,14 +53,14 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
   }
 
   companion object {
-    private const val TAG_SESSION_I_D = 0
+    private const val TAG_SESSION_ID = 0
     private const val TAG_STATE = 1
     private const val TAG_MAXIMUM_CURRENT = 2
     private const val TAG_MAXIMUM_DISCHARGE_CURRENT = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStartedEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
+      val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val maximumCurrent = tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_CURRENT))
       val maximumDischargeCurrent =

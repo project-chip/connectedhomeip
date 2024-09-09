@@ -18,6 +18,7 @@
 #include "app/util/af-types.h"
 
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <app/util/ember-io-storage.h>
 #include <lib/support/Span.h>
 
@@ -101,9 +102,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
     return Status::Success;
 }
 
-Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                  uint8_t * dataPtr, EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
-                                  chip::app::AttributeChanged * changed)
+Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
     if (gEmberStatusCode != Status::Success)
     {
@@ -112,7 +111,7 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
 
     // ember here deduces the size of dataPtr. For testing however, we KNOW we read
     // out of the ember IO buffer, so we try to use that
-    VerifyOrDie(dataPtr == chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.data());
+    VerifyOrDie(input.dataPtr == chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.data());
 
     // In theory this should do type validation and sizes. This is NOT done for testing.
     // copy over as much data as possible
@@ -121,11 +120,11 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
 
     if (changed != nullptr)
     {
-        *changed = (memcmp(gEmberIoBuffer, dataPtr, len) != 0) ? chip::app::AttributeChanged::kValueChanged
-                                                               : chip::app::AttributeChanged::kValueNotChanged;
+        *changed = (memcmp(gEmberIoBuffer, input.dataPtr, len) != 0) ? chip::app::AttributeChanged::kValueChanged
+                                                                     : chip::app::AttributeChanged::kValueNotChanged;
     }
 
-    memcpy(gEmberIoBuffer, dataPtr, len);
+    memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
 
     return Status::Success;
@@ -135,5 +134,6 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                              EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
                              chip::app::AttributeChanged * changed)
 {
-    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType, markDirty, changed);
+    return emAfWriteAttributeExternal(chip::app::ConcreteAttributePath(endpoint, cluster, attributeID),
+                                      EmberAfWriteDataInput(dataPtr, dataType));
 }

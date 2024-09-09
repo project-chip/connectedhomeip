@@ -200,27 +200,7 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
 
     static constexpr bool CanRepresentValue(bool isNullable, WorkingType value)
     {
-        // Since WorkingType has at least one extra byte, none of our bitshifts
-        // overflow.
-        if (IsSigned)
-        {
-            WorkingType max = (static_cast<WorkingType>(1) << (8 * ByteSize - 1)) - 1;
-            WorkingType min = -max;
-            if (!isNullable)
-            {
-                // We have one more value.
-                min -= 1;
-            }
-            return value >= min && value <= max;
-        }
-
-        WorkingType max = (static_cast<WorkingType>(1) << (8 * ByteSize)) - 1;
-        if (isNullable)
-        {
-            // we have one less value
-            max -= 1;
-        }
-        return value <= max;
+        return MinValue(isNullable) <= value && value <= MaxValue(isNullable);
     }
 
     static CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, StorageType value)
@@ -229,6 +209,43 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
     }
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return value; }
+
+    static WorkingType MinValue(bool isNullable)
+    {
+        if constexpr (!IsSigned)
+        {
+            return 0;
+        }
+
+        // Since WorkingType has at least one extra byte, the bitshift cannot overflow.
+        constexpr WorkingType signedMin = -(static_cast<WorkingType>(1) << (8 * ByteSize - 1));
+        if (isNullable)
+        {
+            // Smallest negative value is excluded for nullable signed types.
+            return signedMin + 1;
+        }
+
+        return signedMin;
+    }
+
+    static WorkingType MaxValue(bool isNullable)
+    {
+        // Since WorkingType has at least one extra byte, none of our bitshifts
+        // overflow.
+        if constexpr (IsSigned)
+        {
+            return (static_cast<WorkingType>(1) << (8 * ByteSize - 1)) - 1;
+        }
+
+        constexpr WorkingType unsignedMax = (static_cast<WorkingType>(1) << (8 * ByteSize)) - 1;
+        if (isNullable)
+        {
+            // Largest value is excluded for nullable unsigned types.
+            return unsignedMax - 1;
+        }
+
+        return unsignedMax;
+    }
 };
 
 } // namespace app

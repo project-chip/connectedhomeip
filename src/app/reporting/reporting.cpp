@@ -30,19 +30,17 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfIncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
-
-    AttributePathParams info;
-    info.mClusterId   = clusterId;
-    info.mAttributeId = attributeId;
-    info.mEndpointId  = endpoint;
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelAttributesChangedListener());
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
-    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                            emberAfGlobalInteractionModelAttributesChangedListener());
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -51,10 +49,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    AttributePathParams info;
-    info.mEndpointId = endpoint;
-
-    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
 }

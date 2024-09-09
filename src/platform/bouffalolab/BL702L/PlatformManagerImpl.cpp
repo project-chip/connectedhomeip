@@ -37,7 +37,6 @@ extern "C" {
 namespace chip {
 namespace DeviceLayer {
 
-extern "C" void (*ot_otrNotifyEvent_ptr)(ot_system_event_t sevent);
 extern "C" int bl_rand_stream(unsigned char *, int);
 extern "C" void otrNotifyEvent(ot_system_event_t sevent);
 
@@ -63,7 +62,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     opt.bf.isCoexEnable = true;
 
     ot_utils_init();
-    ot_otrNotifyEvent_ptr = otrNotifyEvent;
 
     ot_alarmInit();
     ot_radioInit(opt);

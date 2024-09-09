@@ -46,6 +46,17 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
+class ContextAttributesChangeListener : public AttributesChangedListener
+{
+public:
+    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
+    {}
+    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(request.path); }
+
+private:
+    DataModel::ProviderChangeListener * mListener;
+};
+
 /// Attempts to write via an attribute access interface (AAI)
 ///
 /// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success)
@@ -279,16 +290,19 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
-        Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
+                                         .endpoint    = request.path.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForWriteAttribute(request.path));
 
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return Status::UnsupportedAccess;
+            return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
         }
     }
 
@@ -347,12 +361,15 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
-    AttributeAccessInterface * aai       = GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId);
+    AttributeAccessInterface * aai =
+        AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
         if (*aai_result == CHIP_NO_ERROR)
         {
+            // TODO: this is awkward since it provides AAI no control over this, specifically
+            //       AAI may not want to increase versions for some attributes that are Q
             emberAfIncreaseClusterDataVersion(request.path);
             CurrentContext().dataModelChangeListener->MarkDirty(request.path);
         }
@@ -370,24 +387,22 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return Status::InvalidValue;
     }
 
-    AttributeChanged attributeChanged = AttributeChanged::kValueNotChanged;
+    ContextAttributesChangeListener change_listener(CurrentContext());
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+
+    dataInput.SetChangeListener(&change_listener);
+    // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
         // validate attribute types) - see attribute-table.h documentation for details.
-        status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                       dataBuffer.data(), (*attributeMetadata)->attributeType,
-                                       MarkAttributeDirty::kNo, // Model handles its own dirty handling
-                                       &attributeChanged);
+        status = emberAfWriteAttribute(request.path, dataInput);
     }
     else
     {
-        status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            dataBuffer.data(), (*attributeMetadata)->attributeType,
-                                            MarkAttributeDirty::kNo, // Model handles its own dirty handling
-                                            &attributeChanged);
+        status = emAfWriteAttributeExternal(request.path, dataInput);
     }
 
     if (status != Protocols::InteractionModel::Status::Success)
@@ -395,15 +410,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return status;
     }
 
-    // TODO: this WILL requre updates
-    //
-    // - Internal writes may need to be able to decide if to mark things dirty or not (see AAI as well)
-    // - Changes-ommited paths should not be marked dirty (ember is not aware of that flag)
-    if (attributeChanged == AttributeChanged::kValueChanged)
-    {
-        emberAfIncreaseClusterDataVersion(request.path);
-        CurrentContext().dataModelChangeListener->MarkDirty(request.path);
-    }
     return CHIP_NO_ERROR;
 }
 

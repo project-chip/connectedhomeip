@@ -595,9 +595,9 @@ public:
     template <typename... Args>
     RegisteredAttributeAccessInterface(Args &&... args) : mData(std::forward<Args>(args)...)
     {
-        VerifyOrDie(registerAttributeAccessOverride(&mData));
+        VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(&mData));
     }
-    ~RegisteredAttributeAccessInterface() { unregisterAttributeAccessOverride(&mData); }
+    ~RegisteredAttributeAccessInterface() { AttributeAccessInterfaceRegistry::Instance().Unregister(&mData); }
 
     T * operator->() { return &mData; }
     T & operator*() { return mData; }

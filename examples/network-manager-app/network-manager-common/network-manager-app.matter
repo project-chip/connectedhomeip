@@ -409,14 +409,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -443,7 +439,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -1518,6 +1514,7 @@ provisional cluster ThreadBorderRouterManagement = 1106 {
   provisional readonly attribute int16u threadVersion = 2;
   provisional readonly attribute boolean interfaceEnabled = 3;
   provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1622,16 +1619,22 @@ endpoint 0 {
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
+    emits event FabricRestrictionReviewUpdate;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute commissioningARL;
+    callback attribute arl;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     callback attribute clusterRevision;
+
+    handle command ReviewFabricRestrictions;
+    handle command ReviewFabricRestrictionsResponse;
   }
 
   server cluster BasicInformation {
@@ -1879,6 +1882,7 @@ endpoint 1 {
     callback attribute threadVersion;
     callback attribute interfaceEnabled;
     callback attribute activeDatasetTimestamp;
+    callback attribute pendingDatasetTimestamp;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1890,6 +1894,7 @@ endpoint 1 {
     handle command GetPendingDatasetRequest;
     handle command DatasetResponse;
     handle command SetActiveDatasetRequest;
+    handle command SetPendingDatasetRequest;
   }
 
   server cluster ThreadNetworkDirectory {

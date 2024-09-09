@@ -32,6 +32,7 @@
 
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
@@ -314,10 +315,14 @@ enum class MarkAttributeDirty
     kYes,
 };
 
-enum class AttributeChanged
+/// Notification object of a specific path being changed
+class AttributesChangedListener
 {
-    kValueNotChanged,
-    kValueChanged,
+public:
+    virtual ~AttributesChangedListener() = default;
+
+    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
 } // namespace app

@@ -94,7 +94,7 @@ public:
     /**
      * Application marks mutated change path and would be sent out in later report.
      */
-    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
+    CHIP_ERROR SetDirty(const AttributePathParams & aAttributePathParams);
 
     /**
      * @brief

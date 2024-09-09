@@ -3302,6 +3302,7 @@ class ChipClusters:
                 "commandName": "KeepActive",
                 "args": {
                     "stayActiveDuration": "int",
+                    "timeoutMs": "int",
                 },
             },
         },
@@ -6658,12 +6659,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "Boost",
                 "args": {
-                    "duration": "int",
-                    "oneShot": "bool",
-                    "emergencyBoost": "bool",
-                    "temporarySetpoint": "int",
-                    "targetPercentage": "int",
-                    "targetReheat": "int",
+                    "boostInfo": "WaterHeaterBoostInfoStruct",
                 },
             },
             0x00000001: {
@@ -8571,6 +8567,7 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "SkipArea",
                 "args": {
+                    "skippedArea": "int",
                 },
             },
         },
@@ -11970,6 +11967,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000005: {
+                "attributeName": "PendingDatasetTimestamp",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13317,20 +13320,14 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "RemovedOn",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "DeviceDirectory",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "LocationDirectory",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
             },
@@ -13380,9 +13377,9 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "RequestCommissioningApproval",
                 "args": {
-                    "requestId": "int",
-                    "vendorId": "int",
-                    "productId": "int",
+                    "requestID": "int",
+                    "vendorID": "int",
+                    "productID": "int",
                     "label": "str",
                 },
             },
@@ -13390,10 +13387,8 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "CommissionNode",
                 "args": {
-                    "requestId": "int",
+                    "requestID": "int",
                     "responseTimeoutSeconds": "int",
-                    "ipAddress": "bytes",
-                    "port": "int",
                 },
             },
         },
@@ -14839,6 +14834,20 @@ class ChipClusters:
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
                 "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00003000: {
+                "attributeName": "ReadFailureCode",
+                "attributeId": 0x00003000,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00003001: {
+                "attributeName": "FailureInt32U",
+                "attributeId": 0x00003001,
+                "type": "int",
                 "reportable": True,
                 "writable": True,
             },

@@ -1024,6 +1024,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kSecureUnicast, &payloadHeader, &packetHeader,
                                     secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
+
+        // Always recompute whether a message is for a commissioning session based on the latest knowledge of
+        // the fabric table.
+        if (secureSession->IsCASESession())
+        {
+            secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() ==
+                                                             mFabricTable->GetPendingNewFabricIndex());
+        }
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }
     else
@@ -1269,18 +1277,18 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
         if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-            if ((transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
-                 transportPayloadCapability == TransportPayloadCapability::kLargePayload) &&
-                session->GetTCPConnection() != nullptr)
+            if (transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
+                transportPayloadCapability == TransportPayloadCapability::kLargePayload)
             {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
-                if ((tcpSession == nullptr) || (tcpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+                if ((tcpSession == nullptr || tcpSession->GetLastActivityTime() < session->GetLastActivityTime()) &&
+                    session->GetTCPConnection() != nullptr)
                 {
                     tcpSession = session;
                 }
-            }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+            }
 
             if ((mrpSession == nullptr) || (mrpSession->GetLastActivityTime() < session->GetLastActivityTime()))
             {

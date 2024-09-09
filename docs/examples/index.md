@@ -149,6 +149,15 @@ lighting-app/**/README
 lighting-app/qpg/APPLICATION
 ```
 
+## Lighting example without unique id
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lighting-app-data-mode-no-unique-id/**/README
+```
+
 ## Light switch example
 
 ```{toctree}
@@ -369,4 +378,13 @@ network-manager-app/README
 :maxdepth: 1
 
 lit-icd-app/**/README
+```
+
+## Thread Border Router example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+thread-br-app/**/README
 ```

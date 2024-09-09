@@ -17,6 +17,7 @@
 #include "app/util/af-types.h"
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -35,9 +36,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
     return Status::Success;
 }
 
-Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                  uint8_t * dataPtr, EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
-                                  chip::app::AttributeChanged * changed)
+Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
     return Status::Success;
 }
@@ -46,5 +45,6 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                              EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
                              chip::app::AttributeChanged * changed)
 {
-    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType, markDirty, changed);
+    return emAfWriteAttributeExternal(chip::app::ConcreteAttributePath(endpoint, cluster, attributeID),
+                                      EmberAfWriteDataInput(dataPtr, dataType));
 }

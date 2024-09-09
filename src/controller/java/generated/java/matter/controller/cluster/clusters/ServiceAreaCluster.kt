@@ -40,9 +40,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ServiceAreaCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class SelectAreasResponse(val status: UByte, val statusText: String?)
+  class SelectAreasResponse(val status: UByte, val statusText: String)
 
-  class SkipAreaResponse(val status: UByte, val statusText: String?)
+  class SkipAreaResponse(val status: UByte, val statusText: String)
 
   class SupportedAreasAttribute(val value: List<ServiceAreaClusterAreaStruct>)
 
@@ -66,10 +66,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     object SubscriptionEstablished : SupportedMapsAttributeSubscriptionState()
   }
 
-  class SelectedAreasAttribute(val value: List<UInt>?)
+  class SelectedAreasAttribute(val value: List<UInt>)
 
   sealed class SelectedAreasAttributeSubscriptionState {
-    data class Success(val value: List<UInt>?) : SelectedAreasAttributeSubscriptionState()
+    data class Success(val value: List<UInt>) : SelectedAreasAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SelectedAreasAttributeSubscriptionState()
 
@@ -148,7 +148,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
   }
 
   suspend fun selectAreas(
-    newAreas: List<UInt>?,
+    newAreas: List<UInt>,
     timedInvokeTimeout: Duration? = null,
   ): SelectAreasResponse {
     val commandId: UInt = 0u
@@ -157,13 +157,11 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_NEW_AREAS_REQ: Int = 0
-    newAreas?.let {
-      tlvWriter.startArray(ContextSpecificTag(TAG_NEW_AREAS_REQ))
-      for (item in newAreas.iterator()) {
-        tlvWriter.put(AnonymousTag, item)
-      }
-      tlvWriter.endArray()
+    tlvWriter.startArray(ContextSpecificTag(TAG_NEW_AREAS_REQ))
+    for (item in newAreas.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
     }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -192,17 +190,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       }
 
       if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
-        statusText_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getString(tag)
-            } else {
-              null
-            }
-          }
+        statusText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
       }
@@ -210,6 +198,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     if (status_decoded == null) {
       throw IllegalStateException("status not found in TLV")
+    }
+
+    if (statusText_decoded == null) {
+      throw IllegalStateException("statusText not found in TLV")
     }
 
     tlvReader.exitContainer()
@@ -217,11 +209,14 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     return SelectAreasResponse(status_decoded, statusText_decoded)
   }
 
-  suspend fun skipArea(timedInvokeTimeout: Duration? = null): SkipAreaResponse {
+  suspend fun skipArea(skippedArea: UInt, timedInvokeTimeout: Duration? = null): SkipAreaResponse {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SKIPPED_AREA_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_SKIPPED_AREA_REQ), skippedArea)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -250,17 +245,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       }
 
       if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
-        statusText_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getString(tag)
-            } else {
-              null
-            }
-          }
+        statusText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
       }
@@ -268,6 +253,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     if (status_decoded == null) {
       throw IllegalStateException("status not found in TLV")
+    }
+
+    if (statusText_decoded == null) {
+      throw IllegalStateException("statusText not found in TLV")
     }
 
     tlvReader.exitContainer()
@@ -399,7 +388,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<ServiceAreaClusterMapStruct>? =
-      if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(AnonymousTag)) {
         buildList<ServiceAreaClusterMapStruct> {
           tlvReader.enterArray(AnonymousTag)
           while (!tlvReader.isEndOfContainer()) {
@@ -408,7 +397,6 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
           tlvReader.exitContainer()
         }
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
@@ -455,7 +443,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<ServiceAreaClusterMapStruct>? =
-            if (!tlvReader.isNull()) {
+            if (tlvReader.isNextTag(AnonymousTag)) {
               buildList<ServiceAreaClusterMapStruct> {
                 tlvReader.enterArray(AnonymousTag)
                 while (!tlvReader.isEndOfContainer()) {
@@ -464,7 +452,6 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
                 tlvReader.exitContainer()
               }
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
@@ -503,18 +490,13 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt>? =
-      if (!tlvReader.isNull()) {
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
         }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
+        tlvReader.exitContainer()
       }
 
     return SelectedAreasAttribute(decodedValue)
@@ -559,21 +541,16 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt>? =
-            if (!tlvReader.isNull()) {
-              buildList<UInt> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUInt(AnonymousTag))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
               }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(SelectedAreasAttributeSubscriptionState.Success(it)) }
+          emit(SelectedAreasAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(SelectedAreasAttributeSubscriptionState.SubscriptionEstablished)
@@ -813,20 +790,15 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<ServiceAreaClusterProgressStruct>? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          buildList<ServiceAreaClusterProgressStruct> {
-            tlvReader.enterArray(AnonymousTag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(ServiceAreaClusterProgressStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ServiceAreaClusterProgressStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ServiceAreaClusterProgressStruct.fromTlv(AnonymousTag, tlvReader))
           }
-        } else {
-          null
+          tlvReader.exitContainer()
         }
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
@@ -873,20 +845,15 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<ServiceAreaClusterProgressStruct>? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                buildList<ServiceAreaClusterProgressStruct> {
-                  tlvReader.enterArray(AnonymousTag)
-                  while (!tlvReader.isEndOfContainer()) {
-                    add(ServiceAreaClusterProgressStruct.fromTlv(AnonymousTag, tlvReader))
-                  }
-                  tlvReader.exitContainer()
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ServiceAreaClusterProgressStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ServiceAreaClusterProgressStruct.fromTlv(AnonymousTag, tlvReader))
                 }
-              } else {
-                null
+                tlvReader.exitContainer()
               }
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 

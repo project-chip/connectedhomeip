@@ -82,12 +82,13 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
 
     if (statusEmber != statusDm)
     {
-        StringBuilder<128> buffer;
+        ActionReturnStatus::StringStorage buffer;
+
         // Note log + chipDie instead of VerifyOrDie so that breakpoints (and usage of rr)
         // is easier to debug.
         ChipLogError(Test, "Different return codes between ember and DM");
-        ChipLogError(Test, "  Ember status: %s", statusEmber.c_str());
-        ChipLogError(Test, "  DM status:    %s", statusDm.c_str());
+        ChipLogError(Test, "  Ember status: %s", statusEmber.c_str(buffer));
+        ChipLogError(Test, "  DM status:    %s", statusDm.c_str(buffer));
 
         // For time-dependent data, we may have size differences here: one data fitting in buffer
         // while another not, resulting in different errors (success vs out of space).
@@ -95,7 +96,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
         // Make unit tests strict; otherwise allow it with potentially odd mismatch errors
         // (in which case logs will be odd, however we also expect Checked versions to only
         // run for a short period until we switch over to either ember or DM completely).
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
         chipDie();
 #endif
     }
@@ -118,7 +119,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
     {
         ChipLogError(Test, "Different written length: %" PRIu32 " (Ember) vs %" PRIu32 " (DataModel)", lengthWrittenEmber,
                      reportBuilder.GetWriter()->GetLengthWritten());
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
         chipDie();
 #endif
     }
@@ -137,7 +138,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                 ChipLogError(Test, "Different partial data");
                 // NOTE: die on unit tests only, since partial data size may differ across
                 //       time-dependent data (very rarely because fast code, but still possible)
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
                 chipDie();
 #endif
             }
@@ -146,7 +147,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
                 ChipLogError(Test, "Different partial data");
                 // NOTE: die on unit tests only, since partial data size may differ across
                 //       time-dependent data (very rarely because fast code, but still possible)
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_CONFIG_DATA_MODEL_CHECK_DIE_ON_FAILURE
                 chipDie();
 #endif
             }
