@@ -327,7 +327,7 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
     return Status::Success;
 }
 
-Status emAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
+Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
                           bool overrideReadOnlyAndDataType)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
