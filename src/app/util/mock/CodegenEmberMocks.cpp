@@ -50,5 +50,5 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
 
 Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
-  return emAfWriteAttributeExternal(path, input);
+    return emAfWriteAttributeExternal(path, input);
 }

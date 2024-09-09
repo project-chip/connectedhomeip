@@ -825,7 +825,7 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
 
         // dirty: we changed the value to null
         ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], 
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0],
                   AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
     }
 
@@ -2454,7 +2454,8 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 
     // AAI marks dirty paths
     ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-    EXPECT_EQ(model.ChangeListener().DirtyList()[0], AttributePathParams(kStructPath.mEndpointId, kStructPath.mClusterId, kStructPath.mAttributeId));
+    EXPECT_EQ(model.ChangeListener().DirtyList()[0],
+              AttributePathParams(kStructPath.mEndpointId, kStructPath.mClusterId, kStructPath.mAttributeId));
 
     // AAI does not prevent read/write of regular attributes
     // validate that once AAI is added, we still can go through writing regular bits (i.e.
