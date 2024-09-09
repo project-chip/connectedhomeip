@@ -409,14 +409,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -443,7 +439,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -1248,7 +1244,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kIdle = 16384;
@@ -1268,7 +1264,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -1307,7 +1303,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kDeepClean = 16384;
@@ -1320,7 +1316,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -1424,9 +1420,9 @@ cluster RvcOperationalState = 97 {
   command GoHome(): OperationalCommandResponse = 128;
 }
 
-/** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
+/** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OperationalStatusEnum : enum8 {
     kPending = 0;
@@ -1438,37 +1434,41 @@ provisional cluster ServiceArea = 336 {
   enum SelectAreasStatus : enum8 {
     kSuccess = 0;
     kUnsupportedArea = 1;
-    kDuplicatedAreas = 2;
-    kInvalidInMode = 3;
-    kInvalidSet = 4;
+    kInvalidInMode = 2;
+    kInvalidSet = 3;
   }
 
   enum SkipAreaStatus : enum8 {
     kSuccess = 0;
     kInvalidAreaList = 1;
     kInvalidInMode = 2;
+    kInvalidSkippedArea = 3;
   }
 
   bitmap Feature : bitmap32 {
-    kListOrder = 0x1;
-    kSelectWhileRunning = 0x2;
+    kSelectWhileRunning = 0x1;
+    kProgressReporting = 0x2;
+    kMaps = 0x4;
+  }
+
+  struct LandmarkInfoStruct {
+    LandmarkTag landmarkTag = 0;
+    nullable RelativePositionTag relativePositionTag = 1;
   }
 
   struct AreaInfoStruct {
     nullable LocationDescriptorStruct locationInfo = 0;
-    nullable LandmarkTag landmarkTag = 1;
-    nullable PositionTag positionTag = 2;
-    nullable FloorSurfaceTag surfaceTag = 3;
+    nullable LandmarkInfoStruct landmarkInfo = 1;
   }
 
   struct AreaStruct {
     int32u areaID = 0;
-    nullable int8u mapID = 1;
-    AreaInfoStruct areaDesc = 2;
+    nullable int32u mapID = 1;
+    AreaInfoStruct areaInfo = 2;
   }
 
   struct MapStruct {
-    int8u mapID = 0;
+    int32u mapID = 0;
     char_string<64> name = 1;
   }
 
@@ -1480,7 +1480,7 @@ provisional cluster ServiceArea = 336 {
   }
 
   readonly attribute AreaStruct supportedAreas[] = 0;
-  readonly attribute MapStruct supportedMaps[] = 1;
+  readonly attribute optional MapStruct supportedMaps[] = 1;
   readonly attribute int32u selectedAreas[] = 2;
   readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
@@ -1498,18 +1498,22 @@ provisional cluster ServiceArea = 336 {
 
   response struct SelectAreasResponse = 1 {
     SelectAreasStatus status = 0;
-    optional char_string<256> statusText = 1;
+    char_string<256> statusText = 1;
+  }
+
+  request struct SkipAreaRequest {
+    int32u skippedArea = 0;
   }
 
   response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
-    optional char_string<256> statusText = 1;
+    char_string<256> statusText = 1;
   }
 
   /** Command used to select a set of device areas, where the device is to operate. */
   command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
   /** This command is used to skip an area where the device operates. */
-  command SkipArea(): SkipAreaResponse = 2;
+  command SkipArea(SkipAreaRequest): SkipAreaResponse = 2;
 }
 
 endpoint 0 {
@@ -1727,7 +1731,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -1741,7 +1745,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;

@@ -27,17 +27,8 @@ import("silabs_board.gni")
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
 declare_args() {
-  # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
-  si91x_alarm_based_periodic_wakeup = false
-
-  # Periodic time at which the 917 SoC should wakeup
-  si91x_alarm_periodic_time = 30
-
   # option to select the crypto library
   sl_si91x_crypto_flavor = "tinycrypt"
-
-  # enable 917 SoC M4 sleep wakeup
-  si917_m4_sleep_enabled = false
 }
 
 # Defines an siwx917 SDK build target.
@@ -215,7 +206,6 @@ template("siwx917_sdk") {
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
-      "BRD4325A",  #TODO: should be removed after SoC macro clean-up
       "SLI_SI917B0=1",
       "SLI_SI91X_MCU_COMMON_FLASH_MODE=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_VER2=1",
@@ -259,11 +249,14 @@ template("siwx917_sdk") {
     }
 
     if (chip_build_libshell) {
-      defines += [ "ENABLE_CHIP_SHELL" ]
+      defines += [
+        "ENABLE_CHIP_SHELL",
+        "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1",
+      ]
     }
 
     defines += [ "LWIP_NETIF_API=1" ]
-    if (lwip_ipv4) {
+    if (chip_enable_wifi_ipv4) {
       defines += [
         "LWIP_IPV4=1",
 
@@ -301,7 +294,6 @@ template("siwx917_sdk") {
 
     if (!disable_lcd) {
       defines += [
-        "CONFIG_ENABLE_UART",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
@@ -310,12 +302,7 @@ template("siwx917_sdk") {
 
     # Enabling led interface
     if (use_wstk_leds) {
-      defines += [
-        "ENABLE_WSTK_LEDS",
-
-        # TODO: remove this when it is added to the board config from wifi sdk
-        "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
-      ]
+      defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
     if (chip_enable_icd_server) {
@@ -329,17 +316,6 @@ template("siwx917_sdk") {
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
       ]
-
-      if (si91x_alarm_based_periodic_wakeup) {
-        defines += [ "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}" ]
-      }
-
-      if (si917_m4_sleep_enabled) {
-        defines += [
-          "SI917_M4_SLEEP_ENABLED=1",
-          "XTAL_OFF",
-        ]
-      }
     }
 
     if (sl_uart_log_output) {

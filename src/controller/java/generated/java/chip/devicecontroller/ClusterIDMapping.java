@@ -1717,8 +1717,7 @@ public class ClusterIDMapping {
         public enum Event {
             AccessControlEntryChanged(0L),
             AccessControlExtensionChanged(1L),
-            AccessRestrictionEntryChanged(2L),
-            FabricRestrictionReviewUpdate(3L),;
+            FabricRestrictionReviewUpdate(2L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -4543,7 +4542,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+        }public enum KeepActiveCommandField {StayActiveDuration(0),TimeoutMs(1),;
                     private final int id;
                     KeepActiveCommandField(int id) {
                         this.id = id;
@@ -9415,7 +9414,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            BoostStarted(0L),
+            BoostEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9455,7 +9456,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum BoostCommandField {Duration(0),OneShot(1),EmergencyBoost(2),TemporarySetpoint(3),TargetPercentage(4),TargetReheat(5),;
+        }public enum BoostCommandField {BoostInfo(0),;
                     private final int id;
                     BoostCommandField(int id) {
                         this.id = id;
@@ -11722,6 +11723,23 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
+                }public enum SkipAreaCommandField {SkippedArea(0),;
+                    private final int id;
+                    SkipAreaCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SkipAreaCommandField value(int id) throws NoSuchFieldError {
+                        for (SkipAreaCommandField field : SkipAreaCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -13574,7 +13592,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OccupancyChanged(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -14867,6 +14886,7 @@ public class ClusterIDMapping {
             ThreadVersion(2L),
             InterfaceEnabled(3L),
             ActiveDatasetTimestamp(4L),
+            PendingDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -17217,9 +17237,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            RemovedOn(0L),
-            DeviceDirectory(1L),
-            LocationDirectory(2L),
+            DeviceDirectory(0L),
+            LocationDirectory(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -17387,7 +17406,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum RequestCommissioningApprovalCommandField {RequestId(0),VendorId(1),ProductId(2),Label(3),;
+        }public enum RequestCommissioningApprovalCommandField {RequestID(0),VendorID(1),ProductID(2),Label(3),;
                     private final int id;
                     RequestCommissioningApprovalCommandField(int id) {
                         this.id = id;
@@ -17404,7 +17423,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),IpAddress(2),Port(3),;
+                }public enum CommissionNodeCommandField {RequestID(0),ResponseTimeoutSeconds(1),;
                     private final int id;
                     CommissionNodeCommandField(int id) {
                         this.id = id;
@@ -17755,6 +17774,8 @@ public class ClusterIDMapping {
             GlobalEnum(51L),
             GlobalStruct(52L),
             Unsupported(255L),
+            ReadFailureCode(12288L),
+            FailureInt32U(12289L),
             NullableBoolean(16384L),
             NullableBitmap8(16385L),
             NullableBitmap16(16386L),

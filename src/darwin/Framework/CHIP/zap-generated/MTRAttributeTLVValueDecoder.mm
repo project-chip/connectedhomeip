@@ -11195,44 +11195,40 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 if (entry_0.mapID.IsNull()) {
                     newElement_0.mapID = nil;
                 } else {
-                    newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID.Value()];
+                    newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID.Value()];
                 }
-                newElement_0.areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
-                if (entry_0.areaDesc.locationInfo.IsNull()) {
-                    newElement_0.areaDesc.locationInfo = nil;
+                newElement_0.areaInfo = [MTRServiceAreaClusterAreaInfoStruct new];
+                if (entry_0.areaInfo.locationInfo.IsNull()) {
+                    newElement_0.areaInfo.locationInfo = nil;
                 } else {
-                    newElement_0.areaDesc.locationInfo = [MTRDataTypeLocationDescriptorStruct new];
-                    newElement_0.areaDesc.locationInfo.locationName = AsString(entry_0.areaDesc.locationInfo.Value().locationName);
-                    if (newElement_0.areaDesc.locationInfo.locationName == nil) {
+                    newElement_0.areaInfo.locationInfo = [MTRDataTypeLocationDescriptorStruct new];
+                    newElement_0.areaInfo.locationInfo.locationName = AsString(entry_0.areaInfo.locationInfo.Value().locationName);
+                    if (newElement_0.areaInfo.locationInfo.locationName == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         *aError = err;
                         return nil;
                     }
-                    if (entry_0.areaDesc.locationInfo.Value().floorNumber.IsNull()) {
-                        newElement_0.areaDesc.locationInfo.floorNumber = nil;
+                    if (entry_0.areaInfo.locationInfo.Value().floorNumber.IsNull()) {
+                        newElement_0.areaInfo.locationInfo.floorNumber = nil;
                     } else {
-                        newElement_0.areaDesc.locationInfo.floorNumber = [NSNumber numberWithShort:entry_0.areaDesc.locationInfo.Value().floorNumber.Value()];
+                        newElement_0.areaInfo.locationInfo.floorNumber = [NSNumber numberWithShort:entry_0.areaInfo.locationInfo.Value().floorNumber.Value()];
                     }
-                    if (entry_0.areaDesc.locationInfo.Value().areaType.IsNull()) {
-                        newElement_0.areaDesc.locationInfo.areaType = nil;
+                    if (entry_0.areaInfo.locationInfo.Value().areaType.IsNull()) {
+                        newElement_0.areaInfo.locationInfo.areaType = nil;
                     } else {
-                        newElement_0.areaDesc.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.locationInfo.Value().areaType.Value())];
+                        newElement_0.areaInfo.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.locationInfo.Value().areaType.Value())];
                     }
                 }
-                if (entry_0.areaDesc.landmarkTag.IsNull()) {
-                    newElement_0.areaDesc.landmarkTag = nil;
+                if (entry_0.areaInfo.landmarkInfo.IsNull()) {
+                    newElement_0.areaInfo.landmarkInfo = nil;
                 } else {
-                    newElement_0.areaDesc.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.landmarkTag.Value())];
-                }
-                if (entry_0.areaDesc.positionTag.IsNull()) {
-                    newElement_0.areaDesc.positionTag = nil;
-                } else {
-                    newElement_0.areaDesc.positionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.positionTag.Value())];
-                }
-                if (entry_0.areaDesc.surfaceTag.IsNull()) {
-                    newElement_0.areaDesc.surfaceTag = nil;
-                } else {
-                    newElement_0.areaDesc.surfaceTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaDesc.surfaceTag.Value())];
+                    newElement_0.areaInfo.landmarkInfo = [MTRServiceAreaClusterLandmarkInfoStruct new];
+                    newElement_0.areaInfo.landmarkInfo.landmarkTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.landmarkInfo.Value().landmarkTag)];
+                    if (entry_0.areaInfo.landmarkInfo.Value().relativePositionTag.IsNull()) {
+                        newElement_0.areaInfo.landmarkInfo.relativePositionTag = nil;
+                    } else {
+                        newElement_0.areaInfo.landmarkInfo.relativePositionTag = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.areaInfo.landmarkInfo.Value().relativePositionTag.Value())];
+                    }
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -11260,7 +11256,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 auto & entry_0 = iter_0.GetValue();
                 MTRServiceAreaClusterMapStruct * newElement_0;
                 newElement_0 = [MTRServiceAreaClusterMapStruct new];
-                newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID];
+                newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID];
                 newElement_0.name = AsString(entry_0.name);
                 if (newElement_0.name == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -12886,7 +12882,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::CompensationText::Id: {
@@ -12924,7 +12920,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::Options::Id: {
@@ -12935,7 +12931,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::NumberOfPrimaries::Id: {
@@ -13327,7 +13323,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ColorLoopActive::Id: {
@@ -13393,7 +13389,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
     case Attributes::ColorTempPhysicalMinMireds::Id: {
@@ -15879,6 +15875,21 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
         }
         return value;
     }
+    case Attributes::PendingDatasetTimestamp::Id: {
+        using TypeInfo = Attributes::PendingDatasetTimestamp::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
     default: {
         break;
     }
@@ -17174,21 +17185,6 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
 {
     using namespace Clusters::EcosystemInformation;
     switch (aAttributeId) {
-    case Attributes::RemovedOn::Id: {
-        using TypeInfo = Attributes::RemovedOn::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::DeviceDirectory::Id: {
         using TypeInfo = Attributes::DeviceDirectory::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -19719,6 +19715,28 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ReadFailureCode::Id: {
+        using TypeInfo = Attributes::ReadFailureCode::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::FailureInt32U::Id: {
+        using TypeInfo = Attributes::FailureInt32U::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     case Attributes::NullableBoolean::Id: {

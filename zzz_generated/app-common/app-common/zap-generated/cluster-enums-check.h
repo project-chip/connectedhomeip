@@ -2598,7 +2598,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectArea
     {
     case EnumType::kSuccess:
     case EnumType::kUnsupportedArea:
-    case EnumType::kDuplicatedAreas:
     case EnumType::kInvalidInMode:
     case EnumType::kInvalidSet:
         return val;
@@ -2614,6 +2613,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipAreaSt
     case EnumType::kSuccess:
     case EnumType::kInvalidAreaList:
     case EnumType::kInvalidInMode:
+    case EnumType::kInvalidSkippedArea:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2941,9 +2941,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterface
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoopAction val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoopActionEnum val)
 {
-    using EnumType = ColorControl::ColorLoopAction;
+    using EnumType = ColorControl::ColorLoopActionEnum;
     switch (val)
     {
     case EnumType::kDeactivate:
@@ -2954,38 +2954,38 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoop
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoopDirection val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoopDirectionEnum val)
 {
-    using EnumType = ColorControl::ColorLoopDirection;
+    using EnumType = ColorControl::ColorLoopDirectionEnum;
     switch (val)
     {
-    case EnumType::kDecrementHue:
-    case EnumType::kIncrementHue:
+    case EnumType::kDecrement:
+    case EnumType::kIncrement:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorModeEnum val)
 {
-    using EnumType = ColorControl::ColorMode;
+    using EnumType = ColorControl::ColorModeEnum;
     switch (val)
     {
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
-    case EnumType::kColorTemperature:
+    case EnumType::kColorTemperatureMireds:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueDirection val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DirectionEnum val)
 {
-    using EnumType = ColorControl::HueDirection;
+    using EnumType = ColorControl::DirectionEnum;
     switch (val)
     {
-    case EnumType::kShortestDistance:
-    case EnumType::kLongestDistance:
+    case EnumType::kShortest:
+    case EnumType::kLongest:
     case EnumType::kUp:
     case EnumType::kDown:
         return val;
@@ -2993,9 +2993,38 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueDirect
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueMoveMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DriftCompensationEnum val)
 {
-    using EnumType = ColorControl::HueMoveMode;
+    using EnumType = ColorControl::DriftCompensationEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kOtherOrUnknown:
+    case EnumType::kTemperatureMonitoring:
+    case EnumType::kOpticalLuminanceMonitoringAndFeedback:
+    case EnumType::kOpticalColorMonitoringAndFeedback:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::EnhancedColorModeEnum val)
+{
+    using EnumType = ColorControl::EnhancedColorModeEnum;
+    switch (val)
+    {
+    case EnumType::kCurrentHueAndCurrentSaturation:
+    case EnumType::kCurrentXAndCurrentY:
+    case EnumType::kColorTemperatureMireds:
+    case EnumType::kEnhancedCurrentHueAndCurrentSaturation:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::MoveModeEnum val)
+{
+    using EnumType = ColorControl::MoveModeEnum;
     switch (val)
     {
     case EnumType::kStop:
@@ -3006,34 +3035,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueMoveMo
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueStepMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::StepModeEnum val)
 {
-    using EnumType = ColorControl::HueStepMode;
-    switch (val)
-    {
-    case EnumType::kUp:
-    case EnumType::kDown:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::SaturationMoveMode val)
-{
-    using EnumType = ColorControl::SaturationMoveMode;
-    switch (val)
-    {
-    case EnumType::kStop:
-    case EnumType::kUp:
-    case EnumType::kDown:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::SaturationStepMode val)
-{
-    using EnumType = ColorControl::SaturationStepMode;
+    using EnumType = ColorControl::StepModeEnum;
     switch (val)
     {
     case EnumType::kUp:
@@ -3425,6 +3429,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::St
     case EnumType::kSuccess:
     case EnumType::kAppNotAvailable:
     case EnumType::kSystemBusy:
+    case EnumType::kPendingUserApproval:
+    case EnumType::kDownloading:
+    case EnumType::kInstalling:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

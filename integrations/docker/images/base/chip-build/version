@@ -1,1 +1,1 @@
-69 : [Infineon] Update ModusToolbox version to 3.2
+75 : remove workaround for bloaty build, workaround involved cloning and installing abseil

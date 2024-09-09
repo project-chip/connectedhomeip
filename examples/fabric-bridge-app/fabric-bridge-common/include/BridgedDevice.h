@@ -18,43 +18,72 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <functional>
 #include <string>
-#include <vector>
 
 class BridgedDevice
 {
 public:
-    static const int kDeviceNameSize = 32;
+    /// Defines all attributes that we keep track of for a bridged device
+    struct BridgedAttributes
+    {
+        std::string uniqueId;
+        std::string vendorName;
+        uint16_t vendorId = 0;
+        std::string productName;
+        uint16_t productId = 0;
+        std::string nodeLabel;
+        uint16_t hardwareVersion = 0;
+        std::string hardwareVersionString;
+        uint32_t softwareVersion = 0;
+        std::string softwareVersionString;
+    };
+
+    struct AdminCommissioningAttributes
+    {
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum commissioningWindowStatus =
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
+        std::optional<chip::FabricIndex> openerFabricIndex = std::nullopt;
+        std::optional<chip::VendorId> openerVendorId       = std::nullopt;
+    };
 
     BridgedDevice(chip::NodeId nodeId);
-    virtual ~BridgedDevice() {}
+    virtual ~BridgedDevice() = default;
 
-    bool IsReachable();
+    [[nodiscard]] bool IsReachable() const { return mReachable; }
     void SetReachable(bool reachable);
-    void SetName(const char * name);
-    void SetLocation(std::string location) { mLocation = location; };
+
+    void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
+
+    [[nodiscard]] bool IsIcd() const { return mIsIcd; }
+    void SetIcd(bool icd) { mIsIcd = icd; }
+
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline chip::NodeId GetNodeId() { return mNodeId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
-    inline char * GetName() { return mName; };
-    inline std::string GetLocation() { return mLocation; };
-    inline std::string GetZone() { return mZone; };
-    inline void SetZone(std::string zone) { mZone = zone; };
+
+    [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
+    void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+
+    void SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes);
+    const AdminCommissioningAttributes & GetAdminCommissioningAttributes() const { return mAdminCommissioningAttributes; }
+
+    /// Convenience method to set just the unique id of a bridged device as it
+    /// is one of the few attributes that is not always bulk-set
+    void SetUniqueId(const std::string & value) { mAttributes.uniqueId = value; }
 
 protected:
-    bool mReachable;
-    char mName[kDeviceNameSize];
-    std::string mLocation;
-    chip::NodeId mNodeId;
-    chip::EndpointId mEndpointId;
-    chip::EndpointId mParentEndpointId;
-    std::string mZone;
+    bool mReachable = false;
+    bool mIsIcd     = false;
+
+    chip::NodeId mNodeId               = 0;
+    chip::EndpointId mEndpointId       = 0;
+    chip::EndpointId mParentEndpointId = 0;
+
+    BridgedAttributes mAttributes;
+    AdminCommissioningAttributes mAdminCommissioningAttributes;
 };

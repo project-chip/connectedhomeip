@@ -88,7 +88,7 @@ limitations under the License.
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="LITS">
+                    <feature code="LITS" name="LongIdleTimeSupport">
                     <otherwiseConform>
                         <provisionalConform/>
                         <mandatoryConform>
@@ -265,7 +265,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -283,10 +283,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -366,7 +366,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -384,10 +384,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -464,7 +464,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -482,10 +482,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -506,7 +506,7 @@ limitations under the License.
             </include>
             <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="CT">
+                    <feature code="CT" name="ColorTemperature">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -581,7 +581,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -599,10 +599,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -623,19 +623,19 @@ limitations under the License.
             </include>
             <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="HS">
+                    <feature code="HS" name="HueSaturation">
                     <optionalConform/>
                     </feature>
-                    <feature code="" name="EHUE">
+                    <feature code="EHUE" name="EnhancedHue">
                     <optionalConform/>
                     </feature>
-                    <feature code="" name="CL">
+                    <feature code="CL" name="ColorLoop">
                     <optionalConform/>
                     </feature>
-                    <feature code="" name="XY">
+                    <feature code="XY" name="XY">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="CT">
+                    <feature code="CT" name="ColorTemperature">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -714,7 +714,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -732,10 +732,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -808,7 +808,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -826,10 +826,10 @@ limitations under the License.
             </include>
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="OO">
+                    <feature code="OO" name="OnOff">
                     <mandatoryConform/>
                     </feature>
-                    <feature code="" name="LT">
+                    <feature code="LT" name="Lighting">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -1490,7 +1490,7 @@ limitations under the License.
             </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="USR">
+                    <feature code="USR" name="User">
                     <mandatoryConform>
                         <andTerm>
                         <condition name="Matter"/>
@@ -1503,7 +1503,7 @@ limitations under the License.
                         </andTerm>
                     </mandatoryConform>
                     </feature>
-                    <feature code="" name="RID">
+                    <feature code="" name="RFIDCredential">
                     <otherwiseConform>
                         <provisionalConform/>
                         <optionalConform/>
@@ -1592,7 +1592,7 @@ limitations under the License.
             </include>
             <include cluster="Window Covering" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="Absolute">
+                    <feature code="ABS" name="AbsolutePosition">
                     <mandatoryConform>
                         <condition name="Zigbee"/>
                     </mandatoryConform>
@@ -1629,7 +1629,7 @@ limitations under the License.
             <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Window Covering" client="true" server="false" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="Absolute">
+                    <feature code="ABS" name="AbsolutePosition">
                     <mandatoryConform>
                         <condition name="Zigbee"/>
                     </mandatoryConform>
@@ -1825,7 +1825,7 @@ limitations under the License.
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false">
                 <features>
-                    <feature code="" name="Application">
+                    <feature code="AP" name="ApplicationPlatform">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -1986,7 +1986,7 @@ limitations under the License.
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="true">
                 <features>
-                    <feature code="" name="Application">
+                    <feature code="AP" name="ApplicationPlatform">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2039,7 +2039,7 @@ limitations under the License.
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="DF">
+                    <feature code="DF" name="DeadFrontBehavior">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -2144,7 +2144,7 @@ limitations under the License.
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="DF">
+                    <feature code="DF" name="DeadFrontBehavior">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -2153,7 +2153,7 @@ limitations under the License.
             <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Dishwasher Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OnOff">
+                    <feature code="OO" name="OnOff">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2188,10 +2188,10 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="Wind">
+                    <feature code="WND" name="Wind">
                     <disallowConform/>
                     </feature>
-                    <feature code="" name="AirflowDirection">
+                    <feature code="DIR" name="AirflowDirection">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2209,12 +2209,18 @@ limitations under the License.
         <deviceId editable="false">0x0070</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                    <deviceType>0x0071</deviceType>
+            </endpoint>
+        </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OnOff">
+                    <feature code="OO" name="OnOff">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2235,14 +2241,14 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="DF">
+                    <feature code="DF" name="DeadFrontBehavior">
                     <mandatoryConform/>
                     </feature>
                 </features>
             </include>
             <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OnOff">
+                    <feature code="OO" name="OnOff">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2265,7 +2271,7 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="DF">
+                    <feature code="DF" name="DeadFrontBehavior">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -2297,13 +2303,13 @@ limitations under the License.
             <include cluster="Activated Carbon Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="Rocking">
+                    <feature code="RCK" name="Rocking">
                     <disallowConform/>
                     </feature>
-                    <feature code="" name="Wind">
+                    <feature code="WND" name="Wind">
                     <disallowConform/>
                     </feature>
-                    <feature code="" name="AirflowDirection">
+                    <feature code="DIR" name="AirflowDirection">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2342,14 +2348,14 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OnOff">
+                    <feature code="OO" name="OnOff">
                     <disallowConform/>
                     </feature>
                 </features>
             </include>
             <include cluster="Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
-                    <feature code="" name="OnOff">
+                    <feature code="OO" name="OnOff">
                     <disallowConform/>
                     </feature>
                 </features>
@@ -2641,7 +2647,7 @@ limitations under the License.
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
-                    <feature code="" name="OFFONLY">
+                    <feature code="OFFONLY" name="OffOnly">
                     <mandatoryConform/>
                     </feature>
                 </features>
@@ -2656,8 +2662,14 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0077</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="OFFONLY" name="OffOnly">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
             </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>

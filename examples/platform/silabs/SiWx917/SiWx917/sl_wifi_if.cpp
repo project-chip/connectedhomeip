@@ -15,51 +15,68 @@
  *    limitations under the License.
  */
 
+/*
+ * This file implements the interface to the wifi sdk
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#if (SL_MATTER_GN_BUILD == 0)
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
+#include "FreeRTOS.h"
+#include "ble_config.h"
+#include "dhcp_client.h"
+#include "event_groups.h"
+#include "sl_board_configuration.h"
 #include "sl_status.h"
+#include "task.h"
+#include "wfx_host_events.h"
+#include "wfx_rsi.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/IPAddress.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "sl_board_configuration.h"
 extern "C" {
+#include "sl_net.h"
+#include "sl_si91x_driver.h"
+#include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
+#include "sl_wifi.h"
+#include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
 #include "sl_wlan_config.h"
+#include "wfx_host_events.h"
+#if SL_MBEDTLS_USE_TINYCRYPT
+#include "sl_si91x_constants.h"
+#include "sl_si91x_trng.h"
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
-#include "task.h"
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #endif
 
-#include "ble_config.h"
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
-#if DISPLAY_ENABLED
-#include "sl_memlcd.h"
-#endif // DISPLAY_ENABLED
-extern "C" {
-#include "sl_si91x_driver.h"
-#include "sl_si91x_m4_ps.h"
-}
+#include "sl_si91x_power_manager.h"
 
+namespace {
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
 bool btn0_pressed = false;
+
+#ifdef ENABLE_CHIP_SHELL
+bool ps_requirement_added = false;
+#endif // ENABLE_CHIP_SHELL
+} // namespace
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
-#include "dhcp_client.h"
-#include "wfx_host_events.h"
-#include "wfx_rsi.h"
 #define ADV_SCAN_THRESHOLD -40
 #define ADV_RSSI_TOLERANCE_THRESHOLD 5
 #define ADV_ACTIVE_SCAN_DURATION 15
@@ -69,22 +86,15 @@ bool btn0_pressed = false;
 
 // TODO: Confirm that this value works for size and timing
 #define WFX_QUEUE_SIZE 10
-extern "C" {
-#include "sl_net.h"
-#include "sl_si91x_host_interface.h"
-#include "sl_wifi.h"
-#include "sl_wifi_callback_framework.h"
-#include "wfx_host_events.h"
-#if SL_MBEDTLS_USE_TINYCRYPT
-#include "sl_si91x_constants.h"
-#include "sl_si91x_trng.h"
-#endif // SL_MBEDTLS_USE_TINYCRYPT
-}
+
+// TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
+#define WIFI_SCAN_TIMEOUT_TICK 10000
+
+#if !defined(MIN)
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#endif
 
 WfxRsi_t wfx_rsi;
-
-/* Declare a variable to hold the data associated with the created event group. */
-StaticEventGroup_t rsiDriverEventGroup;
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -92,27 +102,11 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
-/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_wifi_disconnection_event = false;
-
-/* Declare a variable to hold connection time intervals */
-uint32_t retryInterval                 = WLAN_MIN_RETRY_TIMER_MS;
 volatile bool scan_results_complete    = false;
 volatile bool bg_scan_results_complete = false;
-
-// TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
-#define WIFI_SCAN_TIMEOUT_TICK 10000
-
 extern osSemaphoreId_t sl_rs_ble_init_sem;
-
-/*
- * This file implements the interface to the wifi sdk
- */
-
 static wfx_wifi_scan_ext_t temp_reset;
-
 volatile sl_status_t callback_status = SL_STATUS_OK;
-
 // Scan semaphore
 static osSemaphoreId_t sScanSemaphore;
 // DHCP Poll timer
@@ -249,12 +243,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         callback_status = *(sl_status_t *) result;
         ChipLogError(DeviceLayer, "join_callback_handler: failed: 0x%lx", static_cast<uint32_t>(callback_status));
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
-        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
-        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
-        {
-            WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
-            WfxPostEvent(&WfxEvent);
-        }
+        wfx_retry_connection(++wfx_rsi.join_retries);
         return SL_STATUS_FAIL;
     }
     /*
@@ -266,10 +255,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     WfxEvent.eventType = WFX_EVT_STA_CONN;
     WfxPostEvent(&WfxEvent);
     wfx_rsi.join_retries = 0;
-    retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    // Once the join passes setting the disconnection event to true to differentiate between the first connection and reconnection
-    is_wifi_disconnection_event = true;
-    callback_status             = SL_STATUS_OK;
+    callback_status      = SL_STATUS_OK;
     return SL_STATUS_OK;
 }
 
@@ -288,28 +274,26 @@ void sl_si91x_invoke_btn_press_event()
     {
         btn0_pressed = false;
     }
-}
 
-/******************************************************************
- * @fn   sl_app_sleep_ready()
- * @brief
- *       Called from the supress ticks from tickless to check if it
- *       is ok to go to sleep
- * @param[in] None
- * @return
- *        None
- *********************************************************************/
-uint32_t sl_app_sleep_ready()
-{
-    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
+#ifdef ENABLE_CHIP_SHELL
+    // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
+    if (RSI_NPSSGPIO_GetPin(RTE_UULP_GPIO_1_PIN))
     {
-#if DISPLAY_ENABLED
-        // Powering down the LCD
-        sl_memlcd_power_on(NULL, false);
-#endif /* DISPLAY_ENABLED */
-        return true;
+        if (!ps_requirement_added)
+        {
+            sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = true;
+        }
     }
-    return false;
+    else
+    {
+        if (ps_requirement_added)
+        {
+            sl_si91x_power_manager_remove_ps_requirement(SL_SI91X_POWER_MANAGER_PS4);
+            ps_requirement_added = false;
+        }
+    }
+#endif // ENABLE_CHIP_SHELL
 }
 #endif // SLI_SI91X_MCU_INTERFACE
 
@@ -340,14 +324,7 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
         ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
-    if (sl_si91x_wifi_state == HIGH_PERFORMANCE)
-    {
-        wfx_rsi.dev_state &= ~(WFX_RSI_ST_SLEEP_READY);
-    }
-    else
-    {
-        wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
-    }
+
     return status;
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
@@ -426,6 +403,16 @@ static sl_status_t wfx_rsi_init(void)
         ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
+#ifdef ENABLE_CHIP_SHELL
+    // While using the matter shell with the ICD server, the GPIO 1 is used to check the UULP PIN 1 status
+    // since UART doesn't act as a wakeup source in the UULP mode
+    /*Configuring the NPS GPIO 1*/
+    RSI_NPSSGPIO_SetPinMux(RTE_UULP_GPIO_1_PIN, 0);
+    /*Configure the NPSS GPIO direction to input */
+    RSI_NPSSGPIO_SetDir(RTE_UULP_GPIO_1_PIN, 1);
+    /*Enable the REN*/
+    RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+#endif // ENABLE_CHIP_SHELL
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SLI_SI91X_MCU_INTERFACE */
 
@@ -465,7 +452,6 @@ static sl_status_t wfx_rsi_init(void)
     }
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
-    wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
@@ -551,7 +537,9 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
-        if (wfx_rsi.scan_ssid != NULL && strcmp(wfx_rsi.scan_ssid, cur_scan_result.ssid) != CMP_SUCCESS)
+        if (wfx_rsi.scan_ssid != NULL &&
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+             CMP_SUCCESS))
         {
             continue;
         }
@@ -694,12 +682,11 @@ static sl_status_t wfx_rsi_do_join(void)
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
-    VerifyOrReturnError((is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
+    VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: retry attempt %d", wfx_rsi.join_retries);
-    wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
-    wfx_rsi.join_retries++;
+    wfx_retry_connection(++wfx_rsi.join_retries);
     event.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&event);
     return status;

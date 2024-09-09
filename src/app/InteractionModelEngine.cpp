@@ -110,9 +110,11 @@ void InteractionModelEngine::Shutdown()
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
     // TODO: individual object clears the entire command handler interface registry.
-    //       This may not be expected.
-    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
-
+    //       This may not be expected as IME does NOT own the command handler interface registry.
+    //
+    //       This is to be cleaned up once InteractionModelEngine maintains a data model fully and
+    //       the code-generation model can do its clear in its shutdown method.
+    CommandHandlerInterfaceRegistry::Instance().UnregisterAllHandlers();
     mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
@@ -492,7 +494,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
-                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId };
+                // leave requestPath.entityId optional value unset to indicate wildcard
+                Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
+                                                 .endpoint    = readPath.mEndpointId,
+                                                 .requestType = Access::RequestType::kAttributeReadRequest };
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(readPath));
                 if (err == CHIP_NO_ERROR)
@@ -508,7 +513,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                paramsList.mValue.mAttributeId);
             if (ConcreteAttributePathExists(concretePath))
             {
-                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+                Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                                 .endpoint    = concretePath.mEndpointId,
+                                                 .requestType = Access::RequestType::kAttributeReadRequest,
+                                                 .entityId    = paramsList.mValue.mAttributeId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(concretePath));
@@ -530,17 +538,27 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
-                      Access::Privilege aNeededPrivilege)
+#if !CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
+                           Access::Privilege aNeededPrivilege)
 {
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                     .endpoint    = aPath.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadRequest };
+    // leave requestPath.entityId optional value unset to indicate wildcard
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
 }
+#endif
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
-    return CanAccess(aSubjectDescriptor, aPath, RequiredPrivilege::ForReadEvent(aPath));
+    Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                     .endpoint    = aPath.mEndpointId,
+                                     .requestType = Access::RequestType::kEventReadRequest,
+                                     .entityId    = aPath.mEventId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
+    return (err == CHIP_NO_ERROR);
 }
 
 /**
@@ -557,7 +575,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
             // If we get here, the path exists.  We just have to do an ACL check for it.
-            bool isValid = CanAccess(aSubjectDescriptor, path);
+            bool isValid = CanAccessEvent(aSubjectDescriptor, path);
             if (isValid)
             {
                 return true;
@@ -569,7 +587,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // We have no way to expand wildcards.  Just assume that we would need
         // View permissions for whatever events are involved.
         ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
-        return CanAccess(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
+        return CanAccessEvent(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
 #endif
     }
 
@@ -579,7 +597,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // Not an existing event path.
         return false;
     }
-    return CanAccess(aSubjectDescriptor, path);
+    return CanAccessEvent(aSubjectDescriptor, path);
 }
 
 /**
@@ -1682,7 +1700,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
                                              TLV::TLVReader & apPayload)
 {
     CommandHandlerInterface * handler =
-        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {

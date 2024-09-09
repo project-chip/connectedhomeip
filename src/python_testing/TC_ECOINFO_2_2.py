@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -32,14 +32,21 @@ class TC_ECOINFO_2_2(MatterBaseTest):
                  TestStep(2, "Add a bridged device"),
                  TestStep("2a", "(Manual Step) Add a bridged device using method indicated by the manufacturer"),
                  TestStep("2b", "Read root endpoint's PartsList, validate exactly one endpoint added"),
-                 TestStep("2c", "On newly added endpoint detected in 2b read RemovedOn Ecosystem Information Attribute and validate"),
+                 TestStep("2c", "On newly added endpoint detected in 2b read DeviceDirectory Ecosystem Information Attribute and validate success"),
+                 TestStep("2d", "On newly added endpoint detected in 2b read LocationDirectory Ecosystem Information Attribute and validate success"),
                  TestStep(3, "Remove bridged device"),
                  TestStep("3a", "(Manual Step) Removed bridged device added in step 2a using method indicated by the manufacturer"),
-                 TestStep("3b", "On newly added endpoint detected in 2b read RemovedOn Ecosystem Information Attribute and validate"),
-                 TestStep("3c", "On newly added endpoint detected in 2b read DeviceDirectory Ecosystem Information Attribute and validate"),
-                 TestStep("3d", "On newly added endpoint detected in 2b read LocationDirectory Ecosystem Information Attribute and validate")]
+                 TestStep("3b", "Verify that PartsList equals what was read in 1a"),
+                 TestStep("3c", "On endpoint detected in 2b, read DeviceDirectory Ecosystem Information Attribute and validate failure"),
+                 TestStep("3d", "On endpoint detected in 2b, read LocationDirectory Ecosystem Information Attribute and validate failure")]
 
         return steps
+
+    # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
+    # be enough time for test to run
+    @property
+    def default_timeout(self) -> int:
+        return 3*60
 
     @async_test_body
     async def test_TC_ECOINFO_2_2(self):
@@ -80,43 +87,55 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         self.step("2c")
         newly_added_endpoint = list(unique_endpoints_set)[0]
-        removed_on = await self.read_single_attribute(
-            dev_ctrl,
-            dut_node_id,
+        await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            node_id=dut_node_id,
             endpoint=newly_added_endpoint,
-            attribute=Clusters.EcosystemInformation.Attributes.RemovedOn)
+            cluster=Clusters.EcosystemInformation,
+            attribute=Clusters.EcosystemInformation.Attributes.DeviceDirectory,
+            fabric_filtered=False)
 
-        asserts.assert_true(removed_on is NullValue, "RemovedOn is expected to be null for a newly added device")
+        self.step("2d")
+        await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            node_id=dut_node_id,
+            endpoint=newly_added_endpoint,
+            cluster=Clusters.EcosystemInformation,
+            attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
+            fabric_filtered=False)
 
         self.step(3)
         self.step("3a")
         self.wait_for_user_input(prompt_msg="Removed bridged device added in step 2a using method indicated by the manufacturer")
 
         self.step("3b")
-        removed_on = await self.read_single_attribute(
-            dev_ctrl,
-            dut_node_id,
-            endpoint=newly_added_endpoint,
-            attribute=Clusters.EcosystemInformation.Attributes.RemovedOn)
-        asserts.assert_true(removed_on is not NullValue, "RemovedOn is expected to have a value")
+        root_part_list_step_3 = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
+        set_of_endpoints_step_3 = set(
+            root_part_list_step_3[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+
+        asserts.assert_equal(set_of_endpoints_step_3, set_of_endpoints_step_1,
+                             "Expected set of endpoints after removal to be identical to when test started")
 
         self.step("3c")
-        device_directory = await self.read_single_attribute(
-            dev_ctrl,
-            dut_node_id,
+        newly_added_endpoint = list(unique_endpoints_set)[0]
+        await self.read_single_attribute_expect_error(
+            dev_ctrl=dev_ctrl,
+            node_id=dut_node_id,
+            error=Status.UnsupportedEndpoint,
             endpoint=newly_added_endpoint,
+            cluster=Clusters.EcosystemInformation,
             attribute=Clusters.EcosystemInformation.Attributes.DeviceDirectory,
-            fabricFiltered=False)
-        asserts.assert_equal(len(device_directory), 0, "Expected device directory to be empty")
+            fabric_filtered=False)
 
         self.step("3d")
-        location_directory = await self.read_single_attribute(
-            dev_ctrl,
-            dut_node_id,
+        await self.read_single_attribute_expect_error(
+            dev_ctrl=dev_ctrl,
+            node_id=dut_node_id,
+            error=Status.UnsupportedEndpoint,
             endpoint=newly_added_endpoint,
+            cluster=Clusters.EcosystemInformation,
             attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
-            fabricFiltered=False)
-        asserts.assert_equal(len(location_directory), 0, "Expected location directory to be empty")
+            fabric_filtered=False)
 
 
 if __name__ == "__main__":

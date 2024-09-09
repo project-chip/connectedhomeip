@@ -46,43 +46,6 @@ struct CommissioningWindowParams
     ByteSpan salt;
 };
 
-class ProtectedIPAddress
-{
-public:
-    const Optional<ByteSpan> GetIPAddress() { return ipAddress; }
-
-    CHIP_ERROR SetIPAddress(const Optional<ByteSpan> & address)
-    {
-        if (!address.HasValue())
-        {
-            ipAddress.ClearValue();
-            return CHIP_NO_ERROR;
-        }
-
-        const ByteSpan & addressSpan = address.Value();
-        size_t addressLength         = addressSpan.size();
-        if (addressLength != 4 && addressLength != 16)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        memcpy(ipAddressBuffer, addressSpan.data(), addressLength);
-        ipAddress.SetValue(ByteSpan(ipAddressBuffer, addressLength));
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    Optional<ByteSpan> ipAddress;
-    uint8_t ipAddressBuffer[kIpAddressBufferSize];
-};
-
-struct CommissionNodeInfo
-{
-    CommissioningWindowParams params;
-    ProtectedIPAddress ipAddress;
-    Optional<uint16_t> port;
-};
-
 class Delegate
 {
 public:
@@ -100,9 +63,6 @@ public:
 
     /**
      * @brief Validate a commission node command.
-     *
-     * This command is sent by a client to request that the server begins commissioning a previously
-     * approved request.
      *
      * The server SHALL return FAILURE if the CommissionNode command is not sent from the same
      * NodeId as the RequestCommissioningApproval or if the provided RequestId to CommissionNode
@@ -128,19 +88,14 @@ public:
     virtual CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) = 0;
 
     /**
-     * @brief Reverse the commission node process.
+     * @brief Handle a commission node request.
      *
-     * When received within the timeout specified by CommissionNode, the client SHALL open a
-     * commissioning window on the node which the client called RequestCommissioningApproval to
-     * have commissioned.
+     * Commission a node specified by the previously approved request.
      *
      * @param params The parameters for the commissioning window.
-     * @param ipAddress Optional IP address for the commissioning window.
-     * @param port Optional port for the commissioning window.
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
-    virtual CHIP_ERROR ReverseCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                             const Optional<uint16_t> & port) = 0;
+    virtual CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) = 0;
 
     virtual ~Delegate() = default;
 };

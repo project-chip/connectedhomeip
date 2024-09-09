@@ -58,8 +58,6 @@
 // allow readwrite access to superclass properties
 @interface MTRDevice_Concrete ()
 
-@property (nonatomic, readwrite, copy) NSNumber * nodeID;
-@property (nonatomic, readwrite, nullable) MTRDeviceController * deviceController;
 @property (nonatomic, readwrite) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @property (nonatomic, readwrite) MTRDeviceState state;
 @property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
@@ -73,84 +71,6 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
-
-// Consider moving utility classes to their own file
-#pragma mark - Utility Classes
-
-// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
-MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo_ConcreteCopy : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-    NSArray * _Nullable _interestedPathsForAttributes;
-    NSArray * _Nullable _interestedPathsForEvents;
-}
-
-// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForAttributes;
-
-// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
-@property (readonly, nullable) NSArray * interestedPathsForEvents;
-
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
-@end
-
-@implementation MTRDeviceDelegateInfo_ConcreteCopy
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    if (self = [super init]) {
-        _delegate = delegate;
-        _delegatePointerValue = (__bridge void *) delegate;
-        _queue = queue;
-        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
-        _interestedPathsForEvents = [interestedPathsForEvents copy];
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
-}
-
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-    dispatch_async(_queue, ^{
-        block(strongDelegate);
-    });
-    return YES;
-}
-
-#ifdef DEBUG
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-
-    block(strongDelegate);
-
-    return YES;
-}
-#endif
-@end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 
@@ -219,6 +139,24 @@ bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
 {
     return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
 }
+
+NSString * InternalDeviceStateString(MTRInternalDeviceState state)
+{
+    switch (state) {
+    case MTRInternalDeviceStateUnsubscribed:
+        return @"Unsubscribed";
+    case MTRInternalDeviceStateSubscribing:
+        return @"Subscribing";
+    case MTRInternalDeviceStateInitialSubscriptionEstablished:
+        return @"InitialSubscriptionEstablished";
+    case MTRInternalDeviceStateResubscribing:
+        return @"Resubscribing";
+    case MTRInternalDeviceStateLaterSubscriptionEstablished:
+        return @"LaterSubscriptionEstablished";
+    default:
+        return @"Unknown";
+    }
+}
 } // anonymous namespace
 
 typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
@@ -263,10 +201,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice_Concrete ()
-@property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
-// and protects device calls to setUTCTime and setDSTOffset
+// and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
+// update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
+// whatever lock protects the time sync bits.
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
+
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
@@ -391,12 +331,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // System time change observer reference
     id _systemTimeChangeObserverToken;
 
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * _delegates;
+    // Protects mutable state used by our description getter.  This is a separate lock from "lock"
+    // so that we don't need to worry about getting our description while holding "lock" (e.g due to
+    // logging self).  This lock _must_ be held narrowly, with no other lock acquisitions allowed
+    // while it's held, to avoid deadlock.
+    os_unfair_lock _descriptionLock;
+
+    // State used by our description getter: access to these must be protected by descriptionLock.
+    NSNumber * _Nullable _vid; // nil if unknown
+    NSNumber * _Nullable _pid; // nil if unknown
+    // _allNetworkFeatures is a bitwise or of the feature maps of all network commissioning clusters
+    // present on the device, or nil if there aren't any.
+    NSNumber * _Nullable _allNetworkFeatures;
+    // Copy of _internalDeviceState that is safe to use in description.
+    MTRInternalDeviceState _internalDeviceStateForDescription;
+    // Copy of _lastSubscriptionAttemptWait that is safe to use in description.
+    uint32_t _lastSubscriptionAttemptWaitForDescription;
+    // Most recent entry in _mostRecentReportTimes, if any.
+    NSDate * _Nullable _mostRecentReportTimeForDescription;
+    // Copy of _lastSubscriptionFailureTime that is safe to use in description.
+    NSDate * _Nullable _lastSubscriptionFailureTimeForDescription;
 }
 
 // synthesize superclass property readwrite accessors
-@synthesize nodeID = _nodeID;
-@synthesize deviceController = _deviceController;
 @synthesize queue = _queue;
 @synthesize asyncWorkQueue = _asyncWorkQueue;
 @synthesize state = _state;
@@ -408,18 +365,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // `super` was NSObject, is now MTRDevice.  MTRDevice hides its `init`
-    if (self = [super initForSubclasses]) {
-        _lock = OS_UNFAIR_LOCK_INIT;
+    if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = [nodeID copy];
+        _descriptionLock = OS_UNFAIR_LOCK_INIT;
         _fabricIndex = controller.fabricIndex;
-        _deviceController = controller;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
+        _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -439,8 +395,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }];
         }
 
-        _delegates = [NSMutableSet set];
-
         MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
@@ -456,13 +410,84 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSString *)description
 {
+    id _Nullable vid;
+    id _Nullable pid;
+    NSNumber * _Nullable networkFeatures;
+    MTRInternalDeviceState internalDeviceState;
+    uint32_t lastSubscriptionAttemptWait;
+    NSDate * _Nullable mostRecentReportTime;
+    NSDate * _Nullable lastSubscriptionFailureTime;
+    {
+        std::lock_guard lock(_descriptionLock);
+        vid = _vid;
+        pid = _pid;
+        networkFeatures = _allNetworkFeatures;
+        internalDeviceState = _internalDeviceStateForDescription;
+        lastSubscriptionAttemptWait = _lastSubscriptionAttemptWaitForDescription;
+        mostRecentReportTime = _mostRecentReportTimeForDescription;
+        lastSubscriptionFailureTime = _lastSubscriptionFailureTimeForDescription;
+    }
+
+    if (vid == nil) {
+        vid = @"Unknown";
+    }
+
+    if (pid == nil) {
+        pid = @"Unknown";
+    }
+
+    NSString * wifi;
+    NSString * thread;
+    if (networkFeatures == nil) {
+        wifi = @"NO";
+        thread = @"NO";
+    } else {
+        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+    }
+
+    NSString * reportAge;
+    if (mostRecentReportTime) {
+        reportAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[mostRecentReportTime timeIntervalSinceNow]];
+    } else {
+        reportAge = @"";
+    }
+
+    NSString * subscriptionFailureAge;
+    if (lastSubscriptionFailureTime) {
+        subscriptionFailureAge = [NSString stringWithFormat:@" (%.0lfs ago)", -[lastSubscriptionFailureTime timeIntervalSinceNow]];
+    } else {
+        subscriptionFailureAge = @"";
+    }
+
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: 0x%016llX]", self, _fabricIndex, _nodeID.unsignedLongLongValue];
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
 }
 
-+ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+- (NSDictionary *)_internalProperties
 {
-    return [controller deviceForNodeID:nodeID];
+    NSMutableDictionary * properties = [NSMutableDictionary dictionary];
+    std::lock_guard lock(_descriptionLock);
+
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWaitForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+
+    return properties;
+}
+
+- (void)_notifyDelegateOfPrivateInternalPropertiesChanges
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
+            [delegate performSelector:@selector(device:internalStateUpdated:) withObject:self withObject:[self _internalProperties]];
+        }
+    }];
 }
 
 #pragma mark - Time Synchronization
@@ -574,13 +599,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
 {
-    auto partsList = [self readAttributeWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID) params:nil];
-    NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
-    if (!endpointsOnDevice) {
-        endpointsOnDevice = [[NSMutableArray<NSNumber *> alloc] init];
+    NSArray<NSNumber *> * endpointsOnDevice;
+    {
+        std::lock_guard lock(_lock);
+        endpointsOnDevice = [self _endpointList];
     }
-    // Add Root node!
-    [endpointsOnDevice addObject:@(0)];
 
     NSMutableArray<NSNumber *> * endpointsWithTimeSyncCluster = [[NSMutableArray<NSNumber *> alloc] init];
     for (NSNumber * endpoint in endpointsOnDevice) {
@@ -696,53 +719,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for device controllers over XPC.
-    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription for suspended controllers or device controllers over XPC.
+    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
-- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)_delegateAdded
 {
-    MTR_LOG("%@ setDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateAdded];
+
+    [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
 }
 
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)_ensureSubscriptionForExistingDelegates:(NSString *)reason
 {
-    MTR_LOG("%@ addDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
-}
-
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    MTR_LOG("%@ addDelegate %@ with interested attribute paths %@ event paths %@", self, delegate, interestedPathsForAttributes, interestedPathsForEvents);
-    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
-}
-
-- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
-{
-    std::lock_guard lock(_lock);
-
-    // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (!strongDelegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
-        } else if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
-        }
-    }
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
-
-    MTRDeviceDelegateInfo_ConcreteCopy * newDelegateInfo = [[MTRDeviceDelegateInfo_ConcreteCopy alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
-    [_delegates addObject:newDelegateInfo];
-    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+    os_unfair_lock_assert_owner(&self->_lock);
 
     __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
 
@@ -766,33 +758,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
+            [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
         }
     }
-}
 
-- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
-{
-    MTR_LOG("%@ removeDelegate %@", self, delegate);
-
-    std::lock_guard lock(_lock);
-
-    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
-        }
-    }];
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)invalidate
@@ -808,8 +781,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_lock(&self->_lock);
 
     _state = MTRDeviceStateUnknown;
-
-    [_delegates removeAllObjects];
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
@@ -836,6 +807,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _stopConnectivityMonitoring];
 
     os_unfair_lock_unlock(&self->_lock);
+
+    [super invalidate];
 }
 
 - (void)nodeMayBeAdvertisingOperational
@@ -960,79 +933,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                      errorHandler:nil];
 }
 
-- (BOOL)_delegateExists
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-    return [self _iterateDelegatesWithBlock:nil];
-}
-
-// Returns YES if any non-null delegates were found
-- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo)_Nullable)block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    if (!_delegates.count) {
-        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
-        return NO;
-    }
-
-    // Opportunistically remove defunct delegate references on every iteration
-    NSMutableSet * delegatesToRemove = nil;
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate) {
-            if (block) {
-                @autoreleasepool {
-                    block(delegateInfo);
-                }
-            }
-            (void) strongDelegate; // ensure it stays alive
-        } else {
-            if (!delegatesToRemove) {
-                delegatesToRemove = [NSMutableSet set];
-            }
-            [delegatesToRemove addObject:delegateInfo];
-        }
-    }
-
-    if (delegatesToRemove.count) {
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
-    }
-
-    return (_delegates.count > 0);
-}
-
-- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    __block NSUInteger delegatesCalled = 0;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
-        if ([delegateInfo callDelegateWithBlock:block]) {
-            delegatesCalled++;
-        }
-    }];
-
-    return (delegatesCalled > 0);
-}
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
-// Returns YES if a delegate is called
-- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
-            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
-            return;
-        }
-    }
-}
-#endif
-
 - (void)_callDelegateDeviceCachePrimed
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -1073,6 +973,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
     MTRInternalDeviceState lastState = _internalDeviceState;
     _internalDeviceState = state;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _internalDeviceStateForDescription = _internalDeviceState;
+    }
     if (lastState != state) {
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
@@ -1084,6 +988,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }];
         /* END DRAGONS */
+
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
 }
 
@@ -1101,22 +1007,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_lock(&self->_lock);
 
+    // If subscription had reset since this handler was scheduled, do not execute "established" logic below
+    if (!HaveSubscriptionEstablishedRightNow(_internalDeviceState)) {
+        MTR_LOG("%@ _handleSubscriptionEstablished run with internal state %lu - skipping subscription establishment logic", self, static_cast<unsigned long>(_internalDeviceState));
+        os_unfair_lock_unlock(&self->_lock);
+        return;
+    }
+
     // We have completed the subscription work - remove from the subscription pool.
     [self _clearSubscriptionPoolWork];
 
-    // reset subscription attempt wait time when subscription succeeds
-    _lastSubscriptionAttemptWait = 0;
-    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
-        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
-    } else {
-        MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
-        [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
-    }
-
-    [self _changeState:MTRDeviceStateReachable];
-
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
+
+    // reset subscription attempt wait time when subscription succeeds
+    [self _setLastSubscriptionAttemptWait:0];
 
     auto initialSubscribeStart = _initialSubscribeStart;
     // We no longer need to track subscribe latency for this device.
@@ -1282,7 +1187,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // former case we recently had a subscription and do not want to be forcing
     // retries immediately.
     _lastSubscriptionFailureTime = [NSDate now];
-
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
+    }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     deviceUsesThread = [self _deviceUsesThread];
 
     // If a previous resubscription failed, remove the item from the subscription pool.
@@ -1323,15 +1232,38 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _doHandleSubscriptionReset:retryDelay];
 }
 
+- (void)_setLastSubscriptionAttemptWait:(uint32_t)lastSubscriptionAttemptWait
+{
+    os_unfair_lock_assert_owner(&_lock);
+    _lastSubscriptionAttemptWait = lastSubscriptionAttemptWait;
+
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+    }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+}
+
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     os_unfair_lock_assert_owner(&_lock);
+
+    if (_deviceController.isSuspended) {
+        MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        return;
+    }
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
     // has given up completely.  Those all count as "we have tried and failed to
     // subscribe".
     _lastSubscriptionFailureTime = [NSDate now];
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
+    }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1356,16 +1288,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // counter, so that we don't end up waiting for a long time if the next
         // attempt fails for some reason, and retry after whatever time period
         // the device told us to use.
-        _lastSubscriptionAttemptWait = 0;
+        [self _setLastSubscriptionAttemptWait:0];
         secondsToWait = retryDelay.doubleValue;
         MTR_LOG("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
             self, secondsToWait);
     } else {
-        _lastSubscriptionAttemptWait *= 2;
-        if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
-            _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
+        auto lastSubscriptionAttemptWait = _lastSubscriptionAttemptWait * 2;
+        if (lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
+            lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
         }
-        secondsToWait = _lastSubscriptionAttemptWait;
+        [self _setLastSubscriptionAttemptWait:lastSubscriptionAttemptWait];
+        secondsToWait = lastSubscriptionAttemptWait;
     }
 
     MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
@@ -1388,6 +1321,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
     }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
@@ -1580,6 +1514,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes
 {
     _mostRecentReportTimes = mostRecentReportTimes;
+
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
+    }
+    std::lock_guard lock(_lock);
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 #endif
 
@@ -1634,6 +1575,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
     [_mostRecentReportTimes addObject:[NSDate now]];
 
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = [_mostRecentReportTimes lastObject];
+    }
+
     // Calculate running average and update multiplier - need at least 2 items to calculate intervals
     if (_mostRecentReportTimes.count > 2) {
         NSTimeInterval cumulativeIntervals = 0;
@@ -1679,6 +1625,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
 
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+
     // Do not schedule persistence if device is reporting excessively
     if ([self _deviceIsReportingExcessively]) {
         return;
@@ -1699,6 +1647,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     _clusterDataPersistenceFirstScheduledTime = nil;
     _mostRecentReportTimes = nil;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = nil;
+    }
+
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
@@ -1706,6 +1659,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if ([self _dataStoreExists]) {
         [self _persistClusterData];
     }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
@@ -1759,6 +1714,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }];
 #endif
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesAttributePath:(MTRAttributePath *)attributePath
@@ -1820,7 +1777,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (attributes.count) {
-        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
+        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
             // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered attributes reports don't bloat memory
             NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedPathsForAttributes];
             if (filteredAttributes.count) {
@@ -1999,7 +1956,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     __block BOOL delegatesCalled = NO;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
         // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered event reports don't bloat memory
         NSArray<NSDictionary<NSString *, id> *> * filteredEvents = [self _filteredEvents:reportToReturn forInterestedPaths:delegateInfo.interestedPathsForEvents];
         if (filteredEvents.count) {
@@ -2151,6 +2108,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [clusterData storeValue:value forAttribute:path.attribute];
 
+    if ([self _attributePathAffectsDescriptionData:path]) {
+        [self _updateAttributeDependentDescriptionData];
+    }
+
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
@@ -2210,10 +2171,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_setupConnectivityMonitoring
 {
 #if ENABLE_CONNECTIVITY_MONITORING
-    // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
+    // Dispatch to own queue because we used to need to do that to get the compressedFabricID, but
+    // at this point that's not really needed anymore.
     dispatch_async(self.queue, ^{
         // Get the required info before setting up the connectivity monitor
-        NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
+        NSNumber * compressedFabricID = [self->_deviceController compressedFabricID];
         if (!compressedFabricID) {
             MTR_LOG_ERROR("%@ could not get compressed fabricID", self);
             return;
@@ -2384,6 +2346,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                },
                                ^(void) {
                                    MTR_LOG("%@ got subscription established", self);
+                                   std::lock_guard lock(self->_lock);
+
+                                   // First synchronously change state
+                                   if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
+                                       [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
+                                   } else {
+                                       MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
+                                       [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
+                                   }
+
+                                   [self _changeState:MTRDeviceStateReachable];
+
+                                   // Then async work that shouldn't be performed on the matter queue
                                    dispatch_async(self.queue, ^{
                                        // OnSubscriptionEstablished
                                        [self _handleSubscriptionEstablished];
@@ -2515,20 +2490,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSUInteger attributesReportedSinceLastCheck = _unitTestAttributesReportedSinceLastCheck;
     _unitTestAttributesReportedSinceLastCheck = 0;
     return attributesReportedSinceLastCheck;
-}
-
-- (NSUInteger)unitTestNonnullDelegateCount
-{
-    std::lock_guard lock(self->_lock);
-
-    NSUInteger nonnullDelegateCount = 0;
-    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
-        if (delegateInfo.delegate) {
-            nonnullDelegateCount++;
-        }
-    }
-
-    return nonnullDelegateCount;
 }
 #endif
 
@@ -2689,7 +2650,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
-    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
+    //
+    // But all this only happens if this device has been accessed via the public
+    // API.  If it's a device we just created internally, don't do read-throughs.
+    BOOL readThroughsAllowed;
+    {
+        std::lock_guard lock(_lock);
+        readThroughsAllowed = _accessedViaPublicAPI;
+    }
+    if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
@@ -2931,59 +2900,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
 }
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    if (commandFields == nil) {
-        commandFields = @{
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        };
-    }
-
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:nil
-                                queue:queue
-                           completion:completion];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    // We don't have a way to communicate a non-default invoke timeout
-    // here for now.
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:nil
-                                 queue:queue
-                            completion:completion];
-}
-
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
@@ -3079,58 +2995,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               }];
     }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue];
-}
-
-- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID
-                           commandPayload:(id)commandPayload
-                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
-              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
-                            responseClass:(Class _Nullable)responseClass
-                                    queue:(dispatch_queue_t)queue
-                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
-{
-    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
-        dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-        });
-        return;
-    }
-
-    NSError * encodingError;
-    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
-    if (commandFields == nil) {
-        dispatch_async(queue, ^{
-            completion(nil, encodingError);
-        });
-        return;
-    }
-
-    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        id _Nullable response = nil;
-        if (error == nil) {
-            if (values.count != 1) {
-                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
-            } else if (responseClass != nil) {
-                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
-            }
-        }
-        completion(response, error);
-    };
-
-    [self _invokeCommandWithEndpointID:endpointID
-                             clusterID:clusterID
-                             commandID:commandID
-                         commandFields:commandFields
-                        expectedValues:expectedValues
-                 expectedValueInterval:expectedValueInterval
-                    timedInvokeTimeout:timeout
-           serverSideProcessingTimeout:serverSideProcessingTimeout
-                                 queue:queue
-                            completion:responseHandler];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -3245,6 +3109,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
     std::lock_guard lock(_lock);
+    return [self _lockedAttributeValueDictionaryForAttributePath:attributePath];
+}
+
+- (NSDictionary<NSString *, id> *)_lockedAttributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -3554,7 +3424,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
-                        MTR_LOG("Device configuration changed due to changes in attribute %@", attributePath);
+                        MTR_LOG("%@ device configuration changed due to changes in attribute %@", self, attributePath);
                     }
                 }
 
@@ -3631,6 +3501,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+    std::lock_guard lock(_lock);
+
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+        MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+        for (NSNumber * attributeID in clusterData.attributes) {
+            auto * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint
+                                                                       clusterID:clusterPath.cluster
+                                                                     attributeID:attributeID];
+
+            // Construct response-value dictionary with the data-value dictionary returned by
+            // _lockedAttributeValueDictionaryForAttributePath, to takes into consideration expected values as well.
+            [attributeReport addObject:@{
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
+            }];
+        }
+    }
+
+    return attributeReport;
+}
+
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount
 {
@@ -3662,6 +3557,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [_persistedClusters addObject:clusterPath];
         [_persistedClusterData setObject:clusterData[clusterPath] forKey:clusterPath];
     }
+
+    [self _updateAttributeDependentDescriptionData];
 
     // We have some stored data.  Since we don't store data until the end of the
     // initial priming report, our device cache must be primed.
@@ -3843,11 +3740,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values expectedValueInterval:(NSNumber *)expectedValueInterval
-{
-    [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
-}
-
 // expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
@@ -3920,91 +3812,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
-// Client Metadata Storage
-
-- (NSArray *)supportedClientDataClasses
-{
-    return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
-}
-
-- (NSArray * _Nullable)clientDataKeys
-{
-    return [self.temporaryMetaDataCache allKeys];
-}
-
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
-{
-    if (key == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
-{
-    // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
-    // TODO: Need to add a delegate method, so when this value changes we call back to the client
-
-    if (key == nil || value == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (void)removeClientDataForKey:(NSString *)key
-{
-    if (key == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
-{
-    if (endpointID == nil)
-        return nil;
-    // TODO: When hooked up to storage, enumerate this better
-
-    return [self.temporaryMetaDataCache allKeys];
-}
-
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
-{
-    if (key == nil || endpointID == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
-{
-    if (key == nil || value == nil || endpointID == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
-{
-    if (key == nil || endpointID == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
 #pragma mark Log Help
 
 - (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
 {
     auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
+
+    if (cachedData == nil) {
+        return nil;
+    }
 
     auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
         MTRAttributePathKey : attributePath,
@@ -4035,11 +3851,124 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_addInformationalAttributesToCurrentMetricScope
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     using namespace chip::Tracing::DarwinFramework;
     MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
     MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
     BOOL usesThread = [self _deviceUsesThread];
     MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
+}
+
+#pragma mark - Description handling
+
+- (BOOL)_attributePathAffectsDescriptionData:(MTRAttributePath *)path
+{
+    // Technically this does not need to be called while locked, but in
+    // practice it is, and we want to make sure it's clear that this function
+    // should never start taking our data lock.
+    os_unfair_lock_assert_owner(&_lock);
+
+    switch (path.cluster.unsignedLongLongValue) {
+    case MTRClusterIDTypeBasicInformationID: {
+        switch (path.attribute.unsignedLongLongValue) {
+        case MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID:
+        case MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID:
+            return YES;
+        default:
+            return NO;
+        }
+    }
+    case MTRClusterIDTypeNetworkCommissioningID: {
+        return path.attribute.unsignedLongLongValue == MTRAttributeIDTypeGlobalAttributeFeatureMapID;
+    }
+    default:
+        return NO;
+    }
+}
+
+- (void)_updateAttributeDependentDescriptionData
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    NSNumber * _Nullable vid = [self _informationalVendorID];
+    NSNumber * _Nullable pid = [self _informationalProductID];
+    NSNumber * _Nullable networkFeatures = [self _networkFeatures];
+
+    std::lock_guard lock(_descriptionLock);
+    _vid = vid;
+    _pid = pid;
+    _allNetworkFeatures = networkFeatures;
+}
+
+- (NSArray<NSNumber *> *)_endpointList
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * partsListPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                               clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                             attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+    auto * partsList = [self _cachedAttributeValueForPath:partsListPath];
+    NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
+    if (!endpointsOnDevice) {
+        endpointsOnDevice = [[NSMutableArray<NSNumber *> alloc] init];
+    }
+    // Add Root node!
+    [endpointsOnDevice addObject:@(0)];
+    return endpointsOnDevice;
+}
+
+- (NSNumber * _Nullable)_networkFeatures
+{
+    NSNumber * _Nullable result = nil;
+    auto * endpoints = [self _endpointList];
+    for (NSNumber * endpoint in endpoints) {
+        auto * featureMapPath = [MTRAttributePath attributePathWithEndpointID:endpoint
+                                                                    clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
+                                                                  attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
+        auto * featureMap = [self _informationalNumberAtAttributePath:featureMapPath];
+        if (featureMap == nil) {
+            // No network commissioning cluster on this endpoint, or no known
+            // FeatureMap attribute value for it yet.
+            continue;
+        }
+
+        if (result == nil) {
+            result = featureMap;
+        } else {
+            result = @(featureMap.unsignedLongLongValue | result.unsignedLongLongValue);
+        }
+    }
+
+    return result;
+}
+
+- (void)controllerSuspended
+{
+    [super controllerSuspended];
+
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Controller suspended"];
+
+    // Ensure that any pre-existing resubscribe attempts we control don't try to
+    // do anything.
+    _reattemptingSubscription = NO;
+}
+
+- (void)controllerResumed
+{
+    [super controllerResumed];
+
+    std::lock_guard lock(self->_lock);
+
+    if (![self _delegateExists]) {
+        MTR_LOG("%@ ignoring controller resume: no delegates", self);
+        return;
+    }
+
+    // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
+    // will go through the pool as needed, not necessarily happen immediately.
+    [self _ensureSubscriptionForExistingDelegates:@"Controller resumed"];
 }
 
 @end
@@ -4075,27 +4004,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 + (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:timeout
-                                queue:queue
-                           completion:completion];
 }
 
 @end

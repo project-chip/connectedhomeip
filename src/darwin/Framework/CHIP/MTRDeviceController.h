@@ -57,13 +57,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                               error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * If true, the controller has not been shut down yet.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
+
+/**
+ * If true, the controller has been suspended via `suspend` and not resumed yet.
+ */
+@property (readonly, nonatomic, getter=isSuspended) BOOL suspended MTR_NEWLY_AVAILABLE;
 
 /**
  * The ID assigned to this controller at creation time.
@@ -252,6 +257,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Suspend the controller.  This will attempt to stop all network traffic associated
+ * with the controller.  The controller will remain suspended until it is
+ * resumed.
+ *
+ * Suspending an already-suspended controller has no effect.
+ */
+- (void)suspend MTR_NEWLY_AVAILABLE;
+
+/**
+ * Resume the controller.  This has no effect if the controller is not
+ * suspended.
+ *
+ * A resume following any number of suspend calls will resume the controller;
+ * there does not need to be a resume call to match every suspend call.
+ */
+- (void)resume MTR_NEWLY_AVAILABLE;
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.
