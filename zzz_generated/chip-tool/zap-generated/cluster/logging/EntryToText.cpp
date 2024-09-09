@@ -6833,6 +6833,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Control Bridge";
     case 0x00000850:
         return "Matter On/Off Sensor";
+    case 0xFFF10001:
+        return "Matter Orphan Clusters";
+    case 0xFFF10003:
+        return "Matter All-clusters-app Server Example";
     default:
         return "Unknown";
     }
