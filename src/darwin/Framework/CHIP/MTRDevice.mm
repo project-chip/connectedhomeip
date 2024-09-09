@@ -648,8 +648,9 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)_delegateAdded
 {
-    // Nothing to do; this is a hook for subclasses.  If that ever changes for
-    // some reason, subclasses need to start calling this hook on their super.
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
@@ -1459,6 +1460,17 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+#define MTRDeviceErrorStr "MTRDevice getAllAttributesReport must be handled by subclasses that support it"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return nil;
+}
+
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount
 {
@@ -1730,6 +1742,16 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     return result;
+}
+
+- (void)controllerSuspended
+{
+    // Nothing to do for now.
+}
+
+- (void)controllerResumed
+{
+    // Nothing to do for now.
 }
 
 @end
