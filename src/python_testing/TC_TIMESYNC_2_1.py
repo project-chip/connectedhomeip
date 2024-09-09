@@ -15,60 +15,72 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --endpoint 0 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import ipaddress
 from datetime import timedelta
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, utc_time_in_matter_epoch
+from matter_testing_support import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, run_if_endpoint_matches,
+                                    utc_time_in_matter_epoch)
 from mobly import asserts
 
 
 class TC_TIMESYNC_2_1(MatterBaseTest):
-    async def read_ts_attribute_expect_success(self, endpoint, attribute):
+    async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
-    def pics_TC_TIMESYNC_2_1(self) -> list[str]:
-        return ["TIMESYNC.S"]
-
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
     async def test_TC_TIMESYNC_2_1(self):
+        attributes = Clusters.TimeSynchronization.Attributes
+        features = await self.read_ts_attribute_expect_success(attribute=attributes.FeatureMap)
 
-        endpoint = self.user_params.get("endpoint", 0)
+        self.supports_time_zone = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeZone)
+        self.supports_ntpc = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient)
+        self.supports_ntps = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPServer)
+        self.supports_trusted_time_source = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeSyncClient)
+
+        timesync_attr_list = attributes.AttributeList
+        attribute_list = await self.read_ts_attribute_expect_success(attribute=timesync_attr_list)
+        timesource_attr_id = attributes.TimeSource.attribute_id
 
         self.print_step(1, "Commissioning, already done")
-        attributes = Clusters.TimeSynchronization.Attributes
 
         self.print_step(2, "Read Granularity attribute")
-        if self.check_pics("TIMESYNC.S.A0001"):
-            granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
-            asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
-                                "Granularity is not in valid range")
-        else:
-            asserts.assert_true(False, "Granularity is a mandatory attribute and must be present in the PICS file")
+        granularity_dut = await self.read_ts_attribute_expect_success(attribute=attributes.Granularity)
+        asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
+                            "Granularity is not in valid range")
 
         self.print_step(3, "Read TimeSource")
-        if self.check_pics("TIMESYNC.S.A0002"):
-            time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
+        if timesource_attr_id in attribute_list:
+            time_source = await self.read_ts_attribute_expect_success(attribute=attributes.TimeSource)
             asserts.assert_less(time_source, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kUnknownEnumValue,
                                 "TimeSource is not in valid range")
 
         self.print_step(4, "Read TrustedTimeSource")
-        if self.check_pics("TIMESYNC.S.A0003"):
-            trusted_time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint,
-                                                                              attribute=attributes.TrustedTimeSource)
+        if self.supports_trusted_time_source:
+            trusted_time_source = await self.read_ts_attribute_expect_success(attribute=attributes.TrustedTimeSource)
             if trusted_time_source is not NullValue:
                 asserts.assert_less_equal(trusted_time_source.fabricIndex, 0xFE,
                                           "FabricIndex for the TrustedTimeSource is out of range")
                 asserts.assert_greater_equal(trusted_time_source.fabricIndex, 1,
                                              "FabricIndex for the TrustedTimeSource is out of range")
-        elif self.check_pics("TIMESYNC.S.F03"):
-            asserts.assert_true(False, "TrustedTimeSource is mandatory if the TSC feature (TIMESYNC.S.F03) is supported")
 
         self.print_step(5, "Read DefaultNTP")
-        if self.check_pics("TIMESYNC.S.A0004"):
-            default_ntp = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultNTP)
+        if self.supports_ntpc:
+            default_ntp = await self.read_ts_attribute_expect_success(attribute=attributes.DefaultNTP)
             if default_ntp is not NullValue:
                 asserts.assert_less_equal(len(default_ntp), 128, "DefaultNTP length must be less than 128")
                 # Assume this is a valid web address if it has at least one . in the name
@@ -80,12 +92,10 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                     is_ip_addr = False
                     pass
                 asserts.assert_true(is_web_addr or is_ip_addr, "Returned DefaultNTP value is not a IP address or web address")
-        elif self.check_pics("TIMESYNC.S.F01"):
-            asserts.assert_true(False, "DefaultNTP is mandatory if the NTPC (TIMESYNC.S.F01) feature is supported")
 
         self.print_step(6, "Read TimeZone")
-        if self.check_pics("TIMESYNC.S.A0005"):
-            tz_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZone)
+        if self.supports_time_zone:
+            tz_dut = await self.read_ts_attribute_expect_success(attribute=attributes.TimeZone)
             asserts.assert_greater_equal(len(tz_dut), 1, "TimeZone must have at least one entry in the list")
             asserts.assert_less_equal(len(tz_dut), 2, "TimeZone may have a maximum of two entries in the list")
             for entry in tz_dut:
@@ -97,12 +107,10 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             asserts.assert_equal(tz_dut[0].validAt, 0, "TimeZone list first entry must have a 0 ValidAt time")
             if len(tz_dut) > 1:
                 asserts.assert_not_equal(tz_dut[1].validAt, 0, "TimeZone list second entry must have a non-zero ValidAt time")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "TimeZone is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(7, "Read DSTOffset")
-        if self.check_pics("TIMESYNC.S.A0006"):
-            dst_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffset)
+        if self.supports_time_zone:
+            dst_dut = await self.read_ts_attribute_expect_success(attribute=attributes.DSTOffset)
             last_valid_until = -1
             last_valid_starting = -1
             for dst in dst_dut:
@@ -114,30 +122,25 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 last_valid_until = dst.validUntil
                 if dst.validUntil is NullValue or dst.validUntil is None:
                     asserts.assert_equal(dst, dst_dut[-1], "DSTOffset list must have Null ValidUntil at the end")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "DSTOffset is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(8, "Read UTCTime")
-        if self.check_pics("TIMESYNC.S.A0000"):
-            utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
-            if utc_dut is NullValue:
-                asserts.assert_equal(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kNoTimeGranularity)
-            else:
-                asserts.assert_not_equal(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kNoTimeGranularity)
-                if granularity_dut is Clusters.TimeSynchronization.Enums.GranularityEnum.kMinutesGranularity:
-                    toleranace = timedelta(minutes=10)
-                else:
-                    toleranace = timedelta(minutes=1)
-                delta_us = abs(utc_dut - utc_time_in_matter_epoch())
-                delta = timedelta(microseconds=delta_us)
-                asserts.assert_less_equal(delta, toleranace, "UTC time is not within tolerance of TH")
+        utc_dut = await self.read_ts_attribute_expect_success(attribute=attributes.UTCTime)
+        if utc_dut is NullValue:
+            asserts.assert_equal(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kNoTimeGranularity)
         else:
-            asserts.assert_true(False, "UTCTime is a mandatory attribute and must be present in the PICS file")
+            asserts.assert_not_equal(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kNoTimeGranularity)
+            if granularity_dut is Clusters.TimeSynchronization.Enums.GranularityEnum.kMinutesGranularity:
+                toleranace = timedelta(minutes=10)
+            else:
+                toleranace = timedelta(minutes=1)
+            delta_us = abs(utc_dut - utc_time_in_matter_epoch())
+            delta = timedelta(microseconds=delta_us)
+            asserts.assert_less_equal(delta, toleranace, "UTC time is not within tolerance of TH")
 
         self.print_step(9, "Read LocalTime")
-        if self.check_pics("TIMESYNC.S.A0007"):
-            utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
-            local_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.LocalTime)
+        if self.supports_time_zone:
+            utc_dut = await self.read_ts_attribute_expect_success(attribute=attributes.UTCTime)
+            local_dut = await self.read_ts_attribute_expect_success(attribute=attributes.LocalTime)
             if utc_dut is NullValue:
                 asserts.assert_true(local_dut is NullValue, "LocalTime must be Null if UTC time is Null")
             elif len(dst_dut) == 0:
@@ -148,45 +151,33 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 delta = timedelta(microseconds=delta_us)
                 toleranace = timedelta(minutes=1)
                 asserts.assert_less_equal(delta, toleranace, "Local time caluclation is not within tolerance of calculated value")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "LocalTime is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(10, "Read TimeZoneDatabase")
-        if self.check_pics("TIMESYNC.S.A0008"):
-            tz_db_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneDatabase)
+        if self.supports_time_zone:
+            tz_db_dut = await self.read_ts_attribute_expect_success(attribute=attributes.TimeZoneDatabase)
             asserts.assert_less(tz_db_dut, Clusters.TimeSynchronization.Enums.TimeZoneDatabaseEnum.kUnknownEnumValue,
                                 "TimeZoneDatabase is not in valid range")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "TimeZoneDatabase is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(11, "Read NTPServerAvailable")
-        if self.check_pics("TIMESYNC.S.A0009"):
+        if self.supports_ntps:
             # bool typechecking happens in the test read functions, so all we need to do here is do the read
-            await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.NTPServerAvailable)
-        elif self.check_pics("TIMESYNC.S.F02"):
-            asserts.assert_true(False, "NTPServerAvailable is mandatory if the NTPS (TIMESYNC.S.F02) feature is supported")
+            await self.read_ts_attribute_expect_success(attribute=attributes.NTPServerAvailable)
 
         self.print_step(12, "Read TimeZoneListMaxSize")
-        if self.check_pics("TIMESYNC.S.A000a"):
-            size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneListMaxSize)
+        if self.supports_time_zone:
+            size = await self.read_ts_attribute_expect_success(attribute=attributes.TimeZoneListMaxSize)
             asserts.assert_greater_equal(size, 1, "TimeZoneListMaxSize must be at least 1")
             asserts.assert_less_equal(size, 2, "TimeZoneListMaxSize must be max 2")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "TimeZoneListMaxSize is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(13, "Read DSTOffsetListMaxSize")
-        if self.check_pics("TIMESYNC.S.A000b"):
-            size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffsetListMaxSize)
+        if self.supports_time_zone:
+            size = await self.read_ts_attribute_expect_success(attribute=attributes.DSTOffsetListMaxSize)
             asserts.assert_greater_equal(size, 1, "DSTOffsetListMaxSize must be at least 1")
-        elif self.check_pics("TIMESYNC.S.F00"):
-            asserts.assert_true(False, "DSTOffsetListMaxSize is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(14, "Read SupportsDNSResolve")
-        if self.check_pics("TIMESYNC.S.A0004"):
-            # bool typechecking happens in the test read functions, so all we need to do here is do the read
-            await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportsDNSResolve)
-        elif self.check_pics("TIMESYNC.S.F01"):
-            asserts.assert_true(False, "SupportsDNSResolve is mandatory if the NTPC (TIMESYNC.S.F01) feature is supported")
+        # bool typechecking happens in the test read functions, so all we need to do here is do the read
+        if self.supports_ntpc:
+            await self.read_ts_attribute_expect_success(attribute=attributes.SupportsDNSResolve)
 
 
 if __name__ == "__main__":

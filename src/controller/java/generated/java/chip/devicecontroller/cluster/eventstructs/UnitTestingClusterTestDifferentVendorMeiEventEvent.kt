@@ -42,7 +42,7 @@ class UnitTestingClusterTestDifferentVendorMeiEventEvent(val arg1: UInt) {
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): UnitTestingClusterTestDifferentVendorMeiEventEvent {
       tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG1))

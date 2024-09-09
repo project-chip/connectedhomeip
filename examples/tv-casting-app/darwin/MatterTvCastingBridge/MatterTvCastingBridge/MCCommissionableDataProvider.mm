@@ -50,9 +50,11 @@ namespace casting {
 
         CHIP_ERROR MCCommissionableDataProvider::Initialize(id<MCDataSource> dataSource)
         {
+            ChipLogProgress(Support, "MCCommissionableDataProvider Initialize()");
             VerifyOrReturnLogError(dataSource != nil, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnLogError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+            ChipLogProgress(Support, "MCCommissionableDataProvider Initialize() calling MCCommissionableData castingAppDidReceiveRequestForCommissionableData()");
             mDataSource = dataSource;
             MCCommissionableData * commissionableData =
                 [mDataSource castingAppDidReceiveRequestForCommissionableData:@"MCCommissionableDataProvider.Initialize()"];

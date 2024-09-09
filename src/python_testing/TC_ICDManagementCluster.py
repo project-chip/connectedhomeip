@@ -14,6 +14,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${LIT_ICD_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import ctypes
 from enum import IntEnum
 
@@ -34,6 +46,7 @@ class ICDTestEventTriggerOperations(IntEnum):
     kRemoveActiveModeReq = 0x0046000000000002
     kInvalidateHalfCounterValues = 0x0046000000000003
     kInvalidateAllCounterValues = 0x0046000000000004
+    kForceMaximumCheckInBackOffState = 0x0046000000000005
 
 
 class TestICDManagementCluster(MatterBaseTest):
@@ -98,6 +111,15 @@ class TestICDManagementCluster(MatterBaseTest):
                 endpoint=kRootEndpointId,
                 payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kTestEventTriggerKey,
                                                                               eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
+            )
+        )
+
+        asserts.assert_is_none(
+            await dev_ctrl.SendCommand(
+                self.dut_node_id,
+                endpoint=kRootEndpointId,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kTestEventTriggerKey,
+                                                                              eventTrigger=ICDTestEventTriggerOperations.kForceMaximumCheckInBackOffState)
             )
         )
 

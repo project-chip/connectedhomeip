@@ -31,8 +31,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
-#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -50,6 +49,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
@@ -87,7 +87,7 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandResponseSender::Callback,
-                               public CommandHandler::Callback,
+                               public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
@@ -124,10 +124,6 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
@@ -215,11 +211,6 @@ public:
 
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
-
-    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
-    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void UnregisterCommandHandlers(EndpointId endpointId);
 
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
@@ -412,6 +403,15 @@ public:
     }
 #endif
 
+    DataModel::Provider * GetDataModelProvider() const;
+
+    // MUST NOT be used while the interaction model engine is running as interaction
+    // model functionality (e.g. active reads/writes/subscriptions) rely on data model
+    // state
+    //
+    // Returns the old data model provider value.
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
@@ -420,7 +420,7 @@ private:
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandResponseSender & apResponderObj) override;
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
     void TryToResumeSubscriptions();
@@ -451,9 +451,9 @@ private:
      *
      *
      */
-    static CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                          AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
-                                          size_t & aRequestedAttributePathCount);
+    CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
+                                   size_t & aRequestedAttributePathCount);
 
     /**
      * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
@@ -500,7 +500,7 @@ private:
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                    System::PacketBufferHandle && aPayload);
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
@@ -615,8 +615,6 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
-    CommandHandlerInterface * mCommandHandlerList = nullptr;
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -700,6 +698,8 @@ private:
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
+
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace app

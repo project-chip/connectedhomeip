@@ -17,7 +17,11 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#if defined(_SILICON_LABS_32B_SERIES_2)
 #include "em_rmu.h"
+#else
+#include "sl_hal_emu.h"
+#endif
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
@@ -71,16 +75,22 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+#ifdef _SILICON_LABS_32B_SERIES_2
+    // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
-    // Clear register so it does accumualate the causes of each reset
+
+    // Clear the register, as the causes cumulate over resets.
     RMU_ResetCauseClear();
+#else
+    // Read the cause of last reset.
+    mRebootCause = sl_hal_emu_get_reset_cause();
+
+    // Clear the register, as the causes cumulate over resets.
+    sl_hal_emu_clear_reset_cause();
+#endif // _SILICON_LABS_32B_SERIES_2
 
 #if SILABS_LOG_OUT_UART && defined(SL_CATALOG_CLI_PRESENT)
     sl_iostream_set_default(sl_iostream_stdio_handle);
-#endif
-
-#if CHIP_ENABLE_OPENTHREAD
-    sl_ot_sys_init();
 #endif
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
@@ -159,7 +169,19 @@ void sl_button_on_change(const sl_button_t * handle)
     }
 }
 }
-#endif
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
+    return nullptr == handle ? 0 : sl_button_get_state(handle);
+}
+
+#else
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return 0;
+}
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 } // namespace Silabs
 } // namespace DeviceLayer

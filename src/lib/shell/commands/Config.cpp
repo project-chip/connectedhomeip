@@ -142,7 +142,7 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
     }
     else
     {
-        streamer_printf(sout, "Setup discriminator setting failed with code: %d\r\n", error);
+        streamer_printf(sout, "Setup discriminator setting failed with code: %d\r\n", error.AsInteger());
     }
 
     return error;

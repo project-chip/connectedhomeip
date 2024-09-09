@@ -18,9 +18,10 @@
 
 #include <vector>
 
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/records/Ptr.h>
 
 namespace {
 

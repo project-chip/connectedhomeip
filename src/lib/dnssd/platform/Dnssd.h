@@ -81,7 +81,8 @@ struct DnssdService
     // Time to live in seconds. Per rfc6762 section 10, because we have a hostname, our default TTL is 120 seconds
     uint32_t mTtlSeconds = 120;
 
-    void ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData);
+    void ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData);
+    void ToDiscoveredOperationalNodeBrowseData(DiscoveredNodeData & nodeData);
 };
 
 /**

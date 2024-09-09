@@ -22,6 +22,8 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
+import matter.controller.InvokeRequest
+import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
@@ -34,14 +36,18 @@ import matter.controller.WriteRequests
 import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
 import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AccessControlCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
+  class ReviewFabricRestrictionsResponse(val token: ULong)
+
   class AclAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>)
 
   sealed class AclAttributeSubscriptionState {
@@ -62,6 +68,31 @@ class AccessControlCluster(
     data class Error(val exception: Exception) : ExtensionAttributeSubscriptionState()
 
     object SubscriptionEstablished : ExtensionAttributeSubscriptionState()
+  }
+
+  class CommissioningARLAttribute(
+    val value: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>?
+  )
+
+  sealed class CommissioningARLAttributeSubscriptionState {
+    data class Success(
+      val value: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>?
+    ) : CommissioningARLAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : CommissioningARLAttributeSubscriptionState()
+
+    object SubscriptionEstablished : CommissioningARLAttributeSubscriptionState()
+  }
+
+  class ArlAttribute(val value: List<AccessControlClusterAccessRestrictionEntryStruct>?)
+
+  sealed class ArlAttributeSubscriptionState {
+    data class Success(val value: List<AccessControlClusterAccessRestrictionEntryStruct>?) :
+      ArlAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ArlAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ArlAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -104,6 +135,57 @@ class AccessControlCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
+  suspend fun reviewFabricRestrictions(
+    arl: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>,
+    timedInvokeTimeout: Duration? = null,
+  ): ReviewFabricRestrictionsResponse {
+    val commandId: UInt = 0u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_ARL_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_ARL_REQ))
+    for (item in arl.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_TOKEN: Int = 0
+    var token_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_TOKEN)) {
+        token_decoded = tlvReader.getULong(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (token_decoded == null) {
+      throw IllegalStateException("token not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return ReviewFabricRestrictionsResponse(token_decoded)
+  }
+
   suspend fun readAclAttribute(): AclAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -144,7 +226,7 @@ class AccessControlCluster(
 
   suspend fun writeAclAttribute(
     value: List<AccessControlClusterAccessControlEntryStruct>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -162,10 +244,10 @@ class AccessControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -191,7 +273,7 @@ class AccessControlCluster(
 
   suspend fun subscribeAclAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AclAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -204,7 +286,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -290,7 +372,7 @@ class AccessControlCluster(
 
   suspend fun writeExtensionAttribute(
     value: List<AccessControlClusterAccessControlExtensionStruct>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 1u
 
@@ -308,10 +390,10 @@ class AccessControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -337,7 +419,7 @@ class AccessControlCluster(
 
   suspend fun subscribeExtensionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ExtensionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -350,7 +432,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -382,7 +464,7 @@ class AccessControlCluster(
                   add(
                     AccessControlClusterAccessControlExtensionStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -436,7 +518,7 @@ class AccessControlCluster(
 
   suspend fun subscribeSubjectsPerAccessControlEntryAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -449,7 +531,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -519,7 +601,7 @@ class AccessControlCluster(
 
   suspend fun subscribeTargetsPerAccessControlEntryAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -532,7 +614,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -604,7 +686,7 @@ class AccessControlCluster(
 
   suspend fun subscribeAccessControlEntriesPerFabricAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -617,7 +699,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -649,6 +731,229 @@ class AccessControlCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readCommissioningARLAttribute(): CommissioningARLAttribute {
+    val ATTRIBUTE_ID: UInt = 5u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Commissioningarl attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<AccessControlClusterCommissioningAccessRestrictionEntryStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              AccessControlClusterCommissioningAccessRestrictionEntryStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return CommissioningARLAttribute(decodedValue)
+  }
+
+  suspend fun subscribeCommissioningARLAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<CommissioningARLAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            CommissioningARLAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Commissioningarl attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<AccessControlClusterCommissioningAccessRestrictionEntryStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    AccessControlClusterCommissioningAccessRestrictionEntryStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader,
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(CommissioningARLAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(CommissioningARLAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readArlAttribute(): ArlAttribute {
+    val ATTRIBUTE_ID: UInt = 6u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Arl attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<AccessControlClusterAccessRestrictionEntryStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<AccessControlClusterAccessRestrictionEntryStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(AccessControlClusterAccessRestrictionEntryStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return ArlAttribute(decodedValue)
+  }
+
+  suspend fun subscribeArlAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<ArlAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 6u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ArlAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Arl attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<AccessControlClusterAccessRestrictionEntryStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<AccessControlClusterAccessRestrictionEntryStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    AccessControlClusterAccessRestrictionEntryStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader,
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(ArlAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ArlAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -694,7 +999,7 @@ class AccessControlCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -707,7 +1012,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -791,7 +1096,7 @@ class AccessControlCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -804,7 +1109,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -888,7 +1193,7 @@ class AccessControlCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -901,7 +1206,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -983,7 +1288,7 @@ class AccessControlCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -996,7 +1301,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1071,7 +1376,7 @@ class AccessControlCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1084,7 +1389,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1152,7 +1457,7 @@ class AccessControlCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1165,7 +1470,7 @@ class AccessControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

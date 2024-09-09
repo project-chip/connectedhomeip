@@ -94,6 +94,7 @@ silabs_executable("chef_app") {
   deps = [
     ":chef-common",
     ":sdk",
+    "${chip_root}/src/platform/logging:default",
     "${examples_plat_dir}:efr32-common",
   ]
 

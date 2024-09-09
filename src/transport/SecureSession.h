@@ -156,6 +156,8 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
+    bool IsCommissioningSession() const override;
+
     bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
@@ -168,6 +170,27 @@ public:
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
                                             GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+        }
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp: {
+            const auto & maybeLocalMRPConfig = GetLocalMRPConfig();
+            const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
+            const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
+            return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -222,6 +245,12 @@ public:
         {
             MoveToState(State::kActive);
         }
+    }
+
+    void SetCaseCommissioningSessionStatus(bool isCaseCommissioningSession)
+    {
+        VerifyOrDie(GetSecureSessionType() == Type::kCASE);
+        mIsCaseCommissioningSession = isCaseCommissioningSession;
     }
 
     bool IsPeerActive() const
@@ -302,9 +331,10 @@ private:
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
-    NodeId mLocalNodeId = kUndefinedNodeId;
-    NodeId mPeerNodeId  = kUndefinedNodeId;
-    CATValues mPeerCATs = CATValues{};
+    bool mIsCaseCommissioningSession = false;
+    NodeId mLocalNodeId              = kUndefinedNodeId;
+    NodeId mPeerNodeId               = kUndefinedNodeId;
+    CATValues mPeerCATs              = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
 

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -1790,7 +1791,7 @@
           ]
         },
         {
-          "name": "WiFi Network Diagnostics",
+          "name": "Wi-Fi Network Diagnostics",
           "code": 54,
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
@@ -3014,7 +3015,6 @@
           "define": "MICROWAVE_OVEN_MODE_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "SupportedModes",
@@ -3153,7 +3153,6 @@
           "define": "MICROWAVE_OVEN_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "SetCookingParameters",

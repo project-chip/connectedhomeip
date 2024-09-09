@@ -18,6 +18,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
@@ -109,7 +110,7 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(&GetLogProvider());
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&GetLogProvider());
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

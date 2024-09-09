@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0452"/>
+    <field name="PANChange" mask="0x1"/>
+  </bitmap>
+
+  <cluster apiMaturity="provisional">
+    <domain>Network Infrastructure</domain>
+    <name>Thread Border Router Management</name>
+    <code>0x0452</code>
+    <define>THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Manage the Thread network of Thread Border Router</description>
+
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
+
+    <attribute side="server" code="0x0000" apiMaturity="provisional" define="BORDER_ROUTER_NAME" type="char_string" length="63">BorderRouterName</attribute>
+
+    <attribute side="server" code="0x0001" apiMaturity="provisional" define="BORDER_AGENT_ID" type="octet_string">BorderAgentID</attribute>
+
+    <attribute side="server" code="0x0002" apiMaturity="provisional" define="THREAD_VERSION" type="int16u">ThreadVersion</attribute>
+
+    <attribute side="server" code="0x0003" apiMaturity="provisional" define="INTERFACE_ENABLED" type="boolean" default="0">InterfaceEnabled</attribute>
+
+    <attribute side="server" code="0x0004" apiMaturity="provisional" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">ActiveDatasetTimestamp</attribute>
+
+    <attribute side="server" code="0x0005" apiMaturity="provisional" define="PENDING_DATASET_TIMESTAMP" type="int64u" isNullable="true">PendingDatasetTimestamp</attribute>
+
+    <command source="client" code="0x00" apiMaturity="provisional" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
+      <description>Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x01" apiMaturity="provisional" name="GetPendingDatasetRequest" response="DatasetResponse" optional="false">
+      <description>Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="server" code="0x02" apiMaturity="provisional" name="DatasetResponse" optional="false">
+      <description>Generated response to GetActiveDatasetRequest or GetPendingDatasetRequest commands.</description>
+      <arg name="Dataset" type="octet_string" length="254"/>
+    </command>
+
+    <command source="client" code="0x03" apiMaturity="provisional" name="SetActiveDatasetRequest" optional="false">
+      <description>Command to set or update the active Dataset of the Thread network to which the Border Router is connected.</description>
+      <arg name="ActiveDataset" type="octet_string" length="254"/>
+      <arg name="Breadcrumb" type="int64u" optional="true"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x04" apiMaturity="provisional" name="SetPendingDatasetRequest" optional="true">
+      <description>Command set or update the pending Dataset of the Thread network to which the Border Router is connected.</description>
+      <arg name="PendingDataset" type="octet_string" length="254"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+  </cluster>
+</configurator>

@@ -42,7 +42,6 @@ static_library("mt793x") {
     "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "MT793XConfig.cpp",
     "MT793XConfig.h",
     "MdnsError.cpp",
@@ -79,4 +78,12 @@ static_library("mt793x") {
       "NetworkCommissioningWiFiDriver.h",
     ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

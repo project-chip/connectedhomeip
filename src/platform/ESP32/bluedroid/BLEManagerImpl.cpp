@@ -99,10 +99,6 @@ const uint8_t UUID_CHIPoBLEChar_TX[]      = { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 const uint8_t ShortUUID_CHIPoBLE_CharTx_Desc[] = { 0x02, 0x29 };
 #endif
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
 
 const uint8_t CharProps_ReadNotify = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
 const uint8_t CharProps_Write      = ESP_GATT_CHAR_PROP_BIT_WRITE;
@@ -324,7 +320,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
@@ -333,16 +329,16 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -393,20 +389,20 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         break;
 
     case DeviceEventType::kPlatformESP32BLEWriteComplete:
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
 
     case DeviceEventType::kPlatformESP32BLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                    &ChipUUID_CHIPoBLEChar_TX);
+                                    &Ble::CHIP_BLE_CHAR_2_UUID);
         else
             HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                      &ChipUUID_CHIPoBLEChar_TX);
+                                      &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kPlatformESP32BLEIndicationReceived:
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
 
@@ -741,7 +737,8 @@ void BLEManagerImpl::ConnectDevice(esp_bd_addr_t & addr, esp_ble_addr_type_t add
 }
 #endif
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     uint8_t value[2];
@@ -756,20 +753,21 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     {
         ChipLogError(Ble, "esp_ble_gattc_get_descr_by_char_handle failed: %d", rc);
         esp_ble_gattc_close(chip_ctrl_gattc_if, conId);
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
     }
     ChipDeviceEvent event;
     event.Type                                          = DeviceEventType::kPlatformESP32BLESubscribeOpComplete;
     event.Platform.BLESubscribeOpComplete.mConnection   = conId;
     event.Platform.BLESubscribeOpComplete.mIsSubscribed = true;
     PlatformMgr().PostEventOrDie(&event);
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     uint8_t value[2];
@@ -784,20 +782,20 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
         esp_ble_gattc_close(chip_ctrl_gattc_if, conId);
-        return false;
+        return BLE_ERROR_GATT_UNSUBSCRIBE_FAILED;
     }
     ChipDeviceEvent event;
     event.Type                                          = DeviceEventType::kPlatformESP32BLESubscribeOpComplete;
     event.Platform.BLESubscribeOpComplete.mConnection   = conId;
     event.Platform.BLESubscribeOpComplete.mIsSubscribed = false;
     PlatformMgr().PostEventOrDie(&event);
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     CHIP_ERROR err;
 
@@ -820,7 +818,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #endif
 
-    return (err == CHIP_NO_ERROR);
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -829,8 +827,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conState != NULL) ? conState->MTU : 0;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle data)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     CHIPoBLEConState * conState = GetConnectionState(conId);
@@ -858,16 +856,11 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     conState->PendingIndBuf = std::move(data);
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        return false;
-    }
-    return true;
+    return err;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     ChipLogProgress(Ble, "In send write request\n");
@@ -879,35 +872,22 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
     }
     ChipDeviceEvent event;
     event.Type                                  = DeviceEventType::kPlatformESP32BLEWriteComplete;
     event.Platform.BLEWriteComplete.mConnection = conId;
     PlatformMgr().PostEventOrDie(&event);
-    return true;
+    return CHIP_NO_ERROR;
 #else
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
-    return false;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
+    CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)

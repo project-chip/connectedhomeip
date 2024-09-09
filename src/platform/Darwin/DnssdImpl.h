@@ -169,6 +169,7 @@ struct BrowseContext : public BrowseHandler
 {
     DnssdBrowseCallback callback;
     std::vector<std::pair<DnssdService, std::string>> services;
+    bool dispatchedSuccessOnce = false;
 
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
 

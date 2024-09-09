@@ -1557,6 +1557,10 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     // Can be called before starting the factory
     XCTAssertFalse(MTRDeviceControllerFactory.sharedInstance.running);
     MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+
+    // Now reset back to the default state, so timings in other tests are not
+    // affected.
+    MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
 @end

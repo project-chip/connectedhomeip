@@ -31,6 +31,12 @@ namespace Test {
 
 namespace internal {
 
+constexpr uint16_t kDefaultStringSize = 16; // note: this is INCLUDING the length byte(s)
+
+// Determine an appropriate size for the given type.
+// NOTE: this is for test only, not all types are included
+uint16_t SizeForType(EmberAfAttributeType type);
+
 constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id)
 {
     return EmberAfAttributeMetadata{
@@ -47,6 +53,7 @@ constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id
 struct MockAttributeConfig
 {
     MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
+    MockAttributeConfig(AttributeId aId, EmberAfAttributeMetadata metadata) : id(aId), attributeMetaData(metadata) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
                         EmberAfAttributeMask mask = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE) :
         id(aId),
@@ -54,6 +61,7 @@ struct MockAttributeConfig
     {
         attributeMetaData.attributeType = type;
         attributeMetaData.mask          = mask;
+        attributeMetaData.size          = internal::SizeForType(type);
     }
 
     const AttributeId id;
@@ -69,7 +77,8 @@ struct MockEventConfig
 struct MockClusterConfig
 {
     MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes = {},
-                      std::initializer_list<MockEventConfig> aEvents = {});
+                      std::initializer_list<MockEventConfig> aEvents = {}, std::initializer_list<CommandId> aAcceptedCommands = {},
+                      std::initializer_list<CommandId> aGeneratedCommands = {});
 
     // Cluster-config is self-referential: mEmberCluster.attributes references  mAttributeMetaData.data()
     MockClusterConfig(const MockClusterConfig & other);
@@ -86,6 +95,8 @@ private:
     EmberAfCluster mEmberCluster;
     std::vector<EventId> mEmberEventList;
     std::vector<EmberAfAttributeMetadata> mAttributeMetaData;
+    std::vector<CommandId> mAcceptedCommands;
+    std::vector<CommandId> mGeneratedCommands;
 };
 
 struct MockEndpointConfig

@@ -25,7 +25,7 @@ Regardless of the option, you will need to rebuild your application. This will
 require you to provide the build target name of the kit you are using. You can
 find the build target names in the Requirements section of the example you are
 building or on the
-[Board support](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/app_dev/board_support/index.html)
+[Board support](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/board_support/index.html)
 page in the nRF Connect SDK documentation.
 
 ### Temporary changes to configuration
@@ -97,7 +97,7 @@ them values of proper type. Few examples:
     `CONFIG_SAMPLE_STRING_OPTION="some_text"`
 
 For more detailed information, read about
-[setting Kconfig values](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/setting.html#setting-configuration-values)
+[setting Kconfig values](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/build/kconfig/setting.html)
 in the nRF Connect SDK documentation.
 
 Because Kconfig configuration files are used in the building process, make sure
@@ -150,7 +150,7 @@ from your perspective:
           $ west build -b build-target -- -DOVERLAY_CONFIG=overlay_file_name
 
 Read the
-[Kconfig](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/index.html#kconfig)
+[Kconfig](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/build/kconfig/index.html)
 guide in the nRF Connect SDK's Zephyr documentation if you are interested in
 getting more advanced and detailed information about the configuration
 structure.
@@ -214,7 +214,7 @@ performance in case it has been polluted with unwanted entries.
 #### Logging
 
 You can enable logging for both the stack and Zephyr’s
-[Logging](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/reference/logging/index.html#logging-api)
+[Logging](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html)
 API by setting the `CONFIG_LOG` option.
 
 Zephyr allows you to configure log levels of different software modules

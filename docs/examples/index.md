@@ -85,6 +85,15 @@ darwin-framework-tool/README
 energy-management-app/**/README
 ```
 
+## Fabric Admin example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+fabric-admin/README
+```
+
 ## Fabric Bridge example
 
 ```{toctree}
@@ -138,6 +147,15 @@ laundry-washer-app/**/README
 
 lighting-app/**/README
 lighting-app/qpg/APPLICATION
+```
+
+## Lighting example without unique id
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lighting-app-data-mode-no-unique-id/**/README
 ```
 
 ## Light switch example
@@ -360,4 +378,13 @@ network-manager-app/README
 :maxdepth: 1
 
 lit-icd-app/**/README
+```
+
+## Thread Border Router example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+thread-br-app/**/README
 ```

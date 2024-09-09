@@ -54,7 +54,6 @@ public:
      *
      * @retval CHIP_NO_ERROR                Successfully initialized the dataset.
      * @retval CHIP_ERROR_INVALID_ARGUMENT  The dataset length @p aLength is too long or @p data is corrupted.
-     *
      */
     CHIP_ERROR Init(ByteSpan aData);
 
@@ -65,7 +64,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the active timestamp.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread active timestamp is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetActiveTimestamp(uint64_t & aActiveTimestamp) const;
 
@@ -76,7 +75,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the active timestamp.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread active timestamp.
-     *
      */
     CHIP_ERROR SetActiveTimestamp(uint64_t aActiveTimestamp);
 
@@ -87,7 +85,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the channel.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread channel is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetChannel(uint16_t & aChannel) const;
 
@@ -98,7 +96,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the channel.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread channel.
-     *
      */
     CHIP_ERROR SetChannel(uint16_t aChannel);
 
@@ -109,19 +106,29 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread extended PAN ID is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeExtendedPanId]) const;
+
+    /**
+     * This method retrieves the Thread extended PAN ID from the dataset, interpreted as a big endian number.
+     * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread extended PAN ID is not present in the dataset.
+     */
+    CHIP_ERROR GetExtendedPanId(uint64_t & extendedPanId) const;
 
     /**
      * This method returns a const ByteSpan to the extended PAN ID in the dataset.
      * This can be used to pass the extended PAN ID to a cluster command without the use of external memory.
      *
+     * Note: The returned span points into storage managed by this class,
+     * and must not be dereferenced beyond the lifetime of this object.
+     *
      * @param[out]  span  A reference to receive the location of the extended PAN ID.
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread extended PAN ID is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetExtendedPanIdAsByteSpan(ByteSpan & span) const;
 
@@ -132,7 +139,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the extended PAN ID.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread extended PAN ID.
-     *
      */
     CHIP_ERROR SetExtendedPanId(const uint8_t (&aExtendedPanId)[kSizeExtendedPanId]);
 
@@ -143,7 +149,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the master key.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread master key is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetMasterKey(uint8_t (&aMasterKey)[kSizeMasterKey]) const;
 
@@ -154,13 +160,11 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the master key.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread master key.
-     *
      */
     CHIP_ERROR SetMasterKey(const uint8_t (&aMasterKey)[kSizeMasterKey]);
 
     /**
      * This method unsets Thread master key to the dataset.
-     *
      */
     void UnsetMasterKey(void);
 
@@ -171,7 +175,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the mesh local prefix.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread mesh local prefix is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetMeshLocalPrefix(uint8_t (&aMeshLocalPrefix)[kSizeMeshLocalPrefix]) const;
 
@@ -182,7 +186,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the Thread mesh local prefix.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread mesh local prefix.
-     *
      */
     CHIP_ERROR SetMeshLocalPrefix(const uint8_t (&aMeshLocalPrefix)[kSizeMeshLocalPrefix]);
 
@@ -193,7 +196,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the network name.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread network name is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetNetworkName(char (&aNetworkName)[kSizeNetworkName + 1]) const;
 
@@ -204,7 +207,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the network name.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread network name.
-     *
      */
     CHIP_ERROR SetNetworkName(const char * aNetworkName);
 
@@ -215,7 +217,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the PAN ID.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread PAN ID is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetPanId(uint16_t & aPanId) const;
 
@@ -226,7 +228,6 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the PAN ID.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread PAN ID.
-     *
      */
     CHIP_ERROR SetPanId(uint16_t aPanId);
 
@@ -237,7 +238,7 @@ public:
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the PSKc.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread PSKc is not present in the dataset.
-     *
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT   If the TLV element is invalid.
      */
     CHIP_ERROR GetPSKc(uint8_t (&aPSKc)[kSizePSKc]) const;
 
@@ -248,15 +249,67 @@ public:
      *
      * @retval CHIP_NO_ERROR           Successfully set the PSKc.
      * @retval CHIP_ERROR_NO_MEMORY    Insufficient memory in the dataset for setting Thread PSKc.
-     *
      */
     CHIP_ERROR SetPSKc(const uint8_t (&aPSKc)[kSizePSKc]);
 
     /**
      * This method unsets Thread PSKc to the dataset.
-     *
      */
     void UnsetPSKc(void);
+
+    /**
+     * Returns ByteSpan pointing to the channel mask within the dataset.
+     *
+     * Note: The returned span points into storage managed by this class,
+     * and must not be dereferenced beyond the lifetime of this object.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if the channel mask is not present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetChannelMask(ByteSpan & aChannelMask) const;
+
+    /**
+     * This method sets the channel mask within the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetChannelMask(ByteSpan aChannelMask);
+
+    /**
+     * Retrieves the security policy from the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetSecurityPolicy(uint32_t & aSecurityPolicy) const;
+
+    /**
+     * This method sets the security policy within the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetSecurityPolicy(uint32_t aSecurityPolicy);
+
+    /**
+     * Retrieves the delay timer from the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetDelayTimer(uint32_t & aDelayMillis) const;
+
+    /**
+     * This method sets the delay timer within the dataset.
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetDelayTimer(uint32_t aDelayMillis);
 
     /**
      * This method clears all data stored in the dataset.
@@ -265,7 +318,6 @@ public:
 
     /**
      * This method checks if the dataset is ready for creating Thread network.
-     *
      */
     bool IsCommissioned(void) const;
 
@@ -278,7 +330,6 @@ public:
      * This method checks whether @p aData is formatted as ThreadTLVs.
      *
      * @note This method doesn't verify ThreadTLV values are valid.
-     *
      */
     static bool IsValid(ByteSpan aData);
 
@@ -296,12 +347,12 @@ private:
     ThreadTLV & End(void) { return const_cast<ThreadTLV &>(const_cast<const OperationalDataset *>(this)->End()); }
     void Remove(uint8_t aType);
     void Remove(ThreadTLV & aTlv);
-    ThreadTLV * MakeRoom(uint8_t aType, uint8_t aSize);
+    ThreadTLV * MakeRoom(uint8_t aType, size_t aSize);
     bool Has(uint8_t aType) const { return Locate(aType) != nullptr; }
 
     uint8_t mData[kSizeOperationalDataset];
-    uint8_t mLength;
+    uint8_t mLength = 0;
 };
 
 } // namespace Thread
-}; // namespace chip
+} // namespace chip

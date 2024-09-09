@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-#include "../common/RemoteDataModelLogger.h"
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/RemoteDataModelLogger.h>
 
 class GetCommissionerNodeIdCommand : public CHIPCommand
 {

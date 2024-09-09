@@ -32,7 +32,7 @@ class ExampleCustomMatterCommissioningFlow(commissioning_flow_blocks.Commissioni
 
     async def commission(self, parameter: commissioning.Parameters):
         # The example uses PASE, however, the blocks uses a node_id, which supports both PASE and CASE.
-        with pase.establish_session(devCtrl=self._devCtrl, parameter=parameter.pase_param) as device:
+        with await pase.establish_session(devCtrl=self._devCtrl, parameter=parameter.pase_param) as device:
             node_id = device.node_id
 
             self._logger.info("Sending ArmFailSafe to device")
@@ -68,7 +68,7 @@ class ExampleCredentialProvider:
 
     async def get_commissionee_credentials(self, request: commissioning.GetCommissioneeCredentialsRequest) -> commissioning.GetCommissioneeCredentialsResponse:
         node_id = random.randint(100000, 999999)
-        nocChain = self._devCtrl.IssueNOCChain(Clusters.OperationalCredentials.Commands.CSRResponse(
+        nocChain = await self._devCtrl.IssueNOCChain(Clusters.OperationalCredentials.Commands.CSRResponse(
             NOCSRElements=request.csr_elements, attestationSignature=request.attestation_signature), nodeId=node_id)
         return commissioning.GetCommissioneeCredentialsResponse(
             rcac=nocChain.rcacBytes,

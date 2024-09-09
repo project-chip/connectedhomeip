@@ -157,9 +157,9 @@ The same procedure can be followed from the
 sub-section, replacing `CONFIG_CHIP_DEVICE_SOFTWARE_VERSION` with a number
 greater than the initial one used on the active application (Candidate
 application version number should be greater than the one used on the active
-application). By default the value is set to 0, try resetting this option to 1
+application). By default the value is set to 1, try resetting this option to 2
 to generate the OTA update Image. You can do this by adding
-`-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1` to the west build command.
+`-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2` to the west build command.
 
 The current implementation automates the following procedures:
 

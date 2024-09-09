@@ -27,7 +27,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
   val name: String,
   val enrollmentGroup: UInt?,
   val randomStartMinutes: UInt?,
-  val randomDurationMinutes: UInt?
+  val randomDurationMinutes: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlProgramStruct {\n")
@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PROGRAM_I_D), programID)
+      put(ContextSpecificTag(TAG_PROGRAM_ID), programID)
       put(ContextSpecificTag(TAG_NAME), name)
       if (enrollmentGroup != null) {
         put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), enrollmentGroup)
@@ -64,7 +64,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
   }
 
   companion object {
-    private const val TAG_PROGRAM_I_D = 0
+    private const val TAG_PROGRAM_ID = 0
     private const val TAG_NAME = 1
     private const val TAG_ENROLLMENT_GROUP = 2
     private const val TAG_RANDOM_START_MINUTES = 3
@@ -72,10 +72,10 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterLoadControlProgramStruct {
       tlvReader.enterStructure(tlvTag)
-      val programID = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_I_D))
+      val programID = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val enrollmentGroup =
         if (!tlvReader.isNull()) {
@@ -106,7 +106,7 @@ class DemandResponseLoadControlClusterLoadControlProgramStruct(
         name,
         enrollmentGroup,
         randomStartMinutes,
-        randomDurationMinutes
+        randomDurationMinutes,
       )
     }
   }

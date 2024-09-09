@@ -27,6 +27,7 @@ enum class Fields : uint8_t
     kMonitoredSubject = 2,
     kAesKeyHandle     = 3,
     kHmacKeyHandle    = 4,
+    kClientType       = 5,
 };
 
 CHIP_ERROR ICDMonitoringEntry::UpdateKey(StorageKeyName & skey)
@@ -48,6 +49,8 @@ CHIP_ERROR ICDMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
 
     ByteSpan hmacKeybuf(hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>());
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kHmacKeyHandle), hmacKeybuf));
+
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kClientType), clientType));
 
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -106,6 +109,9 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                        sizeof(Crypto::Symmetric128BitsKeyByteArray));
             }
             break;
+            case to_underlying(Fields::kClientType):
+                ReturnErrorOnFailure(reader.Get(clientType));
+                break;
             default:
                 break;
             }
@@ -122,6 +128,7 @@ void ICDMonitoringEntry::Clear()
     this->checkInNodeID    = kUndefinedNodeId;
     this->monitoredSubject = kUndefinedNodeId;
     this->keyHandleValid   = false;
+    this->clientType       = app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
 }
 
 CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
@@ -210,6 +217,7 @@ ICDMonitoringEntry & ICDMonitoringEntry::operator=(const ICDMonitoringEntry & ic
     fabricIndex       = icdMonitoringEntry.fabricIndex;
     checkInNodeID     = icdMonitoringEntry.checkInNodeID;
     monitoredSubject  = icdMonitoringEntry.monitoredSubject;
+    clientType        = icdMonitoringEntry.clientType;
     index             = icdMonitoringEntry.index;
     keyHandleValid    = icdMonitoringEntry.keyHandleValid;
     symmetricKeystore = icdMonitoringEntry.symmetricKeystore;
@@ -257,6 +265,7 @@ CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & en
     ICDMonitoringEntry e(this->mFabric, index);
     e.checkInNodeID    = entry.checkInNodeID;
     e.monitoredSubject = entry.monitoredSubject;
+    e.clientType       = entry.clientType;
     e.index            = index;
 
     memcpy(e.aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),

@@ -79,11 +79,7 @@ static uint32_t dummy_rx_data;
 static uint32_t dummy_tx_data;
 static bool spi_enabled = false;
 
-#if defined(EFR32MG12)
-uint8_t wirq_irq_nb = SL_WFX_HOST_PINOUT_SPI_IRQ;
-#elif defined(EFR32MG24)
 uint8_t wirq_irq_nb = SL_WFX_HOST_PINOUT_SPI_WIRQ_PIN; // SL_WFX_HOST_PINOUT_SPI_WIRQ_PIN;
-#endif
 
 #define PIN_OUT_SET 1
 #define PIN_OUT_CLEAR 0
@@ -102,16 +98,9 @@ sl_status_t sl_wfx_host_init_bus(void)
      * EUSARTROUTE register to do this.
      */
 
-#if defined(EFR32MG12)
-    MY_USART->CTRL |= (1u << _USART_CTRL_SMSDELAY_SHIFT);
-    MY_USART->ROUTEPEN = USART_ROUTEPEN_TXPEN | USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_CLKPEN;
-#endif
-
-#if defined(EFR32MG24)
     GPIO->USARTROUTE[0].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
         GPIO_USART_ROUTEEN_TXPEN |                           // MOSI
         GPIO_USART_ROUTEEN_CLKPEN;
-#endif
 
     spi_sem = xSemaphoreCreateBinaryStatic(&xEfrSpiSemaBuffer);
     xSemaphoreGive(spi_sem);
@@ -347,11 +336,8 @@ void sl_wfx_host_gpio_init(void)
 {
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
-
-#if defined(EFR32MG24)
     // configure WF200 CS pin.
     GPIO_PinModeSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN, gpioModePushPull, 1);
-#endif
     // Configure WF200 reset pin.
     GPIO_PinModeSet(SL_WFX_HOST_PINOUT_RESET_PORT, SL_WFX_HOST_PINOUT_RESET_PIN, gpioModePushPull, 0);
     // Configure WF200 WUP pin.

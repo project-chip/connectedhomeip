@@ -235,16 +235,22 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ICDClientInfo clientInfo;
         TLV::TLVType ICDClientInfoType;
         NodeId nodeId;
+        NodeId checkInNodeId;
         FabricIndex fabric;
         ReturnErrorOnFailure(reader.EnterContainer(ICDClientInfoType));
         // Peer Node ID
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kPeerNodeId)));
         ReturnErrorOnFailure(reader.Get(nodeId));
 
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kCheckInNodeId)));
+        ReturnErrorOnFailure(reader.Get(checkInNodeId));
+
         // Fabric Index
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kFabricIndex)));
         ReturnErrorOnFailure(reader.Get(fabric));
-        clientInfo.peer_node = ScopedNodeId(nodeId, fabric);
+
+        clientInfo.peer_node     = ScopedNodeId(nodeId, fabric);
+        clientInfo.check_in_node = ScopedNodeId(checkInNodeId, fabric);
 
         // Start ICD Counter
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kStartICDCounter)));
@@ -273,6 +279,10 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         VerifyOrReturnError(hmacBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
         memcpy(clientInfo.hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmacBuf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
+        // ClientType
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kClientType)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.client_type));
 
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
@@ -319,6 +329,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         TLV::TLVType ICDClientInfoContainerType;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ICDClientInfoContainerType));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kPeerNodeId), clientInfo.peer_node.GetNodeId()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kCheckInNodeId), clientInfo.check_in_node.GetNodeId()));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kFabricIndex), clientInfo.peer_node.GetFabricIndex()));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
@@ -327,6 +338,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), aesBuf));
         ByteSpan hmacBuf(clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), hmacBuf));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kClientType), clientInfo.client_type));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
     return writer.EndContainer(arrayType);

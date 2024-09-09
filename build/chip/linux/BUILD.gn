@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,4 +21,5 @@ pkg_config("glib") {
     "glib-2.0",
     "gio-unix-2.0",
   ]
+  optional = true  # Only certain conditionally-compiled modules depend on glib
 }

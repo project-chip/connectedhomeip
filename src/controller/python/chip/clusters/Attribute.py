@@ -27,18 +27,20 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import chip
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-import construct
+import construct  # type: ignore
 from chip.interaction_model import PyWriteAttributeData
 from chip.native import ErrorSDKPart, PyChipError
-from rich.pretty import pprint
+from rich.pretty import pprint  # type: ignore
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
+
+LOGGER = logging.getLogger(__name__)
 
 
 @unique
@@ -54,61 +56,42 @@ class EventPriority(Enum):
     CRITICAL = 2
 
 
-@dataclass
+@dataclass(frozen=True)
 class AttributePath:
-    EndpointId: int = None
-    ClusterId: int = None
-    AttributeId: int = None
+    EndpointId: Optional[int] = None
+    ClusterId: Optional[int] = None
+    AttributeId: Optional[int] = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Attribute=None, ClusterId=None, AttributeId=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Attribute is not None) or (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Attribute is not None:
-            if (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "ClusterId and AttributeId is ignored when Attribute is specified")
-            self.ClusterId = Attribute.cluster_id
-            self.AttributeId = Attribute.attribute_id
-            return
-        self.ClusterId = ClusterId
-        self.AttributeId = AttributeId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Cluster.id)
+
+    @staticmethod
+    def from_attribute(EndpointId: int, Attribute: ClusterAttributeDescriptor) -> AttributePath:
+        if Attribute is None:
+            raise ValueError("Attribute cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Attribute.cluster_id, AttributeId=Attribute.attribute_id)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
 
-    def __hash__(self):
-        return str(self).__hash__()
 
-
-@dataclass
+@dataclass(frozen=True)
 class DataVersionFilter:
-    EndpointId: int = None
-    ClusterId: int = None
-    DataVersion: int = None
+    EndpointId: Optional[int] = None
+    ClusterId: Optional[int] = None
+    DataVersion: Optional[int] = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, ClusterId=None, DataVersion=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (ClusterId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-        else:
-            self.ClusterId = ClusterId
-        self.DataVersion = DataVersion
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int) -> DataVersionFilter:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return DataVersionFilter(EndpointId=EndpointId, ClusterId=Cluster.id, DataVersion=DataVersion)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.DataVersion}"
-
-    def __hash__(self):
-        return str(self).__hash__()
 
 
 @dataclass
@@ -116,113 +99,84 @@ class TypedAttributePath:
     ''' Encapsulates an attribute path that has strongly typed references to cluster and attribute
         cluster object types. These types serve as keys into the attribute cache.
     '''
-    ClusterType: Cluster = None
-    AttributeType: ClusterAttributeDescriptor = None
-    AttributeName: str = None
-    Path: AttributePath = None
+    ClusterType: Optional[Cluster] = None
+    AttributeType: Optional[ClusterAttributeDescriptor] = None
+    AttributeName: Optional[str] = None
+    Path: Optional[AttributePath] = None
+    ClusterId: Optional[int] = None
+    AttributeId: Optional[int] = None
 
-    def __init__(self, ClusterType: Cluster = None, AttributeType: ClusterAttributeDescriptor = None,
-                 Path: AttributePath = None):
-        ''' Only one of either ClusterType and AttributeType OR Path may be provided.
-        '''
+    def __post_init__(self):
+        '''Only one of either ClusterType and AttributeType OR Path may be provided.'''
 
-        #
-        # First, let's populate ClusterType and AttributeType. If it's already provided,
-        # we can continue onwards to deriving the label. Otherwise, we'll need to
-        # walk the attribute index to find the right type information.
-        #
-        if (ClusterType is not None and AttributeType is not None):
-            self.ClusterType = ClusterType
-            self.AttributeType = AttributeType
-        else:
-            if (Path is None):
-                raise ValueError("Path should have a valid value")
+        if (self.ClusterType is not None and self.AttributeType is not None) and self.Path is not None:
+            raise ValueError("Only one of either ClusterType and AttributeType OR Path may be provided.")
+        if (self.ClusterType is None or self.AttributeType is None) and self.Path is None:
+            raise ValueError("Either ClusterType and AttributeType OR Path must be provided.")
 
+        # if ClusterType and AttributeType were provided we can continue onwards to deriving the label.
+        # Otherwise, we'll need to walk the attribute index to find the right type information.
+
+        # If Path is provided, derive ClusterType and AttributeType from it
+        if self.Path is not None:
             for cluster, attribute in _AttributeIndex:
                 attributeType = _AttributeIndex[(cluster, attribute)][0]
                 clusterType = _AttributeIndex[(cluster, attribute)][1]
 
-                if (clusterType.id == Path.ClusterId and attributeType.attribute_id == Path.AttributeId):
+                if clusterType.id == self.Path.ClusterId and attributeType.attribute_id == self.Path.AttributeId:
                     self.ClusterType = clusterType
                     self.AttributeType = attributeType
                     break
 
-            if (self.ClusterType is None or self.AttributeType is None):
-                raise KeyError(f"No Schema found for Attribute {Path}")
+            if self.ClusterType is None or self.AttributeType is None:
+                raise KeyError(f"No Schema found for Attribute {self.Path}")
 
         # Next, let's figure out the label.
         for c_field in self.ClusterType.descriptor.Fields:
-            if (c_field.Tag != self.AttributeType.attribute_id):
+            if c_field.Tag != self.AttributeType.attribute_id:
                 continue
 
             self.AttributeName = c_field.Label
 
-        if (self.AttributeName is None):
-            raise KeyError(f"Unable to resolve name for Attribute {Path}")
+        if self.AttributeName is None:
+            raise KeyError(f"Unable to resolve name for Attribute {self.Path}")
 
-        self.Path = Path
         self.ClusterId = self.ClusterType.id
         self.AttributeId = self.AttributeType.attribute_id
 
 
-@dataclass
+@dataclass(frozen=True)
 class EventPath:
-    EndpointId: int = None
-    ClusterId: int = None
-    EventId: int = None
-    Urgent: int = None
+    EndpointId: Optional[int] = None
+    ClusterId: Optional[int] = None
+    EventId: Optional[int] = None
+    Urgent: Optional[int] = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, Urgent=None):
-        self.EndpointId = EndpointId
-        self.Urgent = Urgent
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Event is not None) or (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "Event, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Event is not None:
-            if (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "ClusterId and EventId is ignored when Event is specified")
-            self.ClusterId = Event.cluster_id
-            self.EventId = Event.event_id
-            return
-        self.ClusterId = ClusterId
-        self.EventId = EventId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: Optional[int] = None, Urgent: Optional[int] = None) -> "EventPath":
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
+
+    @staticmethod
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: Optional[int] = None) -> "EventPath":
+        if Event is None:
+            raise ValueError("Event cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.Urgent}"
 
-    def __hash__(self):
-        return str(self).__hash__()
-
-
-@dataclass
-class AttributePathWithListIndex(AttributePath):
-    ListIndex: int = None
-
 
 @dataclass
 class EventHeader:
-    EndpointId: int = None
-    ClusterId: int = None
-    EventId: int = None
-    EventNumber: int = None
-    Priority: EventPriority = None
-    Timestamp: int = None
-    TimestampType: EventTimestampType = None
-
-    def __init__(self, EndpointId: int = None, ClusterId: int = None,
-                 EventId: int = None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
-        self.EndpointId = EndpointId
-        self.ClusterId = ClusterId
-        self.EventId = EventId
-        self.EventNumber = EventNumber
-        self.Priority = Priority
-        self.Timestamp = Timestamp
-        self.TimestampType = TimestampType
+    EndpointId: Optional[int] = None
+    ClusterId: Optional[int] = None
+    EventId: Optional[int] = None
+    EventNumber: Optional[int] = None
+    Priority: Optional[EventPriority] = None
+    Timestamp: Optional[int] = None
+    TimestampType: Optional[EventTimestampType] = None
 
     def __str__(self) -> str:
         return (f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/"
@@ -280,7 +234,7 @@ class ValueDecodeFailure:
     '''
 
     TLVValue: Any = None
-    Reason: Exception = None
+    Reason: Optional[Exception] = None
 
 
 @dataclass
@@ -321,7 +275,7 @@ def _BuildClusterIndex():
     ''' Build internal cluster index for locating the corresponding cluster object by path in the future.
     '''
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj) and issubclass(obj, Cluster):
             _ClusterIndex[obj.id] = obj
 
 
@@ -464,15 +418,16 @@ class AttributeCache:
 
 class SubscriptionTransaction:
     def __init__(self, transaction: AsyncReadTransaction, subscriptionId, devCtrl):
-        self._onResubscriptionAttemptedCb = DefaultResubscriptionAttemptedCallback
-        self._onAttributeChangeCb = DefaultAttributeChangeCallback
-        self._onEventChangeCb = DefaultEventChangeCallback
-        self._onErrorCb = DefaultErrorCallback
+        self._onResubscriptionAttemptedCb: Callable[[SubscriptionTransaction,
+                                                     int, int], None] = DefaultResubscriptionAttemptedCallback
+        self._onAttributeChangeCb: Callable[[TypedAttributePath, SubscriptionTransaction], None] = DefaultAttributeChangeCallback
+        self._onEventChangeCb: Callable[[EventReadResult, SubscriptionTransaction], None] = DefaultEventChangeCallback
+        self._onErrorCb: Callable[[int, SubscriptionTransaction], None] = DefaultErrorCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
         self._isDone = False
-        self._onResubscriptionSucceededCb = None
+        self._onResubscriptionSucceededCb: Optional[Callable[[SubscriptionTransaction], None]] = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
 
@@ -498,6 +453,13 @@ class SubscriptionTransaction:
         handle = chip.native.GetLibraryHandle()
         builtins.chipStack.Call(
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
+        )
+
+    async def TriggerResubscribeIfScheduled(self, reason: str):
+        handle = chip.native.GetLibraryHandle()
+        await builtins.chipStack.CallAsyncWithResult(
+            lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
+                self._readTransaction._pReadClient, reason.encode("utf-8"))
         )
 
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
@@ -597,7 +559,7 @@ class SubscriptionTransaction:
 
     def Shutdown(self):
         if (self._isDone):
-            print("Subscription was already terminated previously!")
+            LOGGER.warning("Subscription 0x%08x was already terminated previously!", self.subscriptionId)
             return
 
         handle = chip.native.GetLibraryHandle()
@@ -673,13 +635,13 @@ class AsyncReadTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
-        self._events = []
+        self._events: List[EventReadResult] = []
         self._devCtrl = devCtrl
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
-        self._changedPathSet = set()
+        self._changedPathSet: Set[AttributePath] = set()
         self._pReadClient = None
         self._pReadCallback = None
-        self._resultError = None
+        self._resultError: Optional[PyChipError] = None
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
@@ -688,7 +650,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = chip.interaction_model.Status(status)
 
@@ -703,7 +665,7 @@ class AsyncReadTransaction:
             self._changedPathSet.add(path)
 
         except Exception as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
@@ -721,12 +683,12 @@ class AsyncReadTransaction:
                     try:
                         eventValue = eventType.FromTLV(data)
                     except Exception as ex:
-                        logging.error(
+                        LOGGER.error(
                             f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/"
                             f"Cluster = {path.ClusterId}/Event = {path.EventId}")
-                        logging.error(
+                        LOGGER.error(
                             f"Failed Cluster Object: {str(eventType)}")
-                        logging.error(ex)
+                        LOGGER.error(ex)
                         eventValue = ValueDecodeFailure(
                             tlvData, ex)
 
@@ -743,10 +705,12 @@ class AsyncReadTransaction:
                     eventResult, self._subscription_handler)
 
         except Exception as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleError(self, chipError: PyChipError):
-        self._resultError = chipError.code
+        if self._subscription_handler:
+            self._subscription_handler.OnErrorCb(chipError.code, self._subscription_handler)
+        self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -754,7 +718,7 @@ class AsyncReadTransaction:
                 self, subscriptionId, self._devCtrl)
             self._future.set_result(self._subscription_handler)
         else:
-            logging.info("Re-subscription succeeded!")
+            self._subscription_handler._subscriptionId = subscriptionId
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
                 if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
                     self._event_loop.create_task(
@@ -789,7 +753,7 @@ class AsyncReadTransaction:
                     attribute_path = TypedAttributePath(Path=change)
                 except (KeyError, ValueError) as err:
                     # path could not be resolved into a TypedAttributePath
-                    logging.getLogger(__name__).exception(err)
+                    LOGGER.exception(err)
                     continue
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
@@ -805,11 +769,8 @@ class AsyncReadTransaction:
         # move on, possibly invalidating the provided _event_loop.
         #
         if not self._future.done():
-            if self._resultError:
-                if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
-                else:
-                    self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
+            if self._resultError is not None:
+                self._future.set_exception(self._resultError.to_exception())
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
@@ -836,15 +797,15 @@ class AsyncWriteTransaction:
     def __init__(self, future: Future, eventLoop):
         self._event_loop = eventLoop
         self._future = future
-        self._resultData = []
-        self._resultError = None
+        self._resultData: List[AttributeWriteResult] = []
+        self._resultError: Optional[PyChipError] = None
 
     def handleResponse(self, path: AttributePath, status: int):
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
         except ValueError as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError
@@ -1041,9 +1002,9 @@ _ReadParams = construct.Struct(
 
 
 def Read(future: Future, eventLoop, device, devCtrl,
-         attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None,
-         events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True,
-         subscriptionParameters: SubscriptionParameters = None,
+         attributes: Optional[List[AttributePath]] = None, dataVersionFilters: Optional[List[DataVersionFilter]] = None,
+         events: Optional[List[EventPath]] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True,
+         subscriptionParameters: Optional[SubscriptionParameters] = None,
          fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
@@ -1159,9 +1120,9 @@ def Read(future: Future, eventLoop, device, devCtrl,
 
 
 def ReadAttributes(future: Future, eventLoop, device, devCtrl,
-                   attributes: List[AttributePath], dataVersionFilters: List[DataVersionFilter] = None,
+                   attributes: List[AttributePath], dataVersionFilters: Optional[List[DataVersionFilter]] = None,
                    returnClusterObject: bool = True,
-                   subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+                   subscriptionParameters: Optional[SubscriptionParameters] = None, fabricFiltered: bool = True) -> int:
     return Read(future=future, eventLoop=eventLoop, device=device,
                 devCtrl=devCtrl, attributes=attributes, dataVersionFilters=dataVersionFilters,
                 events=None, returnClusterObject=returnClusterObject,
@@ -1170,7 +1131,7 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl,
 
 def ReadEvents(future: Future, eventLoop, device, devCtrl,
                events: List[EventPath], eventNumberFilter=None, returnClusterObject: bool = True,
-               subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+               subscriptionParameters: Optional[SubscriptionParameters] = None, fabricFiltered: bool = True) -> int:
     return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None,
                 dataVersionFilters=None, events=events, eventNumberFilter=eventNumberFilter,
                 returnClusterObject=returnClusterObject,

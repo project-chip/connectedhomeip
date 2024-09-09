@@ -27,7 +27,7 @@ class DeviceEnergyManagementClusterCostStruct(
   val costType: UInt,
   val value: Long,
   val decimalPoints: UInt,
-  val currency: Optional<UInt>
+  val currency: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterCostStruct {\n")

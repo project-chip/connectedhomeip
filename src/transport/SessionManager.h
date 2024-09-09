@@ -345,7 +345,20 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * Expire all sessions for a given peer, as identified by a specific fabric
+     * index and node ID.
+     */
     void ExpireAllSessions(const ScopedNodeId & node);
+
+    /**
+     * Expire all sessions associated with the given fabric index.
+     *
+     * *NOTE* This is generally all sessions for a given fabric _EXCEPT_ if there are multiple
+     *        FabricInfo instances in the FabricTable that collide on the same logical fabric (i.e
+     *        root public key + fabric ID tuple).  This can ONLY happen if multiple controller
+     *        instances on the same fabric is permitted and each is assigned a unique fabric index.
+     */
     void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
 
     /**
@@ -375,6 +388,12 @@ public:
     CHIP_ERROR ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex);
 
     void ExpireAllPASESessions();
+
+    /**
+     * Expire all secure sessions.  See documentation for Shutdown on when it's
+     * appropriate to use this.
+     */
+    void ExpireAllSecureSessions();
 
     /**
      * @brief
@@ -422,6 +441,15 @@ public:
      * @brief
      *  Shutdown the Secure Session Manager. This terminates this instance
      *  of the object and reset it's state.
+     *
+     * The proper order of shutdown for SessionManager is as follows:
+     *
+     * 1) Call ExpireAllSecureSessions() on the SessionManager, and ensure that any unauthenticated
+     *    sessions (e.g. CASEServer and CASESessionManager instances, or anything that does PASE
+     *    handshakes) are released.
+     * 2) Shut down the exchange manager, so that it's no longer referencing
+     *    the to-be-shut-down SessionManager.
+     * 3) Shut down the SessionManager.
      */
     void Shutdown();
 
@@ -587,6 +615,10 @@ private:
                                         System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {

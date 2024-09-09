@@ -22,9 +22,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>

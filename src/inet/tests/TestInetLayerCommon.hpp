@@ -126,8 +126,8 @@ extern bool IsSender();
 extern bool IsTesting(const TestStatus & aTestStatus);
 extern bool WasSuccessful(const TestStatus & aTestStatus);
 
-extern chip::System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
-extern chip::System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength);
+extern chip::System::PacketBufferHandle MakeDataBuffer(size_t aDesiredLength, uint8_t aFirstValue);
+extern chip::System::PacketBufferHandle MakeDataBuffer(size_t aDesiredLength);
 extern chip::System::PacketBufferHandle MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
 extern chip::System::PacketBufferHandle MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
 

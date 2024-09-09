@@ -15,10 +15,24 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_LOCK_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 from drlk_2_x_common import DRLK_COMMON
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 
 # Configurable parameters:
+# - userIndex: userIndex to use when creating a user on the DUT for testing purposes
+#     defaults to 1. Add `--int-arg user_index:<index>` to command line to override
 # - CredentialIndex: CredentialIndex to use when creating a Credential on the DUT for testing purposes
 #     defaults to 1. Add `--int-arg credential_index:<index>` to command line to override
 # - UserCodeTemporaryDisableTime: Value used to configure DUT for testing purposes.
@@ -30,13 +44,14 @@ from matter_testing_support import MatterBaseTest, async_test_body, default_matt
 
 
 class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
-    def setup_class(self):
-        return super().setup_class()
 
     @async_test_body
     async def teardown_test(self):
         await self.teardown()
         return super().teardown_test()
+
+    def setup_class(self):
+        return super().setup_class()
 
     def pics_TC_DRLK_2_12(self) -> list[str]:
         return ["DRLK.S.F0c"]

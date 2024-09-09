@@ -23,6 +23,7 @@
  *
  */
 
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -31,6 +32,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/Read.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 
@@ -87,25 +89,6 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         }
     }
     return existPathMatch && !existVersionMismatch;
-}
-
-CHIP_ERROR
-Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                            AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
-                            AttributeEncodeState * aEncoderState)
-{
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
-                  aPath.mAttributeId);
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Pre, aPath);
-
-    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Post, aPath);
-
-    return CHIP_NO_ERROR;
 }
 
 static bool IsOutOfWriterSpaceError(CHIP_ERROR err)
@@ -210,15 +193,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
-                                      pathForRetrieval, &encodeState);
-            if (err != CHIP_NO_ERROR)
+            DataModel::ActionReturnStatus status =
+                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
+                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+            if (status.IsError())
             {
+                // Operation error set, since this will affect early return or override on status encoding
+                // it will also be used for error reporting below.
+                err = status.GetUnderlyingError();
+
                 // If error is not an "out of writer space" error, rollback and encode status.
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
+                if (encodeState.AllowPartialData() && status.IsOutOfSpaceEncodingResponse())
                 {
                     ChipLogDetail(DataManagement,
                                   "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
@@ -238,7 +226,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
-                    if (!IsOutOfWriterSpaceError(err))
+                    if (!status.IsOutOfSpaceEncodingResponse())
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
@@ -246,7 +234,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                      err.Format());
                         // Try to encode our error as a status response.
-                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(status.GetStatusCode()));
                         if (err != CHIP_NO_ERROR)
                         {
                             // OK, just roll back again and give up; if we still ran out of space we
@@ -361,27 +349,33 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
+                                         .endpoint    = current->mValue.mEndpointId,
+                                         .requestType = RequestType::kEventReadRequest,
+                                         .entityId    = current->mValue.mEventId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if (err != CHIP_ERROR_ACCESS_DENIED)
+        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
         {
             ReturnErrorOnFailure(err);
         }
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
+                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
+                                                                                                              : StatusIB(Status::AccessRestricted));
+
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId));
+                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
         }
         current = current->mpNext;
     }
@@ -502,10 +496,11 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter reportDataWriter;
     ReportDataMessage::Builder reportDataBuilder;
-    chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    chip::System::PacketBufferHandle bufHandle = nullptr;
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
     bool needCloseReadHandler                  = false;
+    size_t reportBufferMaxSize                 = 0;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -522,11 +517,15 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apReadHandler->GetSession() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    reportBufferMaxSize = apReadHandler->GetReportBufferMaxSize();
+
+    bufHandle = System::PacketBufferHandle::New(reportBufferMaxSize);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
+    if (bufHandle->AvailableDataLength() > reportBufferMaxSize)
     {
-        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - kMaxSecureSduLengthBytes);
+        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - reportBufferMaxSize);
     }
 
     reportDataWriter.Init(std::move(bufHandle));
@@ -535,8 +534,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     reportDataWriter.ReserveBuffer(mReservedSize);
 #endif
 
-    // Always limit the size of the generated packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer
-    // capacity.
+    // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
+    // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
     reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 

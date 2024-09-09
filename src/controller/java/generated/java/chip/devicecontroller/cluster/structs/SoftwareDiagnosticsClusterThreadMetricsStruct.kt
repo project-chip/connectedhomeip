@@ -28,7 +28,7 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
   val name: Optional<String>,
   val stackFreeCurrent: Optional<ULong>,
   val stackFreeMinimum: Optional<ULong>,
-  val stackSize: Optional<ULong>
+  val stackSize: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
     append("SoftwareDiagnosticsClusterThreadMetricsStruct {\n")
@@ -106,7 +106,7 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
         name,
         stackFreeCurrent,
         stackFreeMinimum,
-        stackSize
+        stackSize,
       )
     }
   }

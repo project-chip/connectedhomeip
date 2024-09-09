@@ -30,7 +30,6 @@ tizen_qemu_mkisofs("chip-tests-runner") {
   #              rebuild of the ISO image, so the test will be run with old
   #              binaries.
   assets_non_tracked = [ rebase_path("${root_build_dir}/tests") ]
-  assets_non_tracked_exclude_globs = [ "*.map" ]
 }
 
 tizen_qemu_run("chip-tests") {

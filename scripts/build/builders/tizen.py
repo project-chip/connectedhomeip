@@ -18,6 +18,7 @@ from collections import namedtuple
 from enum import Enum
 from xml.etree import ElementTree as ET
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 Board = namedtuple('Board', ['target_cpu'])
@@ -116,6 +117,10 @@ class TizenBuilder(GnBuilder):
 
         if app == TizenApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
+            # Tizen test driver creates ISO image with all unit test files. So,
+            # it uses twice as much space as regular build. Due to CI storage
+            # limitations, we need to strip debug symbols from executables.
+            self.extra_gn_options.append('strip_symbols=true')
             self.build_command = 'check'
 
         if not enable_ble:
@@ -147,23 +152,23 @@ class TizenBuilder(GnBuilder):
             'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
 
-    def _generate_flashbundle(self):
+    def _bundle(self):
         if self.app.is_tpk:
             logging.info('Packaging %s', self.output_dir)
             cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
             self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
-        return {
-            output: os.path.join(self.output_dir, output)
-            for output in self.app.value.outputs
-        }
+        for name in self.app.value.outputs:
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
+            yield BuilderOutput(
+                os.path.join(self.output_dir, name),
+                name)
 
-    def flashbundle(self):
+    def bundle_outputs(self):
         if not self.app.is_tpk:
-            return {}
-        return {
-            self.app.package: os.path.join(self.output_dir,
-                                           self.app.package_name, 'out',
-                                           self.app.package),
-        }
+            return
+        source = os.path.join(self.output_dir, self.app.package_name,
+                              'out', self.app.package)
+        yield BuilderOutput(source, self.app.package)

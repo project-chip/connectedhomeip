@@ -1,0 +1,151 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Google LLC.
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *          Platform-specific configuration overrides for the chip Device Layer
+ *          on K32W platforms using the NXP SDK.
+ */
+
+#pragma once
+
+// ==================== Platform Adaptations ====================
+
+#define K32W_NO_ERRORS 0
+#define K32W_ENTRY_NOT_FOUND 1
+
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
+
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CHIP0BLE_DEBUG 0
+#endif
+
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
+// #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Set unique id to maximum length if not defined to ensure the actual unique
+ * id is retrieved instead of the default one (if factory data read fails).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
+#define CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER <lib/address_resolve/AddressResolve_DefaultImpl.h>
+
+// ========== Platform-specific Configuration =========
+
+// These are configuration options that are unique to the K32W platform.
+// These can be overridden by the application as needed.
+
+/**
+ * @def CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+ *
+ * Enables default OTA TLV factory data processor.
+ * Disabled by default.
+ */
+#ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
+#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+
+/**
+ * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
+ *
+ * The priority of the SoftDevice observer event handler registered by the
+ * chip BleLayer.
+ */
+#ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
+#define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
+#endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
+
+/**
+ * @def CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
+ *
+ * The SoftDevice BLE connection configuration tag used by the chip
+ * BleLayer.
+ */
+#ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
+#define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
+#endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
+
+/**
+ * @def CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+ *
+ * The delay before rebooting after an OTA process was finished.
+ */
+#ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+#define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
+#endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+
+// ========== Platform-specific Configuration Overrides =========
+#ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
+#endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+
+#ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE 3072
+#endif // CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
+
+// Max size of event queue
+#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 25
+
+#ifndef CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME
+#define CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME "BLE App Task"
+#endif // CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME
+
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY 0
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
+
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED 1
+
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
+
+#define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 3
+
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 2
+
+#if CHIP_ENABLE_OPENTHREAD
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+
+#ifndef CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL chip::System::Clock::Milliseconds32(NXP_OT_IDLE_INTERVAL)
+#endif // CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
+
+#ifndef CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(NXP_OT_ACTIVE_INTERVAL)
+#endif // CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
+
+#endif
+
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1

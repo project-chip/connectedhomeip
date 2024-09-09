@@ -22,6 +22,9 @@ chip_test_suite("tests") {
   if (chip_device_platform == "fake") {
     test_sources = [ "TestPlatform.cpp" ]
 
-    public_deps = [ "${chip_root}/src/lib/dnssd" ]
+    public_deps = [
+      "${chip_root}/src/lib/core:string-builder-adapters",
+      "${chip_root}/src/lib/dnssd",
+    ]
   }
 }

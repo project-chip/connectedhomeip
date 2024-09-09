@@ -64,59 +64,13 @@ if (silabs_board == "") {
 
 assert(silabs_board != "", "silabs_board must be specified")
 
-# Differentiate between boards
-# - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-# - BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-# - BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 868MHz@19dBm
-# - BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
-# - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
-# - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
-# - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
-# - BRD4186A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@10dBm
-# - BRD4187A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@20dBm
-
-board_defines = []
-
-if (silabs_board == "BRD4304A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P432F1024GM48"
-  enable_fem = true
-
-  # Board does not support LEDs and Buttons at the same time
-  use_wstk_leds = false
-  board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
-} else if (silabs_board == "BRD4161A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P432F1024GL125"
-} else if (silabs_board == "BRD4162A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P332F1024GL125"
-} else if (silabs_board == "BRD4163A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P433F1024GL125"
-} else if (silabs_board == "BRD4164A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P433F1024GL125"
-} else if (silabs_board == "BRD4166A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P332F1024GL125"
-
-  # ThunderBoards don't have a LCD
-  show_qr_code = false
-  disable_lcd = true
-} else if (silabs_board == "BRD4170A") {
-  silabs_family = "efr32mg12"
-  silabs_mcu = "EFR32MG12P433F1024GM68"
-} else if (silabs_board == "BRD4338A") {
+# Si917 WIFI board ----------
+if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
-} else if (silabs_board == "BRD4180A") {
-  assert(
-      false,
-      "The board ${silabs_board} not currently supported due to RAM limitation")
-  silabs_family = "efr32mg21"
-  silabs_mcu = "EFR32MG21A020F1024IM32"
+
+  # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
   variant = string_replace(silabs_board, "A", "C")
   print(
@@ -144,6 +98,8 @@ if (silabs_board == "BRD4304A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  # EFR32 MG24 Modules series ----------
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB22VNA"
@@ -179,6 +135,24 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
+
+  # EFR32 MG26 series ----------
+} else if (silabs_board == "BRD4116A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B410F3200IM48"
+} else if (silabs_board == "BRD4117A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B420F3200IM48"
+} else if (silabs_board == "BRD4118A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B510F3200IL136"
+} else if (silabs_board == "BRD2608A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B510F3200IM68"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
 } else {
   assert(
       false,

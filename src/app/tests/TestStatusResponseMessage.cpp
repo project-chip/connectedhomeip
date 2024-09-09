@@ -16,20 +16,14 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a test for  CHIP Interaction Model Message Def
- *
- */
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/AppConfig.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -37,19 +31,26 @@ using namespace chip::app;
 constexpr chip::Protocols::InteractionModel::Status statusValue        = chip::Protocols::InteractionModel::Status::Success;
 constexpr chip::Protocols::InteractionModel::Status invalidStatusValue = chip::Protocols::InteractionModel::Status::Failure;
 
-void BuildStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+class TestStatusResponseMessage : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+void BuildStatusResponseMessage(chip::TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusResponseMessage::Builder statusResponse;
 
     err = statusResponse.Init(&aWriter);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     statusResponse.Status(statusValue);
-    NL_TEST_ASSERT(apSuite, statusResponse.GetError() == CHIP_NO_ERROR);
+    EXPECT_EQ(statusResponse.GetError(), CHIP_NO_ERROR);
 }
 
-void ParseStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, bool aTestPositiveCase)
+void ParseStatusResponseMessage(chip::TLV::TLVReader & aReader, bool aTestPositiveCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -57,7 +58,7 @@ void ParseStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
     chip::Protocols::InteractionModel::Status status;
 
     err = statusResponse.Init(aReader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     statusResponse.PrettyPrint();
 #endif
@@ -65,87 +66,42 @@ void ParseStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
     err = statusResponse.GetStatus(status);
     if (aTestPositiveCase)
     {
-        NL_TEST_ASSERT(apSuite, status == statusValue && err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(status, statusValue);
     }
     else
     {
-        NL_TEST_ASSERT(apSuite, status != invalidStatusValue && err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_NE(status, invalidStatusValue);
     }
 }
 
-void StatusResponseMessagePositiveTest(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestStatusResponseMessage, TestStatusResponseMessagePositive)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildStatusResponseMessage(apSuite, writer);
+    BuildStatusResponseMessage(writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     reader.Init(std::move(buf));
-    ParseStatusResponseMessage(apSuite, reader, true /*aTestPositiveCase*/);
+    ParseStatusResponseMessage(reader, true /*aTestPositiveCase*/);
 }
 
-void StatusResponseMessageNegativeTest(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestStatusResponseMessage, TestStatusResponseMessageNegative)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildStatusResponseMessage(apSuite, writer);
+    BuildStatusResponseMessage(writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     reader.Init(std::move(buf));
-    ParseStatusResponseMessage(apSuite, reader, false /*aTestPositiveCase*/);
+    ParseStatusResponseMessage(reader, false /*aTestPositiveCase*/);
 }
 
-// clang-format off
-const nlTest sTests[] =
-        {
-                NL_TEST_DEF("StatusResponseMessagePositiveTest", StatusResponseMessagePositiveTest),
-                NL_TEST_DEF("StatusResponseMessageNegativeTest", StatusResponseMessageNegativeTest),
-                NL_TEST_SENTINEL()
-        };
-// clang-format on
 } // namespace
-
-/**
- *  Set up the test suite.
- */
-static int TestSetup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-static int TestTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-int TestStatusResponseMessage()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "StatusResponseMessage",
-        &sTests[0],
-        TestSetup,
-        TestTeardown,
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestStatusResponseMessage)

@@ -21,8 +21,6 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the  NXP SDK.
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "NXPConfig.h"
 
@@ -30,6 +28,7 @@
 #include "FunctionLib.h"
 #include "board.h"
 #include <lib/core/CHIPEncoding.h>
+#include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 /* FS Writes in Idle task only - LittleFS only , already enabled by default on NVM */
@@ -84,14 +83,14 @@ typedef struct
 {
     uint16_t chipConfigRamBufferLen;
     uint16_t padding;
-    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT];
+    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT] __attribute__((aligned(4)));
 } ChipConfigRamStructKeyInt;
 
 typedef struct
 {
     uint16_t chipConfigRamBufferLen;
     uint16_t padding;
-    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING];
+    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING] __attribute__((aligned(4)));
 } ChipConfigRamStructKeyString;
 
 /* File system containing only integer keys */
@@ -193,6 +192,14 @@ CHIP_ERROR NXPConfig::Init()
 {
     if (!isInitialized)
     {
+        /*
+         * Make sure to check that read buffers are always 4 bytes aligned,
+         * as NXP flash drivers may mandate the alignment of dst read buffer to 4 bytes
+         */
+        static_assert(alignof(chipConfigRamStructKeyInt.chipConfigRamBuffer) == 4,
+                      "Wrong buffer alignment, it must be 4 bytes aligned");
+        static_assert(alignof(chipConfigRamStructKeyString.chipConfigRamBuffer) == 4,
+                      "Wrong buffer alignment, it must be 4 bytes aligned");
         ramStorageInit();
 
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)

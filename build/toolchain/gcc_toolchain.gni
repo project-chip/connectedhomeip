@@ -16,11 +16,9 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_toolchain/generate_toolchain.gni")
 
 declare_args() {
-  # Generate Linker map files. Can skip since they can
+  # Generate Linker map files. By default it is disabled since they can
   # be quite large.
-  #
-  # Note that toolchains can individually override this
-  chip_generate_link_map_file = true
+  chip_generate_link_map_file = false
 }
 
 template("gcc_toolchain") {
@@ -48,11 +46,7 @@ template("gcc_toolchain") {
       cxx = invoker.cxx
     }
 
-    if (defined(invoker.link_generate_map_file)) {
-      link_generate_map_file = invoker.link_generate_map_file
-    } else {
-      link_generate_map_file = chip_generate_link_map_file
-    }
+    link_generate_map_file = chip_generate_link_map_file
 
     is_host_toolchain = invoker_toolchain_args.current_os == host_os
     link_group = invoker_toolchain_args.current_os != "mac" &&

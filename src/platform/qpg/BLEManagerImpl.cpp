@@ -65,17 +65,6 @@ StaticTimer_t sbleAdvTimeoutTimerBuffer;
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
 const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
 
-const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-
-const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-const ChipBleUUID chipUUID_CHIPoBLEChar_C3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21,
-                                                 0x8F, 0x04 } };
-#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
-
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -104,10 +93,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     appCbacks.cccCallback      = _handleTXCharCCCDWrite;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes, chipUUID_CHIPoBLEChar_RX.bytes,
-                       chipUUID_CHIPoBLEChar_C3.bytes);
+    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, Ble::CHIP_BLE_CHAR_2_UUID.bytes, Ble::CHIP_BLE_CHAR_1_UUID.bytes,
+                       Ble::CHIP_BLE_CHAR_3_UUID.bytes);
 #else
-    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes, chipUUID_CHIPoBLEChar_RX.bytes, nullptr);
+    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, Ble::CHIP_BLE_CHAR_2_UUID.bytes, Ble::CHIP_BLE_CHAR_1_UUID.bytes, nullptr);
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
     qvCHIP_BleInit(&appCbacks);
@@ -211,7 +200,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipDeviceEvent connEstEvent;
 
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEventOrDie(&connEstEvent);
     }
@@ -221,7 +210,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipDeviceEvent connClosedEvent;
 
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connClosedEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
         PlatformMgr().PostEventOrDie(&connClosedEvent);
     }
@@ -229,7 +218,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived: {
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
     }
     break;
@@ -251,7 +240,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
 
@@ -261,19 +250,21 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
@@ -285,7 +276,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
         ChipLogError(DeviceLayer, "qvCHIP_BleCloseConnection() failed: %s", ErrorStr(err));
     }
 
-    return (err == CHIP_NO_ERROR);
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -300,8 +291,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return retVal;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool isRxHandle;
@@ -311,39 +302,20 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
 
-    isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
+    isRxHandle = UUIDsMatch(&Ble::CHIP_BLE_CHAR_1_UUID, charId);
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
     qvCHIP_BleSendIndication(conId, cId, dataLen, data->Start());
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        return false;
-    }
-    return true;
+    return err;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)

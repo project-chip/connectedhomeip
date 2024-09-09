@@ -19,6 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 if (chip_enable_pw_rpc) {
@@ -46,6 +47,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/occupancy-sensing-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
@@ -58,15 +60,28 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
+    "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
+    "ButtonEventsSimulator.cpp",
+    "ButtonEventsSimulator.h",
     "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
@@ -84,7 +99,12 @@ source_set("chip-all-clusters-common") {
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -181,4 +201,14 @@ group("linux") {
 
 group("default") {
   deps = [ ":linux" ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-chip-all-clusters-app") {
+    sources = [ "fuzzing-main.cpp" ]
+    public_deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+  }
 }

@@ -1,12 +1,12 @@
-#include <protocols/bdx/BdxMessages.h>
+#include <limits>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-
-#include <limits>
+#include <protocols/bdx/BdxMessages.h>
 
 using namespace chip;
 using namespace chip::bdx;

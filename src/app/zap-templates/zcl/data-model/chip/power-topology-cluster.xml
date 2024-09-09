@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="Measurement &amp; Sensing"/>
 
-  <cluster code="0x009C" apiMaturity="provisional">
+  <cluster code="0x009C">
     <domain>Measurement &amp; Sensing</domain>
     <name>Power Topology</name>
     <code>0x009C</code>

@@ -96,4 +96,29 @@
     }
 }
 
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device
+{
+    if (self.onClusterDataPersisted != nil) {
+        self.onClusterDataPersisted();
+    }
+}
+
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device
+{
+    // Allowing time-based reachability changes just makes the tests
+    // non-deterministic and can lead to random failures.  Suppress them
+    // unconditionally for now.  If we ever add tests that try to exercise that
+    // codepath, we can make this configurable.
+    return YES;
+}
+
+@end
+
+@implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
+
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return !_skipSetupSubscription;
+}
+
 @end

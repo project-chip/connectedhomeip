@@ -17,6 +17,7 @@ from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -41,6 +42,7 @@ class HostFuzzingType(Enum):
     NONE = auto()
     LIB_FUZZER = auto()
     OSS_FUZZ = auto()
+    PW_FUZZTEST = auto()
 
 
 class HostApp(Enum):
@@ -55,6 +57,7 @@ class HostApp(Enum):
     TV_APP = auto()
     TV_CASTING_APP = auto()
     LIGHT = auto()
+    LIGHT_DATA_MODEL_NO_UNIQUE_ID = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -103,6 +106,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.LIGHT:
             return 'lighting-app/linux'
+        elif self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
+            return 'lighting-app-data-mode-no-unique-id/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -186,7 +191,7 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
-        elif self == HostApp.LIGHT:
+        elif self == HostApp.LIGHT or self == HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID:
             yield 'chip-lighting-app'
             yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
@@ -215,7 +220,7 @@ class HostApp(Enum):
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
-            yield 'chip_nl_test_runner_wheels'
+            yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
@@ -255,6 +260,9 @@ class HostApp(Enum):
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
+        elif self == HostApp.NETWORK_MANAGER:
+            yield 'matter-network-manager-app'
+            yield 'matter-network-manager-app.map'
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
@@ -312,7 +320,10 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None
+                 enable_dnssd_tests: Optional[bool] = None,
+                 chip_casting_simplified: Optional[bool] = None,
+                 data_model_interface: Optional[bool] = None,
+                 chip_data_model_check_die_on_failure: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -347,6 +358,9 @@ class HostBuilder(GnBuilder):
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
 
+        if data_model_interface is not None:
+            self.extra_gn_options.append(f'chip_use_data_model_interface="{data_model_interface}"')
+
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
             self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
@@ -367,6 +381,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
             self.extra_gn_options.append('oss_fuzz=true')
+        elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -404,13 +420,19 @@ class HostBuilder(GnBuilder):
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
+            self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
             self.build_command = 'check'
+        elif chip_data_model_check_die_on_failure is not None:
+            if chip_data_model_check_die_on_failure:
+                self.extra_gn_options.append('chip_data_model_check_die_on_failure=true')
+            else:
+                self.extra_gn_options.append('chip_data_model_check_die_on_failure=false')
 
         if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
-            self.extra_gn_options.append('silabs_board="BRD4161A"')
+            self.extra_gn_options.append('silabs_board="BRD4187C"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -426,6 +448,9 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=true')
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_casting_simplified is not None:
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -451,6 +476,9 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'
+
+        if self.app == HostApp.TESTS and fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+            self.build_command = 'pw_fuzz_tests'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
@@ -564,19 +592,13 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

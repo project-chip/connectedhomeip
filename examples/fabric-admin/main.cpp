@@ -16,16 +16,24 @@
  *
  */
 
-#include "commands/common/Commands.h"
-
-#include "commands/clusters/SubscriptionsCommands.h"
-#include "commands/interactive/Commands.h"
-#include "commands/pairing/Commands.h"
+#include <commands/clusters/SubscriptionsCommands.h>
+#include <commands/common/Commands.h>
+#include <commands/fabric-sync/Commands.h>
+#include <commands/interactive/Commands.h>
+#include <commands/pairing/Commands.h>
+#include <device_manager/DeviceManager.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
+
+using namespace chip;
+
+void ApplicationInit()
+{
+    DeviceMgr().Init();
+}
 
 // ================================================================================
 // Main Code
@@ -44,8 +52,9 @@ int main(int argc, char * argv[])
     }
 
     ExampleCredentialIssuerCommands credIssuerCommands;
-    Commands commands;
+    Commands & commands = CommandMgr();
 
+    registerCommandsFabricSync(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
@@ -56,6 +65,8 @@ int main(int argc, char * argv[])
     {
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
+
+    ApplicationInit();
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }

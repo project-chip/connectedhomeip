@@ -46,7 +46,7 @@ LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -88,19 +88,19 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
+    FailIfNot(await test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
     logger.info("Testing commissioning")
-    FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
-                                     setuppin=20202021,
-                                     nodeid=1),
+    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
+                                           setuppin=20202021,
+                                           nodeid=1),
               "Failed to finish key exchange")
 
-    FailIfNot(asyncio.run(test.TestFailsafe(nodeid=1)), "Failed failsafe test")
+    FailIfNot(await test.TestFailsafe(nodeid=1), "Failed failsafe test")
 
     timeoutTicker.stop()
 
@@ -113,7 +113,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

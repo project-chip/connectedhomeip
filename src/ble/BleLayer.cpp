@@ -138,20 +138,6 @@ public:
 //
 static BleEndPointPool sBLEEndPointPool;
 
-// UUIDs used internally by BleLayer:
-
-const ChipBleUUID BleLayer::CHIP_BLE_CHAR_1_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D11
-                                                     0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
-                                                     0x9F, 0x9D, 0x11 } };
-
-const ChipBleUUID BleLayer::CHIP_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D12
-                                                     0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
-                                                     0x9F, 0x9D, 0x12 } };
-
-const ChipBleUUID BleLayer::CHIP_BLE_CHAR_3_ID = { { // 64630238-8772-45F2-B87D-748A83218F04
-                                                     0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83,
-                                                     0x21, 0x8F, 0x04 } };
-
 // BleTransportCapabilitiesRequestMessage implementation:
 
 void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t index, uint8_t version)
@@ -486,7 +472,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
                                    PacketBufferHandle && pBuf)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Write received on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_1_ID, charId), false, ChipLogError(Ble, "Write received on unknown char"));
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_1_UUID, charId), false, ChipLogError(Ble, "Write received on unknown char"));
     VerifyOrReturnError(!pBuf.IsNull(), false, ChipLogError(Ble, "Write received null buffer"));
 
     // Find matching connection end point.
@@ -512,7 +498,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
                                         PacketBufferHandle && pBuf)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Indication received on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId), false, ChipLogError(Ble, "Indication received on unknown char"));
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId), false, ChipLogError(Ble, "Indication received on unknown char"));
     VerifyOrReturnError(!pBuf.IsNull(), false, ChipLogError(Ble, "Indication received null buffer"));
 
     // Find matching connection end point.
@@ -528,7 +514,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
 bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Write confirmation on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_1_ID, charId), false, ChipLogError(Ble, "Write confirmation on unknown char"));
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_1_UUID, charId), false, ChipLogError(Ble, "Write confirmation on unknown char"));
 
     HandleAckReceived(connObj);
     return true;
@@ -537,7 +523,7 @@ bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const Chip
 bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Indication confirmation on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId), false,
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId), false,
                         ChipLogError(Ble, "Indication confirmation on unknown char"));
 
     HandleAckReceived(connObj);
@@ -558,7 +544,7 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
 bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Subscribe received on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId), false,
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_UUID, charId), false,
                         ChipLogError(Ble, "Subscribe received on unknown char"));
 
     // Find end point already associated with BLE connection, if any.
@@ -572,7 +558,7 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Chip
 bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Subscribe complete on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId), false,
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_UUID, charId), false,
                         ChipLogError(Ble, "Subscribe complete on unknown char"));
 
     BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -585,7 +571,7 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Chip
 bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Unsubscribe received on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId), false,
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_UUID, charId), false,
                         ChipLogError(Ble, "Unsubscribe received on unknown char"));
 
     // Find end point already associated with BLE connection, if any.
@@ -599,7 +585,7 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Ch
 bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_SVC_ID, svcId), false, ChipLogError(Ble, "Unsubscribe complete on unknown svc"));
-    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId), false,
+    VerifyOrReturnError(UUIDsMatch(&CHIP_BLE_CHAR_2_UUID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_UUID, charId), false,
                         ChipLogError(Ble, "Unsubscribe complete on unknown char"));
 
     // Find end point already associated with BLE connection, if any.

@@ -20,7 +20,7 @@
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
 #include <controller/ExamplePersistentStorage.h>
-#endif // CONFIG_USE_LOCAL_STORAGE
+#endif
 
 #include "../common/CHIPCommand.h"
 #include <lib/core/CHIPEncoding.h>

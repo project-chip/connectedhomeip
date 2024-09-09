@@ -26,7 +26,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
   val minPower: Long,
   val maxPower: Long,
   val minDuration: ULong,
-  val maxDuration: ULong
+  val maxDuration: ULong,
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustStruct {\n")
@@ -67,7 +67,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
         minPower,
         maxPower,
         minDuration,
-        maxDuration
+        maxDuration,
       )
     }
   }

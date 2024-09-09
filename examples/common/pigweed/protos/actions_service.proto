@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+import 'pw_protobuf_protos/common.proto';
+
+enum ActionType {
+  WRITE_ATTRIBUTE         = 0x00; // Write an cluster Attribute
+  RUN_COMMAND             = 0x01; // Run a cluster Command
+  EMIT_EVENT              = 0x02; // Emit a cluster Events
+}
+
+message Action {
+  ActionType type               = 1; // ActionType above
+  uint32 delayMs                = 2; // Delay and run action after xx ms
+  uint32 actionId               = 3; // Align with Cluster Attribute/Event/Command ID
+  optional uint32 arg1          = 4; // 1st attribute
+  optional uint32 arg2          = 5; // 2nd attribute
+  optional uint32 arg3          = 6; // 3rd attribute
+}
+
+message ActionsRequest {
+  uint32 endpoint_id = 1;
+  uint32 cluster_id = 2;
+  repeated Action actions       = 3; // Actions including Attribute Write / Event / Command 
+}
+
+service Actions {
+  rpc Set(ActionsRequest) returns (pw.protobuf.Empty){}
+}

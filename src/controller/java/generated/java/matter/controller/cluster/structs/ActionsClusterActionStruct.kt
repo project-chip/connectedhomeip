@@ -28,7 +28,7 @@ class ActionsClusterActionStruct(
   val type: UByte,
   val endpointListID: UShort,
   val supportedCommands: UShort,
-  val state: UByte
+  val state: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionStruct {\n")
@@ -44,10 +44,10 @@ class ActionsClusterActionStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
+      put(ContextSpecificTag(TAG_ACTION_ID), actionID)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_TYPE), type)
-      put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
+      put(ContextSpecificTag(TAG_ENDPOINT_LIST_ID), endpointListID)
       put(ContextSpecificTag(TAG_SUPPORTED_COMMANDS), supportedCommands)
       put(ContextSpecificTag(TAG_STATE), state)
       endStructure()
@@ -55,19 +55,19 @@ class ActionsClusterActionStruct(
   }
 
   companion object {
-    private const val TAG_ACTION_I_D = 0
+    private const val TAG_ACTION_ID = 0
     private const val TAG_NAME = 1
     private const val TAG_TYPE = 2
-    private const val TAG_ENDPOINT_LIST_I_D = 3
+    private const val TAG_ENDPOINT_LIST_ID = 3
     private const val TAG_SUPPORTED_COMMANDS = 4
     private const val TAG_STATE = 5
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterActionStruct {
       tlvReader.enterStructure(tlvTag)
-      val actionID = tlvReader.getUShort(ContextSpecificTag(TAG_ACTION_I_D))
+      val actionID = tlvReader.getUShort(ContextSpecificTag(TAG_ACTION_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
-      val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_ID))
       val supportedCommands = tlvReader.getUShort(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
 
@@ -79,7 +79,7 @@ class ActionsClusterActionStruct(
         type,
         endpointListID,
         supportedCommands,
-        state
+        state,
       )
     }
   }

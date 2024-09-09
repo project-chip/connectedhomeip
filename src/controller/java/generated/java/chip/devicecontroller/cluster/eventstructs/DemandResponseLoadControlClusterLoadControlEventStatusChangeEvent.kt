@@ -48,7 +48,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   val heatingSourceControl:
     Optional<
       chip.devicecontroller.cluster.structs.DemandResponseLoadControlClusterHeatingSourceControlStruct
-    >?
+    >?,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {\n")
@@ -68,7 +68,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_EVENT_I_D), eventID)
+      put(ContextSpecificTag(TAG_EVENT_ID), eventID)
       if (transitionIndex != null) {
         put(ContextSpecificTag(TAG_TRANSITION_INDEX), transitionIndex)
       } else {
@@ -122,7 +122,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   }
 
   companion object {
-    private const val TAG_EVENT_I_D = 0
+    private const val TAG_EVENT_ID = 0
     private const val TAG_TRANSITION_INDEX = 1
     private const val TAG_STATUS = 2
     private const val TAG_CRITICALITY = 3
@@ -135,10 +135,10 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_I_D))
+      val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_ID))
       val transitionIndex =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_INDEX))
@@ -237,7 +237,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
         averageLoadControl,
         dutyCycleControl,
         powerSavingsControl,
-        heatingSourceControl
+        heatingSourceControl,
       )
     }
   }

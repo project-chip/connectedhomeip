@@ -26,14 +26,14 @@ on:
         run-codeql:
           required: false
           type: boolean
-    
+
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
@@ -42,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:74
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -75,7 +75,7 @@ jobs:
               with:
                   languages: "cpp"
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_data_model_check_die_on_failure=true"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:74
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -179,7 +179,7 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
+                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false chip_data_model_check_die_on_failure=true"
                   scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
                   BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
             - name: Clean output
@@ -197,18 +197,20 @@ jobs:
                       esac
 
                       rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
                       BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                   done
             - name: Ensure codegen is done for sanitize
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
+              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+              #       See https://github.com/llvm/llvm-project/issues/97426
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
                        check \
                     "
             - name: Clean output
@@ -241,7 +243,7 @@ jobs:
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
-                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py 
+                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
             - name: Run fake linux tests with build_examples
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -251,7 +253,7 @@ jobs:
               uses: ./.github/actions/perform-codeql-analysis
               with:
                 language: cpp
-        
+
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
@@ -281,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:54
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -306,7 +308,7 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true enable_pylib=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false chip_data_model_check_die_on_failure=true"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
@@ -332,8 +334,8 @@ jobs:
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install -r src/setup_payload/python/requirements.txt
-                  python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool
+                  pip3 install -r scripts/setup/requirements.setuppayload.txt
+                  python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
@@ -342,7 +344,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:54
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -412,9 +414,8 @@ jobs:
                           # "host clang" build, which uses the pigweed
                           # clang.
                           "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
-                          "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
-                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS chip_data_model_check_die_on_failure=true" --export-compile-commands
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
@@ -422,10 +423,13 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
+              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+              #       See https://github.com/llvm/llvm-project/issues/97426
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting' \
                        check \
                     "
             - name: Uploading diagnostic logs
@@ -440,7 +444,7 @@ jobs:
               uses: ./.github/actions/perform-codeql-analysis
               with:
                 language: cpp
-        
+
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
 
@@ -451,7 +455,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:74
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

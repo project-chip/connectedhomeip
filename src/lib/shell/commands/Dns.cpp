@@ -51,7 +51,8 @@ public:
         result.address.ToString(addr_string);
 
         streamer_printf(streamer_get(), "Resolve completed: %s\r\n", addr_string);
-        streamer_printf(streamer_get(), "   Supports TCP:                  %s\r\n", result.supportsTcp ? "YES" : "NO");
+        streamer_printf(streamer_get(), "   Supports TCP Client:  %s\r\n", result.supportsTcpClient ? "YES" : "NO");
+        streamer_printf(streamer_get(), "   Supports TCP Server:  %s\r\n", result.supportsTcpServer ? "YES" : "NO");
         streamer_printf(streamer_get(), "   MRP IDLE retransmit timeout:   %u ms\r\n",
                         result.mrpRemoteConfig.mIdleRetransTimeout.count());
         streamer_printf(streamer_get(), "   MRP ACTIVE retransmit timeout: %u ms\r\n",
@@ -121,20 +122,22 @@ public:
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.has_value())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", *retryInterval);
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval->count());
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
         if (retryInterval.has_value())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", *retryInterval);
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval->count());
 
         auto activeThreshold = nodeData.GetMrpRetryActiveThreshold();
 
         if (activeThreshold.has_value())
         {
-            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", *activeThreshold);
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", activeThreshold->count());
         }
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
+
+        streamer_printf(streamer_get(), "   Supports TCP Client: %s\r\n", nodeData.supportsTcpClient ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP Server: %s\r\n", nodeData.supportsTcpServer ? "yes" : "no");
 
         if (nodeData.isICDOperatingAsLIT.has_value())
         {
@@ -211,13 +214,23 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     case 'C':
         filterType = Dnssd::DiscoveryFilterType::kCommissioningMode;
         break;
+    case 'I':
+        filterType = Dnssd::DiscoveryFilterType::kCompressedFabricId;
+        break;
     default:
         return false;
     }
 
-    uint16_t code;
-    VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
-
+    uint64_t code = 0;
+    if (filterType == Dnssd::DiscoveryFilterType::kCompressedFabricId)
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code, 16), false);
+        VerifyOrReturnValue(code != 0, false);
+    }
+    else
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
+    }
     filter = Dnssd::DiscoveryFilter(filterType, code);
     return true;
 }
@@ -261,6 +274,13 @@ CHIP_ERROR BrowseOperationalHandler(int argc, char ** argv)
     return sResolverProxy.DiscoverOperationalNodes(filter);
 }
 
+CHIP_ERROR BrowseStopHandler(int argc, char ** argv)
+{
+    streamer_printf(streamer_get(), "Stopping browse...\r\n");
+
+    return sResolverProxy.StopDiscovery();
+}
+
 } // namespace
 
 void RegisterDnsCommands()
@@ -270,6 +290,8 @@ void RegisterDnsCommands()
           "Browse Matter commissionables. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner", "Browse Matter commissioners. Usage: dns browse commissioner [subtype]" },
         { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
+        { &BrowseStopHandler, "stop", "Stop ongoing browse. Usage: dns browse stop" },
+
     };
 
     static constexpr Command subCommands[] = {

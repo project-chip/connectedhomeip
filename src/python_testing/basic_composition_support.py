@@ -15,20 +15,46 @@
 #    limitations under the License.
 #
 
-
+import asyncio
 import base64
 import copy
 import json
 import logging
 import pathlib
 import sys
-from pprint import pprint
+import typing
+from dataclasses import dataclass
+from pprint import pformat, pprint
 from typing import Any, Optional
 
+import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
+
+
+@dataclass
+class ArlData:
+    have_arl: bool
+    have_carl: bool
+
+
+def arls_populated(tlv_data: dict[int, Any]) -> ArlData:
+    """ Returns a tuple indicating if the ARL and CommissioningARL are populated.
+        Requires a wildcard read of the device TLV.
+    """
+    # ACL is always on endpoint 0
+    if 0 not in tlv_data or Clusters.AccessControl.id not in tlv_data[0]:
+        return ArlData(have_arl=False, have_carl=False)
+    # Both attributes are mandatory for this feature, so if one doesn't exist, neither should the other.
+    if Clusters.AccessControl.Attributes.Arl.attribute_id not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]:
+        return ArlData(have_arl=False, have_carl=False)
+
+    have_arl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.Arl.attribute_id]
+    have_carl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.CommissioningARL.attribute_id]
+
+    return ArlData(have_arl=have_arl, have_carl=have_carl)
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -97,45 +123,82 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    async def setup_class_helper(self, default_to_pase: bool = True):
-        dev_ctrl = self.default_controller
-        self.problems = []
+    def get_code(self, dev_ctrl):
+        created_codes = []
+        for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+            created_codes.append(dev_ctrl.CreateManualCode(discriminator, self.matter_test_config.setup_passcodes[idx]))
 
-        do_test_over_pase = self.user_params.get("use_pase_only", default_to_pase)
-        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
+        setup_codes = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code + created_codes
+        if not setup_codes:
+            return None
+        asserts.assert_equal(len(setup_codes), 1,
+                             "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
+        return setup_codes[0]
 
-        if do_test_over_pase:
-            setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
-            asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
-            node_id = self.dut_node_id
-            dev_ctrl.EstablishPASESession(setupCode, node_id)
-        else:
-            # Using the already commissioned node
-            node_id = self.dut_node_id
-
-        wildcard_read = (await dev_ctrl.Read(node_id, [()]))
-        endpoints_tlv = wildcard_read.tlvAttributes
-
-        node_dump_dict = {endpoint_id: MatterTlvToJson(endpoints_tlv[endpoint_id]) for endpoint_id in endpoints_tlv}
-        logging.debug(f"Raw TLV contents of Node: {json.dumps(node_dump_dict, indent=2)}")
+    def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
+        """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
+            Returns the json and txt as strings.
+        """
+        node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
+        json_dump_string = json.dumps(node_dump_dict, indent=2)
+        logging.debug(f"Raw TLV contents of Node: {json_dump_string}")
 
         if dump_device_composition_path is not None:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
                 json.dump(node_dump_dict, outfile, indent=2)
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
-                pprint(wildcard_read.attributes, outfile, indent=1, width=200, compact=True)
+                pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
+        return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
-        logging.info("###########################################################")
-        logging.info("Start of actual tests")
-        logging.info("###########################################################")
+    async def setup_class_helper(self, allow_pase: bool = True):
+        dev_ctrl = self.default_controller
+        self.problems = []
+
+        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
+
+        node_id = self.dut_node_id
+
+        task_list = []
+        if allow_pase and self.get_code(dev_ctrl):
+            setup_code = self.get_code(dev_ctrl)
+            pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
+            task_list.append(asyncio.create_task(pase_future))
+
+        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        task_list.append(asyncio.create_task(case_future))
+
+        for task in task_list:
+            asyncio.ensure_future(task)
+
+        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending:
+            try:
+                task.cancel()
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        wildcard_read = (await dev_ctrl.Read(node_id, [()]))
 
         # ======= State kept for use by all tests =======
-
         # All endpoints in "full object" indexing format
         self.endpoints = wildcard_read.attributes
 
         # All endpoints in raw TLV format
         self.endpoints_tlv = wildcard_read.tlvAttributes
+
+        self.dump_wildcard(dump_device_composition_path)
+
+        logging.info("###########################################################")
+        logging.info("Start of actual tests")
+        logging.info("###########################################################")
+
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(
+            arl_data.have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+        asserts.assert_false(
+            arl_data.have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""

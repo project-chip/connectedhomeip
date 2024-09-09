@@ -43,7 +43,7 @@ class ChannelClusterProgramStruct(
   val seriesInfo: Optional<ChannelClusterSeriesInfoStruct>?,
   val categoryList: Optional<List<ChannelClusterProgramCategoryStruct>>,
   val castList: Optional<List<ChannelClusterProgramCastStruct>>,
-  val externalIDList: Optional<List<ChannelClusterProgramCastStruct>>
+  val externalIDList: Optional<List<ChannelClusterProgramCastStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterProgramStruct {\n")
@@ -151,7 +151,7 @@ class ChannelClusterProgramStruct(
       }
       if (externalIDList.isPresent) {
         val optexternalIDList = externalIDList.get()
-        startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+        startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
         for (item in optexternalIDList.iterator()) {
           item.toTlv(AnonymousTag, this)
         }
@@ -180,7 +180,7 @@ class ChannelClusterProgramStruct(
     private const val TAG_SERIES_INFO = 15
     private const val TAG_CATEGORY_LIST = 16
     private const val TAG_CAST_LIST = 17
-    private const val TAG_EXTERNAL_I_D_LIST = 18
+    private const val TAG_EXTERNAL_ID_LIST = 18
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterProgramStruct {
       tlvReader.enterStructure(tlvTag)
@@ -308,10 +308,10 @@ class ChannelClusterProgramStruct(
           Optional.empty()
         }
       val externalIDList =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))) {
           Optional.of(
             buildList<ChannelClusterProgramCastStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST))
               while (!tlvReader.isEndOfContainer()) {
                 add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
               }
@@ -343,7 +343,7 @@ class ChannelClusterProgramStruct(
         seriesInfo,
         categoryList,
         castList,
-        externalIDList
+        externalIDList,
       )
     }
   }

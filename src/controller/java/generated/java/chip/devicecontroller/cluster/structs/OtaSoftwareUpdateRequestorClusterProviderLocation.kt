@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class OtaSoftwareUpdateRequestorClusterProviderLocation(
   val providerNodeID: ULong,
   val endpoint: UInt,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
@@ -38,7 +38,7 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D), providerNodeID)
+      put(ContextSpecificTag(TAG_PROVIDER_NODE_ID), providerNodeID)
       put(ContextSpecificTag(TAG_ENDPOINT), endpoint)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -46,16 +46,16 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
   }
 
   companion object {
-    private const val TAG_PROVIDER_NODE_I_D = 1
+    private const val TAG_PROVIDER_NODE_ID = 1
     private const val TAG_ENDPOINT = 2
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tlvTag)
-      val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
+      val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_ID))
       val endpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
@@ -64,7 +64,7 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
       return OtaSoftwareUpdateRequestorClusterProviderLocation(
         providerNodeID,
         endpoint,
-        fabricIndex
+        fabricIndex,
       )
     }
   }

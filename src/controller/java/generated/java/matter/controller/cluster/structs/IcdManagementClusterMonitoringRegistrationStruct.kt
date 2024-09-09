@@ -25,12 +25,14 @@ import matter.tlv.TlvWriter
 class IcdManagementClusterMonitoringRegistrationStruct(
   val checkInNodeID: ULong,
   val monitoredSubject: ULong,
-  val fabricIndex: UByte
+  val clientType: UByte,
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("IcdManagementClusterMonitoringRegistrationStruct {\n")
     append("\tcheckInNodeID : $checkInNodeID\n")
     append("\tmonitoredSubject : $monitoredSubject\n")
+    append("\tclientType : $clientType\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -38,25 +40,28 @@ class IcdManagementClusterMonitoringRegistrationStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D), checkInNodeID)
+      put(ContextSpecificTag(TAG_CHECK_IN_NODE_ID), checkInNodeID)
       put(ContextSpecificTag(TAG_MONITORED_SUBJECT), monitoredSubject)
+      put(ContextSpecificTag(TAG_CLIENT_TYPE), clientType)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_CHECK_IN_NODE_I_D = 1
+    private const val TAG_CHECK_IN_NODE_ID = 1
     private const val TAG_MONITORED_SUBJECT = 2
+    private const val TAG_CLIENT_TYPE = 4
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): IcdManagementClusterMonitoringRegistrationStruct {
       tlvReader.enterStructure(tlvTag)
-      val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D))
+      val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_ID))
       val monitoredSubject = tlvReader.getULong(ContextSpecificTag(TAG_MONITORED_SUBJECT))
+      val clientType = tlvReader.getUByte(ContextSpecificTag(TAG_CLIENT_TYPE))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
@@ -64,7 +69,8 @@ class IcdManagementClusterMonitoringRegistrationStruct(
       return IcdManagementClusterMonitoringRegistrationStruct(
         checkInNodeID,
         monitoredSubject,
-        fabricIndex
+        clientType,
+        fabricIndex,
       )
     }
   }

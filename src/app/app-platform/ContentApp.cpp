@@ -64,8 +64,17 @@ Status ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attribu
     return Status::Failure;
 }
 
-void ContentApp::AddClientNode(NodeId subjectNodeId)
+bool ContentApp::AddClientNode(NodeId subjectNodeId)
 {
+    for (int i = 0; i < kMaxClientNodes; ++i)
+    {
+        if (mClientNodes[i] == subjectNodeId)
+        {
+            // avoid storing duplicate nodes
+            return false;
+        }
+    }
+
     mClientNodes[mNextClientNodeIndex++] = subjectNodeId;
     if (mClientNodeCount < kMaxClientNodes)
     {
@@ -76,6 +85,8 @@ void ContentApp::AddClientNode(NodeId subjectNodeId)
         // if we exceed the max number, then overwrite the oldest entry
         mNextClientNodeIndex = 0;
     }
+
+    return true;
 }
 
 void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
@@ -92,6 +103,18 @@ void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * c
                                                          encodingHint);
 
     ChipLogProgress(Controller, "Completed send of AppObserver command");
+}
+
+bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const
+{
+    for (const auto & supportedCluster : mSupportedClusters)
+    {
+        if (clusterId == supportedCluster.mClusterIdentifier)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 CHIP_ERROR ContentAppClientCommandSender::SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner,

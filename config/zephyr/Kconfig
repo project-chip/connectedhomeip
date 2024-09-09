@@ -42,6 +42,15 @@ menuconfig CHIP
 
 if CHIP
 
+config CHIP_APP_LOG_LEVEL
+	int "Logging level in application"
+	default LOG_DEFAULT_LEVEL
+	depends on LOG
+	help
+	  Sets the logging level in the Matter application. Use this configuration
+	  option only within the application. To set the logging level for the
+	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
+
 # Device and firmware identifers
 
 config CHIP_DEVICE_VENDOR_ID
@@ -344,6 +353,15 @@ config CHIP_ICD_SLOW_POLL_INTERVAL
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
 	  to receive the messages in the idle mode.
+
+config CHIP_ICD_SIT_SLOW_POLL_LIMIT
+	int "Intermittently Connected Device slow polling interval limit for device in SIT mode (ms)"
+	default 15000
+	range 0 15000
+	help
+	  Provides the limit for Intermittently Connected Device slow polling interval in milliseconds while the
+	  device is in the SIT mode. By spec, this value cannot exceed 15 s (spec 9.16.1.5). This value can be
+	  used for the LIT device, to limit the slow poll interval used while temporarily working in the SIT mode.
 
 config CHIP_ICD_FAST_POLLING_INTERVAL
 	int "Intermittently Connected Device fast polling interval (ms)"

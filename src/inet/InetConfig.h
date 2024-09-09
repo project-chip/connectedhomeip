@@ -283,4 +283,16 @@
 #define HAVE_SO_BINDTODEVICE 0
 #endif
 
+/**
+ *  @def INET_CONFIG_UDP_SOCKET_MREQN
+ *
+ *  @brief
+ *    Should be set to 1 if your platform can handle struct ip_mreqn,
+ *    mandatory in UDPEndPointSocket.cpp
+ */
+
+#ifndef INET_CONFIG_UDP_SOCKET_MREQN
+#define INET_CONFIG_UDP_SOCKET_MREQN 0
+#endif
+
 // clang-format on

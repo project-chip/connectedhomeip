@@ -96,6 +96,7 @@ public:
 
     void SetICDManager(ICDManager * manager) { mICDManager = manager; };
 #endif
+
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ContentControlClusterRatingNameStruct(
   val ratingName: String,
-  val ratingNameDesc: Optional<String>
+  val ratingNameDesc: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("ContentControlClusterRatingNameStruct {\n")

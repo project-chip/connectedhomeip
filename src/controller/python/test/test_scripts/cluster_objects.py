@@ -38,6 +38,8 @@ ignoreAttributeDecodeFailureList = [
      Clusters.Objects.UnitTesting.Attributes.GeneralErrorBoolean),
     (1, Clusters.Objects.UnitTesting,
      Clusters.Objects.UnitTesting.Attributes.ClusterErrorBoolean),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.FailureInt32U),
 ]
 
 
@@ -164,7 +166,7 @@ class ClusterObjectTests:
             ]
         )
         expectedRes = [
-            AttributeStatus(Path=AttributePath(
+            AttributeStatus(Path=AttributePath.from_attribute(
                 EndpointId=1,
                 Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
         ]

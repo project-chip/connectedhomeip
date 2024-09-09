@@ -32,4 +32,8 @@ chip_enable_rotating_device_id = true
 
 chip_max_discovered_ip_addresses = 20
 
+enable_rtti = true
+
 matter_enable_tracing_support = true
+matter_log_json_payload_hex = true
+matter_log_json_payload_decode_full = true

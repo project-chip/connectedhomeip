@@ -44,7 +44,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   class ProgramGuideResponse(
     val paging: ChannelClusterChannelPagingStruct,
-    val programList: List<ChannelClusterProgramStruct>
+    val programList: List<ChannelClusterProgramStruct>,
   )
 
   class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
@@ -122,7 +122,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun changeChannel(
     match: String,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ChangeChannelResponse {
     val commandId: UInt = 0u
 
@@ -137,7 +137,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -187,7 +187,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
   suspend fun changeChannelByNumber(
     majorNumber: UShort,
     minorNumber: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 2u
 
@@ -205,7 +205,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -226,7 +226,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -241,7 +241,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     recordingFlag: UInt?,
     externalIDList: List<ChannelClusterAdditionalInfoStruct>?,
     data: ByteArray?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ProgramGuideResponse {
     val commandId: UInt = 4u
 
@@ -269,9 +269,9 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_RECORDING_FLAG_REQ: Int = 4
     recordingFlag?.let { tlvWriter.put(ContextSpecificTag(TAG_RECORDING_FLAG_REQ), recordingFlag) }
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 5
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 5
     externalIDList?.let {
-      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
       for (item in externalIDList.iterator()) {
         item.toTlv(AnonymousTag, tlvWriter)
       }
@@ -286,7 +286,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -339,7 +339,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     shouldRecordSeries: Boolean,
     externalIDList: List<ChannelClusterAdditionalInfoStruct>,
     data: ByteArray,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
 
@@ -352,8 +352,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_SHOULD_RECORD_SERIES_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
     for (item in externalIDList.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
@@ -367,7 +367,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -379,7 +379,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     shouldRecordSeries: Boolean,
     externalIDList: List<ChannelClusterAdditionalInfoStruct>,
     data: ByteArray,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 7u
 
@@ -392,8 +392,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_SHOULD_RECORD_SERIES_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
     for (item in externalIDList.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
@@ -407,7 +407,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -458,7 +458,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeChannelListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ChannelListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -471,7 +471,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -560,7 +560,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeLineupAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LineupAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -573,7 +573,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -661,7 +661,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeCurrentChannelAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentChannelAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -674,7 +674,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -761,7 +761,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -774,7 +774,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -858,7 +858,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -871,7 +871,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -955,7 +955,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -968,7 +968,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1050,7 +1050,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1063,7 +1063,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1138,7 +1138,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1151,7 +1151,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1219,7 +1219,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1232,7 +1232,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

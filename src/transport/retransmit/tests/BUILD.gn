@@ -25,5 +25,8 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestCache.cpp" ]
 
-  public_deps = [ "${chip_root}/src/transport/retransmit" ]
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/transport/retransmit",
+  ]
 }

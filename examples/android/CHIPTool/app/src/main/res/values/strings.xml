@@ -192,6 +192,8 @@
     <string name="wildcard_add_btn_text">Add</string>
     <string name="wildcard_reset_btn_text">Reset</string>
     <string name="wildcard_send_btn_text">Send</string>
+    <string name="wildcard_wait_check_in_message_btn_text">Wait Check In\nexperimental ICD Queue</string>
+    <string name="wildcard_send_when_check_in_message_btn_text">Set Send\nexperimental ICD Queue</string>
     <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>

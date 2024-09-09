@@ -80,7 +80,9 @@ tests:
 
 
            By sending a ReadRequest that the Write action was performed correctly.
+
           ./chip-tool levelcontrol read on-level 1 1
+
           [1655799013.466144][7075:7080] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039642
           [1655799013.466237][7075:7080] CHIP:TOO:   on level: 1
           [1655799013.466336][7075:7080] CHIP:EM: Sending Standalone Ack for MessageCounter:202402347 on exchange 58038i
@@ -92,32 +94,27 @@ tests:
           status response message to be received. Wait for 5 seconds(Timer has
           expired) and then send the Invoke Request Message to the DUT."
       verification: |
-          ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
+          On TH(chip-tool), Verify the DUT's response based on Matter release versions:
 
-          On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
+          For Matter release 1.4 or later, verify that the DUT responds with a status of TIMEOUT (0x94).
+          For Matter release 1.3 or earlier, verify that the DUT sends back a Status response with either TIMEOUT (0x94) or UNSUPPORTED_ACCESS (0x7e).
 
-          [1649686333.696111][3252:3257] CHIP:DMG: StatusResponseMessage =
-          [1649686333.696178][3252:3257] CHIP:DMG: {
-          [1649686333.696236][3252:3257] CHIP:DMG:         Status = 0x0,
-          [1649686333.696311][3252:3257] CHIP:DMG:         InteractionModelRevision = 1
-          [1649686333.696375][3252:3257] CHIP:DMG: }
-          [1649686333.696434][3252:3257] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
-          [1649686333.696513][3252:3257] CHIP:EM: Piggybacking Ack for MessageCounter:3570360 on exchange: 28108i
-          [1649686333.696626][3252:3257] CHIP:IN: Prepared secure message 0xaaaae019e098 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 28108i with MessageCounter:6840786.
-          [1649686333.696711][3252:3257] CHIP:IN: Sending encrypted msg 0xaaaae019e098 with MessageCounter:6840786 to 0x0000000000000001 (1) at monotonic time: 0000000000CE3312 msec
-          [1649686333.696989][3252:3257] CHIP:DMG: ICR moving to [CommandSen]
-          [1649686333.698938][3252:3257] CHIP:EM: Received message of type 0x1 with protocolId (0, 1) and MessageCounter:3570361 on exchange 28108i
-          [1649686333.699013][3252:3257] CHIP:EM: Found matching exchange: 28108i, Delegate: 0xffff68005c30
-          [1649686333.699089][3252:3257] CHIP:EM: Rxd Ack; Removing MessageCounter:6840786 from Retrans Table on exchange 28108i
-          [1649686333.699147][3252:3257] CHIP:EM: Removed CHIP MessageCounter:6840786 from RetransTable on exchange 28108i
-          [1649686333.699215][3252:3257] CHIP:DMG: ICR moving to [ResponseRe]
-          [1649686333.699294][3252:3257] CHIP:DMG: StatusResponseMessage =
-          [1649686333.699354][3252:3257] CHIP:DMG: {
-          [1649686333.699410][3252:3257] CHIP:DMG:         Status = 0x7e,
-          [1649686333.699471][3252:3257] CHIP:DMG:         InteractionModelRevision = 1
-          [1649686333.699528][3252:3257] CHIP:DMG: }
-          [1649686333.699585][3252:3257] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
-          [1649686333.699661][3252:3257] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+           ./chip-tool onoff on 1 1 --repeat-delay-ms 1000  --timedInteractionTimeoutMs 500
+
+          [1720440076.857] [11806:11808] [EM] Found matching exchange: 17395i, Delegate: 0xffff7c008198
+          [1720440076.857] [11806:11808] [EM] CHIP MessageCounter:107413542 not in RetransTable on exchange 17395i
+          [1720440076.858] [11806:11808] [EM] >>> [E:17395i S:706 M:204574784 (Ack:107413543)] (S) Msg RX from 1:0000000000000001 [67EF] --- Type 0001:01 (IM:StatusResponse)
+          [1720440076.858] [11806:11808] [EM] Found matching exchange: 17395i, Delegate: 0xffff7c008198
+          [1720440076.858] [11806:11808] [EM] Rxd Ack; Removing MessageCounter:107413543 from Retrans Table on exchange 17395i
+          [1720440076.858] [11806:11808] [DMG] ICR moving to [ResponseRe]
+          [1720440076.858] [11806:11808] [DMG] StatusResponseMessage =
+          [1720440076.858] [11806:11808] [DMG] {
+          [1720440076.858] [11806:11808] [DMG]         Status = 0x94 (TIMEOUT),
+          [1720440076.858] [11806:11808] [DMG]         InteractionModelRevision = 11
+          [1720440076.858] [11806:11808] [DMG] }
+          [1720440076.858] [11806:11808] [IM] Received status response, status is 0x94 (TIMEOUT)
+          [1720440076.858] [11806:11808] [TOO] Error: IM Error 0x00000594: General error: 0x94 (TIMEOUT)
+          [1720440076.858] [11806:11808] [EM] <<< [E:17395i S:706 M:107413546 (Ack:204574784)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0001:01 (IM:StatusResponse)
       disabled: true
 
     - label:
@@ -126,17 +123,26 @@ tests:
           status response message to be received. Wait for 5 seconds(Timer has
           expired) and then send the Write Request Message to the DUT."
       verification: |
+          On TH(chip-tool), Verify the DUT's response based on Matter release versions:
+
+          For Matter release 1.4 or later, verify that the DUT responds with a status of TIMEOUT (0x94).
+          For Matter release 1.3 or earlier, verify that the DUT sends back a Status response with either TIMEOUT (0x94) or UNSUPPORTED_ACCESS (0x7e).
+
           ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
 
           On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
 
-          [1654771611.106067][28715:28720] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1654771611.106112][28715:28720] CHIP:DMG: StatusResponseMessage =
-          [1654771611.106140][28715:28720] CHIP:DMG: {
-          [1654771611.106165][28715:28720] CHIP:DMG:         Status = 0x7e (UNSUPPORTED_ACCESS),
-          [1654771611.106192][28715:28720] CHIP:DMG:         InteractionModelRevision = 1
-          [1654771611.106216][28715:28720] CHIP:DMG: }
-          [1654771611.106244][28715:28720] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
-          [1654771611.106280][28715:28720] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1654771611.106303][28715:28720] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          [1720440084.666] [11810:11812] [EM] Found matching exchange: 22607i, Delegate: 0xffff9000a040
+          [1720440084.666] [11810:11812] [EM] Rxd Ack; Removing MessageCounter:200551619 from Retrans Table on exchange 22607i
+          [1720440084.667] [11810:11812] [DMG] WriteClient moving to [ResponseRe]
+          [1720440084.667] [11810:11812] [DMG] StatusResponseMessage =
+          [1720440084.667] [11810:11812] [DMG] {
+          [1720440084.667] [11810:11812] [DMG]         Status = 0x94 (TIMEOUT),
+          [1720440084.667] [11810:11812] [DMG]         InteractionModelRevision = 11
+          [1720440084.667] [11810:11812] [DMG] }
+          [1720440084.667] [11810:11812] [IM] Received status response, status is 0x94 (TIMEOUT)
+          [1720440084.667] [11810:11812] [TOO] Error: IM Error 0x00000594: General error: 0x94 (TIMEOUT)
+          [1720440084.667] [11810:11812] [EM] <<< [E:22607i S:23365 M:200551622 (Ack:3244934)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0001:01 (IM:StatusResponse)
+          [1720440084.668] [11810:11812] [DMG] WriteClient moving to [AwaitingDe]
       disabled: true

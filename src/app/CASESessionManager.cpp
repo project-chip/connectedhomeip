@@ -29,6 +29,11 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
+void CASESessionManager::Shutdown()
+{
+    AddressResolve::Resolver::Instance().Shutdown();
+}
+
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

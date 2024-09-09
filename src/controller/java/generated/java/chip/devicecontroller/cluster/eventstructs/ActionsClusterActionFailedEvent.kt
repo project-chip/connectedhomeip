@@ -26,7 +26,7 @@ class ActionsClusterActionFailedEvent(
   val actionID: UInt,
   val invokeID: ULong,
   val newState: UInt,
-  val error: UInt
+  val error: UInt,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionFailedEvent {\n")
@@ -40,8 +40,8 @@ class ActionsClusterActionFailedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
-      put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
+      put(ContextSpecificTag(TAG_ACTION_ID), actionID)
+      put(ContextSpecificTag(TAG_INVOKE_ID), invokeID)
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
       put(ContextSpecificTag(TAG_ERROR), error)
       endStructure()
@@ -49,15 +49,15 @@ class ActionsClusterActionFailedEvent(
   }
 
   companion object {
-    private const val TAG_ACTION_I_D = 0
-    private const val TAG_INVOKE_I_D = 1
+    private const val TAG_ACTION_ID = 0
+    private const val TAG_INVOKE_ID = 1
     private const val TAG_NEW_STATE = 2
     private const val TAG_ERROR = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterActionFailedEvent {
       tlvReader.enterStructure(tlvTag)
-      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_ID))
+      val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_ID))
       val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
       val error = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR))
 

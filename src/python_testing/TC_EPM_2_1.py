@@ -14,6 +14,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
@@ -39,26 +51,48 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def steps_TC_EPM_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads PowerMode attribute. Verify that the DUT response contains an enum8 value"),
-            TestStep("3", "TH reads NumberOfMeasurementTypes attribute. Verify that the DUT response contains an uint8 value."),
-            TestStep("4", "TH reads Accuracy attribute. Verify that the DUT response contains a list of MeasurementAccuracyStruct entries - Verify that the list has between 1 and NumberOfMeasurementTypes entries."),
-            TestStep("5", "TH reads Ranges attribute. Verify that the DUT response contains a list of MeasurementRangeStruct entries - Verify that the list has between 0 and NumberOfMeasurementTypes entries."),
-            TestStep("6", "TH reads Voltage attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("7", "TH reads ActiveCurrent attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("8", "TH reads ReactiveCurrent attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("9", "TH reads ApparentCurrent attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of 0 to 2^62."),
-            TestStep("10", "TH reads ActivePower attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("11", "TH reads ReactivePower attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("12", "TH reads ApparentPower attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("13", "TH reads RMSVoltage attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("14", "TH reads RMSCurrent attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("15", "TH reads RMSPower attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
-            TestStep("16", "TH reads Frequency attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of 0 to 1000000."),
-            TestStep("17", "TH reads HarmonicCurrents attribute. Verify that the DUT response contains a list of HarmonicMeasurementStruct entries."),
-            TestStep("18", "TH reads HarmonicPhases attribute. Verify that the DUT response contains a list of HarmonicMeasurementStruct entries."),
-            TestStep("19", "TH reads PowerFactor attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -10000 to 10000."),
-            TestStep("20", "TH reads NeutralCurrent attribute. Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads PowerMode attribute",
+                     "Verify that the DUT response contains an enum8 value"),
+            TestStep("3", "TH reads NumberOfMeasurementTypes attribute",
+                     "Verify that the DUT response contains an uint8 value."),
+            TestStep("4", "TH reads Accuracy attribute",
+                     "Verify that the DUT response contains a list of MeasurementAccuracyStruct entries ",
+                     "Verify that the list has between 1 and NumberOfMeasurementTypes entries."),
+            TestStep("5", "TH reads Ranges attribute",
+                     "Verify that the DUT response contains a list of MeasurementRangeStruct entries ",
+                     "Verify that the list has between 0 and NumberOfMeasurementTypes entries."),
+            TestStep("6", "TH reads Voltage attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("7", "TH reads ActiveCurrent attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("8", "TH reads ReactiveCurrent attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("9", "TH reads ApparentCurrent attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of 0 to 2^62."),
+            TestStep("10", "TH reads ActivePower attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("11", "TH reads ReactivePower attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("12", "TH reads ApparentPower attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("13", "TH reads RMSVoltage attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("14", "TH reads RMSCurrent attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("15", "TH reads RMSPower attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
+            TestStep("16", "TH reads Frequency attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of 0 to 1000000."),
+            TestStep("17", "TH reads HarmonicCurrents attribute",
+                     "Verify that the DUT response contains a list of HarmonicMeasurementStruct entries."),
+            TestStep("18", "TH reads HarmonicPhases attribute",
+                     "Verify that the DUT response contains a list of HarmonicMeasurementStruct entries."),
+            TestStep("19", "TH reads PowerFactor attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -10000 to 10000."),
+            TestStep("20", "TH reads NeutralCurrent attribute",
+                     "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
         ]
 
         return steps
@@ -102,7 +136,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
             for index, range_entry in enumerate(measurement.accuracyRanges):
                 logging.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
-                asserts.assert_greater(range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
+                asserts.assert_greater(
+                    range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
                 if index == 0:
                     minimum_range = range_entry.rangeMin
                     maximum_range = range_entry.rangeMax
@@ -122,7 +157,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             asserts.assert_equal(minimum_range, measurement.minMeasuredValue,
                                  "The minMeasuredValue must be the same as any of the minimum of all rangeMin's")
 
-        asserts.assert_is(found_active_power, True, "There must be an ActivePower measurement accuracy")
+        asserts.assert_is(found_active_power, True,
+                          "There must be an ActivePower measurement accuracy")
         asserts.assert_equal(len(accuracy), number_of_measurements,
                              "The number of accuracy entries should match the NumberOfMeasurementTypes")
 
@@ -195,9 +231,11 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
             asserts.assert_is(type(harmonic_currents), list)
             for index, entry in enumerate(harmonic_currents):
-                logging.info(f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                logging.info(
+                    f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
                 asserts.assert_greater_equal(entry.order, 1)
-                self.check_value_in_range("Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
+                self.check_value_in_range(
+                    "Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
 
         self.step("18")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicPhases.attribute_id in supported_attributes):
@@ -205,9 +243,11 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
             asserts.assert_is(type(harmonic_phases), list)
             for index, entry in enumerate(harmonic_phases):
-                logging.info(f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                logging.info(
+                    f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
                 asserts.assert_greater_equal(entry.order, 1)
-                self.check_value_in_range("Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
+                self.check_value_in_range(
+                    "Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
 
         self.step("19")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.PowerFactor.attribute_id in supported_attributes):

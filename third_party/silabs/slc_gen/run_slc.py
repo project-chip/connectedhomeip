@@ -14,10 +14,11 @@ def asBoolean(valueToTest):
 
 
 def isMG24(partnumber):
-    if "EFR32MG24" in partnumber or "MGM240" in partnumber:
-        return True
-    else:
-        return False
+    return ("EFR32MG24" in partnumber or "MGM240" in partnumber)
+
+
+def isMG26(partnumber):
+    return ("EFR32MG26" in partnumber)
 
 
 root_path = sys.argv[1]
@@ -35,10 +36,8 @@ template_path = os.path.join(root_path, "third_party/silabs/slc_gen/")
 slc_arguments = ""
 
 # Add Familly specific component
-if isMG24(silabs_mcu):
+if isMG24(silabs_mcu) or isMG26(silabs_mcu):
     slc_arguments += "uartdrv_eusart:vcom,"
-else:
-    slc_arguments += "uartdrv_usart:vcom,"
 
 # Translate GN arguments in SLC arguments
 if not disable_lcd:
@@ -58,15 +57,15 @@ slc_arguments += silabs_board
 
 print(slc_arguments)
 
-if "GSDK_ROOT" in os.environ:
-    gsdk_root = os.getenv('GSDK_ROOT')
+if "SISDK_ROOT" in os.environ:
+    sisdk_root = os.getenv('SISDK_ROOT')
 else:
     # If no gsdk path is set in the environment, use the standard path to the submodule
-    gsdk_root = os.path.join(root_path, "third_party/silabs/gecko_sdk/")
+    sisdk_root = os.path.join(root_path, "third_party/silabs/simplicity_sdk/")
 
 # make sure we have a configured and trusted gsdk in slc
-subprocess.run(["slc", "configuration", "--sdk", gsdk_root], check=True)
-subprocess.run(["slc", "signature", "trust", "--sdk", gsdk_root], check=True)
+subprocess.run(["slc", "configuration", "--sdk", sisdk_root], check=True)
+subprocess.run(["slc", "signature", "trust", "--sdk", sisdk_root], check=True)
 
 subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], check=True)
 

@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --bool-arg allow_sdk_dac:true --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 from glob import glob
 from pathlib import Path
@@ -146,15 +158,13 @@ class TC_DA_1_7(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DA_1_7(self):
-        # post_cert_tests (or sdk) can use the qr or manual code
-        # We don't currently support this in cert because the base doesn't support multiple QR/manual
         num = 0
         if self.matter_test_config.discriminators:
             num += len(self.matter_test_config.discriminators)
         if self.matter_test_config.qr_code_content:
-            num += 1
+            num += len(self.matter_test_config.qr_code_content)
         if self.matter_test_config.manual_code:
-            num += 1
+            num += len(self.matter_test_config.manual_code)
 
         if num != self.expected_number_of_DUTs():
             if self.allow_sdk_dac:

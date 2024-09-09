@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -62,17 +63,14 @@ class cc32xxBuilder(GnBuilder):
         return args
 
     def build_outputs(self):
-        items = {}
         if (self.app == cc32xxApp.LOCK):
-            extensions = [".out", ".bin", ".out.map"]
+            extensions = ["out", "bin"]
         elif (self.app == cc32xxApp.AIR_PURIFIER):
-            extensions = [".out", ".bin", ".out.map"]
-
+            extensions = ["out", "bin"]
         else:
             raise Exception('Unknown app type: %r' % self.app)
-
-        for extension in extensions:
-            name = '%s%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

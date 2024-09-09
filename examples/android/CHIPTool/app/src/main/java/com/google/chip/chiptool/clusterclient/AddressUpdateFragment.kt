@@ -230,6 +230,10 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
     val runnable =
       object : Runnable {
         override fun run() {
+          if (!isAdded) {
+            Log.d(TAG, "Fragment is not attached")
+            return
+          }
           if (icdTotalRemainStayActiveTimeMs >= ICD_PROGRESS_STEP) {
             icdDeviceRemainStayActiveTimeMs -= ICD_PROGRESS_STEP
             icdTotalRemainStayActiveTimeMs -= ICD_PROGRESS_STEP

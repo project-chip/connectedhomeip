@@ -244,7 +244,28 @@ public:
     virtual bool AllowsLargePayload() const                              = 0;
     virtual const SessionParameters & GetRemoteSessionParameters() const = 0;
     virtual System::Clock::Timestamp GetMRPBaseTimeout() const           = 0;
-    virtual System::Clock::Milliseconds32 GetAckTimeout() const          = 0;
+
+    // Returns true if `subjectDescriptor.IsCommissioning` (based on Core Specification
+    // pseudocode in ACL Architecture chapter) should be true when computing a
+    // subject descriptor for that session. This is only valid to call during
+    // synchronous processing of a message received on the session.
+    virtual bool IsCommissioningSession() const { return false; }
+
+    // GetAckTimeout is the estimate for how long it could take for the other
+    // side to receive our message (accounting for our MRP retransmits if it
+    // gets lost) and send a response.
+    virtual System::Clock::Milliseconds32 GetAckTimeout() const = 0;
+
+    // GetReceiptTimeout is the estimate for how long it could take for us to
+    // receive a message after the other side sends it, accounting for the MRP
+    // retransmits the other side might do if the message gets lost.
+    //
+    // The caller is expected to provide an estimate for when the peer would
+    // last have heard from us.  The most likely values to pass are
+    // System::SystemClock().GetMonotonicTimestamp() (to indicate "peer is
+    // responding to a message it just received") and System::Clock::kZero (to
+    // indicate "peer is reaching out to us, not in response to anything").
+    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
 

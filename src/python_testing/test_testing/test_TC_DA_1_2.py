@@ -71,7 +71,7 @@ def main():
         cert_path, "struct_cd_authorized_paa_list_count1_valid/test_case_vector.json"))
     run_single_test(path, 32768, factory_reset=True)
 
-    test_cases = {'struct_cd': 32768, 'fallback_encoding': 177}
+    test_cases = ['struct_cd', 'fallback_encoding']
 
     # struct_cd_version_number_wrong - excluded because this is a DCL test not covered by cert
     # struct_cd_cert_id_mismatch - excluded because this is a DCL test not covered by cert
@@ -80,7 +80,7 @@ def main():
 
     passes = []
     for p in os.listdir(cert_path):
-        matches = list(filter(lambda t: t in str(p), test_cases.keys()))
+        matches = list(filter(lambda t: t in str(p), test_cases))
         if len(matches) != 1:
             continue
 
@@ -91,8 +91,9 @@ def main():
         with open(path, 'r') as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
+            pid = j['basic_info_pid']
 
-        ret = run_single_test(path, test_cases[matches[0]])
+        ret = run_single_test(path, pid)
         passes.append((str(p), ret, success_expected))
 
     retval = 0

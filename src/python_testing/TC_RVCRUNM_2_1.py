@@ -15,8 +15,19 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_RVC_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
+# === END CI TEST ARGUMENTS ===
+
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
@@ -47,14 +58,6 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for ChangeToMode")
         return ret
-
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
 
     def pics_TC_RVCRUNM_2_1(self) -> list[str]:
         return ["RVCRUNM.S"]
@@ -90,7 +93,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
@@ -133,7 +136,8 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                 print("Change to RVC Run mode Cleaning")
                 await self.send_change_to_mode_cmd(newMode=1)
             else:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(
+                    prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when ready." % (self.mode_fail))
 
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -163,7 +167,8 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         if self.is_ci:
             print("Continuing...")
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(
+                prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when ready." % (self.mode_ok))
 
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

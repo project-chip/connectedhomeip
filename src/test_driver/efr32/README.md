@@ -1,6 +1,6 @@
 #CHIP EFR32 Test Driver
 
-This builds and runs the NLUnitTest on the efr32 device
+This builds and runs the unit tests on the efr32 device.
 
 <hr>
 
@@ -14,9 +14,9 @@ This builds and runs the NLUnitTest on the efr32 device
 
 ## Introduction
 
-This builds a test binary which contains the NLUnitTests and can be flashed onto
-a device. The device is controlled using the included RPCs, through the python
-test runner.
+This builds a set of test binaries which contain the unit tests and can be
+flashed onto a device. The device is controlled using the included RPCs, through
+the python test runner.
 
 <a name="building"></a>
 
@@ -40,22 +40,6 @@ test runner.
 
 -   Supported hardware:
 
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
     MG24 boards :
 
     -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
@@ -71,7 +55,7 @@ OR use GN/Ninja directly
           cd ~/connectedhomeip/src/test_driver/efr32/
           git submodule update --init
           source third_party/connectedhomeip/scripts/activate.sh
-          export SILABS_BOARD=BRD4161A
+          export SILABS_BOARD=BRD4187C
           gn gen out/debug
           ninja -C out/debug
           ```
@@ -99,7 +83,7 @@ Or build using build script from the root
 
     ```
     cd <connectedhomeip>
-    ./scripts/build/build_examples.py --target linux-x64-nl-test-runner build
+    ./scripts/build/build_examples.py --target linux-x64-pw-test-runner build
     ```
 
 The runner will be installed into the venv and python wheels will be packaged in
@@ -108,7 +92,7 @@ the output folder for deploying.
 Then the python wheels need to installed using pip3.
 
     ```
-    pip3 install out/debug/chip_nl_test_runner_wheels/*.whl
+    pip3 install out/debug/chip_pw_test_runner_wheels/*.whl
     ```
 
 Other python libraries may need to be installed such as
@@ -117,8 +101,8 @@ Other python libraries may need to be installed such as
     pip3 install pyserial
     ```
 
--   To run the tests:
+-   To run all tests:
 
     ```
-    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/matter-silabs-device_tests.s37 -o out.log
+    python -m pw_test_runner.pw_test_runner -d /dev/ttyACM1 -f out/debug/matter-silabs-device_tests.s37 -o out.log
     ```

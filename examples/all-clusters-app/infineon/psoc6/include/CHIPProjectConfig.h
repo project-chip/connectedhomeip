@@ -42,10 +42,10 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8003
 
 /* The ProductName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 All Clusters"
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "PSOC6-CYW43012 All Clusters"
 
 /* The HardwareVersionString attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "PSOC6-43012"
 
 /* The HardwareVersion attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012

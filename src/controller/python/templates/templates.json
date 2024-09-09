@@ -22,8 +22,16 @@
             "path": "../../../../src/app/zap-templates/partials/clusters_header.zapt"
         },
         {
-            "name": "cluster_header",
-            "path": "../../../../src/app/zap-templates/partials/cluster_header.zapt"
+            "name": "enum_def",
+            "path": "partials/enum_def.zapt"
+        },
+        {
+            "name": "bitmap_def",
+            "path": "partials/bitmap_def.zapt"
+        },
+        {
+            "name": "struct_def",
+            "path": "partials/struct_def.zapt"
         }
     ],
     "templates": [

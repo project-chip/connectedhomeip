@@ -195,8 +195,8 @@ public:
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
+         *   status response from the server.  In that case, constructing
+         *   a StatusIB from the error can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
@@ -338,6 +338,9 @@ public:
      *
      *  This will send either a Read Request or a Subscribe Request depending on
      *  the InteractionType this read client was initialized with.
+     *
+     *  If the params contain more data version filters than can fit in the request packet
+     *  the list will be truncated as needed, i.e. filter inclusion is on a best effort basis.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
@@ -559,6 +562,8 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                       DataVersionFilter const & aFilter);
     CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);

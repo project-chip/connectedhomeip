@@ -69,6 +69,15 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Unique ID length in bytes. The value should be 16-bytes or longer.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
 /**
  *  @brief Fallback value for the basic information cluster's Vendor name attribute
@@ -121,7 +130,11 @@
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+#if SLI_SI91X_MCU_INTERFACE
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (7 * 1024)
+#else
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
+#endif
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
