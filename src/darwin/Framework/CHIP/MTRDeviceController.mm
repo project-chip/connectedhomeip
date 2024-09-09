@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
@@ -82,6 +83,8 @@
 
 #import <os/lock.h>
 
+// TODO: These strings and their consumers in this file should probably go away,
+// since none of them really apply to all controllers.
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
 static NSString * const kErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
@@ -117,7 +120,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
-    NSMapTable * _nodeIDToDeviceMap;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
@@ -139,6 +141,8 @@ using namespace chip::Tracing::DarwinFramework;
     os_unfair_lock _assertionLock;
 }
 
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+
 - (os_unfair_lock_t)deviceMapLock
 {
     return &_underlyingDeviceMapLock;
@@ -156,7 +160,13 @@ using namespace chip::Tracing::DarwinFramework;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
+    // All synchronous suspend/resume activity has to be protected by
+    // @synchronized(self), so that parts of suspend/resume can't
+    // interleave with each other. Using @synchronized here because
+    // MTRDevice may call isSuspended.
     _suspended = startSuspended;
+
+    _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
     return self;
 }
@@ -176,7 +186,7 @@ using namespace chip::Tracing::DarwinFramework;
     auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
     // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
+    return [MTRDeviceControllerFactory.sharedInstance initializeController:[MTRDeviceController_Concrete alloc] withParameters:controllerParameters error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -330,7 +340,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
 }
 
 - (BOOL)isRunning
@@ -342,28 +352,53 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
-    return _suspended;
+    @synchronized(self) {
+        return _suspended;
+    }
 }
 
 - (void)suspend
 {
-    _suspended = YES;
+    MTR_LOG("%@ suspending", self);
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to tear down subscriptions.  Possibly close all
-    // CASE sessions for our identity.  Possibly try to see whether we can
-    // change our fabric entry to not advertise and restart advertising.
+    @synchronized(self) {
+        _suspended = YES;
 
-    // TODO: What should happen with active commissioning sessions?  Presumably
-    // close them?
+        NSArray * devicesToSuspend;
+        {
+            std::lock_guard lock(*self.deviceMapLock);
+            devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+        }
+
+        for (MTRDevice * device in devicesToSuspend) {
+            [device controllerSuspended];
+        }
+
+        // TODO: In the concrete class, consider what should happen with:
+        //
+        // * Active commissioning sessions (presumably close them?)
+        // * CASE sessions in general.
+        // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
+    }
 }
 
 - (void)resume
 {
-    _suspended = NO;
+    MTR_LOG("%@ resuming", self);
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to restart subscriptions.
+    @synchronized(self) {
+        _suspended = NO;
+
+        NSArray * devicesToResume;
+        {
+            std::lock_guard lock(*self.deviceMapLock);
+            devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+        }
+
+        for (MTRDevice * device in devicesToResume) {
+            [device controllerResumed];
+        }
+    }
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
@@ -449,7 +484,7 @@ using namespace chip::Tracing::DarwinFramework;
     // devices before we start invalidating.
     MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
     os_unfair_lock_lock(self.deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     [_nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(self.deviceMapLock);
 
@@ -1718,6 +1753,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 @end
 
+// TODO: This should not be in the superclass: either move to
+// MTRDeviceController_Concrete.mm, or move into a separate .h/.mm pair of
+// files.
 @implementation MTRDevicePairingDelegateShim
 - (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate
 {
@@ -1770,6 +1808,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
+// TODO: This should not be in the superclass: either move to
+// MTRDeviceController_Concrete.mm, or move into a separate .h/.mm pair of
+// files.
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;

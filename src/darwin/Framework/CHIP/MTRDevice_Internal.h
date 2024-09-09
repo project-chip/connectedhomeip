@@ -196,11 +196,21 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)_delegateExists;
 
+// Must be called by subclasses or MTRDevice implementation only.
+- (void)_delegateAdded;
+
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
 // Returns YES if a delegate is called
 - (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block;
 #endif
+
+// Used to generate attribute report that contains all known attributes, taking into consideration expected values
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport;
+
+// Hooks for controller suspend/resume.
+- (void)controllerSuspended;
+- (void)controllerResumed;
 
 @end
 

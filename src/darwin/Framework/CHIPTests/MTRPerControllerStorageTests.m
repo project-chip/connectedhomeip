@@ -24,12 +24,12 @@
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
-#import "MTRTestServerAppRunner.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -262,11 +262,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                                                        nodeID:(NSNumber *)nodeID
                                                       storage:(MTRTestPerControllerStorage *)storage
                                         caseAuthenticatedTags:(NSSet * _Nullable)caseAuthenticatedTags
+                                               paramsModifier:(void (^_Nullable)(MTRDeviceControllerExternalCertificateParameters *))paramsModifier
                                                         error:(NSError * __autoreleasing *)error
-                                            certificateIssuer:
-                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
-                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
-                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
 {
     XCTAssertTrue(error != NULL);
 
@@ -295,31 +292,58 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                                                                                      intermediateCertificate:nil
                                                                                              rootCertificate:root];
     XCTAssertNotNil(params);
-    // TODO: This is only used by testControllerServer.  If that moves
-    // elsewhere, take this back out again.
-    params.shouldAdvertiseOperational = YES;
 
-    __auto_type * ourCertificateIssuer = [[MTRPerControllerStorageTestsCertificateIssuer alloc] initWithRootCertificate:root
-                                                                                                intermediateCertificate:nil
-                                                                                                             signingKey:rootKeys
-                                                                                                               fabricID:fabricID];
-    XCTAssertNotNil(ourCertificateIssuer);
-
-    if (certificateIssuer) {
-        *certificateIssuer = ourCertificateIssuer;
-    }
-
-    [params setOperationalCertificateIssuer:ourCertificateIssuer queue:dispatch_get_main_queue()];
-
-    if (concurrentSubscriptionPoolSize > 0) {
-        params.concurrentSubscriptionEstablishmentsAllowedOnThread = concurrentSubscriptionPoolSize;
-    }
-
-    if (storageBehaviorConfiguration) {
-        params.storageBehaviorConfiguration = storageBehaviorConfiguration;
+    if (paramsModifier) {
+        paramsModifier(params);
     }
 
     return [[MTRDeviceController alloc] initWithParameters:params error:error];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                        caseAuthenticatedTags:(NSSet * _Nullable)caseAuthenticatedTags
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:caseAuthenticatedTags
+                              paramsModifier:^(MTRDeviceControllerExternalCertificateParameters * params) {
+                                  // TODO: This is only used by testControllerServer.  If that moves
+                                  // elsewhere, take this back out again.
+                                  params.shouldAdvertiseOperational = YES;
+
+                                  __auto_type * ourCertificateIssuer = [[MTRPerControllerStorageTestsCertificateIssuer alloc] initWithRootCertificate:params.rootCertificate
+                                                                                                                              intermediateCertificate:nil
+                                                                                                                                           signingKey:rootKeys
+                                                                                                                                             fabricID:fabricID];
+                                  XCTAssertNotNil(ourCertificateIssuer);
+
+                                  if (certificateIssuer) {
+                                      *certificateIssuer = ourCertificateIssuer;
+                                  }
+
+                                  [params setOperationalCertificateIssuer:ourCertificateIssuer queue:dispatch_get_main_queue()];
+
+                                  if (concurrentSubscriptionPoolSize > 0) {
+                                      params.concurrentSubscriptionEstablishmentsAllowedOnThread = concurrentSubscriptionPoolSize;
+                                  }
+
+                                  if (storageBehaviorConfiguration) {
+                                      params.storageBehaviorConfiguration = storageBehaviorConfiguration;
+                                  }
+                              }
+                                       error:error];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -462,6 +486,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
+    XCTAssertFalse(controller.suspended);
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
@@ -1611,6 +1636,128 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:YES];
 }
 
+// TODO: Factor out startControllerWithRootKeys into a test helper, move these
+// suspension tests to a different file.
+- (void)test012_startSuspended
+{
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
+                                                 operationalKeys:[[MTRTestKeys alloc] init]
+                                                        fabricID:@555
+                                                          nodeID:@888
+                                                         storage:storageDelegate
+                                           caseAuthenticatedTags:nil
+                                                  paramsModifier:^(MTRDeviceControllerExternalCertificateParameters * params) {
+                                                      params.startSuspended = YES;
+                                                  }
+                                                           error:&error];
+
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue(controller.running);
+    XCTAssertTrue(controller.suspended);
+    [controller shutdown];
+}
+
+- (void)test013_suspendDevices
+{
+    NSNumber * deviceID = @(17);
+    __auto_type * device = [self getMTRDevice:deviceID];
+    __auto_type * controller = device.deviceController;
+
+    XCTAssertFalse(controller.suspended);
+
+    __auto_type queue = dispatch_get_main_queue();
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * initialSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    XCTestExpectation * initialReachableExpectation = [self expectationWithDescription:@"Device initially became reachable"];
+    XCTestExpectation * initialUnreachableExpectation = [self expectationWithDescription:@"Device initially became unreachable"];
+    initialUnreachableExpectation.inverted = YES;
+
+    delegate.onReachable = ^{
+        [initialReachableExpectation fulfill];
+    };
+
+    delegate.onNotReachable = ^{
+        // We do not expect to land here.
+        [initialUnreachableExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^{
+        [initialSubscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ initialReachableExpectation, initialSubscriptionExpectation ] timeout:60];
+    // Separately wait for the unreachable bit, so we don't end up waiting 60
+    // seconds for it.
+    [self waitForExpectations:@[ initialUnreachableExpectation ] timeout:0];
+
+    // Test that sending a command works.  Clear the delegate's onReportEnd
+    // first, so reports from the command don't trigger it.
+    delegate.onReportEnd = nil;
+    XCTestExpectation * toggle1Expectation = [self expectationWithDescription:@"toggle 1"];
+    __auto_type * cluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    [cluster toggleWithExpectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [toggle1Expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ toggle1Expectation ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * becameUnreachableExpectation = [self expectationWithDescription:@"Device became unreachable"];
+    delegate.onNotReachable = ^{
+        [becameUnreachableExpectation fulfill];
+    };
+
+    [controller suspend];
+    XCTAssertTrue(controller.suspended);
+
+    // Test that sending a command no longer works.
+    XCTestExpectation * toggle2Expectation = [self expectationWithDescription:@"toggle 2"];
+    [cluster toggleWithExpectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [toggle2Expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ becameUnreachableExpectation, toggle2Expectation ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * newSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up again"];
+    XCTestExpectation * newReachableExpectation = [self expectationWithDescription:@"Device became reachable again"];
+    delegate.onReachable = ^{
+        [newReachableExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^{
+        [newSubscriptionExpectation fulfill];
+    };
+
+    [controller resume];
+    XCTAssertFalse(controller.suspended);
+
+    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation ] timeout:kTimeoutInSeconds];
+
+    // Test that sending a command works again.  Clear the delegate's onReportEnd
+    // first, so reports from the command don't trigger it.
+    delegate.onReportEnd = nil;
+    XCTestExpectation * toggle3Expectation = [self expectationWithDescription:@"toggle 3"];
+    [cluster toggleWithExpectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [toggle3Expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ toggle3Expectation ] timeout:kTimeoutInSeconds];
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+}
+
 // TODO: This might want to go in a separate test file, with some shared setup
 // across multiple tests, maybe.  Would need to factor out
 // startControllerWithRootKeys into a test helper.
@@ -2437,11 +2584,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // Start our helper apps.
     __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
     for (NSNumber * deviceID in sortedKeys) {
-        __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initWithAppName:@"all-clusters"
-                                                                        arguments:@[]
-                                                                          payload:deviceOnboardingPayloads[deviceID]
-                                                                         testcase:self];
-        XCTAssertNotNil(appRunner);
+        BOOL started = [self startAppWithName:@"all-clusters"
+                                    arguments:@[]
+                                      payload:deviceOnboardingPayloads[deviceID]];
+        XCTAssertTrue(started);
     }
 
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];

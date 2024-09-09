@@ -719,11 +719,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for device controllers over XPC.
-    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription for suspended controllers or device controllers over XPC.
+    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateAdded];
+
+    [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
+}
+
+- (void)_ensureSubscriptionForExistingDelegates:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -749,10 +758,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
+            [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
         }
     }
 
@@ -1240,6 +1249,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&_lock);
 
+    if (_deviceController.isSuspended) {
+        MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        return;
+    }
+
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
     // has given up completely.  Those all count as "we have tried and failed to
@@ -1505,6 +1519,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
     }
+    std::lock_guard lock(_lock);
     [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 #endif
@@ -3094,6 +3109,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
     std::lock_guard lock(_lock);
+    return [self _lockedAttributeValueDictionaryForAttributePath:attributePath];
+}
+
+- (NSDictionary<NSString *, id> *)_lockedAttributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -3478,6 +3499,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return attributesToReport;
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+    std::lock_guard lock(_lock);
+
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+        MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+        for (NSNumber * attributeID in clusterData.attributes) {
+            auto * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint
+                                                                       clusterID:clusterPath.cluster
+                                                                     attributeID:attributeID];
+
+            // Construct response-value dictionary with the data-value dictionary returned by
+            // _lockedAttributeValueDictionaryForAttributePath, to takes into consideration expected values as well.
+            [attributeReport addObject:@{
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
+            }];
+        }
+    }
+
+    return attributeReport;
 }
 
 #ifdef DEBUG
@@ -3975,6 +4021,34 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return result;
+}
+
+- (void)controllerSuspended
+{
+    [super controllerSuspended];
+
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Controller suspended"];
+
+    // Ensure that any pre-existing resubscribe attempts we control don't try to
+    // do anything.
+    _reattemptingSubscription = NO;
+}
+
+- (void)controllerResumed
+{
+    [super controllerResumed];
+
+    std::lock_guard lock(self->_lock);
+
+    if (![self _delegateExists]) {
+        MTR_LOG("%@ ignoring controller resume: no delegates", self);
+        return;
+    }
+
+    // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
+    // will go through the pool as needed, not necessarily happen immediately.
+    [self _ensureSubscriptionForExistingDelegates:@"Controller resumed"];
 }
 
 @end
