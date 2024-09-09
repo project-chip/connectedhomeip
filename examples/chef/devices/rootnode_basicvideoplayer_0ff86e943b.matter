@@ -2521,7 +2521,6 @@ endpoint 1 {
     persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 6;
@@ -2538,7 +2537,6 @@ endpoint 1 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2548,7 +2546,6 @@ endpoint 1 {
     ram      attribute MACAddress;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2560,7 +2557,6 @@ endpoint 1 {
     callback attribute currentChannel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
@@ -2577,7 +2573,6 @@ endpoint 1 {
     persist  attribute currentTarget default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2597,7 +2592,6 @@ endpoint 1 {
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
@@ -2621,7 +2615,6 @@ endpoint 1 {
     persist  attribute currentInput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -2635,7 +2628,6 @@ endpoint 1 {
   server cluster LowPower {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -2646,7 +2638,6 @@ endpoint 1 {
   server cluster KeypadInput {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
@@ -2660,7 +2651,6 @@ endpoint 1 {
     persist  attribute currentOutput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -2678,7 +2668,6 @@ endpoint 2 {
     ram      attribute identifyType default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
@@ -2691,7 +2680,6 @@ endpoint 2 {
     persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 6;
@@ -2709,7 +2697,6 @@ endpoint 2 {
     ram      attribute onLevel default = 0xFE;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 6;
@@ -2731,7 +2718,6 @@ endpoint 2 {
     callback attribute partsList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;

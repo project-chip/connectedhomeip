@@ -401,18 +401,6 @@ struct TypeInfo
 };
 } // namespace AcceptedCommandList
 
-namespace EventList {
-struct TypeInfo
-{
-    using Type             = DataModel::List<const chip::EventId>;
-    using DecodableType    = DataModel::DecodableList<chip::EventId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::EventId> &;
-
-    static constexpr AttributeId GetAttributeId() { return Attributes::EventList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace EventList
-
 namespace AttributeList {
 struct TypeInfo
 {
@@ -577,12 +565,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -615,7 +597,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Identify::IdentifyTypeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1046,12 +1027,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -1083,7 +1058,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1390,12 +1364,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -1430,7 +1398,6 @@ struct TypeInfo
         Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1478,12 +1445,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -1515,7 +1476,6 @@ struct TypeInfo
         Attributes::SwitchActions::TypeInfo::DecodableType switchActions = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -2114,12 +2074,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -2164,7 +2118,6 @@ struct TypeInfo
         Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -2299,12 +2252,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -2343,7 +2290,6 @@ struct TypeInfo
         Attributes::ApplicationType::TypeInfo::DecodableType applicationType = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -2367,12 +2313,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -2402,7 +2342,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -2520,12 +2459,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -2560,7 +2493,6 @@ struct TypeInfo
         Attributes::TagList::TypeInfo::DecodableType tagList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -2636,12 +2568,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -2672,7 +2598,6 @@ struct TypeInfo
         Attributes::Binding::TypeInfo::DecodableType binding;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -3084,12 +3009,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -3126,7 +3045,6 @@ struct TypeInfo
         Attributes::Arl::TypeInfo::DecodableType arl;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -3902,12 +3820,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Actions::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -3940,7 +3852,6 @@ struct TypeInfo
         Attributes::SetupURL::TypeInfo::DecodableType setupURL;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4424,12 +4335,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -4482,7 +4387,6 @@ struct TypeInfo
         Attributes::MaxPathsPerInvoke::TypeInfo::DecodableType maxPathsPerInvoke       = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4879,12 +4783,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -4914,7 +4812,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -5080,12 +4977,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -5120,7 +5011,6 @@ struct TypeInfo
         Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -5291,12 +5181,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -5328,7 +5212,6 @@ struct TypeInfo
         Attributes::SupportedLocales::TypeInfo::DecodableType supportedLocales;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -5389,12 +5272,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -5429,7 +5306,6 @@ struct TypeInfo
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -5465,12 +5341,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -5502,7 +5372,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::UnitLocalization::TempUnitEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -5538,12 +5407,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -5574,7 +5437,6 @@ struct TypeInfo
         Attributes::Sources::TypeInfo::DecodableType sources;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6078,12 +5940,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -6152,7 +6008,6 @@ struct TypeInfo
         Attributes::EndpointList::TypeInfo::DecodableType endpointList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6740,12 +6595,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -6786,7 +6635,6 @@ struct TypeInfo
         Attributes::TCAcknowledgementsRequired::TypeInfo::DecodableType TCAcknowledgementsRequired     = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -7522,12 +7370,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -7569,7 +7411,6 @@ struct TypeInfo
         Attributes::ThreadVersion::TypeInfo::DecodableType threadVersion = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -7690,12 +7531,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -7725,7 +7560,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -8111,12 +7945,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -8156,7 +7984,6 @@ struct TypeInfo
         Attributes::TestEventTriggersEnabled::TypeInfo::DecodableType testEventTriggersEnabled = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -8445,12 +8272,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -8484,7 +8305,6 @@ struct TypeInfo
         Attributes::CurrentHeapHighWatermark::TypeInfo::DecodableType currentHeapHighWatermark = static_cast<uint64_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9514,12 +9334,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -9613,7 +9427,6 @@ struct TypeInfo
         Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9906,12 +9719,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -9954,7 +9761,6 @@ struct TypeInfo
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -10231,12 +10037,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -10275,7 +10075,6 @@ struct TypeInfo
         Attributes::TimeSinceReset::TypeInfo::DecodableType timeSinceReset = static_cast<uint64_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -10798,12 +10597,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -10849,7 +10642,6 @@ struct TypeInfo
         Attributes::SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve     = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11317,12 +11109,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -11369,7 +11155,6 @@ struct TypeInfo
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11586,12 +11371,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -11624,7 +11403,6 @@ struct TypeInfo
         Attributes::MultiPressMax::TypeInfo::DecodableType multiPressMax         = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -12050,12 +11828,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -12089,7 +11861,6 @@ struct TypeInfo
         Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -12746,12 +12517,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -12787,7 +12552,6 @@ struct TypeInfo
         Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13207,12 +12971,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13246,7 +13004,6 @@ struct TypeInfo
         Attributes::MaxGroupKeysPerFabric::TypeInfo::DecodableType maxGroupKeysPerFabric = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13286,12 +13043,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13322,7 +13073,6 @@ struct TypeInfo
         Attributes::LabelList::TypeInfo::DecodableType labelList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13362,12 +13112,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13398,7 +13142,6 @@ struct TypeInfo
         Attributes::LabelList::TypeInfo::DecodableType labelList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13422,12 +13165,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13457,7 +13194,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13481,12 +13217,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13516,7 +13246,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13540,12 +13269,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13575,7 +13298,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13611,12 +13333,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -13647,7 +13363,6 @@ struct TypeInfo
         Attributes::StateValue::TypeInfo::DecodableType stateValue = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14074,12 +13789,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -14121,7 +13830,6 @@ struct TypeInfo
         Attributes::MaximumCheckInBackOff::TypeInfo::DecodableType maximumCheckInBackOff = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14333,12 +14041,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -14371,7 +14073,6 @@ struct TypeInfo
         Attributes::TimerState::TypeInfo::DecodableType timerState = static_cast<chip::app::Clusters::Timer::TimerStatusEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14651,12 +14352,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -14693,7 +14388,6 @@ struct TypeInfo
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14930,12 +14624,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OvenMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -14969,7 +14657,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15018,12 +14705,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15055,7 +14736,6 @@ struct TypeInfo
         Attributes::SelectedDrynessLevel::TypeInfo::DecodableType selectedDrynessLevel;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15257,12 +14937,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15298,7 +14972,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15461,12 +15134,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15500,7 +15167,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15664,12 +15330,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15703,7 +15363,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15776,12 +15435,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15816,7 +15469,6 @@ struct TypeInfo
         Attributes::SupportedRinses::TypeInfo::DecodableType supportedRinses;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15955,12 +15607,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -15992,7 +15638,6 @@ struct TypeInfo
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16131,12 +15776,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -16168,7 +15807,6 @@ struct TypeInfo
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16312,12 +15950,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -16353,7 +15985,6 @@ struct TypeInfo
         Attributes::SupportedTemperatureLevels::TypeInfo::DecodableType supportedTemperatureLevels;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16413,12 +16044,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -16454,7 +16079,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16661,12 +16285,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -16700,7 +16318,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16736,12 +16353,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -16773,7 +16384,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::AirQuality::AirQualityEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16994,12 +16604,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -17051,7 +16655,6 @@ struct TypeInfo
         Attributes::ExpiryDate::TypeInfo::DecodableType expiryDate = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -17540,12 +17143,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -17583,7 +17180,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -17681,12 +17277,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -17718,7 +17308,6 @@ struct TypeInfo
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -17944,12 +17533,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -17988,7 +17571,6 @@ struct TypeInfo
         Attributes::WattRating::TypeInfo::DecodableType wattRating               = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -18267,12 +17849,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -18309,7 +17885,6 @@ struct TypeInfo
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -18629,12 +18204,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -18670,7 +18239,6 @@ struct TypeInfo
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -19567,12 +19135,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -19605,7 +19167,6 @@ struct TypeInfo
         Attributes::FabricSceneInfo::TypeInfo::DecodableType fabricSceneInfo;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -19770,12 +19331,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -19813,7 +19368,6 @@ struct TypeInfo
         Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -19978,12 +19532,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -20021,7 +19569,6 @@ struct TypeInfo
         Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -20223,12 +19770,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -20271,7 +19812,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -20581,12 +20121,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -20628,7 +20162,6 @@ struct TypeInfo
         Attributes::LevelStep::TypeInfo::DecodableType levelStep = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -21031,12 +20564,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -21086,7 +20613,6 @@ struct TypeInfo
         Attributes::NeutralCurrent::TypeInfo::DecodableType neutralCurrent;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -21293,12 +20819,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -21334,7 +20854,6 @@ struct TypeInfo
         Attributes::CumulativeEnergyReset::TypeInfo::DecodableType cumulativeEnergyReset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -21615,12 +21134,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -21659,7 +21172,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::WaterHeaterManagement::BoostStateEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -22266,12 +21778,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -22309,7 +21815,6 @@ struct TypeInfo
         Attributes::DefaultRandomDuration::TypeInfo::DecodableType defaultRandomDuration       = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -22590,12 +22095,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -22627,7 +22126,6 @@ struct TypeInfo
         Attributes::ActiveMessageIDs::TypeInfo::DecodableType activeMessageIDs;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -23444,12 +22942,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -23490,7 +22982,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24275,12 +23766,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -24335,7 +23820,6 @@ struct TypeInfo
         Attributes::SessionEnergyDischarged::TypeInfo::DecodableType sessionEnergyDischarged;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24690,12 +24174,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyPreference::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::EnergyPreference::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -24731,7 +24209,6 @@ struct TypeInfo
             static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24779,12 +24256,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PowerTopology::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PowerTopology::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -24816,7 +24287,6 @@ struct TypeInfo
         Attributes::ActiveEndpoints::TypeInfo::DecodableType activeEndpoints;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24979,12 +24449,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvseMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvseMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -25018,7 +24482,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25181,12 +24644,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -25220,7 +24677,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25383,12 +24839,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagementMode::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagementMode::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -25422,7 +24872,6 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27202,12 +26651,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -27294,7 +26737,6 @@ struct TypeInfo
             static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28055,12 +27497,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -28116,7 +27552,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28338,12 +27773,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -28383,7 +27812,6 @@ struct TypeInfo
         Attributes::BarrierPosition::TypeInfo::DecodableType barrierPosition                     = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28768,12 +28196,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -28809,7 +28231,6 @@ struct TypeInfo
         Attributes::Progress::TypeInfo::DecodableType progress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -29109,12 +28530,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -29172,7 +28587,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -30958,12 +30372,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -31069,7 +30477,6 @@ struct TypeInfo
         Attributes::SetpointHoldExpiryTimestamp::TypeInfo::DecodableType setpointHoldExpiryTimestamp;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -31288,12 +30695,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -31341,7 +30742,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -31401,12 +30801,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -31442,7 +30836,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33018,12 +32411,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33110,7 +32497,6 @@ struct TypeInfo
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33304,12 +32690,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33355,7 +32735,6 @@ struct TypeInfo
         Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33440,12 +32819,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33480,7 +32853,6 @@ struct TypeInfo
         Attributes::LightSensorType::TypeInfo::DecodableType lightSensorType;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33552,12 +32924,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33591,7 +32957,6 @@ struct TypeInfo
         Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33723,12 +33088,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33767,7 +33126,6 @@ struct TypeInfo
         Attributes::Scale::TypeInfo::DecodableType scale                     = static_cast<int8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33839,12 +33197,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33878,7 +33230,6 @@ struct TypeInfo
         Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33950,12 +33301,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -33989,7 +33334,6 @@ struct TypeInfo
         Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -34208,12 +33552,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -34267,7 +33605,6 @@ struct TypeInfo
             physicalContactUnoccupiedToOccupiedThreshold = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -34458,12 +33795,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -34507,7 +33838,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -34663,12 +33993,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -34712,7 +34036,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -34868,12 +34191,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -34917,7 +34234,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -35073,12 +34389,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -35122,7 +34432,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -35278,12 +34587,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -35327,7 +34630,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -35483,12 +34785,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -35532,7 +34828,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -35688,12 +34983,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -35737,7 +35026,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -35893,12 +35181,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -35942,7 +35224,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -36098,12 +35379,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -36147,7 +35422,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -36303,12 +35577,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -36352,7 +35620,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -36479,12 +35746,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -36516,7 +35777,6 @@ struct TypeInfo
         Attributes::PassphraseSurrogate::TypeInfo::DecodableType passphraseSurrogate;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -36802,12 +36062,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -36843,7 +36097,6 @@ struct TypeInfo
         Attributes::PendingDatasetTimestamp::TypeInfo::DecodableType pendingDatasetTimestamp;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37091,12 +36344,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -37129,7 +36376,6 @@ struct TypeInfo
         Attributes::ThreadNetworkTableSize::TypeInfo::DecodableType threadNetworkTableSize = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37179,12 +36425,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -37216,7 +36456,6 @@ struct TypeInfo
         Attributes::LinkLocalAddress::TypeInfo::DecodableType linkLocalAddress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37912,12 +37151,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -37950,7 +37183,6 @@ struct TypeInfo
         Attributes::CurrentChannel::TypeInfo::DecodableType currentChannel;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -38113,12 +37345,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -38150,7 +37376,6 @@ struct TypeInfo
         Attributes::CurrentTarget::TypeInfo::DecodableType currentTarget = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -38969,12 +38194,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -39016,7 +38235,6 @@ struct TypeInfo
         Attributes::AvailableTextTracks::TypeInfo::DecodableType availableTextTracks;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -39305,12 +38523,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -39342,7 +38554,6 @@ struct TypeInfo
         Attributes::CurrentInput::TypeInfo::DecodableType currentInput = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -39407,12 +38618,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -39442,7 +38647,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -39548,12 +38752,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -39583,7 +38781,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40003,12 +39200,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -40041,7 +39232,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40203,12 +39393,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -40240,7 +39424,6 @@ struct TypeInfo
         Attributes::CurrentOutput::TypeInfo::DecodableType currentOutput = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40478,12 +39661,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -40515,7 +39692,6 @@ struct TypeInfo
         Attributes::CurrentApp::TypeInfo::DecodableType currentApp;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40641,12 +39817,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -40685,7 +39855,6 @@ struct TypeInfo
         Attributes::AllowedVendorList::TypeInfo::DecodableType allowedVendorList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40871,12 +40040,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -40906,7 +40069,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -41493,12 +40655,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -41536,7 +40692,6 @@ struct TypeInfo
         Attributes::BlockUnrated::TypeInfo::DecodableType blockUnrated               = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -41681,12 +40836,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -41716,7 +40865,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -41867,12 +41015,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -41904,7 +41046,6 @@ struct TypeInfo
         Attributes::LocationDirectory::TypeInfo::DecodableType locationDirectory;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -42083,12 +41224,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -42120,7 +41255,6 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -43908,12 +43042,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -44088,7 +43216,6 @@ struct TypeInfo
         Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::DecodableType rmsVoltageSwellPeriodPhaseC = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -47235,12 +46362,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -47374,7 +46495,6 @@ struct TypeInfo
         Attributes::NullableGlobalStruct::TypeInfo::DecodableType nullableGlobalStruct;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -47617,12 +46737,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -47652,7 +46766,6 @@ struct TypeInfo
 
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -47806,12 +46919,6 @@ struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::Typ
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
 };
 } // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMei::Id; }
-};
-} // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
@@ -47842,7 +46949,6 @@ struct TypeInfo
         Attributes::FlipFlop::TypeInfo::DecodableType flipFlop = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
