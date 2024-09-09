@@ -321,7 +321,7 @@ class ChangedPathListener
 public:
     virtual ~ChangedPathListener() = default;
 
-    /// Called when a specific path is to be considered dirty.
+    /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
     virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
