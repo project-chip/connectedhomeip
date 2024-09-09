@@ -295,10 +295,16 @@ def cmd_list(context):
     default=0,
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
+@click.option(
+    '--ble-wifi',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use a virtual wifi and bluetooth to commission device')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -368,8 +374,24 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     )
 
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare, ble_wifi)
+        if ble_wifi:
+            dbus = chiptest.linux.DbusTest()
+            dbus.start()
+
+            virt_wifi = chiptest.linux.VirtualWifi(
+                "/usr/sbin/hostapd",
+                "/usr/sbin/dnsmasq",
+                "/usr/sbin/wpa_supplicant",
+                dry_run=context.obj.dry_run,
+            )
+            virt_ble = chiptest.linux.VirtualBle(
+                "/usr/bin/btvirt",
+                "/usr/bin/bluetoothctl",
+                dry_run=context.obj.dry_run,
+            )
+            virt_wifi.start()
+            virt_ble.start()
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -380,10 +402,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
+            if ble_wifi:
+                virt_wifi.stop()
+                virt_ble.stop()
+                dbus.stop()
             chiptest.linux.ShutdownNamespaceForTestExecution()
 
     for i in range(iterations):
-        logging.info("Starting iteration %d" % (i+1))
+        logging.info("Starting iteration %d" % (i + 1))
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
@@ -401,18 +427,35 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 if context.obj.dry_run:
                     logging.info("Would run test: %s" % test.name)
                 else:
-                    logging.info('%-20s - Starting test' % (test.name))
-                test.Run(
-                    runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=context.obj.runtime)
+                    logging.info("%-20s - Starting test" % (test.name))
+                if ble_wifi:
+                    test.Run(
+                        runner,
+                        apps_register,
+                        paths,
+                        pics_file,
+                        test_timeout_seconds,
+                        context.obj.dry_run,
+                        test_runtime=context.obj.runtime,
+                        app_hci_number=virt_ble.ble_app.index,
+                        tool_hci_number=virt_ble.ble_tool.index,
+                    )
+                else:
+                    test.Run(
+                        runner,
+                        apps_register,
+                        paths,
+                        pics_file,
+                        test_timeout_seconds,
+                        context.obj.dry_run,
+                        test_runtime=context.obj.runtime,
+                    )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    logging.info('%-30s - Completed in %0.2f seconds' %
-                                 (test.name, (test_end - test_start)))
+                    logging.info("%-30s - Completed in %0.2f seconds" % (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%-30s - FAILED in %0.2f seconds' %
-                                  (test.name, (test_end - test_start)))
+                logging.exception("%-30s - FAILED in %0.2f seconds" % (test.name, (test_end - test_start)))
                 observed_failures += 1
                 if not keep_going:
                     cleanup()

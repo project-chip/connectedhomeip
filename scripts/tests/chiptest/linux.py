@@ -18,15 +18,22 @@
 Handles linux-specific functionality for running test cases
 """
 
+import glob
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import time
+from collections import namedtuple
+from time import sleep
+from typing import Optional
 
 from .test_definition import ApplicationPaths
 
 test_environ = os.environ.copy()
+PW_PROJECT_ROOT = os.environ.get("PW_PROJECT_ROOT")
+QEMU_CONFIG_FILES = "integrations/docker/images/stage-2/chip-build-linux-qemu/files"
 
 
 def EnsureNetworkNamespaceAvailability():
@@ -57,7 +64,7 @@ def EnsurePrivateState():
         sys.exit(1)
 
 
-def CreateNamespacesForAppTest():
+def CreateNamespacesForAppTest(ble_wifi: bool = False):
     """
     Creates appropriate namespaces for a tool and app binaries in a simulated
     isolated network.
@@ -88,22 +95,32 @@ def CreateNamespacesForAppTest():
         "ip netns exec app ip link set dev lo up",
         "ip link set dev eth-app-switch up",
 
-        "ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool",
+        "ip netns exec tool ip addr add 10.10.12.2/24 dev eth-tool",
         "ip netns exec tool ip link set dev eth-tool up",
         "ip netns exec tool ip link set dev lo up",
         "ip link set dev eth-tool-switch up",
 
-        # Force IPv6 to use ULAs that we control
-        "ip netns exec tool ip -6 addr flush eth-tool",
-        "ip netns exec app ip -6 addr flush eth-app",
-        "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool",
-        "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app",
-
-        # create link between virtual host 'tool' and the test runner
         "ip addr add 10.10.10.5/24 dev eth-ci",
+        "ip addr add 10.10.12.5/24 dev eth-ci",
         "ip link set dev eth-ci up",
         "ip link set dev eth-ci-switch up",
     ]
+
+    if not ble_wifi:
+        COMMANDS += [
+            "ip link add eth-app-direct type veth peer name eth-tool-direct",
+            "ip link set eth-app-direct netns app",
+            "ip link set eth-tool-direct netns tool",
+            "ip netns exec app ip addr add 10.10.15.1/24 dev eth-app-direct",
+            "ip netns exec app ip link set dev eth-app-direct up",
+            "ip netns exec tool ip addr add 10.10.15.2/24 dev eth-tool-direct",
+            "ip netns exec tool ip link set dev eth-tool-direct up",
+            # Force IPv6 to use ULAs that we control
+            "ip netns exec tool ip -6 addr flush eth-tool",
+            "ip netns exec app ip -6 addr flush eth-app",
+            "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool-direct",
+            "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app-direct",
+        ]
 
     for command in COMMANDS:
         logging.debug("Executing '%s'" % command)
@@ -156,17 +173,230 @@ def RemoveNamespaceForAppTest():
             sys.exit(1)
 
 
-def PrepareNamespacesForTestExecution(in_unshare: bool):
+def PrepareNamespacesForTestExecution(in_unshare: bool, ble_wifi: bool = False):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
     elif in_unshare:
         EnsurePrivateState()
 
-    CreateNamespacesForAppTest()
+    CreateNamespacesForAppTest(ble_wifi)
 
 
 def ShutdownNamespaceForTestExecution():
     RemoveNamespaceForAppTest()
+
+
+class DbusTest:
+    DBUS_SYSTEM_BUS_ADDRESS = "unix:path=/tmp/chip-dbus-test"
+
+    def __init__(self, dry_run: bool = False):
+        self._dbus = None
+        self._dbus_proxy = None
+        self.dry_run = dry_run
+
+    def start(self):
+        if self.dry_run:
+            logging.info("Would start dbus")
+            return
+        original_env = os.environ.copy()
+        os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = DbusTest.DBUS_SYSTEM_BUS_ADDRESS
+        dbus = shutil.which("dbus-daemon")
+        self._dbus = subprocess.Popen([dbus, "--session", "--address", self.DBUS_SYSTEM_BUS_ADDRESS])
+
+        self._dbus_proxy = subprocess.Popen(
+            ["python3", f"{PW_PROJECT_ROOT}/scripts/tools/dbus-proxy-bluez.py", "--bus-proxy", DbusTest.DBUS_SYSTEM_BUS_ADDRESS],
+            env=original_env,
+        )
+
+    def stop(self):
+        if self._dbus:
+            self._dbus_proxy.terminate()
+            self._dbus.terminate()
+            self._dbus.wait()
+
+
+class VirtualWifi:
+    def __init__(
+        self,
+        hostapd_path: str,
+        dnsmasq_path: str,
+        wpa_supplicant_path: str,
+        wlan_app: Optional[str] = None,
+        wlan_tool: Optional[str] = None,
+        dry_run: bool = False,
+    ):
+        self.dry_run = dry_run
+        self._hostapd_path = hostapd_path
+        self._dnsmasq_path = dnsmasq_path
+        self._wpa_supplicant_path = wpa_supplicant_path
+        self._hostapd_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/hostapd.conf")
+        self._dnsmasq_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/dnsmasq.conf")
+        self._wpa_supplicant_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/wpa_supplicant.conf")
+
+        if (wlan_app is None or wlan_tool is None) and not dry_run:
+            wlans = glob.glob("/sys/devices/virtual/mac80211_hwsim/hwsim*/net/*")
+            if len(wlans) < 2:
+                raise RuntimeError("Not enough wlan devices found")
+
+            self._wlan_app = os.path.basename(wlans[0])
+            self._wlan_tool = os.path.basename(wlans[1])
+        else:
+            self._wlan_app = wlan_app
+            self._wlan_tool = wlan_tool
+        self._hostapd = None
+        self._dnsmasq = None
+        self._wpa_supplicant = None
+        self._dhclient = None
+
+    @staticmethod
+    def _get_phy(dev: str) -> str:
+        output = subprocess.check_output(["iw", "dev", dev, "info"])
+        for line in output.split(b"\n"):
+            if b"wiphy" in line:
+                wiphy = int(line.split(b" ")[1])
+                return f"phy{wiphy}"
+        raise ValueError(f"No wiphy found for {dev}")
+
+    @staticmethod
+    def _move_phy_to_netns(phy: str, netns: str):
+        subprocess.check_call(["iw", "phy", phy, "set", "netns", "name", netns])
+
+    @staticmethod
+    def _set_interface_ip_in_netns(netns: str, dev: str, ip: str):
+        subprocess.check_call(["ip", "netns", "exec", netns, "ip", "link", "set", "dev", dev, "up"])
+        subprocess.check_call(["ip", "netns", "exec", netns, "ip", "addr", "add", ip, "dev", dev])
+
+    def start(self):
+        hostapd_cmd = ["ip", "netns", "exec", "tool", self._hostapd_path, self._hostapd_conf]
+        dnsmaq_cmd = ["ip", "netns", "exec", "tool", self._dnsmasq_path, "-d", "-C", self._dnsmasq_conf]
+        dhclient_cmd = ["ip", "netns", "exec", "app", "dhclient", self._wlan_app]
+        wpa_cmd = [
+            "ip",
+            "netns",
+            "exec",
+            "app",
+            self._wpa_supplicant_path,
+            "-u",
+            "-s",
+            "-i",
+            self._wlan_app,
+            "-c",
+            self._wpa_supplicant_conf,
+        ]
+        if self.dry_run:
+            logging.info(f"Would run hostapd with {hostapd_cmd}")
+            logging.info(f"Would run dnsmasq with {dnsmaq_cmd}")
+            logging.info(f"Would run wpa_supplicant with {wpa_cmd}")
+            return
+        # Write clean configuration for wifi to prevent auto wifi connection during next test
+        with open(self._wpa_supplicant_conf, "w") as f:
+            f.write("ctrl_interface=DIR=/run/wpa_supplicant\nctrl_interface_group=root\nupdate_config=1\n")
+        self._move_phy_to_netns(self._get_phy(self._wlan_app), "app")
+        self._move_phy_to_netns(self._get_phy(self._wlan_tool), "tool")
+        self._set_interface_ip_in_netns("tool", self._wlan_tool, "192.168.200.1/24")
+
+        self._hostapd = subprocess.Popen(hostapd_cmd, stdout=subprocess.DEVNULL)
+        self._dnsmasq = subprocess.Popen(dnsmaq_cmd, stdout=subprocess.DEVNULL)
+        self._dhclient = subprocess.Popen(dhclient_cmd, stdout=subprocess.DEVNULL)
+        print(f"DnsMasq started with {self._dnsmasq.pid}")
+        self._wpa_supplicant = subprocess.Popen(wpa_cmd, stdout=subprocess.DEVNULL)
+
+    def stop(self):
+        if self.dry_run:
+            logging.info("Would stop hostapd, dnsmasq and wpa_supplicant")
+            return
+        if self._hostapd:
+            self._hostapd.terminate()
+            self._hostapd.wait()
+        if self._dnsmasq:
+            self._dnsmasq.terminate()
+            self._dnsmasq.wait()
+        if self._wpa_supplicant:
+            self._wpa_supplicant.terminate()
+            self._wpa_supplicant.wait()
+        if self._dhclient:
+            self._dhclient.terminate()
+            self._dhclient.wait()
+
+
+class VirtualBle:
+    BleDevice = namedtuple("BleDevice", ["hci", "mac", "index"])
+
+    def __init__(self, btvirt_path: str, bluetoothctl_path: str, dry_run: bool = False):
+        self._btvirt_path = btvirt_path
+        self._bluetoothctl_path = bluetoothctl_path
+        self._btvirt = None
+        self._bluetoothctl = None
+        self._ble_app = None
+        self._ble_tool = None
+        self._dry_run = dry_run
+
+    @property
+    def ble_app(self) -> Optional[BleDevice]:
+        if self._dry_run:
+            return self.BleDevice(hci="hci0", mac="00:11:22:33:44:55", index=0)
+        if not self._ble_app:
+            raise RuntimeError("Bluetooth not started")
+        return self._ble_app
+
+    @property
+    def ble_tool(self) -> Optional[BleDevice]:
+        if self._dry_run:
+            return self.BleDevice(hci="hci1", mac="00:11:22:33:44:56", index=1)
+        if not self._ble_tool:
+            raise RuntimeError("Bluetooth not started")
+        return self._ble_tool
+
+    def bletoothctl_cmd(self, cmd):
+        self._bluetoothctl.stdin.write(cmd)
+        self._bluetoothctl.stdin.flush()
+
+    def _get_mac_address(self, hci_name):
+        result = subprocess.run(["hcitool", "dev"], capture_output=True, text=True)
+        lines = result.stdout.splitlines()
+
+        for line in lines:
+            if hci_name in line:
+                mac_address = line.split()[1]
+                return mac_address
+
+        raise RuntimeError(f"No MAC address found for device {hci_name}")
+
+    def _get_ble_info(self):
+        ble_dev_paths = glob.glob("/sys/devices/virtual/bluetooth/hci*")
+        hci = [os.path.basename(path) for path in ble_dev_paths]
+        if len(hci) < 2:
+            raise RuntimeError("Not enough BLE devices found")
+        self._ble_app = self.BleDevice(hci=hci[0], mac=self._get_mac_address(hci[0]), index=int(hci[0].replace("hci", "")))
+        self._ble_tool = self.BleDevice(hci=hci[1], mac=self._get_mac_address(hci[1]), index=int(hci[1].replace("hci", "")))
+
+    def _run_bluetoothctl(self):
+        self._bluetoothctl = subprocess.Popen(
+            [self._bluetoothctl_path], text=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL
+        )
+        self.bletoothctl_cmd(f"select {self.ble_app.mac}\n")
+        self.bletoothctl_cmd("power on\n")
+        self.bletoothctl_cmd(f"select {self.ble_tool.mac}\n")
+        self.bletoothctl_cmd("power on\n")
+        self.bletoothctl_cmd("quit\n")
+        self._bluetoothctl.wait()
+
+    def start(self):
+        if self._dry_run:
+            logging.info("Would start bluetooth")
+            return
+        self._btvirt = subprocess.Popen([self._btvirt_path, "-l2"])
+        sleep(1)
+        self._get_ble_info()
+        self._run_bluetoothctl()
+
+    def stop(self):
+        if self._dry_run:
+            logging.info("Would stop bluetooth")
+            return
+        if self._btvirt:
+            self._btvirt.terminate()
+            self._btvirt.wait()
 
 
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
