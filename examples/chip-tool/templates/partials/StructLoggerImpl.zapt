@@ -3,11 +3,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const ch
   DataModelLogger::LogString(label, indent, "{");
 {{#zcl_struct_items}}
   {
-{{#if (isEqual label "DeviceType") }}
-{{#if (isEqual parent.name "DeviceTypeStruct") }}
-      std::string item = std::to_string(value.{{asLowerCamelCase label}}) + " (" + DeviceTypeIdToText(value.{{asLowerCamelCase label}}) + ")";
-      DataModelLogger::LogString("{{asUpperCamelCase label}}", indent + 1, item);
-{{else}}
+{{#if (isEqual type "devtype_id") }}
+{{#if isNullable }}
       if (value.{{asLowerCamelCase label}}.IsNull())
       {
           CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
@@ -22,6 +19,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const ch
           std::string item = std::to_string(value.{{asLowerCamelCase label}}.Value()) + " (" + DeviceTypeIdToText(value.{{asLowerCamelCase label}}.Value()) + ")";
           DataModelLogger::LogString("{{asUpperCamelCase label}}", indent + 1, item);
       }
+{{else}}
+      std::string item = std::to_string(value.{{asLowerCamelCase label}}) + " (" + DeviceTypeIdToText(value.{{asLowerCamelCase label}}) + ")";
+      DataModelLogger::LogString("{{asUpperCamelCase label}}", indent + 1, item);
 {{/if}}
 {{else}}
       CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
