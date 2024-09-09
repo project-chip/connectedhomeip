@@ -29,9 +29,9 @@ extern "C" {
 #include <sparkfun_sgp40_i2c.h>
 }
 #include "sl_i2cspm_instances.h"
-#endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
+#endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
-namespace{
+namespace {
 bool initialized = false;
 }
 
@@ -41,7 +41,8 @@ namespace AirQualitySensor {
  * @brief Initializes the air quality sensor.
  *
  * This function initializes the air quality sensor, specifically supporting the SparkFun SGP40 air quality sensor.
- * It uses the I2C protocol for communication and sets up the VOC (Volatile Organic Compounds) algorithm for air quality measurement.
+ * It uses the I2C protocol for communication and sets up the VOC (Volatile Organic Compounds) algorithm for air quality
+ * measurement.
  *
  * @note If the macro USE_SPARKFUN_AIR_QUALITY_SENSOR is defined, the SparkFun SGP40 sensor is initialized.
  *       If initialization is successful, the function returns SL_STATUS_OK, indicating the sensor is ready for use.
@@ -53,20 +54,20 @@ namespace AirQualitySensor {
 
 sl_status_t Init()
 {
-  sl_status_t status = SL_STATUS_FAIL;
+    sl_status_t status = SL_STATUS_FAIL;
 
-  #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
+#ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
     status = sparkfun_sgp40_init(sl_i2cspm_qwiic);
     VerifyOrReturnError(status == SL_STATUS_OK, SL_STATUS_FAIL);
     initialized = true;
 
     sparkfun_sgp40_voc_algorithm_init();
 
-  #else
-  //User implementation of Init
-  #endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
+#else
+// User implementation of Init
+#endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
-  return status;
+    return status;
 }
 
 /**
@@ -87,22 +88,22 @@ sl_status_t Init()
  *         SL_STATUS_NOT_INITIALIZED if the sensor has not been initialized, or other error codes as defined.
  */
 
-sl_status_t GetAirQuality(int32_t &air_quality)
+sl_status_t GetAirQuality(int32_t & air_quality)
 {
-  sl_status_t status = SL_STATUS_FAIL;
-  VerifyOrReturnError(initialized, SL_STATUS_NOT_INITIALIZED);
+    sl_status_t status = SL_STATUS_FAIL;
+    VerifyOrReturnError(initialized, SL_STATUS_NOT_INITIALIZED);
 
-  #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
-  constexpr  float relativeHumidity = 50; //50%
-  constexpr  float temperature      = 25; //25°C
+#ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
+    constexpr float relativeHumidity = 50; // 50%
+    constexpr float temperature      = 25; // 25°C
 
-  status =  sparkfun_sgp40_get_voc_index(&air_quality, relativeHumidity, temperature);
-  VerifyOrReturnError(status == SL_STATUS_OK, status);
+    status = sparkfun_sgp40_get_voc_index(&air_quality, relativeHumidity, temperature);
+    VerifyOrReturnError(status == SL_STATUS_OK, status);
 
-  #else
-    //User implementation of GetAirQuality
-  #endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
+#else
+    // User implementation of GetAirQuality
+#endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
-  return status;
+    return status;
 }
 }; // namespace AirQualitySensor

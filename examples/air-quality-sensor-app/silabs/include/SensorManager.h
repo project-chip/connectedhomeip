@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
 #include "AppEvent.h"
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 class SensorManager
 {
@@ -32,7 +32,7 @@ public:
 
 private:
     SensorManager()  = default;
-    ~SensorManager()  = default;
+    ~SensorManager() = default;
 
     osTimerId_t mSensorTimer;
 

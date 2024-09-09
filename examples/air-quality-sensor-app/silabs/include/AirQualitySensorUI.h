@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <CommonIcons.h>
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include "glib.h"
 #include "lcd.h"
+#include <CommonIcons.h>
 
 class AirQualitySensorUI
 {

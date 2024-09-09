@@ -24,9 +24,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-#include <air-quality-sensor-manager.h>
 #include <AirQualityConfig.h>
-
+#include <air-quality-sensor-manager.h>
 
 #ifdef USE_AIR_QUALITY_SENSOR
 #include "AirQualitySensor.h"
@@ -44,15 +43,16 @@ using namespace chip::app::Clusters::AirQuality;
  * Variable declarations
  *********************************************************/
 SensorManager SensorManager::sSensorManager;
-namespace{
-constexpr uint16_t kSensorTImerPeriodMs  = 30000; // 30s timer period
+namespace {
+constexpr uint16_t kSensorTImerPeriodMs = 30000; // 30s timer period
 
 #ifndef USE_AIR_QUALITY_SENSOR
-constexpr uint16_t kSimulatedReadingFrequency = (60000 / kSensorTImerPeriodMs); // for every two timer cycles, a simulated sensor update is triggered.
-int32_t mSimulatedAirQuality[]         = { 5, 55, 105, 155, 205, 255, 305, 355, 400 };
+constexpr uint16_t kSimulatedReadingFrequency =
+    (60000 / kSensorTImerPeriodMs); // for every two timer cycles, a simulated sensor update is triggered.
+int32_t mSimulatedAirQuality[] = { 5, 55, 105, 155, 205, 255, 305, 355, 400 };
 #endif
 
-}
+} // namespace
 
 /**
  * @brief Classifies the air quality based on a given sensor value.
@@ -65,20 +65,34 @@ int32_t mSimulatedAirQuality[]         = { 5, 55, 105, 155, 205, 255, 305, 355, 
  * @param value The sensor value used to classify air quality.
  * @return AirQualityEnum The classified air quality category.
  */
-AirQualityEnum classifyAirQuality(int32_t value) {
-    if (value < MIN_THRESHOLD) {
+AirQualityEnum classifyAirQuality(int32_t value)
+{
+    if (value < MIN_THRESHOLD)
+    {
         return AirQualityEnum::kUnknown;
-    } else if (value < GOOD_THRESHOLD) {
+    }
+    else if (value < GOOD_THRESHOLD)
+    {
         return AirQualityEnum::kGood;
-    } else if (value < FAIR_THRESHOLD) {
+    }
+    else if (value < FAIR_THRESHOLD)
+    {
         return AirQualityEnum::kFair;
-    } else if (value < MODERATE_THRESHOLD) {
+    }
+    else if (value < MODERATE_THRESHOLD)
+    {
         return AirQualityEnum::kModerate;
-    } else if (value < POOR_THRESHOLD) {
+    }
+    else if (value < POOR_THRESHOLD)
+    {
         return AirQualityEnum::kPoor;
-    } else if (value < VERY_POOR_THRESHOLD) {
+    }
+    else if (value < VERY_POOR_THRESHOLD)
+    {
         return AirQualityEnum::kVeryPoor;
-    } else {
+    }
+    else
+    {
         return AirQualityEnum::kExtremelyPoor;
     }
 }
@@ -87,9 +101,9 @@ CHIP_ERROR SensorManager::Init()
 {
 
     PlatformMgr().LockChipStack();
-    ChipLogDetail(AppServer ,"Int instnace");
+    ChipLogDetail(AppServer, "Int instnace");
     AirQualitySensorManager::InitInstance(1);
-    ChipLogDetail(AppServer ,"Int instnace success");
+    ChipLogDetail(AppServer, "Int instnace success");
     PlatformMgr().UnlockChipStack();
     // Create cmsisos sw timer for air quality sensor timer.
     mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
@@ -114,7 +128,7 @@ CHIP_ERROR SensorManager::Init()
     // Starts or restarts the function timer
     if (osTimerStart(mSensorTimer, delayTicks))
     {
-        ChipLogDetail(AppServer ,"mSensor Timer start() failed");
+        ChipLogDetail(AppServer, "mSensor Timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
     return CHIP_NO_ERROR;
@@ -122,7 +136,7 @@ CHIP_ERROR SensorManager::Init()
 
 void SensorManager::SensorTimerEventHandler(void * arg)
 {
-int32_t air_quality;
+    int32_t air_quality;
 #ifdef USE_AIR_QUALITY_SENSOR
     if (SL_STATUS_OK != AirQualitySensor::GetAirQuality(air_quality))
     {
@@ -157,6 +171,6 @@ int32_t air_quality;
     AppTask::GetAppTask().UpdateAirQualitySensorUI();
     PlatformMgr().UnlockChipStack();
 
-    ChipLogDetail(AppServer , "RAW AirQuality value: %ld and corresponding Enum value : %d", air_quality,chip::to_underlying( AirQualitySensorManager::GetInstance()->GetAirQuality() ));
-
+    ChipLogDetail(AppServer, "RAW AirQuality value: %ld and corresponding Enum value : %d", air_quality,
+                  chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
 }

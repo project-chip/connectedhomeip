@@ -134,7 +134,7 @@ void AirQualitySensorManager::Init()
     mFormaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
-AirQualityEnum AirQualitySensorManager:: GetAirQuality()
+AirQualityEnum AirQualitySensorManager::GetAirQuality()
 {
     return mAirQualityInstance.GetAirQuality();
 }

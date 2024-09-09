@@ -34,6 +34,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#include <air-quality-sensor-manager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -47,7 +48,6 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <air-quality-sensor-manager.h>
 
 /**********************************************************
  * Defines and Constants
@@ -67,7 +67,6 @@ using namespace chip::app::Clusters;
  *********************************************************/
 
 AppTask AppTask::sAppTask;
-
 
 CHIP_ERROR AppTask::Init()
 {
@@ -129,20 +128,21 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::UpdateAirQualitySensorUI()
 {
-    // Update the LCD with the Stored value. Show QR Code if not provisioned
-    #ifdef DISPLAY_ENABLED
-        GetLCD().WriteDemoUI(false);
-    #ifdef QR_CODE_ENABLED
-        if (BaseApplication::GetProvisionStatus())
-        {
-            GetLCD().ShowQRCode(true);
-        }
-    #endif // QR_CODE_ENABLED
-    #else
-        PlatformMgr().LockChipStack();
-        ChipLogDetail(AppServer, "Air Quality Sensor Status - AirQualityEnumValue:%d", chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
-        PlatformMgr().UnlockChipStack();
-    #endif
+// Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(false);
+#ifdef QR_CODE_ENABLED
+    if (BaseApplication::GetProvisionStatus())
+    {
+        GetLCD().ShowQRCode(true);
+    }
+#endif // QR_CODE_ENABLED
+#else
+    PlatformMgr().LockChipStack();
+    ChipLogDetail(AppServer, "Air Quality Sensor Status - AirQualityEnumValue:%d",
+                  chip::to_underlying(AirQualitySensorManager::GetInstance()->GetAirQuality()));
+    PlatformMgr().UnlockChipStack();
+#endif
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)

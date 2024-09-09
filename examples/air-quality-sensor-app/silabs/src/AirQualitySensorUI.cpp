@@ -20,10 +20,10 @@
 #include <string.h>
 
 #include "AirQualitySensorUI.h"
+#include "AppTask.h"
 #include "SensorManager.h"
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
-#include "AppTask.h"
 #include <air-quality-sensor-manager.h>
 #if DISPLAY_ENABLED
 #include "glib.h"
@@ -32,7 +32,7 @@
 
 using namespace chip::app::Clusters;
 
-namespace{
+namespace {
 // Bitmap
 const uint8_t silabsLogo[]       = { SILABS_LOGO_SMALL };
 const uint8_t matterLogoBitmap[] = { MATTER_LOGO_BITMAP };
@@ -41,14 +41,14 @@ const uint8_t wifiLogo[]   = { WIFI_BITMAP };
 const uint8_t threadLogo[] = { THREAD_BITMAP };
 const uint8_t bleLogo[]    = { BLUETOOTH_ICON_SMALL };
 
-const unsigned char monaco_48pt[]          = { MONACO_48PT };
+const unsigned char monaco_48pt[] = { MONACO_48PT };
 
 #ifdef SL_WIFI
 constexpr bool UI_WIFI = true;
 #else
 constexpr bool UI_WIFI = false;
 #endif
-}
+} // namespace
 
 using namespace chip::app::Clusters::AirQuality;
 
@@ -56,7 +56,7 @@ void AirQualitySensorUI::DrawUI(GLIB_Context_t * glibContext)
 {
     if (glibContext == nullptr)
     {
-        ChipLogDetail(AppServer,"Context is null");
+        ChipLogDetail(AppServer, "Context is null");
         return;
     }
 
@@ -132,7 +132,6 @@ void AirQualitySensorUI::DrawFooter(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
-
 /**
  * @brief Draw a 2 digit Air Quality of screen. Because of this Celsius is used by default
  * @param GLIB_Context_t * pointer to the context for the GLIB library
@@ -142,23 +141,23 @@ void AirQualitySensorUI::DrawCurrentAirQuality(GLIB_Context_t * glibContext)
 {
     // LCD line define
     constexpr uint8_t kAirQualityLcdInitialX = 30;
-    uint8_t position_x = 10;
-    uint8_t *data;
+    uint8_t position_x                       = 10;
+    uint8_t * data;
     uint8_t print_val;
 
     // Print Current air quality
     print_val = 0;
-    data = (uint8_t *) &monaco_48pt[print_val * MONACO_FONT_NB_LENGTH];
+    data      = (uint8_t *) &monaco_48pt[print_val * MONACO_FONT_NB_LENGTH];
     DrawFont(glibContext, position_x, kAirQualityLcdInitialX, MONACO_FONT_WIDTH, data, MONACO_FONT_NB_LENGTH);
     position_x += MONACO_FONT_WIDTH;
 
-    print_val = static_cast<uint8_t>( AirQualitySensorManager::GetInstance()->GetAirQuality() );
-    data = (uint8_t *) &monaco_48pt[print_val * MONACO_FONT_NB_LENGTH];
+    print_val = static_cast<uint8_t>(AirQualitySensorManager::GetInstance()->GetAirQuality());
+    data      = (uint8_t *) &monaco_48pt[print_val * MONACO_FONT_NB_LENGTH];
     DrawFont(glibContext, position_x, kAirQualityLcdInitialX, MONACO_FONT_WIDTH, data, MONACO_FONT_NB_LENGTH);
 }
 
 void AirQualitySensorUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
-                            uint32_t size)
+                                  uint32_t size)
 {
     uint8_t x = initial_x, y = initial_y;
     for (uint16_t i = 0; i < size; i++)

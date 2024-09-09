@@ -22,8 +22,7 @@
 #include <sl_status.h>
 #include <stdint.h>
 
-
 namespace AirQualitySensor {
 sl_status_t Init();
-sl_status_t GetAirQuality (int32_t &air_quality);
+sl_status_t GetAirQuality(int32_t & air_quality);
 }; // namespace AirQualitySensor
