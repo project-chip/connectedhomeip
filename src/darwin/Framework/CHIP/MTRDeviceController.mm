@@ -172,11 +172,14 @@ using namespace chip::Tracing::DarwinFramework;
     return &_underlyingDeviceMapLock;
 }
 
-- (instancetype)initForSubclasses:(BOOL)startSuspended
+- (instancetype)initForSubclasses:(BOOL)startSuspended uniqueIdentifier:(NSUUID *)uniqueIdentifier
 {
     if (self = [super init]) {
         // nothing, as superclass of MTRDeviceController is NSObject
     }
+
+    _uniqueIdentifier = uniqueIdentifier;
+
     _underlyingDeviceMapLock = OS_UNFAIR_LOCK_INIT;
 
     // Setup assertion variables
@@ -186,8 +189,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     // All synchronous suspend/resume activity has to be protected by
     // @synchronized(self), so that parts of suspend/resume can't
-    // interleave with each other. Using @synchronized here because
-    // MTRDevice may call isSuspended.
+    // interleave with each other.
     _suspended = startSuspended;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
@@ -378,6 +380,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
+    // Using @synchronized here because MTRDevice may call isSuspended.
     @synchronized(self) {
         return _suspended;
     }
