@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DataVersionFilter.h>
