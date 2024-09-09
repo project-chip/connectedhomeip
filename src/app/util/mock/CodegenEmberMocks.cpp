@@ -42,9 +42,13 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
 }
 
 Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
-                             chip::app::AttributeChanged * changed)
+                             EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty)
 {
     return emAfWriteAttributeExternal(chip::app::ConcreteAttributePath(endpoint, cluster, attributeID),
                                       EmberAfWriteDataInput(dataPtr, dataType));
+}
+
+Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+  return emAfWriteAttributeExternal(path, input);
 }

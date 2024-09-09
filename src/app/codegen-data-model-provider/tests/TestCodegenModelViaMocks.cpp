@@ -803,7 +803,8 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
 
         EXPECT_EQ(actual, value);
         ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0],
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
 
         // reset for the next test
         model.ChangeListener().DirtyList().clear();
@@ -824,7 +825,8 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
 
         // dirty: we changed the value to null
         ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], 
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
     }
 
     // nullable test
@@ -848,7 +850,8 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         ASSERT_EQ(actual, value);
         // dirty a 2nd time when we moved from null to a real value
         ASSERT_EQ(model.ChangeListener().DirtyList().size(), 2u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[1], test.request.path);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[1],
+                  AttributePathParams(test.request.path.mEndpointId, test.request.path.mClusterId, test.request.path.mAttributeId));
     }
 }
 
@@ -2451,7 +2454,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 
     // AAI marks dirty paths
     ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-    EXPECT_EQ(model.ChangeListener().DirtyList()[0], kStructPath);
+    EXPECT_EQ(model.ChangeListener().DirtyList()[0], AttributePathParams(kStructPath.mEndpointId, kStructPath.mClusterId, kStructPath.mAttributeId));
 
     // AAI does not prevent read/write of regular attributes
     // validate that once AAI is added, we still can go through writing regular bits (i.e.

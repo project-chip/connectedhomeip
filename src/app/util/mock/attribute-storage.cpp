@@ -313,11 +313,6 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
     return &dataVersion;
 }
 
-void emberAfIncreaseClusterDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
-{
-    dataVersion++;
-}
-
 namespace chip {
 namespace app {
 

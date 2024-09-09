@@ -118,12 +118,6 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
     // NOTE: we do NOT use (*metadata)->size since it is unclear if our mocks set that correctly
     size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size());
 
-    if (changed != nullptr)
-    {
-        *changed = (memcmp(gEmberIoBuffer, input.dataPtr, len) != 0) ? chip::app::AttributeChanged::kValueChanged
-                                                                     : chip::app::AttributeChanged::kValueNotChanged;
-    }
-
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
 
@@ -131,9 +125,14 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
 }
 
 Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
-                             chip::app::AttributeChanged * changed)
+                             EmberAfAttributeType dataType)
 {
     return emAfWriteAttributeExternal(chip::app::ConcreteAttributePath(endpoint, cluster, attributeID),
                                       EmberAfWriteDataInput(dataPtr, dataType));
 }
+
+Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+  return emAfWriteAttributeExternal(path, input);
+}
+
