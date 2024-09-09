@@ -2335,10 +2335,10 @@ endpoint 1 {
     ram      attribute numberOfPrimaries;
     persist  attribute enhancedColorMode default = 0x02;
     ram      attribute colorCapabilities default = 0x0010;
-    ram      attribute colorTempPhysicalMinMireds default = 0x0001;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
+    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
+    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds default = 0xFEFF;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
