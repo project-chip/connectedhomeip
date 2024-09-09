@@ -152,7 +152,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
     uint8_t zclString[{{>sizingBytes}}] = { {{#if (isShortString type)}}0xFF{{else}}0xFF, 0xFF{{/if}} };
     {{#if passMarkDirty}}
     return emberAfWriteAttribute(
-        chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+        ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
         EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
     {{else}}
     return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
