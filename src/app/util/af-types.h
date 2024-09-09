@@ -322,7 +322,7 @@ public:
     virtual ~ChangedPathListener() = default;
 
     /// Called when a specific path is to be considered dirty.
-    virtual void MarkDirty(const chip::app::AttributePathParams & path) = 0;
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
 } // namespace app
