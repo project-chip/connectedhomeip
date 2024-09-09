@@ -19,9 +19,9 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
@@ -186,14 +186,13 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)startServerApp
 {
     // For manual testing, CASE retry code paths can be tested by adding --faults chip_CASEServerBusy_f1 (or similar)
-    __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initWithAppName:@"all-clusters"
-                                                                    arguments:@[
-                                                                        @"--dac_provider",
-                                                                        [self absolutePathFor:@"credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json"],
-                                                                    ]
-                                                                      payload:kOnboardingPayload
-                                                                     testcase:self];
-    XCTAssertNotNil(appRunner);
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[
+                                    @"--dac_provider",
+                                    [self absolutePathFor:@"credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json"],
+                                ]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
 }
 
 // attestationDelegate and failSafeExtension can both be nil
