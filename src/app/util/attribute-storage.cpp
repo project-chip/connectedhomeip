@@ -1479,7 +1479,7 @@ public:
 
 } // namespace
 
-chip::app::ChangedPathListener * emberAfGlobalInteractionModelChangePathListener()
+ChangedPathListener * emberAfGlobalInteractionModelChangePathListener()
 {
     static GlobalInteractionModelEngineChangedpathListener listener;
     return &listener;
