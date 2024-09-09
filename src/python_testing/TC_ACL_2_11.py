@@ -105,11 +105,11 @@ class TC_ACL_2_11(MatterBaseTest):
         self.step(1)
 
         wildcard_read = (await dev_ctrl.Read(self.dut_node_id, [()]))
-        has_arl, has_carl = arls_populated(wildcard_read.tlvAttributes)
+        arl_data = arls_populated(wildcard_read.tlvAttributes)
         asserts.assert_true(
-            has_arl, "ARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+            arl_data.have_arl, "ARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
         asserts.assert_true(
-            has_carl, "CommissioningARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
+            arl_data.have_carl, "CommissioningARL attribute must contain at least one restriction to run this test. Please follow manufacturer-specific steps to add access restrictions and re-run this test")
 
         self.step(2)
         await self.read_single_attribute_check_success(

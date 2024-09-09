@@ -28,6 +28,7 @@
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDiagnosticLogsDownloader.h"
 #import "MTRError_Internal.h"
@@ -474,6 +475,7 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -483,6 +485,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
+        startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -545,7 +548,8 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
-                storageBehaviorConfiguration:storageBehaviorConfiguration];
+                storageBehaviorConfiguration:storageBehaviorConfiguration
+                              startSuspended:startSuspended];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -666,7 +670,7 @@ MTR_DIRECT_MEMBERS
         return existingController;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -738,7 +742,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -955,6 +959,10 @@ MTR_DIRECT_MEMBERS
             }
         } else if (_otaProviderDelegateBridge) {
             _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+        }
+
+        if (_diagnosticLogsDownloader != nil) {
+            [_diagnosticLogsDownloader abortDownloadsForController:controller];
         }
 
         [controller shutDownCppController];

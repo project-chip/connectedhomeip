@@ -1532,6 +1532,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vm
 vn
 vnc
 vous

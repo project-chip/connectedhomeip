@@ -183,6 +183,26 @@ menu "CHIP Core"
                 or failure during certification tests. Even if it passes, it may fail
                 to function properly with actual controllers.
 
+        config MAX_GROUP_ENDPOINTS_PER_FABRIC
+            int "Maximum Group Endpoints per Fabric"
+            default 1
+            help
+                Specifies the maximum number of group endpoints supported per fabric.
+
+        config MAX_GROUPS_PER_FABRIC_PER_ENDPOINT
+            int "Maximum Groups per Fabric per Endpoint"
+            default 4
+            help
+                Specifies the maximum number of groups per fabric for each endpoint.
+                The value of CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is calculated as:
+                (MAX_GROUP_ENDPOINTS_PER_FABRIC * MAX_GROUPS_PER_FABRIC_PER_ENDPOINT)
+
+        config MAX_GROUP_KEYS_PER_FABRIC
+            int "Maximum Number of Group Key Sets per Fabric"
+            default 3
+            help
+                Specifies the maximum number of group key sets supported per fabric.
+
     endmenu # "General Options"
 
     menu "Networking Options"

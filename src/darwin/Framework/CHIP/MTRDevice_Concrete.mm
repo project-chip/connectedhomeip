@@ -461,7 +461,33 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     return [NSString
-        stringWithFormat:@"<MTRDevice: %p, XPC: NO, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, state: %@, last subscription attempt wait: %lus, queued work: %lu, last report: %@%@, last subscription failure: %@%@, controller: %@>", NSStringFromClass(self.class), self, _deviceController.compressedFabricID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, _nodeID.unsignedLongLongValue, vid, pid, wifi, thread, InternalDeviceStateString(internalDeviceState), static_cast<unsigned long>(lastSubscriptionAttemptWait), static_cast<unsigned long>(_asyncWorkQueue.itemCount), mostRecentReportTime, reportAge, lastSubscriptionFailureTime, subscriptionFailureAge, _deviceController.uniqueIdentifier];
+}
+
+- (NSDictionary *)_internalProperties
+{
+    NSMutableDictionary * properties = [NSMutableDictionary dictionary];
+    std::lock_guard lock(_descriptionLock);
+
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyVendorID, _vid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyKeyProductID, _pid, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyNetworkFeatures, _allNetworkFeatures, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, [NSNumber numberWithUnsignedInteger:_internalDeviceStateForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, [NSNumber numberWithUnsignedInt:_lastSubscriptionAttemptWaitForDescription], properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+
+    return properties;
+}
+
+- (void)_notifyDelegateOfPrivateInternalPropertiesChanges
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:internalStateUpdated:)]) {
+            [delegate performSelector:@selector(device:internalStateUpdated:) withObject:self withObject:[self _internalProperties]];
+        }
+    }];
 }
 
 #pragma mark - Time Synchronization
@@ -693,11 +719,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for device controllers over XPC.
-    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription for suspended controllers or device controllers over XPC.
+    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _delegateAdded];
+
+    [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
+}
+
+- (void)_ensureSubscriptionForExistingDelegates:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -723,12 +758,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
+                [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
-            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
+            [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and subscription is needed", reason]];
         }
     }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)invalidate
@@ -951,6 +988,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }];
         /* END DRAGONS */
+
+        [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
 }
 
@@ -971,6 +1010,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // If subscription had reset since this handler was scheduled, do not execute "established" logic below
     if (!HaveSubscriptionEstablishedRightNow(_internalDeviceState)) {
         MTR_LOG("%@ _handleSubscriptionEstablished run with internal state %lu - skipping subscription establishment logic", self, static_cast<unsigned long>(_internalDeviceState));
+        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
@@ -1151,7 +1191,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
-
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     deviceUsesThread = [self _deviceUsesThread];
 
     // If a previous resubscription failed, remove the item from the subscription pool.
@@ -1197,13 +1237,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&_lock);
     _lastSubscriptionAttemptWait = lastSubscriptionAttemptWait;
 
-    std::lock_guard lock(_descriptionLock);
-    _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+    {
+        std::lock_guard lock(_descriptionLock);
+        _lastSubscriptionAttemptWaitForDescription = lastSubscriptionAttemptWait;
+    }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     os_unfair_lock_assert_owner(&_lock);
+
+    if (_deviceController.isSuspended) {
+        MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
+        return;
+    }
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
@@ -1214,6 +1263,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _lastSubscriptionFailureTimeForDescription = _lastSubscriptionFailureTime;
     }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 
     // if there is no delegate then also do not retry
     if (![self _delegateExists]) {
@@ -1271,6 +1321,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
     }
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
@@ -1464,8 +1515,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     _mostRecentReportTimes = mostRecentReportTimes;
 
-    std::lock_guard lock(_descriptionLock);
-    _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
+    {
+        std::lock_guard lock(_descriptionLock);
+        _mostRecentReportTimeForDescription = [mostRecentReportTimes lastObject];
+    }
+    std::lock_guard lock(_lock);
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 #endif
 
@@ -1570,6 +1625,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
 
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
+
     // Do not schedule persistence if device is reporting excessively
     if ([self _deviceIsReportingExcessively]) {
         return;
@@ -1594,6 +1651,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_descriptionLock);
         _mostRecentReportTimeForDescription = nil;
     }
+
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
@@ -1601,6 +1659,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if ([self _dataStoreExists]) {
         [self _persistClusterData];
     }
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
@@ -1654,6 +1714,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }];
 #endif
+
+    [self _notifyDelegateOfPrivateInternalPropertiesChanges];
 }
 
 - (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesAttributePath:(MTRAttributePath *)attributePath
@@ -3047,6 +3109,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
     std::lock_guard lock(_lock);
+    return [self _lockedAttributeValueDictionaryForAttributePath:attributePath];
+}
+
+- (NSDictionary<NSString *, id> *)_lockedAttributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -3431,6 +3499,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return attributesToReport;
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+    std::lock_guard lock(_lock);
+
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+        MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+        for (NSNumber * attributeID in clusterData.attributes) {
+            auto * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint
+                                                                       clusterID:clusterPath.cluster
+                                                                     attributeID:attributeID];
+
+            // Construct response-value dictionary with the data-value dictionary returned by
+            // _lockedAttributeValueDictionaryForAttributePath, to takes into consideration expected values as well.
+            [attributeReport addObject:@{
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : [self _lockedAttributeValueDictionaryForAttributePath:attributePath]
+            }];
+        }
+    }
+
+    return attributeReport;
 }
 
 #ifdef DEBUG
@@ -3928,6 +4021,34 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     return result;
+}
+
+- (void)controllerSuspended
+{
+    [super controllerSuspended];
+
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Controller suspended"];
+
+    // Ensure that any pre-existing resubscribe attempts we control don't try to
+    // do anything.
+    _reattemptingSubscription = NO;
+}
+
+- (void)controllerResumed
+{
+    [super controllerResumed];
+
+    std::lock_guard lock(self->_lock);
+
+    if (![self _delegateExists]) {
+        MTR_LOG("%@ ignoring controller resume: no delegates", self);
+        return;
+    }
+
+    // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
+    // will go through the pool as needed, not necessarily happen immediately.
+    [self _ensureSubscriptionForExistingDelegates:@"Controller resumed"];
 }
 
 @end

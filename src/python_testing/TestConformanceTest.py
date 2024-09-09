@@ -251,33 +251,33 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         self.endpoints_tlv = {0: root, 1: nim}
 
         # device with no macl
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
-        asserts.assert_false(have_arl, "Unexpected ARL found")
-        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(arl_data.have_arl, "Unexpected ARL found")
+        asserts.assert_false(arl_data.have_carl, "Unexpected CommissioningARL found")
 
         # device with unpopulated macl
         self.add_macl(root)
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
-        asserts.assert_false(have_arl, "Unexpected ARL found")
-        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(arl_data.have_arl, "Unexpected ARL found")
+        asserts.assert_false(arl_data.have_carl, "Unexpected CommissioningARL found")
 
         # device with populated ARL
         self.add_macl(root, populate_arl=True)
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
-        asserts.assert_true(have_arl, "Did not find expected ARL")
-        asserts.assert_false(have_carl, "Unexpected CommissioningARL found")
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_true(arl_data.have_arl, "Did not find expected ARL")
+        asserts.assert_false(arl_data.have_carl, "Unexpected CommissioningARL found")
 
         # device with populated commissioning ARL
         self.add_macl(root, populate_commissioning_arl=True)
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
-        asserts.assert_false(have_arl, "Unexpected ARL found")
-        asserts.assert_true(have_carl, "Did not find expected Commissioning ARL")
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_false(arl_data.have_arl, "Unexpected ARL found")
+        asserts.assert_true(arl_data.have_carl, "Did not find expected Commissioning ARL")
 
         # device with both
         self.add_macl(root, populate_arl=True, populate_commissioning_arl=True)
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
-        asserts.assert_true(have_arl, "Did not find expected ARL")
-        asserts.assert_true(have_carl, "Did not find expected Commissioning ARL")
+        arl_data = arls_populated(self.endpoints_tlv)
+        asserts.assert_true(arl_data.have_arl, "Did not find expected ARL")
+        asserts.assert_true(arl_data.have_carl, "Did not find expected Commissioning ARL")
 
 
 if __name__ == "__main__":
