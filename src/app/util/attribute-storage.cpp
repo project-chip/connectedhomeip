@@ -1466,7 +1466,7 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 }
 
 namespace {
-class GlobalInteractionModelEngineChangedpathListener : public chip::app::ChangedPathListener
+class GlobalInteractionModelEngineChangedpathListener : public ChangedPathListener
 {
 public:
     ~GlobalInteractionModelEngineChangedpathListener() = default;
