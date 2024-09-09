@@ -27,7 +27,7 @@
 
 struct EmberAfWriteDataInput
 {
-    // Where the input data originates from. 
+    // Where the input data originates from.
     //
     // NOTE: at this time there is no information regarding
     // input buffer size and it is assumed "correct" for the given data type.
