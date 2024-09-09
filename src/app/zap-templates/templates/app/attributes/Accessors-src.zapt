@@ -164,7 +164,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
     {{#if passMarkDirty}}
     return emberAfWriteAttribute(
-        chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+        ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
         EmberAfWriteDataInput(writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
     {{else}}
     return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
