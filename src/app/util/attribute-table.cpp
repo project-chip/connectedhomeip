@@ -159,7 +159,7 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
  *           the attribute
  * - Status::Success: if the attribute was found and successfully written
  */
-Status emAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
+Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
                           bool overrideReadOnlyAndDataType);
 
 } // anonymous namespace
