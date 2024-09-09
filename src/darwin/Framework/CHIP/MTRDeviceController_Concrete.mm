@@ -719,7 +719,7 @@ using namespace chip::Tracing::DarwinFramework;
 
         // Set self as delegate, which fans out delegate callbacks to all added delegates
         id<MTRDeviceControllerDelegate> selfDelegate = static_cast<id<MTRDeviceControllerDelegate>>(self);
-        self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, dispatch_get_main_queue());
+        self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, _chipWorkQueue);
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
     });
