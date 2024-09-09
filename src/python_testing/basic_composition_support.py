@@ -23,6 +23,7 @@ import logging
 import pathlib
 import sys
 import typing
+from dataclasses import dataclass
 from pprint import pformat, pprint
 from typing import Any, Optional
 
@@ -33,21 +34,27 @@ from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
 
 
-def arls_populated(tlv_data: dict[int, Any]) -> tuple[bool, bool]:
+@dataclass
+class ArlData:
+    have_arl: bool
+    have_carl: bool
+
+
+def arls_populated(tlv_data: dict[int, Any]) -> ArlData:
     """ Returns a tuple indicating if the ARL and CommissioningARL are populated.
         Requires a wildcard read of the device TLV.
     """
     # ACL is always on endpoint 0
     if 0 not in tlv_data or Clusters.AccessControl.id not in tlv_data[0]:
-        return (False, False)
+        return ArlData(have_arl=False, have_carl=False)
     # Both attributes are mandatory for this feature, so if one doesn't exist, neither should the other.
     if Clusters.AccessControl.Attributes.Arl.attribute_id not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]:
-        return (False, False)
+        return ArlData(have_arl=False, have_carl=False)
 
     have_arl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.Arl.attribute_id]
     have_carl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.CommissioningARL.attribute_id]
 
-    return (have_arl, have_carl)
+    return ArlData(have_arl=have_arl, have_carl=have_carl)
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -187,11 +194,11 @@ class BasicCompositionTests:
         logging.info("Start of actual tests")
         logging.info("###########################################################")
 
-        have_arl, have_carl = arls_populated(self.endpoints_tlv)
+        arl_data = arls_populated(self.endpoints_tlv)
         asserts.assert_false(
-            have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+            arl_data.have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
         asserts.assert_false(
-            have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+            arl_data.have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""

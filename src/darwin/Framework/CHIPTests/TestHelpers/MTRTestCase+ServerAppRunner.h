@@ -16,21 +16,14 @@
 
 #import <Foundation/Foundation.h>
 
-@class MTRTestCase;
+#import "MTRTestCase.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- * A representation of a server application instance.
- *
- * Server applications are assumed to be compiled into out/debug/${APPNAME}-app,
- * with the binary being out/debug/${APPNAME}-app/chip-${APPNAME}-app.
- */
-@interface MTRTestServerAppRunner : NSObject
+@interface MTRTestCase (ServerAppRunner)
 
 /**
- * Initialize the app runner with the given app name, arguments, setup payload, and testcase
- * instance.
+ * Start a server app with the given app name, arguments, and setup payload.
  *
  * The payload will be used to determine the discriminator and passcode
  * arguments the app should use, in addition to the provided arguments.
@@ -43,13 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
  * subtracting 1111 from the discriminator and adding 5542 (so as not to collide
  * with any existing Matter things running on 5540/5541).
  */
-- (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase;
+- (BOOL)startAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload;
 
 /**
- * Same thing, but initialize as a "cross test" helper, which is not killed at
- * the end of the current test (but is killed at the end of the current suite).
+ * Same thing, but the server will be killed at the end of the current suite,
+ * and is not bound to a particular test in the suite.
  */
-- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase;
++ (BOOL)startAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload;
 
 /**
  * Get the unique index that will be used for the next initialization.  This

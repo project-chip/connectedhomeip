@@ -59,11 +59,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
 /**
- * The ID assigned to this controller at creation time.
- */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
-
-/**
  * Return the Node ID assigned to the controller.  Will return nil if the
  * controller is not running (and hence does not know its node id).
  */
