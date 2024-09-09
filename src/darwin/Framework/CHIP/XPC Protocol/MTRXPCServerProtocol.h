@@ -35,15 +35,6 @@ MTR_NEWLY_AVAILABLE
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
 
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getClientDataKeysWithReply:(void (^)(NSArray * _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataForKey:(NSString *)key withReply:(void (^)(id<NSSecureCoding> _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID removeClientDataForKey:(NSString *)key;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataKeysForEndpointID:(NSNumber *)endpointID withReply:(void (^)(NSArray * _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID withReply:(void (^)(id<NSSecureCoding> _Nullable))reply;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding> _Nullable)value;
-- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID;
-
 // Not Supported via XPC
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 @end
