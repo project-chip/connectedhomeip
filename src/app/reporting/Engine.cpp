@@ -1011,16 +1011,9 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-void Engine::MarkDirty(const ConcreteAttributePath & path)
+void Engine::MarkDirty(const AttributePathParams & path)
 {
-    // NOTE: original MatterReportingAttributeChangeCallback ALSO does a
-    //       IncreaseClusterDataVersion. However that ties directly to ember so it is not
-    //       done here.
-    //
-    //       Instead the DataModel::Provider is responsible to properly increase cluster
-    //       data versions.
-    AttributePathParams info(path.mEndpointId, path.mClusterId, path.mAttributeId);
-    CHIP_ERROR err = SetDirty(info);
+    CHIP_ERROR err = SetDirty(path);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());

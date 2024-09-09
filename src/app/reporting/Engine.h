@@ -142,7 +142,7 @@ public:
 #endif
 
     /* ProviderChangeListener implementation */
-    void MarkDirty(const ConcreteAttributePath & path) override;
+    void MarkDirty(const AttributePathParams & path) override;
 
 private:
     /**

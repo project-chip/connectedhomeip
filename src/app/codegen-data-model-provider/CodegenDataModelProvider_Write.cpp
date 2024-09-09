@@ -51,7 +51,7 @@ class ContextAttributesChangeListener : public AttributesChangedListener
 public:
     ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(request.path); }
+    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
 
 private:
     DataModel::ProviderChangeListener * mListener;
@@ -370,8 +370,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
-            emberAfIncreaseClusterDataVersion(request.path);
-            CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+            //
+            // This is a direct increase of version to avoid calling the global change listener
+            // and instead to call the argument one.
+            DataVersion * version = emberAfDataVersionStorage(request.path);
+            if (version != nullptr)
+            {
+                (*version)++;
+            }
+
+            // request path is concrete, however we need a wildcard-aware version;
+            AttributePathParams changePath(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+            CurrentContext().dataModelChangeListener->MarkDirty(changePath);
         }
         return *aai_result;
     }

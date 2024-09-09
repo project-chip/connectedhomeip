@@ -133,13 +133,13 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
 class TestProviderChangeListener : public ProviderChangeListener
 {
 public:
-    void MarkDirty(const ConcreteAttributePath & path) override { mDirtyList.push_back(path); }
+    void MarkDirty(const AttributePathParams & path) override { mDirtyList.push_back(path); }
 
-    std::vector<ConcreteAttributePath> & DirtyList() { return mDirtyList; }
-    const std::vector<ConcreteAttributePath> & DirtyList() const { return mDirtyList; }
+    std::vector<AttributePathParams> & DirtyList() { return mDirtyList; }
+    const std::vector<AttributePathParams> & DirtyList() const { return mDirtyList; }
 
 private:
-    std::vector<ConcreteAttributePath> mDirtyList;
+    std::vector<AttributePathParams> mDirtyList;
 };
 
 class TestEventGenerator : public EventsGenerator
