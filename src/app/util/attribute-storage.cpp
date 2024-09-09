@@ -1485,8 +1485,8 @@ chip::app::ChangedPathListener * emberAfGlobalInteractionModelChangePathListener
     return &listener;
 }
 
-void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::ChangedPathListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             ChangedPathListener * listener)
 {
     // Increase cluster data path
     DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
