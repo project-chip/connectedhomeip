@@ -33,7 +33,7 @@ public:
 private:
     SensorManager()  = default;
     ~SensorManager()  = default;
-    
+
     osTimerId_t mSensorTimer;
 
     // Reads new generated sensor value, stores it, and updates local Air Quality attribute

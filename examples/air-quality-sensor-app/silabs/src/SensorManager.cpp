@@ -56,12 +56,12 @@ int32_t mSimulatedAirQuality[]         = { 5, 55, 105, 155, 205, 255, 305, 355, 
 
 /**
  * @brief Classifies the air quality based on a given sensor value.
- * 
+ *
  * This function compares the input value against predefined thresholds
  * defined in the AirQualityConfig.h file. The thresholds are used
  * to classify the air quality into categories defined by the AirQualityEnum.
  * The thresholds are defined in the SensorThresholds enum.
- * 
+ *
  * @param value The sensor value used to classify air quality.
  * @return AirQualityEnum The classified air quality category.
  */
@@ -88,7 +88,7 @@ CHIP_ERROR SensorManager::Init()
 
     PlatformMgr().LockChipStack();
     ChipLogDetail(AppServer ,"Int instnace");
-    AirQualitySensorManager::InitInstance(1); 
+    AirQualitySensorManager::InitInstance(1);
     ChipLogDetail(AppServer ,"Int instnace success");
     PlatformMgr().UnlockChipStack();
     // Create cmsisos sw timer for air quality sensor timer.

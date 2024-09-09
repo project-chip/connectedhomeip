@@ -62,9 +62,9 @@ sl_status_t Init()
 
     sparkfun_sgp40_voc_algorithm_init();
 
-  #else 
+  #else
   //User implementation of Init
-  #endif //USE_SPARKFUN_AIR_QUALITY_SENSOR  
+  #endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
 
   return status;
 }
@@ -98,7 +98,7 @@ sl_status_t GetAirQuality(int32_t &air_quality)
 
   status =  sparkfun_sgp40_get_voc_index(&air_quality, relativeHumidity, temperature);
   VerifyOrReturnError(status == SL_STATUS_OK, status);
-  
+
   #else
     //User implementation of GetAirQuality
   #endif //USE_SPARKFUN_AIR_QUALITY_SENSOR
