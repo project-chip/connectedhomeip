@@ -111,7 +111,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
     {{#if passMarkDirty}}
     return emberAfWriteAttribute(
-      chip::app::ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
+      ConcreteAttributePath(endpoint, {{>clusterId}}, Id),
       EmberAfWriteDataInput(zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
     {{else}}
     return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
