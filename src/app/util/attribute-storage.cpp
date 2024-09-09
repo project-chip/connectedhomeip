@@ -1504,5 +1504,5 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
 
 void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
 {
-    listener->MarkDirty(AttributePathParams(endpoint, kInvalidClusterId));
+    listener->MarkDirty(AttributePathParams(endpoint));
 }
