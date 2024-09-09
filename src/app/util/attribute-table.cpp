@@ -164,7 +164,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 
 } // anonymous namespace
 
-chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
                                                                      const EmberAfWriteDataInput & input)
 {
     EmberAfWriteDataInput completeInput = input;
