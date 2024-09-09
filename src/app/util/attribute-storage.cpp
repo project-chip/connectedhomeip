@@ -1471,7 +1471,7 @@ class GlobalInteractionModelEngineChangedpathListener : public ChangedPathListen
 public:
     ~GlobalInteractionModelEngineChangedpathListener() = default;
 
-    void MarkDirty(const chip::app::AttributePathParams & path) override
+    void MarkDirty(const AttributePathParams & path) override
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
