@@ -527,7 +527,7 @@ def _get_data_model_root() -> str:
     choices = [os.getcwd()]
 
     if 'PW_PROJECT_ROOT' in os.environ:
-        choices.insert(0, os.environ('PW_PROJECT_ROOT'))
+        choices.insert(0, os.environ['PW_PROJECT_ROOT'])
 
     for c in choices:
         data_model_path = os.path.join(c, 'data_model')
