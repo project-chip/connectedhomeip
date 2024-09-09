@@ -115,7 +115,7 @@
         self.xpcRetryTimeInterval = 0.5;
         mtr_weakify(self);
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
             mtr_strongify(self);
             [self _xpcConnectionRetry];
         });
@@ -135,7 +135,7 @@
             self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
             mtr_weakify(self);
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
                 mtr_strongify(self);
                 [self _xpcConnectionRetry];
             });

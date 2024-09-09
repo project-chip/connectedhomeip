@@ -757,7 +757,7 @@ using namespace chip::Tracing::DarwinFramework;
             //
             // Note that this is just an optimization to avoid throwing the information away and immediately
             // re-reading it from storage.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), self.chipWorkQueue, ^{
                 MTR_LOG("%@ un-retain devices loaded at startup %lu", self, static_cast<unsigned long>(deviceList.count));
             });
         }];
