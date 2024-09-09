@@ -57,7 +57,10 @@ struct AttributePathParams
         mClusterId(aClusterId), mAttributeId(aAttributeId), mEndpointId(aEndpointId), mListIndex(aListIndex)
     {}
 
-    [[nodiscard]] bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    [[nodiscard]] bool IsWildcardPath() const
+    {
+        return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId();
+    }
 
     bool operator==(const AttributePathParams & aOther) const
     {
