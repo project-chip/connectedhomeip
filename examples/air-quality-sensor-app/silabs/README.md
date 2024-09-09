@@ -4,25 +4,25 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
-- [Matter Air Quality Sensor Example](#matter-air-quality-sensor-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-      - [Linux](#linux)
-      - [Mac OS X](#mac-os-x)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-      - [On Border Router:](#on-border-router)
-      - [On PC(Linux):](#on-pclinux)
-  - [Running RPC console](#running-rpc-console)
-  - [Memory settings](#memory-settings)
-  - [OTA Software Update](#ota-software-update)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter Air Quality Sensor Example](#matter-air-quality-sensor-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+        -   [Linux](#linux)
+        -   [Mac OS X](#mac-os-x)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+            -   [On Border Router:](#on-border-router)
+            -   [On PC(Linux):](#on-pclinux)
+    -   [Running RPC console](#running-rpc-console)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -34,9 +34,9 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 ## Introduction
 
-The EFR32 Air Quality Sensor example provides a baseline demonstration of a air quality sensor
-device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
-by a Chip controller over an Openthread or Wifi network.
+The EFR32 Air Quality Sensor example provides a baseline demonstration of a air
+quality sensor device, built using Matter and the Silicon Labs gecko SDK. It can
+be controlled by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
@@ -47,9 +47,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The air quality sensor example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs platform.
+The air quality sensor example is intended to serve both as a means to explore
+the workings of Matter as well as a template for creating real products based on
+the Silicon Labs platform.
 
 ## Building
 
