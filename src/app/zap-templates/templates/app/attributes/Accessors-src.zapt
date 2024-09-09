@@ -36,7 +36,7 @@ namespace {{asUpperCamelCase label}} {
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value)
 {
     {{~#if (isString type)}}
     {{#if isNullable}}
@@ -135,12 +135,12 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
     {{/if}}
 {{/inline}}
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
     {{> setBody passMarkDirty=true}}
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
 {
     {{> setBody passMarkDirty=false}}
 }
@@ -172,17 +172,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
     {{/if}}
 {{/inline}}
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     {{> setNullBody passMarkDirty=true}}
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     {{> setNullBody passMarkDirty=false}}
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
   if (value.IsNull()) {
     return SetNull(endpoint, markDirty);
@@ -191,7 +191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
   return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
 {
   if (value.IsNull()) {
     return SetNull(endpoint);
