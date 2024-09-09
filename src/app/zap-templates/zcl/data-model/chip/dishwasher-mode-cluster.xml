@@ -41,10 +41,10 @@ limitations under the License.
     </features>
     
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
-    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
-    <attribute side="server" code="0x0003" define="ON_MODE"          type="int8u"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
+    <attribute side="server"                           code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
+    <attribute side="server"                           code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" apiMaturity="provisional" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" apiMaturity="provisional" code="0x0003" define="ON_MODE"          type="int8u"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
