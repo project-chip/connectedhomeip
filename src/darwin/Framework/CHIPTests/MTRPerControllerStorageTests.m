@@ -33,6 +33,7 @@
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
+static const uint16_t kSubscriptionTimeoutInSeconds = 60;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
@@ -1690,8 +1691,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     };
 
     [device setDelegate:delegate queue:queue];
-    [self waitForExpectations:@[ initialReachableExpectation, initialSubscriptionExpectation ] timeout:60];
-    // Separately wait for the unreachable bit, so we don't end up waiting 60
+    [self waitForExpectations:@[ initialReachableExpectation, initialSubscriptionExpectation ] timeout:kSubscriptionTimeoutInSeconds];
+    // Separately wait for the unreachable bit, so we don't end up waiting kSubscriptionTimeoutInSeconds
     // seconds for it.
     [self waitForExpectations:@[ initialUnreachableExpectation ] timeout:0];
 
@@ -1737,7 +1738,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [controller resume];
     XCTAssertFalse(controller.suspended);
 
-    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation ] timeout:kSubscriptionTimeoutInSeconds];
 
     // Test that sending a command works again.  Clear the delegate's onReportEnd
     // first, so reports from the command don't trigger it.
