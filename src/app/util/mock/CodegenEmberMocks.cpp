@@ -35,7 +35,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
+Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
                                                                      const EmberAfWriteDataInput & input)
 {
     return Status::Success;
