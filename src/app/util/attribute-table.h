@@ -23,10 +23,16 @@
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cstdint>
+
 struct EmberAfWriteDataInput
 {
-    // where the input data originates from. NOTE: at this time there is no information regarding
+    // Where the input data originates from. NOTE: at this time there is no information regarding
     // input buffer size and it is assumed "correct" for the given data type
+    //
+    // NOTE: technically this should be `const uint8_t*`, however ember internal logic uses a
+    //       `emAfReadOrWriteAttribute` method and because of the duality of read/write it needs
+    //       a non-const input. This is odd and should probably be fixed.
     uint8_t * dataPtr;
 
     // The data type that dataPtr points to
