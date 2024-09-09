@@ -108,7 +108,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #include "rsi_common_apis.h"
 #include "sl_wifi_device.h"
 
-#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
+#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS (1000)
 #endif //(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 /* Wi-Fi events*/
@@ -128,7 +128,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define WFX_MAX_SSID_LENGTH (32)
 // MAX PASSKEY LENGTH including NULL character
 #define WFX_MAX_PASSKEY_LENGTH (64)
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // (SLI_SI91X_MCU_INTERFACE  | EXP_BOARD)
 
 #include "sl_status.h"
 #include "stdbool.h"
@@ -151,7 +151,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_RETRY_CONNECT (1 << 7)
 
 // WLAN MAX retry
-#define MAX_JOIN_RETRIES_COUNT 5
+#define MAX_JOIN_RETRIES_COUNT (5)
 
 #define WLAN_TASK_STACK_SIZE (1024)
 
@@ -353,7 +353,7 @@ void wfx_ip_changed_notify(int got_ip);
 void wfx_ipv6_notify(int got_ip);
 
 #ifdef RS911X_WIFI
-#if !(EXP_BOARD)
+#if !(EXP_BOARD) // for RS9116
 void * wfx_rsi_alloc_pkt(void);
 /* RSI for LWIP */
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
@@ -361,7 +361,7 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif //!(EXP_BOARD)
 #endif // RS911X_WIFI
 
-#ifdef RS911X_WIFI
+#ifdef RS911X_WIFI // for RS9116, 917 NCP and 917 SoC
 /* RSI Power Save */
 #if SL_ICD_ENABLED
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
@@ -379,7 +379,7 @@ void wfx_bus_start(void);
 sl_status_t get_all_counters(void);
 void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
-#endif
+#endif /* WF200_WIFI */
 
 #if (SLI_SI91X_MCU_INTERFACE)
 #if SL_ICD_ENABLED
