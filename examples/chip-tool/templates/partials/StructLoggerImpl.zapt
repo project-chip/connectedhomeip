@@ -37,3 +37,4 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const ch
 
   return CHIP_NO_ERROR;
 }
+
