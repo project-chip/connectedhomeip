@@ -171,7 +171,7 @@ Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAtt
 
     if (completeInput.changeListener == nullptr)
     {
-        completeInput.SetChangeListener(emberAfGlobalInteractionModelChangePathListener());
+        completeInput.SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener());
     }
 
     return emAfWriteAttribute(path, completeInput, false /* overrideReadOnlyAndDataType */);
@@ -183,7 +183,7 @@ Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId
 
     return emberAfWriteAttribute(
         ConcreteAttributePath(endpoint, cluster, attributeID),
-        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelChangePathListener()));
+        EmberAfWriteDataInput(dataPtr, dataType).SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener()));
 }
 
 Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
@@ -192,7 +192,7 @@ Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWr
 
     if (completeInput.changeListener == nullptr)
     {
-        completeInput.SetChangeListener(emberAfGlobalInteractionModelChangePathListener());
+        completeInput.SetChangeListener(emberAfGlobalInteractionModelAttributesChangedListener());
     }
 
     return emAfWriteAttribute(path, completeInput, true /* overrideReadOnlyAndDataType */);

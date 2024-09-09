@@ -918,7 +918,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         if (enable)
         {
             initializeEndpoint(&(emAfEndpoints[index]));
-            emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelChangePathListener());
+            emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
         }
         else
         {
@@ -930,7 +930,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         while (parentEndpointId != kInvalidEndpointId)
         {
             emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                    emberAfGlobalInteractionModelChangePathListener());
+                                    emberAfGlobalInteractionModelAttributesChangedListener());
             uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
             if (parentIndex == kEmberInvalidEndpointIndex)
             {
@@ -941,7 +941,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
 
         emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                emberAfGlobalInteractionModelChangePathListener());
+                                emberAfGlobalInteractionModelAttributesChangedListener());
     }
 
     return true;
@@ -1476,7 +1476,7 @@ public:
 
 } // namespace
 
-AttributesChangedListener * emberAfGlobalInteractionModelChangePathListener()
+AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
     static GlobalInteractionModelEngineChangedpathListener listener;
     return &listener;

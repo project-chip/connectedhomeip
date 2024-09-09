@@ -30,7 +30,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelChangePathListener());
+    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelAttributesChangedListener());
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -40,7 +40,7 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     assertChipStackLockedByCurrentThread();
 
     emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                            emberAfGlobalInteractionModelChangePathListener());
+                            emberAfGlobalInteractionModelAttributesChangedListener());
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -49,5 +49,5 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelChangePathListener());
+    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
 }

@@ -286,7 +286,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 
 /// Returns a change listener that uses the global InteractionModelEngine
 /// instance to report dirty paths
-chip::app::AttributesChangedListener * emberAfGlobalInteractionModelChangePathListener();
+chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
 
 /// Mark the given attribute as having changed:
 ///   - increases the cluster data version for the given cluster
