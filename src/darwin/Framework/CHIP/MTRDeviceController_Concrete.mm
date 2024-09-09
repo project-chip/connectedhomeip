@@ -426,7 +426,7 @@ using namespace chip::Tracing::DarwinFramework;
     // devices before we start invalidating.
     MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
     os_unfair_lock_lock(self.deviceMapLock);
-    NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     [self.nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(self.deviceMapLock);
 

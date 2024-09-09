@@ -364,13 +364,10 @@ using namespace chip::Tracing::DarwinFramework;
     @synchronized(self) {
         _suspended = YES;
 
-        NSMutableArray * devicesToSuspend = [NSMutableArray array];
+        NSArray * devicesToSuspend;
         {
             std::lock_guard lock(*self.deviceMapLock);
-            NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
-            for (MTRDevice * device in devices) {
-                [devicesToSuspend addObject:device];
-            }
+            devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
         }
 
         for (MTRDevice * device in devicesToSuspend) {
@@ -392,13 +389,10 @@ using namespace chip::Tracing::DarwinFramework;
     @synchronized(self) {
         _suspended = NO;
 
-        NSMutableArray * devicesToResume = [NSMutableArray array];
+        NSArray * devicesToResume;
         {
             std::lock_guard lock(*self.deviceMapLock);
-            NSEnumerator * devices = [self.nodeIDToDeviceMap objectEnumerator];
-            for (MTRDevice * device in devices) {
-                [devicesToResume addObject:device];
-            }
+            devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
         }
 
         for (MTRDevice * device in devicesToResume) {
@@ -490,7 +484,7 @@ using namespace chip::Tracing::DarwinFramework;
     // devices before we start invalidating.
     MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
     os_unfair_lock_lock(self.deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     [_nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(self.deviceMapLock);
 
