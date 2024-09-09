@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "EmberReadWriteOverride.h"
+#include "app/AttributePathParams.h"
 #include "app/util/af-types.h"
 
 #include <app/util/attribute-storage.h>
@@ -120,6 +121,11 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
 
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
+
+    if (input.changeListener != nullptr)
+    {
+        input.changeListener->MarkDirty(chip::app::AttributePathParams(path.mEndpointId, path.mClusterId, path.mAttributeId));
+    }
 
     return Status::Success;
 }
