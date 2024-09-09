@@ -288,10 +288,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
         return nil;
     }
 
-    if (self = [super initForSubclasses:parameters.startSuspended]) {
-        auto * xpcParameters = static_cast<MTRXPCDeviceControllerParameters *>(parameters);
+    auto * xpcParameters = static_cast<MTRXPCDeviceControllerParameters *>(parameters);
+    auto * UUID = xpcParameters.uniqueIdentifier;
+
+    if (self = [super initForSubclasses:parameters.startSuspended uniqueIdentifier:UUID]) {
         auto connectionBlock = xpcParameters.xpcConnectionBlock;
-        auto * UUID = xpcParameters.uniqueIdentifier;
 
         MTR_LOG("Setting up XPC Controller for UUID: %@ with connection block: %p", UUID, connectionBlock);
 
@@ -304,7 +305,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
             return nil;
         }
 
-        self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
         _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
@@ -321,10 +321,9 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
 {
     // TODO: Presumably this should end up doing some sort of
     // MTRDeviceControllerAbstractParameters thing eventually?
-    if (self = [super initForSubclasses:NO]) {
+    if (self = [super initForSubclasses:NO uniqueIdentifier:UUID]) {
         MTR_LOG("Setting up XPC Controller for UUID: %@  with machServiceName: %s options: %d", UUID, machServiceName, options);
         self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
-        self.uniqueIdentifier = UUID;
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
         if (self.xpcConnection) {

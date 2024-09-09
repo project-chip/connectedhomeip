@@ -51,10 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSMapTable<NSNumber *, MTRDevice *> * nodeIDToDeviceMap;
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
-@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
-// (moved here so subclasses can initialize differently)
-
-- (instancetype)initForSubclasses:(BOOL)startSuspended;
+- (instancetype)initForSubclasses:(BOOL)startSuspended uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 #pragma mark - MTRDeviceControllerFactory methods
 
