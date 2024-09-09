@@ -41,7 +41,7 @@ struct EmberAfWriteDataInput
     // Listener called when when the written data is consided changed/dirty.
     // This being called depends on settings of `markDirty` combined with the actual contents of dataPtr
     // vs the contents of the current attribute storage.
-    chip::app::ChangedPathListener * changeListener = nullptr;
+    chip::app::AttributesChangedListener * changeListener = nullptr;
 
     EmberAfWriteDataInput(uint8_t * data, EmberAfAttributeType type) : dataPtr(data), dataType(type) {}
 
@@ -51,7 +51,7 @@ struct EmberAfWriteDataInput
         return *this;
     }
 
-    EmberAfWriteDataInput & SetChangeListener(chip::app::ChangedPathListener * listener)
+    EmberAfWriteDataInput & SetChangeListener(chip::app::AttributesChangedListener * listener)
     {
         changeListener = listener;
         return *this;

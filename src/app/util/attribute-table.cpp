@@ -165,7 +165,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 } // anonymous namespace
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
-                                                                     const EmberAfWriteDataInput & input)
+                                                               const EmberAfWriteDataInput & input)
 {
     EmberAfWriteDataInput completeInput = input;
 
@@ -327,8 +327,7 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
     return Status::Success;
 }
 
-Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input,
-                          bool overrideReadOnlyAndDataType)
+Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input, bool overrideReadOnlyAndDataType)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;

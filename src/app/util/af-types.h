@@ -316,10 +316,10 @@ enum class MarkAttributeDirty
 };
 
 /// Notification object of a specific path being changed
-class ChangedPathListener
+class AttributesChangedListener
 {
 public:
-    virtual ~ChangedPathListener() = default;
+    virtual ~AttributesChangedListener() = default;
 
     /// Called when the set of attributes identified by AttributePathParams (which may contain wildcards) is to be considered dirty.
     virtual void MarkDirty(const AttributePathParams & path) = 0;

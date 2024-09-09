@@ -1466,7 +1466,7 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 }
 
 namespace {
-class GlobalInteractionModelEngineChangedpathListener : public ChangedPathListener
+class GlobalInteractionModelEngineChangedpathListener : public AttributesChangedListener
 {
 public:
     ~GlobalInteractionModelEngineChangedpathListener() = default;
@@ -1479,14 +1479,14 @@ public:
 
 } // namespace
 
-ChangedPathListener * emberAfGlobalInteractionModelChangePathListener()
+AttributesChangedListener * emberAfGlobalInteractionModelChangePathListener()
 {
     static GlobalInteractionModelEngineChangedpathListener listener;
     return &listener;
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             ChangedPathListener * listener)
+                             AttributesChangedListener * listener)
 {
     // Increase cluster data path
     DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
@@ -1505,7 +1505,7 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::ChangedPathListener * listener)
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint, kInvalidClusterId));
 }
