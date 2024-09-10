@@ -55,7 +55,8 @@ public:
     /**
      * Get the reader from the decoder for raw data. Calling this is considered to be tried decoding.
      */
-    TLV::TLVReader & GetReaderForDecoding() {
+    TLV::TLVReader & GetReaderForDecoding()
+    {
         mTriedDecode = true;
         return mReader;
     }
