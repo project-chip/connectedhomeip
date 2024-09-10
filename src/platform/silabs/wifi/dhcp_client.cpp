@@ -101,10 +101,6 @@ uint8_t dhcpclient_poll(void * arg)
         if (dhcp_supplied_address(netif))
         {
             dhcp_state = DHCP_ADDRESS_ASSIGNED;
-
-            uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
-            ChipLogProgress(DeviceLayer, "DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1),
-                            NETIF_IPV4_ADDRESS(addr, 2), NETIF_IPV4_ADDRESS(addr, 3));
         }
         else
         {
