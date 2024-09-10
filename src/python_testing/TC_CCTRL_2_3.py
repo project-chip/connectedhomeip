@@ -34,7 +34,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                                   per_endpoint_test)
+                                                   run_if_endpoint_matches)
 from mobly import asserts
 
 
