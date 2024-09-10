@@ -85,6 +85,7 @@ def main(search_directory, env_file):
         "TestChoiceConformanceSupport.py",
         "TC_DEMTestBase.py",
         "choice_conformance_support.py",
+        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
         "TestConformanceTest.py",
@@ -123,7 +124,7 @@ def main(search_directory, env_file):
     # Run each script with the base command
     for script in python_files:
         full_command = f"{base_command} --load-from-env {env_file} --script {script}"
-        print(f"Running command: {full_command}")
+        print(f"Running command: {full_command}", flush=True)  # Flush print to stdout immediately
         subprocess.run(full_command, shell=True, check=True)
 
 

@@ -20857,6 +20857,28 @@ public class ClusterReadMapping {
           readUnitTestingUnsupportedCommandParams
         );
         result.put("readUnsupportedAttribute", readUnitTestingUnsupportedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingReadFailureCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingReadFailureCodeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readReadFailureCodeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readUnitTestingReadFailureCodeCommandParams
+        );
+        result.put("readReadFailureCodeAttribute", readUnitTestingReadFailureCodeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingFailureInt32UCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingFailureInt32UAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readFailureInt32UAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readUnitTestingFailureInt32UCommandParams
+        );
+        result.put("readFailureInt32UAttribute", readUnitTestingFailureInt32UAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingNullableBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingNullableBooleanAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

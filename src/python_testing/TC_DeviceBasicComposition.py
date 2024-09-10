@@ -19,7 +19,7 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1 run2 run3 run4 run5 run6 run7
+# test-runner-runs: run1 run2 run3 run4 run5 run6 run7 run8
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
@@ -61,6 +61,12 @@
 # test-runner-run/run7/quiet: True
 # test-runner-run/run7/app-args: --discriminator 1234 --KVS kvs1
 # test-runner-run/run7/script-args: --storage-path admin_storage.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network
+#
+# test-runner-run/run8/app: ${CHIP_LOCK_APP}
+# test-runner-run/run8/factoryreset: False
+# test-runner-run/run8/quiet: True
+# test-runner-run/run8/app-args: --discriminator 1234 --KVS kvs1
+# test-runner-run/run8/script-args: --storage-path admin_storage.json
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests

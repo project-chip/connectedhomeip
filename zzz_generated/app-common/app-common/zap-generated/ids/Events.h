@@ -36,12 +36,8 @@ namespace AccessControlExtensionChanged {
 static constexpr EventId Id = 0x00000001;
 } // namespace AccessControlExtensionChanged
 
-namespace AccessRestrictionEntryChanged {
-static constexpr EventId Id = 0x00000002;
-} // namespace AccessRestrictionEntryChanged
-
 namespace FabricRestrictionReviewUpdate {
-static constexpr EventId Id = 0x00000003;
+static constexpr EventId Id = 0x00000002;
 } // namespace FabricRestrictionReviewUpdate
 
 } // namespace Events

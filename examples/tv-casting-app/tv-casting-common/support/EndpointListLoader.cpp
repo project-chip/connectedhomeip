@@ -90,7 +90,8 @@ CHIP_ERROR EndpointListLoader::Load()
         if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
-            chip::EndpointId endpointId                     = binding.remote;
+            chip::EndpointId endpointId = binding.remote;
+            ChipLogProgress(AppServer, "EndpointListLoader::Load() Found new endpointId: %d", endpointId);
             std::vector<memory::Strong<Endpoint>> endpoints = CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
             if (std::find_if(endpoints.begin(), endpoints.end(), [&endpointId](const memory::Strong<Endpoint> & endpoint) {
                     return endpoint->GetId() == endpointId;
@@ -128,17 +129,19 @@ void EndpointListLoader::Complete()
 
     if (mPendingAttributeReads == 0)
     {
-        ChipLogProgress(AppServer, "EndpointListLoader::Complete Loading %lu endpoint(s)", mNewEndpointsToLoad);
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete() Loading %lu endpoint(s)", mNewEndpointsToLoad);
         for (unsigned long i = 0; i < mNewEndpointsToLoad; i++)
         {
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
             std::shared_ptr<Endpoint> endpoint =
                 std::make_shared<Endpoint>(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes);
+            ChipLogProgress(AppServer, "EndpointListLoader::Complete() mEndpointServerLists[i].size: %lu",
+                            static_cast<unsigned long>(mEndpointServerLists[i].size()));
             endpoint->RegisterClusters(mEndpointServerLists[i]);
             CastingPlayer::GetTargetCastingPlayer()->RegisterEndpoint(endpoint);
         }
 
-        ChipLogProgress(AppServer, "EndpointListLoader::Complete finished Loading %lu endpoints", mNewEndpointsToLoad);
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete() Finished Loading %lu endpoints", mNewEndpointsToLoad);
 
         // TODO cleanup
         // delete mEndpointAttributesList;

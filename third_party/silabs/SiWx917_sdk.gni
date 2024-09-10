@@ -256,7 +256,7 @@ template("siwx917_sdk") {
     }
 
     defines += [ "LWIP_NETIF_API=1" ]
-    if (lwip_ipv4) {
+    if (chip_enable_wifi_ipv4) {
       defines += [
         "LWIP_IPV4=1",
 

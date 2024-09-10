@@ -48,7 +48,34 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
+async def wait_for_server_initialization(server_port, timeout=5):
+    """Wait until the server is ready by checking if it opens the expected port."""
+    start_time = asyncio.get_event_loop().time()
+    elapsed_time = 0
+    retry_interval = 1
+
+    logging.info(f"Waiting for server to initialize on TCP port {server_port} for up to {timeout} seconds.")
+
+    while elapsed_time < timeout:
+        try:
+            # Try connecting to the server to check if it's ready
+            reader, writer = await asyncio.open_connection('::1', server_port)
+            writer.close()
+            await writer.wait_closed()
+            logging.info(f"TH_SERVER_NO_UID is initialized and ready on port {server_port}.")
+            return
+        except (ConnectionRefusedError, OSError) as e:
+            logging.warning(f"Connection to port {server_port} failed: {e}. Retrying in {retry_interval} seconds...")
+
+        await asyncio.sleep(retry_interval)
+        elapsed_time = asyncio.get_event_loop().time() - start_time
+
+    raise TimeoutError(f"Server on port {server_port} did not initialize within {timeout} seconds. "
+                       f"Total time waited: {elapsed_time} seconds.")
+
 # TODO: Make this class more generic. Issue #35348
+
+
 class Subprocess(threading.Thread):
 
     def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
@@ -228,7 +255,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         self.th_server_port = 5544
         self.th_server_discriminator = self.th_fsa_bridge_discriminator + 1
-        self.th_server_passcode = 20202021
+        self.th_server_passcode = 20202022
 
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServer(
@@ -237,6 +264,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
             passcode=self.th_server_passcode)
+
+        # Wait for TH_SERVER_NO_UID get initialized.
+        try:
+            asyncio.run(wait_for_server_initialization(self.th_server_port))
+        except TimeoutError:
+            asserts.fail(f"TH_SERVER_NO_UID server failed to open port {self.th_server_port}")
 
     def teardown_class(self):
         if self.th_fsa_controller is not None:
@@ -271,6 +304,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.step(1)
 
         th_server_th_node_id = 1
+
         await self.default_controller.CommissionOnNetwork(
             nodeId=th_server_th_node_id,
             setupPinCode=self.th_server_passcode,
