@@ -95,7 +95,7 @@ class GnBuilder(Builder):
         self.PreBuildCommand()
 
         cmd = ['ninja', '-C', self.output_dir]
-        if self.ninja_jobs > 0:
+        if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
         if self.build_command:
             cmd.append(self.build_command)

@@ -106,7 +106,10 @@ def ValidateTargetNames(context, parameter, values):
     help='Prefix for the generated file output.')
 @click.option(
     '--ninja-jobs',
-    default=0,
+    type=int,
+    is_flag=False,
+    flag_value=0,
+    default=None,
     help='Number of ninja jobs')
 @click.option(
     '--pregen-dir',
