@@ -6700,3 +6700,146 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         return "Unknown";
     }
 }
+
+char const * DeviceTypeIdToText(chip::DeviceTypeId id)
+{
+    switch (id)
+    {
+    case 0x0000000A:
+        return "Matter Door Lock";
+    case 0x0000000B:
+        return "Matter Door Lock Controller";
+    case 0x0000000E:
+        return "Matter Aggregator";
+    case 0x0000000F:
+        return "Matter Generic Switch";
+    case 0x00000011:
+        return "Matter Power Source";
+    case 0x00000012:
+        return "Matter OTA Requestor";
+    case 0x00000013:
+        return "Matter Bridged Device";
+    case 0x00000014:
+        return "Matter OTA Provider";
+    case 0x00000015:
+        return "Matter Contact Sensor";
+    case 0x00000016:
+        return "Matter Root Node";
+    case 0x00000019:
+        return "Matter Secondary Network Interface Device Type";
+    case 0x00000022:
+        return "Matter Speaker";
+    case 0x00000023:
+        return "Matter Casting Video Player";
+    case 0x00000024:
+        return "Matter Content App";
+    case 0x00000027:
+        return "Matter Mode Select";
+    case 0x00000028:
+        return "Matter Basic Video Player";
+    case 0x00000029:
+        return "Matter Casting Video Client";
+    case 0x0000002A:
+        return "Matter Video Remote Control";
+    case 0x0000002B:
+        return "Matter Fan";
+    case 0x0000002C:
+        return "Matter Air Quality Sensor";
+    case 0x0000002D:
+        return "Matter Air Purifier";
+    case 0x00000041:
+        return "Matter Water Freeze Detector";
+    case 0x00000042:
+        return "Matter Water Valve";
+    case 0x00000043:
+        return "Matter Water Leak Detector";
+    case 0x00000044:
+        return "Matter Rain Sensor";
+    case 0x00000070:
+        return "Matter Refrigerator";
+    case 0x00000071:
+        return "Matter Temperature Controlled Cabinet";
+    case 0x00000072:
+        return "Matter Room Air Conditioner";
+    case 0x00000073:
+        return "Matter Laundry Washer";
+    case 0x00000074:
+        return "Matter Robotic Vacuum Cleaner";
+    case 0x00000075:
+        return "Matter Dishwasher";
+    case 0x00000076:
+        return "Matter Smoke CO Alarm";
+    case 0x00000077:
+        return "Matter Cook Surface";
+    case 0x00000078:
+        return "Matter Cooktop";
+    case 0x00000079:
+        return "Matter Microwave Oven";
+    case 0x0000007A:
+        return "Matter Extractor Hood";
+    case 0x0000007B:
+        return "Matter Oven";
+    case 0x0000007C:
+        return "Matter Laundry Dryer";
+    case 0x00000090:
+        return "Matter Network Infrastructure Manager";
+    case 0x00000091:
+        return "Matter Thread Border Router";
+    case 0x00000100:
+        return "Matter On/Off Light";
+    case 0x00000101:
+        return "Matter Dimmable Light";
+    case 0x00000103:
+        return "Matter On/Off Light Switch";
+    case 0x00000104:
+        return "Matter Dimmer Switch";
+    case 0x00000105:
+        return "Matter Color Dimmer Switch";
+    case 0x00000106:
+        return "Matter Light Sensor";
+    case 0x00000107:
+        return "Matter Occupancy Sensor";
+    case 0x0000010A:
+        return "Matter On/Off Plug-in Unit";
+    case 0x0000010B:
+        return "Matter Dimmable Plug-in Unit";
+    case 0x0000010C:
+        return "Matter Color Temperature Light";
+    case 0x0000010D:
+        return "Matter Extended Color Light";
+    case 0x00000202:
+        return "Matter Window Covering";
+    case 0x00000203:
+        return "Matter Window Covering Controller";
+    case 0x00000300:
+        return "Matter Heating/Cooling Unit";
+    case 0x00000301:
+        return "Matter Thermostat";
+    case 0x00000302:
+        return "Matter Temperature Sensor";
+    case 0x00000303:
+        return "Matter Pump";
+    case 0x00000304:
+        return "Matter Pump Controller";
+    case 0x00000305:
+        return "Matter Pressure Sensor";
+    case 0x00000306:
+        return "Matter Flow Sensor";
+    case 0x00000307:
+        return "Matter Humidity Sensor";
+    case 0x0000050C:
+        return "Matter EVSE";
+    case 0x00000510:
+        return "Matter Electrical Sensor";
+    case 0x00000840:
+        return "Matter Control Bridge";
+    case 0x00000850:
+        return "Matter On/Off Sensor";
+    case 0xFFF10001:
+        return "Matter Orphan Clusters";
+    case 0xFFF10003:
+        return "Matter All-clusters-app Server Example";
+    default:
+        return "Unknown";
+    }
+}
