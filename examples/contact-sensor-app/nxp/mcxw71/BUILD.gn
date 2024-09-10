@@ -55,19 +55,19 @@ mcxw71_k32w1_sdk("sdk") {
 
   include_dirs += [
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C"
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C",
   ]
 
   sources += [
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/clock_config.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/pin_mux.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c"
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
   ]
 
   if (is_debug) {
@@ -80,12 +80,11 @@ mcxw71_k32w1_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
 
-  if (chip_key_storage == "littlefs")
-  {
+  if (chip_key_storage == "littlefs") {
     include_dirs += [ "${example_platform_dir}/board" ]
     sources += [
       "${example_platform_dir}/board/peripherals.c",
-      "${example_platform_dir}/board/peripherals.h"
+      "${example_platform_dir}/board/peripherals.h",
     ]
   }
 }
@@ -104,7 +103,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "CONFIG_NETWORK_LAYER_BLE=1",
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_OPERATIONAL_KEYSTORE=1",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/legacy/FactoryDataProvider.h\""
+    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/legacy/FactoryDataProvider.h\"",
   ]
 
   if (chip_with_diag_logs_demo) {
@@ -116,7 +115,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   } else {
     defines += [
       "CONFIG_ENABLE_FEEDBACK=1",
-      "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)"
+      "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
     ]
   }
 
@@ -141,7 +140,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
-    "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp"
+    "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
   if (chip_with_low_power == 1) {
@@ -149,15 +148,14 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   }
 
   if (chip_with_factory_data == 1) {
-    include_dirs += [
-      "${chip_root}/src/platform/nxp/common/legacy"
-    ]
+    include_dirs += [ "${chip_root}/src/platform/nxp/common/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
   if (chip_enable_ota_requestor) {
     defines += [
       "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/legacy/OTAImageProcessorImpl.h\"",
+
       # The status LED and the external flash CS pin are wired together. The OTA image writing may fail if used together.
       "LED_MANAGER_ENABLE_STATUS_LED=0",
     ]
@@ -178,19 +176,17 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   include_dirs += [
     "${example_platform_dir}/util",
     "${example_platform_dir}/app/support",
-    "${example_platform_dir}/button"
+    "${example_platform_dir}/button",
   ]
 
   sources += [
     "${example_platform_dir}/button/ButtonManager.cpp",
     "${example_platform_dir}/clusters/Identify.cpp",
-    "${example_platform_dir}/operational_keystore/OperationalKeystore.cpp"
+    "${example_platform_dir}/operational_keystore/OperationalKeystore.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "${example_platform_dir}/ota/OtaUtils.cpp"
-    ]
+    sources += [ "${example_platform_dir}/ota/OtaUtils.cpp" ]
   }
 
   include_dirs += [
@@ -201,8 +197,8 @@ mcxw71_k32w1_executable("contact_sensor_app") {
   sources += [
     "../common/AppTask.cpp",
     "../common/DeviceCallbacks.cpp",
+    "../common/ZclCallbacks.cpp",
     "../common/main.cpp",
-    "../common/ZclCallbacks.cpp"
   ]
 
   if (chip_with_low_power == 0) {
@@ -214,7 +210,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
 
   deps += [
     "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/src/platform/logging:default"
+    "${chip_root}/src/platform/logging:default",
   ]
 
   #lit and sit are using different zap files
