@@ -82,32 +82,36 @@ class TC_CADMIN_1_15(MatterBaseTest):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(
-                2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster", 
-                    "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
+                2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster",
+                "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
             TestStep(
                 3, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
             TestStep(
-                4, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds", 
-                    "Commissioning window should open with timeout set to MaxCumulativeFailsafeSeconds"),
+                4, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds",
+                "Commissioning window should open with timeout set to MaxCumulativeFailsafeSeconds"),
             TestStep(5, "TH_CR2 fully commissions DUT_CE", "DUT should fully commission"),
             TestStep(
                 6, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "New commissioning window should open and be set to timeout"),
             TestStep(7, "TH_CR3 fully commissions DUT_CE", "DUT should fully commission to TH_CR3"),
             TestStep(8, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
-                    "Verify the list shows initial_number_of_fabrics + 2 fabrics"),
+                     "Verify the list shows initial_number_of_fabrics + 2 fabrics"),
             TestStep(9, "Verify DUT_CE is now discoverable over DNS-SD with 3 Operational service records (_matter._tcp SRV records).", ""),
             TestStep(10, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2", ""),
             TestStep(11, "TH_CR2 sends RemoveFabric with FabricIndex = fabric_idx_cr2 command to DUT_CE", ""),
-            TestStep(12, "TH_CR2 reads the Basic Information Cluster’s NodeLabel attribute of DUT_CE", "Verify read/write commands fail as expected since the DUT_CE is no longer on the network"),
-            TestStep(13, "TH_CR1 reads the list of Fabrics on DUT_CE", "Verify the list shows initial_number_of_fabrics + 1 fabrics and fabric_idx_cr2 is not included."),
+            TestStep(12, "TH_CR2 reads the Basic Information Cluster’s NodeLabel attribute of DUT_CE",
+                     "Verify read/write commands fail as expected since the DUT_CE is no longer on the network"),
+            TestStep(13, "TH_CR1 reads the list of Fabrics on DUT_CE",
+                     "Verify the list shows initial_number_of_fabrics + 1 fabrics and fabric_idx_cr2 is not included."),
             TestStep(14, "TH_CR1 sends a OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", ""),
             TestStep(15, "TH_CR2 commissions DUT_CE", "Commissioning is successful"),
-            TestStep(16, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read", 
-                    "Verify the list shows initial_number_of_fabrics + 2 fabrics and fabric_idx_cr2 is not included, since a new fabric index should have been allocated."),
+            TestStep(16, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
+                     "Verify the list shows initial_number_of_fabrics + 2 fabrics and fabric_idx_cr2 is not included, since a new fabric index should have been allocated."),
             TestStep(17, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2_2"),
             TestStep(18, "TH_CR3 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr3"),
-            TestStep(19, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr2_2 command to DUT_CE", "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            TestStep(20, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr3 command to DUT_CE", "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
+            TestStep(19, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr2_2 command to DUT_CE",
+                     "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
+            TestStep(20, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr3 command to DUT_CE",
+                     "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
             TestStep(21, "TH_CR1 reads the list of Fabrics on DUT_CE", "Verify the list shows initial_number_of_fabrics fabrics."),
         ]
 
@@ -122,12 +126,12 @@ class TC_CADMIN_1_15(MatterBaseTest):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
 
-        # Establishing TH2 controller    
+        # Establishing TH2 controller
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        # Establishing TH3 controller    
+        # Establishing TH3 controller
         th3_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th3_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
         self.th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
@@ -163,8 +167,8 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail("Expected number of fabrics not correct")
 
         self.step(9)
-        # TODO: Currently on hold for impl created by Raul for DNS-SD check of multiple operational service records 
-        
+        # TODO: Currently on hold for impl created by Raul for DNS-SD check of multiple operational service records
+
         self.step(10)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
 
@@ -177,8 +181,8 @@ class TC_CADMIN_1_15(MatterBaseTest):
         try:
             await self.read_single_attribute_check_success(
                 dev_ctrl=self.th2,
-                endpoint=0, 
-                cluster=Clusters.BasicInformation, 
+                endpoint=0,
+                cluster=Clusters.BasicInformation,
                 attribute=Clusters.BasicInformation.Attributes.NodeLabel
             )
             asserts.fail("Expected exception not thrown")
@@ -231,7 +235,9 @@ class TC_CADMIN_1_15(MatterBaseTest):
         self.step(21)
         fabrics4 = await self.get_fabrics(th=self.th1)
         if len(fabrics4) > initial_number_of_fabrics:
-            asserts.fail(f"Expected number of fabrics not correct, should be {str(initial_number_of_fabrics)}, but instead found {str(len(fabrics4))}")
+            asserts.fail(
+                f"Expected number of fabrics not correct, should be {str(initial_number_of_fabrics)}, but instead found {str(len(fabrics4))}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
