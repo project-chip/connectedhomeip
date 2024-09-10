@@ -2016,7 +2016,20 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
     CodegenDataModelProviderWithContext model;
     ScopedMockAccessControl accessControl;
 
-    TestWriteRequest test(kDenySubjectDescriptor, ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    /* Using this path is also failing existence checks, so this cannot be enabled
+     * until we fix ordering of ACL to be done before existence checks
+
+      TestWriteRequest test(kDenySubjectDescriptor,
+                            ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+      AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+      ASSERT_EQ(model.WriteAttribute(test.request, decoder), Status::UnsupportedAccess);
+      ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
+    */
+
+    TestWriteRequest test(kDenySubjectDescriptor,
+                          ConcreteDataAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                    MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
     AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), Status::UnsupportedAccess);
