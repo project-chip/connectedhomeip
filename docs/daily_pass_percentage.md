@@ -1,13 +1,13 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          67 |
+| darwin                                  |          56 |
+| darwin-tests                            |          89 |
 | build-example-ameba                     |         100 |
-| recent-fail-summary                     |         100 |
 | build-example-efr32                     |         100 |
 | build-example-asr                       |         100 |
 | issue-labeler                           |         100 |
-| build-example-stm32                     |         100 |
+| recent-fail-summary                     |         100 |
 | build-example-qpg                       |         100 |
 | full-builds-android                     |         100 |
 | tests                                   |         100 |
@@ -15,7 +15,7 @@
 | build-example-bouffalolab               |         100 |
 | build-example-infineon                  |         100 |
 | builds                                  |         100 |
-| qemu                                    |         100 |
+| build-example-stm32                     |         100 |
 | cirque                                  |         100 |
 | build-example-telink                    |         100 |
 | documentation-build                     |         100 |
@@ -28,16 +28,18 @@
 | delete-old-artifacts                    |         100 |
 | java-tests                              |         100 |
 | build-example-nxp                       |         100 |
+| run-misspell                            |         100 |
 | tv-casting-example-darwin               |         100 |
 | lint-code-base                          |         100 |
+| qemu                                    |         100 |
+| docker-chip-images                      |         100 |
 | build-example-i-mx-linux                |         100 |
-| build-example-nuttx                     |         100 |
 | build-example-linux-standalone          |         100 |
+| build-example-nuttx                     |         100 |
 | build-example-esp32                     |         100 |
 | unit-integration-tests                  |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-linux-arm                 |         100 |
-| darwin-tests                            |         100 |
 | build-example-tizen                     |         100 |
 | build-example-nrf-connect-sdk           |         100 |
 | zap                                     |         100 |
