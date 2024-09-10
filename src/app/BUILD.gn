@@ -457,8 +457,7 @@ static_library("app") {
     #       Name with _ so that linter does not recognize it
     # "CommandResponseSender._h"
     # "ReadHandler._h",
-    # "WriteHandler._h",
-    # "EventManagement._h"
+    # "WriteHandler._h"
   ]
 
   public_deps = [
