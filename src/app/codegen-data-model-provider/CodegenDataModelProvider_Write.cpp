@@ -290,7 +290,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     // For chunking, ACL check is not re-done if the previous write was successful for the exact same
     // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
-    if (checkAcl && (request.path.mClusterId == Clusters::AccessControl::Id) && request.previousSuccessPath.has_value())
+    if (checkAcl && request.previousSuccessPath.has_value())
     {
         checkAcl = ((request.path.mEndpointId != request.previousSuccessPath->mEndpointId) ||
                     (request.path.mClusterId != request.previousSuccessPath->mClusterId) ||
