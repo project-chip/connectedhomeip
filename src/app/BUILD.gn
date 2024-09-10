@@ -432,6 +432,7 @@ static_library("app") {
     "CommandResponseSender.cpp",
     "EventLogging.h",
     "EventManagement.cpp",
+    "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "GenericEventManagementTestEventTriggerHandler.cpp",

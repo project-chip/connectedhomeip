@@ -193,18 +193,6 @@ struct LogStorageResources
 
 /**
  * @brief
- *  A EventScheduler to schedule deliveries of events.
- */
-
-class EventScheduler
-{
-public:
-    virtual ~EventScheduler()                                                                   = default;
-    CHIP_ERROR virtual ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
-};
-
-/**
- * @brief
  *   A class for managing the in memory event logs.  See documentation at the
  *   top of the file describing the eviction policy for events when there is no
  *   more space for new events.
