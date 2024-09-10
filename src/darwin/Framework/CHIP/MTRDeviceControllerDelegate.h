@@ -68,9 +68,9 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Notify the delegate when commissioning is completed.
  */
 - (void)controller:(MTRDeviceController *)controller
-commissioningComplete:(NSError * _Nullable)error
-MTR_DEPRECATED("Please use controller:commissioningComplete:nodeID:", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
-               tvos(16.4, 17.0));
+    commissioningComplete:(NSError * _Nullable)error
+    MTR_DEPRECATED("Please use controller:commissioningComplete:nodeID:", ios(16.4, 17.0), macos(13.3, 14.0), watchos(9.4, 10.0),
+        tvos(16.4, 17.0));
 
 /**
  * Notify the delegate when commissioning is completed.
@@ -80,8 +80,8 @@ MTR_DEPRECATED("Please use controller:commissioningComplete:nodeID:", ios(16.4, 
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
  */
 - (void)controller:(MTRDeviceController *)controller
-commissioningComplete:(NSError * _Nullable)error
-            nodeID:(NSNumber * _Nullable)nodeID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Notify the delegate when commissioning is completed.
@@ -93,9 +93,9 @@ commissioningComplete:(NSError * _Nullable)error
  * The metrics object contains information corresponding to the commissioning session.
  */
 - (void)controller:(MTRDeviceController *)controller
-commissioningComplete:(NSError * _Nullable)error
-            nodeID:(NSNumber * _Nullable)nodeID
-           metrics:(MTRMetrics *)metrics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic
@@ -105,7 +105,7 @@ commissioningComplete:(NSError * _Nullable)error
  * so the information delivered by this notification should not be trusted.
  */
 - (void)controller:(MTRDeviceController *)controller
-readCommissioningInfo:(MTRProductIdentity *)info MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    readCommissioningInfo:(MTRProductIdentity *)info MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Notify the delegate when the suspended state changed of the controller, after this happens
