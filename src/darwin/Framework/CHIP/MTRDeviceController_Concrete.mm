@@ -717,6 +717,10 @@ using namespace chip::Tracing::DarwinFramework;
 
         commissionerInitialized = YES;
 
+        // Set self as delegate, which fans out delegate callbacks to all added delegates
+        id<MTRDeviceControllerDelegate> selfDelegate = static_cast<id<MTRDeviceControllerDelegate>>(self);
+        self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, _chipWorkQueue);
+
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
     });
 
@@ -1184,15 +1188,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceAttributeCounts;
 }
 #endif
-
-- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
-{
-    [self
-        asyncDispatchToMatterQueue:^() {
-            self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
-        }
-                      errorHandler:nil];
-}
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(nullable dispatch_queue_t)queue
