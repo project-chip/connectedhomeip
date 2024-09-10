@@ -198,7 +198,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail(f"Expected number of fabrics not correct, should show 2, but instead shows {str(len(fabrics2))}")
 
         if 2 in fabric_indexes:
-            asserts.fail(f"fabricIndexes should consist of indexes 1 and 3 at this point")
+            asserts.fail("fabricIndexes should consist of indexes 1 and 3 at this point")
 
         self.step(14)
         params3 = await self.OpenCommissioningWindow(self.th1, expectedErrCode=0x00)
@@ -215,7 +215,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
             asserts.fail("Expected number of fabrics not correct")
 
         if 2 in fabric_indexes2:
-            asserts.fail(f"fabricIndexes should consist of indexes 1, 3, and 4 at this time")
+            asserts.fail("fabricIndexes should consist of indexes 1, 3, and 4 at this time")
 
         self.step(17)
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
