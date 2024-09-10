@@ -111,7 +111,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         self.step("3a")
         good_request_id = 0x1234567812345678
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-            requestId=good_request_id, vendorId=th_fsa_server_vid, productId=th_fsa_server_pid, label="Test Ecosystem")
+            requestID=good_request_id, vendorID=th_fsa_server_vid, productID=th_fsa_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
 
         if not self.is_ci:
@@ -125,12 +125,12 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(new_event[0].Data.clientNodeId,
+        asserts.assert_equal(new_event[0].Data.clientNodeID,
                              self.matter_test_config.controller_node_id, "Unexpected client node id")
-        asserts.assert_equal(new_event[0].Data.requestId, good_request_id, "Unexpected request ID")
+        asserts.assert_equal(new_event[0].Data.requestID, good_request_id, "Unexpected request ID")
 
         self.step("3b")
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=good_request_id, responseTimeoutSeconds=30)
         resp = await self.send_single_cmd(cmd, endpoint=dut_commissioning_control_endpoint)
         asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
                              "Incorrect response type")

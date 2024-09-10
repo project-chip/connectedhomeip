@@ -170,9 +170,9 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         await self.send_single_cmd(
             node_id=controller_node_id,
             cmd=Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
-                requestId=request_id,
-                vendorId=vendor_id,
-                productId=product_id,
+                requestID=request_id,
+                vendorID=vendor_id,
+                productID=product_id,
             ),
         )
 
@@ -182,7 +182,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         resp = await self.send_single_cmd(
             node_id=controller_node_id,
             cmd=Clusters.CommissionerControl.Commands.CommissionNode(
-                requestId=request_id,
+                requestID=request_id,
                 responseTimeoutSeconds=30,
             ),
         )

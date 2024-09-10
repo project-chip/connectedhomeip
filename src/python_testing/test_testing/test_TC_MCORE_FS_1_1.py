@@ -72,7 +72,7 @@ def dynamic_event_return(*args, **argv):
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
-            requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
+            requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
     else:
