@@ -82,3 +82,13 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
 		default: return "Unknown";
 	}
 }
+
+char const * DeviceTypeIdToText(chip::DeviceTypeId id) {
+	switch(id)
+	{
+{{#zcl_device_types}}
+		case {{asHex code 8}}: return "{{caption}}";
+{{/zcl_device_types}}
+		default: return "Unknown";
+	}
+}
