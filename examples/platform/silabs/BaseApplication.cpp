@@ -621,7 +621,7 @@ void BaseApplication::CancelFactoryResetSequence()
     if (sIsFactoryResetTriggered)
     {
         sIsFactoryResetTriggered = false;
-        ChipLogProgress(AppServer, "Factory Reset has been Canceled");
+        ChipLogProgress(AppServer, "Factory Reset has been cancelled");
     }
 }
 
@@ -854,7 +854,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         VerifyOrReturn(event->InternetConnectivityChange.IPv4 == kConnectivity_Established);
         if (DIC_OK != dic_init(dic::control::subscribeCB))
         {
-            SILABS_LOG("Failed to initialize DIC module\n");
+            ChipLogError(AppServer, "dic_init failed");
         }
 #endif // DIC_ENABLE
 #ifdef DISPLAY_ENABLED

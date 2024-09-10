@@ -77,6 +77,7 @@ typedef struct wfx_rsi_s
 #ifdef SL_WFX_CONFIG_SCAN
     void (*scan_cb)(wfx_wifi_scan_result_t *);
     char * scan_ssid; /* Which one are we scanning for */
+    size_t scan_ssid_length;
 #endif
 #ifdef SL_WFX_CONFIG_SOFTAP
     sl_wfx_mac_address_t softap_mac;
