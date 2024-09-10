@@ -138,6 +138,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${common_example_dir}/low_power/include",
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
@@ -147,6 +148,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
