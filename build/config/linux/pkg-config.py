@@ -205,10 +205,12 @@ def main():
         sys.stdout.write(dridriverdir.strip())
         return
 
+    cmd = [options.pkg_config, "--cflags", "--libs"]
+
     if options.static:
-        cmd = [options.pkg_config, "--cflags", "--libs", "--static"] + args
-    else:
-        cmd = [options.pkg_config, "--cflags", "--libs"] + args
+        cmd.append("--static")
+
+    cmd.extend(args)
 
     if options.debug:
         sys.stderr.write('Running: %s\n' % ' '.join(cmd))
