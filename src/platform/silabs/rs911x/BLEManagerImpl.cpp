@@ -117,7 +117,7 @@ void ProcessEvent(BleEvent_t inEvent)
         rsi_ble_set_data_len(inEvent.eventData->resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
 
         // Used to send the Indication confirmation
-        memcpy(dev_address,inEvent.eventData->resp_enh_conn.dev_addr, RSI_DEV_ADDR_LEN);
+        memcpy(dev_address, inEvent.eventData->resp_enh_conn.dev_addr, RSI_DEV_ADDR_LEN);
         ble_measurement_hndl = inEvent.eventData->rsi_ble_measurement_hndl;
     }
     break;
@@ -150,7 +150,7 @@ void ProcessEvent(BleEvent_t inEvent)
     }
     break;
     default:
-    break;
+        break;
     }
 }
 
@@ -426,8 +426,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
                                           PacketBufferHandle data)
 {
     int32_t status = 0;
-    status = rsi_ble_indicate_value(dev_address, ble_measurement_hndl,data->DataLength(),data->Start());
-
+    status         = rsi_ble_indicate_value(dev_address, ble_measurement_hndl, data->DataLength(), data->Start());
     if (status != RSI_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
