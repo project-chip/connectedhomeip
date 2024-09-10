@@ -79,8 +79,8 @@ and global variables in the shared memory area from `NBU` domain.
 Note: These instances and global variables are placed in `SMU2` memory through
 name matching in the application linker script. They should not be changed or,
 if changed, the names must be updated in `app.ld`. See
-[app.ld](../../../platform/nxp/mcxw71_k32w1/app/ldscripts/app.ld) for names
-and `SMU2` memory range size.
+[app.ld](../../../platform/nxp/mcxw71_k32w1/app/ldscripts/app.ld) for names and
+`SMU2` memory range size.
 
 When compiling the application as an OT Full Thread Device
 (`chip_openthread_ftd=true`), using `use_smu2_static=true` gn arg will cause the
