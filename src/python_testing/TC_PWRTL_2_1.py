@@ -78,7 +78,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                                    "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
 
         
-            if available_endpoints == NullValue or available_endpoints == []:
+            if available_endpoints == []:
                 # Verify that ActiveEndpoints is a subset of AvailableEndpoints
                 asserts.assert_true(set(active_endpoints).issubset(set(available_endpoints)),
                                   "ActiveEndpoints should be a subset of AvailableEndpoints")
