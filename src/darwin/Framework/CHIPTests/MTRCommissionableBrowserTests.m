@@ -55,6 +55,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 @property (nonatomic, nullable) XCTestExpectation * expectation;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * results;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * removedResults;
+@property (nonatomic) BOOL expectedResultsCountReached;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device;
@@ -71,6 +72,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     _expectation = expectation;
     _results = [[NSMutableArray alloc] init];
     _removedResults = [[NSMutableArray alloc] init];
+    _expectedResultsCountReached = NO;
     return self;
 }
 
@@ -83,6 +85,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
     _expectation = nil;
     _results = [[NSMutableArray alloc] init];
     _removedResults = [[NSMutableArray alloc] init];
+    _expectedResultsCountReached = NO;
     return self;
 }
 
@@ -111,7 +114,14 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
         // Ensure that we just saw the same results as our final set popping in and out if things
         // ever got removed here.
         XCTAssertEqualObjects(finalResultsSet, allResultsSet);
-        [self.expectation fulfill];
+
+        // If we have a remove and re-add after the result count reached the
+        // expected one, we can end up in this branch again.  Doing the above
+        // checks is fine, but we shouldn't double-fulfill the expectation.
+        if (self.expectedResultsCountReached == NO) {
+            self.expectedResultsCountReached = YES;
+            [self.expectation fulfill];
+        }
     }
 
     XCTAssertLessThanOrEqual(_results.count, kExpectedDiscoveredDevicesCount);
