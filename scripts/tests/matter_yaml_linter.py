@@ -15,8 +15,8 @@
 # limitations under the License.
 import os
 import re
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 from chiptest import AllChipToolYamlTests
