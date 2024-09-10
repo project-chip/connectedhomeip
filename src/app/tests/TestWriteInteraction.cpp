@@ -49,30 +49,16 @@ chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
-using TestContext = chip::Test::AppContext;
-
 } // namespace
 
 namespace chip {
 namespace app {
-class TestWriteInteraction : public ::testing::Test
+class TestWriteInteraction : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
     void SetUp() override
     {
-
-        mpTestContext->SetUp();
+        AppContext::SetUp();
 
         gTestStorage.ClearStorage();
         gGroupsProvider.SetStorageDelegate(&gTestStorage);
@@ -82,8 +68,8 @@ public:
 
         uint8_t buf[sizeof(chip::CompressedFabricId)];
         chip::MutableByteSpan span(buf);
-        ASSERT_EQ(mpTestContext->GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
-        ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, mpTestContext->GetBobFabricIndex(), span), CHIP_NO_ERROR);
+        ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
     }
     void TearDown() override
     {
@@ -92,10 +78,8 @@ public:
         {
             provider->Finish();
         }
-        mpTestContext->TearDown();
+        AppContext::TearDown();
     }
-
-    static TestContext * mpTestContext;
 
     void TestWriteClient();
     void TestWriteClientGroup();
@@ -110,8 +94,6 @@ public:
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 };
-
-TestContext * TestWriteInteraction::mpTestContext = nullptr;
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
@@ -261,14 +243,14 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClient)
 {
 
     TestWriteClientCallback callback;
-    app::WriteClient writeClient(&mpTestContext->GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     GenerateWriteResponse(buf);
 
@@ -276,7 +258,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClient)
 
     writeClient.Close();
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
 
@@ -284,17 +266,17 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
 {
 
     TestWriteClientCallback callback;
-    app::WriteClient writeClient(&mpTestContext->GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+    app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataIB(writeClient);
 
-    SessionHandle groupSession = mpTestContext->GetSessionBobToFriends();
+    SessionHandle groupSession = GetSessionBobToFriends();
     EXPECT_TRUE(groupSession->IsGroupSession());
 
     EXPECT_EQ(writeClient.SendWriteRequest(groupSession), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // The WriteClient should be shutdown once we SendWriteRequest for group.
     EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
@@ -319,7 +301,7 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             GenerateWriteRequest(messageIsTimed, buf);
 
             TestExchangeDelegate delegate;
-            Messaging::ExchangeContext * exchange = mpTestContext->NewExchangeToBob(&delegate);
+            Messaging::ExchangeContext * exchange = NewExchangeToBob(&delegate);
 
             Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
             if (messageIsTimed == transactionIsTimed)
@@ -328,12 +310,12 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             }
             else
             {
-                EXPECT_EQ(status, Status::UnsupportedAccess);
+                EXPECT_EQ(status, Status::TimedRequestMismatch);
             }
 
-            mpTestContext->DrainAndServiceIO();
+            DrainAndServiceIO();
 
-            Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+            Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
             EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
         }
     }
@@ -342,15 +324,13 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -375,9 +355,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(callback.mOnSuccessCalled, 1);
 
@@ -408,15 +388,13 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -435,9 +413,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(callback.mOnSuccessCalled, 1);
     EXPECT_EQ(callback.mOnErrorCalled, 0);
@@ -454,15 +432,13 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -484,9 +460,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(callback.mOnSuccessCalled, 1);
     EXPECT_EQ(callback.mOnErrorCalled, 0);
@@ -503,15 +479,13 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
 TEST_F(TestWriteInteraction, TestWriteRoundtrip)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -522,9 +496,9 @@ TEST_F(TestWriteInteraction, TestWriteRoundtrip)
     EXPECT_EQ(callback.mOnErrorCalled, 0);
     EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(callback.mOnSuccessCalled, 1);
     EXPECT_EQ(callback.mOnErrorCalled, 0);
@@ -541,37 +515,35 @@ TEST_F(TestWriteInteraction, TestWriteRoundtrip)
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
 {
-    auto sessionHandle = mpTestContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     app::AttributePathParams attributePath(2, 3, 4);
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // Reserve all except the last 128 bytes, so that we make sure to chunk.
-    app::WriteClient writeClient(&mpTestContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
 
     ByteSpan list[5];
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
     EXPECT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 1u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 3u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 3u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     EXPECT_FALSE(msgBuf.IsNull());
@@ -590,65 +562,63 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
 
     rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
     rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
-    mpTestContext->GetLoopback().mSentMessageCount  = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop = 0;
+    GetLoopback().mSentMessageCount  = 0;
+    GetLoopback().mNumMessagesToDrop = 0;
     writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(writeCallback.mLastErrorReason.mStatus, Protocols::InteractionModel::Status::InvalidAction);
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // This test is to create Chunked write requests, we drop the message since the 3rd message, then remove fabrics for client and
 // handler, the corresponding client and handler would be released as well.
 TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
 {
-    auto sessionHandle = mpTestContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     app::AttributePathParams attributePath(2, 3, 4);
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // Reserve all except the last 128 bytes, so that we make sure to chunk.
-    app::WriteClient writeClient(&mpTestContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                  static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
 
     ByteSpan list[5];
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
 
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
+    GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
     EXPECT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 1u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 3u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 3u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
-    mpTestContext->GetFabricTable().Delete(mpTestContext->GetAliceFabricIndex());
+    GetFabricTable().Delete(GetAliceFabricIndex());
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateAliceFabric();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateAliceFabric();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 #endif
@@ -657,15 +627,13 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -676,15 +644,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     EXPECT_EQ(callback.mOnErrorCalled, 0);
     EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     EXPECT_FALSE(msgBuf.IsNull());
@@ -700,15 +668,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     // Since we are dropping packets, things are not getting acked.  Set up
     // our MRP state to look like what it would have looked like if the
     // packet had not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, writeClient.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, writeClient.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
     EXPECT_EQ(writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_EQ(callback.mError, CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
@@ -717,28 +685,26 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
 
     // TODO: Check that the server gets the right status.
     // Client sents status report with invalid action, server's exchange has been closed, so all it sends is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
 
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Write Client sends a write request, receives a malformed write response message, sends a Status Report.
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -749,15 +715,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     EXPECT_EQ(callback.mOnErrorCalled, 0);
     EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     EXPECT_FALSE(msgBuf.IsNull());
@@ -773,15 +739,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     // Since we are dropping packets, things are not getting acked.  Set up
     // our MRP state to look like what it would have looked like if the
     // packet had not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, writeClient.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, writeClient.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
     EXPECT_EQ(writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_END_OF_TLV);
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_EQ(callback.mError, CHIP_ERROR_END_OF_TLV);
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
@@ -789,28 +755,26 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     EXPECT_EQ(callback.mOnDoneCalled, 1);
 
     // Client sents status report with invalid action, server's exchange has been closed, so all it sends is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
 
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Write Client sends a write request, receives a malformed status response message.
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -821,15 +785,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     EXPECT_EQ(callback.mOnErrorCalled, 0);
     EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     EXPECT_FALSE(msgBuf.IsNull());
@@ -845,15 +809,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     // Since we are dropping packets, things are not getting acked.  Set up
     // our MRP state to look like what it would have looked like if the
     // packet had not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, writeClient.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, writeClient.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
     EXPECT_EQ(writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_END_OF_TLV);
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_EQ(callback.mError, CHIP_ERROR_END_OF_TLV);
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
@@ -862,28 +826,26 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
 
     // TODO: Check that the server gets the right status
     // Client sents status report with invalid action, server's exchange has been closed, so all it sends is an MRP ack.
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
 
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Write Client sends a write request, receives a busy status response message.
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
 {
 
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
 
@@ -894,15 +856,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     EXPECT_EQ(callback.mOnErrorCalled, 0);
     EXPECT_EQ(callback.mOnDoneCalled, 0);
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
-    EXPECT_EQ(writeClient.SendWriteRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     EXPECT_FALSE(msgBuf.IsNull());
@@ -919,15 +881,15 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     // Since we are dropping packets, things are not getting acked.  Set up
     // our MRP state to look like what it would have looked like if the
     // packet had not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, writeClient.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, writeClient.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
     EXPECT_EQ(writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_IM_GLOBAL_STATUS(Busy));
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_EQ(callback.mError, CHIP_IM_GLOBAL_STATUS(Busy));
 
     EXPECT_EQ(callback.mOnSuccessCalled, 0);
@@ -936,13 +898,13 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
 
     // TODO: Check that the server gets the right status..
     // Client sents status report with invalid action, server's exchange has been closed, so it just sends an MRP ack.
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
 
     engine->Shutdown();
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 } // namespace app

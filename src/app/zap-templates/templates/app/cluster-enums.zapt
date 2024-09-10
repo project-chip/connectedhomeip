@@ -37,6 +37,37 @@ k{{asUpperCamelCase label}} = {{asHex mask}},
 
 } // namespace detail
 
+namespace Globals {
+// Global enums.
+{{#zcl_enums}}
+
+{{#if has_no_clusters}}
+
+{{> cluster_enums_enum ns=""}}
+
+{{/if}}
+{{/zcl_enums}}
+
+// Global bitmaps.
+{{#zcl_bitmaps}}
+
+{{#if has_no_clusters}}
+{{! Work around https://github.com/project-chip/zap/issues/1370 and manually filter out built-in bitmap types. }}
+{{#if_is_atomic label}}
+{{else}}
+
+// Bitmap for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType name}} {
+{{#zcl_bitmap_items}}
+k{{asUpperCamelCase label}} = {{asHex mask}},
+{{/zcl_bitmap_items}}
+};
+
+{{/if_is_atomic}}
+{{/if}}
+{{/zcl_bitmaps}}
+
+} // namespace Globals
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {

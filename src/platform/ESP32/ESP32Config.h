@@ -75,11 +75,15 @@ public:
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
     static const Key kConfigKey_ProductLabel;
+    static const Key kConfigKey_PartNumber;
     static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_SupportedCalTypes;
     static const Key kConfigKey_SupportedLocaleSize;
     static const Key kConfigKey_RotatingDevIdUniqueId;
+    static const Key kConfigKey_ProductFinish;
+    static const Key kConfigKey_ProductColor;
     static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_PrimaryDeviceType;
 
     // CHIP Config keys
     static const Key kConfigKey_ServiceConfig;

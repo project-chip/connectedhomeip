@@ -67,7 +67,8 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onAdded(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+                  "DiscoveryExampleFragment onAdded() Discovered CastingPlayer deviceId: "
+                      + castingPlayer.getDeviceId());
               // Display CastingPlayer info on the screen
               new Handler(Looper.getMainLooper())
                   .post(
@@ -80,7 +81,7 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onChanged(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onChanged() Discovered changes to CastingPlayer with deviceId: "
+                  "DiscoveryExampleFragment onChanged() Discovered changes to CastingPlayer with deviceId: "
                       + castingPlayer.getDeviceId());
               // Update the CastingPlayer on the screen
               new Handler(Looper.getMainLooper())
@@ -107,7 +108,7 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onRemoved(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "onRemoved() Removed CastingPlayer with deviceId: "
+                  "DiscoveryExampleFragment onRemoved() Removed CastingPlayer with deviceId: "
                       + castingPlayer.getDeviceId());
               // Remove CastingPlayer from the screen
               new Handler(Looper.getMainLooper())
@@ -215,7 +216,10 @@ public class DiscoveryExampleFragment extends Fragment {
   @Override
   public void onPause() {
     super.onPause();
-    Log.i(TAG, "onPause() called");
+    Log.i(TAG, "DiscoveryExampleFragment onPause() called, calling stopDiscovery()");
+    // Stop discovery when leaving the fragment, for example, while displaying the
+    // ConnectionExampleFragment.
+    stopDiscovery();
   }
 
   /** Interface for notifying the host. */
@@ -261,7 +265,7 @@ public class DiscoveryExampleFragment extends Fragment {
   }
 
   private void stopDiscovery() {
-    Log.i(TAG, "stopDiscovery() called");
+    Log.i(TAG, "DiscoveryExampleFragment stopDiscovery() called");
     matterDiscoveryErrorMessageTextView.setText(
         getString(R.string.matter_discovery_error_message_initial));
 

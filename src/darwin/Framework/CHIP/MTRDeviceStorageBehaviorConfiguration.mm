@@ -75,7 +75,7 @@
 
     // Sanity check all the values, and if any is out of range, reset to default values
     if ((_reportToPersistenceDelayTime <= 0) || (_reportToPersistenceDelayTimeMax <= 0) || (_reportToPersistenceDelayTimeMax < _reportToPersistenceDelayTime) || (_recentReportTimesMaxCount < 2) || (_timeBetweenReportsTooShortThreshold <= 0) || (_timeBetweenReportsTooShortMinThreshold <= 0) || (_timeBetweenReportsTooShortMinThreshold > _timeBetweenReportsTooShortThreshold) || (_reportToPersistenceDelayMaxMultiplier <= 1) || (_deviceReportingExcessivelyIntervalThreshold <= 0)) {
-        MTR_LOG_ERROR("%@ storage behavior: MTRDeviceStorageBehaviorConfiguration values out of bounds - resetting to default", self);
+        MTR_LOG("%@ storage behavior: MTRDeviceStorageBehaviorConfiguration values out of bounds - resetting to default", self);
 
         _reportToPersistenceDelayTime = kReportToPersistenceDelayTimeDefault;
         _reportToPersistenceDelayTimeMax = kReportToPersistenceDelayTimeMaxDefault;

@@ -240,7 +240,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     switch (key)
     {
     case TxtFieldKey::kTcpSupported:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
+        VerifyOrReturnError(params.GetTCPSupportModes() != TCPModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
+        return CopyTextRecordValue(buffer, bufferLen, to_underlying(params.GetTCPSupportModes()));
     case TxtFieldKey::kSessionIdleInterval:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // A ICD operating as a LIT should not advertise its slow polling interval
@@ -419,7 +420,12 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
     mState = State::kInitializing;
 
-    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
+    CHIP_ERROR err = ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mState = State::kUninitialized;
+        return err;
+    }
     UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;

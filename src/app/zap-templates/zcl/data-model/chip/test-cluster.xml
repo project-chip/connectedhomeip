@@ -58,6 +58,7 @@ limitations under the License.
     <item name="f" type="SimpleBitmap" optional="false"/>
     <item name="g" type="single" optional="false"/>
     <item name="h" type="double" optional="false"/>
+    <item name="i" type="TestGlobalEnum" optional="true"/>
   </struct>
 
   <struct name="NestedStruct">
@@ -65,6 +66,7 @@ limitations under the License.
     <item name="a" type="int8u" optional="false"/>
     <item name="b" type="boolean" optional="false"/>
     <item name="c" type="SimpleStruct" optional="false"/>
+    <item name="d" type="TestGlobalStruct" optional="true"/>
   </struct>
 
   <struct name="NestedStructList">
@@ -198,6 +200,17 @@ limitations under the License.
     <attribute side="server" code="0x0032" define="CLUSTER_ERROR_BOOLEAN"
                type="boolean" writable="true" optional="false">cluster_error_boolean</attribute>
 
+    <attribute side="server" code="0x0033" define="GLOBAL_ENUM" type="TestGlobalEnum" writable="true">global_enum</attribute>
+    <attribute side="server" code="0x0034" define="GLOBAL_STRUCT" type="TestGlobalStruct" writable="true">global_struct</attribute>
+
+    <!-- These attributes are intended to return internal failures when read.
+         They are internal SDK-test code that are intended to only run through EMBER interfaces instead of
+         code-backed support (to be able to test ember-based error paths)
+      -->
+    <attribute side="server" code="0x3000" define="INT8U" type="int8u" writable="true" min="1" max="0xcb" default="1" optional="true">readFailureCode</attribute>
+    <attribute side="server" code="0x3001" define="INT32U" type="int32u" writable="true" default="0" optional="true">failureInt32U</attribute>
+
+
     <attribute side="server" code="0x4000" define="NULLABLE_BOOLEAN" type="boolean" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
     <attribute side="server" code="0x4001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
     <attribute side="server" code="0x4002" define="NULLABLE_BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap16</attribute>
@@ -232,7 +245,13 @@ limitations under the License.
     <attribute side="server" code="0x4028" define="NULLABLE_RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" isNullable="true" optional="false" default="200">nullable_range_restricted_int16u</attribute>
     <attribute side="server" code="0x4029" define="NULLABLE_RANGE_RESTRICTED_INT16S" type="int16s" min="-150" max="200" writable="true" isNullable="true" optional="false" default="-5">nullable_range_restricted_int16s</attribute>
 
+    <!-- NOTE: write_only_int8u should not have been added in the 0x4... range
+         where the nullable versions of attributes go, but now we have to be a
+         bit careful about our attribute IDs as a result. -->
     <attribute side="server" code="0x402A" define="WRITE_ONLY_INT8U" type="int8u" writable="true" default="0" optional="true">write_only_int8u</attribute>
+
+    <attribute side="server" code="0x4033" define="NULLABLE_GLOBAL_ENUM" type="TestGlobalEnum" isNullable="true" writable="true">nullable_global_enum</attribute>
+    <attribute side="server" code="0x4034" define="NULLABLE_GLOBAL_STRUCT" type="TestGlobalStruct" isNullable="true" writable="true">nullable_global_struct</attribute>
 
     <!-- Attribute MEI sample having a different vendor ID than the cluster. -->
     <attribute side="server" code="0xFFF24F01" define="MEI_INT8U" type="int8u" writable="true" default="0" optional="false">mei_int8u</attribute>
@@ -464,6 +483,26 @@ limitations under the License.
       <arg name="fillCharacter" type="int8u"/>
     </command>
 
+    <command source="client" code="0x18" name="StringEchoRequest"
+             response="StringEchoResponse" optional="true">
+      <description>
+        Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads.
+      </description>
+      <arg name="payload" type="octet_string"/>
+    </command>
+
+    <command source="client" code="0x19" name="GlobalEchoRequest"
+             response="GlobalEchoResponse" optional="true">
+      <description>
+        Command that takes arguments that are global structs/enums and the
+        response just echoes them back.
+      </description>
+      <arg name="field1" type="TestGlobalStruct"/>
+      <arg name="field2" type="TestGlobalEnum"/>
+    </command>
+
     <command source="client" code="0xFFF200AA" name="TestDifferentVendorMeiRequest"
              optional="true" response="TestDifferentVendorMeiResponse">
       <description>
@@ -603,6 +642,21 @@ limitations under the License.
         Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
       </description>
       <arg name="buffer" type="octet_string" length="800"/>
+    </command>
+
+    <command source="server" code="0xD" name="StringEchoResponse"  optional="true" disableDefaultResponse="true">
+      <description>
+        Response to StringEchoRequest. Buffer in response is filled by the payload in the Request.
+      </description>
+      <arg name="payload" type="octet_string"/>
+    </command>
+
+    <command source="server" code="0x0E" name="GlobalEchoResponse"  optional="true" disableDefaultResponse="true">
+      <description>
+        Response to GlobalEchoRequest.
+      </description>
+      <arg name="field1" type="TestGlobalStruct"/>
+      <arg name="field2" type="TestGlobalEnum"/>
     </command>
 
     <command source="server" code="0xFFF200BB" name="TestDifferentVendorMeiResponse" optional="true" disableDefaultResponse="true">

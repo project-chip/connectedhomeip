@@ -18,8 +18,9 @@
 
 #include <cstring>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Scoped.h>
 #include <lib/support/static_support_smart_ptr.h>
 

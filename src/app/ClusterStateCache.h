@@ -505,6 +505,22 @@ public:
     }
 
     /*
+     * Clear out all the attribute data and DataVersions stored for a given endpoint.
+     */
+    void ClearAttributes(EndpointId endpoint);
+
+    /*
+     * Clear out all the attribute data and the DataVersion stored for a given cluster.
+     */
+    void ClearAttributes(const ConcreteClusterPath & cluster);
+
+    /*
+     * Clear out the data (or size, if not storing data) stored for an
+     * attribute.
+     */
+    void ClearAttribute(const ConcreteAttributePath & attribute);
+
+    /*
      * Clear out the event data and status caches.
      *
      * By default, this will not clear out any internally tracked event counters, specifically:

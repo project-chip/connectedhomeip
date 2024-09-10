@@ -4,11 +4,11 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/sl_wifi_if.cpp",
-  "${examples_plat_dir}/rs911x/wfx_rsi_host.cpp",
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
   "${examples_plat_dir}/rs911x/hal/sl_si91x_ncp_utility.c",
   "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
-  "${silabs_plat_efr32_wifi_dir}/wfx_notify.cpp",
+  "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
+  "${silabs_common_plat_dir}/wifi/wfx_rsi_host.cpp",
 ]
 
 rs9117_inc_plat = [

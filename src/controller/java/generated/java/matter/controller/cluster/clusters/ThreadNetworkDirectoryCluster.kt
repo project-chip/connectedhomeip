@@ -49,10 +49,10 @@ class ThreadNetworkDirectoryCluster(
 ) {
   class OperationalDatasetResponse(val operationalDataset: ByteArray)
 
-  class PreferredExtendedPanIDAttribute(val value: ULong?)
+  class PreferredExtendedPanIDAttribute(val value: ByteArray?)
 
   sealed class PreferredExtendedPanIDAttributeSubscriptionState {
-    data class Success(val value: ULong?) : PreferredExtendedPanIDAttributeSubscriptionState()
+    data class Success(val value: ByteArray?) : PreferredExtendedPanIDAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : PreferredExtendedPanIDAttributeSubscriptionState()
 
@@ -131,14 +131,14 @@ class ThreadNetworkDirectoryCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun removeNetwork(extendedPanID: ULong, timedInvokeTimeout: Duration) {
+  suspend fun removeNetwork(extendedPanID: ByteArray, timedInvokeTimeout: Duration) {
     val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
+    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -153,16 +153,16 @@ class ThreadNetworkDirectoryCluster(
   }
 
   suspend fun getOperationalDataset(
-    extendedPanID: ULong,
-    timedInvokeTimeout: Duration,
+    extendedPanID: ByteArray,
+    timedInvokeTimeout: Duration? = null,
   ): OperationalDatasetResponse {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
+    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -225,9 +225,9 @@ class ThreadNetworkDirectoryCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ULong? =
+    val decodedValue: ByteArray? =
       if (!tlvReader.isNull()) {
-        tlvReader.getULong(AnonymousTag)
+        tlvReader.getByteArray(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -237,7 +237,7 @@ class ThreadNetworkDirectoryCluster(
   }
 
   suspend fun writePreferredExtendedPanIDAttribute(
-    value: ULong,
+    value: ByteArray,
     timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 0u
@@ -320,9 +320,9 @@ class ThreadNetworkDirectoryCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ULong? =
+          val decodedValue: ByteArray? =
             if (!tlvReader.isNull()) {
-              tlvReader.getULong(AnonymousTag)
+              tlvReader.getByteArray(AnonymousTag)
             } else {
               tlvReader.getNull(AnonymousTag)
               null

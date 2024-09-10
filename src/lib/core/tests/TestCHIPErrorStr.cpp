@@ -28,10 +28,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
@@ -139,6 +140,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_ACCESS_DENIED,
     CHIP_ERROR_UNKNOWN_RESOURCE_ID,
     CHIP_ERROR_VERSION_MISMATCH,
+    CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL,
     CHIP_EVENT_ID_FOUND,
     CHIP_ERROR_INTERNAL,
     CHIP_ERROR_OPEN_FAILED,

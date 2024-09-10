@@ -73,14 +73,13 @@ private:
     chip::System::Clock::ClockBase & mRealClock;
 };
 
-class TestEventLoggingNoUTCTime : public ::testing::Test
+class TestEventLoggingNoUTCTime : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
     static void SetUpTestSuite()
     {
-        mpTestContext = new chip::Test::AppContext;
-        mpTestContext->SetUpTestSuite();
+        AppContext::SetUpTestSuite();
         sClock.Emplace(chip::System::SystemClock());
     }
 
@@ -88,8 +87,7 @@ public:
     static void TearDownTestSuite()
     {
         sClock.ClearValue();
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
+        AppContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
@@ -101,9 +99,9 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        mpTestContext->SetUp();
+        AppContext::SetUp();
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&mpTestContext->GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -111,17 +109,14 @@ public:
     void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-        mpTestContext->TearDown();
+        AppContext::TearDown();
     }
-
-    static chip::Test::AppContext * mpTestContext;
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
     static chip::Optional<MockClock> sClock;
 };
 
-chip::Test::AppContext * TestEventLoggingNoUTCTime::mpTestContext = nullptr;
 chip::Optional<MockClock> TestEventLoggingNoUTCTime::sClock;
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)

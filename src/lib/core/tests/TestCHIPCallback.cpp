@@ -21,9 +21,11 @@
  *      This file implements a test for  CHIP Callback
  *
  */
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCallback.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
@@ -201,7 +203,7 @@ TEST_F(TestCHIPCallback, NotifierTest)
 {
     int n = 1;
     Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
-    Callback<Notifier::NotifyFn> cancelcb(reinterpret_cast<Notifier::NotifyFn>(canceler), cb.Cancel());
+    Callback<Notifier::NotifyFn> cancelcb([](void * call, int) { canceler(reinterpret_cast<Cancelable *>(call)); }, cb.Cancel());
 
     // safe to call anytime
     cb.Cancel();

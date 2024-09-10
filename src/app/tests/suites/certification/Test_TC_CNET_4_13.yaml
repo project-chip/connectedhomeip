@@ -54,7 +54,7 @@ tests:
           entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -128,7 +128,7 @@ tests:
           NT_SSID 2. NetworkIn dex is 'MaxNetwo rksValue' 3. Breadcrum b is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -189,7 +189,7 @@ tests:
     - label: "Step 13: TH readsNetworksattribute list fromthe DUT"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -208,7 +208,7 @@ tests:
     - label: "Step 15: TH readsNetworksattribute list fromthe DUT"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -268,7 +268,7 @@ tests:
     - label: "Step 21: TH readsNetworksattribute list fromthe DUT"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)

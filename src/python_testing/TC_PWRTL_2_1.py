@@ -15,17 +15,21 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -58,7 +62,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 logging.info("AvailableEndpoints is an empty list")
             else:
                 logging.info("AvailableEndpoints: %s" % (available_endpoints))
-                asserts.assert_less_equal(len(available_endpoints), 21,
+                asserts.assert_less_equal(len(available_endpoints), 20,
                                           "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
         else:
@@ -66,18 +70,22 @@ class TC_PWRTL_2_1(MatterBaseTest):
             return
 
         self.print_step(3, "Read ActiveEndpoints attribute")
+
         if act_endpoints_attr_id in attribute_list:
             active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
             logging.info("ActiveEndpoints: %s" % (active_endpoints))
+            asserts.assert_less_equal(len(active_endpoints), 20,
+                                   "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
 
+        
             if available_endpoints == NullValue or available_endpoints == []:
-                asserts.assert_true(active_endpoints == NullValue or active_endpoints == [],
-                                    "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
+                # Verify that ActiveEndpoints is a subset of AvailableEndpoints
+                asserts.assert_true(set(active_endpoints).issubset(set(available_endpoints)),
+                                  "ActiveEndpoints should be a subset of AvailableEndpoints")
 
         else:
             logging.info('Skipping test step 3 as active endpoints attribute ID not in attribute list on DUT')
             return
-
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -1,0 +1,57 @@
+{{! Arguments: cluster (might be "Globals", not case-canonicalized), struct }}
+{{! Avoid uppercasing stuff all the time by wrapping the whole thing in an inline that takes cluster,
+    originalCluster, and struct, where cluster and struct are uppercased }}
+{{#*inline "interfaceImpl"}}
+{{#if (isSupported cluster struct=struct)}}
+@implementation {{asObjectiveCClass struct cluster}}
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_struct_items}}
+    {{#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))}}
+    {{>init_struct_member label=label type=type cluster=../originalCluster}}
+    {{/if}}
+    {{/zcl_struct_items}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+  auto other = [[{{asObjectiveCClass struct cluster}} alloc] init];
+
+  {{#zcl_struct_items}}
+  {{#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/if}}
+  {{/zcl_struct_items}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items~}}
+  {{~#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))~}}
+  {{~asStructPropertyName label}}:%@; {{!Just here to keep the preceding space}}
+  {{~/if~}}
+  {{~/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items~}}
+  {{~#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))~}}
+  ,{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}
+  {{~/if~}}
+  {{~/zcl_struct_items}}];
+  return descriptionString;
+}
+{{#zcl_struct_items}}
+{{#if (and (hasOldName ../cluster struct=../struct structField=(asStructPropertyName label))
+           (isSupported ../cluster struct=../struct structField=(oldName ../cluster struct=../struct structField=(asStructPropertyName label))))}}
+
+{{> renamed_struct_field_impl cluster=../originalCluster type=type newName=label oldName=(oldName ../cluster struct=../struct structField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_struct_items}}
+
+@end
+
+{{/if}}
+{{/inline}}
+{{> interfaceImpl cluster=(asUpperCamelCase cluster preserveAcronyms=true) originalCluster=cluster struct=(asUpperCamelCase struct preserveAcronyms=true)}}

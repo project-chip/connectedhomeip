@@ -22,6 +22,9 @@
 #include <string>
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
@@ -30,8 +33,6 @@
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemMutex.h>
-
-#include <gtest/gtest.h>
 
 namespace mdns {
 namespace Minimal {

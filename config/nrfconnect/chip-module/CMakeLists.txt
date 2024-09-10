@@ -147,6 +147,7 @@ if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_user_active_mode_trigger"  CONFIG_CHIP_ICD_UAT_SUPPORT)
+    matter_add_gn_arg_bool  ("icd_enforce_sit_slow_poll_limit"           TRUE)
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
@@ -200,7 +201,6 @@ matter_generate_args_tmp_file()
 # ==============================================================================
 
 matter_build(chip
-    LIB_SHELL   ${CONFIG_CHIP_LIB_SHELL}
     LIB_TESTS   ${CONFIG_CHIP_BUILD_TESTS}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
@@ -225,11 +225,21 @@ if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
     )
 endif()
 
+if (CONFIG_CHIP_LIB_SHELL)
+    # Force pulling chip::Shell::Engine::RunMainLoop() in the final binary.
+    # Without this workaround, the linker script does not process the shell and
+    # init objects defined in MainLoopZephyr.cpp unless the Matter library or
+    # the Matter shell library is linked using the '--whole-archive' flag.
+    target_link_options(chip INTERFACE
+        -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
+    )
+endif()
+
 # ==============================================================================
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
-if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+if (CONFIG_CHIP_OTA_IMAGE_BUILD AND NOT SYSBUILD)
     chip_ota_image(chip-ota-image
         INPUT_FILES ${PROJECT_BINARY_DIR}/dfu_multi_image.bin
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
@@ -240,7 +250,7 @@ endif()
 # Define 'factory_data' target for generating a factory data partition
 # ==============================================================================
 
-if (CONFIG_CHIP_FACTORY_DATA_BUILD)
+if(CONFIG_CHIP_FACTORY_DATA_BUILD AND (NOT SYSBUILD OR NOT CONFIG_PARTITION_MANAGER_ENABLED))
     nrfconnect_generate_factory_data()
 endif()
 

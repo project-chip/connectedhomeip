@@ -35,13 +35,14 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: If TH is aware of the DUT's Discovery Capability Bitmask, it
+          "Step 1: If TH is aware of the DUT’s Discovery Capability Bitmask, it
           SHALL initiate Device Discovery in any order of priority on all the
           networking technologies that are supported by both the TH and the DUT
-          If TH is unaware of the DUT's Discovery Capability Bitmask, it SHALL
+          If TH is unaware of the DUT’s Discovery Capability Bitmask, it MAY
           initiate Device Discovery in any order on all the networking
-          technologies it supports out of Wi-Fi Soft-AP, BLE, and on IP network
-          discovery."
+          technologies it supports out of Wi-Fi Soft-AP, Wi-Fi PAF, BLE, and on
+          IP network discovery, or initiate Device Discovery on a specific
+          networking technology."
       verification: |
           TH selects the DUT's capability bitmask and start the commissiong process accordingly
           No applicable TH or DUT logs.
@@ -137,8 +138,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: TH does not respond to DUT and DUT keeps sending ADVs. TH
-          waits at least 15 minutes"
+          "Step 7a: TH waits until T0+ 2 minutes and 45 seconds and confirms
+          that the DUT is still sending ADVs."
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -148,39 +149,94 @@ tests:
           OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           2. After DUT has been advertising for 2min59sec (right before the minimum 3min mark), check that the DUT is still advertising over BLE
-          3. After DUT has been advertising for 15min, check that the DUT has stopped advertising over BLE
-      disabled: true
-
-    - label: "Step 8: TH scans and finds the DUT SSID"
-      PICS: MCORE.COM.WIFI
-      verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label:
-          "Step 9: TH scans and finds the DUT SSID TH sends to DUT a 1st power
-          cycle command (or reset manually) TH sends to DUT a 2nd power cycle
-          command (or reset manually)"
-      PICS: MCORE.COM.WIFI
+          "Step 7b: TH waits until T0+ 15 minutes and checks if the DUT is
+          sending ADVs."
+      PICS: MCORE.COM.BLE
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
+          No applicable TH logs.
+
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          2.  After DUT has been advertising for 15min(T0+ 15 minutes), check that the DUT has not stopped the advertising over BLE
+
+          Instruction to verify using NRF Connect app:
+          >open nrfconnect app and scan for the device.
+          >once the deviceis listed double click on the device to view the ADV data
+          >Here you can see the  advertisement range  under the ADV. interval feild Check the advertisement range is grater than 1200ms
+          if the advertising rate is not 1285ms +/- 10ms, even though this is legal, since 1285ms is a SHOULD in the core specification.
+          >Click on the raw data option in theselected device, where you can get the 16-bit data
+          For example, "0xF6FF00050F0000000002" would translate to:
+          0xF6, 0xFF= 0xFFF6 = 16-bit Matter UUID assigned by Bluetooth SIG
+          0x00 = 0x00 (Commissionable) = Matter BLE OpCode
+          0x01, 0x0F = 0x0F01 = 3841 Discriminator
+          0x00, 0x00, = 0x0000 = 0 VendorID
+          0x00, 0x00 = 0x0000 = 0 Product ID
+          0x02 = Additional Data Flag(Extended Announcement)
+          here check discrimator and the "vendor-id"&"product-id" feild is set to 0 and  Extended Data is set to 1
+      disabled: true
+
+    - label:
+          "Step 8a: TH is configured to perform commissioning on Channel 6 in
+          2.4GHz band."
+      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
+      verification: |
+          [Configuration command to be filled by NXP]
+
+          Configure the AP to the PAF working channel and connect TH to AP
+      disabled: true
+
+    - label:
+          "Step 8b: TH is configured to perform commissioning on Channel 44 in
+          5GHz band if it is in non-ETSI regulatory domains and on Channel 149
+          in 5GHz band if it is in ETSI regulatory domains."
+      PICS: MCORE.COM.WIFI && !MCORE.COM.BLE && MCORE.DD.DISCOVERY_PAF
+      verification: |
+          [Configuration command to be filled by NXP]
+
+          Configure the AP to the PAF working channel and connect TH to AP
+      disabled: true
+
+    - label: "Step 9: DUT begins sending Wi-Fi PAF Publish messages."
+      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
+      verification: |
+          [Verification command to be filled by NXP]
+
+          * 2.4g:
+          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+          * 5g, FCC:
+          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+          * 5g ETSI:
+          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
     - label: "Step 10: TH scans and finds the DUT SSID"
-      PICS: MCORE.COM.WIFI && MCORE.DD.IE
+      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           Out of Scope
           SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label:
-          "Step 11: TH and DUT are connected to the same network through
+          "Step 11: TTH scans and finds the DUT SSID TH sends to DUT a 1st power
+          cycle command (or reset manually) TH sends to DUT a 2nd power cycle
+          command (or reset manually)"
+      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=chip-tool
+      disabled: true
+
+    - label:
+          "Step 12: TH and DUT are connected to the same network through
           vendor-unique means or by commissioning the DUT onto the Matter
           network and opening a commissioning window. The DUT is sending
-          mandatory Commissionable Node Discovery service records over
-          DNS-SD.|DUT is able to be discovered over DNS-SD."
+          mandatory Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           ./chip-all-clusters-app
           ...
@@ -220,7 +276,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12a: TH and DUT are connected to the same network and the DUT is
+          "Step 13a: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_VP
@@ -262,7 +318,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12b: TH and DUT are connected to the same network and the DUT is
+          "Step 13b: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_DT
@@ -304,7 +360,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12c: TH and DUT are connected to the same network and the DUT is
+          "Step 13c: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_DN
@@ -346,7 +402,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12d: TH and DUT are connected to the same network and the DUT is
+          "Step 13d: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_RI
@@ -388,7 +444,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12e: TH and DUT are connected to the same network and the DUT is
+          "Step 13e: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_PH
@@ -430,7 +486,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12f: TH and DUT are connected to the same network and the DUT is
+          "Step 13f: TH and DUT are connected to the same network and the DUT is
           sending optional Commissionable Node Discovery service records over
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_PI
@@ -471,7 +527,7 @@ tests:
              txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
-    - label: "Step 13: Place the DUT device into a non-commissionable state"
+    - label: "Step 14: Place the DUT device into a non-commissionable state"
       PICS: MCORE.DD.EXTENDED_DISCOVERY
       verification: |
           1. Vendor specific, take DUT out of commissioning mode
@@ -484,7 +540,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14a: TH and DUT are connected to the same network and the DUT is
+          "Step 15a: TH and DUT are connected to the same network and the DUT is
           sending a Commissionable Node Discovery service record over DNS-SD."
       verification: |
           ./chip-tool discover commissionables
@@ -509,7 +565,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14b: Mandatory Commissioning Subtypes: Send a browse request for
+          "Step 15b: Mandatory Commissioning Subtypes: Send a browse request for
           '_services._dns-sd._udp' using a DNS-SD records command-line test tool
           (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
@@ -524,7 +580,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14c: Optional Commissioning Subtypes: Send a browse request for
+          "Step 15c: Optional Commissioning Subtypes: Send a browse request for
           '_services._dns-sd._udp' using a DNS-SD records command-line test tool
           (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
@@ -537,7 +593,7 @@ tests:
           11:56:29.770  Add        3   7 .                    _sub.local.          _V65521
       disabled: true
 
-    - label: "Step 15a: Place the DUT device into Commissioning mode"
+    - label: "Step 16a: Place the DUT device into Commissioning mode"
       verification: |
           $  ./chip-tool discover commissionables
           Verify in TH as commissioner side:
@@ -561,7 +617,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 15b: Send a browse request for '_matterc._udp' using a DNS-SD
+          "Step 16b: Send a browse request for '_matterc._udp' using a DNS-SD
           records command-line test tool (i.e. 'dns-sd -B _matterc._udp' or
           'avahi-browse _matterc._udp -r')"
       verification: |

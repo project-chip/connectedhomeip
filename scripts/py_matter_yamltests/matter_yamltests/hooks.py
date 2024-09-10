@@ -104,7 +104,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         """
         This method is called when the runner starts running a single test.
 
@@ -118,6 +118,9 @@ class TestRunnerHooks():
 
         count: int
             The number of steps from the test that will be run.
+
+        steps: list[str]
+            The computed test step names
         """
         pass
 
@@ -218,9 +221,17 @@ class TestRunnerHooks():
     def show_prompt(self,
                     msg: str,
                     placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    default_value: Optional[str] = None,
+                    endpoint_id: Optional[int] = None,
+                    ) -> None:
         """
         This method is called when the step needs to ask the user to perform some action or provide some value.
+        """
+        pass
+
+    def test_skipped(self, filename: str, name: str):
+        """
+        This method is called when the test script determines that the test is not applicable for the DUT.
         """
         pass
 

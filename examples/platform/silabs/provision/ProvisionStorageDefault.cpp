@@ -17,7 +17,6 @@
 #include "AttestationKey.h"
 #include "ProvisionStorage.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <em_msc.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -26,15 +25,23 @@
 #include <nvm3_default.h>
 #include <nvm3_hal_flash.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
-#include <psa/crypto.h>
 #include <silabs_creds.h>
+#ifdef OTA_ENCRYPTION_ENABLE
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif // OTA_ENCRYPTION_ENABLE
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include <sl_si91x_common_flash_intf.h>
+#else
+#include <em_msc.h>
+#include <psa/crypto.h>
 #endif
 
 #ifdef SL_PROVISION_GENERATOR
 extern void setNvm3End(uint32_t addr);
+#elif !SL_MATTER_GN_BUILD
+#include <sl_matter_provision_config.h>
 #endif
 
 extern uint8_t linker_nvm_end[];
@@ -83,7 +90,7 @@ size_t RoundNearest(size_t n, size_t multiple)
 CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig::Key size_key, const ByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
     if (0 == sCredentialsOffset)
     {
         ReturnErrorOnFailure(ErasePage(base_addr));
@@ -113,7 +120,7 @@ CHIP_ERROR WriteFile(Storage & store, SilabsConfig::Key offset_key, SilabsConfig
 CHIP_ERROR ReadFileByOffset(Storage & store, const char * description, uint32_t offset, uint32_t size, MutableByteSpan & value)
 {
     uint32_t base_addr = 0;
-    ReturnErrorOnFailure(store.GetBaseAddress(base_addr));
+    ReturnErrorOnFailure(store.GetCredentialsBaseAddress(base_addr));
 
     uint8_t * address = (uint8_t *) (base_addr + offset);
     ByteSpan span(address, size);
@@ -160,12 +167,7 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
         setNvm3End(base_addr);
 #endif
     }
-    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr);
-}
-
-CHIP_ERROR Storage::GetBaseAddress(uint32_t & value)
-{
-    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, value);
+    return SetCredentialsBaseAddress(base_addr);
 }
 
 CHIP_ERROR Storage::Commit()
@@ -535,7 +537,7 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
     return err;
 }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && defined(SL_MBEDTLS_USE_TINYCRYPT)
 CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
 {
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, value.data(), value.size());
@@ -573,7 +575,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 }
 
-#else // SLI_SI91X_MCU_INTERFACEX_MCU_INTERFACEX_MCU_INTERFACE
+#else
 
 CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
 {
@@ -618,6 +620,16 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 // Other
 //
 
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, addr);
+}
+
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {
     return SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Provision_Version, value, size);
@@ -655,7 +667,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
     ReturnErrorOnFailure(key.Import(value.data(), value.size()));
     return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
 }
-#endif
+#endif // OTA_ENCRYPTION_ENABLE
 
 /**
  * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
@@ -696,15 +708,6 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 
 } // namespace Provision
 
-void MigrateUint32(uint32_t old_key, uint32_t new_key)
-{
-    uint32_t value = 0;
-    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
-    {
-        SilabsConfig::WriteConfigValue(new_key, value);
-    }
-}
-
 void MigrateDacProvider(void)
 {
     constexpr uint32_t kOldKey_Creds_KeyId      = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x21);
@@ -716,14 +719,14 @@ void MigrateDacProvider(void)
     constexpr uint32_t kOldKey_Creds_CD_Offset  = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x27);
     constexpr uint32_t kOldKey_Creds_CD_Size    = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x28);
 
-    MigrateUint32(kOldKey_Creds_KeyId, SilabsConfig::kConfigKey_Creds_KeyId);
-    MigrateUint32(kOldKey_Creds_Base_Addr, SilabsConfig::kConfigKey_Creds_Base_Addr);
-    MigrateUint32(kOldKey_Creds_DAC_Offset, SilabsConfig::kConfigKey_Creds_DAC_Offset);
-    MigrateUint32(kOldKey_Creds_DAC_Size, SilabsConfig::kConfigKey_Creds_DAC_Size);
-    MigrateUint32(kOldKey_Creds_PAI_Offset, SilabsConfig::kConfigKey_Creds_PAI_Offset);
-    MigrateUint32(kOldKey_Creds_PAI_Size, SilabsConfig::kConfigKey_Creds_PAI_Size);
-    MigrateUint32(kOldKey_Creds_CD_Offset, SilabsConfig::kConfigKey_Creds_CD_Offset);
-    MigrateUint32(kOldKey_Creds_CD_Size, SilabsConfig::kConfigKey_Creds_CD_Size);
+    MigrationManager::MigrateUint32(kOldKey_Creds_KeyId, SilabsConfig::kConfigKey_Creds_KeyId);
+    MigrationManager::MigrateUint32(kOldKey_Creds_Base_Addr, SilabsConfig::kConfigKey_Creds_Base_Addr);
+    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Offset, SilabsConfig::kConfigKey_Creds_DAC_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Size, SilabsConfig::kConfigKey_Creds_DAC_Size);
+    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Offset, SilabsConfig::kConfigKey_Creds_PAI_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Size, SilabsConfig::kConfigKey_Creds_PAI_Size);
+    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Offset, SilabsConfig::kConfigKey_Creds_CD_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Size, SilabsConfig::kConfigKey_Creds_CD_Size);
 }
 
 } // namespace Silabs

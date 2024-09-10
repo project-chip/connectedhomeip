@@ -23,10 +23,9 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "FreeRTOS.h"
 #include <functional>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_PLAT_NO_NVM 0
 #define CHIP_PLAT_NVM_FWK 1
@@ -60,7 +59,7 @@ namespace Internal {
 
 constexpr inline uint16_t config_key(uint8_t chipId, uint8_t pdmId)
 {
-    return static_cast<uint16_t>(chipId) << 8 | pdmId;
+    return (uint16_t) (static_cast<uint16_t>(chipId) << 8 | pdmId);
 }
 
 /**

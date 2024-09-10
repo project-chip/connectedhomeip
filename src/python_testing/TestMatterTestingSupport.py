@@ -625,7 +625,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         self.pics_assert('BINFO.S.A0010', True)
         self.pics_assert('BINFO.S.A0011', False)
         self.pics_assert('BINFO.S.A0012', True)
-        self.pics_assert('BINFO.S.A0013', True)
+        self.pics_assert('BINFO.S.A0013', False)
         self.pics_assert('BINFO.S.A0014', False)
         self.pics_assert('PICSDOESNOTEXIST', False)
 

@@ -108,3 +108,11 @@ static_library("nxp_zephyr") {
 
   cflags = [ "-Wconversion" ]
 }
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../../Zephyr/Logging.cpp" ]
+}

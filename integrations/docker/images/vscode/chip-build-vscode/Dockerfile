@@ -5,12 +5,14 @@ FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
 FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
-FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS p6
+FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
 FROM ghcr.io/project-chip/chip-build-k32w:${VERSION} AS k32w
 FROM ghcr.io/project-chip/chip-build-rw61x:${VERSION} AS rw61x
+FROM ghcr.io/project-chip/chip-build-nxp:${VERSION} AS nxp
+FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
 FROM ghcr.io/project-chip/chip-build-ti:${VERSION} AS ti
 FROM ghcr.io/project-chip/chip-build-openiotsdk:${VERSION} AS openiotsdk
@@ -35,7 +37,7 @@ COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
-COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
+COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/zephyr-sdk-0.16.1 /opt/telink/zephyr-sdk-0.16.1
@@ -49,6 +51,11 @@ COPY --from=ameba /opt/ameba /opt/ameba
 COPY --from=k32w /opt/sdk /opt/k32w
 
 COPY --from=rw61x /opt/sdk /opt/nxp-sdk
+
+COPY --from=nxp /opt/nxp /opt/nxp
+
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.16.5/ /opt/nxp-zephyr/zephyr-sdk-0.16.5/
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
@@ -103,16 +110,11 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Required for the Bouffalolab platform
-RUN set -x \
-    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
-    && : # last line
-
 ENV PATH $PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
+ENV CY_TOOLS_PATHS="/opt/Tools/ModusToolbox/tools_3.2"
 ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
@@ -128,7 +130,6 @@ ENV NXP_K32W0_SDK_ROOT=/opt/k32w/core
 ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
 ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
-ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
@@ -138,6 +139,13 @@ ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.5
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
+ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.16.5
+ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
+
+# Places bootstrap files there instead of the default one which is `.environment`.
+# NOTE: This directory is NOT persistent.
+ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
 ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk

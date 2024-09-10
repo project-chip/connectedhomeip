@@ -6,7 +6,7 @@ protocols:
 
 -   Matter-compliant OTA update protocol that uses the Matter operational
     network for querying and downloading a new firmware image.
--   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/services/device_mgmt/smp_protocol.html)
+-   [Simple Management Protocol](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/smp_protocol.html)
     over Bluetooth LE. In this case, the DFU can be done either using a
     smartphone application or a PC command line tool. Note that this protocol is
     not part of the Matter specification.
@@ -49,8 +49,8 @@ To test the DFU over Matter, you need to complete the following steps:
 
 4.  Run OTA Provider application with _matter.ota_ replaced with the path to the
     Matter OTA image which you wish to provide to the Matter device. Note that
-    the Matter OTA image is, by default, generated at _zephyr/matter.ota_ in the
-    example's build directory:
+    the Matter OTA image is, by default, generated in the example's build
+    directory:
 
     ```
     $ out/provider/chip-ota-provider-app -f matter.ota
@@ -125,11 +125,9 @@ rebooted to apply the update.
 To upgrade your device firmware over Bluetooth LE using a smartphone, complete
 the following steps:
 
-1. Install _one_ of the following applications on your smartphone:
-
-    - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
-    - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
-
+1. Install the
+   [nRF Connect Device Manager](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager)
+   application on your smartphone.
 2. Push the appropriate button on the device to enable the software update
    functionality (if it is not enabled by default) and start the Bluetooth LE
    advertising of the SMP service. See the user interface section in the example
@@ -138,8 +136,10 @@ the following steps:
    advertising. See the user interface section in the example documentation to
    check the button number.
 4. Follow the instructions about downloading the new image to a device on the
-   [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/working_with_nrf/nrf52/developing.html#fota-updates)
-   page in the nRF Connect SDK documentation.
+   FOTA updates page for either
+   [nRF52 Series devices](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf52/fota_update.html)
+   or the
+   [nRF5340 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf53/fota_update_nrf5340.html).
 
 <hr>
 
@@ -171,7 +171,7 @@ Complete the following steps to perform DFU using mcumgr:
 > (for example, `MatterLock`).
 
 1.  Install the tool by following the
-    [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
+    [mcumgr command line tool installation instructions](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/mcumgr.html#command-line_tool).
 2.  Push the appropriate button on the device to enable the software update
     functionality (if it is not enabled by default) and start the Bluetooth LE
     advertising of SMP service. See the user interface section in the example
@@ -180,10 +180,11 @@ Complete the following steps to perform DFU using mcumgr:
     that the Bluetooth LE advertising has started. See the user interface
     section in the example documentation to check the LED number.
 4.  Upload the application firmware image to the device by running the following
-    command in your example directory:
+    command in your example directory with the <application_name> replaced by
+    your application name, for example `lock`:
 
     ```
-    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0 -w 1
+    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/<application_name>/zephyr/zephyr.signed.bin -n 0 -w 1
     ```
 
     The operation can take a few minutes. Wait until the progress bar reaches
@@ -246,10 +247,11 @@ Complete the following steps to perform DFU using mcumgr:
     go straight to the step 8.
 
     a. Upload the network core firmware image to the device by running the
-    following command in your example directory:
+    following command in your example directory with the <network_image_name>
+    replaced by your network image name, for example `ipc_radio`:
 
     ```
-    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
+    sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/signed_by_mcuboot_and_b0_<network_image_name>.bin -n 1 -w 1
     ```
 
     The operation can take a few minutes. Wait until the progress bar reaches
@@ -340,6 +342,6 @@ Swapping operation can take some time, and after it completes, the new firmware
 is booted.
 
 Visit the
-[mcumgr image management](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/indexhtml#image-management)
+[mcumgr image management](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/mcumgr.html#image_management)
 section to get familiar with all image management commands supported by the
 tool.

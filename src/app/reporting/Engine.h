@@ -93,7 +93,7 @@ public:
     /**
      * Application marks mutated change path and would be sent out in later report.
      */
-    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
+    CHIP_ERROR SetDirty(const AttributePathParams & aAttributePathParams);
 
     /**
      * @brief
@@ -168,9 +168,6 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData);
-    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                   AttributeReportIBs::Builder & aAttributeReportIBs,
-                                   const ConcreteReadAttributePath & aClusterInfo, AttributeEncodeState * apEncoderState);
     CHIP_ERROR CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler);
 
     // If version match, it means don't send, if version mismatch, it means send.

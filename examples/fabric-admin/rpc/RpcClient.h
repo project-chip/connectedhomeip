@@ -20,17 +20,21 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-constexpr uint16_t kFabricBridgeServerPort = 33002;
+#include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
 /**
- * @brief Initializes the RPC client with the specified server port.
+ * @brief Sets the RPC server port to which the RPC client will connect.
  *
- * This function sets the RPC server port and starts packet processing for the RPC client.
- *
- * @param rpcServerPort The port number on which the RPC server is running.
- * @return CHIP_NO_ERROR on successful initialization, or an appropriate CHIP_ERROR on failure.
+ * @param port The port number.
  */
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
+void SetRpcRemoteServerPort(uint16_t port);
+
+/**
+ * @brief Starts packet processing for the RPC client.
+ *
+ * @return CHIP_NO_ERROR on successful start, or an appropriate CHIP_ERROR on failure.
+ */
+CHIP_ERROR StartRpcClient();
 
 /**
  * @brief Adds a synchronized device to the RPC client.
@@ -39,10 +43,47 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * It logs the progress and checks if an `AddSynchronizedDevice` operation is already in progress.
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
- * @param nodeId The Node ID of the device to be added.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
- * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
-CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
+CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data);
+
+/**
+ * @brief Removes a synchronized device from the RPC client.
+ *
+ * This function attempts to remove a device identified by its `nodeId` from the synchronized device list.
+ * It logs the progress and checks if a `RemoveSynchronizedDevice` operation is already in progress.
+ * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
+ *
+ * @param nodeId The Node ID of the device to be removed.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
+
+/**
+ * @brief Received StayActiveResponse on behalf of client that previously called KeepActive
+ *
+ * @param nodeId The Node ID of the device we recieved a StayActiveResponse.
+ * @param promisedActiveDurationMs the computed duration (in milliseconds) that the ICD intends to stay active for.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs);
+
+/**
+ * @brief CADMIN attribute has changed of one of the bridged devices that was previously added.
+ *
+ * @param data information regarding change in AdministratorCommissioning attributes
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data);

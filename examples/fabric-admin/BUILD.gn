@@ -46,8 +46,6 @@ config("config") {
     defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
   }
 
-  cflags = [ "-Wconversion" ]
-
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
   }
@@ -71,13 +69,27 @@ static_library("fabric-admin-utils") {
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
     "commands/common/HexConversion.h",
+    "commands/common/IcdManager.cpp",
+    "commands/common/IcdManager.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/common/StayActiveSender.cpp",
+    "commands/common/StayActiveSender.h",
     "commands/fabric-sync/FabricSyncCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
+    "device_manager/DeviceManager.cpp",
+    "device_manager/DeviceManager.h",
+    "device_manager/DeviceSubscription.cpp",
+    "device_manager/DeviceSubscription.h",
+    "device_manager/DeviceSubscriptionManager.cpp",
+    "device_manager/DeviceSubscriptionManager.h",
+    "device_manager/DeviceSynchronization.cpp",
+    "device_manager/DeviceSynchronization.h",
+    "device_manager/UniqueIdGetter.cpp",
+    "device_manager/UniqueIdGetter.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
@@ -142,6 +154,10 @@ static_library("fabric-admin-utils") {
     ]
 
     deps += pw_build_LINK_DEPS
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
   }
 
   if (chip_enable_transport_trace) {

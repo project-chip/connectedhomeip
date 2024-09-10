@@ -22,9 +22,12 @@
  */
 
 #include <errno.h>
-#include <gtest/gtest.h>
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 #include <credentials/FabricTable.h>
 
@@ -40,8 +43,6 @@
 #include <platform/ConfigurationManager.h>
 
 #include <lib/support/BytesToHex.h>
-
-#include <stdarg.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -550,6 +551,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
     FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
     EXPECT_EQ(fabricTable.FabricCount(), 0);
+    EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
     {
         FabricIndex nextFabricIndex = kUndefinedFabricIndex;
@@ -603,6 +605,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan), CHIP_NO_ERROR);
             EXPECT_TRUE(fetchedSpan.data_equal(rcac));
         }
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
         bool keyIsExternallyOwned  = true;
@@ -613,6 +616,11 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                   CHIP_NO_ERROR);
         EXPECT_EQ(newFabricIndex, 1);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
+
+        // After adding the pending new fabric (equivalent of AddNOC processing), the new
+        // fabric must be pending.
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), 1);
+
         {
             // No more pending root cert; it's associated with a fabric now.
             MutableByteSpan fetchedSpan{ rcacBuf };
@@ -659,6 +667,9 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(fabricTable.PeekFabricIndexForNextAddition(nextFabricIndex), CHIP_NO_ERROR);
             EXPECT_EQ(nextFabricIndex, 2);
         }
+
+        // Fabric can't be pending anymore.
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
         // Validate contents
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
@@ -731,12 +742,16 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
         }
 
         EXPECT_EQ(fabricTable.AddNewPendingTrustedRootCert(rcac), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
+
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
 
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex), CHIP_NO_ERROR);
         EXPECT_EQ(fabricTable.FabricCount(), 2);
         EXPECT_EQ(newFabricIndex, 2);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), 2);
+
         // No storage yet
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterFirstAdd);
         // Next fabric index has not been updated yet.
@@ -1896,6 +1911,8 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
         uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
 
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
+
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
         EXPECT_EQ(fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(1)), csrSpan),
                   CHIP_NO_ERROR);
@@ -1907,6 +1924,7 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
 
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(fabricTable.UpdatePendingFabricWithOperationalKeystore(1, noc, ByteSpan{}), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
 
         // No storage yet
@@ -1935,6 +1953,7 @@ TEST_F(TestFabricTable, TestUpdateNocFailSafe)
         // Revert, should see Node ID 999 again
         fabricTable.RevertPendingFabricData();
         EXPECT_EQ(fabricTable.FabricCount(), 1);
+        EXPECT_EQ(fabricTable.GetPendingNewFabricIndex(), kUndefinedFabricIndex);
 
         EXPECT_EQ(storage.GetNumKeys(), numStorageAfterAdd);
 

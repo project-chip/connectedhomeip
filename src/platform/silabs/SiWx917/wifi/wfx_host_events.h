@@ -23,7 +23,6 @@
 #include "wfx_msgs.h"
 
 /* LwIP includes. */
-#include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
@@ -41,7 +40,10 @@
 #define SL_WFX_CONNECT_IND_ID (2)
 #define SL_WFX_DISCONNECT_IND_ID (3)
 #define SL_WFX_SCAN_COMPLETE_ID (4)
-#define WFX_RSI_SSID_SIZE (64)
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
 
 /* Wi-Fi bitmask events - for the task */
 #define SL_WFX_CONNECT (1 << 1)
@@ -55,18 +57,15 @@
 #define WLAN_TASK_STACK_SIZE (1024)
 #define WLAN_TASK_PRIORITY (3)
 #define WLAN_DRIVER_TASK_PRIORITY (2)
+#define BLE_DRIVER_TASK_PRIORITY (2)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-// WLAN retry time intervals in milli seconds
-#define WLAN_MAX_RETRY_TIMER_MS 30000
-#define WLAN_MIN_RETRY_TIMER_MS 1000
-#define WLAN_RETRY_TIMER_MS 5000
-#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
 // WLAN related Macros
 #define ETH_FRAME (0)
 #define CMP_SUCCESS (0)
-#define BSSID_MAX_STR_LEN (6)
+#define BSSID_LEN (6)
 #define MAC_ADDRESS_FIRST_OCTET (6)
 #define AP_START_SUCCESS (0)
 #define BITS_TO_WAIT (0)
@@ -159,8 +158,10 @@ typedef enum
 
 typedef struct
 {
-    char ssid[32 + 1];
-    char passkey[64 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    size_t ssid_length;
+    char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
+    size_t passkey_length;
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -175,9 +176,10 @@ typedef enum
 
 typedef struct wfx_wifi_scan_result
 {
-    char ssid[32 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    size_t ssid_length;
     wfx_sec_t security;
-    uint8_t bssid[6];
+    uint8_t bssid[BSSID_LEN];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
@@ -252,7 +254,7 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #endif /* SL_ICD_ENABLED */
 
 void wfx_ipv6_notify(int got_ip);
-void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
+void wfx_retry_connection(uint16_t retryAttempt);
 
 #ifdef __cplusplus
 }

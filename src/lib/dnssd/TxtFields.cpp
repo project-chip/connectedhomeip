@@ -38,6 +38,9 @@ namespace Dnssd {
 
 namespace Internal {
 
+constexpr uint8_t kTCPClient = 1;
+constexpr uint8_t kTCPServer = 2;
+
 namespace {
 
 char SafeToLower(uint8_t ch)
@@ -276,9 +279,13 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
     case TxtFieldKey::kSessionActiveThreshold:
         nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+    case TxtFieldKey::kTcpSupported: {
+        // bit 0 is reserved and deprecated
+        uint8_t support            = Internal::MakeU8FromAsciiDecimal(value);
+        nodeData.supportsTcpClient = (support & (1 << Internal::kTCPClient)) != 0;
+        nodeData.supportsTcpServer = (support & (1 << Internal::kTCPServer)) != 0;
         break;
+    }
     case TxtFieldKey::kLongIdleTimeICD:
         nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;

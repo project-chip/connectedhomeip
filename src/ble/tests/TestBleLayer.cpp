@@ -21,9 +21,10 @@
 #include <type_traits>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
@@ -131,19 +132,23 @@ public:
     ///
     // Implementation of BlePlatformDelegate
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override { return true; }
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override { return true; }
-    bool CloseConnection(BLE_CONNECTION_OBJECT connObj) override { return true; }
-    uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const override { return 0; }
-    bool SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBufferHandle pBuf) override
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override
     {
-        return true;
+        return CHIP_NO_ERROR;
     }
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBufferHandle pBuf) override
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override
     {
-        return true;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 0; }
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
+    {
+        return CHIP_NO_ERROR;
     }
 
 private:

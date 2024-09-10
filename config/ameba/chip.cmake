@@ -63,7 +63,6 @@ list(
     ${CHIP_ROOT}/src/app
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
-    ${CHIP_ROOT}/third_party/nlunit-test/repo/src
 )
 
 execute_process(

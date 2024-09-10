@@ -23,10 +23,8 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
-#include <functional>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
-#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -225,6 +223,8 @@ protected:
             func(handlerContext, requestPayload);
         }
     }
+
+    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
 
 private:
     Optional<EndpointId> mEndpointId;

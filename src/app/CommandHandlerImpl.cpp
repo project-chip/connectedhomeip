@@ -323,6 +323,7 @@ void CommandHandlerImpl::InvalidateHandles()
     {
         handle->Invalidate();
     }
+    mpHandleList.Clear();
 }
 
 void CommandHandlerImpl::IncrementHoldOff(Handle * apHandle)
@@ -401,17 +402,21 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                         .endpoint    = concretePath.mEndpointId,
+                                         .requestType = Access::RequestType::kCommandInvokeRequest,
+                                         .entityId    = concretePath.mCommandId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            if (err != CHIP_ERROR_ACCESS_DENIED)
+            if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
             {
                 return FallibleAddStatus(concretePath, Status::Failure) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return FallibleAddStatus(concretePath, Status::UnsupportedAccess) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
+            Status status = err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
+            return FallibleAddStatus(concretePath, status) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
 
@@ -547,7 +552,10 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         {
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+            Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
+                                             .endpoint    = concretePath.mEndpointId,
+                                             .requestType = Access::RequestType::kCommandInvokeRequest,
+                                             .entityId    = concretePath.mCommandId };
             Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
             if (err != CHIP_NO_ERROR)
