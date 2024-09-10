@@ -154,7 +154,11 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
 
-    BOOL _suspended;
+    // For now, we just ensure that access to _suspended is atomic, but don't
+    // guarantee atomicity of the the entire suspend/resume operation.  The
+    // expectation is that suspend/resume on a given controller happen on some
+    // specific queue, so can't race against each other.
+    std::atomic<bool> _suspended;
 
     // Counters to track assertion status and access controlled by the _assertionLock
     NSUInteger _keepRunningAssertionCounter;
@@ -378,9 +382,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isSuspended
 {
-    @synchronized(self) {
-        return _suspended;
-    }
+    return _suspended;
 }
 
 - (void)_notifyDelegatesOfSuspendState
@@ -397,48 +399,49 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_LOG("%@ suspending", self);
 
-    @synchronized(self) {
+    NSArray * devicesToSuspend;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        // Set _suspended under the device map lock.  This guarantees that
+        // for any given device exactly one of two things is true:
+        // * It is in the snapshot we are creating
+        // * It is created after we have changed our _suspended state.
         _suspended = YES;
-
-        NSArray * devicesToSuspend;
-        {
-            std::lock_guard lock(*self.deviceMapLock);
-            devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
-        }
-
-        for (MTRDevice * device in devicesToSuspend) {
-            [device controllerSuspended];
-        }
-
-        // TODO: In the concrete class, consider what should happen with:
-        //
-        // * Active commissioning sessions (presumably close them?)
-        // * CASE sessions in general.
-        // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
-
-        [self _notifyDelegatesOfSuspendState];
+        devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
+
+    for (MTRDevice * device in devicesToSuspend) {
+        [device controllerSuspended];
+    }
+
+    // TODO: In the concrete class, consider what should happen with:
+    //
+    // * Active commissioning sessions (presumably close them?)
+    // * CASE sessions in general.
+    // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (void)resume
 {
     MTR_LOG("%@ resuming", self);
 
-    @synchronized(self) {
+    NSArray * devicesToResume;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        // Set _suspended under the device map lock.  This guarantees that
+        // for any given device exactly one of two things is true:
+        // * It is in the snapshot we are creating
+        // * It is created after we have changed our _suspended state.
         _suspended = NO;
-
-        NSArray * devicesToResume;
-        {
-            std::lock_guard lock(*self.deviceMapLock);
-            devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
-        }
-
-        for (MTRDevice * device in devicesToResume) {
-            [device controllerResumed];
-        }
-
-        [self _notifyDelegatesOfSuspendState];
+        devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
+
+    for (MTRDevice * device in devicesToResume) {
+        [device controllerResumed];
+    }
+
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
