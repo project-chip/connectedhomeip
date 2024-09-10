@@ -8304,6 +8304,14 @@ namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
 
+namespace ReadFailureCode {
+static constexpr AttributeId Id = 0x00003000;
+} // namespace ReadFailureCode
+
+namespace FailureInt32U {
+static constexpr AttributeId Id = 0x00003001;
+} // namespace FailureInt32U
+
 namespace NullableBoolean {
 static constexpr AttributeId Id = 0x00004000;
 } // namespace NullableBoolean

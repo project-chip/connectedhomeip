@@ -27,8 +27,13 @@ namespace Clusters {
 namespace ServiceArea {
 
 // These limits are defined in the spec.
-inline constexpr size_t kAreaNameMaxSize = 128u;
-inline constexpr size_t kMapNameMaxSize  = 64u;
+inline constexpr size_t kMaxNumSupportedAreas   = 255;
+inline constexpr size_t kMaxNumSupportedMaps    = 255;
+inline constexpr size_t kMaxNumSelectedAreas    = 255;
+inline constexpr size_t kMaxNumProgressElements = 255;
+inline constexpr size_t kMaxSizeStatusText      = 256;
+inline constexpr size_t kAreaNameMaxSize        = 128u;
+inline constexpr size_t kMapNameMaxSize         = 64u;
 
 /**
  * This class is used to wrap the AreaStruct object and provide a more user-friendly interface for the data.

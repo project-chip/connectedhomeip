@@ -55,12 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Joint Fabric Datastore Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0752" name="Joint Fabric Datastore Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId name="Joint Fabric Datastore Cluster"/>
+    <clusterId id="0x0752" name="Joint Fabric Datastore Cluster"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFDS" scope="Node"/>
   <dataTypes>
@@ -264,6 +264,10 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0007" name="AdminList" type="DataTypeList[Datastore Administrator Information Entry Type]">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="StatusEntry" type="Datastore Administrator Information Entry">
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
     </attribute>

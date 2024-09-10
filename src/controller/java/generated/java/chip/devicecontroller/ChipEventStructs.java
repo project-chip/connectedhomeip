@@ -236,79 +236,33 @@ public static class AccessControlClusterAccessControlExtensionChangedEvent {
     return output.toString();
   }
 }
-public static class AccessControlClusterAccessRestrictionEntryChangedEvent {
-  public Integer fabricIndex;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public AccessControlClusterAccessRestrictionEntryChangedEvent(
-    Integer fabricIndex
-  ) {
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static AccessControlClusterAccessRestrictionEntryChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new AccessControlClusterAccessRestrictionEntryChangedEvent(
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("AccessControlClusterAccessRestrictionEntryChangedEvent {\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
   public Long token;
-  public @Nullable String instruction;
-  public @Nullable String redirectURL;
+  public Optional<String> instruction;
+  public Optional<String> ARLRequestFlowUrl;
   public Integer fabricIndex;
   private static final long TOKEN_ID = 0L;
   private static final long INSTRUCTION_ID = 1L;
-  private static final long REDIRECT_URL_ID = 2L;
+  private static final long ARL_REQUEST_FLOW_URL_ID = 2L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public AccessControlClusterFabricRestrictionReviewUpdateEvent(
     Long token,
-    @Nullable String instruction,
-    @Nullable String redirectURL,
+    Optional<String> instruction,
+    Optional<String> ARLRequestFlowUrl,
     Integer fabricIndex
   ) {
     this.token = token;
     this.instruction = instruction;
-    this.redirectURL = redirectURL;
+    this.ARLRequestFlowUrl = ARLRequestFlowUrl;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(TOKEN_ID, new UIntType(token)));
-    values.add(new StructElement(INSTRUCTION_ID, instruction != null ? new StringType(instruction) : new NullType()));
-    values.add(new StructElement(REDIRECT_URL_ID, redirectURL != null ? new StringType(redirectURL) : new NullType()));
+    values.add(new StructElement(INSTRUCTION_ID, instruction.<BaseTLVType>map((nonOptionalinstruction) -> new StringType(nonOptionalinstruction)).orElse(new EmptyType())));
+    values.add(new StructElement(ARL_REQUEST_FLOW_URL_ID, ARLRequestFlowUrl.<BaseTLVType>map((nonOptionalARLRequestFlowUrl) -> new StringType(nonOptionalARLRequestFlowUrl)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -319,8 +273,8 @@ public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
       return null;
     }
     Long token = null;
-    @Nullable String instruction = null;
-    @Nullable String redirectURL = null;
+    Optional<String> instruction = Optional.empty();
+    Optional<String> ARLRequestFlowUrl = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TOKEN_ID) {
@@ -331,12 +285,12 @@ public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
       } else if (element.contextTagNum() == INSTRUCTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          instruction = castingValue.value(String.class);
+          instruction = Optional.of(castingValue.value(String.class));
         }
-      } else if (element.contextTagNum() == REDIRECT_URL_ID) {
+      } else if (element.contextTagNum() == ARL_REQUEST_FLOW_URL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          redirectURL = castingValue.value(String.class);
+          ARLRequestFlowUrl = Optional.of(castingValue.value(String.class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -348,7 +302,7 @@ public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
     return new AccessControlClusterFabricRestrictionReviewUpdateEvent(
       token,
       instruction,
-      redirectURL,
+      ARLRequestFlowUrl,
       fabricIndex
     );
   }
@@ -363,8 +317,8 @@ public static class AccessControlClusterFabricRestrictionReviewUpdateEvent {
     output.append("\tinstruction: ");
     output.append(instruction);
     output.append("\n");
-    output.append("\tredirectURL: ");
-    output.append(redirectURL);
+    output.append("\tARLRequestFlowUrl: ");
+    output.append(ARLRequestFlowUrl);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -6234,8 +6188,8 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
   }
 }
 public static class CommissionerControlClusterCommissioningRequestResultEvent {
-  public Long requestId;
-  public Long clientNodeId;
+  public Long requestID;
+  public Long clientNodeID;
   public Integer statusCode;
   public Integer fabricIndex;
   private static final long REQUEST_ID_ID = 0L;
@@ -6244,21 +6198,21 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
   private static final long FABRIC_INDEX_ID = 254L;
 
   public CommissionerControlClusterCommissioningRequestResultEvent(
-    Long requestId,
-    Long clientNodeId,
+    Long requestID,
+    Long clientNodeID,
     Integer statusCode,
     Integer fabricIndex
   ) {
-    this.requestId = requestId;
-    this.clientNodeId = clientNodeId;
+    this.requestID = requestID;
+    this.clientNodeID = clientNodeID;
     this.statusCode = statusCode;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestId)));
-    values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeId)));
+    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestID)));
+    values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeID)));
     values.add(new StructElement(STATUS_CODE_ID, new UIntType(statusCode)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
@@ -6269,20 +6223,20 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long requestId = null;
-    Long clientNodeId = null;
+    Long requestID = null;
+    Long clientNodeID = null;
     Integer statusCode = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == REQUEST_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          requestId = castingValue.value(Long.class);
+          requestID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == CLIENT_NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          clientNodeId = castingValue.value(Long.class);
+          clientNodeID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == STATUS_CODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6297,8 +6251,8 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
       }
     }
     return new CommissionerControlClusterCommissioningRequestResultEvent(
-      requestId,
-      clientNodeId,
+      requestID,
+      clientNodeID,
       statusCode,
       fabricIndex
     );
@@ -6308,11 +6262,11 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("CommissionerControlClusterCommissioningRequestResultEvent {\n");
-    output.append("\trequestId: ");
-    output.append(requestId);
+    output.append("\trequestID: ");
+    output.append(requestID);
     output.append("\n");
-    output.append("\tclientNodeId: ");
-    output.append(clientNodeId);
+    output.append("\tclientNodeID: ");
+    output.append(clientNodeID);
     output.append("\n");
     output.append("\tstatusCode: ");
     output.append(statusCode);

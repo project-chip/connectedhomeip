@@ -92,7 +92,7 @@ defined:
 
     ```
     source scripts/activate.sh
-    ./scripts/build/build_examples.py --target linux-x64-fabric-bridge-rpc build
+    ./scripts/build/build_examples.py --target linux-x64-fabric-bridge-rpc-no-ble build
     ```
 
     ### For Raspberry Pi 4 example:

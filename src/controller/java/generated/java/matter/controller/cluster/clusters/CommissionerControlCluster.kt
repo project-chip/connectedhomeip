@@ -92,9 +92,9 @@ class CommissionerControlCluster(
   }
 
   suspend fun requestCommissioningApproval(
-    requestId: ULong,
-    vendorId: UShort,
-    productId: UShort,
+    requestID: ULong,
+    vendorID: UShort,
+    productID: UShort,
     label: String?,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -104,13 +104,13 @@ class CommissionerControlCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_REQUEST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestId)
+    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestID)
 
     val TAG_VENDOR_ID_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorId)
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
     val TAG_PRODUCT_ID_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productId)
+    tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productID)
 
     val TAG_LABEL_REQ: Int = 3
     label?.let { tlvWriter.put(ContextSpecificTag(TAG_LABEL_REQ), label) }
@@ -128,7 +128,7 @@ class CommissionerControlCluster(
   }
 
   suspend fun commissionNode(
-    requestId: ULong,
+    requestID: ULong,
     responseTimeoutSeconds: UShort,
     timedInvokeTimeout: Duration? = null,
   ): ReverseOpenCommissioningWindow {
@@ -138,7 +138,7 @@ class CommissionerControlCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_REQUEST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestId)
+    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_ID_REQ), requestID)
 
     val TAG_RESPONSE_TIMEOUT_SECONDS_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_RESPONSE_TIMEOUT_SECONDS_REQ), responseTimeoutSeconds)

@@ -90,10 +90,11 @@ bool ps_requirement_added = false;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
-WfxRsi_t wfx_rsi;
+#if !defined(MIN)
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#endif
 
-/* Declare a variable to hold the data associated with the created event group. */
-StaticEventGroup_t rsiDriverEventGroup;
+WfxRsi_t wfx_rsi;
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -451,7 +452,6 @@ static sl_status_t wfx_rsi_init(void)
     }
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
-    wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
     return status;
@@ -537,7 +537,9 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
-        if (wfx_rsi.scan_ssid != NULL && strcmp(wfx_rsi.scan_ssid, cur_scan_result.ssid) != CMP_SUCCESS)
+        if (wfx_rsi.scan_ssid != NULL &&
+            (strncmp(wfx_rsi.scan_ssid, cur_scan_result.ssid, MIN(strlen(wfx_rsi.scan_ssid), strlen(cur_scan_result.ssid))) ==
+             CMP_SUCCESS))
         {
             continue;
         }

@@ -23,6 +23,7 @@ import stat
 import subprocess
 import sys
 import textwrap
+import traceback
 
 # Here are the options that can be use to configure a `Flasher`
 # object (as dictionary keys) and/or passed as command line options.
@@ -409,7 +410,11 @@ class Flasher:
 
         # Give platform-specific code a chance to manipulate the arguments
         # for the wrapper script.
-        self._platform_wrapper_args(args)
+        try:
+            self._platform_wrapper_args(args)
+        except OSError:
+            traceback.print_last()
+            return 1
 
         # Find any option values that differ from the class defaults.
         # These will be inserted into the wrapper script.
@@ -445,7 +450,7 @@ class Flasher:
             os.chmod(args.output, (stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
                                    | stat.S_IXGRP | stat.S_IRGRP
                                    | stat.S_IXOTH | stat.S_IROTH))
-        except OSError as exception:
-            print(exception, sys.stderr)
+        except OSError:
+            traceback.print_last()
             return 1
         return 0
