@@ -69,7 +69,42 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+        // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
+        // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
+        // workaround until TSAN-enabled GLib will be used in our CI.
+        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
+
+        // g_main_context_invoke_full needs (void *) arguments
+        GLibMatterContextInvokeData invokeData{ reinterpret_cast<CHIP_ERROR (*)(void *)>(func), static_cast<void *>(userData) };
+
+        lock.unlock();
+
+        g_main_context_invoke_full(
+            g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+
+                std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+
+                // recasting func and userData back to T* to avoid undefined behaviour
+                auto mFunc     = reinterpret_cast<CHIP_ERROR (*)(T *)>(data->mFunc);
+                auto mUserData = static_cast<T *>(data->mFuncUserData);
+
+                lock_.unlock();
+                auto result = mFunc(mUserData);
+                lock_.lock();
+                data->mDone       = true;
+                data->mFuncResult = result;
+                data->mDoneCond.notify_one();
+
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+
+        lock.lock();
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+
+        return invokeData.mFuncResult;
     }
 
     unsigned int GLibMatterContextAttachSource(GSource * source)
@@ -109,14 +144,6 @@ private:
         std::condition_variable mDoneCond;
         bool mDone = false;
     };
-
-    /**
-     * @brief Invoke a function on the Matter GLib context.
-     *
-     * @note This function does not provide type safety for the user data. Please,
-     *       use the GLibMatterContextInvokeSync() template function instead.
-     */
-    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.
