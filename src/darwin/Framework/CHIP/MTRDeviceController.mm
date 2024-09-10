@@ -383,6 +383,16 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (void)_notifyDelegatesOfSuspendState
+{
+    BOOL isSuspended = [self isSuspended];
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
+            [delegate controller:self isSuspended:isSuspended];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 - (void)suspend
 {
     MTR_LOG("%@ suspending", self);
@@ -405,6 +415,8 @@ using namespace chip::Tracing::DarwinFramework;
         // * Active commissioning sessions (presumably close them?)
         // * CASE sessions in general.
         // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
+
+        [self _notifyDelegatesOfSuspendState];
     }
 }
 
@@ -424,6 +436,8 @@ using namespace chip::Tracing::DarwinFramework;
         for (MTRDevice * device in devicesToResume) {
             [device controllerResumed];
         }
+
+        [self _notifyDelegatesOfSuspendState];
     }
 }
 
