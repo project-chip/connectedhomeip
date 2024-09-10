@@ -372,6 +372,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
+    ContextAttributesChangeListener change_listener(CurrentContext());
+
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
@@ -381,18 +383,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
-            //
-            // This is a direct increase of version to avoid calling the global change listener
-            // and instead to call the argument one.
-            DataVersion * version = emberAfDataVersionStorage(request.path);
-            if (version != nullptr)
-            {
-                (*version)++;
-            }
-
-            // request path is concrete, however we need a wildcard-aware version;
-            AttributePathParams changePath(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-            CurrentContext().dataModelChangeListener->MarkDirty(changePath);
+            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &change_listener);
         }
         return *aai_result;
     }
@@ -408,7 +399,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return Status::InvalidValue;
     }
 
-    ContextAttributesChangeListener change_listener(CurrentContext());
     EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
 
     dataInput.SetChangeListener(&change_listener);
