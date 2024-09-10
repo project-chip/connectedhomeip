@@ -165,7 +165,7 @@ using namespace chip::Tracing::DarwinFramework;
     BOOL _shutdownPending;
     os_unfair_lock _assertionLock;
 
-    NSMutableSet<MTRDeviceControllerDelegateInfo *> * _delegates;
+    NSMutableArray<MTRDeviceControllerDelegateInfo *> * _delegates;
     id<MTRDeviceControllerDelegate> _strongDelegateForSetDelegateAPI;
 }
 
@@ -196,7 +196,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
-    _delegates = [NSMutableSet set];
+    _delegates = [NSMutableArray array];
 
     return self;
 }
@@ -1814,6 +1814,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
+        __block BOOL delegateAlreadyAdded = NO;
+        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo *delegateInfo) {
+            if (delegateInfo.delegate == delegate) {
+                delegateAlreadyAdded = YES;
+            }
+        }];
+        if (delegateAlreadyAdded) {
+            MTR_LOG("%@ addDeviceControllerDelegate: delegate already added", self);
+            return;
+        }
+
         MTRDeviceControllerDelegateInfo * newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
         [_delegates addObject:newDelegateInfo];
         MTR_LOG("%@ addDeviceControllerDelegate: added %p total %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
@@ -1857,7 +1868,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
 
         // Opportunistically remove defunct delegate references on every iteration
-        NSMutableSet * delegatesToRemove = nil;
+        NSMutableArray * delegatesToRemove = nil;
         for (MTRDeviceControllerDelegateInfo * delegateInfo in _delegates) {
             id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
             if (strongDelegate) {
@@ -1866,14 +1877,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 }
             } else {
                 if (!delegatesToRemove) {
-                    delegatesToRemove = [NSMutableSet set];
+                    delegatesToRemove = [NSMutableArray array];
                 }
                 [delegatesToRemove addObject:delegateInfo];
             }
         }
 
         if (delegatesToRemove.count) {
-            [_delegates minusSet:delegatesToRemove];
+            [_delegates removeObjectsInArray:delegatesToRemove];
             MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), static_cast<unsigned long>(_delegates.count));
         }
 

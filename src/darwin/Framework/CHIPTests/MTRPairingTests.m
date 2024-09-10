@@ -143,7 +143,7 @@ static MTRTestKeys * sTestKeys = nil;
 @implementation MTRPairingTestMonitoringControllerDelegate
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRPairingTestMonitoringControllerDelegate: %p statusUpdateCalled %@ commissioningSessionEstablishmentDoneCalled %@ commissioningCompleteCalled %@ readCommissioningInfoCalled %@>", self, YES_NO(_statusUpdateCalled), YES_NO(_commissioningSessionEstablishmentDoneCalled), YES_NO(_commissioningCompleteCalled), YES_NO(_readCommissioningInfoCalled)];
+    return [NSString stringWithFormat:@"<MTRPairingTestMonitoringControllerDelegate: %p statusUpdateCalled %@ commissioningSessionEstablishmentDoneCalled %@ commissioningCompleteCalled %@ readCommissioningInfoCalled %@>", self, MTR_YES_NO(_statusUpdateCalled), MTR_YES_NO(_commissioningSessionEstablishmentDoneCalled), MTR_YES_NO(_commissioningCompleteCalled), MTR_YES_NO(_readCommissioningInfoCalled)];
 }
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
