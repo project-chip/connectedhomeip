@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <vector>
 
 #include <pw_unit_test/framework.h>
