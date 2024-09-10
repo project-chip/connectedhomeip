@@ -406,7 +406,7 @@ using namespace chip::Tracing::DarwinFramework;
         // * CASE sessions in general.
         // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
     }
-    
+
     BOOL isSuspended = [self isSuspended];
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
