@@ -1303,6 +1303,16 @@ cluster LaundryWasherMode = 81 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kDelicate = 16385;
     kHeavy = 16386;

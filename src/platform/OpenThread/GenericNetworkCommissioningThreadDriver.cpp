@@ -189,6 +189,24 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
         status = Status::kUnknownError;
     }
 
+    if (status == Status::kSuccess && ThreadStackMgrImpl().IsThreadAttached())
+    {
+        Thread::OperationalDataset currentDataset;
+        if (ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR)
+        {
+            // Clear the previous srp host and services
+            if (!currentDataset.AsByteSpan().data_equal(mStagingNetwork.AsByteSpan()) &&
+                ThreadStackMgrImpl().ClearAllSrpHostAndServices() != CHIP_NO_ERROR)
+            {
+                status = Status::kUnknownError;
+            }
+        }
+        else
+        {
+            status = Status::kUnknownError;
+        }
+    }
+
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)
     {
@@ -276,6 +294,19 @@ void GenericThreadDriver::CheckInterfaceEnabled()
     }
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
+{
+    if (ThreadStackMgrImpl().IsThreadProvisioned())
+    {
+        Thread::OperationalDataset emptyNetwork = {};
+        // Attach to an empty network will disconnect the driver.
+        ReturnErrorOnFailure(ThreadStackMgrImpl().AttachToThreadNetwork(emptyNetwork, nullptr));
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()
 {

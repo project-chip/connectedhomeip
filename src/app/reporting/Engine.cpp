@@ -855,7 +855,7 @@ CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
+CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 

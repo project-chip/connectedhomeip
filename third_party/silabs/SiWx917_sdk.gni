@@ -248,15 +248,8 @@ template("siwx917_sdk") {
       defines += [ "SILABS_LOG_ENABLED=0" ]
     }
 
-    if (chip_build_libshell) {
-      defines += [
-        "ENABLE_CHIP_SHELL",
-        "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1",
-      ]
-    }
-
     defines += [ "LWIP_NETIF_API=1" ]
-    if (lwip_ipv4) {
+    if (chip_enable_wifi_ipv4) {
       defines += [
         "LWIP_IPV4=1",
 
@@ -329,6 +322,9 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
+    if (chip_build_libshell || sl_uart_log_output) {
+      defines += [ "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1" ]
+    }
     if (enable_dic) {
       defines += [ "DIC_ENABLE=1" ]
     }
