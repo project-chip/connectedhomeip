@@ -34,7 +34,7 @@ namespace app {
 class EventScheduler
 {
 public:
-    virtual ~EventScheduler()                                                                   = default;
+    virtual ~EventScheduler() = default;
 
     /**
      * @brief
