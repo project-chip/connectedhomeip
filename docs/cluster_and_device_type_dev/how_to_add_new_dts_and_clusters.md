@@ -17,7 +17,6 @@ directory:**
 
 1. [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/tree/master/.github/workflows/tests.yaml)
 2. [scripts/rules.matterlint](https://github.com/project-chip/connectedhomeip/tree/master/scripts/rules.matterlint)
-3. [src/app/zap-templates/zcl/data-model/all.xml](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/all.xml)
 4. [src/app/zap-templates/zcl/zcl-with-test-extensions.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl-with-test-extensions.json)
 5. [src/app/zap-templates/zcl/zcl.json](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/zcl.json)
 6. If it is a derived cluster, add a reference to the base cluster definition.
