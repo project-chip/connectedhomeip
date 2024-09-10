@@ -168,15 +168,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 - (void)preWarmCommissioningSession MTR_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]", ios(16.4, 17.6), macos(13.3, 14.6), watchos(9.4, 10.6), tvos(16.4, 17.6));
 
-/**
- * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
- *
- * @param[in] delegate The delegate the commissioning process should use
- *
- * @param[in] queue The queue on which the callbacks will be delivered
- */
-- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
-                              queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+// Use super class implementation for -setDeviceControllerDelegate:queue:
 
 /**
  * Start scanning for commissionable devices.

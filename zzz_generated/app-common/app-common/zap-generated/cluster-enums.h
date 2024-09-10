@@ -53,20 +53,6 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for ErrorStateEnum
-enum class ErrorStateEnum : uint8_t
-{
-    kNoError                   = 0x00,
-    kUnableToStartOrResume     = 0x01,
-    kUnableToCompleteOperation = 0x02,
-    kCommandInvalidInState     = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-
 // Enum for LevelValueEnum
 enum class LevelValueEnum : uint8_t
 {
@@ -136,20 +122,6 @@ enum class MeasurementUnitEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 8,
-};
-
-// Enum for OperationalStateEnum
-enum class OperationalStateEnum : uint8_t
-{
-    kStopped = 0x00,
-    kRunning = 0x01,
-    kPaused  = 0x02,
-    kError   = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
 };
 
 // Enum for ProductIdentifierTypeEnum
@@ -1992,9 +1964,33 @@ enum class Feature : uint32_t
 
 namespace OvenCavityOperationalState {
 
-using ErrorStateEnum = Clusters::detail::ErrorStateEnum;
+// Enum for ErrorStateEnum
+enum class ErrorStateEnum : uint8_t
+{
+    kNoError                   = 0x00,
+    kUnableToStartOrResume     = 0x01,
+    kUnableToCompleteOperation = 0x02,
+    kCommandInvalidInState     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
 
-using OperationalStateEnum = Clusters::detail::OperationalStateEnum;
+// Enum for OperationalStateEnum
+enum class OperationalStateEnum : uint8_t
+{
+    kStopped = 0x00,
+    kRunning = 0x01,
+    kPaused  = 0x02,
+    kError   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
 } // namespace OvenCavityOperationalState
 
 namespace OvenMode {
@@ -2002,6 +1998,16 @@ namespace OvenMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
+    kAuto            = 0x00,
+    kQuick           = 0x01,
+    kQuiet           = 0x02,
+    kLowNoise        = 0x03,
+    kLowEnergy       = 0x04,
+    kVacation        = 0x05,
+    kMin             = 0x06,
+    kMax             = 0x07,
+    kNight           = 0x08,
+    kDay             = 0x09,
     kBake            = 0x4000,
     kConvection      = 0x4001,
     kGrill           = 0x4002,
@@ -2015,7 +2021,7 @@ enum class ModeTag : uint16_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 10,
 };
 
 // Bitmap for Feature
@@ -2056,10 +2062,20 @@ namespace LaundryWasherMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kNormal   = 0x4000,
-    kDelicate = 0x4001,
-    kHeavy    = 0x4002,
-    kWhites   = 0x4003,
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    kNormal    = 0x4000,
+    kDelicate  = 0x4001,
+    kHeavy     = 0x4002,
+    kWhites    = 0x4003,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -2079,6 +2095,16 @@ namespace RefrigeratorAndTemperatureControlledCabinetMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
+    kAuto        = 0x00,
+    kQuick       = 0x01,
+    kQuiet       = 0x02,
+    kLowNoise    = 0x03,
+    kLowEnergy   = 0x04,
+    kVacation    = 0x05,
+    kMin         = 0x06,
+    kMax         = 0x07,
+    kNight       = 0x08,
+    kDay         = 0x09,
     kRapidCool   = 0x4000,
     kRapidFreeze = 0x4001,
     // kUnknownEnumValue intentionally not defined. This enum never goes
@@ -2124,9 +2150,19 @@ namespace RvcRunMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kIdle     = 0x4000,
-    kCleaning = 0x4001,
-    kMapping  = 0x4002,
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    kIdle      = 0x4000,
+    kCleaning  = 0x4001,
+    kMapping   = 0x4002,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -2164,6 +2200,16 @@ namespace RvcCleanMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
     kDeepClean = 0x4000,
     kVacuum    = 0x4001,
     kMop       = 0x4002,
@@ -2217,9 +2263,19 @@ namespace DishwasherMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kNormal = 0x4000,
-    kHeavy  = 0x4001,
-    kLight  = 0x4002,
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    kNormal    = 0x4000,
+    kHeavy     = 0x4001,
+    kLight     = 0x4002,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -2381,13 +2437,23 @@ namespace MicrowaveOvenMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kNormal  = 0x4000,
-    kDefrost = 0x4001,
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    kNormal    = 0x4000,
+    kDefrost   = 0x4001,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kUnknownEnumValue = 10,
 };
 
 // Bitmap for Feature
@@ -2410,9 +2476,33 @@ enum class Feature : uint32_t
 
 namespace OperationalState {
 
-using ErrorStateEnum = Clusters::detail::ErrorStateEnum;
+// Enum for ErrorStateEnum
+enum class ErrorStateEnum : uint8_t
+{
+    kNoError                   = 0x00,
+    kUnableToStartOrResume     = 0x01,
+    kUnableToCompleteOperation = 0x02,
+    kCommandInvalidInState     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
 
-using OperationalStateEnum = Clusters::detail::OperationalStateEnum;
+// Enum for OperationalStateEnum
+enum class OperationalStateEnum : uint8_t
+{
+    kStopped = 0x00,
+    kRunning = 0x01,
+    kPaused  = 0x02,
+    kError   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
 } // namespace OperationalState
 
 namespace RvcOperationalState {
@@ -2420,14 +2510,18 @@ namespace RvcOperationalState {
 // Enum for ErrorStateEnum
 enum class ErrorStateEnum : uint8_t
 {
-    kFailedToFindChargingDock = 0x40,
-    kStuck                    = 0x41,
-    kDustBinMissing           = 0x42,
-    kDustBinFull              = 0x43,
-    kWaterTankEmpty           = 0x44,
-    kWaterTankMissing         = 0x45,
-    kWaterTankLidOpen         = 0x46,
-    kMopCleaningPadMissing    = 0x47,
+    kNoError                   = 0x00,
+    kUnableToStartOrResume     = 0x01,
+    kUnableToCompleteOperation = 0x02,
+    kCommandInvalidInState     = 0x03,
+    kFailedToFindChargingDock  = 0x40,
+    kStuck                     = 0x41,
+    kDustBinMissing            = 0x42,
+    kDustBinFull               = 0x43,
+    kWaterTankEmpty            = 0x44,
+    kWaterTankMissing          = 0x45,
+    kWaterTankLidOpen          = 0x46,
+    kMopCleaningPadMissing     = 0x47,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -2438,6 +2532,10 @@ enum class ErrorStateEnum : uint8_t
 // Enum for OperationalStateEnum
 enum class OperationalStateEnum : uint8_t
 {
+    kStopped        = 0x00,
+    kRunning        = 0x01,
+    kPaused         = 0x02,
+    kError          = 0x03,
     kSeekingCharger = 0x40,
     kCharging       = 0x41,
     kDocked         = 0x42,
@@ -3092,6 +3190,16 @@ namespace EnergyEvseMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
+    kAuto          = 0x00,
+    kQuick         = 0x01,
+    kQuiet         = 0x02,
+    kLowNoise      = 0x03,
+    kLowEnergy     = 0x04,
+    kVacation      = 0x05,
+    kMin           = 0x06,
+    kMax           = 0x07,
+    kNight         = 0x08,
+    kDay           = 0x09,
     kManual        = 0x4000,
     kTimeOfUse     = 0x4001,
     kSolarCharging = 0x4002,
@@ -3114,9 +3222,19 @@ namespace WaterHeaterMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kOff    = 0x4000,
-    kManual = 0x4001,
-    kTimed  = 0x4002,
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    kOff       = 0x4000,
+    kManual    = 0x4001,
+    kTimed     = 0x4002,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -3136,6 +3254,16 @@ namespace DeviceEnergyManagementMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
+    kAuto               = 0x00,
+    kQuick              = 0x01,
+    kQuiet              = 0x02,
+    kLowNoise           = 0x03,
+    kLowEnergy          = 0x04,
+    kVacation           = 0x05,
+    kMin                = 0x06,
+    kMax                = 0x07,
+    kNight              = 0x08,
+    kDay                = 0x09,
     kNoOptimization     = 0x4000,
     kDeviceOptimization = 0x4001,
     kLocalOptimization  = 0x4002,
