@@ -285,37 +285,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
-    // ACL check for non-internal requests
-    bool checkAcl = !request.operationFlags.Has(DataModel::OperationFlags::kInternal);
-
-    // For chunking, ACL check is not re-done if the previous write was successful for the exact same
-    // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
-    if (checkAcl && request.previousSuccessPath.has_value())
-    {
-        checkAcl = ((request.path.mEndpointId != request.previousSuccessPath->mEndpointId) ||
-                    (request.path.mClusterId != request.previousSuccessPath->mClusterId) ||
-                    (request.path.mAttributeId != request.previousSuccessPath->mAttributeId));
-    }
-
-    if (checkAcl)
-    {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
-
-        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
-                                         .endpoint    = request.path.mEndpointId,
-                                         .requestType = Access::RequestType::kAttributeWriteRequest,
-                                         .entityId    = request.path.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                          RequiredPrivilege::ForWriteAttribute(request.path));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
-
-            // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
-        }
-    }
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
@@ -345,7 +314,46 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         VerifyOrReturnError(!isReadOnly, Status::UnsupportedWrite);
+    }
 
+
+    // ACL check for non-internal requests
+    bool checkAcl = !request.operationFlags.Has(DataModel::OperationFlags::kInternal);
+
+    // For chunking, ACL check is not re-done if the previous write was successful for the exact same
+    // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
+    if (checkAcl && request.previousSuccessPath.has_value())
+    {
+        checkAcl = ((request.path.mEndpointId != request.previousSuccessPath->mEndpointId) ||
+                    (request.path.mClusterId != request.previousSuccessPath->mClusterId) ||
+                    (request.path.mAttributeId != request.previousSuccessPath->mAttributeId));
+    }
+
+    // If not writable, do unsupported write instead of unsupported-access
+
+    if (checkAcl)
+    {
+        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
+
+        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
+                                         .endpoint    = request.path.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = request.path.mAttributeId };
+        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
+                                                          RequiredPrivilege::ForWriteAttribute(request.path));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+
+            // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
+            return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
+        }
+    }
+
+    // Internal is allowed to bypass timed writes and read-only.
+    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
+    {
         VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
                             Status::NeedsTimedInteraction);
     }
