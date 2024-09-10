@@ -54,6 +54,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ModeTagStruct::DecodableType & value)
 {
@@ -78,6 +79,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType & value)
 {
@@ -110,6 +112,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::DecodableType & value)
@@ -183,6 +186,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::DecodableType & value)
 {
@@ -231,6 +235,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value)
 {
@@ -263,6 +268,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::DeviceTypeStruct::DecodableType & value)
 {
@@ -283,6 +289,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
 {
@@ -307,6 +314,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::DecodableType & value)
@@ -332,6 +340,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ErrorStateStruct::DecodableType & value)
 {
@@ -364,6 +373,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value)
 {
@@ -388,6 +398,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::OperationalStateStruct::DecodableType & value)
 {
@@ -453,6 +464,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value)
 {
@@ -501,6 +513,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::DecodableType & value)
@@ -526,6 +539,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::DecodableType & value)
@@ -559,6 +573,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::DecodableType & value)
@@ -600,6 +615,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::DecodableType & value)
@@ -641,6 +657,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
@@ -690,6 +707,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType & value)
@@ -715,6 +733,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType & value)
 {
@@ -771,6 +790,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType & value)
 {
@@ -811,6 +831,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value)
@@ -836,6 +857,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
@@ -861,6 +883,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
@@ -894,6 +917,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::DecodableType & value)
@@ -919,6 +943,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::DecodableType & value)
 {
@@ -943,6 +968,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::PowerSource::Structs::WiredFaultChangeType::DecodableType & value)
 {
@@ -967,6 +993,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value)
@@ -992,6 +1019,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType & value)
@@ -1033,6 +1061,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResultStruct::DecodableType & value)
@@ -1106,6 +1135,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::DecodableType & value)
@@ -1163,6 +1193,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType & value)
@@ -1236,6 +1267,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType & value)
@@ -1285,6 +1317,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType & value)
@@ -1406,6 +1439,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value)
@@ -1511,6 +1545,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType & value)
@@ -1600,6 +1635,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value)
@@ -1625,6 +1661,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType & value)
@@ -1658,6 +1695,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::DecodableType & value)
@@ -1683,6 +1721,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType & value)
 {
@@ -1715,6 +1754,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType & value)
@@ -1748,6 +1788,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
@@ -1773,6 +1814,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & value)
@@ -1830,6 +1872,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value)
 {
@@ -1862,6 +1905,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType & value)
@@ -1903,6 +1947,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType & value)
@@ -1936,6 +1981,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value)
@@ -2009,6 +2055,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType & value)
@@ -2050,6 +2097,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::DecodableType & value)
 {
@@ -2074,6 +2122,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value)
 {
@@ -2106,6 +2155,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::DecodableType & value)
@@ -2187,6 +2237,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value)
 {
@@ -2211,6 +2262,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value)
 {
@@ -2267,6 +2319,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
@@ -2292,6 +2345,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
@@ -2317,6 +2371,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType & value)
@@ -2342,6 +2397,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::DecodableType & value)
@@ -2439,6 +2495,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::DecodableType & value)
@@ -2480,6 +2537,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::DecodableType & value)
@@ -2529,6 +2587,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::DecodableType & value)
@@ -2586,6 +2645,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::DecodableType & value)
@@ -2603,6 +2663,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::PowerSavingsControlStruct::DecodableType & value)
@@ -2620,6 +2681,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::DutyCycleControlStruct::DecodableType & value)
@@ -2637,6 +2699,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::AverageLoadControlStruct::DecodableType & value)
@@ -2654,6 +2717,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::TemperatureControlStruct::DecodableType & value)
@@ -2695,6 +2759,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventTransitionStruct::DecodableType & value)
@@ -2760,6 +2825,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::DecodableType & value)
@@ -2833,6 +2899,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::DecodableType & value)
@@ -2882,6 +2949,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType & value)
@@ -2907,6 +2975,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Messages::Structs::MessageStruct::DecodableType & value)
 {
@@ -2971,6 +3040,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DeviceEnergyManagement::Structs::CostStruct::DecodableType & value)
 {
@@ -3011,6 +3081,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType & value)
@@ -3052,6 +3123,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType & value)
@@ -3077,6 +3149,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::DecodableType & value)
 {
@@ -3229,6 +3302,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::DecodableType & value)
@@ -3310,6 +3384,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType & value)
@@ -3359,6 +3434,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType & value)
@@ -3392,6 +3468,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::DecodableType & value)
 {
@@ -3424,6 +3501,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType & value)
@@ -3449,6 +3527,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value)
 {
@@ -3473,6 +3552,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value)
 {
@@ -3497,6 +3577,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::DecodableType & value)
 {
@@ -3521,6 +3602,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value)
 {
@@ -3545,6 +3627,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType & value)
 {
@@ -3577,6 +3660,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType & value)
 {
@@ -3601,6 +3685,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType & value)
 {
@@ -3641,6 +3726,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Thermostat::Structs::ScheduleTransitionStruct::DecodableType & value)
@@ -3698,6 +3784,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & value)
 {
@@ -3754,6 +3841,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & value)
 {
@@ -3810,6 +3898,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType & value)
 {
@@ -3842,6 +3931,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType & value)
 {
@@ -3874,6 +3964,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::DecodableType & value)
@@ -3907,6 +3998,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType & value)
@@ -3940,6 +4032,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::DecodableType & value)
@@ -3981,6 +4074,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ProgramCastStruct::DecodableType & value)
 {
@@ -4005,6 +4099,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ProgramCategoryStruct::DecodableType & value)
 {
@@ -4029,6 +4124,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::SeriesInfoStruct::DecodableType & value)
 {
@@ -4053,6 +4149,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType & value)
 {
@@ -4117,6 +4214,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ProgramStruct::DecodableType & value)
 {
@@ -4277,6 +4375,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::PageTokenStruct::DecodableType & value)
 {
@@ -4309,6 +4408,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ChannelPagingStruct::DecodableType & value)
 {
@@ -4333,6 +4433,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::DecodableType & value)
 {
@@ -4357,6 +4458,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType & value)
 {
@@ -4397,6 +4499,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & value)
 {
@@ -4421,6 +4524,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::MediaPlayback::Structs::TrackAttributesStruct::DecodableType & value)
@@ -4446,6 +4550,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::MediaPlayback::Structs::TrackStruct::DecodableType & value)
 {
@@ -4470,6 +4575,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType & value)
@@ -4495,6 +4601,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType & value)
 {
@@ -4535,6 +4642,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::DecodableType & value)
 {
@@ -4567,6 +4675,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::TrackPreferenceStruct::DecodableType & value)
@@ -4600,6 +4709,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType & value)
@@ -4633,6 +4743,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::DecodableType & value)
@@ -4658,6 +4769,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType & value)
 {
@@ -4690,6 +4802,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::DecodableType & value)
@@ -4707,6 +4820,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::StyleInformationStruct::DecodableType & value)
@@ -4740,6 +4854,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::DecodableType & value)
@@ -4797,6 +4912,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType & value)
 {
@@ -4829,6 +4945,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType & value)
@@ -4854,6 +4971,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ContentControl::Structs::RatingNameStruct::DecodableType & value)
 {
@@ -4878,6 +4996,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType & value)
@@ -4951,6 +5070,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType & value)
@@ -4992,6 +5112,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
@@ -5072,6 +5193,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType & value)
 {
@@ -5145,6 +5267,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType & value)
@@ -5250,6 +5373,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::NestedStruct::DecodableType & value)
 {
@@ -5290,6 +5414,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::NestedStructList::DecodableType & value)
 {
@@ -5354,6 +5479,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::DecodableType & value)
 {
@@ -5370,6 +5496,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType & value)
 {
