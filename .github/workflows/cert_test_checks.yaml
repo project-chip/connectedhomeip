@@ -18,6 +18,8 @@ on:
   pull_request:
     paths:
       - "src/app/tests/suites/certification/**"
+permissions:
+  contents: read
 
 jobs:
   check-certification-tests:
@@ -30,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Run checks
         run: |
           python3 scripts/tests/matter_yaml_linter.py

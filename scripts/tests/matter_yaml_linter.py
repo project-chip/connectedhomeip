@@ -54,10 +54,10 @@ def check_manual_steps():
     # Doing this on a test-by-test basis so the log message is more obvious
     bad_tests = set()
     for test in AllChipToolYamlTests(use_short_run_name=False):
-        cmd = ['git', 'diff', 'HEAD^..HEAD', '--unified=0', '--', test.run_name]
-        output = subprocess.check_output(cmd).decode().splitlines()
-        user_prompt_added = [line for line in output if re.search('^\+.*UserPrompt.*', line)]
-        user_prompt_removed = [line for line in output if re.search('^\-.*UserPrompt.*', line)]
+        cmd = f'git diff HEAD^..HEAD --unified=0 -- {test.run_name}'
+        output = subprocess.check_output(cmd, shell=True).decode().splitlines()
+        user_prompt_added = [line for line in output if re.search(r'^\+.*UserPrompt.*', line)]
+        user_prompt_removed = [line for line in output if re.search(r'^\-.*UserPrompt.*', line)]
         if len(user_prompt_added) > len(user_prompt_removed):
             print(f'Found YAML test with additional manual steps: {test.name}')
     if bad_tests:
