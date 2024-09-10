@@ -52,12 +52,25 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_fuzz_test_targets) {
     group("fuzz_tests") {
       deps = [
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
         "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-decode",
+      ]
+    }
+  }
+
+  if (pw_enable_fuzz_test_targets) {
+    group("pw_fuzz_tests") {
+      deps = [
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
     }
   }
@@ -138,6 +151,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (enable_fuzz_test_targets) {
       deps += [ "//:fuzz_tests" ]
+    }
+
+    if (pw_enable_fuzz_test_targets) {
+      deps += [ "//:pw_fuzz_tests" ]
     }
 
     if (chip_device_platform != "none") {

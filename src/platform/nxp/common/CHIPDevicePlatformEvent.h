@@ -70,6 +70,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformNxpIpChangeEvent,
     kPlatformNxpStartWlanConnectEvent,
     kPlatformNxpScanWiFiNetworkDoneEvent,
+    kPlatformNxpStartWlanInitWaitTimerEvent,
 };
 
 } // namespace DeviceEventType

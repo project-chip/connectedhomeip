@@ -22,6 +22,7 @@ from enum import Enum
 
 class Branch(Enum):
     MASTER = "master"
+    IN_PROGRESS = "in_progress"
     V1_3 = "v1_3"
 
 

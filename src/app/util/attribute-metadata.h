@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/util/basic-types.h>
-
 #include <cstdint>
 
 /**
@@ -157,6 +157,21 @@ struct EmberAfAttributeMetadata
      * functionality.
      */
     EmberAfAttributeMask mask;
+
+    /**
+     * Check wether this attribute is a boolean based on its type according to the spec.
+     */
+    bool IsBoolean() const { return attributeType == ZCL_BOOLEAN_ATTRIBUTE_TYPE; }
+
+    /**
+     * Check wether this attribute is signed based on its type according to the spec.
+     */
+    bool IsSignedIntegerAttribute() const { return chip::app::IsSignedAttributeType(attributeType); }
+
+    /**
+     * Check whether this attribute has a define min and max.
+     */
+    bool HasMinMax() const { return mask & ATTRIBUTE_MASK_MIN_MAX; }
 
     /**
      * Check whether this attribute is nullable.

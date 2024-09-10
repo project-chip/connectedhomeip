@@ -110,6 +110,7 @@ class XmlCluster:
     unknown_commands: list[XmlCommand]
     events: dict[uint, XmlEvent]
     pics: str
+    is_provisional: bool
 
 
 class ClusterSide(Enum):
@@ -208,6 +209,7 @@ class ClusterParser:
         self._name = name
 
         self._derived = None
+        self._is_provisional = False
         try:
             classification = next(cluster.iter('classification'))
             hierarchy = classification.attrib['hierarchy']
@@ -215,6 +217,10 @@ class ClusterParser:
                 self._derived = classification.attrib['baseCluster']
         except (KeyError, StopIteration):
             self._derived = None
+
+        for id in cluster.iter('clusterIds'):
+            if list(id.iter('provisionalConform')):
+                self._is_provisional = True
 
         try:
             classification = next(cluster.iter('classification'))
@@ -400,6 +406,8 @@ class ClusterParser:
                 return CommandType.UNKNOWN
             if element.attrib['direction'].lower() == 'commandtoserver':
                 return CommandType.ACCEPTED
+            if element.attrib['direction'].lower() == 'responsefromclient':
+                return CommandType.UNKNOWN
             raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
             return CommandType.UNKNOWN
@@ -453,7 +461,7 @@ class ClusterParser:
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
                           unknown_commands=self.parse_unknown_commands(),
-                          events=self.parse_events(), pics=self._pics)
+                          events=self.parse_events(), pics=self._pics, is_provisional=self._is_provisional)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -502,6 +510,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 
 class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
+    kInProgress = auto()
     kMaster = auto()
 
 
@@ -530,6 +539,8 @@ def _get_data_model_root() -> str:
 def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
         return os.path.join(_get_data_model_root(), '1.3', data_model_level)
+    elif data_model_directory == PrebuiltDataModelDirectory.kInProgress:
+        return os.path.join(_get_data_model_root(), 'in_progress', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
         return os.path.join(_get_data_model_root(), 'master', data_model_level)
     else:
@@ -683,11 +694,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
                     generated_commands[cmd.id].conformance = cmd.conformance
                 else:
                     unknown_commands.append(cmd)
+            provisional = c.is_provisional or base.is_provisional
 
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics)
+                             generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics,
+                             is_provisional=provisional)
             xml_clusters[id] = new
 
 
@@ -763,7 +776,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []

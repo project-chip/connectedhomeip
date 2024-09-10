@@ -6684,6 +6684,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::Unsupported::Id: {
         return YES;
     }
+    case Attributes::ReadFailureCode::Id: {
+        return YES;
+    }
+    case Attributes::FailureInt32U::Id: {
+        return YES;
+    }
     case Attributes::NullableBoolean::Id: {
         return YES;
     }

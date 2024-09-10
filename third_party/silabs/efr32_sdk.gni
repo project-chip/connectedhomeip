@@ -61,7 +61,7 @@ declare_args() {
   sl_active_mode_duration_ms = 1000  # 1s Active Mode Duration
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
-  sl_use_subscription_synching = false
+  sl_use_subscription_syncing = false
 
   silabs_log_enabled = true
 
@@ -362,6 +362,9 @@ template("efr32_sdk") {
     if (use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
+    if (use_wf200 || use_rs9116 || use_SiWx917) {
+      _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
+    }
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -658,7 +661,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (sl_use_subscription_synching) {
+    if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
 

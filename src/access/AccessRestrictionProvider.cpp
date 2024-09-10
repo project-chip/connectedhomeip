@@ -197,45 +197,31 @@ CHIP_ERROR AccessRestrictionProvider::DoCheck(const std::vector<Entry> & entries
                 if (requestPath.requestType == RequestType::kAttributeReadRequest ||
                     requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
-#if 0
-                    // TODO(#35177): use new ARL error code when access checks are fixed
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
-#else
-                    return CHIP_ERROR_ACCESS_DENIED;
-#endif
+                    if (!IsGlobalAttribute(requestPath.entityId.value()))
+                    {
+                        return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    }
                 }
                 break;
             case Type::kAttributeWriteForbidden:
                 if (requestPath.requestType == RequestType::kAttributeWriteRequest)
                 {
-#if 0
-                    // TODO(#35177): use new ARL error code when access checks are fixed
-                    return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
-#else
-                    return CHIP_ERROR_ACCESS_DENIED;
-#endif
+                    if (!IsGlobalAttribute(requestPath.entityId.value()))
+                    {
+                        return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
+                    }
                 }
                 break;
             case Type::kCommandForbidden:
                 if (requestPath.requestType == RequestType::kCommandInvokeRequest)
                 {
-#if 0
-                    // TODO(#35177): use new ARL error code when access checks are fixed
                     return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
-#else
-                    return CHIP_ERROR_ACCESS_DENIED;
-#endif
                 }
                 break;
             case Type::kEventForbidden:
                 if (requestPath.requestType == RequestType::kEventReadRequest)
                 {
-#if 0
-                    // TODO(#35177): use new ARL error code when access checks are fixed
                     return CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL;
-#else
-                    return CHIP_ERROR_ACCESS_DENIED;
-#endif
                 }
                 break;
             }

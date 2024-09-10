@@ -327,7 +327,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
                     if ((serr = wfx_connect_to_ap()) != SL_STATUS_OK)
                     {
-                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed: %" PRId32, serr);
                     }
                     SuccessOrExit(serr);
 
@@ -359,18 +359,7 @@ void ConnectivityManagerImpl::OnStationConnected()
 {
     wfx_setup_ip6_link_local(SL_WFX_STA_INTERFACE);
     NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
-    // Setting the rs911x in the power save mode
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI)
-#if SLI_SI917
-    sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
-#else
-    sl_status_t err = wfx_power_save();
-#endif /* SLI_SI917 */
-    if (err != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
-    }
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI */
+
     UpdateInternetConnectivityState();
     // Alert other components of the new state.
     ChipDeviceEvent event;
