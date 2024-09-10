@@ -88,6 +88,7 @@ typedef struct BleEvent_s
 } BleEvent_t;
 
 #define ATT_REC_IN_HOST (0)
+#define WFX_QUEUE_SIZE 10
 
 #define RSI_BT_CTRL_REMOTE_USER_TERMINATED (0x4E13)
 #define RSI_BT_CTRL_REMOTE_DEVICE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES (0x4E14)
@@ -121,8 +122,8 @@ typedef struct BleEvent_s
 #define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION (5)
 
 // ALL Ble functions
-void BlePostEvent(BleEvent_t * event);
-void BleGetEvent(BleEvent_t event);
+void InitBleEventQueue();
+osMessageQueueId_t GetBleEventQueue();
 void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
 void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason);
 void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn);

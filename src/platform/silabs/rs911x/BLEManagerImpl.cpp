@@ -29,7 +29,6 @@
 #include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
 
-
 #include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -56,7 +55,6 @@ extern "C" {
 }
 #endif
 
-#define WFX_QUEUE_SIZE 10
 #define BLE_MIN_CONNECTION_INTERVAL_MS 24
 #define BLE_MAX_CONNECTION_INTERVAL_MS 40
 #define BLE_SLAVE_LATENCY_MS 0
@@ -68,7 +66,6 @@ uint8_t dev_address[RSI_DEV_ADDR_LEN];
 uint16_t ble_measurement_hndl;
 
 osSemaphoreId_t sl_rs_ble_init_sem;
-osMessageQueueId_t sBleEventQueue = NULL;
 
 osTimerId_t sbleAdvTimeoutTimer;
 
@@ -99,7 +96,7 @@ void sl_ble_init()
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
-                                   NULL, NULL, NULL);
+                                NULL, NULL, NULL);
 
     // registering the GATT call back functions
     rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL,
@@ -109,10 +106,7 @@ void sl_ble_init()
     //  Exchange of GATT info with BLE stack
     rsi_ble_add_matter_service();
     rsi_ble_set_random_address_with_value(randomAddrBLE);
-
-    sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
-    VerifyOrDie(sBleEventQueue != nullptr);
-
+    InitBleEventQueue();
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
 
@@ -179,7 +173,7 @@ void sl_ble_event_handling_task(void * args)
     // Application event map
     while (1)
     {
-        status = osMessageQueueGet(sBleEventQueue, &bleEvent, NULL, osWaitForever);
+        status = osMessageQueueGet(GetBleEventQueue(), &bleEvent, NULL, osWaitForever);
         if (status == osOK)
         {
             ProcessEvent(bleEvent);

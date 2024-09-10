@@ -29,6 +29,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#include <platform/CHIPDeviceLayer.h>
+
 #include "silabs_utils.h"
 
 // Global Variables
@@ -37,11 +39,22 @@ sl_wfx_msg_t event_msg;
 
 BleEvent_t bleEvent;
 
-extern osMessageQueueId_t sBleEventQueue;
+static osMessageQueueId_t sBleEventQueue = NULL;
 
 // Memory to initialize driver
 uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
+
+void InitBleEventQueue()
+{
+    sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
+    VerifyOrDie(sBleEventQueue != nullptr);
+}
+
+osMessageQueueId_t GetBleEventQueue()
+{
+    return sBleEventQueue;
+}
 
 void BlePostEvent(BleEvent_t * event)
 {
