@@ -440,6 +440,7 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
+    "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "GenericEventManagementTestEventTriggerHandler.cpp",

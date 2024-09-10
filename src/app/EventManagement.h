@@ -29,6 +29,7 @@
 #include "EventLoggingDelegate.h"
 #include <access/SubjectDescriptor.h>
 #include <app/EventLoggingTypes.h>
+#include <app/EventScheduler.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
@@ -187,18 +188,6 @@ struct LogStorageResources
     uint32_t mBufferSize = 0; ///< The size, in bytes, of the `mBuffer`.
     PriorityLevel mPriority =
         PriorityLevel::Invalid; // Log priority level associated with the resources provided in this structure.
-};
-
-/**
- * @brief
- *  A EventScheduler to schedule deliveries of events.
- */
-
-class EventScheduler
-{
-public:
-    virtual ~EventScheduler()                                                                   = default;
-    CHIP_ERROR virtual ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
 };
 
 /**
