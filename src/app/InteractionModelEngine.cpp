@@ -24,8 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "lib/core/CHIPError.h"
-#include "platform/LockTracker.h"
 
 #include <cinttypes>
 
