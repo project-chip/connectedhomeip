@@ -1815,7 +1815,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     @synchronized(self) {
         __block BOOL delegateAlreadyAdded = NO;
-        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo *delegateInfo) {
+        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
             if (delegateInfo.delegate == delegate) {
                 delegateAlreadyAdded = YES;
             }
