@@ -285,7 +285,12 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
-
+    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
+    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
+    //
+    //       This should likely be fixed in spec (probably already fixed by
+    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
+    //       and tests and implementation
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -315,7 +320,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         VerifyOrReturnError(!isReadOnly, Status::UnsupportedWrite);
     }
-
 
     // ACL check for non-internal requests
     bool checkAcl = !request.operationFlags.Has(DataModel::OperationFlags::kInternal);
