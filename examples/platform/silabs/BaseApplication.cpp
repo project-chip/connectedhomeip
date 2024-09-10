@@ -857,14 +857,14 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
             SILABS_LOG("Failed to initialize DIC module\n");
         }
 #endif // DIC_ENABLE
-#ifdef DISPLAY_ENABLED
-        SilabsLCD::Screen_e screen;
-        AppTask::GetLCD().GetScreen(screen);
-        // Update the LCD screen with SSID and connected state
-        VerifyOrReturn(screen == SilabsLCD::Screen_e::StatusScreen);
-        BaseApplication::UpdateLCDStatusScreen(false);
-        AppTask::GetLCD().SetScreen(screen);
-#endif // DISPLAY_ENABLED
+// #ifdef DISPLAY_ENABLED
+//         SilabsLCD::Screen_e screen;
+//         AppTask::GetLCD().GetScreen(screen);
+//         // Update the LCD screen with SSID and connected state
+//         VerifyOrReturn(screen == SilabsLCD::Screen_e::StatusScreen);
+//         BaseApplication::UpdateLCDStatusScreen(false);
+//         AppTask::GetLCD().SetScreen(screen);
+// #endif // DISPLAY_ENABLED
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
         {

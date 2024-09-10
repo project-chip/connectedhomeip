@@ -52,11 +52,21 @@
 #include <stdbool.h>
 #include <string.h>
 
+typedef enum
+{
+    RSI_BLE_CONN_EVENT,
+    RSI_BLE_DISCONN_EVENT,
+    RSI_BLE_GATT_WRITE_EVENT,
+    RSI_BLE_MTU_EVENT,
+    RSI_BLE_GATT_INDICATION_CONFIRMATION,
+    RSI_BLE_RESP_ATT_VALUE,
+    RSI_BLE_EVENT_GATT_RD
+} BleEventType_e;
+
 typedef struct sl_wfx_msg_s
 {
     uint8_t connectionHandle;
     uint8_t bondingHandle;
-    uint32_t event_num;
     uint16_t reason;
     uint16_t event_id;
     uint16_t resp_status;
@@ -66,13 +76,16 @@ typedef struct sl_wfx_msg_s
     rsi_ble_event_disconnect_t * resp_disconnect;
     rsi_ble_read_req_t * rsi_ble_read_req;
     rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
-    uint32_t ble_app_event_map;
-    uint32_t ble_app_event_mask;
     uint16_t rsi_ble_measurement_hndl;
     uint16_t rsi_ble_gatt_server_client_config_hndl;
     uint16_t subscribed;
-
 } sl_wfx_msg_t;
+
+typedef struct BleEvent_s
+{
+    BleEventType_e eventType;
+    sl_wfx_msg_t * eventData;
+} BleEvent_t;
 
 #define ATT_REC_IN_HOST (0)
 
@@ -108,6 +121,8 @@ typedef struct sl_wfx_msg_s
 #define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION (5)
 
 // ALL Ble functions
+void BlePostEvent(BleEvent_t * event);
+void BleGetEvent(BleEvent_t event);
 void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
 void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason);
 void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn);
