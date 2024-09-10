@@ -163,7 +163,8 @@ declare_args() {
   # e.g. for CI
   use_rps_extension = wifi_soc
 
-  # UART log forwarding enabled by default for 917 SoC
+  # UART log forwarding
+  # Default true for the wifi soc and false for EFR32 boards
   sl_uart_log_output = wifi_soc
 }
 
