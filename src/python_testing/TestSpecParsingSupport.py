@@ -19,12 +19,12 @@ import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
+import jinja2
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
 from matter_testing_support.spec_parsing import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
                                                  add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                                  combine_derived_clusters_with_base)
-import jinja2
 from mobly import asserts
 
 # TODO: improve the test coverage here
