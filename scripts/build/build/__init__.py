@@ -18,11 +18,12 @@ class Context:
          to generate make/ninja instructions and to compile.
       """
 
-    def __init__(self, runner, repository_path: str, output_prefix: str):
+    def __init__(self, runner, repository_path: str, output_prefix: str, ninja_jobs: int):
         self.builders = []
         self.runner = runner
         self.repository_path = repository_path
         self.output_prefix = output_prefix
+        self.ninja_jobs = ninja_jobs
         self.completed_steps = set()
 
     def SetupBuilders(self, targets: Sequence[str], options: BuilderOptions):
@@ -36,7 +37,7 @@ class Context:
             found = False
             for choice in BUILD_TARGETS:
                 builder = choice.Create(target, self.runner, self.repository_path,
-                                        self.output_prefix, options)
+                                        self.output_prefix, self.ninja_jobs, options)
                 if builder:
                     self.builders.append(builder)
                     found = True
