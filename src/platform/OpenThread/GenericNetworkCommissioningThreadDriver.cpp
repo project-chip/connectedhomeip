@@ -189,6 +189,24 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
         status = Status::kUnknownError;
     }
 
+    if (status == Status::kSuccess && ThreadStackMgrImpl().IsThreadAttached())
+    {
+        Thread::OperationalDataset currentDataset;
+        if (ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR)
+        {
+            // Clear the previous srp host and services
+            if (!currentDataset.AsByteSpan().data_equal(mStagingNetwork.AsByteSpan()) &&
+                ThreadStackMgrImpl().ClearAllSrpHostAndServices() != CHIP_NO_ERROR)
+            {
+                status = Status::kUnknownError;
+            }
+        }
+        else
+        {
+            status = Status::kUnknownError;
+        }
+    }
+
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)
     {
