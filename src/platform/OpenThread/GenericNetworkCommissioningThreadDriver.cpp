@@ -277,6 +277,19 @@ void GenericThreadDriver::CheckInterfaceEnabled()
 #endif
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
+{
+    if (ThreadStackMgrImpl().IsThreadProvisioned())
+    {
+        Thread::OperationalDataset emptyNetwork = {};
+        // Attach to an empty network will disconnect the driver.
+        ReturnErrorOnFailure(ThreadStackMgrImpl().AttachToThreadNetwork(emptyNetwork, nullptr));
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
+
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()
 {
     return driver->mStagingNetwork.IsCommissioned() ? 1 : 0;
