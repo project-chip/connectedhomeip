@@ -383,6 +383,16 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (void)_notifyDelegatesOfSuspendState
+{
+    BOOL isSuspended = [self isSuspended];
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
+            [delegate controller:self isSuspended:isSuspended];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 - (void)suspend
 {
     MTR_LOG("%@ suspending", self);
@@ -407,12 +417,7 @@ using namespace chip::Tracing::DarwinFramework;
         // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
     }
 
-    BOOL isSuspended = [self isSuspended];
-    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
-            [delegate controller:self isSuspended:isSuspended];
-        }
-    } logString:__PRETTY_FUNCTION__];
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (void)resume
@@ -432,6 +437,8 @@ using namespace chip::Tracing::DarwinFramework;
             [device controllerResumed];
         }
     }
+
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
@@ -1182,8 +1189,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    auto block = ^MTRBaseDevice *
-    {
+    auto block = ^MTRBaseDevice * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
@@ -1332,8 +1338,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    auto block = ^NSData *
-    {
+    auto block = ^NSData * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = CHIP_NO_ERROR;
@@ -2292,8 +2297,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return nil;
     }
 
-    auto block = ^NSString *
-    {
+    auto block = ^NSString * {
         chip::SetupPayload setupPayload;
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
