@@ -14,8 +14,17 @@
 
 declare_args() {
   # Enable recommended settings by default. This is a meta-setting
-  # that acts as a default for various other settings. Setting it
-  # to false produces a more conservative / minimal set of defaults.
+  # that is enabled by default, and acts as a default for various
+  # other settings. Setting it to false produces a more conservative /
+  # minimal set of defaults.
+  #
+  # As additional features with their own settings are added to the SDK,
+  # consider using this meta-setting instead of a default value of 'true',
+  # especially where a different default is used based on platform (current_os):
+  # E.g. various debugging features have previously been defaulted to on
+  # for Linux and/or Mac but off for embedded platforms (on the assumption
+  # that Linux / Mac don't have resource constraints?); build settings of that
+  # nature should instead reference this meta-setting.
   matter_enable_recommended = true
 
   # Enable logging. Shorthand for chip_error_logging, etc.
