@@ -161,7 +161,7 @@ void sl_ble_event_handling_task(void * args)
 
     //! This semaphore is waiting for wifi module initialization.
     osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
-    
+
     // This function initialize BLE and start BLE advertisement.
     sl_ble_init();
 
