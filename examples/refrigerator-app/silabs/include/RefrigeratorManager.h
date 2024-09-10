@@ -73,9 +73,9 @@ private:
     int16_t mSelectedTemperatureLevel;
     int16_t mSupportedTemperatureLevels;
 
-    uint8_t mMask;
-    uint8_t mState;
-    uint8_t mSupported;
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mMask;
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mState;
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mSupported;
 
     int8_t ConvertToPrintableTemp(int16_t temperature);
     static RefrigeratorManager sRefrigeratorMgr;
