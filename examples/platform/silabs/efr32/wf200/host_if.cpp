@@ -1197,9 +1197,19 @@ bool wfx_hw_ready(void)
  ******************************************************************************/
 void wfx_dhcp_got_ipv4(uint32_t ip)
 {
-    /* Acquire the new IP address
+    /*
+     * Acquire the new IP address
      */
+    uint8_t ip4_addr[4];
+
+    ip4_addr[0] = (ip) &HEX_VALUE_FF;
+    ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
+    ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
+    ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
+
+    ChipLogDetail(DeviceLayer, "DHCP IP=%d.%d.%d.%d", ip4_addr[0], ip4_addr[1], ip4_addr[2], ip4_addr[3]);
     sta_ip = ip;
+
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
