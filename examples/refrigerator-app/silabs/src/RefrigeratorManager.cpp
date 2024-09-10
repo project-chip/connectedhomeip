@@ -26,6 +26,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 
 /**********************************************************
@@ -129,26 +130,36 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
     switch (attributeId)
     {
         case TempCtrlAttr::TemperatureSetpoint::Id: {
-            int8_t temperatureSetpoint = ConvertToPrintableTemp(*((int16_t *) value));
+            int16_t temperatureSetpoint = ConvertToPrintableTemp(*((int16_t *) value));
             mTemperatureSetpoint = temperatureSetpoint;
+            TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
         }
         break;
 
         case TempCtrlAttr::MinTemperature::Id: {
-            int8_t minTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+            int16_t minTemperature = ConvertToPrintableTemp(*((int16_t *) value));
             mMinTemperature = minTemperature;
+            TempCtrlAttr::MinTemperature::Set(endpointId, minTemperature);
         }
         break;
 
         case TempCtrlAttr::MaxTemperature::Id: {
-            int8_t maxTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+            int16_t maxTemperature = ConvertToPrintableTemp(*((int16_t *) value));
             mMaxTemperature = maxTemperature;
+            TempCtrlAttr::MaxTemperature::Set(endpointId, maxTemperature);
         }
         break;
 
         case TempCtrlAttr::SelectedTemperatureLevel::Id: {
-            int8_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
+            int16_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
             mSelectedTemperatureLevel = selectedTemperatureLevel;
+            TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
+        }
+        break;
+        
+        case TempCtrlAttr::Step::Id: {
+            int16_t step = ConvertToPrintableTemp(*((int16_t *) value));
+            TempCtrlAttr::MaxTemperature::Set(endpointId, step);
         }
         break;
 
@@ -167,20 +178,23 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
     switch (attributeId)
     {
         case RefAlarmAttr::Mask::Id: {
-            int8_t mask = static_cast<int8_t>(*value);
-            mCurrentMode = mask;
+            int8_t mask = static_cast<uint32_t>(*value);
+            mMask = mask;
+            RefAlarmAttr::Mask::Set(endpointId, mMask);
         }
         break;
 
         case RefAlarmAttr::State::Id: {
-            int8_t state = static_cast<int8_t>(*value);
+            int8_t state = static_cast<uint32_t>(*value);
             mState = state;
+            RefAlarmAttr::State::Set(endpointId, mState);
         }
         break;
 
         case RefAlarmAttr::Supported::Id: {
-            int8_t supported = static_cast<int8_t>(*value);
+            int8_t supported = static_cast<uint32_t>(*value);
             mSupported = supported;
+            RefAlarmAttr::Supported::Set(endpointId, mSupported);
         }
         break;
 

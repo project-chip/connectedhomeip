@@ -66,12 +66,12 @@ private:
     uint8_t mStartUpMode;
     uint8_t mOnMode;
 
-    int8_t mTemperatureSetpoint;
-    int8_t mMinTemperature;
-    int8_t mMaxTemperature;
-    int8_t mStep;
-    int8_t mSelectedTemperatureLevel;
-    int8_t mSupportedTemperatureLevels;
+    int16_t mTemperatureSetpoint;
+    int16_t mMinTemperature;
+    int16_t mMaxTemperature;
+    int16_t mStep;
+    int16_t mSelectedTemperatureLevel;
+    int16_t mSupportedTemperatureLevels;
 
     uint8_t mMask;
     uint8_t mState;

@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
 
-silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-import("${chip_root}/src/platform/silabs/wifi_args.gni")
-chip_enable_wifi = true
-chip_enable_ota_requestor = false
-app_data_model = "${chip_root}/examples/refrigerator-app/silabs/data_model:silabs-refrigerator"
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/platform/device.gni")
+
+chip_data_model("silabs-refrigerator") {
+   zap_file = "refrigerator-app.zap"
+  is_server = true
+}
