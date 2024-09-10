@@ -121,7 +121,7 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * 
  */
 void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    bleEvent.eventType = RSI_BLE_DISCONN_EVENT;
+    bleEvent.eventType         = RSI_BLE_DISCONN_EVENT;
     bleEvent.eventData->reason = reason;
     BlePostEvent(&bleEvent);
 }
