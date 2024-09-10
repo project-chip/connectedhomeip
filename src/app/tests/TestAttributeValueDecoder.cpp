@@ -136,4 +136,34 @@ TEST(TestAttributeValueDecoder, TestOverwriteFabricIndexInListOfStructs)
     }
 }
 
+TEST(TestAttributeValueDecoder, TestGetReaderForDecoding)
+{
+    TestSetup setup;
+    CHIP_ERROR err;
+    Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type item;
+    Access::SubjectDescriptor subjectDescriptor = { .fabricIndex = kTestFabricIndex };
+
+    item.fabricIndex = 0;
+
+    err = setup.Encode(item);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    TLVType ignored;
+    reader.Init(setup.buf, setup.writer.GetLengthWritten());
+
+    err = reader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = reader.EnterContainer(ignored);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = reader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    AttributeValueDecoder decoder(reader, subjectDescriptor);
+    decoder.GetReaderForDecoding();
+    EXPECT_TRUE(decoder.TriedDecode());
+}
+
 } // anonymous namespace

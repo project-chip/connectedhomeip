@@ -52,6 +52,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * Get the reader from the decoder for raw data. Calling this is considered to be tried decoding.
+     */
+    TLV::TLVReader & GetReaderForDecoding() {
+        mTriedDecode = true;
+        return mReader;
+    }
+
     bool TriedDecode() const { return mTriedDecode; }
 
     /**
