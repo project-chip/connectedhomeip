@@ -37,6 +37,7 @@ RUN apt-get update \
     valgrind \
     docker.io \
     iputils-ping \
+    icecc \
     && :
 
 RUN groupadd -g $USER_GID $USERNAME \
@@ -80,3 +81,8 @@ ENV TIZEN_ROOTFS /tizen_rootfs
 
 # Fast Model GDB plugins path for debugging support
 ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+
+# icecc and ccache for cluster compilation
+ENV CHIP_PW_COMMAND_LAUNCHER ccache
+ENV CCACHE_PREFIX icecc
+ENV PATH /usr/lib/ccache:$PATH
