@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
-import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/config/recommended.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {

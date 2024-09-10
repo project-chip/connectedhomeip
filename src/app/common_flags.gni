@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/config/recommended.gni")
 
 declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
