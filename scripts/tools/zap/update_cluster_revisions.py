@@ -46,7 +46,7 @@ def getTargets(cluster_id: int):
 
     if cluster_id in EXCLUDE_FROM_UPDATE_DICTIONARY:
         for target_to_exclude in EXCLUDE_FROM_UPDATE_DICTIONARY[cluster_id]:
-            targets = [target for target in targets if target_to_exclude not in target.parts]
+            targets = [target for target in targets if target_to_exclude not in str(target)]
 
     return targets
 
