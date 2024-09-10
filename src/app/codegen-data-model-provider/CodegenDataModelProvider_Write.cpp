@@ -286,7 +286,18 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
     // ACL check for non-internal requests
-    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
+    bool checkAcl = !request.operationFlags.Has(DataModel::OperationFlags::kInternal);
+
+    // For chunking, ACL check is not re-done if the previous write was successful for the exact same
+    // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
+    if (checkAcl && (request.path.mClusterId == Clusters::AccessControl::Id) && request.previousSuccessPath.has_value())
+    {
+        checkAcl = ((request.path.mEndpointId != request.previousSuccessPath->mEndpointId) ||
+                    (request.path.mClusterId != request.previousSuccessPath->mClusterId) ||
+                    (request.path.mAttributeId != request.previousSuccessPath->mAttributeId));
+    }
+
+    if (checkAcl)
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 

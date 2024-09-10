@@ -33,6 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -563,6 +564,10 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     // our callees hand out Status as well.
     Status status = Status::InvalidAction;
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    mPreviousWriteSuccess = std::nullopt;
+#endif
+
     reader.Init(std::move(aPayload));
 
     err = writeRequestParser.Init(reader);
@@ -724,13 +729,16 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     DataModel::WriteAttributeRequest request;
 
-    request.path              = path;
-    request.subjectDescriptor = subject;
+    request.path                = path;
+    request.subjectDescriptor   = subject;
+    request.previousSuccessPath = mPreviousWriteSuccess;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
     AttributeValueDecoder decoder(data, subject);
 
     DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+
+    mPreviousWriteSuccess = status.IsSuccess() ? std::make_optional(path) : std::nullopt;
 
     return AddStatusInternal(path, StatusIB(status.GetStatusCode()));
 #else
