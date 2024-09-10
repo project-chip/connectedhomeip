@@ -25,7 +25,6 @@
 
 import logging
 import random
-from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -133,7 +132,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         # Establishing TH3 controller
         th3_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th3_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
+        th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
         self.th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
 
         self.step(2)
