@@ -26,7 +26,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
 
 #include <ble/Ble.h>
@@ -39,9 +38,6 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-// #ifndef SLI_SI91X_MCU_INTERFACE
-// #include "rail.h"
-// #endif
 #include <crypto/RandUtils.h>
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +62,6 @@ uint8_t dev_address[RSI_DEV_ADDR_LEN];
 uint16_t ble_measurement_hndl;
 
 osSemaphoreId_t sl_rs_ble_init_sem;
-
 osTimerId_t sbleAdvTimeoutTimer;
 
 static osThreadId_t sBleThread;
@@ -96,7 +91,7 @@ void sl_ble_init()
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
-                                NULL, NULL, NULL);
+                                   NULL, NULL, NULL);
 
     // registering the GATT call back functions
     rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL,

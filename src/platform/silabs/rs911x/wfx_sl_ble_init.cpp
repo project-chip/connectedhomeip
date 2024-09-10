@@ -20,30 +20,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/logging/CHIPLogging.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include "wfx_sl_ble_init.h"
-#include "ble_config.h"
-#include "cmsis_os2.h"
 #ifdef __cplusplus
 }
 #endif
-#include <platform/CHIPDeviceLayer.h>
-
-#include "silabs_utils.h"
 
 // Global Variables
 rsi_ble_t att_list;
-sl_wfx_msg_t event_msg;
-
 BleEvent_t bleEvent;
-
 static osMessageQueueId_t sBleEventQueue = NULL;
-
-// Memory to initialize driver
-uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
-const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 void InitBleEventQueue()
 {
@@ -61,7 +52,7 @@ void BlePostEvent(BleEvent_t * event)
     sl_status_t status = osMessageQueuePut(sBleEventQueue, event, 0, 0);
     if (status != osOK)
     {
-        SILABS_LOG("BlePostEvent: failed to post event: 0x%lx", status);
+        ChipLogError(DeviceLayer,"BlePostEvent: failed to post event: 0x%lx", status);
         // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
     }
 }

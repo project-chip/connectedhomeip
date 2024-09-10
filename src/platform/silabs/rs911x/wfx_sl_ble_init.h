@@ -29,11 +29,8 @@
 #define WFX_SL_BLE_INIT
 
 // BLE include file to refer BLE APIs
-#include "FreeRTOS.h"
+#include "cmsis_os2.h"
 #include "ble_config.h"
-#include "event_groups.h"
-#include "task.h"
-#include "timers.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include <rsi_ble.h>
