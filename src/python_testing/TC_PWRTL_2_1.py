@@ -75,17 +75,17 @@ class TC_PWRTL_2_1(MatterBaseTest):
             active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
             logging.info("ActiveEndpoints: %s" % (active_endpoints))
             asserts.assert_less_equal(len(active_endpoints), 20,
-                                   "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
+                                      "ActiveEndpoints length %d must be less than 21!" % len(active_endpoints))
 
-        
             if available_endpoints == []:
                 # Verify that ActiveEndpoints is a subset of AvailableEndpoints
                 asserts.assert_true(set(active_endpoints).issubset(set(available_endpoints)),
-                                  "ActiveEndpoints should be a subset of AvailableEndpoints")
+                                    "ActiveEndpoints should be a subset of AvailableEndpoints")
 
         else:
             logging.info('Skipping test step 3 as active endpoints attribute ID not in attribute list on DUT')
             return
+
 
 if __name__ == "__main__":
     default_matter_test_main()
