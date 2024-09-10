@@ -33,8 +33,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
-#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
