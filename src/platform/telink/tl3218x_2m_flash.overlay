@@ -18,7 +18,11 @@
 		};
 		factory_partition: partition@102000 {
 			label = "factory-data";
-			reg = <0x102000 0x1000>;
+			reg = <0x102000 0x800>;
+		};
+		factory_rfu_partition: partition@102800 {
+			label = "factory-data-rfu";
+			reg = <0x102800 0x800>;
 		};
 		storage_partition: partition@103000 {
 			label = "storage";

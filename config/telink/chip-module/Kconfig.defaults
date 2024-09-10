@@ -61,17 +61,19 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 3240 if PM
+    default 3240 if PM || SOC_RISCV_TELINK_TL321X
     default 4096
 
 config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM
+    default 512 if PM || SOC_RISCV_TELINK_TL321X
+
 
 config ISR_STACK_SIZE
     default 502 if PM
+    default 512 if SOC_RISCV_TELINK_TL321X
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
@@ -79,7 +81,8 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 256
 
-config COMMON_LIBC_MALLOC_ARENA_SIZE 
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default 20716 if SOC_RISCV_TELINK_TL321X
     default 12288
 
 config NET_IPV6_MLD
@@ -92,19 +95,21 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_BUF_RX_COUNT
     default 16 if PM
+    default 12 if SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
     default 16 if PM
+    default 12 if SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -134,17 +139,36 @@ config BT_MAX_CONN
     default 1
 
 config BT_L2CAP_TX_MTU
+    default 103 if SOC_RISCV_TELINK_TL321X
     default 247
 
 config BT_BUF_ACL_RX_SIZE
+    default 107 if SOC_RISCV_TELINK_TL321X
     default 251
 
 config BT_BUF_ACL_TX_SIZE
+    default 107 if SOC_RISCV_TELINK_TL321X
     default 251
+
+
+#ifdef CONFIG_SOC_RISCV_TELINK_TL321X
+
+config BT_BUF_EVT_RX_COUNT
+    default 4
+
+config BT_BUF_ACL_RX_COUNT
+    default 4
+
+config BT_GATT_CACHING
+    bool
+    default n
+
+
+#endif
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X
-    default 810 if BT_TLX
+    default 1010 if BT_TLX
     default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
@@ -213,19 +237,6 @@ config PWM
 
 endif
 
-if BOARD_TL3218X_RETENTION
-
-config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
-    default y if PM
-
-config TELINK_TLX_MATTER_RETENTION_LAYOUT
-    default y if PM
-
-config PWM
-    default n
-
-endif
-
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
     BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D || BOARD_TL3218X
@@ -264,6 +275,7 @@ config NVS_LOOKUP_CACHE
     default y
 
 config NVS_LOOKUP_CACHE_SIZE
+    default 400  if SOC_RISCV_TELINK_TL321X
     default 2048 if !PM
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
@@ -303,7 +315,7 @@ config CHIP_ENABLE_ICD_SUPPORT
 	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 2178 if PM
+    default 2178 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
     default 361 if PM
@@ -326,10 +338,10 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
-    default 554 if PM
+    default 554 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
-    default 554 if PM
+    default 554 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
