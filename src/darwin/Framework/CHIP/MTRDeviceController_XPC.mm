@@ -34,7 +34,6 @@
 
 @interface MTRDeviceController_XPC ()
 
-@property (nonatomic, readwrite, retain) NSUUID * uniqueIdentifier;
 @property (nonnull, atomic, readwrite, retain) MTRXPCDeviceControllerParameters * xpcParameters;
 @property (atomic, readwrite, assign) NSTimeInterval xpcRetryTimeInterval;
 @property (atomic, readwrite, assign) BOOL xpcConnectedOrConnecting;
@@ -45,55 +44,62 @@
 
 @implementation MTRDeviceController_XPC
 
-@synthesize uniqueIdentifier = _uniqueIdentifier;
-
-- (NSXPCInterface *)_interfaceForServerProtocol
++ (NSMutableSet *)_allowedClasses
 {
-    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
-
-    NSSet * allowedClasses = [NSSet setWithArray:@[
+    static NSArray * sBaseAllowedClasses = @[
         [NSString class],
         [NSNumber class],
         [NSData class],
         [NSArray class],
         [NSDictionary class],
         [NSError class],
-        [MTRCommandPath class],
-        [MTRAttributePath class],
         [NSDate class],
+    ];
+
+    return [NSMutableSet setWithArray:sBaseAllowedClasses];
+}
+
+- (NSXPCInterface *)_interfaceForServerProtocol
+{
+    NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRCommandPath class],
+        [MTRAttributePath class]
     ]];
 
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:completion:)
             argumentIndex:0
                   ofReply:YES];
+
     return interface;
 }
 
 - (NSXPCInterface *)_interfaceForClientProtocol
 {
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
-    NSSet * allowedClasses = [NSSet setWithArray:@[
-        [NSString class],
-        [NSNumber class],
-        [NSData class],
-        [NSArray class],
-        [NSDictionary class],
-        [NSError class],
-        [MTRAttributePath class],
-        [NSDate class],
+    NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRAttributePath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedAttributeReport:)
             argumentIndex:1
                   ofReply:NO];
-    allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class], [MTREventPath class]
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTREventPath class]
     ]];
+
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedEventReport:)
             argumentIndex:1
                   ofReply:NO];
+
     return interface;
 }
 
@@ -109,7 +115,7 @@
         self.xpcRetryTimeInterval = 0.5;
         mtr_weakify(self);
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
             mtr_strongify(self);
             [self _xpcConnectionRetry];
         });
@@ -129,7 +135,7 @@
             self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
             mtr_weakify(self);
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
                 mtr_strongify(self);
                 [self _xpcConnectionRetry];
             });
@@ -193,15 +199,8 @@
             }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
         }
 
-        __block BOOL barrierComplete = NO;
-
-        [self.xpcConnection scheduleSendBarrierBlock:^{
-            barrierComplete = YES;
-            MTR_LOG("%@: Barrier complete: %d", self, barrierComplete);
-        }];
-
-        MTR_LOG("%@ Done existing NodeID Registration, barrierComplete: %d", self, barrierComplete);
-        self.xpcConnectedOrConnecting = barrierComplete;
+        MTR_LOG("%@ Done existing NodeID Registration", self);
+        self.xpcConnectedOrConnecting = YES;
     } else {
         MTR_LOG_ERROR("%@ Failed to set up XPC Connection", self);
         self.xpcConnectedOrConnecting = NO;
@@ -237,10 +236,9 @@
             return nil;
         }
 
+        self.uniqueIdentifier = UUID;
         self.xpcParameters = xpcParameters;
         self.chipWorkQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        self.nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
-        self.uniqueIdentifier = UUID;
 
         if (![self _setupXPCConnection]) {
             return nil;
@@ -288,6 +286,13 @@
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
     [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
+
+    mtr_weakify(self);
+    [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        mtr_strongify(self);
+        MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
+    }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
+
     return deviceToReturn;
 }
 

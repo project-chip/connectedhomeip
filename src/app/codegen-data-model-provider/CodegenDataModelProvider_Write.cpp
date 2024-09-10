@@ -386,8 +386,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     }
     else
     {
-        status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            dataBuffer.data(), (*attributeMetadata)->attributeType);
+        status =
+            emAfWriteAttributeExternal(request.path, EmberAfWriteDataInput(dataBuffer.data(), (*attributeMetadata)->attributeType));
     }
 
     if (status != Protocols::InteractionModel::Status::Success)

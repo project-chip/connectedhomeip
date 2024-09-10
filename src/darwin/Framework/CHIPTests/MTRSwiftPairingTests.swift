@@ -3,7 +3,7 @@ import XCTest
 
 // This more or less parallels the "no delegate" case in MTRPairingTests, but uses the "normal"
 // all-clusters-app, since it does not do any of the "interesting" VID/PID notification so far.  If
-// it ever starts needing to do that, we should figure out a way to use MTRTestServerAppRunner from
+// it ever starts needing to do that, we should figure out a way to use MTRTestCase+ServerAppRunner from
 // here.
 
 struct PairingConstants {
