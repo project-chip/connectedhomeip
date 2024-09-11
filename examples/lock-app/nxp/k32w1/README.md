@@ -37,7 +37,7 @@ wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
 the OTA image is stored in external memory, `LED2` operations will affect OTA
 operation by corrupting packages and OTA will not work.
 
-The user actions are summarised below:
+The user actions are summarized below:
 
 | button | action      | state                        | output                                                                                                                                 |
 | ------ | ----------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
