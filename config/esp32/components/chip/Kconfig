@@ -1117,6 +1117,36 @@ menu "CHIP Device Layer"
 	     To see detailed logging please set default log level to Debug.
 	     (Component config --> Log output --> Default log verbosity --> Debug)
 
+    choice CHIP_LOG_DEFAULT_LEVEL
+        bool "CHIP default log verbosity"
+        default CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+        help
+            Default log level for CHIP logs. Note that CHIP_LOG_DEFAULT_LEVEL can only be less than or equal to LOG_DEFAULT_LEVEL.
+
+        config CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+            bool "Same as default log level"
+        config CHIP_LOG_DEFAULT_LEVEL_NONE
+            bool "CHIP logging disabled"
+        config CHIP_LOG_DEFAULT_LEVEL_ERROR
+            bool "Enable Error Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_PROGRESS
+            bool "Enable Progress Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_DETAIL
+            bool "Enable Detail Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_AUTOMATION
+            bool "Enable Automation Logs"
+    endchoice
+
+    config CHIP_LOG_DEFAULT_LEVEL
+        int
+        range 0 LOG_DEFAULT_LEVEL
+        default LOG_DEFAULT_LEVEL if CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+        default 0 if CHIP_LOG_DEFAULT_LEVEL_NONE
+        default 1 if CHIP_LOG_DEFAULT_LEVEL_ERROR
+        default 3 if CHIP_LOG_DEFAULT_LEVEL_PROGRESS
+        default 4 if CHIP_LOG_DEFAULT_LEVEL_DETAIL
+        default 5 if CHIP_LOG_DEFAULT_LEVEL_AUTOMATION
+
     endmenu
 
     config CHIP_ENABLE_BDX_LOG_TRANSFER
