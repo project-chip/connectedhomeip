@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -152,7 +153,9 @@ class TelinkBuilder(Builder):
                  enable_factory_data: bool = False,
                  enable_4mb_flash: bool = False,
                  mars_board_config: bool = False,
-                 usb_board_config: bool = False):
+                 usb_board_config: bool = False,
+                 data_model_interface: Optional[str] = None,
+                 ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -164,6 +167,7 @@ class TelinkBuilder(Builder):
         self.enable_4mb_flash = enable_4mb_flash
         self.mars_board_config = mars_board_config
         self.usb_board_config = usb_board_config
+        self.data_model_interface = data_model_interface
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -214,10 +218,12 @@ class TelinkBuilder(Builder):
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
         cmd = self.get_cmd_prefixes()
-        cmd += '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
-        '''.format(
+        cmd += '\nsource "$ZEPHYR_BASE/zephyr-env.sh";'
+
+        if self.data_model_interface:
+            cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface};'
+
+        cmd += '\nwest build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}\n'.format(
             outdir=shlex.quote(self.output_dir),
             board=self.board.GnArgName(),
             sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'telink')),

@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -139,11 +140,14 @@ class NrfConnectBuilder(Builder):
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 data_model_interface: Optional[str] = None,
+                 ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.data_model_interface = data_model_interface
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -189,16 +193,15 @@ class NrfConnectBuilder(Builder):
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
-            cmd = '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
-            if zephyr_sdk_dir:
-                cmd += f'''
-export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
+            cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
 
-            cmd += '''
-west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}
-        '''.format(
+            if zephyr_sdk_dir:
+                cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
+            if self.data_model_interface:
+                cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface};'
+
+
+            cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(

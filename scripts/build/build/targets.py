@@ -232,6 +232,8 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -330,6 +332,8 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -415,6 +419,8 @@ def BuildMbedTarget():
         '-(release|debug)')
     target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
         '-(release|develop)')
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -538,6 +544,8 @@ def BuildNxpTarget():
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
@@ -779,6 +787,8 @@ def BuildTelinkTarget():
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
