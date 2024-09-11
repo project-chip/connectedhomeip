@@ -1,50 +1,51 @@
 # Matter K32W1 Door Lock Example Application
 
-For generic information related to door lock application,
-please see the [common README](../README.md).
+For generic information related to door lock application, please see the
+[common README](../README.md).
 
-- [Matter K32W1 Door Lock Example Application](#matter-k32w1-door-lock-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-  - [Flashing](#flashing)
-    - [Flashing the `NBU` image](#flashing-the-nbu-image)
-    - [Flashing the host image](#flashing-the-host-image)
-  - [Debugging](#debugging)
-  - [OTA](#ota)
+-   [Matter K32W1 Door Lock Example Application](#matter-k32w1-door-lock-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+        -   [Flashing the `NBU` image](#flashing-the-nbu-image)
+        -   [Flashing the host image](#flashing-the-host-image)
+    -   [Debugging](#debugging)
+    -   [OTA](#ota)
 
 ## Introduction
 
-The following board was used when testing this Matter reference app
-for a `k32w1` device: ![K32W1 EVK](../../../platform/nxp/mcxw71_k32w1/doc/images/k32w1-evk.jpg)
+The following board was used when testing this Matter reference app for a
+`k32w1` device:
+![K32W1 EVK](../../../platform/nxp/mcxw71_k32w1/doc/images/k32w1-evk.jpg)
 
 ## Device UI
 
 The state feedback is provided through LED effects:
 
-| widget | effect | description |
-| ------ | ------ | ----------- |
-| LED2 | short flash on (50ms on/950ms off) | The device is in an unprovisioned (unpaired) state and is waiting for a commissioner to connect. |
-| LED2 | rapid even flashing (100ms period) | The device is in an unprovisioned state and a commissioner is connected via BLE. |
-| LED2 | short flash off (950ms on/50ms off) | The device is fully provisioned, but does not yet have full network (Thread) or service connectivity. |
-| LED2 | solid on | The device is fully provisioned and has full network and service connectivity. |
-| RGB LED | on | The `LockState` attribute of the `DoorLock` cluster is `Unlocked`. |
-| RGB LED | off | The `LockState` attribute of the `DoorLock` cluster is `Locked`. |
+| widget  | effect                              | description                                                                                           |
+| ------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| LED2    | short flash on (50ms on/950ms off)  | The device is in an unprovisioned (unpaired) state and is waiting for a commissioner to connect.      |
+| LED2    | rapid even flashing (100ms period)  | The device is in an unprovisioned state and a commissioner is connected via BLE.                      |
+| LED2    | short flash off (950ms on/50ms off) | The device is fully provisioned, but does not yet have full network (Thread) or service connectivity. |
+| LED2    | solid on                            | The device is fully provisioned and has full network and service connectivity.                        |
+| RGB LED | on                                  | The `LockState` attribute of the `DoorLock` cluster is `Unlocked`.                                    |
+| RGB LED | off                                 | The `LockState` attribute of the `DoorLock` cluster is `Locked`.                                      |
 
 NOTE: `LED2` will be disabled when OTA is used. On K32W1 EVK board, `PTB0` is
-wired to both `LED2` and CS (Chip Select) of the External Flash Memory.
-Since the OTA image is stored in external memory, `LED2` operations will affect
-OTA operation by corrupting packages and OTA will not work.
+wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
+the OTA image is stored in external memory, `LED2` operations will affect OTA
+operation by corrupting packages and OTA will not work.
 
 The user actions are summarised below:
 
-| button | action | state | output |
-| ------ | ------ | ----- | ------ |
-| SW2 | short press | not commissioned | Enable BLE advertising |
-| SW2 | short press | commissioned + device is LIT | Enable Active Mode |
-| SW2 | long press | NA | Initiate a factory reset (can be cancelled by pressing the button again within the factory reset timeout limit - 6 seconds by default) |
-| SW3 | short press | NA | Toggle attribute `LockState` value |
-| SW3 | long press | NA | Clean soft reset of the device (takes into account proper Matter shutdown procedure) |
+| button | action      | state                        | output                                                                                                                                 |
+| ------ | ----------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| SW2    | short press | not commissioned             | Enable BLE advertising                                                                                                                 |
+| SW2    | short press | commissioned + device is LIT | Enable Active Mode                                                                                                                     |
+| SW2    | long press  | NA                           | Initiate a factory reset (can be cancelled by pressing the button again within the factory reset timeout limit - 6 seconds by default) |
+| SW3    | short press | NA                           | Toggle attribute `LockState` value                                                                                                     |
+| SW3    | long press  | NA                           | Clean soft reset of the device (takes into account proper Matter shutdown procedure)                                                   |
 
 ## Building
 
@@ -56,8 +57,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w1$ gn gen ou
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w1$ ninja -C out/debug
 ```
 
-Please note that running `gn gen out/debug` without `--args` option will use the default
-gn args values found in `args.gni`.
+Please note that running `gn gen out/debug` without `--args` option will use the
+default gn args values found in `args.gni`.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/`.
 See the files prefixed with `chip-k32w1-lock-example`.
@@ -98,6 +99,7 @@ section. Otherwise, if only flashing is needed then
     doing this, e.g. ISP mode is not needed for host flashing)
 
 -   Connect JLink to the device:
+
     ```bash
     JLinkExe -device K32W1480 -if SWD -speed 4000 -autoconnect 1
     ```
@@ -159,4 +161,5 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ## OTA
 
-Please see [k32w1 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+Please see
+[k32w1 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
