@@ -23,19 +23,20 @@
 class MTROperationalBrowser
 {
 public:
-    // Should be created at a point when the factory starts up the event loop,
-    // and destroyed when the event loop is stopped.
+    // Should be created at a point when the dispatch queue is available.
     MTROperationalBrowser(MTRDeviceControllerFactory * aFactory, dispatch_queue_t aQueue);
 
     ~MTROperationalBrowser();
+
+    // EnsureBrowse is a no-op if a browse has already been started.
+    void EnsureBrowse();
+    void StopBrowse();
 
 private:
     static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId, DNSServiceErrorType aError,
                          const char * aName, const char * aType, const char * aDomain, void * aContext);
 
-    void TryToStartBrowse();
-
-    MTRDeviceControllerFactory * const mDeviceControllerFactory;
+    MTRDeviceControllerFactory * const __weak mDeviceControllerFactory;
     dispatch_queue_t mQueue;
     DNSServiceRef mBrowseRef;
 
