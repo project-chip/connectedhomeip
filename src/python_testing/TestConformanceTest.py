@@ -22,8 +22,8 @@ from matter_testing_support.basic_composition import arls_populated
 from matter_testing_support.conformance import ConformanceDecision
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 from matter_testing_support.spec_parsing import build_xml_clusters, build_xml_device_types
+from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
 
 
