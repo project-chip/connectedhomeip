@@ -115,7 +115,7 @@ tests:
               - name: "ms"
                 value: 15000
 
-    # Tolerance to be computed from the range, hue wraps back to 0 the continues
+    # Tolerance to be computed from the range (20*5=100) that hue changed (note that hue reaches max, wraps back to 0 then continues from min value)
     # In 20s the value will have changed by 100 and wrapped around to 45. A 15% tolerance is 15, so 30 to 60
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
