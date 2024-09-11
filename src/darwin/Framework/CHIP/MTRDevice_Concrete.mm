@@ -2700,12 +2700,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
     //
-    // But all this only happens if this device has been accessed via the public
-    // API.  If it's a device we just created internally, don't do read-throughs.
+    // But all this only happens if this device is not suspended.  If it's suspended, read-throughs will fail
+    // anyway, so we should not bother trying.
     BOOL readThroughsAllowed;
     {
         std::lock_guard lock(_lock);
-        readThroughsAllowed = _accessedViaPublicAPI;
+        readThroughsAllowed = !self.suspended;
     }
     if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
