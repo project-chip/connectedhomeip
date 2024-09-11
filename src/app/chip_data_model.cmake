@@ -119,6 +119,27 @@ function(chip_configure_data_model APP_TARGET)
         set(APP_GEN_FILES)
     endif()
 
+    # These are:
+    #   //src/app/icd/server:notfier
+    #   //src/app/icd/server:monitoring-table
+    #   //src/app/icd/server:configuration-data
+    #
+    # TODO: ideally we would avoid duplication and would link gn-built items. In this case
+    #       it may be slightly harder because these are source_sets rather than libraries.
+    target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
+│       ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
+│       ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
+    )
+
+    # This is:
+    #    //src/app/common:cluster-objects
+    #
+    # TODO: ideally we would avoid duplication and would link gn-built items
+    target_sources(${APP_TARGET} ${SCOPE}
+        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/cluster-objects.cpp
+    )
+
     chip_zapgen(${APP_TARGET}-zapgen
         INPUT "${ARG_ZAP_FILE}"
         GENERATOR "app-templates"
@@ -133,18 +154,12 @@ function(chip_configure_data_model APP_TARGET)
     target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
-    # TODO: source for codedgen_data_model ???
-
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
         ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
-        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-global-attribute-access-interface.cpp
