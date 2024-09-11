@@ -95,7 +95,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
     sl_wfx_mib_req_body_t body;
 } sl_wfx_mib_req_t;
 
-#else /* End WF200 else 916,917 NCP and 917 SoC */
+#else /* End WF200 else RS9116,917 NCP and 917 SoC */
 
 #include "wfx_msgs.h"
 
@@ -116,7 +116,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_CONNECT_IND_ID (2)
 #define SL_WFX_DISCONNECT_IND_ID (3)
 #define SL_WFX_SCAN_COMPLETE_ID (4)
-#endif /* WF200 */
+#endif /* WF200_WIFI */
 
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 // MAX SSID LENGTH excluding NULL character
