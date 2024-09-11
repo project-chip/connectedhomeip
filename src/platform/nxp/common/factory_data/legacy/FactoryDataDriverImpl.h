@@ -19,7 +19,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
 
 extern "C" {
 #include "HWParameter.h"
@@ -29,7 +29,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * This class implements the FactoryDataDriver with K32W1 specific functions
+ * This class implements the FactoryDataDriver
  */
 
 class FactoryDataDriverImpl : public FactoryDataDriver
