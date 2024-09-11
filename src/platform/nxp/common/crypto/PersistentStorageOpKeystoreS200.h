@@ -61,15 +61,15 @@ public:
  *        of how to use the interface.
  *
  */
-class K32W1PersistentStorageOpKeystore : public Crypto::OperationalKeystore
+class PersistentStorageOpKeystoreS200 : public Crypto::OperationalKeystore
 {
 public:
-    K32W1PersistentStorageOpKeystore() = default;
-    virtual ~K32W1PersistentStorageOpKeystore() { Finish(); }
+    PersistentStorageOpKeystoreS200() = default;
+    virtual ~PersistentStorageOpKeystoreS200() { Finish(); }
 
     // Non-copyable
-    K32W1PersistentStorageOpKeystore(K32W1PersistentStorageOpKeystore const &) = delete;
-    void operator=(K32W1PersistentStorageOpKeystore const &)                   = delete;
+    PersistentStorageOpKeystoreS200(PersistentStorageOpKeystoreS200 const &) = delete;
+    void operator=(PersistentStorageOpKeystoreS200 const &)                   = delete;
 
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
