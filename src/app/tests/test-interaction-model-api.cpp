@@ -173,8 +173,8 @@ ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeReq
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                                 CommandHandler * handler)
+std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequest & request,
+                                                                chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }
