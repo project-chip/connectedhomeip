@@ -91,7 +91,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                                 \
         NSXPCConnection * xpcConnection = XPC_CONNECTION;                                             \
                                                                                                       \
-        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {    \
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {               \
             MTR_LOG_ERROR("Error: %@", error);                                                        \
         }] PREFIX ADDITIONAL_ARGUMENTS];                                                              \
     }
