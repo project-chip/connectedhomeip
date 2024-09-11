@@ -44,11 +44,11 @@ public:
 	void AppMatter_RegisterCustomCliCommands(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
-	
+
 
 private:
     static AppTask sAppTask;
-	
+
 };
 } // namespace LockApp
 
