@@ -69,7 +69,7 @@ public:
 
     // Non-copyable
     PersistentStorageOpKeystoreS200(PersistentStorageOpKeystoreS200 const &) = delete;
-    void operator=(PersistentStorageOpKeystoreS200 const &)                   = delete;
+    void operator=(PersistentStorageOpKeystoreS200 const &)                  = delete;
 
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.

@@ -16,9 +16,9 @@
  */
 
 #include "OperationalKeystore.h"
-#include "K32W1PersistentStorageOpKeystore.h"
+#include <platform/nxp/common/crypto/PersistentStorageOpKeystoreS200.h>
 
-static chip::K32W1PersistentStorageOpKeystore sInstance;
+static chip::PersistentStorageOpKeystoreS200 sInstance;
 
 chip::Crypto::OperationalKeystore * chip::NXP::App::OperationalKeystore::GetInstance()
 {

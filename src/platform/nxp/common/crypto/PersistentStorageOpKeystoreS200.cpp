@@ -103,7 +103,7 @@ bool PersistentStorageOpKeystoreS200::HasOpKeypairForFabric(FabricIndex fabricIn
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreS200::NewOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                   MutableByteSpan & outCertificateSigningRequest)
+                                                                  MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -136,7 +136,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::NewOpKeypairForFabric(FabricIndex fa
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreS200::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                        const Crypto::P256PublicKey & nocPublicKey)
+                                                                       const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -197,7 +197,7 @@ void PersistentStorageOpKeystoreS200::RevertPendingKeypair()
 }
 
 CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
-                                                               Crypto::P256ECDSASignature & outSignature) const
+                                                              Crypto::P256ECDSASignature & outSignature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
