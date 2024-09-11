@@ -1,9 +1,9 @@
-# Matter MCXW71 Lighting Example Application
+# Matter `MCXW71` Lighting Example Application
 
 For generic information related to on/off light application, please see the
 [common README](../README.md).
 
--   [Matter MCXW71 Lighting Example Application](#matter-mcxw71-lighting-example-application)
+-   [Matter `MCXW71` Lighting Example Application](#matter-mcxw71-lighting-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -18,7 +18,7 @@ For generic information related to on/off light application, please see the
 
 ## Introduction
 
-This is an on/off lighting application implemented for an mcxw71 device.
+This is an on/off lighting application implemented for an `mcxw71` device.
 
 The following board was used when testing this Matter reference app for a
 `mcxw71` device:
@@ -42,7 +42,7 @@ is wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
 the OTA image is stored in external memory, `LED2` operations will affect OTA
 operation by corrupting packages and OTA will not work.
 
-The user actions are summarised below:
+The user actions are summarized below:
 
 | button | action      | output                                                                                                                                 |
 | ------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -53,7 +53,7 @@ The user actions are summarised below:
 
 The example application provides a simple UI that depicts the state of the
 device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in the MCXW71 EVK board.
+general-purpose LEDs and buttons built in the `MCXW71` board.
 
 ## Building
 
@@ -139,9 +139,9 @@ path -
 
 2. Updating `NBU` for Wireless examples
 
-    It is necessary to work with the matching NBU image for the SDK version of
+    It is necessary to work with the matching `NBU` image for the SDK version of
     the application you are working with. This means that when you download your
-    SDK, prior to loading any wireless SDK example, update your NBU image with
+    SDK, prior to loading any wireless SDK example, update your `NBU` image with
     the SDK provided binaries. For `FRDM` users, please write the following
     binary:
 
@@ -175,8 +175,8 @@ If debugging is needed then jump directly to the [Debugging](#debugging)
 section. Otherwise, if only flashing is needed then
 [JLink](https://www.segger.com/downloads/jlink/) can be used:
 
--   Plug MCXW71 to the USB port (no need to keep the SW4 button pressed while
-    doing this, e.g. ISP mode is not needed for host flashing)
+-   Plug `MCXW71` to the USB port (no need to keep the `SW4` button pressed
+    while doing this, e.g. ISP mode is not needed for host flashing)
 
 -   Connect JLink to the device:
 
@@ -217,7 +217,7 @@ Import SDK example(s).. -> choose a demo app (demo_apps -> hello_world) -> Finis
 Right click on the application (from Project Explorer) -> Debug as -> JLink/CMSIS-DAP
 ```
 
-After this step, a debug configuration specific for the MCXW71 board was
+After this step, a debug configuration specific for the `MCXW71` board was
 created. This debug configuration will be used later on for debugging the
 application resulted after ot-nxp compilation.
 
@@ -231,7 +231,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 ![New Project](../../../platform/nxp/mcxw71_k32w1/doc/images/new_project.jpg)
 
 -   Replace the path of the existing demo application with the path of the
-    MCXW71 application:
+    `MCXW71` application:
 
 ```
 Run -> Debug Configurations... -> C/C++ Application
