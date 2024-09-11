@@ -24,6 +24,8 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "FreeRTOS.h"
+#include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #ifdef __cplusplus
 extern "C" {
