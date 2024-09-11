@@ -24,6 +24,7 @@ The example is based on:
 ## Supported devices
 
 -   [k32w1](k32w1/README.md)
+-   [mcxw71](mcxw71/README.md)
 
 ## Introduction
 

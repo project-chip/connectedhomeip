@@ -1,9 +1,9 @@
-# Matter K32W1 Lighting Example Application
+# Matter `MCXW71` Lighting Example Application
 
 For generic information related to on/off light application, please see the
 [common README](../README.md).
 
--   [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
+-   [Matter `MCXW71` Lighting Example Application](#matter-mcxw71-lighting-example-application)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -18,11 +18,11 @@ For generic information related to on/off light application, please see the
 
 ## Introduction
 
-This is an on/off lighting application implemented for a k32w1 device.
+This is an on/off lighting application implemented for an `mcxw71` device.
 
 The following board was used when testing this Matter reference app for a
-`k32w1` device:
-![K32W1 EVK](../../../platform/nxp/mcxw71_k32w1/doc/images/k32w1-evk.jpg)
+`mcxw71` device:
+![FRDM-MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/frdm-mcxw71.jpg)
 
 ## Device UI
 
@@ -37,8 +37,8 @@ The state feedback is provided through LED effects:
 | RGB LED | on                                  | The `OnOff` attribute of the `On/Off` cluster is `true` (simulating device turned on).                |
 | RGB LED | off                                 | The `OnOff` attribute of the `On/Off` cluster is `false` (simulating device turned off).              |
 
-NOTE: `LED2` will be disabled when OTA is used. On K32W1 EVK board, `PTB0` is
-wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
+NOTE: `LED2` will be disabled when OTA is used. On `FRDM-MCXW71` board, `PTB0`
+is wired to both `LED2` and CS (Chip Select) of the External Flash Memory. Since
 the OTA image is stored in external memory, `LED2` operations will affect OTA
 operation by corrupting packages and OTA will not work.
 
@@ -53,23 +53,23 @@ The user actions are summarized below:
 
 The example application provides a simple UI that depicts the state of the
 device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in the K32W1 EVK board.
+general-purpose LEDs and buttons built in the `MCXW71` board.
 
 ## Building
 
 Manually building requires running the following commands:
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w1$ gn gen out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w1$ ninja -C out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/mcxw71
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/mcxw71$ gn gen out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/mcxw71$ ninja -C out/debug
 ```
 
 Please note that running `gn gen out/debug` without `--args` option will use the
 default gn args values found in `args.gni`.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/`.
-See the files prefixed with `chip-k32w1-light-example`.
+See the files prefixed with `chip-mcxw71-light-example`.
 
 ### `SMU2` Memory
 
@@ -123,16 +123,48 @@ path -
 
 ### Flashing the `NBU` image
 
-`NBU` image should be written only when a new NXP-SDK is released.
+`NBU` image should be written only when a new NXP SDK is released.
 
-[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK)
-can be used for updating the `NBU/radio` core:
+1. Install
+   [Secure Provisioning SDK tool](https://www.nxp.com/design/design-center/software/development-software/secure-provisioning-sdk-spsdk:SPSDK)
+   using Python:
 
--   Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command
-    Line Tool)
--   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
-    .sb3 file found in the SDK package at path
-    `middleware\wireless\ieee-802.15.4\bin\k32w1\`
+    ```
+    pip install spsdk
+    ```
+
+    Note: There might be some dependencies that cause conflicts with already
+    installed Python modules. However, `blhost` tool is still installed and can
+    be used.
+
+2. Updating `NBU` for Wireless examples
+
+    It is necessary to work with the matching `NBU` image for the SDK version of
+    the application you are working with. This means that when you download your
+    SDK, prior to loading any wireless SDK example, update your `NBU` image with
+    the SDK provided binaries. For `FRDM` users, please write the following
+    binary:
+
+    `middleware\wireless\ieee-802.15.4\bin\mcxw71\mcxw71_nbu_ble_15_4_dyn_matter_<nbu_version>.sb3`
+
+    Please note that `<nbu_version>` may vary depending on the SDK version.
+
+    1. Place your device in `ISP` mode.
+
+        - Make sure a jumper is placed on `JP25`
+        - Press and hold `SW4`, press and release Reset, then release `SW4`
+
+    2. Once the device is connected, you may find the assigned port by running:
+
+        ```
+        nxpdevscan
+        ```
+
+    3. Run the `blhost` command to write the `sb3` file:
+
+        ```
+        blhost -p <assigned_port> receive-sb-file <path_to_SDK>\middleware\wireless\ieee-802.15.4\bin\mcxw71\mcxw71_nbu_ble_15_4_dyn_matter_<nbu_version>.sb3
+        ```
 
 ### Flashing the host image
 
@@ -141,22 +173,22 @@ build process.
 
 If debugging is needed then jump directly to the [Debugging](#debugging)
 section. Otherwise, if only flashing is needed then
-[JLink 7.84b or greater](https://www.segger.com/downloads/jlink/) can be used:
+[JLink](https://www.segger.com/downloads/jlink/) can be used:
 
--   Plug K32W1 to the USB port (no need to keep the SW4 button pressed while
-    doing this, e.g. ISP mode is not needed for host flashing)
+-   Plug `MCXW71` to the USB port (no need to keep the `SW4` button pressed
+    while doing this, e.g. ISP mode is not needed for host flashing)
 
 -   Connect JLink to the device:
 
     ```bash
-    JLinkExe -device K32W1480 -if SWD -speed 4000 -autoconnect 1
+    JLinkExe -device MCXW71 -if SWD -speed 4000 -autoconnect 1
     ```
 
 -   Run the following commands:
     ```bash
     reset
     halt
-    loadfile chip-k32w1-light-example.srec
+    loadfile chip-mcxw71-light-example.srec
     reset
     go
     quit
@@ -169,7 +201,7 @@ One option for debugging would be to use MCUXpresso IDE.
 -   Drag-and-drop the zip file containing the NXP SDK in the "Installed SDKs"
     tab:
 
-![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/installed_sdks.jpg)
+![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_installed_sdks.jpg)
 
 -   Import any demo application from the installed SDK:
 
@@ -185,9 +217,9 @@ Import SDK example(s).. -> choose a demo app (demo_apps -> hello_world) -> Finis
 Right click on the application (from Project Explorer) -> Debug as -> JLink/CMSIS-DAP
 ```
 
-After this step, a debug configuration specific for the K32W1 board was created.
-This debug configuration will be used later on for debugging the application
-resulted after ot-nxp compilation.
+After this step, a debug configuration specific for the `MCXW71` board was
+created. This debug configuration will be used later on for debugging the
+application resulted after ot-nxp compilation.
 
 -   Import Matter repo in MCUXpresso IDE as Makefile Project. Use _none_ as
     _Toolchain for Indexer Settings_:
@@ -198,14 +230,14 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 
 ![New Project](../../../platform/nxp/mcxw71_k32w1/doc/images/new_project.jpg)
 
--   Replace the path of the existing demo application with the path of the K32W1
-    application:
+-   Replace the path of the existing demo application with the path of the
+    `MCXW71` application:
 
 ```
 Run -> Debug Configurations... -> C/C++ Application
 ```
 
-![Debug K32W1](../../../platform/nxp/mcxw71_k32w1/doc/images/debug_k32w1.jpg)
+![Debug MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_debug.jpg)
 
 ## Running RPC console
 
@@ -235,4 +267,4 @@ To reboot the device, please run `rpcs.chip.rpc.Device.Reboot()`.
 ## OTA
 
 Please see
-[k32w1 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+[mcxw71 OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
