@@ -243,6 +243,13 @@ struct SetpointLimits
     int16_t UnoccupiedHeatingSetpoint;
 };
 
+/**
+ * @brief Reads all the attributes for enforcing setpoint limits
+ *
+ * @param endpoint The endpoint for the server whose limits are being enforced
+ * @param setpointLimits The SetpointLimits to populate
+ * @return Success if the limits were read completely, otherwise an error code
+ */
 Status getSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
 {
     uint32_t flags;
@@ -385,8 +392,8 @@ typedef Status (*setpointSetter)(EndpointId endpoint, int16_t value, MarkAttribu
  * @param deadband The deadband to preserve
  * @param setter A function for setting the cooling setpoint
  */
-void ensureCoolSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
-                                int16_t maxCoolingSetpoint, int16_t deadband, setpointSetter setter)
+void ensureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpoint, int16_t newHeatingSetpoint,
+                                   int16_t maxCoolingSetpoint, int16_t deadband, setpointSetter setter)
 {
     int16_t minValidCoolingSetpoint = newHeatingSetpoint + deadband;
     if (currentCoolingSetpoint >= minValidCoolingSetpoint)
@@ -397,7 +404,7 @@ void ensureCoolSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpo
     if (minValidCoolingSetpoint > maxCoolingSetpoint)
     {
         // Adjusting the cool setpoint to preserve the deadband would violate the max cool setpoint
-        // This should have been caught in checkCoolSetpointDeadband, so log and exit
+        // This should have been caught in checkCoolingSetpointDeadband, so log and exit
         ChipLogError(Zcl, "Failed ensuring cooling setpoint deadband");
         return;
     }
@@ -405,7 +412,7 @@ void ensureCoolSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpo
     auto status = setter(endpoint, minValidCoolingSetpoint, MarkAttributeDirty::kYes);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Error: ensureCoolSetpointDeadband failed!");
+        ChipLogError(Zcl, "Error: ensureCoolingSetpointDeadband failed!");
     }
 }
 
@@ -420,8 +427,8 @@ void ensureCoolSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSetpo
  * @param deadband The deadband to preserve
  * @param setter A function for setting the heating setpoint
  */
-void ensureHeatSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
-                                int16_t minHeatingSetpoint, int16_t deadband, setpointSetter setter)
+void ensureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
+                                   int16_t minHeatingSetpoint, int16_t deadband, setpointSetter setter)
 {
     int16_t maxValidHeatingSetpoint = newCoolingSetpoint - deadband;
     if (currentHeatingSetpoint <= maxValidHeatingSetpoint)
@@ -432,7 +439,7 @@ void ensureHeatSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpo
     if (maxValidHeatingSetpoint < minHeatingSetpoint)
     {
         // Adjusting the heating setpoint to preserve the deadband would violate the max cooling setpoint
-        // This should have been caught in checkHeatSetpointDeadband, so log and exit
+        // This should have been caught in checkHeatingSetpointDeadband, so log and exit
         ChipLogError(Zcl, "Failed ensuring heating setpoint deadband");
         return;
     }
@@ -440,7 +447,7 @@ void ensureHeatSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpo
     auto status = setter(endpoint, maxValidHeatingSetpoint, MarkAttributeDirty::kYes);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Error: ensureCoolSetpointDeadband failed!");
+        ChipLogError(Zcl, "Error: ensureHeatingSetpointDeadband failed!");
     }
 }
 
@@ -468,22 +475,24 @@ void ensureDeadband(const ConcreteAttributePath & attributePath)
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        ensureCoolSetpointDeadband(endpoint, setpointLimits.OccupiedCoolingSetpoint, setpointLimits.OccupiedHeatingSetpoint,
-                                   setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp, OccupiedCoolingSetpoint::Set);
+        ensureCoolingSetpointDeadband(endpoint, setpointLimits.OccupiedCoolingSetpoint, setpointLimits.OccupiedHeatingSetpoint,
+                                      setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp,
+                                      OccupiedCoolingSetpoint::Set);
         break;
     case OccupiedCoolingSetpoint::Id:
-        ensureHeatSetpointDeadband(endpoint, setpointLimits.OccupiedHeatingSetpoint, setpointLimits.OccupiedCoolingSetpoint,
-                                   setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp,
-                                   UnoccupiedHeatingSetpoint::Set);
+        ensureHeatingSetpointDeadband(endpoint, setpointLimits.OccupiedHeatingSetpoint, setpointLimits.OccupiedCoolingSetpoint,
+                                      setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp,
+                                      OccupiedHeatingSetpoint::Set);
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        ensureCoolSetpointDeadband(endpoint, setpointLimits.UnoccupiedCoolingSetpoint, setpointLimits.UnoccupiedHeatingSetpoint,
-                                   setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp,
-                                   UnoccupiedCoolingSetpoint::Set);
+        ensureCoolingSetpointDeadband(endpoint, setpointLimits.UnoccupiedCoolingSetpoint, setpointLimits.UnoccupiedHeatingSetpoint,
+                                      setpointLimits.MaxCoolSetpointLimit, setpointLimits.DeadBandTemp,
+                                      UnoccupiedCoolingSetpoint::Set);
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        ensureHeatSetpointDeadband(endpoint, setpointLimits.UnoccupiedHeatingSetpoint, setpointLimits.UnoccupiedCoolingSetpoint,
-                                   setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp, OccupiedHeatingSetpoint::Set);
+        ensureHeatingSetpointDeadband(endpoint, setpointLimits.UnoccupiedHeatingSetpoint, setpointLimits.UnoccupiedCoolingSetpoint,
+                                      setpointLimits.MinHeatSetpointLimit, setpointLimits.DeadBandTemp,
+                                      UnoccupiedHeatingSetpoint::Set);
         break;
     }
 }
