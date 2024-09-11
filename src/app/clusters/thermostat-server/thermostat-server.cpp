@@ -265,6 +265,16 @@ Status getSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
     setpointLimits.CoolSupported      = featureMap.Has(Feature::kCooling);
     setpointLimits.OccupancySupported = featureMap.Has(Feature::kOccupancy);
 
+    if (setpointLimits.AutoSupported)
+    {
+        int8_t deadband = 0;
+        if (MinSetpointDeadBand::Get(endpoint, &deadband) != Status::Success)
+        {
+            deadband = kDefaultDeadBand;
+        }
+        setpointLimits.DeadBandTemp = static_cast<int16_t>(deadband * 10);
+    }
+
     if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.AbsMinCoolSetpointLimit) != Status::Success)
         setpointLimits.AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
 
