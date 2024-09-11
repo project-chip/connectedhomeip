@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
@@ -82,6 +83,8 @@
 
 #import <os/lock.h>
 
+// TODO: These strings and their consumers in this file should probably go away,
+// since none of them really apply to all controllers.
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
 static NSString * const kErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
@@ -109,6 +112,27 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
+@interface MTRDeviceControllerDelegateInfo : NSObject
+- (instancetype)initWithDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
+@property (nonatomic, weak, readonly) id<MTRDeviceControllerDelegate> delegate;
+@property (nonatomic, readonly) dispatch_queue_t queue;
+@end
+
+@implementation MTRDeviceControllerDelegateInfo
+@synthesize delegate = _delegate, queue = _queue;
+- (instancetype)initWithDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _delegate = delegate;
+    _queue = queue;
+
+    return self;
+}
+@end
+
 @implementation MTRDeviceController {
     chip::Controller::DeviceCommissioner * _cppCommissioner;
     chip::Credentials::PartialDACVerifier * _partialDACVerifier;
@@ -117,7 +141,6 @@ using namespace chip::Tracing::DarwinFramework;
     MTROperationalCredentialsDelegate * _operationalCredentialsDelegate;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
-    NSMapTable * _nodeIDToDeviceMap;
     os_unfair_lock _underlyingDeviceMapLock;
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
@@ -131,13 +154,22 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _signingKeypairBridge;
     MTRP256KeypairBridge _operationalKeypairBridge;
 
-    BOOL _suspended;
+    // For now, we just ensure that access to _suspended is atomic, but don't
+    // guarantee atomicity of the the entire suspend/resume operation.  The
+    // expectation is that suspend/resume on a given controller happen on some
+    // specific queue, so can't race against each other.
+    std::atomic<bool> _suspended;
 
     // Counters to track assertion status and access controlled by the _assertionLock
     NSUInteger _keepRunningAssertionCounter;
     BOOL _shutdownPending;
     os_unfair_lock _assertionLock;
+
+    NSMutableSet<MTRDeviceControllerDelegateInfo *> * _delegates;
+    id<MTRDeviceControllerDelegate> _strongDelegateForSetDelegateAPI;
 }
+
+@synthesize uniqueIdentifier = _uniqueIdentifier;
 
 - (os_unfair_lock_t)deviceMapLock
 {
@@ -156,7 +188,15 @@ using namespace chip::Tracing::DarwinFramework;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
+    // All synchronous suspend/resume activity has to be protected by
+    // @synchronized(self), so that parts of suspend/resume can't
+    // interleave with each other. Using @synchronized here because
+    // MTRDevice may call isSuspended.
     _suspended = startSuspended;
+
+    _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
+
+    _delegates = [NSMutableSet set];
 
     return self;
 }
@@ -176,7 +216,7 @@ using namespace chip::Tracing::DarwinFramework;
     auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
     // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
-    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
+    return [MTRDeviceControllerFactory.sharedInstance initializeController:[MTRDeviceController_Concrete alloc] withParameters:controllerParameters error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -330,7 +370,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, _uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
 }
 
 - (BOOL)isRunning
@@ -345,25 +385,65 @@ using namespace chip::Tracing::DarwinFramework;
     return _suspended;
 }
 
+- (void)_notifyDelegatesOfSuspendState
+{
+    BOOL isSuspended = [self isSuspended];
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
+            [delegate controller:self isSuspended:isSuspended];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 - (void)suspend
 {
-    _suspended = YES;
+    MTR_LOG("%@ suspending", self);
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to tear down subscriptions.  Possibly close all
-    // CASE sessions for our identity.  Possibly try to see whether we can
-    // change our fabric entry to not advertise and restart advertising.
+    NSArray * devicesToSuspend;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        // Set _suspended under the device map lock.  This guarantees that
+        // for any given device exactly one of two things is true:
+        // * It is in the snapshot we are creating
+        // * It is created after we have changed our _suspended state.
+        _suspended = YES;
+        devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+    }
 
-    // TODO: What should happen with active commissioning sessions?  Presumably
-    // close them?
+    MTR_LOG("%@ found %lu devices to suspend", self, static_cast<unsigned long>(devicesToSuspend.count));
+    for (MTRDevice * device in devicesToSuspend) {
+        [device controllerSuspended];
+    }
+
+    // TODO: In the concrete class, consider what should happen with:
+    //
+    // * Active commissioning sessions (presumably close them?)
+    // * CASE sessions in general.
+    // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (void)resume
 {
-    _suspended = NO;
+    MTR_LOG("%@ resuming", self);
 
-    // TODO: In the concrete class (which is unused so far!), iterate our
-    // MTRDevices, tell them to restart subscriptions.
+    NSArray * devicesToResume;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        // Set _suspended under the device map lock.  This guarantees that
+        // for any given device exactly one of two things is true:
+        // * It is in the snapshot we are creating
+        // * It is created after we have changed our _suspended state.
+        _suspended = NO;
+        devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+    }
+
+    MTR_LOG("%@ found %lu devices to resume", self, static_cast<unsigned long>(devicesToResume.count));
+    for (MTRDevice * device in devicesToResume) {
+        [device controllerResumed];
+    }
+
+    [self _notifyDelegatesOfSuspendState];
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
@@ -449,7 +529,7 @@ using namespace chip::Tracing::DarwinFramework;
     // devices before we start invalidating.
     MTR_LOG("%s: %@", __PRETTY_FUNCTION__, self);
     os_unfair_lock_lock(self.deviceMapLock);
-    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     [_nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(self.deviceMapLock);
 
@@ -532,6 +612,10 @@ using namespace chip::Tracing::DarwinFramework;
     if (_deviceControllerDelegateBridge) {
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
+        @synchronized(self) {
+            _strongDelegateForSetDelegateAPI = nil;
+            [_delegates removeAllObjects];
+        }
     }
 }
 
@@ -780,7 +864,7 @@ using namespace chip::Tracing::DarwinFramework;
             //
             // Note that this is just an optimization to avoid throwing the information away and immediately
             // re-reading it from storage.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
                 MTR_LOG("%@ un-retain devices loaded at startup %lu", self, static_cast<unsigned long>(deviceList.count));
             });
         }];
@@ -1207,15 +1291,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceAttributeCounts;
 }
 #endif
-
-- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
-{
-    [self
-        asyncDispatchToMatterQueue:^() {
-            self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
-        }
-                      errorHandler:nil];
-}
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(nullable dispatch_queue_t)queue
@@ -1716,8 +1791,163 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 #endif // DEBUG
 
+#pragma mark - MTRDeviceControllerDelegate management
+
+// Note these are implemented in the base class so that XPC subclass can use it as well when it
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    @synchronized(self) {
+        if (_strongDelegateForSetDelegateAPI) {
+            if (_strongDelegateForSetDelegateAPI == delegate) {
+                MTR_LOG("%@ setDeviceControllerDelegate: delegate %p is already set", self, delegate);
+                return;
+            }
+
+            MTR_LOG("%@ setDeviceControllerDelegate: replacing %p with %p", self, _strongDelegateForSetDelegateAPI, delegate);
+            [self removeDeviceControllerDelegate:_strongDelegateForSetDelegateAPI];
+        }
+        _strongDelegateForSetDelegateAPI = delegate;
+        [self addDeviceControllerDelegate:delegate queue:queue];
+    }
+}
+
+- (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    @synchronized(self) {
+        MTRDeviceControllerDelegateInfo * newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
+        [_delegates addObject:newDelegateInfo];
+        MTR_LOG("%@ addDeviceControllerDelegate: added %p total %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
+    }
+}
+
+- (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
+{
+    @synchronized(self) {
+        if (_strongDelegateForSetDelegateAPI == delegate) {
+            _strongDelegateForSetDelegateAPI = nil;
+        }
+
+        __block MTRDeviceControllerDelegateInfo * delegateInfoToRemove = nil;
+        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
+            if (delegateInfo.delegate == delegate) {
+                delegateInfoToRemove = delegateInfo;
+            }
+        }];
+
+        if (delegateInfoToRemove) {
+            [_delegates removeObject:delegateInfoToRemove];
+            if (_strongDelegateForSetDelegateAPI == delegate) {
+                _strongDelegateForSetDelegateAPI = nil;
+            }
+            MTR_LOG("%@ removeDeviceControllerDelegate: removed %p remaining %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
+        } else {
+            MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
+        }
+    }
+}
+
+// Iterates the delegates, and remove delegate info objects if the delegate object has dealloc'ed
+// Returns number of delegates called
+- (NSUInteger)_iterateDelegateInfoWithBlock:(void (^_Nullable)(MTRDeviceControllerDelegateInfo * delegateInfo))block
+{
+    @synchronized(self) {
+        if (!_delegates.count) {
+            MTR_LOG("%@ No delegates to iterate", self);
+            return 0;
+        }
+
+        // Opportunistically remove defunct delegate references on every iteration
+        NSMutableSet * delegatesToRemove = nil;
+        for (MTRDeviceControllerDelegateInfo * delegateInfo in _delegates) {
+            id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
+            if (strongDelegate) {
+                if (block) {
+                    block(delegateInfo);
+                }
+            } else {
+                if (!delegatesToRemove) {
+                    delegatesToRemove = [NSMutableSet set];
+                }
+                [delegatesToRemove addObject:delegateInfo];
+            }
+        }
+
+        if (delegatesToRemove.count) {
+            [_delegates minusSet:delegatesToRemove];
+            MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), static_cast<unsigned long>(_delegates.count));
+        }
+
+        return _delegates.count;
+    }
+}
+
+- (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString;
+{
+    NSUInteger delegatesCalled = [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
+        id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
+        dispatch_async(delegateInfo.queue, ^{
+            block(strongDelegate);
+        });
+    }];
+
+    MTR_LOG("%@ %lu delegates called for %s", self, static_cast<unsigned long>(delegatesCalled), logString);
+}
+
+#if DEBUG
+- (NSUInteger)unitTestDelegateCount
+{
+    return [self _iterateDelegateInfoWithBlock:nil];
+}
+#endif
+
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:statusUpdate:)]) {
+            [delegate controller:controller statusUpdate:status];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
+            [delegate controller:controller commissioningSessionEstablishmentDone:error];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+            [delegate controller:controller commissioningComplete:error nodeID:nodeID metrics:metrics];
+        } else if ([delegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
+            [delegate controller:controller commissioningComplete:error nodeID:nodeID];
+        } else if ([delegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
+            [delegate controller:controller commissioningComplete:error];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            [delegate controller:controller readCommissioningInfo:info];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 @end
 
+// TODO: This should not be in the superclass: either move to
+// MTRDeviceController_Concrete.mm, or move into a separate .h/.mm pair of
+// files.
 @implementation MTRDevicePairingDelegateShim
 - (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate
 {
@@ -1770,6 +2000,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
+// TODO: This should not be in the superclass: either move to
+// MTRDeviceController_Concrete.mm, or move into a separate .h/.mm pair of
+// files.
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
