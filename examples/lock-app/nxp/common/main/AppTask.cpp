@@ -20,12 +20,12 @@
 
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
+#include "LockManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include "LockManager.h"
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
 
 #if !CHIP_CONFIG_ENABLE_ICD_SERVER
 #include "ICDUtil.h"
@@ -59,40 +59,44 @@ static CHIP_ERROR cliDoorLock(int argc, char * argv[])
         goto exit;
     }
 
-	if (!strcmp(argv[0], "open"))
+    if (!strcmp(argv[0], "open"))
     {
         ChipLogDetail(Shell, "Door : Set to %s state", argv[0]);
-		DoorLockServer::Instance().SetDoorState(1, DoorStateEnum::kDoorOpen);
+        DoorLockServer::Instance().SetDoorState(1, DoorStateEnum::kDoorOpen);
     }
     else if (!strcmp(argv[0], "closed"))
     {
         ChipLogDetail(Shell, "Door : Set to %s state", argv[0]);
-		DoorLockServer::Instance().SetDoorState(1, DoorStateEnum::kDoorClosed);
+        DoorLockServer::Instance().SetDoorState(1, DoorStateEnum::kDoorClosed);
     }
     else if (!strcmp(argv[0], "jammedalarm"))
     {
         ChipLogDetail(Shell, "Send out Lock Jammed Alarm...");
-		DoorLockServer::Instance().SendLockAlarmEvent(1, AlarmCodeEnum::kLockJammed);
+        DoorLockServer::Instance().SendLockAlarmEvent(1, AlarmCodeEnum::kLockJammed);
     }
-	else if (!strcmp(argv[0], "locked"))
+    else if (!strcmp(argv[0], "locked"))
     {
         ChipLogDetail(Shell, "Lock : lock set to %s state", argv[0]);
-		DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked, OperationSourceEnum::kManual, NullNullable, NullNullable, NullNullable, NullNullable);
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked, OperationSourceEnum::kManual, NullNullable, NullNullable,
+                                                NullNullable, NullNullable);
     }
-	else if (!strcmp(argv[0], "unlocked"))
+    else if (!strcmp(argv[0], "unlocked"))
     {
         ChipLogDetail(Shell, "Lock : lock set to %s state", argv[0]);
-		DoorLockServer::Instance().SetLockState(1, DlLockState::kUnlocked, OperationSourceEnum::kManual, NullNullable, NullNullable, NullNullable, NullNullable);
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kUnlocked, OperationSourceEnum::kManual, NullNullable, NullNullable,
+                                                NullNullable, NullNullable);
     }
-	else if (!strcmp(argv[0], "unlatched"))
+    else if (!strcmp(argv[0], "unlatched"))
     {
         ChipLogDetail(Shell, "Lock : lock set to %s state", argv[0]);
-		DoorLockServer::Instance().SetLockState(1, DlLockState::kUnlatched, OperationSourceEnum::kManual, NullNullable, NullNullable, NullNullable, NullNullable);
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kUnlatched, OperationSourceEnum::kManual, NullNullable,
+                                                NullNullable, NullNullable, NullNullable);
     }
-	else if (!strcmp(argv[0], "notfullylocked"))
+    else if (!strcmp(argv[0], "notfullylocked"))
     {
         ChipLogDetail(Shell, "Lock : lock set to %s state", argv[0]);
-		DoorLockServer::Instance().SetLockState(1, DlLockState::kNotFullyLocked, OperationSourceEnum::kManual, NullNullable, NullNullable, NullNullable, NullNullable);
+        DoorLockServer::Instance().SetLockState(1, DlLockState::kNotFullyLocked, OperationSourceEnum::kManual, NullNullable,
+                                                NullNullable, NullNullable, NullNullable);
     }
     else
     {
@@ -127,7 +131,8 @@ void LockApp::AppTask::AppMatter_RegisterCustomCliCommands()
     static const shell_command_t kCommands[] = {
         { .cmd_func = cliDoorLock,
           .cmd_name = "doorlock",
-          .cmd_help = "Set the Door Lock State or trigger Lock Jammed Alarm. Usage:[open|closed|jammedalarm|locked|unlocked|notfullylocked|unlatched] " },
+          .cmd_help = "Set the Door Lock State or trigger Lock Jammed Alarm. "
+                      "Usage:[open|closed|jammedalarm|locked|unlocked|notfullylocked|unlatched] " },
     };
     Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
 #endif
@@ -145,7 +150,7 @@ CHIP_ERROR LockApp::AppTask::ProcessSetStateClusterHandler(void)
     Nullable<DoorLock::DlLockState> state;
     DoorLock::Attributes::LockState::Get(APP_DEVICE_TYPE_ENDPOINT, state);
     auto newState = (state.Value() == DlLockState::kUnlocked) ? DlLockState::kLocked : DlLockState::kUnlocked;
-    auto status = DoorLock::Attributes::LockState::Set(APP_DEVICE_TYPE_ENDPOINT, newState);
+    auto status   = DoorLock::Attributes::LockState::Set(APP_DEVICE_TYPE_ENDPOINT, newState);
 
     VerifyOrReturnError(status == Status::Success, CHIP_ERROR_WRITE_FAILED);
 

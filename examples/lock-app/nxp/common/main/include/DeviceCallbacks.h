@@ -36,7 +36,7 @@ public:
     static DeviceCallbacks & GetDefaultInstance();
 
     void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
+                                     uint8_t type, uint16_t size, uint8_t * value);
 
 private:
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);

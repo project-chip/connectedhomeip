@@ -37,7 +37,6 @@
 #include "UserInterfaceFeedback.h"
 #endif
 
-
 using namespace chip::app;
 void OnTriggerEffect(::Identify * identify)
 {
@@ -84,7 +83,7 @@ using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
 void LockApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                          uint8_t type, uint16_t size, uint8_t * value)
+                                                           uint8_t type, uint16_t size, uint8_t * value)
 {
     ChipLogProgress(DeviceLayer,
                     "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI

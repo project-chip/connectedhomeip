@@ -21,11 +21,11 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 
-#include <app/clusters/door-lock-server/door-lock-server.h>
-#include <app/data-model/Nullable.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -155,5 +155,6 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
 {
     // Apply the relock state in the application control
-	DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked, OperationSourceEnum::kAuto, NullNullable, NullNullable, NullNullable, NullNullable);
+    DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked, OperationSourceEnum::kAuto, NullNullable, NullNullable,
+                                            NullNullable, NullNullable);
 }

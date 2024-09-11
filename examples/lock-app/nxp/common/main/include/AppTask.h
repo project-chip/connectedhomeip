@@ -26,7 +26,7 @@
 #include "AppTaskZephyr.h"
 #endif
 
-namespace LockApp{
+namespace LockApp {
 #if CONFIG_APP_FREERTOS_OS
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
 #else
@@ -41,14 +41,12 @@ public:
     ~AppTask() override{};
     void PostInitMatterStack(void) override;
     void PreInitMatterStack(void) override;
-	void AppMatter_RegisterCustomCliCommands(void) override;
+    void AppMatter_RegisterCustomCliCommands(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
 
-
 private:
     static AppTask sAppTask;
-
 };
 } // namespace LockApp
 
