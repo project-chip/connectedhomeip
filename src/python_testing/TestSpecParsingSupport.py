@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
@@ -38,7 +37,8 @@ ATTRIBUTE_ID = 0x0000
 
 
 def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
-    xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
+    xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{
+        CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
                       '<revision revision="2" summary="Some other revision"/>'
