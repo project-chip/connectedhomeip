@@ -127,8 +127,8 @@ If debugging is needed then jump directly to the [Debugging](#debugging)
 section. Otherwise, if only flashing is needed then
 [JLink 7.84b or greater](https://www.segger.com/downloads/jlink/) can be used:
 
--   Plug `MCXW71` to the USB port (no need to keep the `SW4` button pressed while
-    doing this, e.g. ISP mode is not needed for host flashing)
+-   Plug `MCXW71` to the USB port (no need to keep the `SW4` button pressed
+    while doing this, e.g. ISP mode is not needed for host flashing)
 
 -   Connect JLink to the device:
 
@@ -182,8 +182,8 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 
 ![New Project](../../../platform/nxp/mcxw71_k32w1/doc/images/new_project.jpg)
 
--   Replace the path of the existing demo application with the path of the `MCXW71`
-    application:
+-   Replace the path of the existing demo application with the path of the
+    `MCXW71` application:
 
 ```
 Run -> Debug Configurations... -> C/C++ Application
