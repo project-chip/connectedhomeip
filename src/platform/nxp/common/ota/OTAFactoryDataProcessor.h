@@ -21,9 +21,9 @@
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #include PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER
 
 namespace chip {

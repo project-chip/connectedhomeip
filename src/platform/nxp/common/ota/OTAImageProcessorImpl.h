@@ -20,7 +20,7 @@
 
 #include <lib/core/OTAImageHeader.h>
 #include <map>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
