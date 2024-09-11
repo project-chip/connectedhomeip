@@ -306,7 +306,6 @@ using namespace chip::Tracing::DarwinFramework;
         _delegates = [NSMutableSet set];
         _deviceController = controller;
         _nodeID = nodeID;
-        _accessedViaPublicAPI = NO;
         _state = MTRDeviceStateUnknown;
     }
 
@@ -322,7 +321,6 @@ using namespace chip::Tracing::DarwinFramework;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
-        _accessedViaPublicAPI = NO;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
@@ -362,19 +360,9 @@ using namespace chip::Tracing::DarwinFramework;
     MTR_LOG("MTRDevice dealloc: %p", self);
 }
 
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    return [controller deviceForNodeID:nodeID];
-}
-
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    auto * device = [self _deviceWithNodeID:nodeID controller:controller];
-    if (device) {
-        std::lock_guard lock(device->_lock);
-        device->_accessedViaPublicAPI = YES;
-    }
-    return device;
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark - Time Synchronization

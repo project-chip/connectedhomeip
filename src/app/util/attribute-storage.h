@@ -60,6 +60,12 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     } /* cluster revision */                                                                                                       \
     }
 
+// The attrMask must contain the relevant ATTRIBUTE_MASK_* bits from
+// attribute-metadata.h.  Specifically:
+//
+// * Writable attributes must have ATTRIBUTE_MASK_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have ATTRIBUTE_MASK_NULLABLE
+// * Attributes that have T in the Access column in the spec must have ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
