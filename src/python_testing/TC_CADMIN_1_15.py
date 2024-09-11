@@ -94,24 +94,26 @@ class TC_CADMIN_1_15(MatterBaseTest):
             TestStep(7, "TH_CR3 fully commissions DUT_CE", "DUT should fully commission to TH_CR3"),
             TestStep(8, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
                      "Verify the list shows initial_number_of_fabrics + 2 fabrics"),
-            TestStep(9, "Verify DUT_CE is now discoverable over DNS-SD with 3 Operational service records (_matter._tcp SRV records).", ""),
-            TestStep(10, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2", ""),
-            TestStep(11, "TH_CR2 sends RemoveFabric with FabricIndex = fabric_idx_cr2 command to DUT_CE", ""),
+            TestStep(9, "Verify DUT_CE is now discoverable over DNS-SD with 3 Operational service records (_matter._tcp SRV records)."),
+            TestStep(10, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2"),
+            TestStep(11, "TH_CR2 sends RemoveFabric with FabricIndex = fabric_idx_cr2 command to DUT_CE", 
+                    "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
             TestStep(12, "TH_CR2 reads the Basic Information Cluster’s NodeLabel attribute of DUT_CE",
-                     "Verify read/write commands fail as expected since the DUT_CE is no longer on the network"),
+                    "Verify read/write commands fail as expected since the DUT_CE is no longer on the network"),
             TestStep(13, "TH_CR1 reads the list of Fabrics on DUT_CE",
-                     "Verify the list shows initial_number_of_fabrics + 1 fabrics and fabric_idx_cr2 is not included."),
-            TestStep(14, "TH_CR1 sends a OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", ""),
+                    "Verify the list shows initial_number_of_fabrics + 1 fabrics and fabric_idx_cr2 is not included."),
+            TestStep(14, "TH_CR1 sends a OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration"),
             TestStep(15, "TH_CR2 commissions DUT_CE", "Commissioning is successful"),
             TestStep(16, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
-                     "Verify the list shows initial_number_of_fabrics + 2 fabrics and fabric_idx_cr2 is not included, since a new fabric index should have been allocated."),
+                    "Verify the list shows initial_number_of_fabrics + 2 fabrics and fabric_idx_cr2 is not included, since a new fabric index should have been allocated."),
             TestStep(17, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2_2"),
             TestStep(18, "TH_CR3 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr3"),
             TestStep(19, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr2_2 command to DUT_CE",
-                     "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
+                    "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
             TestStep(20, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr3 command to DUT_CE",
-                     "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            TestStep(21, "TH_CR1 reads the list of Fabrics on DUT_CE", "Verify the list shows initial_number_of_fabrics fabrics."),
+                    "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
+            TestStep(21, "TH_CR1 reads the list of Fabrics on DUT_CE", 
+                    "Verify the list shows initial_number_of_fabrics fabrics."),
         ]
 
     def pics_TC_CADMIN_1_15(self) -> list[str]:
@@ -194,7 +196,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
         fabrics2 = await self.get_fabrics(th=self.th1)
         fabric_indexes = [fabric.fabricIndex for fabric in fabrics2]
         if len(fabrics2) != initial_number_of_fabrics + 1:
-            # len of fabrics is expected to be 3, if 3 not found then we assert failure
+            # len of fabrics is expected to be 2, if 2 not found then we assert failure
             asserts.fail(f"Expected number of fabrics not correct, should show 2, but instead shows {str(len(fabrics2))}")
 
         if 2 in fabric_indexes:
