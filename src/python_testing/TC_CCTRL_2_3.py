@@ -33,8 +33,8 @@ import uuid
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                    per_endpoint_test)
+from matter_testing_support.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                                   per_endpoint_test)
 from mobly import asserts
 
 

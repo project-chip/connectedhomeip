@@ -36,8 +36,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    default_matter_test_main)
+from matter_testing_support.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                                   default_matter_test_main)
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
