@@ -24,7 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "app/data-model-provider/ActionReturnStatus.h"
 
 #include <cinttypes>
 
@@ -44,6 +43,10 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/data-model-provider/ActionReturnStatus.h>
+
+// TODO: defaulting to codegen should eventually be an application choice and not
+//       hard-coded in the interaction model
 #include <app/codegen-data-model-provider/Instance.h>
 #endif
 
