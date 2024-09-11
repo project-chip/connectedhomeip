@@ -26,8 +26,8 @@ The example is based on:
 
 ## Introduction
 
-The application showcases a door lock device that communicates with clients
-over a low-power, 802.15.4 Thread network.
+The application showcases a door lock device that communicates with clients over
+a low-power, 802.15.4 Thread network.
 
 It can be commissioned into an existing Matter network using a controller such
 as `chip-tool`.
@@ -105,7 +105,7 @@ A list of all available contact sensor targets can be viewed in the following
 table:
 
 | target name                  | description      |
-| -----------------------------| ---------------- |
+| ---------------------------- | ---------------- |
 | nxp-device-freertos-lock-app | Default lock app |
 
 where `device` can be one of the [Supported devices](#supported-devices).
