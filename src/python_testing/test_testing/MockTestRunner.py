@@ -17,6 +17,7 @@
 
 import importlib
 import os
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -49,7 +50,15 @@ class MockTestRunner():
     def set_test(self, filename: str, classname: str, test: str):
         self.test = test
         self.config.tests = [self.test]
-        module = importlib.import_module(Path(os.path.basename(filename)).stem)
+
+        module_name = Path(os.path.basename(filename)).stem
+
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            module = importlib.import_module(module_name)
+
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: MatterTestConfig = MatterTestConfig()):
