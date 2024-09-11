@@ -67,6 +67,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
+                --target efr32-brd4187c-air-quality-sensor \
                 --target efr32-brd4187c-thermostat-openthread-mtd \
                 --target efr32-brd4187c-switch-shell-use-ot-coap-lib \
                 --target efr32-brd4187c-unit-test \
