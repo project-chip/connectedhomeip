@@ -38,6 +38,7 @@ class NxpBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
     RW61X = auto()
+    MCXW71 = auto()
 
     def Name(self, os_env):
         if self == NxpBoard.K32W0:
@@ -49,6 +50,8 @@ class NxpBoard(Enum):
                 return 'rd_rw612_bga'
             else:
                 return 'rw61x'
+        elif self == NxpBoard.MCXW71:
+            return 'mcxw71'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -62,6 +65,8 @@ class NxpBoard(Enum):
                 return 'zephyr'
             else:
                 return 'rt/rw61x'
+        elif self == NxpBoard.MCXW71:
+            return 'mcxw71'
         else:
             raise Exception('Unknown board type: %r' % self)
 

@@ -63,10 +63,15 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
+        self._partslist_subscription = None
         self._app_th_server_process = None
         self._th_server_kvs = None
 
     def teardown_class(self):
+        if self._partslist_subscription is not None:
+            self._partslist_subscription.Shutdown()
+            self._partslist_subscription = None
+
         if self._app_th_server_process is not None:
             logging.warning("Stopping app with SIGTERM")
             self._app_th_server_process.send_signal(signal.SIGTERM.value)
@@ -142,7 +147,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         subscription_contents = [
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
-        sub = await self.default_controller.ReadAttribute(
+        self._partslist_subscription = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
@@ -152,8 +157,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         parts_list_queue = queue.Queue()
         attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.Descriptor.Attributes.PartsList, output=parts_list_queue)
-        sub.SetAttributeUpdateCallback(attribute_handler)
-        cached_attributes = sub.GetAttributes()
+        self._partslist_subscription.SetAttributeUpdateCallback(attribute_handler)
+        cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")

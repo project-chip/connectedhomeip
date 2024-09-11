@@ -124,6 +124,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
+        self._active_change_event_subscription = None
         self.app_process = None
         self.app_process_paused = False
         app = self.user_params.get("th_icd_server_app_path", None)
@@ -157,6 +158,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
+        if self._active_change_event_subscription is not None:
+            self._active_change_event_subscription.Shutdown()
+            self._active_change_event_subscription = None
+
         # In case the th_icd_server_app_path does not exist, then we failed the test
         # and there is nothing to remove
         if self.app_process is not None:
@@ -240,8 +245,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.q = queue.Queue()
         urgent = 1
         cb = SimpleEventCallback("ActiveChanged", event.cluster_id, event.event_id, self.q)
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
-        subscription.SetEventUpdateCallback(callback=cb)
+        self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
+        self._active_change_event_subscription.SetEventUpdateCallback(callback=cb)
 
         self.step("3")
         stay_active_duration_ms = 1000
