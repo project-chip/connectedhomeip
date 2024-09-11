@@ -115,7 +115,7 @@
         self.xpcRetryTimeInterval = 0.5;
         mtr_weakify(self);
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
             mtr_strongify(self);
             [self _xpcConnectionRetry];
         });
@@ -135,7 +135,7 @@
             self.xpcRetryTimeInterval = MIN(60.0, self.xpcRetryTimeInterval);
             mtr_weakify(self);
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.xpcRetryTimeInterval * NSEC_PER_SEC)), self.chipWorkQueue, ^{
                 mtr_strongify(self);
                 [self _xpcConnectionRetry];
             });
@@ -181,7 +181,7 @@
         MTR_LOG("%@ Activating new XPC connection", self);
         [self.xpcConnection activate];
 
-        [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Checkin error: %@", error);
         }] deviceController:self.uniqueIdentifier checkInWithContext:[NSDictionary dictionary]];
 
@@ -193,7 +193,7 @@
             MTR_LOG("%@ => Registering nodeID: %@", self, nodeID);
             mtr_weakify(self);
 
-            [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
                 mtr_strongify(self);
                 MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
             }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];
@@ -288,7 +288,7 @@
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
     mtr_weakify(self);
-    [[self.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+    [[self.xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         mtr_strongify(self);
         MTR_LOG_ERROR("%@ Registration error for device nodeID: %@ : %@", self, nodeID, error);
     }] deviceController:self.uniqueIdentifier registerNodeID:nodeID];

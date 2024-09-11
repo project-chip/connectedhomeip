@@ -37,9 +37,6 @@
             Groups/4:
                 attributes:
                     FeatureMap/65532: '0'
-            LocalizationConfiguration/43:
-                attributes:
-                    FeatureMap/65532: '0'
             OperationalCredentials/62:
                 attributes:
                     FeatureMap/65532: '0'
@@ -55,9 +52,6 @@
             ThreadNetworkDiagnostics/53:
                 attributes:
                     FeatureMap/65532: '15'
-            TimeFormatLocalization/44:
-                attributes:
-                    FeatureMap/65532: '0'
             UserLabel/65:
                 attributes:
                     FeatureMap/65532: '0'

@@ -104,8 +104,8 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
 
 source "$ENVIRONMENT_ROOT"/bin/activate
-"$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
+"$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
+"$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "
