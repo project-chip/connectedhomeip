@@ -22,9 +22,10 @@ import chip.clusters as Clusters
 import jinja2
 from matter_testing_support.global_attribute_ids import GlobalAttributeIds
 from matter_testing_support.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from matter_testing_support.spec_parsing import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
-                                                 add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                                 combine_derived_clusters_with_base)
+from matter_testing_support.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException,
+                                                 XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
+                                                 check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
+                                                 get_data_model_directory)
 from mobly import asserts
 
 # TODO: improve the test coverage here
@@ -272,9 +273,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(in_progress.keys())-set(tot_xml_clusters.keys()),
                              set(), "There are some in_progress clusters that are not included in the TOT spec")
 
-        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters'))
+        str_path = get_data_model_directory(PrebuiltDataModelDirectory.kMaster, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
-        asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
+
+        asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
         with asserts.assert_raises(SpecParsingException):
             build_xml_clusters("baddir")

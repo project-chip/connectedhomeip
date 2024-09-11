@@ -536,7 +536,7 @@ def _get_data_model_root() -> str:
     raise FileNotFoundError('Cannot find a CHIP_ROOT/data_model path. Tried %r as prefixes.' % choices)
 
 
-def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
+def get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
     if data_model_directory == PrebuiltDataModelDirectory.k1_3:
         return os.path.join(_get_data_model_root(), '1.3', data_model_level)
     elif data_model_directory == PrebuiltDataModelDirectory.kInProgress:
@@ -547,8 +547,8 @@ def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataMod
         return data_model_directory
 
 
-def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
-    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kMaster) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+    dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
 
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
@@ -776,7 +776,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
 
 
 def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.kInProgress) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
-    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+    dir = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems = []
     for xml in glob.glob(f"{dir}/*.xml"):
