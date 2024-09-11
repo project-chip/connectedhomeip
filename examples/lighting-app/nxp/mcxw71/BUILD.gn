@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,12 +61,12 @@ mcxw71_k32w1_sdk("sdk") {
 
   include_dirs += [
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C",
   ]
 
   sources += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/clock_config.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/pin_mux.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/clock_config.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/pin_mux.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
@@ -105,7 +105,7 @@ mcxw71_k32w1_sdk("sdk") {
 }
 
 mcxw71_k32w1_executable("light_app") {
-  output_name = "chip-k32w1-light-example"
+  output_name = "chip-mcxw71-light-example"
 
   defines = []
   deps = []
