@@ -16,8 +16,7 @@
 
 #import <Matter/Matter.h>
 
-#import "MTRTestCase.h"
-#import "MTRTestServerAppRunner.h"
+#import "MTRTestCase+ServerAppRunner.h"
 
 static unsigned sAppRunnerIndex = 1;
 
@@ -29,24 +28,12 @@ static const uint16_t kMinDiscriminator = 1111;
 static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 
-@implementation MTRTestServerAppRunner {
-    unsigned _uniqueIndex;
+@implementation MTRTestCase (ServerAppRunner)
+
 #if HAVE_NSTASK
-    NSTask * _appTask;
-#endif
-}
-
-- (instancetype)initInternalWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase isCrossTest:(BOOL)isCrossTest
++ (NSTask *)doStartAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload
 {
-#if !HAVE_NSTASK
-    XCTFail("Unable to start server app when we do not have NSTask");
-    return nil;
-#else // HAVE_NSTASK
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _uniqueIndex = sAppRunnerIndex++;
+    __auto_type uniqueIndex = sAppRunnerIndex++;
 
     NSError * error;
     __auto_type * parsedPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
@@ -61,7 +48,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     NSNumber * passcode = parsedPayload.setupPasscode;
 
     __auto_type * executable = [NSString stringWithFormat:@"out/debug/%@-app/chip-%@-app", name, name];
-    _appTask = [testcase createTaskForPath:executable];
+    __auto_type * appTask = [self createTaskForPath:executable];
 
     __auto_type * forcedArguments = @[
         // Make sure we only advertise on the local interface.
@@ -74,44 +61,50 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
         @"--passcode",
         [NSString stringWithFormat:@"%llu", passcode.unsignedLongLongValue],
         @"--KVS",
-        [NSString stringWithFormat:@"/tmp/chip-%@-kvs%u", name, _uniqueIndex],
+        [NSString stringWithFormat:@"/tmp/chip-%@-kvs%u", name, uniqueIndex],
         @"--product-id",
         [NSString stringWithFormat:@"%u", parsedPayload.productID.unsignedShortValue],
     ];
 
     __auto_type * allArguments = [forcedArguments arrayByAddingObjectsFromArray:arguments];
-    [_appTask setArguments:allArguments];
+    [appTask setArguments:allArguments];
 
-    NSString * outFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/%@-app-%u.log", name, _uniqueIndex];
-    NSString * errorFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/%@-app-err-%u.log", name, _uniqueIndex];
+    NSString * outFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/%@-app-%u.log", name, uniqueIndex];
+    NSString * errorFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/%@-app-err-%u.log", name, uniqueIndex];
 
     // Make sure the files exist.
     [[NSFileManager defaultManager] createFileAtPath:outFile contents:nil attributes:nil];
     [[NSFileManager defaultManager] createFileAtPath:errorFile contents:nil attributes:nil];
 
-    _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
-    _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
+    appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
+    appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
 
-    if (isCrossTest) {
-        [testcase launchCrossTestTask:_appTask];
-    } else {
-        [testcase launchTask:_appTask];
-    }
+    NSLog(@"Started chip-%@-app (%@) with arguments %@ stdout=%@ and stderr=%@", name, appTask, allArguments, outFile, errorFile);
 
-    NSLog(@"Started chip-%@-app (%@) with arguments %@ stdout=%@ and stderr=%@", name, _appTask, allArguments, outFile, errorFile);
+    return appTask;
+}
+#endif // HAVE_NSTASK
 
-    return self;
+- (BOOL)startAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload
+{
+#if !HAVE_NSTASK
+    XCTFail("Unable to start server app when we do not have NSTask");
+    return NO;
+#else
+    [self launchTask:[self.class doStartAppWithName:name arguments:arguments payload:payload]];
+    return YES;
 #endif // HAVE_NSTASK
 }
 
-- (instancetype)initWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
++ (BOOL)startAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload
 {
-    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:NO];
-}
-
-- (instancetype)initCrossTestWithAppName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload testcase:(MTRTestCase *)testcase
-{
-    return [self initInternalWithAppName:name arguments:arguments payload:payload testcase:testcase isCrossTest:YES];
+#if !HAVE_NSTASK
+    XCTFail("Unable to start server app when we do not have NSTask");
+    return NO;
+#else
+    [self launchTask:[self doStartAppWithName:name arguments:arguments payload:payload]];
+    return YES;
+#endif // HAVE_NSTASK
 }
 
 + (unsigned)nextUniqueIndex
