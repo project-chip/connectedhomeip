@@ -159,4 +159,33 @@ typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
     = 0x08,
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateState", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
+/**
+ * ColorControl used to have HueMoveMode/SaturationMoveMode and HueStepMode/SaturationStepMode that had
+ * identical values.  Those got replaced with MoveModeEnum and StepModeEnum respectively.  We codegen
+ * HueMoveMode and HueStepMode as aliases of MoveModeEnum and StepModeEnum, but we need manual shims for
+ * SaturationMoveMode and SaturationStepMode.
+ */
+typedef NS_ENUM(uint8_t, MTRColorControlSaturationMoveMode) {
+    MTRColorControlSaturationMoveModeStop MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeStop")
+    = 0x00,
+    MTRColorControlSaturationMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeUp")
+    = 0x01,
+    MTRColorControlSaturationMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeDown")
+    = 0x03,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveMode");
+
+typedef NS_ENUM(uint8_t, MTRColorControlSaturationStepMode) {
+    MTRColorControlSaturationStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeUp")
+    = 0x01,
+    MTRColorControlSaturationStepModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeDown")
+    = 0x03,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepMode");
+
 NS_ASSUME_NONNULL_END

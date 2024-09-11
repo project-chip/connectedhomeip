@@ -1,0 +1,94 @@
+{{> header}}
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+
+char const * ClusterIdToText(chip::ClusterId id) {
+	switch(id)
+	{
+{{#zcl_clusters}}
+		case chip::app::Clusters::{{asUpperCamelCase name}}::Id: return "{{asUpperCamelCase name}}";
+{{/zcl_clusters}}
+		default: return "Unknown";
+	}
+}
+
+char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id) {
+	switch(cluster)
+	{
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+		case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id:
+		{
+			switch(id)
+			{
+{{/first}}
+				case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id: return "{{asUpperCamelCase name}}";
+{{#last}}
+				default: return "Unknown";
+			}
+		}
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+		default: return "Unknown";
+	}
+}
+
+char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
+	switch(cluster)
+	{
+{{#zcl_clusters}}
+{{#zcl_commands_source_client}}
+{{#first}}
+		case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id:
+		{
+			switch(id)
+			{
+{{/first}}
+				case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id: return "{{asUpperCamelCase name}}";
+{{#last}}
+				default: return "Unknown";
+			}
+		}
+{{/last}}
+{{/zcl_commands_source_client}}
+{{/zcl_clusters}}
+		default: return "Unknown";
+	}
+}
+
+char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId id) {
+	switch(cluster)
+	{
+{{#zcl_clusters}}
+{{#zcl_commands_source_server}}
+{{#first}}
+		case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id:
+		{
+			switch(id)
+			{
+{{/first}}
+				case chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id: return "{{asUpperCamelCase name}}";
+{{#last}}
+				default: return "Unknown";
+			}
+		}
+{{/last}}
+{{/zcl_commands_source_server}}
+{{/zcl_clusters}}
+		default: return "Unknown";
+	}
+}
+
+char const * DeviceTypeIdToText(chip::DeviceTypeId id) {
+	switch(id)
+	{
+{{#zcl_device_types}}
+		case {{asHex code 8}}: return "{{caption}}";
+{{/zcl_device_types}}
+		default: return "Unknown";
+	}
+}

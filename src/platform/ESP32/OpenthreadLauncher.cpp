@@ -138,7 +138,7 @@ static void ot_task_worker(void * context)
     vTaskDelete(NULL);
 }
 
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
 
 static constexpr size_t kRcpVersionMaxSize = 100;
 static const char * TAG                    = "RCP_UPDATE";
@@ -183,16 +183,14 @@ static void try_update_ot_rcp(const esp_openthread_platform_config_t * config)
         esp_restart();
     }
 }
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
 
 static void rcp_failure_handler(void)
 {
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
     esp_rcp_mark_image_unusable();
     try_update_ot_rcp(s_platform_config);
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
     esp_rcp_reset();
 }
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
 esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config)
 {
@@ -208,7 +206,7 @@ esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * conf
     return ESP_OK;
 }
 
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
 esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config)
 {
     esp_err_t err = ESP_OK;
@@ -219,7 +217,7 @@ esp_err_t openthread_init_br_rcp(const esp_rcp_update_config_t * update_config)
     esp_openthread_register_rcp_failure_handler(rcp_failure_handler);
     return err;
 }
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
 esp_err_t openthread_init_stack(void)
 {
@@ -236,9 +234,9 @@ esp_err_t openthread_init_stack(void)
     assert(s_platform_config);
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
     try_update_ot_rcp(s_platform_config);
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 #ifdef CONFIG_OPENTHREAD_CLI
     esp_openthread_matter_cli_init();
     cli_command_transmit_task();

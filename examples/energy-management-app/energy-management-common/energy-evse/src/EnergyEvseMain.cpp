@@ -67,6 +67,13 @@ EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
     return gEvseManufacturer.get();
 }
 
+DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
+{
+    VerifyOrDieWithMsg(gDEMDelegate.get() != nullptr, AppServer, "DEM Delegate is null");
+
+    return gDEMDelegate.get();
+}
+
 /*
  *  @brief  Creates a Delegate and Instance for DEM
  *
@@ -472,7 +479,7 @@ void EvseApplicationInit()
 
 void EvseApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Energy Management App (EVSE): ApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */

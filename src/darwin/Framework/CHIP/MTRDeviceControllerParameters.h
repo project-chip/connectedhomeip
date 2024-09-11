@@ -31,6 +31,13 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Whether the controller should start out suspended.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL startSuspended;
 @end
 
 /**
@@ -142,6 +149,11 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
                  operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate;
+
+/**
+ * The root certificate we were initialized with.
+ */
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate MTR_NEWLY_AVAILABLE;
 
 @end
 

@@ -104,7 +104,7 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     pairingCommand->RegisterCommissioningDelegate(this);
     mBridgeNodeId = remoteId;
 
-    DeviceMgr().PairRemoteFabricBridge(remoteId, reinterpret_cast<const char *>(mRemoteAddr.data()));
+    DeviceMgr().PairRemoteFabricBridge(remoteId, mSetupPINCode, reinterpret_cast<const char *>(mRemoteAddr.data()), mRemotePort);
 
     return CHIP_NO_ERROR;
 }
@@ -206,6 +206,15 @@ CHIP_ERROR FabricSyncAddLocalBridgeCommand::RunCommand(NodeId deviceId)
 
     pairingCommand->RegisterCommissioningDelegate(this);
     mLocalBridgeNodeId = deviceId;
+
+    if (mSetupPINCode.HasValue())
+    {
+        DeviceMgr().SetLocalBridgeSetupPinCode(mSetupPINCode.Value());
+    }
+    if (mLocalPort.HasValue())
+    {
+        DeviceMgr().SetLocalBridgePort(mLocalPort.Value());
+    }
 
     DeviceMgr().PairLocalFabricBridge(deviceId);
 

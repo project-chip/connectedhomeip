@@ -101,7 +101,11 @@ class BridgedDeviceBasicInformationCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun keepActive(stayActiveDuration: UInt, timedInvokeTimeout: Duration? = null) {
+  suspend fun keepActive(
+    stayActiveDuration: UInt,
+    timeoutMs: UInt,
+    timedInvokeTimeout: Duration? = null,
+  ) {
     val commandId: UInt = 128u
 
     val tlvWriter = TlvWriter()
@@ -109,6 +113,9 @@ class BridgedDeviceBasicInformationCluster(
 
     val TAG_STAY_ACTIVE_DURATION_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_STAY_ACTIVE_DURATION_REQ), stayActiveDuration)
+
+    val TAG_TIMEOUT_MS_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_MS_REQ), timeoutMs)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

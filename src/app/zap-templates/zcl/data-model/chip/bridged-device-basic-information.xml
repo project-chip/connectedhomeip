@@ -97,7 +97,8 @@ limitations under the License.
 
         <command source="client" code="0x80" name="KeepActive" optional="true" apiMaturity="provisional">
           <description> The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.</description>
-          <arg name="StayActiveDuration" type="int32u"/>
+          <arg id="0" name="StayActiveDuration" type="int32u"/>
+          <arg id="1" name="TimeoutMs" type="int32u" min="30000" max="3600000"/>
         </command>
 
         <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">
@@ -110,7 +111,7 @@ limitations under the License.
         <event side="server" code="0x02" name="Leave" priority="info" optional="true">
             <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
         </event>
-        <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="false">
+        <event side="server" code="0x03" name="ReachableChanged" priority="info">
             <description>This event SHALL be generated when there is a change in the Reachable attribute.</description>
             <field id="0" name="ReachableNewValue" type="boolean"/>
         </event>

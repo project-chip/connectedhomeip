@@ -23,6 +23,7 @@ chip_config_dimmable_led = false
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
+chip_generate_link_map_file = true
 
 is_debug = false
 
@@ -34,5 +35,5 @@ chip_system_config_provide_statistics = false
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
-use_smu2_static = false
-use_smu2_dynamic = false
+use_smu2_static = true
+use_smu2_dynamic = true

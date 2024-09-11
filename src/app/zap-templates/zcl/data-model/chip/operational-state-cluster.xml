@@ -19,7 +19,6 @@ limitations under the License.
 
   <enum name="OperationalStateEnum" type="enum8">
     <cluster code="0x0060"/>
-    <cluster code="0x0048"/>
     <item name="Stopped" value="0x00"/>
     <item name="Running" value="0x01"/>
     <item name="Paused"  value="0x02"/>
@@ -28,7 +27,6 @@ limitations under the License.
 
   <enum name="ErrorStateEnum" type="enum8">
     <cluster code="0x0060"/>
-    <cluster code="0x0048"/>
     <item name="NoError"                    value="0x00"/>
     <item name="UnableToStartOrResume"      value="0x01"/>
     <item name="UnableToCompleteOperation"  value="0x02"/>

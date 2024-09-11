@@ -19,6 +19,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-table.h>
 
 #include <app/util/af-types.h>
 #include <app/util/privilege-storage.h>
@@ -39,8 +40,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 
-Protocols::InteractionModel::Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-    EmberAfAttributeType dataType)
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
+    const EmberAfWriteDataInput & input)
 {
     assertChipStackLockedByCurrentThread();
 

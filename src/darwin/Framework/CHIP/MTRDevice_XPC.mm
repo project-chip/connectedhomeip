@@ -44,6 +44,7 @@
 #import "MTRDeviceController_XPC.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -82,6 +83,8 @@
 
 @implementation MTRDevice_XPC
 
+@synthesize _internalState;
+
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // TODO: Verify that this is a valid MTRDeviceController_XPC?
@@ -91,6 +94,44 @@
     }
 
     return self;
+}
+
+- (void)dealloc
+{
+    [self _setInternalState:nil];
+}
+
+- (NSString *)description
+{
+    NSString * wifi;
+    NSString * thread;
+    NSNumber * networkFeatures = [self._internalState objectForKey:kMTRDeviceInternalPropertyNetworkFeatures];
+
+    if (networkFeatures == nil) {
+        wifi = @"NO";
+        thread = @"NO";
+    } else {
+        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+    }
+
+    // TODO: Add these to the description
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDeviceState, _internalDeviceStateForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionAttemptWait, _lastSubscriptionAttemptWaitForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyMostRecentReportTime, _mostRecentReportTimeForDescription, properties);
+    // MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyLastSubscriptionFailureTime, _lastSubscriptionFailureTimeForDescription, properties);
+
+    return [NSString
+        stringWithFormat:@"<%@: %p, node: %016llX-%016llX (%llu), VID: %@, PID: %@, WiFi: %@, Thread: %@, controller: %@>",
+        NSStringFromClass(self.class), self,
+        _deviceController.compressedFabricID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        _nodeID.unsignedLongLongValue,
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyVendorID],
+        [self._internalState objectForKey:kMTRDeviceInternalPropertyKeyProductID],
+        wifi,
+        thread,
+        _deviceController.uniqueIdentifier];
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
@@ -149,14 +190,20 @@
     }];
 }
 
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    [self _setInternalState:dictionary];
+    MTR_LOG("%@ internal state updated", self);
+}
+
 #pragma mark - Remote Commands
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(state, MTRDeviceState, MTRDeviceStateUnknown, getStateWithReply)
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCachePrimedWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate *, nil, getEstimatedStartTimeWithReply)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber *, nil, getEstimatedSubscriptionLatencyWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
-typedef NSDictionary<NSString *, id> * readAttributeResponseType;
+typedef NSDictionary<NSString *, id> * _Nullable readAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
                                      : (NSNumber *) clusterID attributeID
@@ -184,18 +231,20 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
+    // TODO: use asynchronous XPC and register a block with controller to call for this transaction
     [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
@@ -207,48 +256,12 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueInterval
                  timedInvokeTimeout:timeout
+        serverSideProcessingTimeout:serverSideProcessingTimeout
                          completion:completion];
 }
 
 // Not Supported via XPC
 //- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator duration:(NSNumber *)duration completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
-
-MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(clientDataKeys, NSArray *, nil, getClientDataKeysWithReply)
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey
-                                     : (NSString *) key, id<NSSecureCoding> _Nullable, nil, clientDataForKey
-                                     : key withReply)
-
-MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey
-                                     : (NSString *) key value
-                                     : (id<NSSecureCoding>) value, setClientDataForKey
-                                     : key value
-                                     : value)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey
-                                     : (NSString *) key, removeClientDataForKey
-                                     : key)
-
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataKeysForEndpointID
-                                     : (NSNumber *) endpointID, NSArray * _Nullable, nil, clientDataKeysForEndpointID
-                                     : (NSNumber *) endpointID withReply)
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(clientDataForKey
-                                     : (NSString *) key endpointID
-                                     : (NSNumber *) endpointID, id<NSSecureCoding> _Nullable, nil, clientDataForKey
-                                     : key endpointID
-                                     : endpointID withReply)
-
-MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(setClientDataForKey
-                                     : (NSString *) key endpointID
-                                     : (NSNumber *) endpointID value
-                                     : (id<NSSecureCoding>) value, setClientDataForKey
-                                     : key endpointID
-                                     : endpointID value
-                                     : value)
-MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(removeClientDataForKey
-                                     : (NSString *) key endpointID
-                                     : (NSNumber *) endpointID value
-                                     : (id<NSSecureCoding>) value, removeClientDataForKey
-                                     : key endpointID
-                                     : endpointID)
 
 // Not Supported via XPC
 // - (oneway void)downloadLogOfType:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;

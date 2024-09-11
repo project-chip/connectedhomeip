@@ -26,10 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#ifndef YES_NO
-#define YES_NO(x) ((x) ? @"YES" : @"NO")
-#endif
-
 MTR_DIRECT_MEMBERS
 @interface MTRError : NSObject
 + (NSError *)errorWithCode:(MTRErrorCode)code;

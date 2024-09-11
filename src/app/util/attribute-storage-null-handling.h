@@ -127,6 +127,39 @@ public:
     // Utility that lets consumers treat a StorageType instance as a uint8_t*
     // for writing to the attribute store.
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+
+    // Min and max values for the type.
+    static WorkingType MinValue(bool isNullable)
+    {
+        if constexpr (!std::is_signed_v<WorkingType>)
+        {
+            return 0;
+        }
+
+        if (isNullable)
+        {
+            // Smallest negative value is excluded for nullable signed types.
+            return static_cast<WorkingType>(std::numeric_limits<WorkingType>::min() + 1);
+        }
+
+        return std::numeric_limits<WorkingType>::min();
+    }
+
+    static WorkingType MaxValue(bool isNullable)
+    {
+        if constexpr (std::is_signed_v<WorkingType>)
+        {
+            return std::numeric_limits<WorkingType>::max();
+        }
+
+        if (isNullable)
+        {
+            // Largest value is excluded for nullable unsigned types.
+            return static_cast<WorkingType>(std::numeric_limits<WorkingType>::max() - 1);
+        }
+
+        return std::numeric_limits<WorkingType>::max();
+    }
 };
 
 template <typename T>
@@ -208,6 +241,10 @@ struct NumericAttributeTraits<bool>
     }
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+
+    static uint8_t MinValue(bool isNullable) { return 0; }
+
+    static uint8_t MaxValue(bool isNullable) { return 1; }
 
 private:
     static constexpr StorageType kNullValue = 0xFF;

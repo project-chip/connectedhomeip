@@ -24,8 +24,6 @@ class TIApp(Enum):
     LOCK = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
-    ALL_CLUSTERS = auto()
-    ALL_CLUSTERS_MINIMAL = auto()
     LIGHTING = auto()
     SHELL = auto()
 
@@ -36,10 +34,6 @@ class TIApp(Enum):
             return 'pump-app'
         elif self == TIApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TIApp.ALL_CLUSTERS:
-            return 'all-clusters-app'
-        elif self == TIApp.ALL_CLUSTERS_MINIMAL:
-            return 'all-clusters-minimal-app'
         elif self == TIApp.LIGHTING:
             return 'lighting-app'
         elif self == TIApp.SHELL:
@@ -54,10 +48,6 @@ class TIApp(Enum):
             return f'chip-{board.BoardName()}-pump-example'
         elif self == TIApp.PUMP_CONTROLLER:
             return f'chip-{board.BoardName()}-pump-controller-example'
-        elif self == TIApp.ALL_CLUSTERS:
-            return f'chip-{board.BoardName()}-all-clusters-example'
-        elif self == TIApp.ALL_CLUSTERS_MINIMAL:
-            return f'chip-{board.BoardName()}-all-clusters-minimal-example'
         elif self == TIApp.LIGHTING:
             return f'chip-{board.BoardName()}-lighting-example'
         elif self == TIApp.SHELL:

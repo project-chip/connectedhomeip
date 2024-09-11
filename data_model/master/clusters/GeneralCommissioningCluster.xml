@@ -65,7 +65,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
   <features>
-    <feature bit="0" code="TC" name="Terms" summary="Supports Terms &amp; Conditions acknowledgement">
+    <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
       <optionalConform/>
     </feature>
   </features>
@@ -91,12 +91,12 @@ Davis, CA 95616, USA
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived, TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
+      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet, TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
@@ -150,24 +150,35 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="TCAcknowledgements" type="map16">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="TCUpdateDeadline" type="uint32">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TC"/>
       </mandatoryConform>

@@ -332,7 +332,7 @@ tests:
     - label:
           "Step 5a: TH sends EnhancedMoveHue command to DUT with MoveMode=0x01
           (up) and Rate=0 (units/s)"
-      PICS: CC.S.F01 && CC.S.C41.Rsp"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:

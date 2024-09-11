@@ -28,7 +28,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
@@ -90,14 +89,6 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                    endpoint=self.endpoint)
 
-    # Sends an out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     def pics_TC_RVCOPSTATE_2_4(self) -> list[str]:
         return ["RVCOPSTATE.S"]
 
@@ -128,13 +119,13 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
             step_name = "Manually put the device in the ERROR operational state"
             self.print_step(2, step_name)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
+                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -146,9 +137,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the CHARGING operational state"
             self.print_step(5, step_name)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
-                self.write_to_app_pipe('{"Name": "Docked"}')
-                self.write_to_app_pipe('{"Name": "Charging"}')
+                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Docked"})
+                self.write_to_app_pipe({"Name": "Charging"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -160,7 +151,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the DOCKED operational state"
             self.print_step(8, step_name)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Charged"}')
+                self.write_to_app_pipe({"Name": "Charged"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 

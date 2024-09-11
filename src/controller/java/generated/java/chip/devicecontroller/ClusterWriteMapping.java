@@ -4871,6 +4871,50 @@ public class ClusterWriteMapping {
       writeUnitTestingUnsupportedCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeUnsupportedAttribute", writeUnitTestingUnsupportedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingReadFailureCodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingreadFailureCodeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeUnitTestingReadFailureCodeCommandParams.put(
+        "value",
+        unitTestingreadFailureCodeCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingReadFailureCodeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeReadFailureCodeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingReadFailureCodeCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeReadFailureCodeAttribute", writeUnitTestingReadFailureCodeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingFailureInt32UCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingfailureInt32UCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeUnitTestingFailureInt32UCommandParams.put(
+        "value",
+        unitTestingfailureInt32UCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingFailureInt32UAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeFailureInt32UAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingFailureInt32UCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeFailureInt32UAttribute", writeUnitTestingFailureInt32UAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingNullableBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingnullableBooleanCommandParameterInfo =
         new CommandParameterInfo(

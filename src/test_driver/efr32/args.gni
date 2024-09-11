@@ -17,14 +17,15 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
 import("${chip_root}/src/platform/silabs/efr32/args.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")  # silabs_family
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_pw_rpc = true
 chip_build_tests = true
+chip_link_tests = true
 chip_enable_openthread = true
 chip_openthread_ftd = false  # use mtd as it is smaller.
-chip_monolithic_tests = true
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
@@ -35,3 +36,19 @@ pw_assert_BACKEND = "$dir_pw_assert_log"
 pw_log_BACKEND = "$dir_pw_log_basic"
 
 pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
+
+# Override the executable type and the test main's target.
+pw_unit_test_EXECUTABLE_TARGET_TYPE = "silabs_executable"
+pw_unit_test_EXECUTABLE_TARGET_TYPE_FILE =
+    "${efr32_sdk_build_root}/silabs_executable.gni"
+pw_unit_test_MAIN = "//:efr32_test_main"
+
+# Additional variables needed by silabs_executable that must be passed in to pw_test.
+test_executable_output_name = "matter-silabs-device_tests-"
+test_executable_output_name_suffix = ".out"
+_ldscript =
+    "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+test_executable_ldflags = [
+  "-T" + rebase_path(_ldscript, root_build_dir),
+  "-Wl,--no-warn-rwx-segment",
+]

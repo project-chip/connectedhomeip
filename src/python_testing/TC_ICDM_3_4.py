@@ -63,7 +63,7 @@ class TC_ICDM_3_4(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
-            TestStep("2a", "Reboot DUT."),
+            TestStep("2a", "Power cycle DUT."),
             TestStep("2b", "TH waits for {PIXIT.WAITTIME.REBOOT}"),
             TestStep(3, "Verify that the DUT response contains value of ICDCounter and stores in IcdCounter2. \
                             IcdCounter2 is greater or equal to IcdCounter1. \

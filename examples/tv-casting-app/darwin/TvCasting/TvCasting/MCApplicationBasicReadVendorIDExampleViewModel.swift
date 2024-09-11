@@ -47,7 +47,7 @@ class MCApplicationBasicReadVendorIDExampleViewModel: ObservableObject {
         // validate that the selected endpoint supports the ApplicationBasic cluster
         if(!endpoint.hasCluster(MCEndpointClusterTypeApplicationBasic))
         {
-            self.Log.error("No ApplicationBasic cluster supporting endpoint found")
+            self.Log.error("MCApplicationBasicReadVendorIDExampleViewModel.read() No ApplicationBasic cluster supporting endpoint found")
             DispatchQueue.main.async
             {
                 self.status = "No ApplicationBasic cluster supporting endpoint found"

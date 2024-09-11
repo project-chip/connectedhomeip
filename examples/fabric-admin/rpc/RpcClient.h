@@ -22,17 +22,19 @@
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
-constexpr uint16_t kFabricBridgeServerPort = 33002;
+/**
+ * @brief Sets the RPC server port to which the RPC client will connect.
+ *
+ * @param port The port number.
+ */
+void SetRpcRemoteServerPort(uint16_t port);
 
 /**
- * @brief Initializes the RPC client with the specified server port.
+ * @brief Starts packet processing for the RPC client.
  *
- * This function sets the RPC server port and starts packet processing for the RPC client.
- *
- * @param rpcServerPort The port number on which the RPC server is running.
- * @return CHIP_NO_ERROR on successful initialization, or an appropriate CHIP_ERROR on failure.
+ * @return CHIP_NO_ERROR on successful start, or an appropriate CHIP_ERROR on failure.
  */
-CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
+CHIP_ERROR StartRpcClient();
 
 /**
  * @brief Adds a synchronized device to the RPC client.
@@ -74,3 +76,14 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs);
+
+/**
+ * @brief CADMIN attribute has changed of one of the bridged devices that was previously added.
+ *
+ * @param data information regarding change in AdministratorCommissioning attributes
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data);

@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include <access/AccessConfig.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
@@ -37,6 +38,10 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <testing/CustomCSRResponse.h>
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include <access/AccessRestrictionProvider.h>
+#endif
 
 struct LinuxDeviceOptions
 {
@@ -81,6 +86,10 @@ struct LinuxDeviceOptions
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     int32_t subscriptionResumptionRetryIntervalSec = -1;
+#endif
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

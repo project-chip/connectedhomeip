@@ -30,7 +30,7 @@ enum class RequestType : uint8_t
     kAttributeReadRequest,
     kAttributeWriteRequest,
     kCommandInvokeRequest,
-    kEventReadOrSubscribeRequest
+    kEventReadRequest
 };
 
 struct RequestPath

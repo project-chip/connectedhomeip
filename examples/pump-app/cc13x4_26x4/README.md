@@ -45,6 +45,14 @@ Instruments devices.
 | Red & Green LED On State                         | Pump is started                        |
 | Red & Green LED Off State                        | Pump stopped                           |
 
+When the device has LIT ICD functionality enabled (`chip_enable_icd_lit` set to
+true in args.gni), the functionality of the right long button press changes as
+described below:
+
+| Action                                           | Functionality            |
+| ------------------------------------------------ | ------------------------ |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | User Active Mode Trigger |
+
 ## Building
 
 ### Preparation

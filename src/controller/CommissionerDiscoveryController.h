@@ -232,12 +232,14 @@ public:
      *  @param[in]    vendorId           The vendorid from the DAC of the new node.
      *  @param[in]    productId          The productid from the DAC of the new node.
      *  @param[in]    nodeId             The node id for the newly commissioned node.
+     *  @param[in]    rotatingId         The rotating ID to handle account login.
+     *  @param[in]    passcode           The passcode to handle account login.
      *  @param[in]    exchangeMgr        The exchange manager to be used to get an exchange context.
      *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
-    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                        chip::Messaging::ExchangeManager & exchangeMgr,
+    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, chip::CharSpan rotatingId,
+                                        uint32_t passcode, chip::Messaging::ExchangeManager & exchangeMgr,
                                         const chip::SessionHandle & sessionHandle) = 0;
 
     virtual ~PostCommissioningListener() = default;
@@ -451,6 +453,7 @@ protected:
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
     uint32_t mPasscode  = 0;
+    std::string mRotatingId;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;

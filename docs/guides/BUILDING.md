@@ -382,6 +382,26 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
 
+### `pw_fuzzer` `FuzzTests`
+
+An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
+framework, integrated through `pw_fuzzer`. The Tests will have to be built and
+executed manually.
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
+```
+
+NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
+build_examples.py invocation.
+
+Tests will be located in:
+`out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
+`chip_pw_fuzztest` is the name of the toolchain used.
+
+-   Details on How To Run Fuzz Tests in
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md)
+
 ## Build custom configuration
 
 The build is configured by setting build arguments. These you can set in one of

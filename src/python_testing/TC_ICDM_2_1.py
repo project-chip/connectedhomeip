@@ -96,7 +96,8 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep("1a", "Commissioning, already done", is_commissioning=True),
+            TestStep("1b", "CTH reads from the DUT the FeatureMap attribute."),
             TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
             TestStep(3, "TH reads from the DUT the ActiveModeDuration attribute."),
             TestStep(4, "TH reads from the DUT the IdleModeDuration attribute."),
@@ -131,8 +132,9 @@ class TC_ICDM_2_1(MatterBaseTest):
         attributes = cluster.Attributes
 
         # Commissioning
-        self.step(1)
+        self.step("1a")
         # Read feature map
+        self.step("1b")
         featureMap = await self._read_icdm_attribute_expect_success(
             attributes.FeatureMap)
 

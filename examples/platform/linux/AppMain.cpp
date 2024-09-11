@@ -103,6 +103,10 @@
 #include "AppMain.h"
 #include "CommissionableInit.h"
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ExampleAccessRestrictionProvider.h"
+#endif
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -121,6 +125,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 
 // Network comissioning implementation
 namespace {
@@ -179,6 +184,10 @@ Optional<app::Clusters::NetworkCommissioning::Instance> sWiFiNetworkCommissionin
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
 app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kRootEndpointId, &sEthernetDriver);
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+auto exampleAccessRestrictionProvider = std::make_unique<ExampleAccessRestrictionProvider>();
+#endif
 
 void EnableThreadNetworkCommissioning()
 {
@@ -593,8 +602,26 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())
+    {
+        exampleAccessRestrictionProvider->SetCommissioningEntries(
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.Value());
+    }
+
+    if (LinuxDeviceOptions::GetInstance().arlEntries.HasValue())
+    {
+        // This example use of the ARL feature proactively installs the provided entries on fabric index 1
+        exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value());
+    }
+#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions

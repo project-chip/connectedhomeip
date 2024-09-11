@@ -47,7 +47,7 @@ class MCContentLauncherLaunchURLExampleViewModel: ObservableObject {
         // validate that the selected endpoint supports the ContentLauncher cluster
         if(!endpoint.hasCluster(MCEndpointClusterTypeContentLauncher))
         {
-            self.Log.error("No ContentLauncher cluster supporting endpoint found")
+            self.Log.error("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() No ContentLauncher cluster supporting endpoint found")
             DispatchQueue.main.async
             {
                 self.status = "No ContentLauncher cluster supporting endpoint found"

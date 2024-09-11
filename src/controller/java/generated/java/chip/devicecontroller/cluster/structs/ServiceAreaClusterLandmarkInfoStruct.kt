@@ -22,11 +22,11 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UInt, val positionTag: UInt?) {
+class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UInt, val relativePositionTag: UInt?) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLandmarkInfoStruct {\n")
     append("\tlandmarkTag : $landmarkTag\n")
-    append("\tpositionTag : $positionTag\n")
+    append("\trelativePositionTag : $relativePositionTag\n")
     append("}\n")
   }
 
@@ -34,10 +34,10 @@ class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UInt, val positionTa
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LANDMARK_TAG), landmarkTag)
-      if (positionTag != null) {
-        put(ContextSpecificTag(TAG_POSITION_TAG), positionTag)
+      if (relativePositionTag != null) {
+        put(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG), relativePositionTag)
       } else {
-        putNull(ContextSpecificTag(TAG_POSITION_TAG))
+        putNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
       }
       endStructure()
     }
@@ -45,22 +45,22 @@ class ServiceAreaClusterLandmarkInfoStruct(val landmarkTag: UInt, val positionTa
 
   companion object {
     private const val TAG_LANDMARK_TAG = 0
-    private const val TAG_POSITION_TAG = 1
+    private const val TAG_RELATIVE_POSITION_TAG = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLandmarkInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val landmarkTag = tlvReader.getUInt(ContextSpecificTag(TAG_LANDMARK_TAG))
-      val positionTag =
+      val relativePositionTag =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_POSITION_TAG))
+          tlvReader.getUInt(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
+          tlvReader.getNull(ContextSpecificTag(TAG_RELATIVE_POSITION_TAG))
           null
         }
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterLandmarkInfoStruct(landmarkTag, positionTag)
+      return ServiceAreaClusterLandmarkInfoStruct(landmarkTag, relativePositionTag)
     }
   }
 }

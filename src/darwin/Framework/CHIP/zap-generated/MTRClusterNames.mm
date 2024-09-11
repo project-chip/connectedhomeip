@@ -8342,10 +8342,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster EcosystemInformation attributes
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
-            result = @"RemovedOn";
-            break;
-
         case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
             result = @"DeviceDirectory";
             break;
@@ -9175,6 +9171,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Unsupported";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeReadFailureCodeID:
+            result = @"ReadFailureCode";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeFailureInt32UID:
+            result = @"FailureInt32U";
+            break;
+
         case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID:
             result = @"NullableBoolean";
             break;
@@ -9509,10 +9513,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID:
             result = @"AccessControlExtensionChanged";
-            break;
-
-        case MTREventIDTypeClusterAccessControlEventAccessRestrictionEntryChangedID:
-            result = @"AccessRestrictionEntryChanged";
             break;
 
         case MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID:
@@ -10763,6 +10763,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeOccupancySensingID:
 
         switch (eventID) {
+
+            // Cluster OccupancySensing events
+        case MTREventIDTypeClusterOccupancySensingEventOccupancyChangedID:
+            result = @"OccupancyChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];

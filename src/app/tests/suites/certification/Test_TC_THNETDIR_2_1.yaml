@@ -47,5 +47,4 @@ tests:
       response:
           constraints:
               type: int8u
-              minValue: 10 # assume 5 supported fabrics
-              # python: value >= 2 * supportedFabrics
+              python: value >= 2 * supportedFabrics

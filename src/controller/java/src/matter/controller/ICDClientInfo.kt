@@ -21,11 +21,13 @@ package matter.controller
 /** Class for holding ICD Client information. */
 data class ICDClientInfo(
   val peerNodeId: Long,
+  val checkInNodeId: Long,
   val startCounter: Long,
   val offset: Long,
   val monitoredSubject: Long,
   val icdAesKey: ByteArray,
   val icdHmacKey: ByteArray
 ) {
-  override fun toString(): String = "$peerNodeId/$startCounter/$offset/$monitoredSubject"
+  override fun toString(): String =
+    "$peerNodeId/$checkInNodeId/$startCounter/$offset/$monitoredSubject"
 }

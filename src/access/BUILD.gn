@@ -13,6 +13,25 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/access/access.gni")
+
+buildconfig_header("access_buildconfig") {
+  header = "AccessBuildConfig.h"
+  header_dir = "access"
+
+  defines = [
+    "CHIP_CONFIG_USE_ACCESS_RESTRICTIONS=${chip_enable_access_restrictions}",
+  ]
+
+  visibility = [ ":access_config" ]
+}
+
+source_set("access_config") {
+  sources = [ "AccessConfig.h" ]
+
+  deps = [ ":access_buildconfig" ]
+}
 
 source_set("types") {
   sources = [
@@ -23,6 +42,7 @@ source_set("types") {
   ]
 
   public_deps = [
+    ":access_config",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
@@ -43,10 +63,18 @@ static_library("access") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":access_config",
     ":types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
   ]
+
+  if (chip_enable_access_restrictions) {
+    sources += [
+      "AccessRestrictionProvider.cpp",
+      "AccessRestrictionProvider.h",
+    ]
+  }
 }

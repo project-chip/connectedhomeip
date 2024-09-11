@@ -31,6 +31,4 @@ public:
 private:
     static CHIP_ERROR InitOpenThread(void);
     static CHIP_ERROR InitWiFi(void);
-    static void ConnectivityEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

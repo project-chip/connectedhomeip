@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import logging
 import os
 import signal
@@ -21,30 +22,32 @@ import subprocess
 import sys
 import time
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+DEFAULT_ALL_CLUSTERS = os.path.join(
+    DEFAULT_CHIP_ROOT,
+    'out',
+    'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test',
+    'chip-all-clusters-app')
+DEFAULT_TEST_RUNNER = os.path.join(DEFAULT_CHIP_ROOT, 'scripts', 'tests', 'run_python_test.py')
+DEFAULT_TEST_SCRIPT = os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'TestTimeSyncTrustedTimeSource.py')
 
 
 class TestDriver:
-    def __init__(self):
-        self.app_path = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'out',
-                                                     'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test', 'chip-all-clusters-app'))
-        self.run_python_test_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'run_python_test.py'))
+    def __init__(self, all_clusters: str, test_runner: str, test_script: str):
+        self.app_path = all_clusters
+        self.run_python_test_path = test_runner
+        self.script_path = test_script
 
-        self.script_path = os.path.abspath(os.path.join(
-            DEFAULT_CHIP_ROOT, 'src', 'python_testing', 'TestTimeSyncTrustedTimeSource.py'))
         if not os.path.exists(self.app_path):
-            msg = 'chip-all-clusters-app not found'
-            logging.error(msg)
-            raise FileNotFoundError(msg)
+            logging.error('%s not found', self.app_path)
+            raise FileNotFoundError(self.app_path)
         if not os.path.exists(self.run_python_test_path):
-            msg = 'run_python_test.py script not found'
-            logging.error(msg)
-            raise FileNotFoundError(msg)
+            logging.error('%s not found', self.run_python_test_path)
+            raise FileNotFoundError(self.run_python_test_path)
         if not os.path.exists(self.script_path):
-            msg = 'TestTimeSyncTrustedTimeSource.py script not found'
-            logging.error(msg)
-            raise FileNotFoundError(msg)
+            logging.error('%s not found', self.script_path)
+            raise FileNotFoundError(self.script_path)
 
     def get_base_run_python_cmd(self, run_python_test_path, app_path, app_args, script_path, script_args):
         return f'{str(run_python_test_path)} --app {str(app_path)} --app-args "{app_args}" --script {str(script_path)} --script-args "{script_args}"'
@@ -78,7 +81,17 @@ def main():
     base_script_args = '--storage-path admin_storage.json --discriminator 1234 --passcode 20202021'
     script_args = base_script_args + ' --commissioning-method on-network --commission-only'
 
-    driver = TestDriver()
+    parser = argparse.ArgumentParser('TimeSyncTrustedTimeSource runner', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--all-clusters', default=DEFAULT_ALL_CLUSTERS, help="All clusters application.")
+    parser.add_argument('--test-runner', default=DEFAULT_TEST_RUNNER, help="the run_python_test.py script.")
+    parser.add_argument('--test-script', default=DEFAULT_TEST_SCRIPT, help="The path to the TimeSyncTrustedTimeSource test.")
+    args = parser.parse_args()
+
+    driver = TestDriver(
+        all_clusters=args.all_clusters,
+        test_runner=args.test_runner,
+        test_script=args.test_script,
+    )
     ret = driver.run_test_section(app_args, script_args, factory_reset_all=True)
     if ret != 0:
         return ret

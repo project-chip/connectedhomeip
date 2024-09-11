@@ -206,7 +206,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     esp_netif_t * netif     = esp_netif_next(NULL);
     NetworkInterface * head = NULL;
     uint8_t ipv6_addr_count = 0;
-    esp_ip6_addr_t ip6_addr[kMaxIPv6AddrCount];
+    esp_ip6_addr_t ip6_addr[LWIP_IPV6_NUM_ADDRESSES];
     if (netif == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces");
@@ -253,7 +253,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #endif // !defined(CONFIG_DISABLE_IPV4)
 
             static_assert(kMaxIPv6AddrCount <= UINT8_MAX, "Count might not fit in ipv6_addr_count");
-            static_assert(ArraySize(ip6_addr) >= LWIP_IPV6_NUM_ADDRESSES, "Not enough space for our addresses.");
             auto addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
             if (addr_count < 0)
             {

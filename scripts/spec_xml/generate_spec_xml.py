@@ -29,10 +29,21 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 DEFAULT_OUTPUT_DIR_1_3 = os.path.abspath(
     os.path.join(DEFAULT_CHIP_ROOT, 'data_model', '1.3'))
+DEFAULT_OUTPUT_DIR_IN_PROGRESS = os.path.abspath(
+    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'in_progress'))
 DEFAULT_OUTPUT_DIR_TOT = os.path.abspath(
     os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'master'))
 DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
     os.path.join(DEFAULT_CHIP_ROOT, 'docs', 'spec_clusters.md'))
+
+# questions
+# is energy-calendar still in?
+# is heat-pump out? wasn't in 0.7
+# location-cluster - is this define gone now?
+# queuedpreset - is this define gone now?
+CURRENT_IN_PROGRESS_DEFINES = ['aliro', 'atomicwrites', 'battery-storage', 'device-location', 'e2e-jf', 'energy-calendar', 'energy-drlc',
+                               'energy-management', 'heat-pump', 'hrap-1', 'hvac', 'matter-fabric-synchronization', 'metering', 'secondary-net',
+                               'service-area-cluster', 'solar-power', 'tcp', 'water-heater', 'wifiSetup']
 
 
 def get_xml_path(filename, output_dir):
@@ -40,10 +51,12 @@ def get_xml_path(filename, output_dir):
     return os.path.abspath(os.path.join(output_dir, xml))
 
 
-def make_asciidoc(target: str, include_in_progress: bool, spec_dir: str, dry_run: bool) -> str:
+def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run: bool) -> str:
     cmd = ['make', 'PRINT_FILENAMES=1']
-    if include_in_progress:
+    if include_in_progress == 'All':
         cmd.append('INCLUDE_IN_PROGRESS=1')
+    elif include_in_progress == 'Current':
+        cmd.append(f'INCLUDE_IN_PROGRESS={" ".join(CURRENT_IN_PROGRESS_DEFINES)}')
     cmd.append(target)
     if dry_run:
         print(cmd)
@@ -75,13 +88,12 @@ def make_asciidoc(target: str, include_in_progress: bool, spec_dir: str, dry_run
     help='Flag for dry run')
 @click.option(
     '--include-in-progress',
-    default=True,
-    type=bool,
-    help='Include in-progress items from spec')
+    type=click.Choice(['All', 'None', 'Current']), default='All')
 def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Clusters need to be scraped first because the cluster directory is passed to the device type directory
     if not output_dir:
-        output_dir = DEFAULT_OUTPUT_DIR_TOT if include_in_progress else DEFAULT_OUTPUT_DIR_1_3
+        output_dir_map = {'All': DEFAULT_OUTPUT_DIR_TOT, 'None': DEFAULT_OUTPUT_DIR_1_3, 'Current': DEFAULT_OUTPUT_DIR_IN_PROGRESS}
+        output_dir = output_dir_map[include_in_progress]
     scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
     scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:
@@ -115,8 +127,11 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress
         xml_path = get_xml_path(filename, clusters_output_dir)
         cmd = [scraper, 'cluster', '-i', filename, '-o',
                xml_path, '-nd']
-        if include_in_progress:
+        if include_in_progress == 'All':
             cmd.extend(['--define', 'in-progress'])
+        elif include_in_progress == 'Current':
+            cmd.extend(['--define'])
+            cmd.extend(CURRENT_IN_PROGRESS_DEFINES)
         if dry_run:
             print(cmd)
         else:

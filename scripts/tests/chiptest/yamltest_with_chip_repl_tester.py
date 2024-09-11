@@ -16,6 +16,7 @@
 
 import asyncio
 import atexit
+import functools
 import logging
 import os
 import tempfile
@@ -84,6 +85,13 @@ async def execute_test(yaml, runner):
             raise Exception(f'Test step failed {test_step.label}')
 
 
+def asyncio_executor(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        return asyncio.run(f(*args, **kwargs))
+    return wrapper
+
+
 @click.command()
 @click.option(
     '--setup-code',
@@ -101,6 +109,7 @@ async def execute_test(yaml, runner):
     '--pics-file',
     default=None,
     help='Optional PICS file')
+@asyncio_executor
 async def main(setup_code, yaml_path, node_id, pics_file):
     # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
@@ -153,4 +162,4 @@ async def main(setup_code, yaml_path, node_id, pics_file):
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()

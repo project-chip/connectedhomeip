@@ -23,6 +23,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import zipfile
 from typing import Optional
 
@@ -123,13 +124,22 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     logging.info("Fetching: %s", url)
 
     r = requests.get(url, stream=True)
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-
-    logging.info("Data downloaded, extracting ...")
-    # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
-    for entry in z.filelist:
-        path = z.extract(entry, install_directory)
-        os.chmod(path, (entry.external_attr >> 16) & 0o777)
+    if zap_platform == 'mac':
+        # zipfile does not support symlinks (https://github.com/python/cpython/issues/82102),
+        # making a zap.app extracted with it unusable due to embedded frameworks.
+        with tempfile.NamedTemporaryFile(suffix='.zip') as tf:
+            for chunk in r.iter_content(chunk_size=4096):
+                tf.write(chunk)
+            tf.flush()
+            os.makedirs(install_directory, exist_ok=True)
+            _ExecuteProcess(['/usr/bin/unzip', '-oq', tf.name], install_directory)
+    else:
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        logging.info("Data downloaded, extracting ...")
+        # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
+        for entry in z.filelist:
+            path = z.extract(entry, install_directory)
+            os.chmod(path, (entry.external_attr >> 16) & 0o777)
     logging.info("Done extracting.")
 
 

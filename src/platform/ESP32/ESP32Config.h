@@ -83,6 +83,7 @@ public:
     static const Key kConfigKey_ProductFinish;
     static const Key kConfigKey_ProductColor;
     static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_PrimaryDeviceType;
 
     // CHIP Config keys
     static const Key kConfigKey_ServiceConfig;

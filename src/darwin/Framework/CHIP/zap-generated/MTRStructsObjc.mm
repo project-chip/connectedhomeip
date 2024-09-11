@@ -532,33 +532,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
-
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
 - (instancetype)init
 {
@@ -568,7 +541,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _instruction = nil;
 
-        _redirectURL = nil;
+        _arlRequestFlowUrl = nil;
 
         _fabricIndex = @(0);
     }
@@ -581,7 +554,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.token = self.token;
     other.instruction = self.instruction;
-    other.redirectURL = self.redirectURL;
+    other.arlRequestFlowUrl = self.arlRequestFlowUrl;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -589,7 +562,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; arlRequestFlowUrl:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _arlRequestFlowUrl, _fabricIndex];
     return descriptionString;
 }
 
@@ -6739,7 +6712,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _landmarkTag = @(0);
 
-        _positionTag = nil;
+        _relativePositionTag = nil;
     }
     return self;
 }
@@ -6749,14 +6722,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRServiceAreaClusterLandmarkInfoStruct alloc] init];
 
     other.landmarkTag = self.landmarkTag;
-    other.positionTag = self.positionTag;
+    other.relativePositionTag = self.relativePositionTag;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; positionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _positionTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; relativePositionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _relativePositionTag];
     return descriptionString;
 }
 
@@ -6801,7 +6774,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mapID = nil;
 
-        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
+        _areaInfo = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
@@ -6812,14 +6785,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.areaDesc = self.areaDesc;
+    other.areaInfo = self.areaInfo;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaInfo:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaInfo];
     return descriptionString;
 }
 
@@ -7541,6 +7514,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROccupancySensingClusterOccupancyChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _occupancy = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterOccupancyChangedEvent alloc] init];
+
+    other.occupancy = self.occupancy;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: occupancy:%@; >", NSStringFromClass([self class]), _occupancy];
     return descriptionString;
 }
 
@@ -8887,9 +8887,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _requestId = @(0);
+        _requestID = @(0);
 
-        _clientNodeId = @(0);
+        _clientNodeID = @(0);
 
         _statusCode = @(0);
 
@@ -8902,8 +8902,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRCommissionerControlClusterCommissioningRequestResultEvent alloc] init];
 
-    other.requestId = self.requestId;
-    other.clientNodeId = self.clientNodeId;
+    other.requestID = self.requestID;
+    other.clientNodeID = self.clientNodeID;
     other.statusCode = self.statusCode;
     other.fabricIndex = self.fabricIndex;
 
@@ -8912,7 +8912,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; clientNodeId:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestId, _clientNodeId, _statusCode, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; clientNodeID:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestID, _clientNodeID, _statusCode, _fabricIndex];
     return descriptionString;
 }
 

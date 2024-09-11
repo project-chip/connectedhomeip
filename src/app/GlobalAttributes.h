@@ -40,5 +40,18 @@ constexpr AttributeId GlobalAttributesNotInMetadata[] = {
 
 static_assert(ArrayIsSorted(GlobalAttributesNotInMetadata), "Array of global attribute ids must be sorted");
 
+inline bool IsSupportedGlobalAttributeNotInMetadata(AttributeId attributeId)
+{
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == attributeId)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 } // namespace app
 } // namespace chip

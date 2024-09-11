@@ -216,9 +216,9 @@ void RvcAppCommandHandler::OnAddServiceAreaArea(Json::Value jsonValue)
     if (jsonValue.isMember("LandmarkTag"))
     {
         DataModel::Nullable<Globals::RelativePositionTag> relativePositionTag = DataModel::NullNullable;
-        if (jsonValue.isMember("PositionTag"))
+        if (jsonValue.isMember("RelativePositionTag"))
         {
-            relativePositionTag = Globals::RelativePositionTag(jsonValue["PositionTag"].asUInt());
+            relativePositionTag = Globals::RelativePositionTag(jsonValue["RelativePositionTag"].asUInt());
         }
 
         area.SetLandmarkInfo(Globals::LandmarkTag(jsonValue["LandmarkTag"].asUInt()), relativePositionTag);

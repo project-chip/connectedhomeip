@@ -163,6 +163,13 @@ struct ServerInitParams
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // Access Restriction implementation: MUST be injected if MNGD feature enabled. Used to enforce
+    // access restrictions that are managed by the device.
+    Access::AccessRestrictionProvider * accessRestrictionProvider = nullptr;
+#endif
+
     // Network native params can be injected depending on the
     // selected Endpoint implementation
     void * endpointNativeParams = nullptr;

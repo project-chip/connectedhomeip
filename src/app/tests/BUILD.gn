@@ -194,6 +194,7 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",

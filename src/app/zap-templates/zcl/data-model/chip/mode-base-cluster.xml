@@ -21,6 +21,8 @@ limitations under the License.
 The generic enum values for the StatusCode and ModeTag enums are defined within the ModeBase namespace
 in the mode-base-server source code. See mode-base-cluster-objects.h.
 This is because zap does not currently support generating code for clusters that do not have a cluster ID.
+
+Each of these enum values is also listed/copied in the derived clusters.
 -->
 
   <struct name="ModeTagStruct">

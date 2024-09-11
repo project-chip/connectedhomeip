@@ -28,19 +28,10 @@
 #include <string>
 #include <vector>
 
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcServer.h>
-#endif
-
 using namespace chip;
 
 void ApplicationInit()
 {
-#if defined(PW_RPC_ENABLED)
-    InitRpcServer(kFabricAdminServerPort);
-    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-#endif
-
     DeviceMgr().Init();
 }
 

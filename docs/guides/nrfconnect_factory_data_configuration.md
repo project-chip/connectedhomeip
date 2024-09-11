@@ -24,7 +24,7 @@ data secure by applying hardware write protection.
 
 > **Note:** Due to hardware limitations, in the nRF Connect platform, protection
 > against writing can be applied only to the internal memory partition. The
-> [Fprotect](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/libraries/others/fprotect.html)
+> [Fprotect](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/security/bootloader/fprotect.html)
 > is the hardware flash protection driver, and we used it to ensure write
 > protection of the factory data partition in internal flash memory.
 
@@ -643,7 +643,7 @@ $ west build -b nrf52840dk_nrf52840 -- \
 
 The factory data partition is an area in the device's persistent storage where a
 factory data set is stored. This area is configured using the
-[Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html),
+[Partition Manager](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/scripts/partition_manager/partition_manager.html),
 within which all partitions are declared in the `pm_static.yml` file.
 
 To prepare an example that supports factory data, add a partition called
@@ -845,7 +845,7 @@ snippet:
 
 > **Note:** To get more information about how to use the interactive Kconfig
 > interfaces, read the
-> [Kconfig documentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
+> [Kconfig documentation](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/build/kconfig/menuconfig.html).
 
 ### Default Kconfig values and developing aspects
 

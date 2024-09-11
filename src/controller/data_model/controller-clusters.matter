@@ -751,14 +751,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -785,7 +781,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
@@ -2587,6 +2583,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   request struct KeepActiveRequest {
     int32u stayActiveDuration = 0;
+    int32u timeoutMs = 1;
   }
 
   /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
@@ -2597,7 +2594,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -3209,6 +3206,16 @@ cluster OvenMode = 73 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kBake = 16384;
     kConvection = 16385;
     kGrill = 16386;
@@ -3327,6 +3334,16 @@ cluster LaundryWasherMode = 81 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kDelicate = 16385;
     kHeavy = 16386;
@@ -3378,6 +3395,16 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kRapidCool = 16384;
     kRapidFreeze = 16385;
   }
@@ -3452,9 +3479,19 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kIdle = 16384;
     kCleaning = 16385;
     kMapping = 16386;
@@ -3472,7 +3509,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -3511,9 +3548,19 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kDeepClean = 16384;
     kVacuum = 16385;
     kMop = 16386;
@@ -3524,7 +3571,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kNoFeatures = 0x0;
+    kDirectModeChange = 0x10000;
   }
 
   struct ModeTagStruct {
@@ -3624,6 +3671,16 @@ cluster DishwasherMode = 89 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kHeavy = 16385;
     kLight = 16386;
@@ -3865,6 +3922,16 @@ cluster MicrowaveOvenMode = 94 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kDefrost = 16385;
   }
@@ -4009,6 +4076,10 @@ cluster RvcOperationalState = 97 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
     kFailedToFindChargingDock = 64;
     kStuck = 65;
     kDustBinMissing = 66;
@@ -4020,6 +4091,10 @@ cluster RvcOperationalState = 97 {
   }
 
   enum OperationalStateEnum : enum8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
@@ -5457,6 +5532,16 @@ cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kManual = 16384;
     kTimeOfUse = 16385;
     kSolarCharging = 16386;
@@ -5507,6 +5592,16 @@ cluster WaterHeaterMode = 158 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kOff = 16384;
     kManual = 16385;
     kTimed = 16386;
@@ -5557,6 +5652,16 @@ provisional cluster DeviceEnergyManagementMode = 159 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNoOptimization = 16384;
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;
@@ -6463,9 +6568,8 @@ provisional cluster ServiceArea = 336 {
   enum SelectAreasStatus : enum8 {
     kSuccess = 0;
     kUnsupportedArea = 1;
-    kDuplicatedAreas = 2;
-    kInvalidInMode = 3;
-    kInvalidSet = 4;
+    kInvalidInMode = 2;
+    kInvalidSet = 3;
   }
 
   enum SkipAreaStatus : enum8 {
@@ -6483,7 +6587,7 @@ provisional cluster ServiceArea = 336 {
 
   struct LandmarkInfoStruct {
     LandmarkTag landmarkTag = 0;
-    nullable RelativePositionTag positionTag = 1;
+    nullable RelativePositionTag relativePositionTag = 1;
   }
 
   struct AreaInfoStruct {
@@ -6494,7 +6598,7 @@ provisional cluster ServiceArea = 336 {
   struct AreaStruct {
     int32u areaID = 0;
     nullable int32u mapID = 1;
-    AreaInfoStruct areaDesc = 2;
+    AreaInfoStruct areaInfo = 2;
   }
 
   struct MapStruct {
@@ -6994,7 +7098,7 @@ cluster Thermostat = 513 {
   }
 
   request struct SetActivePresetRequestRequest {
-    octet_string<16> presetHandle = 0;
+    nullable octet_string<16> presetHandle = 0;
   }
 
   response struct AtomicResponse = 253 {
@@ -7145,65 +7249,62 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 cluster ColorControl = 768 {
   revision 7;
 
-  enum ColorLoopAction : enum8 {
+  enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
     kActivateFromColorLoopStartEnhancedHue = 1;
     kActivateFromEnhancedCurrentHue = 2;
   }
 
-  enum ColorLoopDirection : enum8 {
-    kDecrementHue = 0;
-    kIncrementHue = 1;
+  enum ColorLoopDirectionEnum : enum8 {
+    kDecrement = 0;
+    kIncrement = 1;
   }
 
-  enum ColorMode : enum8 {
+  enum ColorModeEnum : enum8 {
     kCurrentHueAndCurrentSaturation = 0;
     kCurrentXAndCurrentY = 1;
-    kColorTemperature = 2;
+    kColorTemperatureMireds = 2;
   }
 
-  enum HueDirection : enum8 {
-    kShortestDistance = 0;
-    kLongestDistance = 1;
+  enum DirectionEnum : enum8 {
+    kShortest = 0;
+    kLongest = 1;
     kUp = 2;
     kDown = 3;
   }
 
-  enum HueMoveMode : enum8 {
+  enum DriftCompensationEnum : enum8 {
+    kNone = 0;
+    kOtherOrUnknown = 1;
+    kTemperatureMonitoring = 2;
+    kOpticalLuminanceMonitoringAndFeedback = 3;
+    kOpticalColorMonitoringAndFeedback = 4;
+  }
+
+  enum EnhancedColorModeEnum : enum8 {
+    kCurrentHueAndCurrentSaturation = 0;
+    kCurrentXAndCurrentY = 1;
+    kColorTemperatureMireds = 2;
+    kEnhancedCurrentHueAndCurrentSaturation = 3;
+  }
+
+  enum MoveModeEnum : enum8 {
     kStop = 0;
     kUp = 1;
     kDown = 3;
   }
 
-  enum HueStepMode : enum8 {
+  enum StepModeEnum : enum8 {
     kUp = 1;
     kDown = 3;
   }
 
-  enum SaturationMoveMode : enum8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationStepMode : enum8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  bitmap ColorCapabilities : bitmap16 {
-    kHueSaturationSupported = 0x1;
-    kEnhancedHueSupported = 0x2;
-    kColorLoopSupported = 0x4;
-    kXYAttributesSupported = 0x8;
-    kColorTemperatureSupported = 0x10;
-  }
-
-  bitmap ColorLoopUpdateFlags : bitmap8 {
-    kUpdateAction = 0x1;
-    kUpdateDirection = 0x2;
-    kUpdateTime = 0x4;
-    kUpdateStartHue = 0x8;
+  bitmap ColorCapabilitiesBitmap : bitmap16 {
+    kHueSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXY = 0x8;
+    kColorTemperature = 0x10;
   }
 
   bitmap Feature : bitmap32 {
@@ -7214,16 +7315,27 @@ cluster ColorControl = 768 {
     kColorTemperature = 0x10;
   }
 
+  bitmap OptionsBitmap : bitmap8 {
+    kExecuteIfOff = 0x1;
+  }
+
+  bitmap UpdateFlagsBitmap : bitmap8 {
+    kUpdateAction = 0x1;
+    kUpdateDirection = 0x2;
+    kUpdateTime = 0x4;
+    kUpdateStartHue = 0x8;
+  }
+
   readonly attribute optional int8u currentHue = 0;
   readonly attribute optional int8u currentSaturation = 1;
   readonly attribute optional int16u remainingTime = 2;
   readonly attribute optional int16u currentX = 3;
   readonly attribute optional int16u currentY = 4;
-  readonly attribute optional enum8 driftCompensation = 5;
+  readonly attribute optional DriftCompensationEnum driftCompensation = 5;
   readonly attribute optional char_string<254> compensationText = 6;
   readonly attribute optional int16u colorTemperatureMireds = 7;
-  readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 options = 15;
+  readonly attribute ColorModeEnum colorMode = 8;
+  attribute OptionsBitmap options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
   readonly attribute optional int16u primary1X = 17;
   readonly attribute optional int16u primary1Y = 18;
@@ -7255,13 +7367,13 @@ cluster ColorControl = 768 {
   attribute access(write: manage) optional int16u colorPointBY = 59;
   attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
-  readonly attribute enum8 enhancedColorMode = 16385;
+  readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
   readonly attribute optional int8u colorLoopDirection = 16387;
   readonly attribute optional int16u colorLoopTime = 16388;
   readonly attribute optional int16u colorLoopStartEnhancedHue = 16389;
   readonly attribute optional int16u colorLoopStoredEnhancedHue = 16390;
-  readonly attribute bitmap16 colorCapabilities = 16394;
+  readonly attribute ColorCapabilitiesBitmap colorCapabilities = 16394;
   readonly attribute optional int16u colorTempPhysicalMinMireds = 16395;
   readonly attribute optional int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute optional int16u coupleColorTempToLevelMinMireds = 16397;
@@ -7275,150 +7387,150 @@ cluster ColorControl = 768 {
 
   request struct MoveToHueRequest {
     int8u hue = 0;
-    HueDirection direction = 1;
+    DirectionEnum direction = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveHueRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepHueRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToSaturationRequest {
     int8u saturation = 0;
     int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepSaturationRequest {
-    SaturationStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToHueAndSaturationRequest {
     int8u hue = 0;
     int8u saturation = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToColorRequest {
     int16u colorX = 0;
     int16u colorY = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveColorRequest {
     int16s rateX = 0;
     int16s rateY = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepColorRequest {
     int16s stepX = 0;
     int16s stepY = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToColorTemperatureRequest {
     int16u colorTemperatureMireds = 0;
     int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct EnhancedMoveToHueRequest {
     int16u enhancedHue = 0;
-    HueDirection direction = 1;
+    DirectionEnum direction = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int16u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct EnhancedStepHueRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int16u stepSize = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct EnhancedMoveToHueAndSaturationRequest {
     int16u enhancedHue = 0;
     int8u saturation = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags = 0;
-    ColorLoopAction action = 1;
-    ColorLoopDirection direction = 2;
+    UpdateFlagsBitmap updateFlags = 0;
+    ColorLoopActionEnum action = 1;
+    ColorLoopDirectionEnum direction = 2;
     int16u time = 3;
     int16u startHue = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
+    OptionsBitmap optionsMask = 5;
+    OptionsBitmap optionsOverride = 6;
   }
 
   request struct StopMoveStepRequest {
-    bitmap8 optionsMask = 0;
-    bitmap8 optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int16u rate = 1;
     int16u colorTemperatureMinimumMireds = 2;
     int16u colorTemperatureMaximumMireds = 3;
-    bitmap8 optionsMask = 4;
-    bitmap8 optionsOverride = 5;
+    OptionsBitmap optionsMask = 4;
+    OptionsBitmap optionsOverride = 5;
   }
 
   request struct StepColorTemperatureRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int16u stepSize = 1;
     int16u transitionTime = 2;
     int16u colorTemperatureMinimumMireds = 3;
     int16u colorTemperatureMaximumMireds = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
+    OptionsBitmap optionsMask = 5;
+    OptionsBitmap optionsOverride = 6;
   }
 
   /** Move to specified hue. */
@@ -7591,7 +7703,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
+/** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -7627,6 +7739,10 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeMin = 0;
     int16u holdTimeMax = 1;
     int16u holdTimeDefault = 2;
+  }
+
+  info event OccupancyChanged = 0 {
+    OccupancyBitmap occupancy = 0;
   }
 
   readonly attribute OccupancyBitmap occupancy = 0;
@@ -9395,9 +9511,8 @@ provisional cluster EcosystemInformation = 1872 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute access(read: manage) optional nullable epoch_us removedOn = 0;
-  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 1;
-  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 2;
+  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 0;
+  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9415,9 +9530,9 @@ provisional cluster CommissionerControl = 1873 {
   }
 
   fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
-    int64u requestId = 0;
-    node_id clientNodeId = 1;
-    enum8 statusCode = 2;
+    int64u requestID = 0;
+    node_id clientNodeID = 1;
+    status statusCode = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -9430,17 +9545,15 @@ provisional cluster CommissionerControl = 1873 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct RequestCommissioningApprovalRequest {
-    int64u requestId = 0;
-    vendor_id vendorId = 1;
-    int16u productId = 2;
+    int64u requestID = 0;
+    vendor_id vendorID = 1;
+    int16u productID = 2;
     optional char_string<64> label = 3;
   }
 
   request struct CommissionNodeRequest {
-    int64u requestId = 0;
+    int64u requestID = 0;
     int16u responseTimeoutSeconds = 1;
-    optional octet_string ipAddress = 2;
-    optional int16u port = 3;
   }
 
   response struct ReverseOpenCommissioningWindow = 2 {
@@ -9800,6 +9913,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
   attribute optional boolean unsupported = 255;
+  attribute optional int8u readFailureCode = 12288;
+  attribute optional int32u failureInt32U = 12289;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;

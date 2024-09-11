@@ -156,6 +156,8 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
+    bool IsCommissioningSession() const override;
+
     bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
@@ -245,6 +247,12 @@ public:
         }
     }
 
+    void SetCaseCommissioningSessionStatus(bool isCaseCommissioningSession)
+    {
+        VerifyOrDie(GetSecureSessionType() == Type::kCASE);
+        mIsCaseCommissioningSession = isCaseCommissioningSession;
+    }
+
     bool IsPeerActive() const
     {
         return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) <
@@ -323,9 +331,10 @@ private:
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
-    NodeId mLocalNodeId = kUndefinedNodeId;
-    NodeId mPeerNodeId  = kUndefinedNodeId;
-    CATValues mPeerCATs = CATValues{};
+    bool mIsCaseCommissioningSession = false;
+    NodeId mLocalNodeId              = kUndefinedNodeId;
+    NodeId mPeerNodeId               = kUndefinedNodeId;
+    CATValues mPeerCATs              = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
 

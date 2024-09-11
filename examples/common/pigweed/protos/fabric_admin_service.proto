@@ -19,12 +19,15 @@ message DeviceCommissioningInfo {
   uint32 discriminator = 1;
   uint32 iterations = 2;
   uint32 setup_pin = 3;
-  bytes salt = 4;
+  uint32 vendor_id = 4;
+  uint32 product_id = 5;  
+  bytes salt = 6;
 }
 
 message KeepActiveParameters {
   uint64 node_id = 1;
   uint32 stay_active_duration_ms = 2;
+  uint32 timeout_ms = 3;
 }
 
 // Define the response message to convey the status of the operation

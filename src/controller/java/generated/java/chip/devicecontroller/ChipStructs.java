@@ -9294,22 +9294,22 @@ public static class DoorLockClusterCredentialStruct {
 }
 public static class ServiceAreaClusterLandmarkInfoStruct {
   public Integer landmarkTag;
-  public @Nullable Integer positionTag;
+  public @Nullable Integer relativePositionTag;
   private static final long LANDMARK_TAG_ID = 0L;
-  private static final long POSITION_TAG_ID = 1L;
+  private static final long RELATIVE_POSITION_TAG_ID = 1L;
 
   public ServiceAreaClusterLandmarkInfoStruct(
     Integer landmarkTag,
-    @Nullable Integer positionTag
+    @Nullable Integer relativePositionTag
   ) {
     this.landmarkTag = landmarkTag;
-    this.positionTag = positionTag;
+    this.relativePositionTag = relativePositionTag;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(LANDMARK_TAG_ID, new UIntType(landmarkTag)));
-    values.add(new StructElement(POSITION_TAG_ID, positionTag != null ? new UIntType(positionTag) : new NullType()));
+    values.add(new StructElement(RELATIVE_POSITION_TAG_ID, relativePositionTag != null ? new UIntType(relativePositionTag) : new NullType()));
 
     return new StructType(values);
   }
@@ -9319,23 +9319,23 @@ public static class ServiceAreaClusterLandmarkInfoStruct {
       return null;
     }
     Integer landmarkTag = null;
-    @Nullable Integer positionTag = null;
+    @Nullable Integer relativePositionTag = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LANDMARK_TAG_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           landmarkTag = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == POSITION_TAG_ID) {
+      } else if (element.contextTagNum() == RELATIVE_POSITION_TAG_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          positionTag = castingValue.value(Integer.class);
+          relativePositionTag = castingValue.value(Integer.class);
         }
       }
     }
     return new ServiceAreaClusterLandmarkInfoStruct(
       landmarkTag,
-      positionTag
+      relativePositionTag
     );
   }
 
@@ -9346,8 +9346,8 @@ public static class ServiceAreaClusterLandmarkInfoStruct {
     output.append("\tlandmarkTag: ");
     output.append(landmarkTag);
     output.append("\n");
-    output.append("\tpositionTag: ");
-    output.append(positionTag);
+    output.append("\trelativePositionTag: ");
+    output.append(relativePositionTag);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -9417,26 +9417,26 @@ public static class ServiceAreaClusterAreaInfoStruct {
 public static class ServiceAreaClusterAreaStruct {
   public Long areaID;
   public @Nullable Long mapID;
-  public ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc;
+  public ChipStructs.ServiceAreaClusterAreaInfoStruct areaInfo;
   private static final long AREA_ID_ID = 0L;
   private static final long MAP_ID_ID = 1L;
-  private static final long AREA_DESC_ID = 2L;
+  private static final long AREA_INFO_ID = 2L;
 
   public ServiceAreaClusterAreaStruct(
     Long areaID,
     @Nullable Long mapID,
-    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaInfo
   ) {
     this.areaID = areaID;
     this.mapID = mapID;
-    this.areaDesc = areaDesc;
+    this.areaInfo = areaInfo;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AREA_ID_ID, new UIntType(areaID)));
     values.add(new StructElement(MAP_ID_ID, mapID != null ? new UIntType(mapID) : new NullType()));
-    values.add(new StructElement(AREA_DESC_ID, areaDesc.encodeTlv()));
+    values.add(new StructElement(AREA_INFO_ID, areaInfo.encodeTlv()));
 
     return new StructType(values);
   }
@@ -9447,7 +9447,7 @@ public static class ServiceAreaClusterAreaStruct {
     }
     Long areaID = null;
     @Nullable Long mapID = null;
-    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc = null;
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaInfo = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AREA_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9459,17 +9459,17 @@ public static class ServiceAreaClusterAreaStruct {
           UIntType castingValue = element.value(UIntType.class);
           mapID = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == AREA_DESC_ID) {
+      } else if (element.contextTagNum() == AREA_INFO_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          areaDesc = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
+          areaInfo = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
         }
       }
     }
     return new ServiceAreaClusterAreaStruct(
       areaID,
       mapID,
-      areaDesc
+      areaInfo
     );
   }
 
@@ -9483,8 +9483,8 @@ public static class ServiceAreaClusterAreaStruct {
     output.append("\tmapID: ");
     output.append(mapID);
     output.append("\n");
-    output.append("\tareaDesc: ");
-    output.append(areaDesc);
+    output.append("\tareaInfo: ");
+    output.append(areaInfo);
     output.append("\n");
     output.append("}\n");
     return output.toString();

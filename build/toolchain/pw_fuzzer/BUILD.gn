@@ -1,0 +1,70 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pigweed/targets/host/target_toolchains.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+# creating a secondary toolchain to be used with pw_fuzzer FuzzTests
+# This toolchain is downstreamed from pigweed's pw_target_toolchain_host.clang_fuzz
+# it allows us to specifically use googletest for fuzzing (instead of the lighter version of googletest used for unit testing)
+
+gcc_toolchain("chip_pw_fuzztest") {
+  forward_variables_from(pw_target_toolchain_host.clang_fuzz, "*", [ "name" ])
+
+  toolchain_args = {
+    # This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
+    forward_variables_from(defaults, "*")
+
+    pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
+    pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
+
+    # The next three lines are needed by the gcc_toolchain template
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = true
+
+    # the upstream pigweed host_clang toolchain defines a default sysroot, which results in build errors
+    # since it does not include SSL lib and is supposed to be minimal by design.
+    # by removing this default config, we will use the system's libs. Otherwise we can define our own sysroot.
+    # discussion on: https://discord.com/channels/691686718377558037/1275092695764959232
+    remove_default_configs = [ "$dir_pw_toolchain/host_clang:linux_sysroot" ]
+
+    # when is_debug = true, we pass -O0 to cflags and ldflags, while upstream pw_fuzzer toolchain defines "optimize_speed" config that passes -O2.
+    # This condition was added to prevent mixing the flags
+    if (is_debug) {
+      remove_default_configs += [ "$dir_pw_build:optimize_speed" ]
+    }
+
+    # removing pigweed downstreamed configs related to warnings
+    # These are triggering an error related to -Wcast-qual in third_party/nlio
+    remove_default_configs += [
+      "$dir_pw_build:strict_warnings",
+      "$dir_pw_build:extra_strict_warnings",
+    ]
+
+    # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]
+    treat_warnings_as_errors = false
+
+    dir_pw_third_party_abseil_cpp = "//third_party/abseil-cpp/src"
+    dir_pw_third_party_fuzztest = "//third_party/fuzztest"
+    dir_pw_third_party_googletest = "//third_party/googletest"
+
+    # TODO: Seems that re2 support within FuzzTest was deprecated, keeping it defined is triggering warning
+    # Remove if re2 is indeed not needed
+    # dir_pw_third_party_re2 = "//third_party/re2/src"
+  }
+}

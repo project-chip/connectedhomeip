@@ -49,7 +49,7 @@ tests:
           constraints:
               type: int64u
 
-    - label: "If the ActiveDatasetTimestamp attribute not null, go to step 4"
+    - label: "If the ActiveDatasetTimestamp attribute not null, go to step 5"
       cluster: EqualityCommands
       command: UnsignedNumberEquals
       arguments:
@@ -75,6 +75,10 @@ tests:
                 value: 60
               - name: Breadcrumb
                 value: 1
+      response:
+          values:
+              - name: ErrorCode
+                value: CommissioningErrorEnum.OK
 
     # Step 3
     - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
@@ -86,6 +90,13 @@ tests:
                 value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
 
     # Step 4
+    - label: "TH sends CommissioningComplete command to the DUT"
+      runIf: noActiveDataset
+      cluster: General Commissioning
+      command: CommissioningComplete
+      endpoint: 0
+
+    # Step 5
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
@@ -94,7 +105,7 @@ tests:
           constraints:
               type: int64u
 
-    # Step 5
+    # Step 6
     - label: "TH sends a SetPendingDatasetRequest command to the DUT"
       command: SetPendingDatasetRequest
       arguments:
@@ -102,7 +113,7 @@ tests:
               - name: PendingDataset
                 value: PIXIT.TBRM.THREAD_PENDING_DATASET
 
-    # Step 6
+    # Step 7
     - label: "TH sends a GetPendingDatasetRequest command to the DUT"
       command: GetPendingDatasetRequest
       response:
@@ -112,7 +123,7 @@ tests:
                     type: octet_string
                     # TODO: This should be PIXIT.TBRM.THREAD_PENDING_DATASET but ignoring the Delay Timer element if present
 
-    # Step 7
+    # Step 8
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
@@ -121,7 +132,7 @@ tests:
               type: int64u
               notValue: initialPendingTimestamp
 
-    # Step 8
+    # Step 9
     - label:
           "TH subscribes to the ActiveDatasetTimestamp attribute from the DUT"
       command: subscribeAttribute
@@ -141,15 +152,15 @@ tests:
           constraints:
               hasValue: true
 
-    # Step 9
+    # Step 10
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
       response:
           value: null
 
-    # Step 10
-    - label: "TH sends a valid GetActiveDatasetRequest command to the DUT"
+    # Step 11
+    - label: "TH sends a GetActiveDatasetRequest command to the DUT"
       command: GetActiveDatasetRequest
       response:
           values:
@@ -158,7 +169,7 @@ tests:
                 constraints:
                     type: octet_string
 
-    # Step 11
+    # Step 12
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
       command: readAttribute
       attribute: InterfaceEnabled

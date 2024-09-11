@@ -32,7 +32,7 @@ static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 extern "C" {
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#include "sl_core.h"
 #if SL_WIFI
 #include "spi_multiplex.h"
 #endif // SL_WIFI

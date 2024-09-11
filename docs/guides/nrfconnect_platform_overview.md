@@ -18,7 +18,7 @@ communication purposes:
 ## nRF Connect SDK
 
 Nordic Semiconductor's
-[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+[nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/index.html)
 allows to build a range of applications, including cellular IoT (LTE-M and
 NB-IoT), Bluetooth Low Energy, Thread, Zigbee, and Bluetooth mesh. The SDK
 contains samples, libraries and a full set of drivers for Nordic Semiconductor's
@@ -57,8 +57,8 @@ Bluetooth LE concurrently with other stacks on the same radio chip.
 
 Read more in the nRF Connect SDK documentation:
 
--   [SoftDevice Controller](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrfxlib/softdevice_controller/README.html)
--   [Multiprotocol Service Layer](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrfxlib/mpsl/README.html)
+-   [SoftDevice Controller](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/softdevice_controller/README.html)
+-   [Multiprotocol Service Layer](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/mpsl/README.html)
 
 <hr>
 
@@ -72,9 +72,9 @@ network layer functionalities provided by the Zephyr.
 
 Read more in the nRF Connect SDK documentation:
 
--   [Multiprotocol Service Layer](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrfxlib/mpsl/README.html)
--   [nRF 802.15.4 Radio Driver](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrfxlib/nrf_802154/README.html)
--   [OpenThread integration](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/protocols/thread/overview/ot_integration.html)
+-   [Multiprotocol Service Layer](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/mpsl/README.html)
+-   [nRF 802.15.4 Radio Driver](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/nrf_802154/README.html)
+-   [OpenThread integration](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/thread/overview/ot_integration.html)
 
 <hr>
 
@@ -105,7 +105,7 @@ agnostic interfaces and no additional platform-related actions are needed to
 perform communication through the Matter stack.
 
 For more information, see the
-[Matter integration in the nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/protocols/matter/overview/integration.html)
+[Matter integration in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/matter/overview/integration.html)
 page in the SDK documentation.
 
 <hr>
@@ -126,5 +126,5 @@ library file is imported during the compilation process.
 
 For more information about the build system in Zephyr and the nRF Connect SDK,
 see the
-[Build and configuration system](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/app_dev/build_and_config_system/index.html)
+[Build and configuration system](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html)
 page in the SDK documentation.

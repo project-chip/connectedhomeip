@@ -87,11 +87,14 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
+@click.option("--script-start-delay", type=int, default=0,
+              help='Delay in seconds before starting the script.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
 @click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, quiet: bool, load_from_env):
+def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
+         script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool, load_from_env):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -103,6 +106,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 app=app,
                 app_args=app_args,
                 script_args=script_args,
+                script_start_delay=script_start_delay,
                 factoryreset=factoryreset,
                 factoryreset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
@@ -117,10 +121,11 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
         main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
-                  run.py_script_path, run.script_args, run.script_gdb, run.quiet)
+                  run.py_script_path, run.script_args, run.script_start_delay, run.script_gdb, run.quiet)
 
 
-def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, quiet: bool):
+def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
+              script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -174,6 +179,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         app_pid = app_process.pid
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
+
+    time.sleep(script_start_delay)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)

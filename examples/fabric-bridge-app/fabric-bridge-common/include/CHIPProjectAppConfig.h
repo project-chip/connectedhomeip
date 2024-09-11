@@ -32,3 +32,6 @@
 
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
+
+// Allows app options (ports) to be configured on launch of app
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1

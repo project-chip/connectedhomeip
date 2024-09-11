@@ -3,6 +3,7 @@
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
 #include "rvc-service-area-delegate.h"
+#include "rvc-service-area-storage-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
@@ -27,6 +28,7 @@ private:
     RvcOperationalState::Instance mOperationalStateInstance;
 
     ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
+    ServiceArea::RvcServiceAreaStorageDelegate mStorageDelegate;
     ServiceArea::Instance mServiceAreaInstance;
 
     bool mDocked   = false;
@@ -44,7 +46,7 @@ public:
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
-        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint,
+        mServiceAreaInstance(&mStorageDelegate, &mServiceAreaDelegate, aRvcClustersEndpoint,
                              BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
         // set the current-mode at start-up

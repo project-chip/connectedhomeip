@@ -302,12 +302,13 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
             if (aPath.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+            return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess)
+                                                   : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
         }
     }
 
@@ -328,6 +329,21 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     }
 
     // Read attribute using Ember, if it doesn't have an override.
+
+    EmberAfAttributeSearchRecord record;
+    record.endpoint    = aPath.mEndpointId;
+    record.clusterId   = aPath.mClusterId;
+    record.attributeId = aPath.mAttributeId;
+    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(),
+                                                  static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+                                                  /* write = */ false);
+
+    if (status != Status::Success)
+    {
+        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+    }
+
+    // data available, return the corresponding record
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
 
@@ -347,19 +363,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
                          .Attribute(aPath.mAttributeId)
                          .EndOfAttributePathIB();
     ReturnErrorOnFailure(err);
-
-    EmberAfAttributeSearchRecord record;
-    record.endpoint    = aPath.mEndpointId;
-    record.clusterId   = aPath.mClusterId;
-    record.attributeId = aPath.mAttributeId;
-    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(),
-                                                  static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-                                                  /* write = */ false);
-
-    if (status != Status::Success)
-    {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
-    }
 
     TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
@@ -701,9 +704,12 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            return apWriteHandler->AddStatus(aPath,
+                                             err == CHIP_ERROR_ACCESS_DENIED
+                                                 ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                 : Protocols::InteractionModel::Status::AccessRestricted);
         }
         apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
     }
@@ -746,8 +752,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
-    auto status = emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                             gEmberAttributeIOBufferSpan.data(), attributeMetadata->attributeType);
+    auto status = emAfWriteAttributeExternal(
+        aPath, EmberAfWriteDataInput(gEmberAttributeIOBufferSpan.data(), attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(aPath, status);
 }
 

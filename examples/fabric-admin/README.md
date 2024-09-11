@@ -14,7 +14,8 @@ fabrics.
 For Linux host example:
 
 ```
-./scripts/examples/gn_build_example.sh examples/fabric-admin out/debug/standalone 'import("//with_pw_rpc.gni")'
+source scripts/activate.sh
+./scripts/build/build_examples.py --target linux-x64-fabric-admin-rpc build
 ```
 
 For Raspberry Pi 4 example:

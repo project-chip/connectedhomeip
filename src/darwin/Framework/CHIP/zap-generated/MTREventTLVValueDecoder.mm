@@ -304,23 +304,6 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
 
         return value;
     }
-    case Events::AccessRestrictionEntryChanged::Id: {
-        Events::AccessRestrictionEntryChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRAccessControlClusterAccessRestrictionEntryChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
-            value.fabricIndex = memberValue;
-        } while (0);
-
-        return value;
-    }
     case Events::FabricRestrictionReviewUpdate::Id: {
         Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -337,31 +320,31 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
         } while (0);
         do {
             NSString * _Nullable memberValue;
-            if (cppValue.instruction.IsNull()) {
-                memberValue = nil;
-            } else {
+            if (cppValue.instruction.HasValue()) {
                 memberValue = AsString(cppValue.instruction.Value());
                 if (memberValue == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
+            } else {
+                memberValue = nil;
             }
             value.instruction = memberValue;
         } while (0);
         do {
             NSString * _Nullable memberValue;
-            if (cppValue.redirectURL.IsNull()) {
-                memberValue = nil;
-            } else {
-                memberValue = AsString(cppValue.redirectURL.Value());
+            if (cppValue.ARLRequestFlowUrl.HasValue()) {
+                memberValue = AsString(cppValue.ARLRequestFlowUrl.Value());
                 if (memberValue == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
+            } else {
+                memberValue = nil;
             }
-            value.redirectURL = memberValue;
+            value.arlRequestFlowUrl = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4099,6 +4082,23 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
 {
     using namespace Clusters::OccupancySensing;
     switch (aEventId) {
+    case Events::OccupancyChanged::Id: {
+        Events::OccupancyChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROccupancySensingClusterOccupancyChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Raw()];
+            value.occupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -4606,13 +4606,13 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestId];
-            value.requestId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.requestID];
+            value.requestID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeId];
-            value.clientNodeId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.clientNodeID];
+            value.clientNodeID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;

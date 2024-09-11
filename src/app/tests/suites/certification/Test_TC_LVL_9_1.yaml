@@ -58,9 +58,9 @@ tests:
                     }
 
     - label:
-          "Step 0b: TH binds GroupIds 0x0001 and 0x0002 with GroupKeySetID
-          0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster
-          by writing the GroupKeyMap attribute with two entries as follows:"
+          "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with two entries as follows:"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -122,8 +122,17 @@ tests:
               - name: "SceneList"
                 value: []
 
+    - label: "Step 2a: TH reads the MinLevel attribute from the DUT"
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: MinLevelValue
+          constraints:
+              type: int8u
+
     - label:
-          "Step 2a: TH sends a MoveToLevel command to DUT, with Level =0 and
+          "Step 2b: TH sends a MoveToLevel command to DUT, with Level =0 and
           TransitionTime =0 (immediate)"
       cluster: "Level Control"
       command: "MoveToLevel"
@@ -137,15 +146,6 @@ tests:
                 value: 1
               - name: "OptionsOverride"
                 value: 1
-
-    - label: "Step 2b: TH reads the MinLevel attribute from the DUT"
-      cluster: "Level Control"
-      command: "readAttribute"
-      attribute: "MinLevel"
-      response:
-          saveAs: MinLevelValue
-          constraints:
-              type: int8u
 
     - label: "Step 2c: TH reads the CurrentLevel attribute from DUT"
       cluster: "Level Control"
@@ -236,7 +236,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 6c: TH reads the CurrentLevel attribute from DUT"
+    - label: "Step 6b: TH reads the CurrentLevel attribute from DUT"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"

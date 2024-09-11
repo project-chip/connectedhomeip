@@ -312,7 +312,7 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 5ab TH sends StepColorTemperature command to DUT with
+          "Step 5b TH sends StepColorTemperature command to DUT with
           StepMode=0x03 (down), StepSize=0"
       PICS: CC.S.F04 && CC.S.C4c.Rsp
       command: "StepColorTemperature"

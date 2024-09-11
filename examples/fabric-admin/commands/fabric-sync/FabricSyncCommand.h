@@ -31,8 +31,10 @@ class FabricSyncAddBridgeCommand : public CHIPCommand, public CommissioningDeleg
 public:
     FabricSyncAddBridgeCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("add-bridge", credIssuerCommands)
     {
-        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
-        AddArgument("device-remote-ip", &mRemoteAddr);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("setup-pin-code", 0, 0x7FFFFFF, &mSetupPINCode, "Setup PIN code for the remote bridge device.");
+        AddArgument("device-remote-ip", &mRemoteAddr, "The IP address of the remote bridge device.");
+        AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort, "The secured device port of the remote bridge device.");
     }
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) override;
@@ -45,7 +47,9 @@ public:
 private:
     chip::NodeId mNodeId;
     chip::NodeId mBridgeNodeId;
+    uint32_t mSetupPINCode;
     chip::ByteSpan mRemoteAddr;
+    uint16_t mRemotePort;
 
     CHIP_ERROR RunCommand(NodeId remoteId);
 };
@@ -73,7 +77,9 @@ public:
     FabricSyncAddLocalBridgeCommand(CredentialIssuerCommands * credIssuerCommands) :
         CHIPCommand("add-local-bridge", credIssuerCommands)
     {
-        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("setup-pin-code", 0, 0x7FFFFFF, &mSetupPINCode, "Setup PIN code for the local bridge device.");
+        AddArgument("local-port", 0, UINT16_MAX, &mLocalPort, "The secured device port of the local bridge device.");
     }
 
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
@@ -85,6 +91,8 @@ public:
 
 private:
     chip::NodeId mNodeId;
+    chip::Optional<uint32_t> mSetupPINCode;
+    chip::Optional<uint16_t> mLocalPort;
     chip::NodeId mLocalBridgeNodeId;
 
     CHIP_ERROR RunCommand(chip::NodeId deviceId);

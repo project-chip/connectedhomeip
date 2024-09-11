@@ -45,7 +45,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Verify SENS feature is supported"),
+            TestStep("2b", "Verify SENSLVL feature is supported"),
             TestStep("2c", "Read AttributeList attribute"),
             TestStep(3, "Read SupportedSensitivityLevels attribute"),
             TestStep(4, "Read DefaultSensitivityLevel attribute, if supported"),

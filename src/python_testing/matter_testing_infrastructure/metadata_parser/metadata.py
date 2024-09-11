@@ -33,6 +33,7 @@ class Metadata:
     app: str
     app_args: str
     script_args: str
+    script_start_delay: int = 0
     factoryreset: bool = False
     factoryreset_app_only: bool = False
     script_gdb: bool = False
@@ -59,6 +60,9 @@ class Metadata:
 
         if "script-args" in attr_dict:
             self.script_args = attr_dict["script-args"]
+
+        if "script-start-delay" in attr_dict:
+            self.script_start_delay = int(attr_dict["script-start-delay"])
 
         if "py_script_path" in attr_dict:
             self.py_script_path = attr_dict["py_script_path"]
@@ -187,6 +191,7 @@ class MetadataReader:
                 app=attr.get("app", ""),
                 app_args=attr.get("app_args", ""),
                 script_args=attr.get("script_args", ""),
+                script_start_delay=int(attr.get("script_start_delay", 0)),
                 factoryreset=bool(attr.get("factoryreset", False)),
                 factoryreset_app_only=bool(attr.get("factoryreset_app_only", False)),
                 script_gdb=bool(attr.get("script_gdb", False)),

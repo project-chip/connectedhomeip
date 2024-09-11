@@ -130,6 +130,14 @@ _ALIASES = {
                 'has_destination': False,
                 'has_endpoint': False,
             },
+            'EstablishPASESession': {
+                'alias': 'code-paseonly',
+                'arguments': {
+                    'nodeId': 'node-id'
+                },
+                'has_destination': False,
+                'has_endpoint': False,
+            },
             'GetCommissionerNodeId': {
                 'has_destination': False,
                 'has_endpoint': False,

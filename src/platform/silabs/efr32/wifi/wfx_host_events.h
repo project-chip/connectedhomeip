@@ -139,12 +139,10 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define WLAN_TASK_PRIORITY 1
 #define WLAN_DRIVER_TASK_PRIORITY 1
 #define BLE_DRIVER_TASK_PRIORITY 1
-#define MAX_JOIN_RETRIES_COUNT 5
 
 #else /* WF200 */
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 1
-#define MAX_JOIN_RETRIES_COUNT 5
 #endif // RS911X_WIFI
 
 // MAX SSID LENGTH excluding NULL character
@@ -152,11 +150,10 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 // MAX PASSKEY LENGTH including NULL character
 #define WFX_MAX_PASSKEY_LENGTH (64)
 
-// WLAN retry time intervals in milli seconds
-#define WLAN_MAX_RETRY_TIMER_MS 30000
-#define WLAN_MIN_RETRY_TIMER_MS 1000
-#define WLAN_RETRY_TIMER_MS 5000
-#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
+#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
+
+// WLAN MAX retry
+#define MAX_JOIN_RETRIES_COUNT 5
 
 // WLAN related Macros
 #define ETH_FRAME 0
@@ -257,7 +254,9 @@ typedef enum
 typedef struct
 {
     char ssid[WFX_MAX_SSID_LENGTH + 1];
+    size_t ssid_length;
     char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
+    size_t passkey_length;
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -273,6 +272,7 @@ typedef enum
 typedef struct wfx_wifi_scan_result
 {
     char ssid[WFX_MAX_SSID_LENGTH + 1];
+    size_t ssid_length;
     wfx_sec_t security;
     uint8_t bssid[BSSID_LEN];
     uint8_t chan;
@@ -388,7 +388,7 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
-void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
+void wfx_retry_connection(uint16_t retryAttempt);
 
 #ifdef __cplusplus
 }

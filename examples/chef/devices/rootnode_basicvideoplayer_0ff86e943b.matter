@@ -606,14 +606,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -640,7 +636,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -892,23 +888,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -2375,13 +2354,6 @@ endpoint 0 {
     handle command AnnounceOTAProvider;
   }
 
-  server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
-    callback attribute supportedLocales;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
@@ -2522,7 +2494,7 @@ endpoint 1 {
 
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2578,7 +2550,7 @@ endpoint 1 {
   server cluster TargetNavigator {
     emits event TargetUpdated;
     callback attribute targetList;
-    ram      attribute currentTarget default = 0;
+    persist  attribute currentTarget default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2592,11 +2564,11 @@ endpoint 1 {
 
   server cluster MediaPlayback {
     emits event StateChanged;
-    ram      attribute currentState default = 0x00;
+    persist  attribute currentState default = 0x00;
     ram      attribute startTime default = 0x00;
     ram      attribute duration default = 0;
     callback attribute sampledPosition;
-    ram      attribute playbackSpeed default = 0;
+    ram      attribute playbackSpeed default = 1;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
@@ -2622,7 +2594,7 @@ endpoint 1 {
 
   server cluster MediaInput {
     callback attribute inputList;
-    ram      attribute currentInput default = 0x00;
+    persist  attribute currentInput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2661,7 +2633,7 @@ endpoint 1 {
 
   server cluster AudioOutput {
     callback attribute outputList;
-    ram      attribute currentOutput default = 0x00;
+    persist  attribute currentOutput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2692,7 +2664,7 @@ endpoint 2 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0;
+    persist  attribute onOff default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2706,7 +2678,7 @@ endpoint 2 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel default = 0x00;
+    persist  attribute currentLevel default = 0x00;
     ram      attribute minLevel default = 0x00;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x00;

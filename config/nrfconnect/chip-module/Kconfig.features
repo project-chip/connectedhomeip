@@ -162,6 +162,7 @@ config CHIP_DFU_OVER_BT_SMP
 	# Enable custom SMP request to erase settings partition.
 	select MCUMGR_GRP_ZBASIC
 	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	select MCUMGR_TRANSPORT_BT_REASSEMBLY
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.

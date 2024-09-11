@@ -44,15 +44,11 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- cluster revision -->
     <globalAttribute code="0xFFFD" side="either" value="1"/>
-    <attribute code="0x0000" side="server" define="REMOVED_ON" type="epoch_us" isNullable="true" optional="true">
-      <description>RemovedOn</description>
-      <access op="read" privilege="manage"/>
-    </attribute>
-    <attribute code="0x0001" side="server" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct" length="256" minLength="1">
+    <attribute code="0x0000" side="server" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct">
       <description>DeviceDirectory</description>
       <access op="read" privilege="manage"/>
     </attribute>
-    <attribute code="0x0002" side="server" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct" length="64" minLength="1">
+    <attribute code="0x0001" side="server" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct">
       <description>LocationDirectory</description>
       <access op="read" privilege="manage"/>
     </attribute>

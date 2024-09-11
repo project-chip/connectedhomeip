@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, per_endpoint_test
+from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -27,7 +27,7 @@ class TC_CCTRL_2_1(MatterBaseTest):
                  TestStep(2, "Validate SupportedDeviceCategories is set accordingly based on MCORE.FS")]
         return steps
 
-    @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_1(self):
         self.step(1)
         is_fabric_sync_pics_enabled = self.check_pics("MCORE.FS")

@@ -16,10 +16,13 @@
  */
 
 #import "MTRDiagnosticLogsDownloader.h"
+#import <Matter/Matter.h>
 
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/LockTracker.h>
 #include <protocols/bdx/BdxTransferServerDelegate.h>
+#include <protocols/bdx/DiagnosticLogs.h>
 
-#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -82,6 +85,9 @@ NS_ASSUME_NONNULL_BEGIN
                          queue:(dispatch_queue_t)queue
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
+
+- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+
 @end
 
 @interface MTRDiagnosticLogsDownloader ()
@@ -348,6 +354,21 @@ private:
     return download;
 }
 
+- (void)abortDownloadsForController:(MTRDeviceController *)controller
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto fabricIndex = @(controller.fabricIndex);
+    for (MTRDownload * download in [_downloads copy]) {
+        if (![download.fabricIndex isEqual:fabricIndex]) {
+            continue;
+        }
+
+        [download failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
+        [self remove:download];
+    }
+}
+
 - (void)remove:(MTRDownload *)download
 {
     assertChipStackLockedByCurrentThread();
@@ -425,20 +446,27 @@ private:
         [download checkInteractionModelResponse:response error:error];
     };
 
-    auto * device = [controller deviceForNodeID:nodeID];
-    auto * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
+    auto * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:controller];
+    auto * cluster = [[MTRBaseClusterDiagnosticLogs alloc] initWithDevice:device endpointID:@(kDiagnosticLogsEndPoint) queue:queue];
 
     auto * params = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
     params.intent = @(type);
     params.requestedProtocol = @(MTRDiagnosticLogsTransferProtocolBDX);
     params.transferFileDesignator = download.fileDesignator;
 
-    [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
+    [cluster retrieveLogsRequestWithParams:params completion:interactionModelDone];
 
     if (timeoutInSeconds > 0) {
         auto err = _bridge->StartBDXTransferTimeout(download, timeoutInSeconds);
         VerifyOrReturn(CHIP_NO_ERROR == err, [download failure:[MTRError errorForCHIPErrorCode:err]]);
     }
+}
+
+- (void)abortDownloadsForController:(MTRDeviceController *)controller;
+{
+    assertChipStackLockedByCurrentThread();
+
+    [_downloads abortDownloadsForController:controller];
 }
 
 - (void)handleBDXTransferSessionBeginForFileDesignator:(NSString *)fileDesignator

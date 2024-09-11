@@ -66,6 +66,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
 /**
+ * If true, the controller has been suspended via `suspend` and not resumed yet.
+ */
+@property (readonly, nonatomic, getter=isSuspended) BOOL suspended MTR_NEWLY_AVAILABLE;
+
+/**
  * The ID assigned to this controller at creation time.
  */
 @property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
@@ -181,7 +186,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)preWarmCommissioningSession MTR_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]", ios(16.4, 17.6), macos(13.3, 14.6), watchos(9.4, 10.6), tvos(16.4, 17.6));
 
 /**
- * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
+ * Set the Delegate for the device controller as well as the Queue on which the Delegate callbacks will be triggered
  *
  * @param[in] delegate The delegate the commissioning process should use
  *
@@ -189,6 +194,23 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
                               queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Adds a Delegate to the device controller as well as the Queue on which the Delegate callbacks will be triggered
+ *
+ * @param[in] delegate The delegate the commissioning process should use
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
+                              queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+
+/**
+ * Removes a Delegate from the device controller
+ *
+ * @param[in] delegate The delegate to be removed
+ */
+- (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate MTR_NEWLY_AVAILABLE;
 
 /**
  * Start scanning for commissionable devices.
@@ -252,6 +274,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Suspend the controller.  This will attempt to stop all network traffic associated
+ * with the controller.  The controller will remain suspended until it is
+ * resumed.
+ *
+ * Suspending an already-suspended controller has no effect.
+ */
+- (void)suspend MTR_NEWLY_AVAILABLE;
+
+/**
+ * Resume the controller.  This has no effect if the controller is not
+ * suspended.
+ *
+ * A resume following any number of suspend calls will resume the controller;
+ * there does not need to be a resume call to match every suspend call.
+ */
+- (void)resume MTR_NEWLY_AVAILABLE;
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

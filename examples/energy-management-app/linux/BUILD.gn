@@ -51,6 +51,12 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -75,6 +81,8 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   if (chip_enable_pw_rpc) {

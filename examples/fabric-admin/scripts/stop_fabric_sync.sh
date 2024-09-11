@@ -20,5 +20,5 @@ if [ ! -z "$fabric_bridge_app_pid" ]; then
 fi
 
 # Remove /tmp/chip_* files and directories
-sudo rm -rf /tmp/chip_*
+rm -rf /tmp/chip_*
 echo "Removed /tmp/chip_* files and directories"

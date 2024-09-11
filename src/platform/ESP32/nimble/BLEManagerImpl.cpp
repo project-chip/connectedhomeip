@@ -659,7 +659,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
     if (pBuf->DataLength() > UINT16_MAX)
     {
         ChipLogError(Ble, "Buffer data Length is too long");
-        return false;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     rc = ble_gattc_write_flat(conId, chr->chr.val_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), OnWriteComplete,
                               this);
@@ -1746,12 +1746,12 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 CHIP_ERROR BLEManagerImpl::HandleRXNotify(struct ble_gap_event * ble_event)
 {
-    size_t dataLen                 = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
+    uint16_t dataLen               = OS_MBUF_PKTLEN(ble_event->notify_rx.om);
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(dataLen, 0);
     VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    ble_hs_mbuf_to_flat(ble_event->notify_rx.om, buf->Start(), data_len, NULL);
-    buf->SetDataLength(data_len);
+    VerifyOrReturnError(buf->AvailableDataLength() >= dataLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ble_hs_mbuf_to_flat(ble_event->notify_rx.om, buf->Start(), dataLen, NULL);
+    buf->SetDataLength(dataLen);
 
     ChipLogDetail(DeviceLayer, "Indication received, conn = %d", ble_event->notify_rx.conn_handle);
 

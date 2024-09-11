@@ -23,15 +23,15 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class CommissionerControlClusterCommissioningRequestResultEvent(
-  val requestId: ULong,
-  val clientNodeId: ULong,
+  val requestID: ULong,
+  val clientNodeID: ULong,
   val statusCode: UInt,
   val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
-    append("\trequestId : $requestId\n")
-    append("\tclientNodeId : $clientNodeId\n")
+    append("\trequestID : $requestID\n")
+    append("\tclientNodeID : $clientNodeID\n")
     append("\tstatusCode : $statusCode\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
@@ -40,8 +40,8 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_REQUEST_ID), requestId)
-      put(ContextSpecificTag(TAG_CLIENT_NODE_ID), clientNodeId)
+      put(ContextSpecificTag(TAG_REQUEST_ID), requestID)
+      put(ContextSpecificTag(TAG_CLIENT_NODE_ID), clientNodeID)
       put(ContextSpecificTag(TAG_STATUS_CODE), statusCode)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -59,16 +59,16 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
       tlvReader: TlvReader,
     ): CommissionerControlClusterCommissioningRequestResultEvent {
       tlvReader.enterStructure(tlvTag)
-      val requestId = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
-      val clientNodeId = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
+      val requestID = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
+      val clientNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
       val statusCode = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS_CODE))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
       return CommissionerControlClusterCommissioningRequestResultEvent(
-        requestId,
-        clientNodeId,
+        requestID,
+        clientNodeID,
         statusCode,
         fabricIndex,
       )

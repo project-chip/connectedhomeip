@@ -30,10 +30,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// Constants
-constexpr uint32_t kSetupPinCode               = 20202021;
-constexpr uint16_t kRemoteBridgePort           = 5540;
-constexpr uint16_t kLocalBridgePort            = 5540;
 constexpr uint16_t kWindowTimeout              = 300;
 constexpr uint16_t kIteration                  = 1000;
 constexpr uint16_t kSubscribeMinInterval       = 0;
@@ -137,7 +133,7 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     // that is part of a different fabric, accessed through a fabric bridge.
     StringBuilder<kMaxCommandSize> commandBuilder;
 
-    // Use random discriminator to have less chance of collission.
+    // Use random discriminator to have less chance of collision.
     uint16_t discriminator =
         Crypto::GetRandU16() % (kMaxDiscriminatorLength + 1); // Include the upper limit kMaxDiscriminatorLength
 
@@ -148,12 +144,13 @@ void DeviceManager::OpenRemoteDeviceCommissioningWindow(EndpointId remoteEndpoin
     PushCommand(commandBuilder.c_str());
 }
 
-void DeviceManager::PairRemoteFabricBridge(NodeId nodeId, const char * deviceRemoteIp)
+void DeviceManager::PairRemoteFabricBridge(chip::NodeId nodeId, uint32_t setupPINCode, const char * deviceRemoteIp,
+                                           uint16_t deviceRemotePort)
 {
     StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing already-discovered ");
-    commandBuilder.AddFormat("%lu %d %s %d", nodeId, kSetupPinCode, deviceRemoteIp, kRemoteBridgePort);
+    commandBuilder.AddFormat("%lu %d %s %d", nodeId, setupPINCode, deviceRemoteIp, deviceRemotePort);
 
     PushCommand(commandBuilder.c_str());
 }
@@ -173,7 +170,7 @@ void DeviceManager::PairLocalFabricBridge(NodeId nodeId)
     StringBuilder<kMaxCommandSize> commandBuilder;
 
     commandBuilder.Add("pairing already-discovered ");
-    commandBuilder.AddFormat("%lu %d ::1 %d", nodeId, kSetupPinCode, kLocalBridgePort);
+    commandBuilder.AddFormat("%lu %d ::1 %d", nodeId, mLocalBridgeSetupPinCode, mLocalBridgePort);
 
     PushCommand(commandBuilder.c_str());
 }
@@ -285,7 +282,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
         return;
     }
 
-    if (value.requestId != mRequestId)
+    if (value.requestID != mRequestId)
     {
         ChipLogError(NotSpecified, "The RequestId does not match the RequestId provided to RequestCommissioningApproval");
         return;
@@ -299,7 +296,7 @@ void DeviceManager::HandleCommissioningRequestResult(TLV::TLVReader & data)
 
     // The server is ready to begin commissioning the requested device, request the Commissioner Control Server to begin
     // commissioning a previously approved request.
-    SendCommissionNodeRequest(value.requestId, kResponseTimeoutSeconds);
+    SendCommissionNodeRequest(value.requestID, kResponseTimeoutSeconds);
 }
 
 void DeviceManager::HandleAttributePartsListUpdate(chip::TLV::TLVReader & data)

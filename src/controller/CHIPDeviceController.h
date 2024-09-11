@@ -980,8 +980,6 @@ private:
     OnICDManagementStayActiveResponse(void * context,
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
 
-    static void OnInterfaceEnableWriteSuccessResponse(void * context);
-
     /**
      * @brief
      *   This function processes the CSR sent by the device.

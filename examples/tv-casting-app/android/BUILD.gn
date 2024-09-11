@@ -22,17 +22,7 @@ import("${chip_root}/build/chip/tools.gni")
 shared_library("jni") {
   output_name = "libTvCastingApp"
 
-  sources = [
-    "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
-    "App/app/src/main/jni/cpp/Constants.h",
-    "App/app/src/main/jni/cpp/ConversionUtils.cpp",
-    "App/app/src/main/jni/cpp/ConversionUtils.h",
-    "App/app/src/main/jni/cpp/JNIDACProvider.cpp",
-    "App/app/src/main/jni/cpp/JNIDACProvider.h",
-    "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.cpp",
-    "App/app/src/main/jni/cpp/MatterCallbackHandler-JNI.h",
-    "App/app/src/main/jni/cpp/TvCastingApp-JNI.cpp",
-  ]
+  sources = [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h" ]
 
   # add simplified casting API files here
   sources += [
@@ -46,6 +36,8 @@ shared_library("jni") {
     "App/app/src/main/jni/cpp/core/MatterEndpoint-JNI.h",
     "App/app/src/main/jni/cpp/support/Converters-JNI.cpp",
     "App/app/src/main/jni/cpp/support/Converters-JNI.h",
+    "App/app/src/main/jni/cpp/support/JNIDACProvider.cpp",
+    "App/app/src/main/jni/cpp/support/JNIDACProvider.h",
     "App/app/src/main/jni/cpp/support/MatterCallback-JNI.h",
     "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.cpp",
     "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.h",
@@ -85,23 +77,21 @@ android_library("java") {
   ]
 
   sources = [
-    "App/app/src/main/jni/com/chip/casting/AppParameters.java",
-    "App/app/src/main/jni/com/chip/casting/CommissioningCallbacks.java",
-    "App/app/src/main/jni/com/chip/casting/ContentApp.java",
-    "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
-    "App/app/src/main/jni/com/chip/casting/DACProvider.java",
-    "App/app/src/main/jni/com/chip/casting/DiscoveredNodeData.java",
-    "App/app/src/main/jni/com/chip/casting/FailureCallback.java",
-    "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
-    "App/app/src/main/jni/com/chip/casting/MatterError.java",
-    "App/app/src/main/jni/com/chip/casting/MediaPlaybackTypes.java",
-    "App/app/src/main/jni/com/chip/casting/NsdDiscoveryListener.java",
-    "App/app/src/main/jni/com/chip/casting/NsdResolveListener.java",
-    "App/app/src/main/jni/com/chip/casting/SubscriptionEstablishedCallback.java",
-    "App/app/src/main/jni/com/chip/casting/SuccessCallback.java",
-    "App/app/src/main/jni/com/chip/casting/TargetNavigatorTypes.java",
-    "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
-    "App/app/src/main/jni/com/chip/casting/VideoPlayer.java",
+    "App/app/src/compat/jni/com/chip/casting/AppParameters.java",
+    "App/app/src/compat/jni/com/chip/casting/CommissioningCallbacks.java",
+    "App/app/src/compat/jni/com/chip/casting/ContentApp.java",
+    "App/app/src/compat/jni/com/chip/casting/ContentLauncherTypes.java",
+    "App/app/src/compat/jni/com/chip/casting/DACProvider.java",
+    "App/app/src/compat/jni/com/chip/casting/DiscoveredNodeData.java",
+    "App/app/src/compat/jni/com/chip/casting/FailureCallback.java",
+    "App/app/src/compat/jni/com/chip/casting/MatterCallbackHandler.java",
+    "App/app/src/compat/jni/com/chip/casting/MatterError.java",
+    "App/app/src/compat/jni/com/chip/casting/MediaPlaybackTypes.java",
+    "App/app/src/compat/jni/com/chip/casting/SubscriptionEstablishedCallback.java",
+    "App/app/src/compat/jni/com/chip/casting/SuccessCallback.java",
+    "App/app/src/compat/jni/com/chip/casting/TargetNavigatorTypes.java",
+    "App/app/src/compat/jni/com/chip/casting/TvCastingApp.java",
+    "App/app/src/compat/jni/com/chip/casting/VideoPlayer.java",
   ]
 
   # add simplified casting API files here

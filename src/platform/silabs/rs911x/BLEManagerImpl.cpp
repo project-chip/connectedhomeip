@@ -62,8 +62,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#define BLE_MIN_CONNECTION_INTERVAL_MS 45
-#define BLE_MAX_CONNECTION_INTERVAL_MS 45
+#define BLE_MIN_CONNECTION_INTERVAL_MS 24
+#define BLE_MAX_CONNECTION_INTERVAL_MS 40
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
@@ -71,13 +71,22 @@ extern "C" {
 
 extern sl_wfx_msg_t event_msg;
 
-StaticTask_t rsiBLETaskStruct;
-
 osSemaphoreId_t sl_ble_event_sem;
 osSemaphoreId_t sl_rs_ble_init_sem;
 
-/* wfxRsi Task will use as its stack */
-StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
+osTimerId_t sbleAdvTimeoutTimer;
+
+static osThreadId_t sBleThread;
+constexpr uint32_t kBleTaskSize = 2048;
+static uint8_t bleStack[kBleTaskSize];
+static osThread_t sBleTaskControlBlock;
+constexpr osThreadAttr_t kBleTaskAttr = { .name       = "rsi_ble",
+                                          .attr_bits  = osThreadDetached,
+                                          .cb_mem     = &sBleTaskControlBlock,
+                                          .cb_size    = osThreadCbSize,
+                                          .stack_mem  = bleStack,
+                                          .stack_size = kBleTaskSize,
+                                          .priority   = osPriorityHigh };
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -110,7 +119,7 @@ void sl_ble_init()
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
 
-void sl_ble_event_handling_task(void)
+void sl_ble_event_handling_task(void * args)
 {
     int32_t event_id;
 
@@ -236,8 +245,6 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
-
 const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
@@ -253,13 +260,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
     sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
-    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL,
-                                         BLE_DRIVER_TASK_PRIORITY, wfxBLETaskStack, &rsiBLETaskStruct);
+    sBleThread = osThreadNew(sl_ble_event_handling_task, NULL, &kBleTaskAttr);
 
-    if (wfx_rsi.ble_task == NULL)
-    {
-        ChipLogError(DeviceLayer, "%s: error: failed to create ble task.", __func__);
-    }
+    VerifyOrReturnError(sBleThread != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
@@ -269,13 +272,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
-    // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                              // Just a text name, not used by the RTOS kernel
-                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
-                                       false,                                      // no timer reload (==one-shot)
-                                       (void *) this,                              // init timer id = ble obj context
-                                       BleAdvTimeoutHandler                        // timer callback handler
-    );
+    // SW timer for BLE timeouts and interval change.
+    sbleAdvTimeoutTimer = osTimerNew(BleAdvTimeoutHandler, osTimerOnce, NULL, NULL);
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -1070,7 +1068,7 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
     return freeIndex;
 }
 
-void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
@@ -1081,7 +1079,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
-    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(sbleAdvTimeoutTimer) != osOK)
     {
         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
     }
@@ -1089,15 +1087,7 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
-    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    if (osTimerStart(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
