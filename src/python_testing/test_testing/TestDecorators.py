@@ -30,9 +30,9 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from matter_testing_support.matter_testing import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute, has_cluster, has_feature,
-                                                   run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
-from typing import Optional
+from matter_testing_support.matter_testing import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute, has_cluster,
+                                                   has_feature, run_if_endpoint_matches, run_on_singleton_matching_endpoint,
+                                                   should_run_test_on_endpoint)
 from mobly import asserts
 from MockTestRunner import MockTestRunner
 
