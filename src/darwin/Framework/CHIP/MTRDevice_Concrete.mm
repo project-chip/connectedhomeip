@@ -62,6 +62,7 @@
 @property (nonatomic, readwrite) MTRDeviceState state;
 @property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
 @property (nonatomic, readwrite, nullable, copy) NSNumber * estimatedSubscriptionLatency;
+@property (nonatomic, readwrite, assign) BOOL suspended;
 
 @end
 
@@ -395,6 +396,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }];
         }
 
+        self.suspended = controller.suspended;
+
         MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
@@ -719,8 +722,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for suspended controllers or device controllers over XPC.
-    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription when we are suspended or for device controllers over XPC.
+    return self.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
@@ -1290,7 +1293,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_assert_owner(&_lock);
 
-    if (_deviceController.isSuspended) {
+    if (self.suspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
         return;
     }
@@ -1378,7 +1381,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
-    self.reattemptingSubscription = NO;
     [self _setupSubscriptionWithReason:reason];
 }
 
@@ -2301,6 +2303,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&self->_lock);
+
+    // If we have a pending subscription reattempt, make sure it does not
+    // actually happen, since we are trying to do a subscription now.
+    self.reattemptingSubscription = NO;
 
     if (![self _subscriptionsAllowed]) {
         MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
@@ -3991,6 +3997,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [super controllerSuspended];
 
     std::lock_guard lock(self->_lock);
+    self.suspended = YES;
     [self _resetSubscriptionWithReasonString:@"Controller suspended"];
 
     // Ensure that any pre-existing resubscribe attempts we control don't try to
@@ -4003,6 +4010,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [super controllerResumed];
 
     std::lock_guard lock(self->_lock);
+    self.suspended = NO;
 
     if (![self _delegateExists]) {
         MTR_LOG("%@ ignoring controller resume: no delegates", self);
