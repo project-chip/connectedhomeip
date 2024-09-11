@@ -2594,7 +2594,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -3206,6 +3206,16 @@ cluster OvenMode = 73 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kBake = 16384;
     kConvection = 16385;
     kGrill = 16386;
@@ -3324,6 +3334,16 @@ cluster LaundryWasherMode = 81 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kDelicate = 16385;
     kHeavy = 16386;
@@ -3375,6 +3395,16 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kRapidCool = 16384;
     kRapidFreeze = 16385;
   }
@@ -3452,6 +3482,16 @@ cluster RvcRunMode = 84 {
   revision 3;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kIdle = 16384;
     kCleaning = 16385;
     kMapping = 16386;
@@ -3511,6 +3551,16 @@ cluster RvcCleanMode = 85 {
   revision 3;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kDeepClean = 16384;
     kVacuum = 16385;
     kMop = 16386;
@@ -3621,6 +3671,16 @@ cluster DishwasherMode = 89 {
   revision 2;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kHeavy = 16385;
     kLight = 16386;
@@ -3862,6 +3922,16 @@ cluster MicrowaveOvenMode = 94 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNormal = 16384;
     kDefrost = 16385;
   }
@@ -4006,6 +4076,10 @@ cluster RvcOperationalState = 97 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
     kFailedToFindChargingDock = 64;
     kStuck = 65;
     kDustBinMissing = 66;
@@ -4017,6 +4091,10 @@ cluster RvcOperationalState = 97 {
   }
 
   enum OperationalStateEnum : enum8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
@@ -5454,6 +5532,16 @@ cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kManual = 16384;
     kTimeOfUse = 16385;
     kSolarCharging = 16386;
@@ -5504,6 +5592,16 @@ cluster WaterHeaterMode = 158 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kOff = 16384;
     kManual = 16385;
     kTimed = 16386;
@@ -5554,6 +5652,16 @@ provisional cluster DeviceEnergyManagementMode = 159 {
   revision 1;
 
   enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
     kNoOptimization = 16384;
     kDeviceOptimization = 16385;
     kLocalOptimization = 16386;

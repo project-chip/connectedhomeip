@@ -91,7 +91,7 @@ typedef struct {} variable_hidden_by_mtr_hide;
     {                                                                                                 \
         NSXPCConnection * xpcConnection = XPC_CONNECTION;                                             \
                                                                                                       \
-        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {    \
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {               \
             MTR_LOG_ERROR("Error: %@", error);                                                        \
         }] PREFIX ADDITIONAL_ARGUMENTS];                                                              \
     }
@@ -111,3 +111,46 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                                     \
         return outValue;                                                                                            \
     }
+
+#ifndef MTR_OPTIONAL_ATTRIBUTE
+#if __has_feature(objc_arc)
+#define MTR_OPTIONAL_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                                                       \
+    {                                                                                                                                              \
+        id valueToAdd = VALUE;                                                                                                                     \
+        if (valueToAdd != nil) {                                                                                                                   \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) (__bridge const void *) ATTRIBUTE, (const void *) valueToAdd); \
+        }                                                                                                                                          \
+    }
+#else
+#define MTR_OPTIONAL_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                                              \
+    {                                                                                                                                     \
+        id valueToAdd = VALUE;                                                                                                            \
+        if (valueToAdd != nil) {                                                                                                          \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) (const void *) ATTRIBUTE, (const void *) valueToAdd); \
+        }                                                                                                                                 \
+    }
+#endif
+#endif
+
+#ifndef MTR_REMOVE_ATTRIBUTE
+#define MTR_REMOVE_ATTRIBUTE(ATTRIBUTE, DICTIONARY)                                            \
+    if (ATTRIBUTE != nil && DICTIONARY) {                                                      \
+        CFDictionaryRemoveValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE); \
+    }
+#endif
+
+#ifndef MTR_REQUIRED_ATTRIBUTE
+#define MTR_REQUIRED_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                               \
+    {                                                                                                                      \
+        id valueToAdd = VALUE;                                                                                             \
+        if (valueToAdd != nil) {                                                                                           \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE, (const void *) valueToAdd); \
+        } else {                                                                                                           \
+            MTR_LOG_ERROR("Warning, missing %@ to add to %s", ATTRIBUTE, #DICTIONARY);                                     \
+        }                                                                                                                  \
+    }
+#endif
+
+#ifndef YES_NO
+#define YES_NO(x) ((x) ? @"YES" : @"NO")
+#endif

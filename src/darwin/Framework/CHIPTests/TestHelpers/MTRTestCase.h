@@ -38,6 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSTask *)createTaskForPath:(NSString *)path;
 
 /**
+ * Same thing, but not tied to a specific testcase instance.
+ */
++ (NSTask *)createTaskForPath:(NSString *)path;
+
+/**
  * Run a task to completion and make sure it succeeds.
  */
 - (void)runTask:(NSTask *)task;
@@ -52,13 +57,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Launch a cross-test task.  The task will be automatically terminated when the testsuite
  * tearDown happens.
  */
-- (void)launchCrossTestTask:(NSTask *)task;
++ (void)launchTask:(NSTask *)task;
 #endif // HAVE_NSTASK
 
 /**
  * Get an absolute path from a path relative to the Matter SDK root.
  */
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath;
+
+/**
+ * Same thing, but not tied to a specific testcase instance.
+ */
++ (NSString *)absolutePathFor:(NSString *)matterRootRelativePath;
 
 @end
 
