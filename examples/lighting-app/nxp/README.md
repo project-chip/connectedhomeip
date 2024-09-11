@@ -121,7 +121,7 @@ The application uses an NXP specific data model file:
 
 | path                          | description                             |
 | ----------------------------- | --------------------------------------- |
-| `zap-lit/lighting-on-off.zap` | Data model for On/Off Light device type |
+| `zap/lighting-on-off.zap` | Data model for On/Off Light device type |
 
 The data model can be changed by simply replacing the gn `deps` statement
 corresponding to data model target.
