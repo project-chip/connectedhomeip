@@ -287,10 +287,10 @@ class NxpBuilder(GnBuilder):
         if self.board_variant:
             if self.board == NxpBoard.RW61X:
                 flag_board_variant = "-DCONFIG_BOARD_VARIANT=\"%s\"" % self.board_variant
-            
+
             flags.append(flag_board_variant)
 
-        build_flags = " ".join(flags) if len(flags) > 0 else ""    
+        build_flags = " ".join(flags) if len(flags) > 0 else ""
 
         return build_flags
 
