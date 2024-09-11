@@ -1866,11 +1866,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-//    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
-        dispatch_async(self.queue, ^{
-            [self _handleEventReport:eventReport];
-        });
-//    } errorHandler: nil];
+    //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
+    dispatch_async(self.queue, ^{
+        [self _handleEventReport:eventReport];
+    });
+    //    } errorHandler: nil];
+}
 
 // END DRAGON: This is used by the XPC Server to inject attribute reports
 
