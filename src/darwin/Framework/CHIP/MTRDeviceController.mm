@@ -410,6 +410,7 @@ using namespace chip::Tracing::DarwinFramework;
         devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
 
+    MTR_LOG("%@ found %lu devices to suspend", self, static_cast<unsigned long>(devicesToSuspend.count));
     for (MTRDevice * device in devicesToSuspend) {
         [device controllerSuspended];
     }
@@ -437,6 +438,7 @@ using namespace chip::Tracing::DarwinFramework;
         devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
 
+    MTR_LOG("%@ found %lu devices to resume", self, static_cast<unsigned long>(devicesToResume.count));
     for (MTRDevice * device in devicesToResume) {
         [device controllerResumed];
     }
