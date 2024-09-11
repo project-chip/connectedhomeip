@@ -38,6 +38,7 @@ declare_args() {
   # enable by default for thread/non-wifi-ncp builds
   enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
   kvs_max_entries = 255
+  sl_nvm3_max_object_size = 4092
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -421,7 +422,7 @@ template("efr32_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
       "NVM3_DEFAULT_NVM_SIZE=40960",
-      "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "NVM3_DEFAULT_MAX_OBJECT_SIZE=${sl_nvm3_max_object_size}",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "CORTEXM3=1",
       "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
