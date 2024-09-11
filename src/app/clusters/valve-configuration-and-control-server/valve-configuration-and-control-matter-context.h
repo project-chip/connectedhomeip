@@ -52,6 +52,11 @@ public:
     CHIP_ERROR GetDefaultOpenDuration(uint32_t & returnVal);
     CHIP_ERROR GetDefaultOpenLevel(uint8_t & returnVal);
 
+    // MarkDirty
+    virtual void MarkDirty(AttributeId id);
+
+    virtual ~MatterContext() = default;
+
 private:
     EndpointId mEndpoint;
     PersistentStorageDelegate & mPersistentStorageDelegate;

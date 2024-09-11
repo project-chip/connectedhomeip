@@ -156,6 +156,7 @@ source_set("thread-border-router-management-test-srcs") {
 
 source_set("valve-configuration-and-control-test-srcs") {
   sources = [
+    "${chip_root}/src/app/cluster-building-blocks/QuieterReporting.h",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h",
@@ -166,6 +167,7 @@ source_set("valve-configuration-and-control-test-srcs") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
   ]
 }
 

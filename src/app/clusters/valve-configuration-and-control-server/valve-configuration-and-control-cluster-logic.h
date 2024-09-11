@@ -22,8 +22,10 @@
 
 #include "valve-configuration-and-control-delegate.h"
 #include "valve-configuration-and-control-matter-context.h"
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace app {
@@ -55,19 +57,56 @@ struct ClusterConformance
     }
 };
 
+struct ClusterInitParameters
+{
+    DataModel::Nullable<ValveStateEnum> currentState = DataModel::NullNullable;
+    DataModel::Nullable<Percent> currentLevel        = DataModel::NullNullable;
+    BitMask<ValveFaultBitmap> valveFault             = 0u;
+    uint8_t levelStep                                = 1u;
+};
 struct ClusterState
 {
-    DataModel::Nullable<ElapsedS> openDuration        = DataModel::NullNullable;
-    DataModel::Nullable<ElapsedS> defaultOpenDuration = DataModel::NullNullable;
-    DataModel::Nullable<EpochUs> autoCloseTime        = DataModel::NullNullable;
-    DataModel::Nullable<ElapsedS> remainingDuration   = DataModel::NullNullable;
-    DataModel::Nullable<ValveStateEnum> currentState  = DataModel::NullNullable;
-    DataModel::Nullable<ValveStateEnum> targetState   = DataModel::NullNullable;
-    DataModel::Nullable<Percent> currentLevel         = DataModel::NullNullable;
-    DataModel::Nullable<Percent> targetLevel          = DataModel::NullNullable;
-    Percent defaultOpenLevel                          = 100u;
-    BitMask<ValveFaultBitmap> valveFault              = 0u;
-    uint8_t levelStep                                 = 1u;
+    DataModel::Nullable<ElapsedS> openDuration            = DataModel::NullNullable;
+    DataModel::Nullable<ElapsedS> defaultOpenDuration     = DataModel::NullNullable;
+    DataModel::Nullable<EpochUs> autoCloseTime            = DataModel::NullNullable;
+    QuieterReportingAttribute<ElapsedS> remainingDuration = QuieterReportingAttribute<ElapsedS>();
+    DataModel::Nullable<ValveStateEnum> currentState      = DataModel::NullNullable;
+    DataModel::Nullable<ValveStateEnum> targetState       = DataModel::NullNullable;
+    DataModel::Nullable<Percent> currentLevel             = DataModel::NullNullable;
+    DataModel::Nullable<Percent> targetLevel              = DataModel::NullNullable;
+    Percent defaultOpenLevel                              = 100u;
+    BitMask<ValveFaultBitmap> valveFault                  = 0u;
+    uint8_t levelStep                                     = 1u;
+};
+
+// Attribute sets are forced to go through this class so the attributes can be marked dirty appropriately.
+// This cluster handles storage and marking dirty. The cluster logic should handle constraint and conformance checking.
+class ClusterStateAttributes
+{
+public:
+    explicit ClusterStateAttributes(MatterContext & matterContext) : mMatterContext(matterContext){};
+    void Init(ClusterInitParameters initialState);
+    const ClusterState & GetState() { return mState; }
+
+    CHIP_ERROR SetOpenDuration(const DataModel::Nullable<ElapsedS> & openDuration);
+    CHIP_ERROR SetDefaultOpenDuration(const DataModel::Nullable<ElapsedS> & defaultOpenDuration);
+    CHIP_ERROR SetAutoCloseTime(const DataModel::Nullable<EpochUs> & autoCloseTime);
+    CHIP_ERROR SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
+    CHIP_ERROR SetCurrentState(const DataModel::Nullable<ValveStateEnum> & currentState);
+    CHIP_ERROR SetTargetState(const DataModel::Nullable<ValveStateEnum> & targetState);
+    CHIP_ERROR SetCurrentLevel(const DataModel::Nullable<Percent> & currentLevel);
+    CHIP_ERROR SetTargetLevel(const DataModel::Nullable<Percent> & targetLevel);
+    CHIP_ERROR SetDefaultOpenLevel(const Percent defaultOpenLevel);
+    CHIP_ERROR SetValveFault(const BitMask<ValveFaultBitmap> & valveFault);
+    CHIP_ERROR SetLevelStep(const uint8_t levelStep);
+
+    System::Clock::Milliseconds64 GetNextReportTimeForRemainingDuration();
+
+private:
+    const System::Clock::Milliseconds64 kRemainingDurationReportRate =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds64(1));
+    ClusterState mState;
+    MatterContext & mMatterContext;
 };
 
 class ClusterLogic
@@ -76,7 +115,7 @@ public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
     ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
-        mClusterDriver(clusterDriver), mMatterContext(matterContext)
+        mClusterDriver(clusterDriver), mState(ClusterStateAttributes(matterContext))
     {
         // TODO: remove these once the fields are used properly
         (void) mClusterDriver;
@@ -85,7 +124,7 @@ public:
     // Validates the conformance and performs initialization.
     // Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
     // Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-    CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterState & initialState = ClusterState());
+    CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & initialState = ClusterInitParameters());
     // CHIP_ERROR HandleOpen();
     // CHIP_ERROR HandleClose();
 
@@ -147,13 +186,22 @@ private:
     CHIP_ERROR HandleOpenLevel(const std::optional<Percent> & targetLevel);
     // Internal function call to handle open commands for devices that do not support the LVL feature.
     CHIP_ERROR HandleOpenNoLevel();
-    bool mInitialized = false;
+
+    // Wrapper for the timer function. Private member so it can call private functions.
+    static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
+    // internal function called by wrapper
+    void HandleUpdateRemainingDurationInternal();
+    // Internal function called by HandleUpdateRemainingDuration to call the close function in the delegate and
+    // set all the attributes back to their closed state.
+    void HandleCloseInternal();
+
+    bool mInitialized                              = false;
+    System::Clock::Milliseconds64 mDurationStarted = System::Clock::Milliseconds64(0);
 
     DelegateBase & mClusterDriver;
-    MatterContext & mMatterContext;
 
     ClusterConformance mConformance;
-    ClusterState mState;
+    ClusterStateAttributes mState;
 };
 
 } // namespace ValveConfigurationAndControl

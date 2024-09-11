@@ -22,18 +22,110 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
+#include <system/SystemClock.h>
+#include <system/SystemTimer.h>
 
+using namespace chip::System::Clock::Literals;
 namespace chip {
+
+namespace System {
+
+// TODO: This might be worthwhile to generalize
+class TimerAndMockClock : public Clock::Internal::MockClock, public Layer
+{
+public:
+    // System Layer overrides
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    void Shutdown() override { Clear(); }
+    void Clear()
+    {
+        mTimerList.Clear();
+        mTimerNodes.ReleaseAll();
+    }
+    bool IsInitialized() const override { return true; }
+
+    CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
+    {
+        Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
+        TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
+        mTimerList.Add(node);
+        return CHIP_NO_ERROR;
+    }
+    void CancelTimer(TimerCompleteCallback aComplete, void * aAppState) override
+    {
+        TimerList::Node * cancelled = mTimerList.Remove(aComplete, aAppState);
+        if (cancelled != nullptr)
+        {
+            mTimerNodes.Release(cancelled);
+        }
+    }
+    CHIP_ERROR ExtendTimerTo(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override
+    {
+        return mTimerList.GetRemainingTime(onComplete, appState) != Clock::Timeout(0);
+    }
+    Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override
+    {
+        return mTimerList.GetRemainingTime(onComplete, appState);
+    }
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // Clock overrides
+    void SetMonotonic(Clock::Milliseconds64 timestamp)
+    {
+        MockClock::SetMonotonic(timestamp);
+        // Find all the timers that fired at this time or before and invoke the callbacks
+        TimerList::Node * node;
+        while ((node = mTimerList.Earliest()) != nullptr && node->AwakenTime() <= timestamp)
+        {
+            mTimerList.PopEarliest();
+            // Invoke auto-releases
+            mTimerNodes.Invoke(node);
+        }
+    }
+
+    void AdvanceMonotonic(Clock::Milliseconds64 increment) { SetMonotonic(GetMonotonicMilliseconds64() + increment); }
+
+private:
+    TimerPool<> mTimerNodes;
+    TimerList mTimerList;
+};
+
+} // namespace System
 namespace app {
 namespace Clusters {
 namespace ValveConfigurationAndControl {
 
+namespace {
+// These are globals because SetUpTestSuite is static and I'm not shaving that yak today.
+System::TimerAndMockClock gSystemLayerAndClock = System::TimerAndMockClock();
+System::Clock::ClockBase * gSavedClock         = nullptr;
+} // namespace
+
 class TestValveConfigurationAndControlClusterLogic : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        gSavedClock = &System::SystemClock();
+        System::Clock::Internal::SetSystemClockForTesting(&gSystemLayerAndClock);
+        DeviceLayer::SetSystemLayerForTesting(&gSystemLayerAndClock);
+    }
+    static void TearDownTestSuite()
+    {
+        gSystemLayerAndClock.Shutdown();
+        DeviceLayer::SetSystemLayerForTesting(nullptr);
+        System::Clock::Internal::SetSystemClockForTesting(gSavedClock);
+        Platform::MemoryShutdown();
+    }
+
+private:
 };
 
 class TestDelegateLevel : public LevelControlDelegate
@@ -128,6 +220,28 @@ public:
     ValveStateEnum target            = ValveStateEnum::kUnknownEnumValue;
 };
 
+// TODO: This also might be good to generalize, by using a common matter context for each cluster with allowed overrides
+class MockedMatterContext : public MatterContext
+{
+public:
+    MockedMatterContext(EndpointId endpoint, PersistentStorageDelegate & persistentStorageDelegate) :
+        MatterContext(endpoint, persistentStorageDelegate)
+    {}
+    void MarkDirty(AttributeId id) override { mDirtyMarkedList.push_back(id); }
+    std::vector<AttributeId> GetDirtyList() { return mDirtyMarkedList; }
+    void ClearDirtyList() { mDirtyMarkedList.clear(); }
+    ~MockedMatterContext() { gSystemLayerAndClock.Clear(); }
+
+private:
+    // Won't handle double-marking an attribute, so don't do that in tests
+    std::vector<AttributeId> mDirtyMarkedList;
+};
+
+//=========================================================================================
+// Tests for conformance
+//=========================================================================================
+
+// This test ensures that the Init function properly errors when the conformance is valid and passes otherwise.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestConformanceValid)
 {
     // Nothing on, should be valid
@@ -195,11 +309,40 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestConformanceValid)
     EXPECT_FALSE(conformance.Valid());
 }
 
+// The cluster requires different versions of the delegate depending on the supported feature set.
+// This test ensures the Init function corectly errors if the supplied delegate does not match
+// the given cluster conformance.
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestWrongDelegates)
+{
+    TestDelegateLevel delegateLevel;
+    TestDelegateNoLevel delegateNoLevel;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logicLevel(delegateLevel, context);
+    ClusterLogic logicNoLevel(delegateNoLevel, context);
+    ClusterConformance conformanceLevel   = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                              .supportsDefaultOpenLevel = true,
+                                              .supportsValveFault       = true,
+                                              .supportsLevelStep        = true };
+    ClusterConformance conformanceNoLevel = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
+    };
+
+    EXPECT_EQ(logicLevel.Init(conformanceNoLevel), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    EXPECT_EQ(logicNoLevel.Init(conformanceLevel), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+}
+
+//=========================================================================================
+// Tests for getters
+//=========================================================================================
+
+// This test ensures that all getters are properly implemented and return valid values after successful initialization.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeatures)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
-    MatterContext context(0, storageDelegate);
+    MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     // Everything on, all should return values
@@ -251,11 +394,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeature
     EXPECT_EQ(val8, 1);
 }
 
+// This test ensures that attributes that are not supported by the conformance properly return errors
+// and attributes that are supported return values properly.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
-    MatterContext context(0, storageDelegate);
+    MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     // Everything on, all should return values
@@ -300,32 +445,32 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
+// This test ensures that all attribute getters return the given starting state values before changes.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingState)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
-    MatterContext context(0, storageDelegate);
+    MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     // Everything on, all should return values
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    ClusterState state             = {
-                    .openDuration        = DataModel::MakeNullable(static_cast<uint32_t>(12u)),
-                    .defaultOpenDuration = DataModel::MakeNullable(static_cast<uint32_t>(10u)),
-                    .autoCloseTime       = DataModel::MakeNullable(static_cast<uint64_t>(2500u)),
-                    .remainingDuration   = DataModel::MakeNullable(static_cast<uint32_t>(1u)),
-                    .currentState        = DataModel::MakeNullable(ValveStateEnum::kTransitioning),
-                    .targetState         = DataModel::MakeNullable(ValveStateEnum::kOpen),
-                    .currentLevel        = DataModel::MakeNullable(static_cast<uint8_t>(50u)),
-                    .targetLevel         = DataModel::MakeNullable(static_cast<uint8_t>(75u)),
-                    .defaultOpenLevel    = 90u,
-                    .valveFault          = BitMask<ValveFaultBitmap>(ValveFaultBitmap::kLeaking),
-                    .levelStep           = 2u,
+    ClusterConformance conformance     = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                           .supportsDefaultOpenLevel = true,
+                                           .supportsValveFault       = true,
+                                           .supportsLevelStep        = true };
+    ClusterInitParameters initialState = {
+        .currentState = DataModel::MakeNullable(ValveStateEnum::kTransitioning),
+        .currentLevel = DataModel::MakeNullable(static_cast<Percent>(50u)),
+        .valveFault   = BitMask<ValveFaultBitmap>(ValveFaultBitmap::kLeaking),
+        .levelStep    = 2u,
     };
-    EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(conformance, initialState), CHIP_NO_ERROR);
+
+    ClusterState state;
+    state.currentState = initialState.currentState;
+    state.currentLevel = initialState.currentLevel;
+    state.valveFault   = initialState.valveFault;
+    state.levelStep    = initialState.levelStep;
 
     DataModel::Nullable<ElapsedS> valElapsedSNullable;
     DataModel::Nullable<EpochUs> valEpochUsNullable;
@@ -345,7 +490,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
     EXPECT_EQ(valEpochUsNullable, state.autoCloseTime);
 
     EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, state.remainingDuration);
+    EXPECT_EQ(valElapsedSNullable, state.remainingDuration.value());
 
     EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valEnumNullable, state.currentState);
@@ -369,11 +514,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
     EXPECT_EQ(val8, state.levelStep);
 }
 
+// This test ensures that all attribute getter functions properly error on an uninitialized cluster.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitialized)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
-    MatterContext context(0, storageDelegate);
+    MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     DataModel::Nullable<ElapsedS> valElapsedSNullable;
@@ -397,12 +543,23 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitiali
     EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_INCORRECT_STATE);
 }
 
+//=========================================================================================
+// Tests for setters
+//=========================================================================================
+
+// This test ensures that the Set function for DefaultOpenDuration sets the value properly including
+// - constraints checks
+// - value pushed through to persistent storage correctly
+// - value is persisted on a per-endpoint basis
+// - cluster logic loads saved values at startup
+// - cluster logic operates only on the stored values for the correct endpoint
+// - Set function correctly errors when the persistent storage errors
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     DataModel::Nullable<ElapsedS> valElapsedSNullable;
@@ -466,7 +623,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
     EXPECT_EQ(valElapsedSNullable, testVal);
 
     // Test that a new logic cluster on a different endpoint does not load the value
-    MatterContext context_ep1             = MatterContext(1, storageDelegate);
+    MockedMatterContext context_ep1       = MockedMatterContext(1, storageDelegate);
     ClusterLogic logic_different_endpoint = ClusterLogic(delegate, context_ep1);
     EXPECT_EQ(logic_different_endpoint.Init(conformance), CHIP_NO_ERROR);
     EXPECT_EQ(logic_different_endpoint.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
@@ -489,12 +646,21 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
     EXPECT_EQ(logic.SetDefaultOpenDuration(testVal), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 }
 
+// This test ensures that the Set function for DefaultOpenDuration sets the value properly including
+// - constraints checks
+// - value pushed through to persistent storage correctly
+// - value is persisted on a per-endpoint basis
+// - cluster logic loads saved values at startup
+// - cluster logic operates only on the stored values for the correct endpoint
+// - Set function correctly errors when the persistent storage errors
+// - Set function errors when the OpenLevel attribute is not supported
+// Conformance to the LevelStep value is tested in another test
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     uint8_t val8;
@@ -563,7 +729,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     EXPECT_EQ(val8, testVal);
 
     // Test that a new logic cluster on a different endpoint does not load the value
-    MatterContext context_ep1             = MatterContext(1, storageDelegate);
+    MockedMatterContext context_ep1       = MockedMatterContext(1, storageDelegate);
     ClusterLogic logic_different_endpoint = ClusterLogic(delegate, context_ep1);
     EXPECT_EQ(logic_different_endpoint.Init(conformance), CHIP_NO_ERROR);
     EXPECT_EQ(logic_different_endpoint.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
@@ -585,12 +751,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     EXPECT_EQ(logic_no_level.SetDefaultOpenLevel(testVal), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
+// This test ensures that the SetDefaultOpenLevel function correctly assesses the set value with respect to the LevelStep.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWithLevelStep)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     uint8_t val8;
@@ -600,8 +767,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWith
                                        .supportsDefaultOpenLevel = true,
                                        .supportsValveFault       = true,
                                        .supportsLevelStep        = true };
-    ClusterState state             = ClusterState();
-    state.levelStep                = 45;
+    ClusterInitParameters state;
+    state.levelStep = 45;
     EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
 
     // Default is 100
@@ -627,34 +794,21 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWith
     EXPECT_EQ(val8, testVal);
 }
 
-TEST_F(TestValveConfigurationAndControlClusterLogic, TestWrongDelegates)
-{
-    TestDelegateLevel delegateLevel;
-    TestDelegateNoLevel delegateNoLevel;
-    TestPersistentStorageDelegate storageDelegate;
-    EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
-    ClusterLogic logicLevel(delegateLevel, context);
-    ClusterLogic logicNoLevel(delegateNoLevel, context);
-    ClusterConformance conformanceLevel   = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                              .supportsDefaultOpenLevel = true,
-                                              .supportsValveFault       = true,
-                                              .supportsLevelStep        = true };
-    ClusterConformance conformanceNoLevel = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
-    };
+//=========================================================================================
+// Tests for Open command parameters
+//=========================================================================================
 
-    EXPECT_EQ(logicLevel.Init(conformanceNoLevel), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(logicNoLevel.Init(conformanceLevel), CHIP_ERROR_INVALID_ARGUMENT);
-}
-
+// This test ensures that the OpenDuration is set correctly when Open is called. Tests:
+// - Fall back to Null when omitted and DefaultOpenDuration is null
+// - Fall back to DefaultOpenDuration when omitted and DefaultOpenDuration is set
+// - Null and value are both accepted when the parameter is supplied in the command field.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenDuration)
 {
 
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
@@ -665,6 +819,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenDuration)
 
     DataModel::Nullable<ElapsedS> valElapsedSNullable;
 
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(DataModel::NullNullable), std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
     EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
 
@@ -696,12 +851,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenDuration)
     EXPECT_EQ(valElapsedSNullable.ValueOr(0), 12u);
 }
 
+// This test ensures that the Open command correctly errors when the TargetLevel field is
+// set for devices that do not support the LVL feature.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelFeatureUnsupported)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = {
@@ -717,12 +874,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelFe
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
 
+// This test ensures that The Open command correctly falls back to the spec-defined default when the target level
+// is omitted and the DefaultOpenLevel is not supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNotSuppliedNoDefaultSupported)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -734,12 +893,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNo
     EXPECT_EQ(delegate.lastRequestedLevel, 100u);
 }
 
+// This test ensures that the Open command correclty calls back to the DefaultOpenLevel when the target level
+// is omitted and the DefaultOpenLevel is supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNotSuppliedDefaultSupported)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -755,20 +916,21 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNo
     EXPECT_EQ(delegate.lastRequestedLevel, 50u);
 }
 
+// This test ensures the Open command uses the supplied target level if it is supplied.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelSupplied)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
                                        .supportsDefaultOpenLevel = true,
                                        .supportsValveFault       = false,
                                        .supportsLevelStep        = true };
-    ClusterState state             = ClusterState();
-    state.levelStep                = 33;
+    ClusterInitParameters state;
+    state.levelStep = 33;
     EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
 
     // 33, 66, 99 and 100 should all work, nothing else should
@@ -791,6 +953,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelSu
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 4);
 }
 
+//=========================================================================================
+// Tests for Open Command handlers - current and target values
+//=========================================================================================
+
+// This test ensures the target and current values are set correcly when the delegate is
+// able to open the value immediately. Cluster supports LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelSupported)
 {
     // Testing that current level, target level, target state and current state are set correctly
@@ -800,7 +968,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -841,12 +1009,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
 }
 
+// This test ensures the target and current values are set correcly when the delegate is
+// able to open the value immediately. Cluster does not support LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelNotSupported)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = {
@@ -867,12 +1037,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
 
+// This test ensures the target and current values are set correcly when the delegate is
+// not able to open the value immediately. Cluster supports LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelSupported)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -913,12 +1085,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelSup
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
 }
 
+// This test ensures the target and current values are set correcly when the delegate is
+// not able to open the value immediately. Cluster does not support LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelNotSupported)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = {
@@ -943,12 +1117,17 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelNot
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
 
+//=========================================================================================
+// Tests for Open Command handlers - valve faults
+//=========================================================================================
+
+// Test ensures valve faults are handled correctly when the valve can still be opened. LVL feature supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedNoErrorLevel)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -967,12 +1146,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
 }
 
+// Test ensures valve faults are handled correctly when the valve can still be opened. LVL feature not supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedNoErrorNoLevel)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = {
@@ -993,12 +1173,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
 }
 
+// Test ensures valve faults are handled correctly when the valve cannot be opened. LVL feature supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorLevel)
 {
     TestDelegateLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
     EndpointId endpoint = 0;
-    MatterContext context(endpoint, storageDelegate);
+    MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
@@ -1016,13 +1197,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
 }
 
+// Test ensures valve faults are handled correctly when the valve cannot be opened. LVL feature not supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorNoLevel)
 {
     TestDelegateNoLevel delegate;
     TestPersistentStorageDelegate storageDelegate;
-    EndpointId endpoint   = 0;
-    MatterContext context = MatterContext(endpoint, storageDelegate);
-    ClusterLogic logic    = ClusterLogic(delegate, context);
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
 
     ClusterConformance conformance = {
         .featureMap               = 0,
@@ -1041,17 +1223,328 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
 }
 
-// Clock::ClockBase * const savedClock = &SystemClock();
-// Clock::Internal::MockClock mockClock;
-// Clock::Internal::SetSystemClockForTesting(&mockClock);
+// Test ensures returned valve faults do not cause cluster problems if returned from the delegate when the valve feature is not
+// supported.
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorLevelFaultNotSupported)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
 
-// Test that the cluster logic doesn't balk if error is returned, but valve fault isn't supported
+    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = false,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+
+    delegate.simulateFailure             = false;
+    delegate.simulateValveFaultNoFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
+}
+
+// Test ensures returned valve faults do not cause cluster problems if returned from the delegate when the valve feature is not
+// supported.
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorNoLevelFaultNotSupported)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap               = 0,
+        .supportsDefaultOpenLevel = false,
+        .supportsValveFault       = false,
+        .supportsLevelStep        = false,
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
+
+    delegate.simulateFailure             = false;
+    delegate.simulateValveFaultNoFailure = true;
+    EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
+}
+
+bool HasAttributeChanges(std::vector<AttributeId> changes, AttributeId id)
+{
+    return std::find(changes.begin(), changes.end(), id) != changes.end();
+}
+//=========================================================================================
+// Tests for timing for Attribute updates and RemainingDuration Q
+//=========================================================================================
+// Tests that remaining duration is updated when openLevel is set to a value or to to null
+// Tests that attribute reports are sent out for attributes changed on Open call
+// Tests that attribute reports are sent for RemainingDuration at Q times.
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<Percent> valPercentNullable;
+
+    // When null, RemainingDuration should also be null. No updates are expected.
+    context.ClearDirtyList();
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(DataModel::NullNullable), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    // We should see the currentLevel and currentState marked as dirty, and the targets should not be
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    // When non-null RemainingDuration should initially be set to OpenDuration and this should trigger
+    // an attribute change callback. Attribute change callbacks should happen no more than once per second
+    // and at the end.
+    // This test tests attribute callbacks on an open duration that runs to the end. The OpenDuration is
+    // in units of seconds, so the close call will come at units of seconds.
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    context.ClearDirtyList();
+
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(12u);
+    Percent requestedLevel = 50u;
+    // Test also that we get an attribute update
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value());
+    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable.ValueOr(0), requestedLevel);
+    // We should see the following attributes marked as dirty: currentLevel, remainingDuration, openDuration
+    // The targetLevel and targetState should be null, and thus we should see no update.
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
+    // No new reports should be happening in this time.
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    // Even if we read the remaining duration to force an update, we shouldn't expect an attribute change report
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    // At 1s, the system should generate a report.
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value() - 1);
+
+    // Nothing else should have changed
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    // At 1.7s, the system should not generate a report even if we read the value to force and update.
+    // The new duration should be reflected (rounded to nearest s)
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(700_ms64);
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value() - 2);
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    // At 2s, we should get an attribute change report even if we don't read.
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(300_ms64);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    // Only that one attribute should be reporting a change.
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::TargetState::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    // Clear out all the attribute reports at 11.5 seconds. This should trigger the prior timer.
+    gSystemLayerAndClock.SetMonotonic(11500_ms64);
+    context.ClearDirtyList();
+
+    // Ensure we get a report at 12s and that the value goes back to Null
+    gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+
+    // Everything else should also be reporting changes as they flip back to their defaults.
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    context.ClearDirtyList();
+    // Ensure we don't get a further report generated by reading
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    // Test increasing the open duration on a non-second order to see that we get an attribute change callback for the change
+    // up.
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    context.ClearDirtyList();
+
+    openDuration.SetNonNull(12u);
+    requestedLevel = 50u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
+    // At 0.5s, we wouldn't normally expect a report for duration, but if we send a new open to increase the time, we should.
+    openDuration.SetNonNull(15u);
+    requestedLevel = 50u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+
+    // TODO: Clarify, should we get a report if we use open to set the remaining duration down? I think so.
+    // TODO: Add such tests here. I don't think the underlying layer handles that properly right now.
+
+    // Just before the next report should go out, we set this to NULL. We should get a report immediately.
+    gSystemLayerAndClock.AdvanceMonotonic(400_ms64);
+
+    openDuration.SetNull();
+    requestedLevel = 100u;
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentState::Id));
+
+    context.ClearDirtyList();
+
+    // Check that we DON'T get a report from the previous Open call, which had a remaining duration timer on it.
+    gSystemLayerAndClock.AdvanceMonotonic(100_ms64);
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+}
+
+// Tests that RemainingDuration gets updated correctly even if the timer doesn't fire on the exact ms (it doesn't).
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdatesNonExactClock)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(550_ms64);
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    context.ClearDirtyList();
+    gSystemLayerAndClock.AdvanceMonotonic(550_ms64);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+
+    context.ClearDirtyList();
+    gSystemLayerAndClock.SetMonotonic(2100_ms64);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+}
+
+//=========================================================================================
+// Tests for automatically calling close from the cluster logic
+//=========================================================================================
+// ensures close is called at open duration and not before
+
+//=========================================================================================
+// Tests for handling close commands
+//=========================================================================================
+// while remaining duration is null and valve is open
+// while remaining duration is not null and valve is open
+// while valve is closed
+
+//=========================================================================================
+// Tests for timing for async read updates to current / target level and state
+//=========================================================================================
+// TODO: Should the cluster logic be responsible for reaching out to the delegate at the Q update period to get updates?
+// TODO: What about for target state? Should this be drive by the cluster logic or the delegate? Maybe both?
+// Pros for cluster logic:
+// - delegate has fewer responsibilities, doesn't have to do things like timers for updating level
+// Pros for delegate:
+// - hardware might have built-in mechanisms to alert for level changes and state changes
+
+// Tests that GetCurrentValveLevel is called until the level hits the target
+// Tests that the attribute update is not more than
+// TODO: should reads in the middle of the update period go out and get the current value? Probably, but it's annoying.
+
+// Timing tests for async read
+// Tests to ensure that we get calls to update the level and state until the target state / level is reached.
+// Tests to ensure that we don't get updates on more than an X basis or at the end and the beginning
+
+//=========================================================================================
+// Tests for attribute callbacks from delegates
+//=========================================================================================
+// TODO: Should the delegate call the cluster logic class direclty, or should this be piped through the delegate class so the app
+// layer ONLY has to interact with the delegate?
+// Test setter for valve fault Test attribute change notifications are sent out and not
+// sent out when the attribute is change do the same value - add in prior
+
+//=========================================================================================
+// Tests for attribute callbacks from delegates
+//=========================================================================================
+// Tests for events
+// Test events are generated
+
+//=========================================================================================
+// Tests for attribute callbacks from delegates
+//=========================================================================================
+// Tests for auto-close
 // Test that the auto close time is set appropriately for open duration - add in prior test?
-// Test setter for valve fault
-// Test attribute change notifications are sent out and not sent out when the attribute is change do the same value - add in prior
-// tests? Test events are generated
-
-// Init providing the wrong delegate type
+// should work both when the time is available at the time of the call and when the time is later set
 
 // TODO: Should the cluster logic query the current level and curent state from the driver at startup?
 

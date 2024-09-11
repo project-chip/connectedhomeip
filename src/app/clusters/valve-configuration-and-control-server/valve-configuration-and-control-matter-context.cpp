@@ -59,6 +59,11 @@ CHIP_ERROR MatterContext::GetDefaultOpenLevel(uint8_t & returnVal)
                                                       &returnVal, size);
 }
 
+void MatterContext::MarkDirty(const AttributeId id)
+{
+    // Uh...how do we do this?
+}
+
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app
