@@ -1793,7 +1793,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 #pragma mark - MTRDeviceControllerDelegate management
 
-// Note these are implemented in the base class so that XPC subclass can use it as well when it
+// Note these are implemented in the base class so that XPC subclass can use it as well
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
@@ -1847,9 +1847,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         if (delegateInfoToRemove) {
             [_delegates removeObject:delegateInfoToRemove];
-            if (_strongDelegateForSetDelegateAPI == delegate) {
-                _strongDelegateForSetDelegateAPI = nil;
-            }
             MTR_LOG("%@ removeDeviceControllerDelegate: removed %p remaining %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
         } else {
             MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));

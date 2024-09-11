@@ -138,6 +138,7 @@ static MTRTestKeys * sTestKeys = nil;
 @property (atomic, readwrite) BOOL commissioningSessionEstablishmentDoneCalled;
 @property (atomic, readwrite) BOOL commissioningCompleteCalled;
 @property (atomic, readwrite) BOOL readCommissioningInfoCalled;
+@property (atomic, readwrite, strong) XCTestExpectation * allCallbacksCalledExpectation;
 @end
 
 @implementation MTRPairingTestMonitoringControllerDelegate
@@ -145,14 +146,27 @@ static MTRTestKeys * sTestKeys = nil;
 {
     return [NSString stringWithFormat:@"<MTRPairingTestMonitoringControllerDelegate: %p statusUpdateCalled %@ commissioningSessionEstablishmentDoneCalled %@ commissioningCompleteCalled %@ readCommissioningInfoCalled %@>", self, MTR_YES_NO(_statusUpdateCalled), MTR_YES_NO(_commissioningSessionEstablishmentDoneCalled), MTR_YES_NO(_commissioningCompleteCalled), MTR_YES_NO(_readCommissioningInfoCalled)];
 }
+
+- (void)_checkIfAllCallbacksCalled
+{
+    if (self.allCallbacksCalledExpectation) {
+        if (self.statusUpdateCalled && self.commissioningSessionEstablishmentDoneCalled && self.commissioningCompleteCalled && self.readCommissioningInfoCalled) {
+            [self.allCallbacksCalledExpectation fulfill];
+            self.allCallbacksCalledExpectation = nil;
+        }
+    }
+}
+
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     self.statusUpdateCalled = YES;
+    [self _checkIfAllCallbacksCalled];
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     self.commissioningSessionEstablishmentDoneCalled = YES;
+    [self _checkIfAllCallbacksCalled];
 }
 
 - (void)controller:(MTRDeviceController *)controller
@@ -161,11 +175,13 @@ static MTRTestKeys * sTestKeys = nil;
                   metrics:(MTRMetrics *)metrics
 {
     self.commissioningCompleteCalled = YES;
+    [self _checkIfAllCallbacksCalled];
 }
 
 - (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
 {
     self.readCommissioningInfoCalled = YES;
+    [self _checkIfAllCallbacksCalled];
 }
 @end
 
@@ -259,6 +275,8 @@ static MTRTestKeys * sTestKeys = nil;
 
     // Test that a monitoring delegate works
     __auto_type * monitoringControllerDelegate = [[MTRPairingTestMonitoringControllerDelegate alloc] init];
+    XCTestExpectation * allCallbacksCalledExpectation = [self expectationWithDescription:@"All callbacks called on monitoring delegate"];
+    monitoringControllerDelegate.allCallbacksCalledExpectation = allCallbacksCalledExpectation;
     [sController addDeviceControllerDelegate:monitoringControllerDelegate queue:callbackQueue];
     XCTAssertEqual([sController unitTestDelegateCount], 2);
 
@@ -278,7 +296,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(sDeviceId) error:&error]);
     XCTAssertNil(error);
 
-    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+    [self waitForExpectations:@[ expectation, allCallbacksCalledExpectation ] timeout:kPairingTimeoutInSeconds];
     XCTAssertNil(controllerDelegate.commissioningCompleteError);
 
     // Test that the monitoring delegate got all the callbacks
