@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 
 #include <cinttypes>
 
@@ -1699,6 +1700,18 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    DataModel::InvokeRequest request;
+    request.path = aCommandPath;
+
+    std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
+
+    if (status.has_value())
+    {
+        apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
+    }
+#else
     CommandHandlerInterface * handler =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
@@ -1717,6 +1730,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     }
 
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
+#endif
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)

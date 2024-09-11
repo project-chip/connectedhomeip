@@ -88,6 +88,8 @@ public:
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
+    ///    - returning `std::nullopt` means that return value was placed in handler directly.
+    ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
     /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
@@ -98,8 +100,9 @@ public:
     ///    - data (as CommandDataIB) which is assumed a "response as a success"
     ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
     ///      cluster-specific success statuses also exist.
-    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                      CommandHandler * handler) = 0;
+    ///
+    virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };
