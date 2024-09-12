@@ -272,7 +272,7 @@ class NxpBuilder(GnBuilder):
 
             extra_args.extend(self.GnBuildArgs() or [])
             if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+                cmd += " --args='%s" % ' '.join(extra_args) + "' "
 
             cmd += self.output_dir
 
