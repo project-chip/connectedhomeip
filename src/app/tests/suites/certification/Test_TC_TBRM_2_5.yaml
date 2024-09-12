@@ -33,7 +33,7 @@ tests:
           values:
               - name: nodeId
                 value: nodeId
-    
+
     - label:
           "Step 2: If DUT was not commissioned using BLE-THREAD method configure Thread network using Network Commissioning Cluster"
       verification: |
@@ -42,26 +42,26 @@ tests:
           On TH(chip-tool) verify that DUT sends a response with errorCode: 0
 
           [1725982685.786] [7126:7136] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1725982685.786] [7126:7136] [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001 
+          [1725982685.786] [7126:7136] [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1725982685.790] [7126:7136] [TOO]   ArmFailSafeResponse: {
           [1725982685.791] [7126:7136] [TOO]     errorCode: 0
           [1725982685.791] [7126:7136] [TOO]     debugText:
           [1725982685.791] [7126:7136] [TOO]    }
-          
+
           #2b Add Dataset using Network Commissioning Cluster
-          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e08000000000001000035060004001fffe00708fd6c6464dd3ce8ca0410765efb0a07009be94c17b35399c6927a0c0402a0f7f8000300001901025b3502085b35dead5b35beef030435623335051000112233445566778899aabbccddeeff 1 2 --Breadcrumb 1  
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e08000000000001000035060004001fffe00708fd6c6464dd3ce8ca0410765efb0a07009be94c17b35399c6927a0c0402a0f7f8000300001901025b3502085b35dead5b35beef030435623335051000112233445566778899aabbccddeeff 1 2 --Breadcrumb 1
           On TH(chip-tool) verify that DUT sends a response with networkingStatus: 0
-          
+
           [1725982952.732] [9168:9170] [TOO] Endpoint: 2 Cluster: 0x0000_0031 Command 0x0000_0005
           [1725982952.732] [9168:9170] [TOO]   NetworkConfigResponse: {
           [1725982952.732] [9168:9170] [TOO]     networkingStatus: 0
           [1725982952.736] [9168:9170] [TOO]     networkIndex: 0
           [1725982952.736] [9168:9170] [TOO]    }
-          
+
           #2c Connect to Thread network
-          ./chip-tool networkcommissioning connect-network hex:5b35dead5b35beef 1 2 --Breadcrumb 1 
+          ./chip-tool networkcommissioning connect-network hex:5b35dead5b35beef 1 2 --Breadcrumb 1
           On TH(chip-tool) verify that DUT sends a response with networkingStatus: 0
-          
+
           [1725983064.276] [10049:10051] [TOO] Endpoint: 2 Cluster: 0x0000_0031 Command 0x0000_0007
           [1725983064.277] [10049:10051] [TOO]   ConnectNetworkResponse: {
           [1725983064.277] [10049:10051] [TOO]     networkingStatus: 0
@@ -71,7 +71,7 @@ tests:
           #2d Send Commissioning Complete command
           ./chip-tool generalcommissioning commissioning-complete 1 0
           On TH(chip-tool) verify that DUT sends a response with errorCode: 0
-          
+
           [1725983243.683] [11490:11500] [TOO] Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
           [1725983243.683] [11490:11500] [TOO]   CommissioningCompleteResponse: {
           [1725983243.683] [11490:11500] [TOO]     errorCode: 0
@@ -84,7 +84,7 @@ tests:
           values:
               - name: "message"
                 value: "Please enter 'y' after running commands above"
-    
+
     # Step 3
     - label: "TH sends a GetActiveDatasetRequest command to the DUT"
       command: GetActiveDatasetRequest
@@ -102,7 +102,7 @@ tests:
       attribute: MaxNetworks
       response:
           value: 1
-    
+
     # Step 5
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
       command: readAttribute
