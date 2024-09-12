@@ -106,7 +106,6 @@ target_sources(app PRIVATE
 
 message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap
 )
 
