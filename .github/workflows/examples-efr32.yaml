@@ -128,6 +128,24 @@ jobs:
             /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
+      - name: Build BRD2605A WiFi Soc variants
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd2605a-light-skip-rps-generation \
+                --target efr32-brd2605a-lock-skip-rps-generation \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Prepare bloat report for brd2605a lock app
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+            efr32 BRD2605a lock-app \
+            out/efr32-brd2605a-lock-skip-rps-generation/matter-silabs-lock-example.out \
+            /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
       - name: Build EFR32 with WiFi NCP
         run: |
           ./scripts/run_in_build_env.sh \
