@@ -92,15 +92,16 @@ public:
     ///      This includes cases where command handling and value return will be done asynchronously.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
-    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
-    /// means that the invoke will be considered to be returning the given path-specific status WITHOUT any data (any data
-    /// that was sent via CommandHandler is to be rolled back/discarded).
+    /// Return value expectations:
+    ///   - if a response has been placed into a `handler` then std::nullopt MUST be returned
+    ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
+    ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
+    ///     convenience to make writing Invoke calls easier.
     ///
-    /// This is because only one of the following may be encoded in a response:
-    ///    - data (as CommandDataIB) which is assumed a "response as a success"
-    ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
-    ///      cluster-specific success statuses also exist.
-    ///
+    /// Expectations if invoke returns data:
+    ///   - if a command data is to be returned, the status can only be 'Success' (it cannot be cluster
+    ///     specific success). This is because responses encode either a CommandDataIB (response as a success)
+    ///     or CommandStatusIB (which can encode failures as well as cluster specific successes).
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
 
