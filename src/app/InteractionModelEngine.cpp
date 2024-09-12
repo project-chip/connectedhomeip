@@ -1733,7 +1733,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     }
 
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
-#endif
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
