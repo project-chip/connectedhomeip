@@ -626,6 +626,8 @@ def BuildQorvoTarget():
     ])
 
     target.AppendModifier('updateimage', update_image=True)
+    target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
+    target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
 
     return target
 
