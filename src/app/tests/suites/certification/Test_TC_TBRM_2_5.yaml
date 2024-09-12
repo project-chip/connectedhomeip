@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: "[TC-TBRM-2.5] Verify configuration of Thread Border Router endpoint which support Secondary Network Interface device type when Network Commissioning Cluster is used to configure Thread network"
+name:
+    "[TC-TBRM-2.5] Verify configuration of Thread Border Router endpoint which
+    support Secondary Network Interface device type when Network Commissioning
+    Cluster is used to configure Thread network"
 
 PICS:
     - TBRM.S
@@ -35,7 +38,8 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 2: If DUT was not commissioned using BLE-THREAD method configure Thread network using Network Commissioning Cluster"
+          "Step 2: If DUT was not commissioned using BLE-THREAD method configure
+          Thread network using Network Commissioning Cluster"
       verification: |
           #2a Arm Fail Safe on DUT
           ./chip-tool generalcommissioning arm-fail-safe 120 1 1 0
