@@ -27,6 +27,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 
 /**********************************************************
@@ -100,19 +101,19 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
     switch (attributeId)
     {
         case RefAndTempAttr::CurrentMode::Id: {
-            int8_t currentMode = static_cast<int16_t>(*value);
+            int16_t currentMode = static_cast<int16_t>(*value);
             mCurrentMode = currentMode;
         }
         break;
 
         case RefAndTempAttr::StartUpMode::Id: {
-            int8_t startUpMode = static_cast<int16_t>(*value);
+            int16_t startUpMode = static_cast<int16_t>(*value);
             mStartUpMode = startUpMode;
         }
         break;
 
         case RefAndTempAttr::OnMode::Id: {
-            int8_t onMode = static_cast<int16_t>(*value);
+            int16_t onMode = static_cast<int16_t>(*value);
             mOnMode = onMode;
         }
         break;
@@ -176,22 +177,22 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
     switch (attributeId)
     {
         case RefAlarmAttr::Mask::Id: {
-            int8_t mask = static_cast<uint32_t>(*value);
-            mMask = mask;
+            auto mask = static_cast<uint32_t>(*value);
+            mState = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
             RefAlarmAttr::Mask::Set(endpointId, mMask);
         }
         break;
 
         case RefAlarmAttr::State::Id: {
-            int8_t state = static_cast<uint32_t>(*value);
-            mState = state;
+            auto state = static_cast<uint32_t>(*value);
+            mState = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(state);
             RefAlarmAttr::State::Set(endpointId, mState);
         }
         break;
 
         case RefAlarmAttr::Supported::Id: {
-            int8_t supported = static_cast<uint32_t>(*value);
-            mSupported = supported;
+            auto supported = static_cast<uint32_t>(*value);
+            mSupported = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(supported);
             RefAlarmAttr::Supported::Set(endpointId, mSupported);
         }
         break;

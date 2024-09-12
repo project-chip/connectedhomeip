@@ -62,9 +62,9 @@ public:
 private:
     friend RefrigeratorManager & RefrigeratorMgr();
 
-    uint8_t mCurrentMode;
-    uint8_t mStartUpMode;
-    uint8_t mOnMode;
+    int16_t mCurrentMode;
+    int16_t mStartUpMode;
+    int16_t mOnMode;
 
     int16_t mTemperatureSetpoint;
     int16_t mMinTemperature;
