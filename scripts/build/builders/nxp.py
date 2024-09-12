@@ -225,7 +225,7 @@ class NxpBuilder(GnBuilder):
     def generate(self):
         if self.os_env == NxpOsUsed.ZEPHYR:
             if 'ZEPHYR_NXP_SDK_INSTALL_DIR' not in os.environ:
-                raise Exception("ZEPHYR_SDK_INSTALL_DIR need to be set")
+                raise Exception("ZEPHYR_NXP_SDK_INSTALL_DIR need to be set")
 
             if 'ZEPHYR_NXP_BASE' not in os.environ:
                 raise Exception("ZEPHYR_NXP_BASE need to be set")
@@ -236,11 +236,11 @@ class NxpBuilder(GnBuilder):
             if self.data_model_interface:
                 cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface}'
 
-            cmd += '\n\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_args}'.format(
+            cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder}{build_args}'.format(
                 board_name=self.board.Name(self.os_env),
                 out_folder=self.output_dir,
                 example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
-                build_args=self.WestBuildArgs()).strip()
+                build_args=self.WestBuildArgs())
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
             cmd = ''
