@@ -71,7 +71,8 @@ namespace Crypto {
 static_assert(PSA_KEY_ID_USER_MIN <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE && CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END <= PSA_KEY_ID_USER_MAX,
               "Matter specific PSA key range doesn't fit within PSA allowed range");
 
-static constexpr uint32_t kMaxICDClientKeys = CHIP_CONFIG_ICD_MAX_CLIENTS;
+// Each ICD client requires storing two keys- AES and HMAC
+static constexpr uint32_t kMaxICDClientKeys = 2 * CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS;
 
 static_assert(kMaxICDClientKeys >= CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS,
               "Number of allocated ICD key slots is lower than maximum number of supported ICD clients");
@@ -81,12 +82,11 @@ static_assert(kMaxICDClientKeys >= CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 
  */
 enum class KeyIdBase : psa_key_id_t
 {
-    Minimum              = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
-    Operational          = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
-    DACPrivKey           = Operational + kMaxValidFabricIndex + 1,
-    ICDHmacKeyRangeStart = DACPrivKey + 1,
-    ICDAesKeyRangeStart  = ICDHmacKeyRangeStart + kMaxICDClientKeys,
-    Maximum              = ICDAesKeyRangeStart + kMaxICDClientKeys,
+    Minimum          = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
+    Operational      = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
+    DACPrivKey       = Operational + kMaxValidFabricIndex + 1,
+    ICDKeyRangeStart = DACPrivKey + 1,
+    Maximum          = ICDKeyRangeStart + kMaxICDClientKeys,
 };
 
 static_assert(to_underlying(KeyIdBase::Minimum) >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE &&

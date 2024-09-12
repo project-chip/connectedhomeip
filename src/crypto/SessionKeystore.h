@@ -142,20 +142,15 @@ public:
                                          AttestationChallenge & attestationChallenge) = 0;
 
     /**
-     * @brief Store key in persistent PSA storage and return a key handle for an ICD Aes key.
+     * @brief Persistently store an ICD key.
+     *
+     * If input is already a persistent key handle, the function is a no-op and the original handle is returned.
+     * If input is a volatile key handle, key is persisted and the handle may be updated.
      *
      * If the method returns no error, the application is responsible for destroying the handle
      * using the DestroyKey() method when the key is no longer needed.
      */
-    virtual CHIP_ERROR PersistICDKey(Aes128KeyHandle & key) { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief Store key in persistent PSA storage and return a key handle for an ICD Hmac key.
-     *
-     * If the method returns no error, the application is responsible for destroying the handle
-     * using the DestroyKey() method when the key is no longer needed.
-     */
-    virtual CHIP_ERROR PersistICDKey(Hmac128KeyHandle & key) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR PersistICDKey(Symmetric128BitsKeyHandle & key) { return CHIP_NO_ERROR; }
 };
 
 /**

@@ -1668,7 +1668,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_MAX_CLIENTS
+ * @def CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
  *
  * @brief
  *   Maximum number of ICD clients. Based on this number, platforms that utilize the
@@ -1679,8 +1679,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *   compute the number of PSA key slots. It should remain unchanged during the device's lifetime,
  *   as alterations may lead to issues with backwards compatibility.
  */
-#ifndef CHIP_CONFIG_ICD_MAX_CLIENTS
-#define CHIP_CONFIG_ICD_MAX_CLIENTS 256
+#ifndef CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+#define CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS 256
 #endif
 
 /**

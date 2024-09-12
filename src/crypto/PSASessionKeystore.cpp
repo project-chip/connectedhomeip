@@ -35,17 +35,6 @@ public:
         psa_set_key_bits(&mAttrs, bits);
     }
 
-    CHIP_ERROR SetKeyPersistence(psa_key_id_t keyId)
-    {
-        VerifyOrReturnError(to_underlying(KeyIdBase::Maximum) >= keyId && keyId >= to_underlying(KeyIdBase::Minimum),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-
-        psa_set_key_lifetime(&mAttrs, PSA_KEY_LIFETIME_PERSISTENT);
-        psa_set_key_id(&mAttrs, keyId);
-
-        return CHIP_NO_ERROR;
-    }
-
     ~KeyAttributesBase() { psa_reset_key_attributes(&mAttrs); }
 
     const psa_key_attributes_t & Get() { return mAttrs; }
@@ -79,6 +68,12 @@ public:
     HkdfKeyAttributes() : KeyAttributesBase(PSA_KEY_TYPE_DERIVE, PSA_ALG_HKDF(PSA_ALG_SHA_256), PSA_KEY_USAGE_DERIVE, 0) {}
 };
 
+void SetKeyId(Symmetric128BitsKeyHandle & key, psa_key_id_t newKeyId)
+{
+    auto & KeyId = key.AsMutable<psa_key_id_t>();
+
+    KeyId = newKeyId;
+}
 } // namespace
 
 CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
@@ -190,66 +185,33 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-CHIP_ERROR PSASessionKeystore::PersistICDKey(Aes128KeyHandle & key)
+CHIP_ERROR PSASessionKeystore::PersistICDKey(Symmetric128BitsKeyHandle & key)
 {
     CHIP_ERROR err;
-    AesKeyAttributes attrs;
-    psa_key_id_t previousKeyId = key.As<psa_key_id_t>();
-    psa_key_attributes_t previousKeyAttrs;
+    psa_key_id_t newKeyId = PSA_KEY_ID_NULL;
+    psa_key_attributes_t attrs;
 
-    psa_get_key_attributes(previousKeyId, &previousKeyAttrs);
+    psa_get_key_attributes(key.As<psa_key_id_t>(), &attrs);
+
     // Exit early if key is already persistent
-    if (psa_get_key_lifetime(&previousKeyAttrs) == PSA_KEY_LIFETIME_PERSISTENT)
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        psa_reset_key_attributes(&attrs);
+        return CHIP_NO_ERROR;
     }
 
-    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(key.AsMutable<psa_key_id_t>(), to_underlying(KeyIdBase::ICDAesKeyRangeStart),
-                                                       kMaxICDClientKeys));
-
-    SuccessOrExit(err = attrs.SetKeyPersistence(key.As<psa_key_id_t>()));
-    VerifyOrExit(psa_copy_key(previousKeyId, &attrs.Get(), &key.AsMutable<psa_key_id_t>()) == PSA_SUCCESS,
-                 err = CHIP_ERROR_INTERNAL);
-
-    psa_destroy_key(previousKeyId);
+    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(newKeyId, to_underlying(KeyIdBase::ICDKeyRangeStart), kMaxICDClientKeys));
+    psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_PERSISTENT);
+    psa_set_key_id(&attrs, newKeyId);
+    VerifyOrExit(psa_copy_key(key.As<psa_key_id_t>(), &attrs, &newKeyId) == PSA_SUCCESS, err = CHIP_ERROR_INTERNAL);
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    DestroyKey(key);
+    psa_reset_key_attributes(&attrs);
+
+    if (err == CHIP_NO_ERROR)
     {
-        psa_destroy_key(previousKeyId);
-        psa_destroy_key(key.As<psa_key_id_t>());
-    }
-
-    return err;
-}
-
-CHIP_ERROR PSASessionKeystore::PersistICDKey(Hmac128KeyHandle & key)
-{
-    CHIP_ERROR err;
-    HmacKeyAttributes attrs;
-    psa_key_id_t previousKeyId = key.As<psa_key_id_t>();
-    psa_key_attributes_t previousKeyAttrs;
-
-    psa_get_key_attributes(previousKeyId, &previousKeyAttrs);
-    // Exit early if key is already persistent
-    if (psa_get_key_lifetime(&previousKeyAttrs) == PSA_KEY_LIFETIME_PERSISTENT)
-    {
-        ExitNow(err = CHIP_NO_ERROR);
-    }
-
-    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(key.AsMutable<psa_key_id_t>(),
-                                                       to_underlying(KeyIdBase::ICDHmacKeyRangeStart), kMaxICDClientKeys));
-    SuccessOrExit(err = attrs.SetKeyPersistence(key.As<psa_key_id_t>()));
-    VerifyOrExit(psa_copy_key(previousKeyId, &attrs.Get(), &key.AsMutable<psa_key_id_t>()) == PSA_SUCCESS,
-                 err = CHIP_ERROR_INTERNAL);
-
-    psa_destroy_key(previousKeyId);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        psa_destroy_key(previousKeyId);
-        psa_destroy_key(key.As<psa_key_id_t>());
+        SetKeyId(key, newKeyId);
     }
 
     return err;

@@ -40,8 +40,7 @@ public:
     void DestroyKey(Symmetric128BitsKeyHandle & key) override;
     void DestroyKey(HkdfKeyHandle & key) override;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    CHIP_ERROR PersistICDKey(Aes128KeyHandle & key) override;
-    CHIP_ERROR PersistICDKey(Hmac128KeyHandle & key) override;
+    CHIP_ERROR PersistICDKey(Symmetric128BitsKeyHandle & key) override;
 #endif
 
 private:
