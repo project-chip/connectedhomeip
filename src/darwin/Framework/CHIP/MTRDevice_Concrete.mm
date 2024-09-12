@@ -62,6 +62,7 @@
 @property (nonatomic, readwrite) MTRDeviceState state;
 @property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
 @property (nonatomic, readwrite, nullable, copy) NSNumber * estimatedSubscriptionLatency;
+@property (nonatomic, readwrite, assign) BOOL suspended;
 
 @end
 
@@ -395,6 +396,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }];
         }
 
+        self.suspended = controller.suspended;
+
         MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
@@ -442,8 +445,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         wifi = @"NO";
         thread = @"NO";
     } else {
-        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
-        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+        wifi = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
     }
 
     NSString * reportAge;
@@ -719,8 +722,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We should not allow a subscription for suspended controllers or device controllers over XPC.
-    return _deviceController.isSuspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    // We should not allow a subscription when we are suspended or for device controllers over XPC.
+    return self.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
 - (void)_delegateAdded
@@ -1290,7 +1293,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_assert_owner(&_lock);
 
-    if (_deviceController.isSuspended) {
+    if (self.suspended) {
         MTR_LOG("%@ ignoring expected subscription reset on controller suspend", self);
         return;
     }
@@ -1378,7 +1381,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
-    self.reattemptingSubscription = NO;
     [self _setupSubscriptionWithReason:reason];
 }
 
@@ -1850,15 +1852,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
 }
 
-#ifdef DEBUG
-- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
-{
-    dispatch_async(self.queue, ^{
-        [self _handleEventReport:eventReport];
-    });
-}
-
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+// BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
+- (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     [_deviceController asyncDispatchToMatterQueue:^{
         [self _handleReportBegin];
@@ -1866,8 +1861,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
             [self _handleReportEnd];
         });
-    }
-                                     errorHandler:nil];
+    } errorHandler:nil];
+}
+
+- (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
+    dispatch_async(self.queue, ^{
+        [self _handleEventReport:eventReport];
+    });
+    //    } errorHandler: nil];
+}
+
+// END DRAGON: This is used by the XPC Server to inject attribute reports
+
+#ifdef DEBUG
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    [self _injectEventReport:eventReport];
+}
+
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+{
+    [self _injectAttributeReport:attributeReport fromSubscription:isFromSubscription];
 }
 #endif
 
@@ -2087,7 +2103,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
-    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
@@ -2301,6 +2317,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&self->_lock);
+
+    // If we have a pending subscription reattempt, make sure it does not
+    // actually happen, since we are trying to do a subscription now.
+    self.reattemptingSubscription = NO;
 
     if (![self _subscriptionsAllowed]) {
         MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
@@ -2694,12 +2714,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
     //
-    // But all this only happens if this device has been accessed via the public
-    // API.  If it's a device we just created internally, don't do read-throughs.
+    // But all this only happens if this device is not suspended.  If it's suspended, read-throughs will fail
+    // anyway, so we should not bother trying.
     BOOL readThroughsAllowed;
     {
         std::lock_guard lock(_lock);
-        readThroughsAllowed = _accessedViaPublicAPI;
+        readThroughsAllowed = !self.suspended;
     }
     if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
@@ -3991,6 +4011,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [super controllerSuspended];
 
     std::lock_guard lock(self->_lock);
+    self.suspended = YES;
     [self _resetSubscriptionWithReasonString:@"Controller suspended"];
 
     // Ensure that any pre-existing resubscribe attempts we control don't try to
@@ -4003,6 +4024,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [super controllerResumed];
 
     std::lock_guard lock(self->_lock);
+    self.suspended = NO;
 
     if (![self _delegateExists]) {
         MTR_LOG("%@ ignoring controller resume: no delegates", self);
