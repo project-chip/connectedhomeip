@@ -31,6 +31,7 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 void CleanShutdown()
 {
+    ApplicationShutdown();
     Server::GetInstance().Shutdown();
     PlatformMgr().Shutdown();
     // TODO: We don't Platform::MemoryShutdown because ~CASESessionManager calls
