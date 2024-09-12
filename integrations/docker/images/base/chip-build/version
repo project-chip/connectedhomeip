@@ -1,1 +1,1 @@
-67 : [ESP32] Update esp-idf to v5.3
+75 : remove workaround for bloaty build, workaround involved cloning and installing abseil

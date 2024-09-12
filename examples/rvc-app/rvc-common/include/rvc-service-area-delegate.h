@@ -21,7 +21,7 @@
 #include <app/clusters/service-area-server/service-area-server.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <utility>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -29,92 +29,102 @@ namespace Clusters {
 
 class RvcDevice;
 
+typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan & statusText);
+typedef bool (RvcDevice::*HandleSkipAreaCallback)(uint32_t skippedArea, MutableCharSpan & skipStatusText);
+typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
+
 namespace ServiceArea {
 
 class RvcServiceAreaDelegate : public Delegate
 {
 private:
-    // containers for array attributes.
-    std::vector<ServiceArea::LocationStructureWrapper> mSupportedLocations;
-    std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
-    std::vector<uint32_t> mSelectedLocations;
-    std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
+    RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
+    IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
+    RvcDevice * mHandleSkipAreaDeviceInstance;
+    HandleSkipAreaCallback mHandleSkipAreaCallback;
+    RvcDevice * mIsSupportedAreasChangeAllowedDeviceInstance;
+    IsChangeAllowedSimpleCallback mIsSupportedAreasChangeAllowedCallback;
+    RvcDevice * mIsSupportedMapChangeAllowedDeviceInstance;
+    IsChangeAllowedSimpleCallback mIsSupportedMapChangeAllowedCallback;
+
+    // hardcoded values for SUPPORTED MAPS.
+    const uint32_t supportedMapId_XX = 3;
+    const uint32_t supportedMapId_YY = 245;
+
+    // hardcoded values for SUPPORTED AREAS.
+    const uint32_t supportedAreaID_A = 7;
+    const uint32_t supportedAreaID_B = 1234567;
+    const uint32_t supportedAreaID_C = 10050;
+    const uint32_t supportedAreaID_D = 0x88888888;
 
 public:
+    /**
+     * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
+     */
+    void SetMapTopology();
+
+    /**
+     * Set the SupportedMaps and SupportedAreas where the SupportedMaps is null.
+     */
+    void SetNoMapTopology();
+
     CHIP_ERROR Init() override;
 
     // command support
-    bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) override;
+    bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
 
-    bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
-                                   ServiceArea::SelectLocationsStatus & locationStatus, MutableCharSpan statusText) override;
+    bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, ServiceArea::SelectAreasStatus & areaStatus,
+                               MutableCharSpan & statusText) override;
 
-    bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText) override;
+    bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
 
-    //*************************************************************************
-    // Supported Locations accessors
-
-    bool IsSupportedLocationsChangeAllowed() override;
-
-    uint32_t GetNumberOfSupportedLocations() override;
-
-    bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
-
-    bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
-                                  ServiceArea::LocationStructureWrapper & supportedLocation) override;
-
-    bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newLocation, uint32_t & listIndex) override;
-
-    bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::LocationStructureWrapper & modifiedLocation) override;
-
-    bool ClearSupportedLocations() override;
-
-    //*************************************************************************
-    // Supported Maps accessors
+    bool IsSupportedAreasChangeAllowed() override;
 
     bool IsSupportedMapChangeAllowed() override;
 
-    uint32_t GetNumberOfSupportedMaps() override;
+    //*************************************************************************
+    // RVC device callback setters
 
-    bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
+    void SetIsSetSelectedAreasAllowedCallback(IsSetSelectedAreasAllowedCallback callback, RvcDevice * instance)
+    {
+        mIsSetSelectedAreasAllowedCallback       = callback;
+        mIsSetSelectedAreasAllowedDeviceInstance = instance;
+    }
 
-    bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
+    void SetHandleSkipAreaCallback(HandleSkipAreaCallback callback, RvcDevice * instance)
+    {
+        mHandleSkipAreaCallback       = callback;
+        mHandleSkipAreaDeviceInstance = instance;
+    }
 
-    bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
+    void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
+    {
+        mIsSupportedAreasChangeAllowedCallback       = callback;
+        mIsSupportedAreasChangeAllowedDeviceInstance = instance;
+    }
 
-    bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
-
-    bool ClearSupportedMaps() override;
+    void SetIsSupportedMapChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
+    {
+        mIsSupportedMapChangeAllowedCallback       = callback;
+        mIsSupportedMapChangeAllowedDeviceInstance = instance;
+    }
 
     //*************************************************************************
-    // Selected Locations accessors
+    // Helper methods for setting service area attributes.
 
-    uint32_t GetNumberOfSelectedLocations() override;
+    /**
+     * Sets the service area attributes at the start of a clean.
+     * This includes the current area an progress attributes.
+     */
+    void SetAttributesAtCleanStart();
 
-    bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) override;
-
-    // IsSelectedLocation() no override
-
-    bool AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex) override;
-
-    bool ClearSelectedLocations() override;
-
-    //*************************************************************************
-    // Progress accessors
-
-    uint32_t GetNumberOfProgressElements() override;
-
-    bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
-                                ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
-
-    bool ModifyProgressElement(uint32_t listIndex,
-                               const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
-
-    bool ClearProgress() override;
+    /**
+     * Go to the next area in the list of selected areas.
+     * @param currentAreaOpState The operational state to be set in the Status field of the Progress attribute for the current area.
+     * This can only be Completed or Skipped.
+     * @param finished true if there are no more areas to clean an we should end the clean.
+     */
+    void GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished);
 };
 
 } // namespace ServiceArea

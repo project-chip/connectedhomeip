@@ -3302,6 +3302,7 @@ class ChipClusters:
                 "commandName": "KeepActive",
                 "args": {
                     "stayActiveDuration": "int",
+                    "timeoutMs": "int",
                 },
             },
         },
@@ -3322,6 +3323,12 @@ class ChipClusters:
                 "attributeName": "ProductName",
                 "attributeId": 0x00000003,
                 "type": "str",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "ProductID",
+                "attributeId": 0x00000004,
+                "type": "int",
                 "reportable": True,
             },
             0x00000005: {
@@ -6652,12 +6659,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "Boost",
                 "args": {
-                    "duration": "int",
-                    "oneShot": "bool",
-                    "emergencyBoost": "bool",
-                    "temporarySetpoint": "int",
-                    "targetPercentage": "int",
-                    "targetReheat": "int",
+                    "boostInfo": "WaterHeaterBoostInfoStruct",
                 },
             },
             0x00000001: {
@@ -8556,21 +8558,22 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SelectLocations",
+                "commandName": "SelectAreas",
                 "args": {
-                    "newLocations": "int",
+                    "newAreas": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
-                "commandName": "SkipCurrentLocation",
+                "commandName": "SkipArea",
                 "args": {
+                    "skippedArea": "int",
                 },
             },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedLocations",
+                "attributeName": "SupportedAreas",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
@@ -8582,13 +8585,13 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "SelectedLocations",
+                "attributeName": "SelectedAreas",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentLocation",
+                "attributeName": "CurrentArea",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
@@ -8879,23 +8882,13 @@ class ChipClusters:
                     "presetHandle": "bytes",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
-                "commandName": "StartPresetsSchedulesEditRequest",
+            0x000000FE: {
+                "commandId": 0x000000FE,
+                "commandName": "AtomicRequest",
                 "args": {
-                    "timeoutSeconds": "int",
-                },
-            },
-            0x00000008: {
-                "commandId": 0x00000008,
-                "commandName": "CancelPresetsSchedulesEditRequest",
-                "args": {
-                },
-            },
-            0x00000009: {
-                "commandId": 0x00000009,
-                "commandName": "CommitPresetsSchedulesRequest",
-                "args": {
+                    "requestType": "int",
+                    "attributeRequests": "int",
+                    "timeout": "int",
                 },
             },
         },
@@ -9284,14 +9277,8 @@ class ChipClusters:
                 "writable": True,
             },
             0x00000052: {
-                "attributeName": "PresetsSchedulesEditable",
-                "attributeId": 0x00000052,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000053: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000053,
+                "attributeId": 0x00000052,
                 "type": "int",
                 "reportable": True,
             },
@@ -11980,6 +11967,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000005: {
+                "attributeName": "PendingDatasetTimestamp",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13327,20 +13320,14 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "RemovedOn",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "DeviceDirectory",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "LocationDirectory",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
             },
@@ -13390,9 +13377,9 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "RequestCommissioningApproval",
                 "args": {
-                    "requestId": "int",
-                    "vendorId": "int",
-                    "productId": "int",
+                    "requestID": "int",
+                    "vendorID": "int",
+                    "productID": "int",
                     "label": "str",
                 },
             },
@@ -13400,10 +13387,8 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "CommissionNode",
                 "args": {
-                    "requestId": "int",
+                    "requestID": "int",
                     "responseTimeoutSeconds": "int",
-                    "ipAddress": "bytes",
-                    "port": "int",
                 },
             },
         },
@@ -14485,6 +14470,14 @@ class ChipClusters:
                     "payload": "bytes",
                 },
             },
+            0x00000019: {
+                "commandId": 0x00000019,
+                "commandName": "GlobalEchoRequest",
+                "args": {
+                    "field1": "TestGlobalStruct",
+                    "field2": "int",
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",
@@ -14823,10 +14816,38 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00000033: {
+                "attributeName": "GlobalEnum",
+                "attributeId": 0x00000033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000034: {
+                "attributeName": "GlobalStruct",
+                "attributeId": 0x00000034,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
                 "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00003000: {
+                "attributeName": "ReadFailureCode",
+                "attributeId": 0x00003000,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00003001: {
+                "attributeName": "FailureInt32U",
+                "attributeId": 0x00003001,
+                "type": "int",
                 "reportable": True,
                 "writable": True,
             },
@@ -15065,6 +15086,20 @@ class ChipClusters:
                 "attributeName": "WriteOnlyInt8u",
                 "attributeId": 0x0000402A,
                 "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004033: {
+                "attributeName": "NullableGlobalEnum",
+                "attributeId": 0x00004033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004034: {
+                "attributeName": "NullableGlobalStruct",
+                "attributeId": 0x00004034,
+                "type": "",
                 "reportable": True,
                 "writable": True,
             },
@@ -15507,7 +15542,7 @@ class ChipClusters:
     def GetClusterInfoById(self, cluster_id: int):
         data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
         if not data:
-            raise exceptions.UnknownCluster(cluster_id)
+            raise exceptions.UnknownCluster(f"Cluster ID: {cluster_id}")
         return data
 
     def ListClusterInfo(self):

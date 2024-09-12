@@ -6,7 +6,7 @@ protocols:
 
 -   Matter-compliant OTA update protocol that uses the Matter operational
     network for querying and downloading a new firmware image.
--   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/services/device_mgmt/smp_protocol.html)
+-   [Simple Management Protocol](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/smp_protocol.html)
     over Bluetooth LE. In this case, the DFU can be done either using a
     smartphone application or a PC command line tool. Note that this protocol is
     not part of the Matter specification.
@@ -125,11 +125,9 @@ rebooted to apply the update.
 To upgrade your device firmware over Bluetooth LE using a smartphone, complete
 the following steps:
 
-1. Install _one_ of the following applications on your smartphone:
-
-    - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
-    - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
-
+1. Install the
+   [nRF Connect Device Manager](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager)
+   application on your smartphone.
 2. Push the appropriate button on the device to enable the software update
    functionality (if it is not enabled by default) and start the Bluetooth LE
    advertising of the SMP service. See the user interface section in the example
@@ -138,8 +136,10 @@ the following steps:
    advertising. See the user interface section in the example documentation to
    check the button number.
 4. Follow the instructions about downloading the new image to a device on the
-   [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/working_with_nrf/nrf52/developing.html#fota-updates)
-   page in the nRF Connect SDK documentation.
+   FOTA updates page for either
+   [nRF52 Series devices](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf52/fota_update.html)
+   or the
+   [nRF5340 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf53/fota_update_nrf5340.html).
 
 <hr>
 
@@ -171,7 +171,7 @@ Complete the following steps to perform DFU using mcumgr:
 > (for example, `MatterLock`).
 
 1.  Install the tool by following the
-    [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
+    [mcumgr command line tool installation instructions](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/mcumgr.html#command-line_tool).
 2.  Push the appropriate button on the device to enable the software update
     functionality (if it is not enabled by default) and start the Bluetooth LE
     advertising of SMP service. See the user interface section in the example
@@ -342,6 +342,6 @@ Swapping operation can take some time, and after it completes, the new firmware
 is booted.
 
 Visit the
-[mcumgr image management](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/indexhtml#image-management)
+[mcumgr image management](https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/device_mgmt/mcumgr.html#image_management)
 section to get familiar with all image management commands supported by the
 tool.

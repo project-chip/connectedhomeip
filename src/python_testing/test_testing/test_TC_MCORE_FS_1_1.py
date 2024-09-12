@@ -72,7 +72,7 @@ def dynamic_event_return(*args, **argv):
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
-            requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
+            requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
     else:
@@ -149,7 +149,7 @@ def main(th_server_app: str):
     print(f'paa = {paa_path}')
 
     pics = {"PICS_SDK_CI_ONLY": True}
-    test_runner = MyMock('TC_MCORE_FS_1_1', 'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', 1, paa_trust_store_path=paa_path, pics=pics)
+    test_runner = MyMock('TC_MCORE_FS_1_1', 'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()
     config.user_params = {'th_server_app_path': th_server_app}
     test_runner.set_test_config(config)

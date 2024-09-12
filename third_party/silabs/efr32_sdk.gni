@@ -38,6 +38,7 @@ declare_args() {
   # enable by default for thread/non-wifi-ncp builds
   enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
   kvs_max_entries = 255
+  sl_nvm3_max_object_size = 4092
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -61,7 +62,7 @@ declare_args() {
   sl_active_mode_duration_ms = 1000  # 1s Active Mode Duration
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
-  sl_use_subscription_synching = false
+  sl_use_subscription_syncing = false
 
   silabs_log_enabled = true
 
@@ -80,10 +81,17 @@ declare_args() {
 
   # Multi-chip OTA
   chip_enable_multi_ota_requestor = false
+  chip_enable_multi_ota_encryption = false
+  chip_enable_ota_custom_tlv_testing = false
+
+  # Factory Provision storage
+  use_provision_flash_storage = wifi_soc
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
+silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
 is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
               silabs_family == "efr32mg26"
 
@@ -355,6 +363,9 @@ template("efr32_sdk") {
     if (use_rs9116 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
+    if (use_wf200 || use_rs9116 || use_SiWx917) {
+      _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
+    }
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -411,7 +422,7 @@ template("efr32_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
       "NVM3_DEFAULT_NVM_SIZE=40960",
-      "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "NVM3_DEFAULT_MAX_OBJECT_SIZE=${sl_nvm3_max_object_size}",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "CORTEXM3=1",
       "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
@@ -467,6 +478,12 @@ template("efr32_sdk") {
       defines += [ "SL_USE_COAP_CONFIG=0" ]
     }
 
+    if (use_provision_flash_storage) {
+      defines += [ "SL_MATTER_PROVISION_FLASH=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
+    }
+
     if (chip_enable_ble_rs911x) {
       defines += [
         "RSI_BLE_ENABLE=1",
@@ -474,6 +491,8 @@ template("efr32_sdk") {
         "RSI_LITTLE_ENDIAN=1",
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
+        "RSI_BLE_MAX_NBR_PERIPHERALS=1",
+        "RSI_BLE_MAX_NBR_CENTRALS=1",
       ]
     }
 
@@ -494,6 +513,14 @@ template("efr32_sdk") {
         "SL_OPENTHREAD_ENABLE_APP_TASK=0",
         "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
       ]
+    }
+
+    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
+    }
+
+    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -635,7 +662,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (sl_use_subscription_synching) {
+    if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
 

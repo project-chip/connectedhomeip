@@ -209,6 +209,11 @@ FACTORY_DATA = {
         'encoding': 'string',
         'value': None,
     },
+    'device-type': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
 }
 
 
@@ -276,6 +281,7 @@ def validate_args(args):
     check_int_range(args.product_id, 0x0000, 0xFFFF, 'Product id')
     check_int_range(args.vendor_id, 0x0000, 0xFFFF, 'Vendor id')
     check_int_range(args.hw_ver, 0x0000, 0xFFFF, 'Hardware version')
+    check_int_range(args.discovery_mode, 0b000, 0b111, 'Discovery-Mode')
 
     check_str_range(args.serial_num, 1, 32, 'Serial number')
     check_str_range(args.vendor_name, 1, 32, 'Vendor name')
@@ -371,6 +377,8 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['product-url']['value'] = args.product_url
     if args.product_label:
         FACTORY_DATA['product-label']['value'] = args.product_label
+    if args.device_type is not None:
+        FACTORY_DATA['device-type']['value'] = args.device_type
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -553,6 +561,8 @@ def get_args():
     parser.add_argument("--product-label", type=str, help='human readable product label')
     parser.add_argument("--product-url", type=str, help='link to product specific web page')
 
+    parser.add_argument("--device-type", type=any_base_int, help='commissionable device type')
+
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
     parser.add_argument('--target', default='esp32',
@@ -566,9 +576,10 @@ def get_args():
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
                                           Default is 0.', choices=[0, 1, 2])
-    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=1,
-                        help='Commissionable device discovery networking technology. \
-                                         0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
+    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=2,
+                        help='3-bit bitmap representing discovery modes for commissionable device discovery \
+                                         Bit 0:WiFi-SoftAP, Bit 1:BLE, Bit 2:On-network. Default is BLE. Specify values between 0-7')
+
     parser.set_defaults(generate_bin=True)
 
     return parser.parse_args()

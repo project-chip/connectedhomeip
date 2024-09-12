@@ -39,6 +39,14 @@ public:
     virtual ~Delegate() = default;
 
     /**
+     * @brief Get the maximum timeout for atomically writing to an attribute
+     *
+     * @param[in] attributeId The attribute to write to.
+     * @return The maximum allowed timeout; nullopt if the request is invalid.
+     */
+    virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
+
+    /**
      * @brief Get the preset type at a given index in the PresetTypes attribute
      *
      * @param[in] index The index of the preset type in the list.
@@ -67,11 +75,10 @@ public:
     /**
      * @brief Get the ActivePresetHandle attribute value.
      *
-     * @param[out] activePresetHandle The MutableByteSpan to copy the active preset handle into. On success,
-     *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     * @param[out] activePresetHandle The nullable MutableByteSpan to copy the active preset handle into. On success,
+     *             the size of the activePresetHandle is updated to the length of the copied data.
      */
-    virtual CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) = 0;
+    virtual CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) = 0;
 
     /**
      * @brief Set the ActivePresetHandle attribute value.
@@ -79,6 +86,11 @@ public:
      * @param[in] newActivePresetHandle The octet string to set the active preset handle to.
      */
     virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) = 0;
+
+    /**
+     * @brief Copies existing presets to the pending preset list
+     */
+    virtual void InitializePendingPresets() = 0;
 
     /**
      * @brief Appends a preset to the pending presets list maintained by the delegate.
@@ -91,7 +103,7 @@ public:
      * @return CHIP_NO_ERROR if the preset was appended to the list successfully.
      * @return CHIP_ERROR if there was an error adding the preset to the list.
      */
-    virtual CHIP_ERROR AppendToPendingPresetList(const Structs::PresetStruct::Type & preset) = 0;
+    virtual CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) = 0;
 
     /**
      * @brief Get the Preset at a given index in the pending presets list.
@@ -114,7 +126,7 @@ public:
      * @return CHIP_ERROR if the updates to the presets attribute failed to commit for some reason.
      *
      */
-    virtual CHIP_ERROR ApplyPendingPresets() = 0;
+    virtual CHIP_ERROR CommitPendingPresets() = 0;
 
     /**
      * @brief Clears the pending presets list.

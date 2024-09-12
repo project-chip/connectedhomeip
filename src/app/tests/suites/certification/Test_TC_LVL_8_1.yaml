@@ -1,0 +1,361 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 32.1.9 [TC-LVL-8.1] Verification of commands (DUT as Client)"
+
+PICS:
+    - LVL.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: TH prompts the operator to make the DUT send one or more
+          supported commands from the Level Control cluster"
+      verification: |
+          The product maker needs to provide instructions on how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when the DUT is a commissioner/Client).
+
+          The DUT should transmit correctly formed commands in any order, with application achievable values that are within the limits allowed by the specification and consistent with the attribute values reported by the TH. Verify this using the TH log of these messages.
+
+          Please send the below command and validate the conditions mentioned above:
+
+          ./chip-tool levelcontrol move-to-level 125 10 0 0 1 1
+          on TH (all-clusters-app) log. Verify the move-to-level command is received successfully.
+
+
+          [1721131579.026] [3188:3188] [DL] HandlePlatformSpecificBLEEvent 32792
+          [1721131579.028] [3188:3188] [EM] >>> [E:39794r S:12010 M:201578598] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131579.028] [3188:3188] [EM] Handling via exchange: 39794r, Delegate: 0xaaaac95ff3b0
+          [1721131579.028] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131579.028] [3188:3188] [DMG] {
+          [1721131579.029] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131579.029] [3188:3188] [DMG]         timedRequest = false,
+          [1721131579.029] [3188:3188] [DMG]         InvokeRequests =
+          [1721131579.029] [3188:3188] [DMG]         [
+          [1721131579.029] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131579.029] [3188:3188] [DMG]                 {
+          [1721131579.029] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131579.029] [3188:3188] [DMG]                         {
+          [1721131579.029] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131579.029] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131579.029] [3188:3188] [DMG]                                 CommandId = 0x0,
+          [1721131579.029] [3188:3188] [DMG]                         },
+          [1721131579.029] [3188:3188] [DMG]
+          [1721131579.029] [3188:3188] [DMG]                         CommandFields =
+          [1721131579.029] [3188:3188] [DMG]                         {
+          [1721131579.029] [3188:3188] [DMG]                                 0x0 = 125 (unsigned),
+          [1721131579.029] [3188:3188] [DMG]                                 0x1 = 10 (unsigned),
+          [1721131579.029] [3188:3188] [DMG]                                 0x2 = 0 (unsigned),
+          [1721131579.029] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131579.029] [3188:3188] [DMG]                         },
+          [1721131579.029] [3188:3188] [DMG]                 },
+          [1721131579.029] [3188:3188] [DMG]
+          [1721131579.029] [3188:3188] [DMG]         ],
+          [1721131579.029] [3188:3188] [DMG]
+          [1721131579.029] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131579.029] [3188:3188] [DMG] },
+          [1721131579.029] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131579.029] [3188:3188] [DMG] AccessControl: allowed
+          [1721131579.030] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0000
+          [1721131579.030] [3188:3188] [ZCL] RX level-control: MOVE_TO_LEVEL 7d  a 0 0
+          [1721131579.030] [3188:3188] [DMG] Command handler moving to [NewRespons]
+
+
+
+          ./chip-tool levelcontrol move 1 5 0 0 1 1
+          on TH (all-clusters-app) log. Verify the move command is received successfully.
+
+
+          [1721131607.050] [3188:3188] [EM] Handling via exchange: 48182r, Delegate: 0xaaaac95ff3b0
+          [1721131607.050] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131607.050] [3188:3188] [DMG] {
+          [1721131607.050] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131607.050] [3188:3188] [DMG]         timedRequest = false,
+          [1721131607.050] [3188:3188] [DMG]         InvokeRequests =
+          [1721131607.050] [3188:3188] [DMG]         [
+          [1721131607.050] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131607.050] [3188:3188] [DMG]                 {
+          [1721131607.050] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131607.050] [3188:3188] [DMG]                         {
+          [1721131607.050] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131607.050] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131607.050] [3188:3188] [DMG]                                 CommandId = 0x1,
+          [1721131607.050] [3188:3188] [DMG]                         },
+          [1721131607.050] [3188:3188] [DMG]
+          [1721131607.050] [3188:3188] [DMG]                         CommandFields =
+          [1721131607.050] [3188:3188] [DMG]                         {
+          [1721131607.050] [3188:3188] [DMG]                                 0x0 = 1 (unsigned),
+          [1721131607.050] [3188:3188] [DMG]                                 0x1 = 5 (unsigned),
+          [1721131607.050] [3188:3188] [DMG]                                 0x2 = 0 (unsigned),
+          [1721131607.050] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131607.050] [3188:3188] [DMG]                         },
+          [1721131607.050] [3188:3188] [DMG]                 },
+          [1721131607.050] [3188:3188] [DMG]
+          [1721131607.050] [3188:3188] [DMG]         ],
+          [1721131607.050] [3188:3188] [DMG]
+          [1721131607.050] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131607.050] [3188:3188] [DMG] },
+          [1721131607.051] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131607.051] [3188:3188] [DMG] AccessControl: allowed
+          [1721131607.051] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0001
+
+
+
+          ./chip-tool levelcontrol step 1 10 0   0 0 1 1
+          on TH (all-clusters-app) log. Verify the step command is received successfully.
+
+          [1721131622.700] [3188:3188] [EM] Handling via exchange: 33066r, Delegate: 0xaaaac95ff3b0
+          [1721131622.700] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131622.700] [3188:3188] [DMG] {
+          [1721131622.700] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131622.700] [3188:3188] [DMG]         timedRequest = false,
+          [1721131622.700] [3188:3188] [DMG]         InvokeRequests =
+          [1721131622.700] [3188:3188] [DMG]         [
+          [1721131622.700] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131622.700] [3188:3188] [DMG]                 {
+          [1721131622.700] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131622.700] [3188:3188] [DMG]                         {
+          [1721131622.700] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131622.700] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131622.700] [3188:3188] [DMG]                                 CommandId = 0x2,
+          [1721131622.700] [3188:3188] [DMG]                         },
+          [1721131622.700] [3188:3188] [DMG]
+          [1721131622.701] [3188:3188] [DMG]                         CommandFields =
+          [1721131622.701] [3188:3188] [DMG]                         {
+          [1721131622.701] [3188:3188] [DMG]                                 0x0 = 1 (unsigned),
+          [1721131622.701] [3188:3188] [DMG]                                 0x1 = 10 (unsigned),
+          [1721131622.701] [3188:3188] [DMG]                                 0x2 = 0 (unsigned),
+          [1721131622.701] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131622.701] [3188:3188] [DMG]                                 0x4 = 0 (unsigned),
+          [1721131622.701] [3188:3188] [DMG]                         },
+          [1721131622.701] [3188:3188] [DMG]                 },
+          [1721131622.701] [3188:3188] [DMG]
+          [1721131622.701] [3188:3188] [DMG]         ],
+          [1721131622.701] [3188:3188] [DMG]
+          [1721131622.701] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131622.701] [3188:3188] [DMG] },
+          [1721131622.701] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131622.701] [3188:3188] [DMG] AccessControl: allowed
+
+
+
+
+          ./chip-tool levelcontrol stop 0 0 1 1
+          on TH (all-clusters-app) log. Verify the stop  command is received successfully.
+
+          [1721131637.910] [3188:3188] [EM] >>> [E:64966r S:12013 M:241263255] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131637.910] [3188:3188] [EM] Handling via exchange: 64966r, Delegate: 0xaaaac95ff3b0
+          [1721131637.910] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131637.910] [3188:3188] [DMG] {
+          [1721131637.910] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131637.910] [3188:3188] [DMG]         timedRequest = false,
+          [1721131637.910] [3188:3188] [DMG]         InvokeRequests =
+          [1721131637.910] [3188:3188] [DMG]         [
+          [1721131637.910] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131637.910] [3188:3188] [DMG]                 {
+          [1721131637.910] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131637.910] [3188:3188] [DMG]                         {
+          [1721131637.910] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131637.910] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131637.910] [3188:3188] [DMG]                                 CommandId = 0x3,
+          [1721131637.910] [3188:3188] [DMG]                         },
+          [1721131637.910] [3188:3188] [DMG]
+          [1721131637.910] [3188:3188] [DMG]                         CommandFields =
+          [1721131637.910] [3188:3188] [DMG]                         {
+          [1721131637.910] [3188:3188] [DMG]                                 0x0 = 0 (unsigned),
+          [1721131637.910] [3188:3188] [DMG]                                 0x1 = 0 (unsigned),
+          [1721131637.910] [3188:3188] [DMG]                         },
+          [1721131637.910] [3188:3188] [DMG]                 },
+          [1721131637.910] [3188:3188] [DMG]
+          [1721131637.911] [3188:3188] [DMG]         ],
+          [1721131637.911] [3188:3188] [DMG]
+          [1721131637.911] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131637.911] [3188:3188] [DMG] },
+          [1721131637.911] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131637.911] [3188:3188] [DMG] AccessControl: allowed
+          [1721131637.911] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0003
+
+
+
+          ./chip-tool levelcontrol move-to-level-with-on-off 1 0 0 0 1 1
+          on TH (all-clusters-app) log. Verify the move-to-level-with-on-off  command is received successfully.
+
+          [1721131651.510] [3188:3188] [EM] >>> [E:42083r S:12014 M:199867058] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131651.510] [3188:3188] [EM] Handling via exchange: 42083r, Delegate: 0xaaaac95ff3b0
+          [1721131651.510] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131651.510] [3188:3188] [DMG] {
+          [1721131651.510] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131651.510] [3188:3188] [DMG]         timedRequest = false,
+          [1721131651.510] [3188:3188] [DMG]         InvokeRequests =
+          [1721131651.510] [3188:3188] [DMG]         [
+          [1721131651.510] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131651.510] [3188:3188] [DMG]                 {
+          [1721131651.511] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131651.511] [3188:3188] [DMG]                         {
+          [1721131651.511] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131651.511] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131651.511] [3188:3188] [DMG]                                 CommandId = 0x4,
+          [1721131651.511] [3188:3188] [DMG]                         },
+          [1721131651.511] [3188:3188] [DMG]
+          [1721131651.511] [3188:3188] [DMG]                         CommandFields =
+          [1721131651.511] [3188:3188] [DMG]                         {
+          [1721131651.511] [3188:3188] [DMG]                                 0x0 = 1 (unsigned),
+          [1721131651.511] [3188:3188] [DMG]                                 0x1 = 0 (unsigned),
+          [1721131651.511] [3188:3188] [DMG]                                 0x2 = 0 (unsigned),
+          [1721131651.511] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131651.511] [3188:3188] [DMG]                         },
+          [1721131651.511] [3188:3188] [DMG]                 },
+          [1721131651.511] [3188:3188] [DMG]
+          [1721131651.511] [3188:3188] [DMG]         ],
+          [1721131651.511] [3188:3188] [DMG]
+          [1721131651.511] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131651.511] [3188:3188] [DMG] },
+          [1721131651.512] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131651.512] [3188:3188] [DMG] AccessControl: allowed
+          [1721131651.512] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0004
+
+
+
+
+          ./chip-tool levelcontrol move-with-on-off 1 5 0 0 1 1
+          on TH (all-clusters-app) log. Verify the move-with-on-off command is received successfully.
+
+
+          [1721131674.036] [3188:3188] [DL] HandlePlatformSpecificBLEEvent 32792
+          [1721131674.039] [3188:3188] [EM] >>> [E:21646r S:12015 M:111324533] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131674.039] [3188:3188] [EM] Handling via exchange: 21646r, Delegate: 0xaaaac95ff3b0
+          [1721131674.039] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131674.039] [3188:3188] [DMG] {
+          [1721131674.039] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131674.039] [3188:3188] [DMG]         timedRequest = false,
+          [1721131674.039] [3188:3188] [DMG]         InvokeRequests =
+          [1721131674.039] [3188:3188] [DMG]         [
+          [1721131674.039] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131674.039] [3188:3188] [DMG]                 {
+          [1721131674.039] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131674.039] [3188:3188] [DMG]                         {
+          [1721131674.039] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131674.039] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131674.039] [3188:3188] [DMG]                                 CommandId = 0x5,
+          [1721131674.039] [3188:3188] [DMG]                         },
+          [1721131674.039] [3188:3188] [DMG]
+          [1721131674.039] [3188:3188] [DMG]                         CommandFields =
+          [1721131674.039] [3188:3188] [DMG]                         {
+          [1721131674.039] [3188:3188] [DMG]                                 0x0 = 1 (unsigned),
+          [1721131674.039] [3188:3188] [DMG]                                 0x1 = 5 (unsigned),
+          [1721131674.039] [3188:3188] [DMG]                                 0x2 = 0 (unsigned),
+          [1721131674.039] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131674.040] [3188:3188] [DMG]                         },
+          [1721131674.040] [3188:3188] [DMG]                 },
+          [1721131674.040] [3188:3188] [DMG]
+          [1721131674.040] [3188:3188] [DMG]         ],
+          [1721131674.040] [3188:3188] [DMG]
+          [1721131674.040] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131674.040] [3188:3188] [DMG] },
+          [1721131674.040] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131674.040] [3188:3188] [DMG] AccessControl: allowed
+          [1721131674.040] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0005
+          [1721131674.040] [3188:3188] [ZCL] RX level-control: MOVE_WITH_ON_OFF 1  5 0 0
+          [1721131674.040] [3188:3188] [ZCL] Setting on/off to OFF due to level change
+          [1721131674.040] [3188:3188] [ZCL] Endpoint 1 On/off already set to new value
+
+
+
+
+          ./chip-tool levelcontrol step-with-on-off 1 15 123 0 0 1 1
+          on TH (all-clusters-app) log. Verify the step-with-on-off command is received successfully.
+
+
+          [1721131696.543] [3188:3188] [EM] >>> [E:11849r S:12016 M:155492710] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131696.543] [3188:3188] [EM] Handling via exchange: 11849r, Delegate: 0xaaaac95ff3b0
+          [1721131696.543] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131696.543] [3188:3188] [DMG] {
+          [1721131696.543] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131696.543] [3188:3188] [DMG]         timedRequest = false,
+          [1721131696.543] [3188:3188] [DMG]         InvokeRequests =
+          [1721131696.543] [3188:3188] [DMG]         [
+          [1721131696.543] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131696.543] [3188:3188] [DMG]                 {
+          [1721131696.543] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131696.543] [3188:3188] [DMG]                         {
+          [1721131696.543] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131696.543] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131696.543] [3188:3188] [DMG]                                 CommandId = 0x6,
+          [1721131696.543] [3188:3188] [DMG]                         },
+          [1721131696.544] [3188:3188] [DMG]
+          [1721131696.544] [3188:3188] [DMG]                         CommandFields =
+          [1721131696.544] [3188:3188] [DMG]                         {
+          [1721131696.544] [3188:3188] [DMG]                                 0x0 = 1 (unsigned),
+          [1721131696.544] [3188:3188] [DMG]                                 0x1 = 15 (unsigned),
+          [1721131696.544] [3188:3188] [DMG]                                 0x2 = 123 (unsigned),
+          [1721131696.544] [3188:3188] [DMG]                                 0x3 = 0 (unsigned),
+          [1721131696.544] [3188:3188] [DMG]                                 0x4 = 0 (unsigned),
+          [1721131696.544] [3188:3188] [DMG]                         },
+          [1721131696.544] [3188:3188] [DMG]                 },
+          [1721131696.544] [3188:3188] [DMG]
+          [1721131696.544] [3188:3188] [DMG]         ],
+          [1721131696.544] [3188:3188] [DMG]
+          [1721131696.544] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131696.544] [3188:3188] [DMG] },
+          [1721131696.544] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131696.544] [3188:3188] [DMG] AccessControl: allowed
+          [1721131696.544] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0006
+          [1721131696.544] [3188:3188] [ZCL] RX level-control: STEP_WITH_ON_OFF 1 f 7b 0 0
+          [1721131696.544] [3188:3188] [ZCL] Setting on/off to OFF due to level change
+          [1721131696.544] [3188:3188] [ZCL] Endpoint 1 On/off already set to new value
+          [1721131696.544] [3188:3188] [DMG] Command handler moving to [NewRespons]
+
+
+          ./chip-tool levelcontrol stop-with-on-off 0 0 1 1
+          on TH (all-clusters-app) log. Verify the stop-with-on-off command is received successfully.
+
+          [1721131714.456] [3188:3188] [EM] >>> [E:55346r S:12017 M:234822330] (S) Msg RX from 1:000000000001B669 [AD70] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1721131714.456] [3188:3188] [EM] Handling via exchange: 55346r, Delegate: 0xaaaac95ff3b0
+          [1721131714.457] [3188:3188] [DMG] InvokeRequestMessage =
+          [1721131714.457] [3188:3188] [DMG] {
+          [1721131714.457] [3188:3188] [DMG]         suppressResponse = false,
+          [1721131714.457] [3188:3188] [DMG]         timedRequest = false,
+          [1721131714.457] [3188:3188] [DMG]         InvokeRequests =
+          [1721131714.457] [3188:3188] [DMG]         [
+          [1721131714.457] [3188:3188] [DMG]                 CommandDataIB =
+          [1721131714.457] [3188:3188] [DMG]                 {
+          [1721131714.457] [3188:3188] [DMG]                         CommandPathIB =
+          [1721131714.457] [3188:3188] [DMG]                         {
+          [1721131714.457] [3188:3188] [DMG]                                 EndpointId = 0x1,
+          [1721131714.457] [3188:3188] [DMG]                                 ClusterId = 0x8,
+          [1721131714.457] [3188:3188] [DMG]                                 CommandId = 0x7,
+          [1721131714.457] [3188:3188] [DMG]                         },
+          [1721131714.457] [3188:3188] [DMG]
+          [1721131714.457] [3188:3188] [DMG]                         CommandFields =
+          [1721131714.457] [3188:3188] [DMG]                         {
+          [1721131714.457] [3188:3188] [DMG]                                 0x0 = 0 (unsigned),
+          [1721131714.457] [3188:3188] [DMG]                                 0x1 = 0 (unsigned),
+          [1721131714.457] [3188:3188] [DMG]                         },
+          [1721131714.457] [3188:3188] [DMG]                 },
+          [1721131714.457] [3188:3188] [DMG]
+          [1721131714.457] [3188:3188] [DMG]         ],
+          [1721131714.457] [3188:3188] [DMG]
+          [1721131714.457] [3188:3188] [DMG]         InteractionModelRevision = 11
+          [1721131714.457] [3188:3188] [DMG] },
+          [1721131714.457] [3188:3188] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1721131714.457] [3188:3188] [DMG] AccessControl: allowed
+          [1721131714.457] [3188:3188] [DMG] Received command for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0007
+          [1721131714.457] [3188:3188] [ZCL] RX level-control: STOP_WITH_ON_OFF
+          [1721131714.457] [3188:3188] [DMG] Command handler moving to [NewRespons]
+          [1721131714.458] [3188:3188] [DMG] Command handler moving to [ Preparing]
+      disabled: true

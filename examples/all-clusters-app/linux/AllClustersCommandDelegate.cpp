@@ -19,7 +19,9 @@
 #include "AllClustersCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
@@ -53,6 +55,17 @@ std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
 bool HasNumericField(Json::Value & jsonValue, const std::string & field)
 {
     return jsonValue.isMember(field) && jsonValue[field].isNumeric();
+}
+
+uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
+{
+    // TODO: Move to using public API of cluster.
+    uint8_t numPositions = 0;
+
+    // On failure, the numPositions won't be changed, so 0 returned.
+    (void) Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+
+    return numPositions;
 }
 
 /**
@@ -97,6 +110,15 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (buttonId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid ButtonId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
     System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
     uint32_t featureMap  = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
@@ -167,6 +189,15 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (buttonId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid ButtonId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     System::Clock::Milliseconds32 multiPressPressedTimeMillis{ static_cast<unsigned>(
         jsonValue["MultiPressPressedTimeMillis"].asUInt()) };
     System::Clock::Milliseconds32 multiPressReleasedTimeMillis{ static_cast<unsigned>(
@@ -225,6 +256,14 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     uint8_t positionId    = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
 
+    uint8_t numPositions = GetNumberOfSwitchPositions(endpointId);
+    if (positionId >= numPositions)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Invalid PositionId (out of range) in %s", inputJson.c_str());
+        return;
+    }
+
     uint8_t previousPositionId                 = 0;
     Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
     VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
@@ -243,6 +282,52 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     {
         ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u",
                       static_cast<unsigned>(positionId));
+    }
+}
+
+/**
+ * Named pipe handler for simulating switch is idle
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateSwitchIdle"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+
+void HandleSimulateSwitchIdle(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+
+    if (!hasEndpointId)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    (void) Switch::Attributes::CurrentPosition::Set(endpointId, 0);
+}
+
+void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
+{
+    Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
+    event.occupancy         = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
+    EventNumber eventNumber = 0;
+
+    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to log OccupancyChanged event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Logged OccupancyChanged(occupancy=%u) on Endpoint %u", static_cast<unsigned>(occupancyValue),
+                        static_cast<unsigned>(endpointId));
     }
 }
 
@@ -406,6 +491,24 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateLatchPosition")
     {
         HandleSimulateLatchPosition(self->mJsonValue);
+    }
+    else if (name == "SimulateSwitchIdle")
+    {
+        HandleSimulateSwitchIdle(self->mJsonValue);
+    }
+    else if (name == "SetOccupancy")
+    {
+        uint8_t occupancy     = static_cast<uint8_t>(self->mJsonValue["Occupancy"].asUInt());
+        EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+
+        if (1 == occupancy || 0 == occupancy)
+        {
+            self->HandleSetOccupancyChange(endpointId, occupancy);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
+        }
     }
     else
     {
@@ -667,21 +770,65 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
 
 void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, std::string operation, Json::Value param)
 {
-    OperationalState::Instance * operationalStateInstance = nullptr;
     if (device == "Generic")
     {
-        operationalStateInstance = OperationalState::GetOperationalStateInstance();
+        OnGenericOperationalStateChange(device, operation, param);
     }
     else if (device == "Oven")
     {
-        operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+        OnOvenOperationalStateChange(device, operation, param);
     }
     else
     {
         ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
         return;
     }
+}
 
+void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance                 = OperationalState::GetOperationalStateInstance();
+    OperationalState::OperationalStateDelegate * operationalStateDelegate = OperationalState::GetOperationalStateDelegate();
+    OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(operationalStateInstance->GetCurrentOperationalState());
+    if (operation == "Start")
+    {
+        operationalStateDelegate->HandleStartStateCallback(noError);
+    }
+    else if (operation == "Resume")
+    {
+        operationalStateDelegate->HandleResumeStateCallback(noError);
+    }
+    else if (operation == "Pause")
+    {
+        operationalStateDelegate->HandlePauseStateCallback(noError);
+    }
+    else if (operation == "Stop" && state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        operationalStateDelegate->HandleStopStateCallback(noError);
+    }
+    else if (operation == "OnFault")
+    {
+        uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        if (!param.isNull())
+        {
+            event_id = to_underlying(static_cast<OperationalState::ErrorStateEnum>(param.asUInt()));
+        }
+
+        OperationalState::GenericOperationalError err(event_id);
+        operationalStateInstance->OnOperationalErrorDetected(err);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
@@ -722,6 +869,71 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
+    }
+}
+
+void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
+{
+    BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
+
+    if (static_cast<BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(newOccupancyValue) == currentOccupancy)
+    {
+        ChipLogDetail(NotSpecified, "Skipping setting occupancy changed due to same value.");
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, newOccupancyValue);
+    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u", newOccupancyValue);
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
+        return;
+    }
+
+    EmitOccupancyChangedEvent(endpointId, newOccupancyValue);
+
+    if (1 == newOccupancyValue)
+    {
+        uint16_t * holdTime = chip::app::Clusters::OccupancySensing::GetHoldTimeForEndpoint(endpointId);
+        if (holdTime != nullptr)
+        {
+            CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler,
+                reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
+            ChipLogDetail(NotSpecified, "Start HoldTime timer");
+            if (CHIP_NO_ERROR != err)
+            {
+                ChipLogError(NotSpecified, "Failed to start HoldTime timer.");
+            }
+        }
+    }
+}
+
+void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    EndpointId endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState));
+    chip::BitMask<Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
+
+    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    uint8_t clearValue = 0;
+    if (!currentOccupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied))
+    {
+        return;
+    }
+
+    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, clearValue);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Failed to set occupancy state.");
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
+        EmitOccupancyChangedEvent(endpointId, clearValue);
     }
 }
 

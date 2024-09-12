@@ -35,104 +35,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition: Create new user"
-      PICS: DRLK.S.F00 && DRLK.S.F07
-      command: "SetUser"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-
-    - label: "Precondition: Read the user back and verify its fields"
-      PICS: DRLK.S.F00 && DRLK.S.F07
-      command: "GetUser"
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-      response:
-          values:
-              - name: "UserIndex"
-                value: 1
-              - name: "UserName"
-                value: "xxx"
-              - name: "UserUniqueID"
-                value: 6452
-              - name: "UserStatus"
-                value: 1
-              - name: "UserType"
-                value: 0
-              - name: "CredentialRule"
-                value: 0
-              - name: "Credentials"
-                value: []
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextUserIndex"
-                value: null
-
-    - label: "Precondition: Create new PIN credential and lock/unlock user"
-      PICS: DRLK.S.F00 && DRLK.S.F07
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "OperationType"
-                value: 0
-              - name: "Credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "CredentialData"
-                value: "123456"
-              - name: "UserIndex"
-                value: 1
-              - name: "UserStatus"
-                value: null
-              - name: "UserType"
-                value: null
-      response:
-          values:
-              - name: "Status"
-                value: 0
-              - name: "UserIndex"
-                value: null
-              - name: "NextCredentialIndex"
-                value: 2
-
-    - label: "Precondition: Verify created PIN credential"
-      PICS: DRLK.S.F00 && DRLK.S.F07
-      command: "GetCredentialStatus"
-      arguments:
-          values:
-              - name: "Credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-      response:
-          values:
-              - name: "CredentialExists"
-                value: true
-              - name: "UserIndex"
-                value: 1
-              - name: "CreatorFabricIndex"
-                value: 1
-              - name: "LastModifiedFabricIndex"
-                value: 1
-              - name: "NextCredentialIndex"
-                value: null
-
     - label: "Step 1a: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -160,8 +62,74 @@ tests:
       response:
           value: LockStateValue
 
+    - label: "Step 1d: TH sends SetUser Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
     - label:
-          "Step 1d: TH sends a Lock Door command to the DUT. If DRLK.S.F00(PIN)
+          "Step 1e: TH reads MinPINCodeLength attribute and saves the value as
+          min_pin_code_length"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          saveAs: min_pin_code_length
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 1f: TH reads MaxPINCodeLength attribute and saves the value as
+          max_pin_code_length"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          saveAs: max_pin_code_length
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 1g: TH sends SetCredential Command"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+
+    - label:
+          "Step 1h: TH sends a Lock Door command to the DUT. If DRLK.S.F00(PIN)
           & DRLK.S.F07(COTA), include a Valid PINCode in the Lock Door command."
       PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
       command: "LockDoor"
@@ -171,7 +139,8 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Step 1d: TH sends a Lock Door command to the DUT."
+    - label:
+          "Step 1h: TH sends a Lock Door command to the DUT without pin_code."
       PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
@@ -184,23 +153,16 @@ tests:
           values:
               - name: "ms"
                 value: WaitAfterLockAandUnlockDoor
-
-    - label: "Step 1d: TH reads LockState attribute from DUT"
+    - label: "Step 1h: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
       attribute: "LockState"
       response:
           value: 1
-
     - label:
-          "Step 1e: TH sends a Unlock Door command to the DUT. If
+          "Step 1i: TH sends a Unlock Door command to the DUT. If
           DRLK.S.F00(PIN) & DRLK.S.F07(COTA), include a Valid PINCode in the
           Unlock Door command"
-      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
-      command: "UnlockDoor"
-      timedInteractionTimeoutMs: 1000
-
-    - label: "Step 1e: TH sends a Unlock Door command to the DUT."
       PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
@@ -208,6 +170,12 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
+
+    - label:
+          "Step 1i: TH sends a Unlock Door command to the DUT without pincode."
+      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
 
     - label: "Wait after Unlock Door"
       PICS: DRLK.S.C00.Rsp
@@ -218,14 +186,14 @@ tests:
               - name: "ms"
                 value: WaitAfterLockAandUnlockDoor
 
-    - label: "Step 1e: TH reads LockState attribute from DUT"
+    - label: "Step 1i: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
       attribute: "LockState"
       response:
           value: 2
 
-    - label: "Step 1f: Simulate a not fully locked scenario on the DUT."
+    - label: "Step 1j: Simulate a not fully locked scenario on the DUT."
       PICS:
           DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked &&
           PICS_SKIP_SAMPLE_APP
@@ -549,7 +517,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 11b: TH writes NumberOfWeekDaySchedules SupportedPerUser
@@ -582,7 +550,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 12b: TH writes NumberOfYearDay SchedulesSupportedPerUser
@@ -615,7 +583,7 @@ tests:
           constraints:
               type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 253
 
     - label:
           "Step 13b: TH writes NumberOfHoliday SchedulesSupported attribute as
@@ -1366,6 +1334,26 @@ tests:
       response:
           value: Current_WrongCode_EntryLimit
 
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
+
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
+      response:
+          error: UNSUPPORTED_WRITE
+
     - label:
           "Step 32a: TH reads UserCodeTemporary DisableTime attribute from DUT
           TH saves the values as Current_UserCode TemporaryDisableTime"
@@ -1551,8 +1539,18 @@ tests:
       response:
           value: NumberOfCredentialsSupportedPerUserValue
 
-    - label: "Cleanup the created user"
-      PICS: DRLK.S.F00 && DRLK.S.F07
+    - label: "Step 36: TH sends ClearCredential Command to DUT"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+
+    - label:
+          "Step 37: TH sends ClearUser Command to DUT with the UserIndex as 1"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -1560,11 +1558,277 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "Clean the created credential"
-      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
-      command: "ClearCredential"
-      timedInteractionTimeoutMs: 1000
+    - label: "Step 38a: TH reads AliroReaderVerificationKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "readAttribute"
+      attribute: "AliroReaderVerificationKey"
+      response:
+          saveAs: verificationkey
+          constraints:
+              type: octet_string
+              minLength: 65
+              maxLength: 65
+
+    - label:
+          "Step 38b: TH writes AliroReaderVerificationKey attribute as an octstr
+          value of length 65 which is different from verificationkey"
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "writeAttribute"
+      attribute: "AliroReaderVerificationKey"
       arguments:
-          values:
-              - name: "Credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
+          value: "047a4c992d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 38c: TH reads AliroReaderVerificationKey attribute from DUT"
+
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "readAttribute"
+      attribute: "AliroReaderVerificationKey"
+      response:
+          value: verificationkey
+
+    - label: "Step 39a: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "readAttribute"
+      attribute: "AliroReaderGroupIdentifier"
+      response:
+          saveAs: aliroreadergrpidentifier
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 39b: TH writes AliroReaderGroupIdentifier attribute as octstr
+          value of length 16 which is different from aliroreadergrpidentifier"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "writeAttribute"
+      attribute: "AliroReaderVerificationKey"
+      arguments:
+          value: "047a4c992d753924"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 39c: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "readAttribute"
+      attribute: "AliroReaderGroupIdentifier"
+      response:
+          value: aliroreadergrpidentifier
+    - label:
+          "Step 40a: TH reads AliroReaderGroupSubIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "readAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      response:
+          saveAs: aliroreadergrpsubidentifier
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 40b: TH writes AliroReaderGroupSubIdentifier attribute as octstr
+          value of length 16 which is different from aliroreadergrpsubidentifier"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "writeAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      arguments:
+          value: "047a4c992d75368"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 40c: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "readAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      response:
+          value: aliroreadergrpsubidentifier
+
+    - label:
+          "Step 41a: TH reads AliroExpeditedTransactionSupportedProtocolVersions
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "readAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      response:
+          saveAs: aliroprotocolversion
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label:
+          "Step 41b: TH writes
+          AliroExpeditedTransactionSupportedProtocolVersions attribute as list
+          which is different from aliroprotocolversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "writeAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      arguments:
+          value: ["\x01", "\x02"]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 41c: TH reads AliroExpeditedTransactionSupportedProtocolVersions
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "readAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      response:
+          value: aliroprotocolversion
+
+    - label: "Step 42a: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "readAttribute"
+      attribute: "AliroGroupResolvingKey"
+      response:
+          saveAs: alirogrpresolvingkey
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
+          of length 16 which is different from alirogrpresolvingkey"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "writeAttribute"
+      attribute: "AliroGroupResolvingKey"
+      arguments:
+          value: "047a4c992d75368"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 42c: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "readAttribute"
+      attribute: "AliroGroupResolvingKey"
+      response:
+          value: alirogrpresolvingkey
+
+    - label:
+          "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
+          from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "readAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      response:
+          saveAs: alirobleuwbprotocolversion
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label:
+          "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
+          list which is different from alirobleuwbprotocolversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "writeAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      arguments:
+          value: ["\x01", "\x02"]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 43c: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "readAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      response:
+          value: alirobleuwbprotocolversion
+
+    - label: "Step 44a: TH reads AliroBLEAdvertisingVersion attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "readAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      response:
+          saveAs: alirobleadvversion
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 44b: TH writes AliroBLEAdvertisingVersion attribute as any value
+          different from alirobleadvversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "writeAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 44c: TH reads AliroBLEAdvertisingVersion attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "readAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      response:
+          value: alirobleadvversion
+
+    - label:
+          "Step 45a: TH reads NumberOfAliroCredentialIssuerKeysSupported
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "readAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      response:
+          saveAs: alirokeysupported
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label:
+          "Step 45b: TH writes NumberOfAliroCredentialIssuerKeysSupported
+          attribute as any value different from alirokeysupported"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "writeAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      arguments:
+          value: 30
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 45c: TH reads NumberOfAliroCredentialIssuerKeysSupported
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "readAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      response:
+          value: alirokeysupported
+
+    - label:
+          "Step 46a: TH reads NumberOfAliroEndpointKeysSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "readAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      response:
+          saveAs: aliroepkeysupported
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label:
+          "Step 46b: TH writes NumberOfAliroEndpointKeysSupported attribute as
+          any value different from aliroepkeysupported"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "writeAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      arguments:
+          value: 1000
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 46c: TH reads NumberOfAliroEndpointKeysSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "readAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      response:
+          value: aliroepkeysupported

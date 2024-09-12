@@ -34,23 +34,29 @@ config("includes") {
 
 executable("chip-energy-management-app") {
   sources = [
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMTestEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseMain.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyReportingEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/FakeReadings.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/PowerTopologyDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -71,7 +77,12 @@ executable("chip-energy-management-app") {
 
   include_dirs = [
     "include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -129,13 +140,13 @@ executable("chip-energy-management-app") {
 
 source_set("test-evse-targets-store") {
   sources = [
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
   ]
 
   include_dirs = [
     "include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
   ]
 
   deps = [

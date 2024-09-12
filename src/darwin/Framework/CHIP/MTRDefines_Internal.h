@@ -64,3 +64,91 @@ typedef struct {} variable_hidden_by_mtr_hide;
 
 // Default timed interaction timeout, in ms, if another one is not provided.
 #define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000
+
+#pragma mark - XPC Defines
+
+#define MTR_SIMPLE_REMOTE_XPC_GETTER(XPC_CONNECTION, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, PREFIX) \
+                                                                                                     \
+    -(TYPE) NAME                                                                                     \
+    {                                                                                                \
+        __block TYPE outValue = DEFAULT_VALUE;                                                       \
+                                                                                                     \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                            \
+                                                                                                     \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {   \
+            MTR_LOG_ERROR("Error: %@", error);                                                       \
+        }] PREFIX                                                                                    \
+            GETTER_NAME:^(TYPE returnValue) {                                                        \
+                outValue = returnValue;                                                              \
+            }];                                                                                      \
+                                                                                                     \
+        return outValue;                                                                             \
+    }
+
+#define MTR_SIMPLE_REMOTE_XPC_COMMAND(XPC_CONNECTION, METHOD_SIGNATURE, ADDITIONAL_ARGUMENTS, PREFIX) \
+                                                                                                      \
+    -(void) METHOD_SIGNATURE                                                                          \
+    {                                                                                                 \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                             \
+                                                                                                      \
+        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {               \
+            MTR_LOG_ERROR("Error: %@", error);                                                        \
+        }] PREFIX ADDITIONAL_ARGUMENTS];                                                              \
+    }
+
+#define MTR_COMPLEX_REMOTE_XPC_GETTER(XPC_CONNECTION, SIGNATURE, TYPE, DEFAULT_VALUE, ADDITIONAL_ARGUMENTS, PREFIX) \
+    -(TYPE) SIGNATURE                                                                                               \
+    {                                                                                                               \
+        __block TYPE outValue = DEFAULT_VALUE;                                                                      \
+                                                                                                                    \
+        NSXPCConnection * xpcConnection = XPC_CONNECTION;                                                           \
+                                                                                                                    \
+        [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {                  \
+            MTR_LOG_ERROR("Error: %@", error);                                                                      \
+        }] PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                                        \
+            outValue = returnValue;                                                                                 \
+        }];                                                                                                         \
+                                                                                                                    \
+        return outValue;                                                                                            \
+    }
+
+#ifndef MTR_OPTIONAL_ATTRIBUTE
+#if __has_feature(objc_arc)
+#define MTR_OPTIONAL_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                                                       \
+    {                                                                                                                                              \
+        id valueToAdd = VALUE;                                                                                                                     \
+        if (valueToAdd != nil) {                                                                                                                   \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) (__bridge const void *) ATTRIBUTE, (const void *) valueToAdd); \
+        }                                                                                                                                          \
+    }
+#else
+#define MTR_OPTIONAL_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                                              \
+    {                                                                                                                                     \
+        id valueToAdd = VALUE;                                                                                                            \
+        if (valueToAdd != nil) {                                                                                                          \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) (const void *) ATTRIBUTE, (const void *) valueToAdd); \
+        }                                                                                                                                 \
+    }
+#endif
+#endif
+
+#ifndef MTR_REMOVE_ATTRIBUTE
+#define MTR_REMOVE_ATTRIBUTE(ATTRIBUTE, DICTIONARY)                                            \
+    if (ATTRIBUTE != nil && DICTIONARY) {                                                      \
+        CFDictionaryRemoveValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE); \
+    }
+#endif
+
+#ifndef MTR_REQUIRED_ATTRIBUTE
+#define MTR_REQUIRED_ATTRIBUTE(ATTRIBUTE, VALUE, DICTIONARY)                                                               \
+    {                                                                                                                      \
+        id valueToAdd = VALUE;                                                                                             \
+        if (valueToAdd != nil) {                                                                                           \
+            CFDictionarySetValue((CFMutableDictionaryRef) DICTIONARY, (CFStringRef) ATTRIBUTE, (const void *) valueToAdd); \
+        } else {                                                                                                           \
+            MTR_LOG_ERROR("Warning, missing %@ to add to %s", ATTRIBUTE, #DICTIONARY);                                     \
+        }                                                                                                                  \
+    }
+#endif
+
+#define MTR_YES_NO(x) ((x) ? @"YES" : @"NO")

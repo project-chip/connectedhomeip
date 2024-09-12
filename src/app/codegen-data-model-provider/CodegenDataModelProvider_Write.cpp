@@ -43,6 +43,7 @@ namespace app {
 namespace {
 
 using namespace chip::app::Compatibility::Internal;
+using Protocols::InteractionModel::Status;
 
 /// Attempts to write via an attribute access interface (AAI)
 ///
@@ -50,7 +51,7 @@ using namespace chip::app::Compatibility::Internal;
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
-std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttributePath & path, AttributeAccessInterface * aai,
                                                      AttributeValueDecoder & decoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
@@ -266,8 +267,8 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
 
 } // namespace
 
-CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                    AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                       AttributeValueDecoder & decoder)
 {
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
@@ -275,29 +276,33 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
-        Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
+        Access::RequestPath requestPath{ .cluster     = request.path.mClusterId,
+                                         .endpoint    = request.path.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForWriteAttribute(request.path));
 
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            ReturnErrorCodeIf((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+            return err == CHIP_ERROR_ACCESS_DENIED ? Status::UnsupportedAccess : Status::AccessRestricted;
         }
     }
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
-    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
+    // Explicit failure in finding a suitable metadata
+    if (const Status * status = std::get_if<Status>(&metadata))
     {
-        VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
-        return *err;
+        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
+                    (*status == Status::UnsupportedCluster) ||  //
+                    (*status == Status::UnsupportedAttribute));
+        return *status;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
@@ -316,15 +321,15 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
     // Internal is allowed to bypass timed writes and read-only.
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        VerifyOrReturnError(!isReadOnly, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+        VerifyOrReturnError(!isReadOnly, Status::UnsupportedWrite);
 
         VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
-                            CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
+                            Status::NeedsTimedInteraction);
     }
 
     // Extra check: internal requests can bypass the read only check, however global attributes
     // have no underlying storage, so write still cannot be done
-    VerifyOrReturnError(attributeMetadata != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
 
     if (request.path.mDataVersion.HasValue())
     {
@@ -333,18 +338,19 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+            return Status::DataVersionMismatch;
         }
 
         if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
         {
             ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+            return Status::DataVersionMismatch;
         }
     }
 
-    AttributeAccessInterface * aai       = GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId);
+    AttributeAccessInterface * aai =
+        AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
@@ -367,7 +373,7 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
     if (dataBuffer.size() > (*attributeMetadata)->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
-        return CHIP_IM_GLOBAL_STATUS(InvalidValue);
+        return Status::InvalidValue;
     }
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
@@ -380,13 +386,13 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
     }
     else
     {
-        status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            dataBuffer.data(), (*attributeMetadata)->attributeType);
+        status =
+            emAfWriteAttributeExternal(request.path, EmberAfWriteDataInput(dataBuffer.data(), (*attributeMetadata)->attributeType));
     }
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+        return status;
     }
 
     // TODO: this WILL requre updates
