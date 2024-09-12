@@ -58,9 +58,9 @@ tests:
                     }
 
     - label:
-          "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in
-          the GroupKeyMap attribute list on GroupKeyManagement cluster by
-          writing the GroupKeyMap attribute with two entries as follows:"
+          "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with two entries as follows:"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
