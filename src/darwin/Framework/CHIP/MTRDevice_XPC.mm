@@ -111,8 +111,8 @@
         wifi = @"NO";
         thread = @"NO";
     } else {
-        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
-        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+        wifi = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
     }
 
     // TODO: Add these to the description
@@ -244,8 +244,7 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
 {
     NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
 
-    // TODO: use asynchronous XPC and register a block with controller to call for this transaction
-    [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+    [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
         MTR_LOG_ERROR("Error: %@", error);
     }] deviceController:[[self deviceController] uniqueIdentifier]
                              nodeID:[self nodeID]
