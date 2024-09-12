@@ -35,6 +35,9 @@
 
 #include <platform/ESP32/ESP32Config.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/timers.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -96,6 +99,9 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
+
+    static uint32_t mTotalOperationalHours;
+    static void TotalOperationalHoursTimerCallback(TimerHandle_t timer);
 };
 
 /**
