@@ -1,11 +1,12 @@
-# Matter EFR32 Refrigerator and Teamprature Controlled Example
+# Matter EFR32 Refrigerator and Temperature Controlled Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG24 and SiWx917
 Wi-Fi Boards.
 
 <hr>
 
--   [Matter EFR32 Refrigerator and Teamprature Controlled Example](#matter-efr32-refrigerator-and-teamprature-controlled-example)
+-   [Matter EFR32 Refrigerator and Temperature Controlled
+    Example](#matter-efr32-refrigerator-and-Temperature -controlled-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
