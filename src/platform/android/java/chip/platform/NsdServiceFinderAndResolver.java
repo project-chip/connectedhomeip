@@ -95,7 +95,8 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   @Override
   public void onServiceFound(NsdServiceInfo service) {
-    if (discoveredServiceInfo == null && targetServiceInfo.getServiceName().equals(service.getServiceName())) {
+    if (discoveredServiceInfo == null
+        && targetServiceInfo.getServiceName().equals(service.getServiceName())) {
       Log.d(TAG, "onServiceFound: found target service " + service);
 
       if (stopDiscoveryRunnable.cancel(false)) {
@@ -206,7 +207,9 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   @Override
   public void onDiscoveryStopped(String serviceType) {
-    Log.i(TAG, "Discovery stopped: " + serviceType + ", discoveredServiceInfo: " + discoveredServiceInfo);
+    Log.i(
+        TAG,
+        "Discovery stopped: " + serviceType + ", discoveredServiceInfo: " + discoveredServiceInfo);
     if (discoveredServiceInfo != null) {
       resolveService(discoveredServiceInfo, callbackHandle, contextHandle, chipMdnsCallback);
       discoveredServiceInfo = null;
