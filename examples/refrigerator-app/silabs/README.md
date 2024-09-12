@@ -1,22 +1,23 @@
 # Matter EFR32 Refrigerator and Teamprature Controlled Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24 and SiWx917
+Wi-Fi Boards.
 
 <hr>
 
-- [Matter EFR32 Refrigerator and Teamprature Controlled Example](#matter-efr32-refrigerator-and-teamprature-controlled-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-  - [OTA Software Update](#ota-software-update)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter EFR32 Refrigerator and Teamprature Controlled Example](#matter-efr32-refrigerator-and-teamprature-controlled-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -30,8 +31,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 The Refrigerator and Temperature Controlled example provides a baseline
 demonstration of a Temperature Controlled Cabinet device, built using Matter and
-the Silicon Labs Gecko SDK. It can be controlled by a Chip controller over an
-Openthread or Wi-Fi network.
+the Silicon Labs Simplicity SDK. It can be controlled by a Chip controller over
+an Openthread or Wi-Fi network.
 
 The Refrigerator device can be commissioned over Bluetooth Low Energy (BLE),
 where the device and the Chip controller will exchange security information
