@@ -39,6 +39,27 @@ MTROperationalBrowser::MTROperationalBrowser(MTRDeviceControllerFactory * aFacto
 {
 }
 
+void MTROperationalBrowser::ControllerActivated()
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mActiveControllerCount == 0) {
+        EnsureBrowse();
+    }
+    ++mActiveControllerCount;
+}
+
+void MTROperationalBrowser::ControllerDeactivated()
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mActiveControllerCount == 1) {
+        StopBrowse();
+    }
+
+    --mActiveControllerCount;
+}
+
 void MTROperationalBrowser::EnsureBrowse()
 {
     assertChipStackLockedByCurrentThread();
@@ -117,10 +138,7 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     }
 
     ChipLogProgress(Controller, "Notifying controller factory about new operational instance: '%s'", aName);
-    MTRDeviceControllerFactory * strongFactory = self->mDeviceControllerFactory;
-    if (strongFactory) {
-        [strongFactory operationalInstanceAdded:peerId];
-    }
+    [self->mDeviceControllerFactory operationalInstanceAdded:peerId];
 }
 
 MTROperationalBrowser::~MTROperationalBrowser()

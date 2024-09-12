@@ -86,7 +86,7 @@ static void ShutdownOnExit()
 @end
 
 MTR_DIRECT_MEMBERS
-@interface MTRDeviceControllerFactory () <MTRDeviceControllerDelegate>
+@interface MTRDeviceControllerFactory ()
 - (void)preWarmCommissioningSessionDone;
 @end
 
@@ -559,21 +559,6 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    // Listen for changes to suspended state on this controller, so we can
-    // track whether we have any unsuspended controllers.
-    [controller addDeviceControllerDelegate:self queue:_chipWorkQueue];
-
-    if (!startSuspended) {
-        // Async dispatch here is fine: in the unlikely case that someone comes
-        // along and shuts down or suspends controllers so that we have to stop
-        // the browse, and our async dispatch runs after that, we'll just
-        // briefly have a browse that we don't really need, then end up shutting
-        // it down again.  That's what would happen with a sync dispatch anyway.
-        dispatch_async(_chipWorkQueue, ^{
-            self->_operationalBrowser->EnsureBrowse();
-        });
-    }
-
     // Add the controller to _controllers now, so if we fail partway through its
     // startup we will still do the right cleanups.
     os_unfair_lock_lock(&_controllersLock);
@@ -949,12 +934,6 @@ MTR_DIRECT_MEMBERS
             self->_groupDataProvider.RemoveGroupKeys(fabricIndex);
         }
 
-        // If all remaining controllers after this one has been removed are
-        // suspended, we should stop our operational browse.
-        if ([self _allControllersSuspended]) {
-            self->_operationalBrowser->StopBrowse();
-        }
-
         // If there are no other controllers left, we can shut down some things.
         // Do this before we shut down the controller itself, because the
         // OtaProviderDelegateBridge uses some services provided by the system
@@ -1260,40 +1239,9 @@ MTR_DIRECT_MEMBERS
     return &_groupDataProvider;
 }
 
-#pragma mark - Controller suspension support
-
-- (BOOL)_allControllersSuspended
+- (MTROperationalBrowser *)operationalBrowser
 {
-    auto * controllers = [self getRunningControllers];
-    for (MTRDeviceController * controller in controllers) {
-        if (!controller.suspended) {
-            return NO;
-        }
-    }
-    return YES;
-}
-
-- (void)controller:(MTRDeviceController *)controller
-       isSuspended:(BOOL)suspended
-{
-    // We use the Matter queue as our delegate queue for this notification.
-    assertChipStackLockedByCurrentThread();
-
-    if (!suspended) {
-        // As long as we have one controller that is not suspended, we should
-        // have a running operational browse. Guard against someone resuming a
-        // controller after it has been shut down (at which point it's not in
-        // our "running controllers" list).
-        auto * controllers = [self getRunningControllers];
-        if ([controllers containsObject:controller]) {
-            _operationalBrowser->EnsureBrowse();
-        }
-        return;
-    }
-
-    if ([self _allControllersSuspended]) {
-        _operationalBrowser->StopBrowse();
-    }
+    return _operationalBrowser.get();
 }
 
 @end
