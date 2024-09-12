@@ -136,8 +136,7 @@ class MbedBuilder(Builder):
             flags.append(f"-DMBED_OS_POSIX_SOCKET_PATH={shlex.quote(self.mbed_os_posix_socket_path)}")
 
             if self.data_model_interface is not None:
-               flags.append(f"-DCHIP_DATA_MODEL_INTERFACE={self.data_model_interface}")
-
+                flags.append(f"-DCHIP_DATA_MODEL_INTERFACE={self.data_model_interface}")
 
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

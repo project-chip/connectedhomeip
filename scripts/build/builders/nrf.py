@@ -200,7 +200,6 @@ class NrfConnectBuilder(Builder):
             if self.data_model_interface:
                 cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface};'
 
-
             cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
