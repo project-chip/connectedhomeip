@@ -107,7 +107,7 @@ endif()
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
 # Usage of env is because `west` seems to use a hierarcical build system
-# where I could not get cmake -D variables to propagate
+# and populating the cache value with cmake -D variables did not work
 if (DEFINED ENV{CHIP_DATA_MODEL_INTERFACE})
     set(CHIP_DATA_MODEL_INTERFACE $ENV{CHIP_DATA_MODEL_INTERFACE} CACHE STRING "Data model interface option to use: enabled or disabled")
 else()

@@ -78,7 +78,7 @@ if (CONFIG_CHIP_OPENTHREAD_CONFIG)
 endif()
 
 # Usage of env is because `west` seems to use a hierarcical build system
-# where propagating with cmake -D variables did not work
+# and populating the cache value with cmake -D variables did not work
 if (DEFINED ENV{CHIP_DATA_MODEL_INTERFACE})
     set(CHIP_DATA_MODEL_INTERFACE $ENV{CHIP_DATA_MODEL_INTERFACE} CACHE STRING "Data model interface option to use: enabled or disabled")
 else()
