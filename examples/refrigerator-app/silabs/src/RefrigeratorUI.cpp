@@ -55,6 +55,10 @@ static uint8_t mMode;
 #define UI_WIFI 0
 #endif
 
+/**
+ * @brief Draw the entire UI on the screen including header, footer, and temperature.
+ * @param GLIB_Context_t * pointer to the context for the GLIB library
+ */
 void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
 {
     if (glibContext == nullptr)
@@ -77,16 +81,28 @@ void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
+/**
+ * @brief Set the current temperature of the refrigerator.
+ * @param int8_t temp The current temperature in Celsius
+ */
 void RefrigeratorUI::SetCurrentTemp(int8_t temp)
 {
     mCurrentTempCelsius = temp;
 }
 
+/**
+ * @brief Set the operating mode of the refrigerator.
+ * @param uint8_t mode Mode of the refrigerator (e.g., cooling, defrosting)
+ */
 void RefrigeratorUI::SetMode(uint8_t mode)
 {
     mMode = mode;
 }
 
+/**
+ * @brief Draw the header of the UI, usually displaying the title or current status.
+ * @param GLIB_Context_t * pointer to the context for the GLIB library
+ */
 void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
 {
     // Draw Silabs Corner icon
@@ -107,6 +123,11 @@ void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
+/**
+ * @brief Draw the footer of the UI, which may display additional information such as mode.
+ * @param GLIB_Context_t * pointer to the context for the GLIB library
+ * @param bool autoMode Whether the refrigerator is in automatic mode
+ */
 void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
 {
     switch (static_cast<RefrigeratorUI::SUPPORTED_MODES>(mMode))
@@ -204,6 +225,15 @@ void RefrigeratorUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, 
     }
 }
 
+/**
+ * @brief Draw a font at a specified position on the screen.
+ * @param GLIB_Context_t * pointer to the context for the GLIB library
+ * @param uint8_t initial_x X-coordinate for the starting position
+ * @param uint8_t initial_y Y-coordinate for the starting position
+ * @param uint8_t width Width of the font to be drawn
+ * @param uint8_t * data Pointer to the font data
+ * @param uint32_t size Size of the font data in bytes
+ */
 void RefrigeratorUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
                             uint32_t size)
 {
@@ -232,6 +262,12 @@ void RefrigeratorUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, u
     }
 }
 
+/**
+ * @brief Draw the set point temperature on the screen.
+ * @param GLIB_Context_t * pointer to the context for the GLIB library
+ * @param int8_t setPoint The set point temperature in Celsius
+ * @param bool secondLine Whether to display on the second line (true) or first line (false)
+ */
 void RefrigeratorUI::DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint, bool secondLine)
 {
     char setPointLine[] = { '-', 'X', 'X', '\0' };
