@@ -1451,8 +1451,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [subscriptionExpectation fulfill];
     };
 
+    NSMutableSet<NSNumber *> * endpoints = [[NSMutableSet alloc] init];
+    NSMutableSet<MTRClusterPath *> * clusters = [[NSMutableSet alloc] init];
+    NSMutableSet<NSNumber *> * rootBasicInformationAttributes = [[NSMutableSet alloc] init];
     __block unsigned attributeReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * dataItem in data) {
+            MTRAttributePath * path = dataItem[MTRAttributePathKey];
+            XCTAssertNotNil(path);
+            if (dataItem[MTRDataKey]) {
+                [endpoints addObject:path.endpoint];
+                [clusters addObject:[MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster]];
+                if (path.endpoint.unsignedLongValue == 0 && path.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID) {
+                    [rootBasicInformationAttributes addObject:path.attribute];
+                }
+            }
+        }
+
         attributeReportsReceived += data.count;
     };
 
@@ -1538,6 +1553,39 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
+
+    // Test readAttributePaths.  First, try DeviceTypeList across all endpoints.
+    __auto_type * deviceTypeListPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    __auto_type * deviceTypes = [device readAttributePaths:@[ deviceTypeListPath ]];
+    XCTAssertEqual(deviceTypes.count, endpoints.count);
+
+    // Now try ClusterRevision across all clusters.
+    __auto_type * clusterRevisionsPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)];
+    __auto_type * clusterRevisions = [device readAttributePaths:@[ clusterRevisionsPath ]];
+    XCTAssertEqual(clusterRevisions.count, clusters.count);
+
+    // Now try BasicInformation in a few different ways:
+    __auto_type * basicInformationAllAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllAttributes = [device readAttributePaths:@[ basicInformationAllAttributesPath ]];
+
+    __auto_type * basicInformationAllRootAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllRootAttributes = [device readAttributePaths:@[ basicInformationAllRootAttributesPath ]];
+    // Should have gotten the same things, because Basic Information only exists
+    // on the root endpoint.
+    XCTAssertEqualObjects([NSSet setWithArray:basicInformationAllAttributes], [NSSet setWithArray:basicInformationAllRootAttributes]);
+    XCTAssertEqual(basicInformationAllAttributes.count, rootBasicInformationAttributes.count);
+
+    // Now try multiple paths.  Should just get the union of all the things for
+    // each path.
+    __auto_type * variousThings = [device readAttributePaths:@[ deviceTypeListPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:deviceTypes] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
+
+    // And similar if the paths expand to overlapping sets of existent paths
+    // (e.g. because Basic Information has a ClusterRevision).
+    variousThings = [device readAttributePaths:@[ clusterRevisionsPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
 
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
