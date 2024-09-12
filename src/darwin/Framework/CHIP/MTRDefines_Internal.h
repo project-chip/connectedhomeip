@@ -151,6 +151,4 @@ typedef struct {} variable_hidden_by_mtr_hide;
     }
 #endif
 
-#ifndef YES_NO
-#define YES_NO(x) ((x) ? @"YES" : @"NO")
-#endif
+#define MTR_YES_NO(x) ((x) ? @"YES" : @"NO")
