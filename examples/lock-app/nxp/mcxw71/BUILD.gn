@@ -89,7 +89,7 @@ mcxw71_k32w1_sdk("sdk") {
 }
 
 mcxw71_k32w1_executable("lock_app") {
-  output_name = "chip-k32w1-lock-example"
+  output_name = "chip-mcxw71-lock-example"
 
   defines = []
   deps = []
