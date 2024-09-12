@@ -22,7 +22,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
-#include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
+
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
