@@ -17,127 +17,32 @@
 
 #pragma once
 
-#ifdef WF200_WIFI
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "semphr.h"
-#include "sl_wfx_cmd_api.h"
-#include "sl_wfx_constants.h"
-#include "task.h"
-#include "timers.h"
-
-#define WLAN_TASK_PRIORITY (1)
-typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
-{
-    uint32_t status;
-    uint16_t mib_id;
-    uint16_t length;
-    uint32_t rcpi;
-    uint32_t count_plcp_errors;
-    uint32_t count_fcs_errors;
-    uint32_t count_tx_packets;
-    uint32_t count_rx_packets;
-    uint32_t count_rx_packet_errors;
-    uint32_t count_rx_decryption_failures;
-    uint32_t count_rx_mic_failures;
-    uint32_t count_rx_no_key_failures;
-    uint32_t count_tx_multicast_frames;
-    uint32_t count_tx_frames_success;
-    uint32_t count_tx_frame_failures;
-    uint32_t count_tx_frames_retried;
-    uint32_t count_tx_frames_multi_retried;
-    uint32_t count_rx_frame_duplicates;
-    uint32_t count_rts_success;
-    uint32_t count_rts_failures;
-    uint32_t count_ack_failures;
-    uint32_t count_rx_multicast_frames;
-    uint32_t count_rx_frames_success;
-    uint32_t count_rx_cmacicv_errors;
-    uint32_t count_rx_cmac_replays;
-    uint32_t count_rx_mgmt_ccmp_replays;
-    uint32_t count_rx_bipmic_errors;
-    uint32_t count_rx_beacon;
-    uint32_t count_miss_beacon;
-    uint32_t reserved[15];
-} sl_wfx_get_counters_cnf_body_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_s
-{
-    /** Common message header. */
-    sl_wfx_header_t header;
-    /** Confirmation message body. */
-    sl_wfx_get_counters_cnf_body_t body;
-} sl_wfx_get_counters_cnf_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_mib_req_body_s
-{
-    uint16_t mib_id; ///< ID of the MIB to be read.
-    uint16_t reserved;
-} sl_wfx_mib_req_body_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_header_mib_s
-{
-    uint16_t length; ///< Message length in bytes including this uint16_t.
-                     ///< Maximum value is 8188 but maximum Request size is FW dependent and reported in the
-                     ///< ::sl_wfx_startup_ind_body_t::size_inp_ch_buf.
-    uint8_t id;      ///< Contains the message Id indexed by sl_wfx_general_commands_ids_t or sl_wfx_message_ids_t.
-    uint8_t reserved : 1;
-    uint8_t interface : 2;
-    uint8_t seqnum : 3;
-    uint8_t encrypted : 2;
-} sl_wfx_header_mib_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
-{
-    /** Common message header. */
-    sl_wfx_header_mib_t header;
-    /** Request message body. */
-    sl_wfx_mib_req_body_t body;
-} sl_wfx_mib_req_t;
-
-#else /* End WF200 else RS9116,917 NCP and 917 SoC */
-
-#include "wfx_msgs.h"
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include "sl_si91x_types.h"
 #include "sl_status.h"
-#include "sl_wifi_constants.h"
-#include "stdbool.h"
-
-#include "rsi_common_apis.h"
-#include "sl_wifi_device.h"
-
-#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS (1000)
-#endif //(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-
-/* Wi-Fi events*/
-#define SL_WFX_STARTUP_IND_ID (1)
-#define SL_WFX_CONNECT_IND_ID (2)
-#define SL_WFX_DISCONNECT_IND_ID (3)
-#define SL_WFX_SCAN_COMPLETE_ID (4)
-#endif /* WF200_WIFI */
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH (32)
-// MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
-#else
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH (32)
-// MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH (64)
-#endif // (SLI_SI91X_MCU_INTERFACE  | EXP_BOARD)
-
-#include "sl_status.h"
-#include "stdbool.h"
+#include <stdbool.h>
 
 /* LwIP includes. */
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
 #include "lwip/netifapi.h"
 #include "lwip/tcpip.h"
+
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#include "rsi_common_apis.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_constants.h"
+#include "sl_wifi_device.h"
+
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
+#define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS (1000)
+#else
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH (64)
+#endif // (SLI_SI91X_MCU_INTERFACE  | EXP_BOARD)
 
 #define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
 
@@ -226,7 +131,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define STATION (0)
 
 #define SPI_CONFIG_SUCCESS (0)
-
 typedef enum
 {
     WIFI_EVENT,
@@ -302,6 +206,94 @@ typedef enum
 } sl_wfx_interface_t;
 #endif /* RS911X_WIFI */
 
+#ifdef WF200_WIFI
+#include "FreeRTOS.h"
+#include "event_groups.h"
+#include "semphr.h"
+#include "sl_wfx_cmd_api.h"
+#include "sl_wfx_constants.h"
+#include "task.h"
+#include "timers.h"
+
+#define WLAN_TASK_PRIORITY (1)
+typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
+{
+    uint32_t status;
+    uint16_t mib_id;
+    uint16_t length;
+    uint32_t rcpi;
+    uint32_t count_plcp_errors;
+    uint32_t count_fcs_errors;
+    uint32_t count_tx_packets;
+    uint32_t count_rx_packets;
+    uint32_t count_rx_packet_errors;
+    uint32_t count_rx_decryption_failures;
+    uint32_t count_rx_mic_failures;
+    uint32_t count_rx_no_key_failures;
+    uint32_t count_tx_multicast_frames;
+    uint32_t count_tx_frames_success;
+    uint32_t count_tx_frame_failures;
+    uint32_t count_tx_frames_retried;
+    uint32_t count_tx_frames_multi_retried;
+    uint32_t count_rx_frame_duplicates;
+    uint32_t count_rts_success;
+    uint32_t count_rts_failures;
+    uint32_t count_ack_failures;
+    uint32_t count_rx_multicast_frames;
+    uint32_t count_rx_frames_success;
+    uint32_t count_rx_cmacicv_errors;
+    uint32_t count_rx_cmac_replays;
+    uint32_t count_rx_mgmt_ccmp_replays;
+    uint32_t count_rx_bipmic_errors;
+    uint32_t count_rx_beacon;
+    uint32_t count_miss_beacon;
+    uint32_t reserved[15];
+} sl_wfx_get_counters_cnf_body_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_s
+{
+    /** Common message header. */
+    sl_wfx_header_t header;
+    /** Confirmation message body. */
+    sl_wfx_get_counters_cnf_body_t body;
+} sl_wfx_get_counters_cnf_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_mib_req_body_s
+{
+    uint16_t mib_id; ///< ID of the MIB to be read.
+    uint16_t reserved;
+} sl_wfx_mib_req_body_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_header_mib_s
+{
+    uint16_t length; ///< Message length in bytes including this uint16_t.
+                     ///< Maximum value is 8188 but maximum Request size is FW dependent and reported in the
+                     ///< ::sl_wfx_startup_ind_body_t::size_inp_ch_buf.
+    uint8_t id;      ///< Contains the message Id indexed by sl_wfx_general_commands_ids_t or sl_wfx_message_ids_t.
+    uint8_t reserved : 1;
+    uint8_t interface : 2;
+    uint8_t seqnum : 3;
+    uint8_t encrypted : 2;
+} sl_wfx_header_mib_t;
+
+typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
+{
+    /** Common message header. */
+    sl_wfx_header_mib_t header;
+    /** Request message body. */
+    sl_wfx_mib_req_body_t body;
+} sl_wfx_mib_req_t;
+
+#else /* End WF200 else RS9116,917 NCP and 917 SoC */
+
+#include "wfx_msgs.h"
+/* Wi-Fi events*/
+#define SL_WFX_STARTUP_IND_ID (1)
+#define SL_WFX_CONNECT_IND_ID (2)
+#define SL_WFX_DISCONNECT_IND_ID (3)
+#define SL_WFX_SCAN_COMPLETE_ID (4)
+#endif /* WF200_WIFI */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -351,6 +343,7 @@ void wfx_dhcp_got_ipv4(uint32_t);
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_ipv6_notify(int got_ip);
+void wfx_retry_connection(uint16_t retryAttempt);
 
 #ifdef RS911X_WIFI
 #if !(EXP_BOARD) // for RS9116
@@ -386,8 +379,6 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #endif /* SL_ICD_ENABLED */
 #endif /* SLI_SI91X_MCU_INTERFACE */
-
-void wfx_retry_connection(uint16_t retryAttempt);
 
 #ifdef __cplusplus
 }
