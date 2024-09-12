@@ -1710,6 +1710,9 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->Invoke(request, apPayload, &apCommandObj);
 
+    // Provider indicates that handler status or data was already set (or will be set asynchronously) by
+    // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+    // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
     if (status.has_value())
     {
         apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
