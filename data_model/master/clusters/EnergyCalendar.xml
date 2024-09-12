@@ -158,7 +158,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DayStruct">
-      <field id="0" name="Date" type="date">
+      <field id="0" name="Date" type="epoch-s">
         <optionalConform choice="a"/>
       </field>
       <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">

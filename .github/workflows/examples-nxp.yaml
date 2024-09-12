@@ -140,6 +140,60 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                 platform-name: K32W1
+    mcxw71:
+        name: MCXW71
+
+        env:
+            BUILD_TYPE: gn_k32w
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-nxp:71
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nxp
+                extra-submodule-parameters: --recursive
+
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                gh-context: ${{ toJson(github) }}
+
+            - name: Build examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw71-freertos-lighting \
+                      --target nxp-mcxw71-freertos-contact-sensor-low-power \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Get lighting app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release light \
+                    out/artifacts/nxp-mcxw71-freertos-lighting/chip-mcxw71-light-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get contact sensor size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release contact \
+                    out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                platform-name: MCXW71
     rw61x:
         name: RW61X
 
@@ -150,7 +204,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-rw61x:74
+            image: ghcr.io/project-chip/chip-build-nxp:74
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

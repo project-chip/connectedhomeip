@@ -16,7 +16,7 @@ step.
 -   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-linux-users)
 -   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v5.1.2
+### Get ESP-IDF v5.3
 
 -   Clone ESP-IDF [v5.3
     release](https://github.com/espressif/esp-idf/releases/tag/v5.3

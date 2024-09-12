@@ -193,7 +193,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="max" value="MaxMeasuredValue"/>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>

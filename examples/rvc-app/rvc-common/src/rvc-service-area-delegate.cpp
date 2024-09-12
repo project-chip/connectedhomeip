@@ -122,7 +122,7 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & 
     }
 
     // If there is 1 or 0 supported maps, any combination of areas is valid.
-    if (!GetInstance()->HasFeature(Feature::kMaps) || GetNumberOfSupportedMaps() <= 1)
+    if (!GetInstance()->HasFeature(Feature::kMaps) || GetInstance()->GetNumberOfSupportedMaps() <= 1)
     {
         return true;
     }
@@ -131,10 +131,10 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & 
     {
         AreaStructureWrapper tempArea;
         uint32_t ignoredIndex;
-        if (!GetSupportedAreaById(selectedAreas[0], ignoredIndex, tempArea))
+        if (!GetInstance()->GetSupportedAreaById(selectedAreas[0], ignoredIndex, tempArea))
         {
             areaStatus = SelectAreasStatus::kUnsupportedArea;
-            CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+            CopyCharSpanToMutableCharSpanWithTruncation("unable to find selected area in supported areas"_span, statusText);
             return false;
         }
 
@@ -142,17 +142,17 @@ bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t> & 
 
         for (const auto & areaId : selectedAreas.SubSpan(1))
         {
-            if (!GetSupportedAreaById(areaId, ignoredIndex, tempArea))
+            if (!GetInstance()->GetSupportedAreaById(areaId, ignoredIndex, tempArea))
             {
                 areaStatus = SelectAreasStatus::kUnsupportedArea;
-                CopyCharSpanToMutableCharSpan("unable to find selected area in supported areas"_span, statusText);
+                CopyCharSpanToMutableCharSpanWithTruncation("unable to find selected area in supported areas"_span, statusText);
                 return false;
             }
 
             if (tempArea.mapID.Value() != mapId)
             {
                 areaStatus = SelectAreasStatus::kInvalidSet;
-                CopyCharSpanToMutableCharSpan("all selected areas must be in the same map"_span, statusText);
+                CopyCharSpanToMutableCharSpanWithTruncation("all selected areas must be in the same map"_span, statusText);
                 return false;
             }
         }
@@ -166,460 +166,27 @@ bool RvcServiceAreaDelegate::HandleSkipArea(uint32_t skippedArea, MutableCharSpa
     return (mHandleSkipAreaDeviceInstance->*mHandleSkipAreaCallback)(skippedArea, skipStatusText);
 };
 
-//*************************************************************************
-// Supported Areas accessors
-
 bool RvcServiceAreaDelegate::IsSupportedAreasChangeAllowed()
 {
     return (mIsSupportedAreasChangeAllowedDeviceInstance->*mIsSupportedAreasChangeAllowedCallback)();
 }
-
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
-{
-    return static_cast<uint32_t>(mSupportedAreas.size());
-}
-
-bool RvcServiceAreaDelegate::GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & supportedArea)
-{
-    if (listIndex < mSupportedAreas.size())
-    {
-        supportedArea = mSupportedAreas[listIndex];
-        return true;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex, AreaStructureWrapper & supportedArea)
-{
-    // We do not need to reimplement this method as it's already done by the SDK.
-    // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
-    // since we have direct access to the list.
-    listIndex = 0;
-
-    while (listIndex < mSupportedAreas.size())
-    {
-        if (mSupportedAreas[listIndex].areaID == aAreaID)
-        {
-            supportedArea = mSupportedAreas[listIndex];
-            return true;
-        }
-
-        ++listIndex;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::AddSupportedArea(const AreaStructureWrapper & newArea, uint32_t & listIndex)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check list size to ensure there no memory issues.
-    if (mSupportedAreas.size() < kMaxNumSupportedAreas)
-    {
-        // not sorting list, number of areas normally expected to be small, max 255
-        mSupportedAreas.push_back(newArea);
-        listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
-        return true;
-    }
-
-    ChipLogError(Zcl, "AddSupportedArea %u - supported areas list is already at maximum size %u", newArea.areaID,
-                 static_cast<uint32_t>(kMaxNumSupportedAreas));
-
-    return false;
-}
-
-bool RvcServiceAreaDelegate::ModifySupportedArea(uint32_t listIndex, const AreaStructureWrapper & modifiedArea)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check that areaID's match.
-    if (modifiedArea.areaID != mSupportedAreas[listIndex].areaID)
-    {
-        ChipLogError(Zcl, "ModifySupportedArea - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID,
-                     mSupportedAreas[listIndex].areaID);
-        return false;
-    }
-
-    // checks passed, update the attribute
-    mSupportedAreas[listIndex] = modifiedArea;
-    return true;
-}
-
-bool RvcServiceAreaDelegate::ClearSupportedAreas()
-{
-    if (!mSupportedAreas.empty())
-    {
-        mSupportedAreas.clear();
-        return true;
-    }
-
-    return false;
-}
-
-bool RvcServiceAreaDelegate::RemoveSupportedArea(uint32_t areaId)
-{
-    for (auto it = mSupportedAreas.begin(); it != mSupportedAreas.end(); ++it)
-    {
-        if (it->areaID == areaId)
-        {
-            mSupportedAreas.erase(it);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//*************************************************************************
-// Supported Maps accessors
 
 bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
 {
     return (mIsSupportedMapChangeAllowedDeviceInstance->*mIsSupportedMapChangeAllowedCallback)();
 }
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
-{
-    return static_cast<uint32_t>(mSupportedMaps.size());
-}
-
-bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
-{
-    if (listIndex < mSupportedMaps.size())
-    {
-        aSupportedMap = mSupportedMaps[listIndex];
-        return true;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
-{
-    // We do not need to reimplement this method as it's already done by the SDK.
-    // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
-    // since we have direct access to the list.
-    listIndex = 0;
-
-    while (listIndex < mSupportedMaps.size())
-    {
-        if (mSupportedMaps[listIndex].mapID == aMapId)
-        {
-            aSupportedMap = mSupportedMaps[listIndex];
-            return true;
-        }
-
-        ++listIndex;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check list size to ensure there no memory issues.
-    if (mSupportedMaps.size() < kMaxNumSupportedMaps)
-    {
-        // not sorting list, number of areas normally expected to be small, max 255
-        mSupportedMaps.push_back(newMap);
-        listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
-        return true;
-    }
-    ChipLogError(Zcl, "AddSupportedMap %u - supported maps list is already at maximum size %u", newMap.mapID,
-                 static_cast<uint32_t>(kMaxNumSupportedMaps));
-
-    return false;
-}
-
-bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check that mapID's match.
-    if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID)
-    {
-        ChipLogError(Zcl, "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
-                     mSupportedMaps[listIndex].mapID);
-        return false;
-    }
-
-    // save modified map
-    mSupportedMaps[listIndex] = modifiedMap;
-    return true;
-}
-
-bool RvcServiceAreaDelegate::ClearSupportedMaps()
-{
-    if (!mSupportedMaps.empty())
-    {
-        mSupportedMaps.clear();
-        return true;
-    }
-
-    return false;
-}
-
-void RvcServiceAreaDelegate::HandleSupportedAreasUpdated()
-{
-    // Get a list of supported area IDs as `supportedAreaIDs`
-    std::vector<uint32_t> supportedAreaIDs;
-    for (const auto & supportedArea : mSupportedAreas)
-    {
-        supportedAreaIDs.push_back(supportedArea.areaID);
-    }
-
-    if (supportedAreaIDs.empty())
-    {
-        // Clear all selected areas, current area, and progress if there are no supported areas.
-        GetInstance()->ClearSelectedAreas();
-        GetInstance()->SetCurrentArea(DataModel::NullNullable);
-        GetInstance()->ClearProgress();
-        return;
-    }
-
-    // Remove mSelectedArea elements that do not exist is `supportedAreaIDs`
-    {
-        for (auto it = mSelectedAreas.begin(); it != mSelectedAreas.end();)
-        {
-            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), *it) == supportedAreaIDs.end())
-            {
-                it = mSelectedAreas.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-
-    // Set current Area to null if current area is not in `supportedAreaIDs`
-    {
-        auto currentAreaId = GetInstance()->GetCurrentArea();
-        if (!currentAreaId.IsNull() &&
-            std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), currentAreaId.Value()) == supportedAreaIDs.end())
-        {
-            GetInstance()->SetCurrentArea(DataModel::NullNullable);
-        }
-    }
-
-    // Remove mProgress elements that do not exist is `supportedAreaIDs`
-    {
-        for (auto it = mProgressList.begin(); it != mProgressList.end();)
-        {
-            if (std::find(supportedAreaIDs.begin(), supportedAreaIDs.end(), it->areaID) == supportedAreaIDs.end())
-            {
-                it = mProgressList.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-}
-
-bool RvcServiceAreaDelegate::RemoveSupportedMap(uint32_t mapId)
-{
-    bool removedEntry = false;
-    for (auto it = mSupportedMaps.begin(); it != mSupportedMaps.end(); ++it)
-    {
-        if (it->mapID == mapId)
-        {
-            mSupportedMaps.erase(it);
-            removedEntry = true;
-        }
-    }
-
-    if (!removedEntry)
-    {
-        return false;
-    }
-
-    // If there are no supported maps left, none of the supported areas are vaild and their MapID needs to be null.
-    if (GetNumberOfSupportedMaps() == 0)
-    {
-        ClearSupportedAreas();
-        return true;
-    }
-
-    // Get the supported area IDs where the map ID matches the removed map ID
-    std::vector<uint32_t> supportedAreaIds;
-    {
-        for (const auto & supportedArea : mSupportedAreas)
-        {
-            if (supportedArea.mapID == mapId)
-            {
-                supportedAreaIds.push_back(supportedArea.areaID);
-            }
-        }
-    }
-
-    // Remove the supported areas with the matching map ID
-    if (!supportedAreaIds.empty())
-    {
-        for (const auto & supportedAreaId : supportedAreaIds)
-        {
-            RemoveSupportedArea(supportedAreaId);
-        }
-        HandleSupportedAreasUpdated();
-    }
-
-    return true;
-}
-
-//*************************************************************************
-// Selected areas accessors
-
-uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedAreas()
-{
-    return static_cast<uint32_t>(mSelectedAreas.size());
-}
-
-bool RvcServiceAreaDelegate::GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea)
-{
-    if (listIndex < mSelectedAreas.size())
-    {
-        selectedArea = mSelectedAreas[listIndex];
-        return true;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::AddSelectedArea(uint32_t aAreaID, uint32_t & listIndex)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check list size to ensure there no memory issues.
-    if (mSelectedAreas.size() < kMaxNumSelectedAreas)
-    {
-        // not sorting list, number of areas normally expected to be small, max 255
-        mSelectedAreas.push_back(aAreaID);
-        listIndex = static_cast<uint32_t>(mSelectedAreas.size()) - 1; // new element is last in list
-        return true;
-    }
-    ChipLogError(Zcl, "AddSelectedArea %u - selected areas list is already at maximum size %u", aAreaID,
-                 static_cast<uint32_t>(kMaxNumSelectedAreas));
-
-    return false;
-}
-
-bool RvcServiceAreaDelegate::ClearSelectedAreas()
-{
-    if (!mSelectedAreas.empty())
-    {
-        mSelectedAreas.clear();
-        return true;
-    }
-
-    return false;
-}
-
-//*************************************************************************
-// Progress List accessors
-
-uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
-{
-    return static_cast<uint32_t>(mProgressList.size());
-}
-
-bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
-{
-    if (listIndex < mProgressList.size())
-    {
-        aProgressElement = mProgressList[listIndex];
-        return true;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aAreaID, uint32_t & listIndex,
-                                                    Structs::ProgressStruct::Type & aProgressElement)
-{
-    // We do not need to reimplement this method as it's already done by the SDK.
-    // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
-    // since we have direct access to the list.
-    listIndex = 0;
-
-    while (listIndex < mProgressList.size())
-    {
-        if (mProgressList[listIndex].areaID == aAreaID)
-        {
-            aProgressElement = mProgressList[listIndex];
-            return true;
-        }
-
-        ++listIndex;
-    }
-
-    return false;
-};
-
-bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
-{
-    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
-    // etc.
-
-    // Double-check list size to ensure there no memory issues.
-    if (mProgressList.size() < kMaxNumProgressElements)
-    {
-        // not sorting list, number of areas normally expected to be small, max 255
-        mProgressList.push_back(newProgressElement);
-        listIndex = static_cast<uint32_t>(mProgressList.size()) - 1; // new element is last in list
-        return true;
-    }
-    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.areaID,
-                 static_cast<uint32_t>(kMaxNumProgressElements));
-
-    return false;
-}
-
-bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex,
-                                                   const Structs::ProgressStruct::Type & modifiedProgressElement)
-{
-    if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
-    {
-        ChipLogError(Zcl, "ModifyProgressElement - areaID's do not match, new areaID %u, existing areaID %u",
-                     modifiedProgressElement.areaID, mProgressList[listIndex].areaID);
-        return false;
-    }
-
-    mProgressList[listIndex] = modifiedProgressElement;
-    return true;
-}
-
-bool RvcServiceAreaDelegate::ClearProgress()
-{
-    if (!mProgressList.empty())
-    {
-        mProgressList.clear();
-        return true;
-    }
-
-    return false;
-}
-
 void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
 {
-    if (GetNumberOfSupportedAreas() == 0)
+    if (GetInstance()->GetNumberOfSupportedAreas() == 0)
     {
         return;
     }
 
-    if (GetNumberOfSelectedAreas() == 0)
+    if (GetInstance()->GetNumberOfSelectedAreas() == 0)
     {
         AreaStructureWrapper firstArea;
-        GetSupportedAreaByIndex(0, firstArea);
+        GetInstance()->GetSupportedAreaByIndex(0, firstArea);
 
         GetInstance()->SetCurrentArea(firstArea.areaID);
 
@@ -632,7 +199,7 @@ void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
     else
     {
         uint32_t areaId;
-        GetSelectedAreaByIndex(0, areaId);
+        GetInstance()->GetSelectedAreaByIndex(0, areaId);
 
         GetInstance()->SetCurrentArea(areaId);
 
@@ -642,7 +209,7 @@ void RvcServiceAreaDelegate::SetAttributesAtCleanStart()
             GetInstance()->SetProgressStatus(areaId, OperationalStatusEnum::kOperating);
 
             uint32_t i = 1;
-            while (GetSelectedAreaByIndex(i, areaId))
+            while (GetInstance()->GetSelectedAreaByIndex(i, areaId))
             {
                 GetInstance()->AddPendingProgressElement(areaId);
                 i++;
@@ -670,7 +237,7 @@ void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
 
     auto currentAreaId = currentAreaIdN.Value();
     uint32_t currentAreaIndex;
-    GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
+    GetInstance()->GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
     auto currentAreaMapId = currentArea.mapID;
     finished              = true;
 
@@ -679,11 +246,11 @@ void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
         GetInstance()->SetProgressStatus(currentAreaId, currentAreaOpState);
     }
 
-    if (GetNumberOfSelectedAreas() == 0)
+    if (GetInstance()->GetNumberOfSelectedAreas() == 0)
     {
         AreaStructureWrapper nextArea;
         uint32_t nextIndex = currentAreaIndex + 1;
-        while (GetSupportedAreaByIndex(nextIndex, nextArea))
+        while (GetInstance()->GetSupportedAreaByIndex(nextIndex, nextArea))
         {
             if (!currentAreaMapId.IsNull() && nextArea.mapID == currentAreaMapId.Value())
             {
@@ -705,7 +272,7 @@ void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
     {
         uint32_t selectedAreaId;
         uint32_t selectedAreaIndex = 0;
-        while (GetSelectedAreaByIndex(selectedAreaIndex, selectedAreaId))
+        while (GetInstance()->GetSelectedAreaByIndex(selectedAreaIndex, selectedAreaId))
         {
             if (selectedAreaId == currentAreaId)
             {
@@ -716,7 +283,7 @@ void RvcServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaOpSta
 
         uint32_t nextSelectedAreaId;
         uint32_t nextSelectedAreaIndex = selectedAreaIndex + 1;
-        if (GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
+        if (GetInstance()->GetSelectedAreaByIndex(nextSelectedAreaIndex, nextSelectedAreaId))
         {
             GetInstance()->SetCurrentArea(nextSelectedAreaId);
 

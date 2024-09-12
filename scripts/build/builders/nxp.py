@@ -38,6 +38,7 @@ class NxpBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
     RW61X = auto()
+    MCXW71 = auto()
 
     def Name(self, os_env):
         if self == NxpBoard.K32W0:
@@ -49,6 +50,8 @@ class NxpBoard(Enum):
                 return 'rd_rw612_bga'
             else:
                 return 'rw61x'
+        elif self == NxpBoard.MCXW71:
+            return 'mcxw71'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -62,6 +65,8 @@ class NxpBoard(Enum):
                 return 'zephyr'
             else:
                 return 'rt/rw61x'
+        elif self == NxpBoard.MCXW71:
+            return 'mcxw71'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -126,8 +131,7 @@ class NxpBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
-                 enable_ota: bool = False,
-                 is_sdk_package: bool = True):
+                 enable_ota: bool = False):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -149,7 +153,6 @@ class NxpBuilder(GnBuilder):
         self.enable_wifi = enable_wifi
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
-        self.is_sdk_package = is_sdk_package
 
     def GnBuildArgs(self):
         args = []
@@ -198,11 +201,6 @@ class NxpBuilder(GnBuilder):
             # thread is enabled by default on kw32
             if self.board == NxpBoard.RW61X:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
-                if self.enable_wifi:
-                    args.append('openthread_root=\\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\\"')
-
-        if self.is_sdk_package:
-            args.append('is_sdk_package=true')
 
         return args
 
