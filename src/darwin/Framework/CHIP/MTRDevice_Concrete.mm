@@ -445,8 +445,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         wifi = @"NO";
         thread = @"NO";
     } else {
-        wifi = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
-        thread = YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
+        wifi = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface);
+        thread = MTR_YES_NO(networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface);
     }
 
     NSString * reportAge;
@@ -1852,15 +1852,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
 }
 
-#ifdef DEBUG
-- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
-{
-    dispatch_async(self.queue, ^{
-        [self _handleEventReport:eventReport];
-    });
-}
-
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+// BEGIN DRAGON: This is used by the XPC Server to inject reports into local cache and broadcast them
+- (void)_injectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     [_deviceController asyncDispatchToMatterQueue:^{
         [self _handleReportBegin];
@@ -1868,8 +1861,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
             [self _handleReportEnd];
         });
-    }
-                                     errorHandler:nil];
+    } errorHandler:nil];
+}
+
+- (void)_injectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    //    [_deviceController asyncDispatchToMatterQueue:^{ // TODO: This wasn't used previously, not sure why, so keeping it here for thought, but preserving existing behavior
+    dispatch_async(self.queue, ^{
+        [self _handleEventReport:eventReport];
+    });
+    //    } errorHandler: nil];
+}
+
+// END DRAGON: This is used by the XPC Server to inject attribute reports
+
+#ifdef DEBUG
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    [self _injectEventReport:eventReport];
+}
+
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+{
+    [self _injectAttributeReport:attributeReport fromSubscription:isFromSubscription];
 }
 #endif
 
@@ -2089,7 +2103,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
-    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
@@ -2700,12 +2714,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 3. The attribute is not in the spec, and the read params asks to assume
     //    an unknown attribute has the Changes Omitted quality.
     //
-    // But all this only happens if this device has been accessed via the public
-    // API.  If it's a device we just created internally, don't do read-throughs.
+    // But all this only happens if this device is not suspended.  If it's suspended, read-throughs will fail
+    // anyway, so we should not bother trying.
     BOOL readThroughsAllowed;
     {
         std::lock_guard lock(_lock);
-        readThroughsAllowed = _accessedViaPublicAPI;
+        readThroughsAllowed = !self.suspended;
     }
     if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
         // Read requests container will be a mutable array of items, each being an array containing:
