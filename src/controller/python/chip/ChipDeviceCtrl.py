@@ -1538,7 +1538,6 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-
         transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
         ClusterAttribute.Read(transaction,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
