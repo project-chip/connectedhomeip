@@ -54,10 +54,10 @@ extern "C" {
 #include "silabs_utils.h"
 #include "wfx_rsi.h"
 
-// TODO convert this file to cpp and use CodeUtils.h
-#ifndef MIN
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #define WFX_QUEUE_SIZE 10
 
@@ -112,21 +112,21 @@ static void DHCPTimerEventHandler(void * arg)
     WfxPostEvent(&event);
 }
 
-static void CancelDHCPTimer()
+static void CancelDHCPTimer(void)
 {
     osStatus_t status;
 
     // Check if timer started
     if (!osTimerIsRunning(sDHCPTimer))
     {
-        SILABS_LOG("CancelDHCPTimer: timer not running");
+        ChipLogError(DeviceLayer, "CancelDHCPTimer: timer not running");
         return;
     }
 
     status = osTimerStop(sDHCPTimer);
     if (status != osOK)
     {
-        SILABS_LOG("CancelDHCPTimer: failed to stop timer with status: %d", status);
+        ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer with status: %d", status);
     }
 }
 
@@ -140,7 +140,7 @@ static void StartDHCPTimer(uint32_t timeout)
     status = osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout));
     if (status != osOK)
     {
-        SILABS_LOG("StartDHCPTimer: failed to start timer with status: %d", status);
+        ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer with status: %d", status);
     }
 }
 
@@ -154,7 +154,7 @@ static void StartDHCPTimer(uint32_t timeout)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
-    int32_t status;
+    int32_t status = RSI_SUCCESS;
     uint8_t rssi;
     ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
@@ -182,70 +182,65 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("Failed, Error Code : 0x%lX", status);
+        ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status);
+        return status;
     }
-    else
-    {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
-        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
-        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
-        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
-        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
-        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
-        extra_info->overrun_count     = test->overrun_count - temp_reset.overrun_count;
-    }
+    rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+    extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
+    extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
+    extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
+    extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
+    extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
+    extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
+    extra_info->overrun_count     = test->overrun_count - temp_reset.overrun_count;
     return status;
 }
 
 /******************************************************************
- * @fn   int32_t wfx_rsi_reset_count()
+ * @fn   int32_t wfx_rsi_reset_count(void)
  * @brief
  *       Getting the driver reset count
  * @param[in] None
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_reset_count()
+int32_t wfx_rsi_reset_count(void)
 {
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("Failed, Error Code : 0x%lX", status);
+        ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status);
+        return status;
     }
-    else
-    {
-        rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
-        temp_reset.beacon_lost_count = test->beacon_lost_count;
-        temp_reset.beacon_rx_count   = test->beacon_rx_count;
-        temp_reset.mcast_rx_count    = test->mcast_rx_count;
-        temp_reset.mcast_tx_count    = test->mcast_tx_count;
-        temp_reset.ucast_rx_count    = test->ucast_rx_count;
-        temp_reset.ucast_tx_count    = test->ucast_tx_count;
-        temp_reset.overrun_count     = test->overrun_count;
-    }
+    rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
+    temp_reset.beacon_lost_count = test->beacon_lost_count;
+    temp_reset.beacon_rx_count   = test->beacon_rx_count;
+    temp_reset.mcast_rx_count    = test->mcast_rx_count;
+    temp_reset.mcast_tx_count    = test->mcast_tx_count;
+    temp_reset.ucast_rx_count    = test->ucast_rx_count;
+    temp_reset.ucast_tx_count    = test->ucast_tx_count;
+    temp_reset.overrun_count     = test->overrun_count;
     return status;
 }
 
 /******************************************************************
- * @fn   wfx_rsi_disconnect()
+ * @fn   wfx_rsi_disconnect(void)
  * @brief
  *       Getting the driver disconnect status
  * @param[in] None
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_disconnect()
+int32_t wfx_rsi_disconnect(void)
 {
-    int32_t status = rsi_wlan_disconnect();
-    return status;
+    return rsi_wlan_disconnect();
 }
 
 #if SL_ICD_ENABLED
 /******************************************************************
- * @fn   wfx_rsi_power_save()
+ * @fn   wfx_rsi_power_save(void)
  * @brief
  *       Setting the RS911x in DTIM sleep based mode
  *
@@ -253,14 +248,14 @@ int32_t wfx_rsi_disconnect()
  * @return
  *        None
  *********************************************************************/
-int32_t wfx_rsi_power_save()
+int32_t wfx_rsi_power_save(void)
 {
     int32_t status;
 #ifdef RSI_BLE_ENABLE
     status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        ChipLogError(DeviceLayer, "BT Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
 #endif /* RSI_BLE_ENABLE */
@@ -268,10 +263,10 @@ int32_t wfx_rsi_power_save()
     status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
+        ChipLogError(DeviceLayer, "Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    SILABS_LOG("Powersave Config Success");
+    ChipLogDetail(DeviceLayer, "Powersave Config Success");
     return status;
 }
 #endif /* SL_ICD_ENABLED */
@@ -295,20 +290,19 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
         /*
          * We should enable retry.. (Need config variable for this)
          */
-        SILABS_LOG("wfx_rsi_join_cb: failed. retry: %d", wfx_rsi.join_retries);
+        ChipLogProgress(DeviceLayer, "wfx_rsi_join_cb: failed. retry: %d", wfx_rsi.join_retries);
         wfx_retry_connection(++wfx_rsi.join_retries);
+        return;
     }
-    else
-    {
-        /*
-         * Join was complete - Do the DHCP
-         */
-        memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
-        SILABS_LOG("wfx_rsi_join_cb: join completed.");
-        WfxEvent.eventType = WFX_EVT_STA_CONN;
-        WfxPostEvent(&WfxEvent);
-        wfx_rsi.join_retries = 0;
-    }
+
+    /*
+     * Join was complete - Do the DHCP
+     */
+    ChipLogProgress(DeviceLayer, "wfx_rsi_join_cb: success");
+    memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
+    WfxEvent.eventType = WFX_EVT_STA_CONN;
+    WfxPostEvent(&WfxEvent);
+    wfx_rsi.join_retries = 0;
 }
 
 /******************************************************************
@@ -323,7 +317,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
  *********************************************************************/
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
-    SILABS_LOG("wfx_rsi_join_fail_cb: error: failed status: %02x", status);
+    ChipLogError(DeviceLayer, "wfx_rsi_join_fail_cb: status: %d", status);
     WfxEvent_t WfxEvent;
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
@@ -363,30 +357,27 @@ static int32_t wfx_rsi_init(void)
     uint8_t buf[RSI_RESPONSE_HOLD_BUFF_SIZE];
     extern void rsi_hal_board_init(void);
 
-    SILABS_LOG("wfx_rsi_init: starting(HEAP_SZ = %d)", SL_HEAP_SIZE);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_init: starting(HEAP_SZ = %d)", SL_HEAP_SIZE);
     //! Driver initialization
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-        SILABS_LOG("wfx_rsi_init: error: RSI Driver initialization failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_driver_init failed: %ld", status);
         return status;
     }
-
-    SILABS_LOG("wfx_rsi_init: rsi_device_init", __func__);
     /* ! Redpine module intialisation */
     if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: error: rsi_device_init failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_device_init failed: %ld", status);
         return status;
     }
-    SILABS_LOG("wfx_rsi_init: start wireless drv task", __func__);
     /*
      * Create the driver wrapper thread
      */
     sDrvThread = osThreadNew(rsi_wireless_driver_task_wrapper, NULL, &kDrvTaskAttr);
     if (NULL == sDrvThread)
     {
-        SILABS_LOG("wfx_rsi_init: error: rsi_wireless_driver_task failed", __func__);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: failed to create task");
         return RSI_ERROR_INVALID_PARAM;
     }
 
@@ -397,41 +388,40 @@ static int32_t wfx_rsi_init(void)
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
     {
 #endif
-        SILABS_LOG("wfx_rsi_init: error: Initialize WiSeConnect failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wireless_init failed: %ld", status);
         return status;
     }
 
-    SILABS_LOG("wfx_rsi_init: get FW version..", __func__);
     /*
      * Get the MAC and other info to let the user know about it.
      */
     if (rsi_wlan_get(RSI_FW_VERSION, buf, sizeof(buf)) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: error: rsi_wlan_get(RSI_FW_VERSION) failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_FW_VERSION) failed: %ld", status);
         return status;
     }
 
     buf[sizeof(buf) - 1] = 0;
-    SILABS_LOG("wfx_rsi_init: RSI firmware version: %s", buf);
+    ChipLogProgress(DeviceLayer, "RSI firmware version: %s", buf);
     //! Send feature frame
     if ((status = rsi_send_feature_frame()) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: error: rsi_send_feature_frame failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "error: rsi_send_feature_frame failed: %ld", status);
         return status;
     }
 
-    SILABS_LOG("wfx_rsi_init: sent rsi_send_feature_frame", __func__);
     /* initializes wlan radio parameters and WLAN supplicant parameters.
      */
     (void) rsi_wlan_radio_init(); /* Required so we can get MAC address */
     if ((status = rsi_wlan_get(RSI_MAC_ADDRESS, &wfx_rsi.sta_mac.octet[0], RESP_BUFF_SIZE)) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: error: rsi_wlan_get failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_get(RSI_MAC_ADDRESS) failed: %ld", status);
         return status;
     }
 
-    SILABS_LOG("wfx_rsi_init: WLAN: MAC %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
-               wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
+    ChipLogDetail(DeviceLayer, "wfx_rsi_init: MAC: %02x:%02x:%02x %02x:%02x:%02x", wfx_rsi.sta_mac.octet[0],
+                  wfx_rsi.sta_mac.octet[1], wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4],
+                  wfx_rsi.sta_mac.octet[5]);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
@@ -453,12 +443,12 @@ static int32_t wfx_rsi_init(void)
      */
     if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: RSI callback register join failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
     if ((status = rsi_wlan_register_callbacks(RSI_WLAN_DATA_RECEIVE_NOTIFY_CB, wfx_rsi_wlan_pkt_cb)) != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_init: RSI callback register data-notify failed with status: %02x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init: rsi_wlan_register_callbacks failed: %ld", status);
         return status;
     }
 
@@ -467,26 +457,26 @@ static int32_t wfx_rsi_init(void)
 #endif
 
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
-    SILABS_LOG("wfx_rsi_init: RSI: OK", __func__);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_init: success");
     return RSI_SUCCESS;
 }
 
 /***************************************************************************************
- * @fn   static void wfx_rsi_save_ap_info()
+ * @fn   static void wfx_rsi_save_ap_info(void)
  * @brief
  *       Saving the details of the AP
  * @param[in]  None
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info() // translation
+static void wfx_rsi_save_ap_info(void) // translation
 {
     int32_t status;
     rsi_rsp_scan_t rsp;
 
     status =
         rsi_wlan_scan_with_bitmap_options((int8_t *) &wfx_rsi.sec.ssid[0], AP_CHANNEL_NO_0, &rsp, sizeof(rsp), SCAN_BITMAP_OPTN_1);
-    if (status)
+    if (status != RSI_SUCCESS)
     {
         /*
          * Scan is done - failed
@@ -496,7 +486,7 @@ static void wfx_rsi_save_ap_info() // translation
 #else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-        SILABS_LOG("wfx_rsi_save_ap_info: warn: failed with status: %02x", status);
+        ChipLogProgress(DeviceLayer, "warn: scan failed: %ld", status);
         return;
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -532,8 +522,8 @@ static void wfx_rsi_save_ap_info() // translation
         break;
     }
 
-    SILABS_LOG("wfx_rsi_save_ap_info: WLAN: connecting to %s, sec=%d, status=%02x", &wfx_rsi.sec.ssid[0], wfx_rsi.sec.security,
-               status);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_save_ap_info: connecting to %s, sec=%d, status=%ld", &wfx_rsi.sec.ssid[0],
+                    wfx_rsi.sec.security, status);
 }
 
 /********************************************************************************************
@@ -550,58 +540,56 @@ static void wfx_rsi_do_join(void)
 
     if (wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED))
     {
-        SILABS_LOG("wfx_rsi_do_join: not joining - already in progress");
+        ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: already in progress");
+        return;
     }
-    else
+
+    switch (wfx_rsi.sec.security)
     {
-
-        switch (wfx_rsi.sec.security)
-        {
-        case WFX_SEC_WEP:
-            connect_security_mode = RSI_WEP;
-            break;
-        case WFX_SEC_WPA:
-        case WFX_SEC_WPA2:
-            connect_security_mode = RSI_WPA_WPA2_MIXED;
-            break;
+    case WFX_SEC_WEP:
+        connect_security_mode = RSI_WEP;
+        break;
+    case WFX_SEC_WPA:
+    case WFX_SEC_WPA2:
+        connect_security_mode = RSI_WPA_WPA2_MIXED;
+        break;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3_PERSONAL_TRANSITION;
-            break;
+    case WFX_SEC_WPA3:
+        connect_security_mode = RSI_WPA3_PERSONAL_TRANSITION;
+        break;
 #endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        case WFX_SEC_NONE:
-            connect_security_mode = RSI_OPEN;
-            break;
-        default:
-            SILABS_LOG("wfx_rsi_do_join: error: unknown security type.");
-            return;
-        }
+    case WFX_SEC_NONE:
+        connect_security_mode = RSI_OPEN;
+        break;
+    default:
+        ChipLogError(DeviceLayer, "wfx_rsi_do_join: error: unknown security type.");
+        return;
+    }
 
-        SILABS_LOG("wfx_rsi_do_join: WLAN: connecting to %s, sec=%d", &wfx_rsi.sec.ssid[0], wfx_rsi.sec.security);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: connecting to %s, sec=%d", &wfx_rsi.sec.ssid[0], wfx_rsi.sec.security);
 
-        /*
-         * Join the network
-         */
-        /* TODO - make the WFX_SECURITY_xxx - same as RSI_xxx
-         * Right now it's done by hand - we need something better
-         */
-        wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
+    /*
+     * Join the network
+     */
+    /* TODO - make the WFX_SECURITY_xxx - same as RSI_xxx
+     * Right now it's done by hand - we need something better
+     */
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
-        if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
-        {
-            SILABS_LOG("wfx_rsi_do_join: RSI callback register join failed with status: %02x", status);
-        }
+    if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_register_callbacks failed: %ld", status);
+    }
 
-        /* Try to connect Wifi with given Credentials
-         * untill there is a success or maximum number of tries allowed
-         */
-        if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
-                                             wfx_rsi_join_cb)) != RSI_SUCCESS)
-        {
-            wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
-            SILABS_LOG("wfx_rsi_do_join: rsi_wlan_connect_async failed with status: %02x on try %d", status, wfx_rsi.join_retries);
-            wfx_retry_connection(++wfx_rsi.join_retries);
-        }
+    /* Try to connect Wifi with given Credentials
+     * until there is a success or maximum number of tries allowed
+     */
+    if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
+                                         wfx_rsi_join_cb)) != RSI_SUCCESS)
+    {
+        wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
+        ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: rsi_wlan_connect_async failed: %ld on try %d", status, wfx_rsi.join_retries);
+        wfx_retry_connection(++wfx_rsi.join_retries);
     }
 }
 
@@ -609,7 +597,7 @@ static void wfx_rsi_do_join(void)
  *   @brief Notify the application about the connectivity status if it has not been notified yet.
  *          Helper function for HandleDHCPPolling.
  */
-void NotifyConnectivity()
+void NotifyConnectivity(void)
 {
     if (!hasNotifiedWifiConnectivity)
     {
@@ -618,7 +606,7 @@ void NotifyConnectivity()
     }
 }
 
-void HandleDHCPPolling()
+void HandleDHCPPolling(void)
 {
     struct netif * sta_netif;
     WfxEvent_t event;
@@ -628,7 +616,7 @@ void HandleDHCPPolling()
     {
         // TODO: Notify the application that the interface is not set up or Chipdie here because we
         // are in an unkonwn state
-        SILABS_LOG("HandleDHCPPolling: failed to get STA netif");
+        ChipLogError(DeviceLayer, "HandleDHCPPolling: failed to get STA netif");
         return;
     }
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -662,7 +650,7 @@ void HandleDHCPPolling()
  *  @brief Reset the flags that are used to notify the application about DHCP connectivity
  *         and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
  */
-void ResetDHCPNotificationFlags()
+void ResetDHCPNotificationFlags(void)
 {
     WfxEvent_t outEvent;
 
@@ -685,19 +673,27 @@ void WfxPostEvent(WfxEvent_t * event)
 
     if (status != osOK)
     {
-        SILABS_LOG("WfxPostEvent: failed to post event with status: %d", status);
+        ChipLogError(DeviceLayer, "WfxPostEvent: failed to post event with status: %ld", status);
         // TODO: Handle error, requeue event depending on queue size or notify relevant task,
         // Chipdie, etc.
     }
 }
 
+/**
+ * @brief Process the Wi-Fi event.
+ *
+ * This function is responsible for processing different types of Wi-Fi events and taking appropriate actions based on the event
+ * type.
+ *
+ * @param inEvent The input Wi-Fi event to be processed.
+ */
 void ProcessEvent(WfxEvent_t inEvent)
 {
     // Process event
     switch (inEvent.eventType)
     {
     case WFX_EVT_STA_CONN: {
-        SILABS_LOG("Starting LwIP STA");
+        ChipLogDetail(DeviceLayer, "_onWFXEvent: WFX_EVT_STA_CONN");
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
         ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_up();
@@ -709,10 +705,10 @@ void ProcessEvent(WfxEvent_t inEvent)
     }
     break;
     case WFX_EVT_STA_DISCONN: {
+        ChipLogDetail(DeviceLayer, "_onWFXEvent: WFX_EVT_STA_DISCONN");
         // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
         wfx_rsi.dev_state &=
             ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
-        SILABS_LOG("Disconnect notify");
         /* TODO: Implement disconnect notify */
         ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
@@ -732,48 +728,64 @@ void ProcessEvent(WfxEvent_t inEvent)
     case WFX_EVT_SCAN: {
 #ifdef SL_WFX_CONFIG_SCAN
         rsi_rsp_scan_t scan_rsp = { 0 };
-        int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
+        memset(&scan_rsp, 0, sizeof(scan_rsp));
+        int32_t status = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
 
-        if (status)
+        if (status != RSI_SUCCESS)
         {
-            SILABS_LOG("SSID scan failed: %02x ", status);
+            ChipLogError(DeviceLayer, "rsi_wlan_bgscan failed: %ld ", status);
+            return;
         }
-        else
-        {
-            rsi_scan_info_t * scan;
-            wfx_wifi_scan_result_t ap;
-            for (int x = 0; x < scan_rsp.scan_count[0]; x++)
-            {
-                scan = &scan_rsp.scan_info[x];
-                // is it a scan all or target scan
-                if (wfx_rsi.scan_ssid != NULL &&
-                    (strncmp(wfx_rsi.scan_ssid, (char *) scan->ssid, MIN(strlen(wfx_rsi.scan_ssid), sizeof(scan->ssid))) ==
-                     CMP_SUCCESS))
-                {
-                    strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
-                    ap.security = static_cast<wfx_sec_t>(scan->security_mode);
-                    ap.rssi     = (-1) * scan->rssi_val;
-                    configASSERT(sizeof(ap.bssid) >= BSSID_LEN);
-                    configASSERT(sizeof(scan->bssid) >= BSSID_LEN);
-                    memcpy(ap.bssid, scan->bssid, BSSID_LEN);
-                    (*wfx_rsi.scan_cb)(&ap);
 
-                    if (wfx_rsi.scan_ssid)
-                    {
-                        break; // we found the targeted ssid.
-                    }
-                }
+        if (wfx_rsi.scan_cb == NULL)
+        {
+            ChipLogError(DeviceLayer, "wfx_rsi.scan_cb is NULL");
+            return;
+        }
+
+        rsi_scan_info_t * scan;
+        wfx_wifi_scan_result_t ap;
+
+        for (int x = 0; x < scan_rsp.scan_count[0]; x++)
+        {
+            scan = &scan_rsp.scan_info[x];
+            // clear structure and calculate size of SSID
+            memset(&ap, 0, sizeof(ap));
+            ap.ssid_length =
+                strnlen(reinterpret_cast<char *>(scan->ssid), chip::min<size_t>(sizeof(scan->ssid), WFX_MAX_SSID_LENGTH));
+            chip::Platform::CopyString(ap.ssid, ap.ssid_length, reinterpret_cast<char *>(scan->ssid));
+
+            // check if the scanned ssid is the one we are looking for
+            if (wfx_rsi.scan_ssid_length != 0 && strncmp(wfx_rsi.scan_ssid, ap.ssid, WFX_MAX_SSID_LENGTH) != CMP_SUCCESS)
+            {
+                continue; // we found the targeted ssid.
             }
+            // TODO: convert security mode from RSI to WFX
+            ap.security = static_cast<wfx_sec_t>(scan->security_mode);
+            ap.rssi     = (-1) * scan->rssi_val;
+
+            configASSERT(sizeof(ap.bssid) == BSSID_LEN);
+            configASSERT(sizeof(scan->bssid) == BSSID_LEN);
+            memcpy(ap.bssid, scan->bssid, BSSID_LEN);
+            (*wfx_rsi.scan_cb)(&ap);
+
+            // no ssid filter set, return all results
+            if (wfx_rsi.scan_ssid_length == 0)
+            {
+                continue;
+            }
+
+            break;
         }
 
         /* Terminate with end of scan which is no ap sent back */
-        (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);
-        wfx_rsi.scan_cb = (void (*)(wfx_wifi_scan_result_t *)) 0;
+        (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) NULL);
+        wfx_rsi.scan_cb = nullptr;
 
         if (wfx_rsi.scan_ssid)
         {
-            vPortFree(wfx_rsi.scan_ssid);
-            wfx_rsi.scan_ssid = (char *) 0;
+            chip::Platform::MemoryFree(wfx_rsi.scan_ssid);
+            wfx_rsi.scan_ssid = NULL;
         }
 #endif /* SL_WFX_CONFIG_SCAN */
     }
@@ -819,14 +831,14 @@ void wfx_rsi_task(void * arg)
     uint32_t rsi_status = wfx_rsi_init();
     if (rsi_status != RSI_SUCCESS)
     {
-        SILABS_LOG("wfx_rsi_task: error: wfx_rsi_init with status: %02x", rsi_status);
+        ChipLogError(DeviceLayer, "wfx_rsi_task: wfx_rsi_init failed: %ld", rsi_status);
         return;
     }
     WfxEvent_t wfxEvent;
     wfx_lwip_start();
     wfx_started_notify();
 
-    SILABS_LOG("Starting event loop");
+    ChipLogProgress(DeviceLayer, "wfx_rsi_task: starting event loop");
     for (;;)
     {
         osStatus_t status = osMessageQueueGet(sWifiEventQueue, &wfxEvent, NULL, osWaitForever);
@@ -836,7 +848,7 @@ void wfx_rsi_task(void * arg)
         }
         else
         {
-            SILABS_LOG("Failed to get event with status: %x", status);
+            ChipLogProgress(DeviceLayer, "wfx_rsi_task: get event failed: %x", status);
         }
     }
 }
@@ -859,8 +871,8 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_rsi.ip4_addr[1] = (ip >> 8) & HEX_VALUE_FF;
     wfx_rsi.ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
-    SILABS_LOG("wfx_dhcp_got_ipv4: DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
-               wfx_rsi.ip4_addr[3]);
+    ChipLogProgress(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
+                    wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
@@ -875,14 +887,14 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
  * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
  */
 /********************************************************************************************
- * @fn   void *wfx_rsi_alloc_pkt()
+ * @fn   void *wfx_rsi_alloc_pkt(void)
  * @brief
  *       Allocate packet to send data
  * @param[in] None
  * @return
  *        None
  **********************************************************************************************/
-void * wfx_rsi_alloc_pkt()
+void * wfx_rsi_alloc_pkt(void)
 {
     rsi_pkt_t * pkt;
 

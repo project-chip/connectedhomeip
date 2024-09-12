@@ -62,6 +62,7 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -76,6 +77,7 @@ void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOpera
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -99,6 +101,7 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
@@ -115,6 +118,8 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
     if (error == CHIP_NO_ERROR)
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+
+        GetInstance()->UpdateCountdownTimeFromDelegate();
 
         OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         GetInstance()->GetCurrentOperationalError(current_err);
@@ -155,6 +160,11 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             delegate->mPausedTime++;
         }
     }
+    else if (!countdown_time.IsNull() && countdown_time.Value() <= 0)
+    {
+        OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        delegate->HandleStopStateCallback(noError);
+    }
 
     if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
     {
@@ -174,6 +184,11 @@ static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 OperationalState::Instance * OperationalState::GetOperationalStateInstance()
 {
     return gOperationalStateInstance;
+}
+
+OperationalStateDelegate * OperationalState::GetOperationalStateDelegate()
+{
+    return gOperationalStateDelegate;
 }
 
 void OperationalState::Shutdown()
