@@ -169,8 +169,6 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         }
         break;
     }
-
-    // AppTask::GetAppTask().UpdateRefUI();
 }
 
 void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
