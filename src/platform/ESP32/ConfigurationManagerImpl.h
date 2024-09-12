@@ -35,6 +35,9 @@
 
 #include <platform/ESP32/ESP32Config.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/timers.h>
+
 namespace chip {
 namespace DeviceLayer {
 
