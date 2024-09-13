@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -1936,20 +1938,23 @@
         "code": 67,
         "profileId": 259,
         "label": "MA-water-leak-detector",
-        "name": "MA-water-leak-detector"
+        "name": "MA-water-leak-detector",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 67,
           "profileId": 259,
           "label": "MA-water-leak-detector",
-          "name": "MA-water-leak-detector"
+          "name": "MA-water-leak-detector",
+          "deviceTypeOrder": 0
         },
         {
           "code": 17,
           "profileId": 259,
           "label": "MA-powersource",
-          "name": "MA-powersource"
+          "name": "MA-powersource",
+          "deviceTypeOrder": 1
         }
       ],
       "deviceVersions": [
@@ -2615,22 +2620,6 @@
               "reportableChange": 0
             },
             {
-              "name": "BatReplacementNeeded",
-              "code": 15,
-              "mfgCode": null,
-              "side": "server",
-              "type": "boolean",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "BatReplaceability",
               "code": 16,
               "mfgCode": null,
@@ -2800,7 +2789,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "0x06",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
