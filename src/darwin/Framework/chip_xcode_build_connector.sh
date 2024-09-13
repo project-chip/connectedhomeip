@@ -95,7 +95,7 @@ for arch in "${archs[@]}"; do
         esac
     fi
     [[ "${#archs[@]}" -gt 1 ]] && target_cflags+=(-arch "$arch")
-    [[ -n "$deployment_variant" ]] && target_cflags+=(-target-variant "${arch}-apple-${deployment_variant}")
+    [[ -n "$deployment_variant" ]] && target_cflags+=(-target-variant "$arch-apple-$deployment_variant")
 done
 
 # Translate other options
