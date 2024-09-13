@@ -78,10 +78,7 @@ source_set("nxp_ota") {
   ]
 }
 
-static_library("nxp_platform") {
-  deps = []
-  defines = [ "CHIP_DEVICE_K32W1=1" ]
-
+config("nxp_platform_config") {
   include_dirs = [
     ".",
     "../common/ble",
@@ -89,6 +86,11 @@ static_library("nxp_platform") {
     "../common/factory_data/legacy",
     "../common/ota",
   ]
+}
+
+static_library("nxp_platform") {
+  deps = []
+  defines = [ "CHIP_DEVICE_K32W1=1" ]
 
   sources = [
     "../../SingletonConfigurationManager.cpp",
@@ -216,4 +218,6 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  public_configs = [ ":nxp_platform_config" ]
 }
