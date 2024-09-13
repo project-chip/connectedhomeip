@@ -203,13 +203,13 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(deviceCachePrimed, BOOL, NO, getDeviceCacheP
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedStartTime, NSDate * _Nullable, nil, getEstimatedStartTimeWithReply)
 MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(estimatedSubscriptionLatency, NSNumber * _Nullable, nil, getEstimatedSubscriptionLatencyWithReply)
 
-typedef NSDictionary<NSString *, id> * _Nullable readAttributeResponseType;
+typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
 MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
                                      : (NSNumber *) clusterID attributeID
                                      : (NSNumber *) attributeID params
                                      : (MTRReadParams * _Nullable) params,
-                                     readAttributeResponseType,
+                                     ReadAttributeResponseType,
                                      nil,
                                      readAttributeWithEndpointID
                                      : endpointID clusterID
@@ -230,6 +230,14 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : value expectedValueInterval
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
+
+typedef NSArray<NSDictionary<NSString *, id> *> * ReadAttributePathsResponseType;
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
+                                     : (NSArray<MTRAttributeRequestPath *> *) attributePaths,
+                                     ReadAttributePathsResponseType,
+                                     [NSArray array], // Default return value
+                                     readAttributePaths
+                                     : attributePaths withReply)
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
