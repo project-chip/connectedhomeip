@@ -144,9 +144,6 @@ static BOOL AttributeIsSpecifiedInOnOffSwitchConfigurationCluster(AttributeId aA
     case Attributes::AcceptedCommandList::Id: {
         return YES;
     }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
     case Attributes::AttributeList::Id: {
         return YES;
     }
@@ -265,9 +262,6 @@ static BOOL AttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
         return YES;
     }
     case Attributes::AttributeList::Id: {
@@ -3840,9 +3834,6 @@ static BOOL AttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttributeId
     case Attributes::AcceptedCommandList::Id: {
         return YES;
     }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
     case Attributes::AttributeList::Id: {
         return YES;
     }
@@ -6511,9 +6502,6 @@ static BOOL AttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
         return YES;
     }
     case Attributes::AttributeList::Id: {
