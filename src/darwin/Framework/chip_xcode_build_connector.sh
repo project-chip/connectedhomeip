@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,32 +61,41 @@ read -r -a xcode_defines <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 for define in "${xcode_defines[@]}"; do
     # skip over those that GN does for us
     case "$define" in
-        CHIP_HAVE_CONFIG_H) continue ;;
+    CHIP_HAVE_CONFIG_H) continue ;;
     esac
     target_defines+=("$define")
 done
 
 # Forward C/C++ flags (OTHER_C*FLAGS)
-declare -a target_cflags=()
 read -r -a target_cflags_c <<<"$OTHER_CFLAGS"
 read -r -a target_cflags_cc <<<"$OTHER_CPLUSPLUSFLAGS"
 
 # Handle target OS and arch
 declare target_arch=
 declare target_cpu=
-declare target_cflags=
+declare -a target_cflags=()
 declare current_arch="$(uname -m)"
+declare deployment_target="$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX"
+declare deployment_variant=
+if [[ "$IS_ZIPPERED" == YES ]]; then
+    if [[ "$CLANG_TARGET_TRIPLE_VARIANTS" != *-apple-* ]]; then
+        echo "Unable to determine target variant for zippered build" >&2
+        exit 1
+    fi
+    deployment_variant="${CLANG_TARGET_TRIPLE_VARIANTS/*-apple-/}"
+fi
 
 read -r -a archs <<<"$ARCHS"
 for arch in "${archs[@]}"; do
     if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
         target_arch="$arch"
         case "$arch" in
-            x86_64) target_cpu="x64" ;;
-            *) target_cpu="$arch" ;;
+        x86_64) target_cpu="x64" ;;
+        *) target_cpu="$arch" ;;
         esac
     fi
-    target_cflags+=(-arch "$arch")
+    [[ "${#archs[@]}" -gt 1 ]] && target_cflags+=(-arch "$arch")
+    [[ -n "$deployment_variant" ]] && target_cflags+=(-target-variant "${arch}-apple-${deployment_variant}")
 done
 
 # Translate other options
@@ -108,7 +117,7 @@ declare -a args=(
     'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
     "mac_target_arch=\"$target_arch\""
-    "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
+    "mac_deployment_target=\"$deployment_target\""
     "target_defines=$(format_gn_list "${target_defines[@]}")"
     "target_cflags=$(format_gn_list "${target_cflags[@]}")"
     "target_cflags_c=$(format_gn_list "${target_cflags_c[@]}")"
@@ -116,8 +125,8 @@ declare -a args=(
 )
 
 case "$CONFIGURATION" in
-    Debug) args+=('is_debug=true') ;;
-    Release) args+=('is_debug=false') ;;
+Debug) args+=('is_debug=true') ;;
+Release) args+=('is_debug=false') ;;
 esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
