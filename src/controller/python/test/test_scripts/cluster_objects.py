@@ -216,12 +216,12 @@ class ClusterObjectTests:
         sub.SetAttributeUpdateCallback(subUpdate)
 
         try:
-            data = sub.GetAttributes()
             req = Clusters.OnOff.Commands.On()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 1):
                 raise ValueError("Current On/Off state should be 1")
 
@@ -232,6 +232,7 @@ class ClusterObjectTests:
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 0):
                 raise ValueError("Current On/Off state should be 0")
 
