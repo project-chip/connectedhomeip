@@ -1,5 +1,6 @@
 /*
- *    Copyright 2024 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +18,34 @@
 
 #pragma once
 
-/* ---- App Config ---- */
+#include <cstdint>
 
-/* ---- Button Manager Config ---- */
-#define BUTTON_MANAGER_FACTORY_RESET_TIMEOUT_MS 6000
+struct AppEvent;
+using EventHandler = void (*)(const AppEvent &);
 
-/* ---- LED Manager Config ---- */
-#define LED_MANAGER_STATUS_LED_INDEX 0
-#define LED_MANAGER_LIGHT_LED_INDEX 1
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Timer = 0,
+        kEventType_TurnOn,
+        kEventType_Install,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } ClusterEvent;
+    };
+
+    EventHandler Handler;
+};

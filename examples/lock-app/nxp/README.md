@@ -1,6 +1,6 @@
-# Matter NXP Lighting Example Application
+# Matter NXP Door Lock Example Application
 
-This reference application implements an On/Off Light device type. It uses board
+This reference application implements an Door Lock device type. It uses board
 buttons or `matter-cli` for user input and LEDs for state feedback. You can use
 this example as a reference for creating your own application.
 
@@ -9,7 +9,7 @@ The example is based on:
 -   [Matter](https://github.com/project-chip/connectedhomeip)
 -   [NXP github SDK](https://github.com/nxp-mcuxpresso/mcux-sdk)
 
--   [Matter NXP Lighting Example Application](#matter-nxp-lighting-example-application)
+-   [Matter NXP Door Lock Example Application](#matter-nxp-door-lock-example-application)
     -   [Supported devices](#supported-devices)
     -   [Introduction](#introduction)
     -   [Device UI](#device-ui)
@@ -26,8 +26,8 @@ The example is based on:
 
 ## Introduction
 
-The application showcases a light bulb device that communicates with clients
-over a low-power, 802.15.4 Thread network.
+The application showcases a door lock device that communicates with clients over
+a low-power, 802.15.4 Thread network.
 
 It can be commissioned into an existing Matter network using a controller such
 as `chip-tool`.
@@ -104,14 +104,9 @@ device.
 A list of all available contact sensor targets can be viewed in the following
 table:
 
-| target name                                         | description                                                                     |
-| --------------------------------------------------- | ------------------------------------------------------------------------------- |
-| nxp-device-freertos-lighting                        | Default lighting app                                                            |
-| nxp-device-freertos-lighting-factory                | Default lighting app with factory data                                          |
-| nxp-device-freertos-lighting-rotating-id            | Lighting app with rotating device id support                                    |
-| nxp-device-freertos-lighting-factory-dac-conversion | Lighting app that leverages a secure enclave to secure the DAC private key      |
-| nxp-device-freertos-lighting-sw-v2                  | Lighting app with software version 2 (can be used to test OTA)                  |
-| nxp-device-freertos-lighting-factory-sw-v2          | Lighting app with factory data and software version 2 (can be used to test OTA) |
+| target name                  | description      |
+| ---------------------------- | ---------------- |
+| nxp-device-freertos-lock-app | Default lock app |
 
 where `device` can be one of the [Supported devices](#supported-devices).
 
@@ -119,9 +114,9 @@ where `device` can be one of the [Supported devices](#supported-devices).
 
 The application uses an NXP specific data model file:
 
-| path                      | description                             |
-| ------------------------- | --------------------------------------- |
-| `zap/lighting-on-off.zap` | Data model for On/Off Light device type |
+| path               | description                          |
+| ------------------ | ------------------------------------ |
+| `zap/lock-app.zap` | Data model for Door Lock device type |
 
 The data model can be changed by simply replacing the gn `deps` statement
 corresponding to data model target.
