@@ -16,6 +16,7 @@ import importlib.util
 import logging
 import os
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
@@ -136,7 +137,9 @@ class NxpBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
-                 enable_ota: bool = False):
+                 enable_ota: bool = False,
+                 data_model_interface: Optional[str] = None,
+                 ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -158,6 +161,7 @@ class NxpBuilder(GnBuilder):
         self.enable_wifi = enable_wifi
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
+        self.data_model_interface = data_model_interface
 
     def GnBuildArgs(self):
         args = []
@@ -207,6 +211,9 @@ class NxpBuilder(GnBuilder):
             if self.board == NxpBoard.RW61X:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
 
+        if self.data_model_interface is not None:
+            args.append(f'chip_use_data_model_interface="{self.data_model_interface}"')
+
         return args
 
     def WestBuildArgs(self):
@@ -217,27 +224,30 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             args.append('-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2')
 
+        if self.data_model_interface:
+            # NOTE: this is not supporting "check"
+            enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
+            args.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
+
         build_args = " -- " + " ".join(args) if len(args) > 0 else ""
         return build_args
 
     def generate(self):
         if self.os_env == NxpOsUsed.ZEPHYR:
-            if 'ZEPHYR_NXP_SDK_INSTALL_DIR' in os.environ:
-                cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"\n'
-            else:
-                raise Exception("ZEPHYR_SDK_INSTALL_DIR need to be set")
-            if 'ZEPHYR_NXP_BASE' in os.environ:
-                cmd += 'export ZEPHYR_BASE="$ZEPHYR_NXP_BASE"\n'
-            else:
+            if 'ZEPHYR_NXP_SDK_INSTALL_DIR' not in os.environ:
+                raise Exception("ZEPHYR_NXP_SDK_INSTALL_DIR need to be set")
+
+            if 'ZEPHYR_NXP_BASE' not in os.environ:
                 raise Exception("ZEPHYR_NXP_BASE need to be set")
-            build_args = self.WestBuildArgs()
-            cmd += '''
-            west build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_args}
-            '''.format(
+
+            cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
+            cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
+
+            cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder}{build_args}'.format(
                 board_name=self.board.Name(self.os_env),
                 out_folder=self.output_dir,
                 example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
-                build_args=build_args).strip()
+                build_args=self.WestBuildArgs())
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
             cmd = ''
@@ -269,7 +279,7 @@ class NxpBuilder(GnBuilder):
 
             extra_args.extend(self.GnBuildArgs() or [])
             if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+                cmd += " --args='%s" % ' '.join(extra_args) + "' "
 
             cmd += self.output_dir
 
