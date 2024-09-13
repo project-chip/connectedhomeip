@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,88 +15,121 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <bridged-actions-stub.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 
-namespace {
-
-class ActionsAttrAccess : public AttributeAccessInterface
+CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionListStructType & action)
 {
-public:
-    // Register for the Actions cluster on all endpoints.
-    ActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    static constexpr uint16_t ClusterRevision = 1;
-
-    CHIP_ERROR ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-};
-
-constexpr uint16_t ActionsAttrAccess::ClusterRevision;
-
-CHIP_ERROR ActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    static const char SetupUrl[] = "https://example.com";
-    return aEncoder.Encode(chip::Span<const char>(SetupUrl, strlen(SetupUrl)));
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(ClusterRevision);
-}
-
-ActionsAttrAccess gAttrAccess;
-
-CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    VerifyOrDie(aPath.mClusterId == Actions::Id);
-
-    switch (aPath.mAttributeId)
+    if (index >= ArraySize(kActionList))
     {
-    case ActionList::Id:
-        return ReadActionListAttribute(aPath.mEndpointId, aEncoder);
-    case EndpointLists::Id:
-        return ReadEndpointListAttribute(aPath.mEndpointId, aEncoder);
-    case SetupURL::Id:
-        return ReadSetupUrlAttribute(aPath.mEndpointId, aEncoder);
-    case ClusterRevision::Id:
-        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
-    default:
-        break;
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
+    action.actionID          = kActionList[index].actionID;
+    action.name              = kActionList[index].name;
+    action.type              = kActionList[index].type;
+    action.endpointListID    = kActionList[index].endpointListID;
+    action.supportedCommands = kActionList[index].supportedCommands;
+    action.state             = kActionList[index].state;
     return CHIP_NO_ERROR;
 }
-} // anonymous namespace
 
-void MatterActionsPluginServerInitCallback()
+CHIP_ERROR ActionsDelegateImpl::ReadEndpointListAtIndex(uint16_t index, EndpointListStructType & epList)
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    if (index >= ArraySize(kEndpointList))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    epList.endpointListID = kEndpointList[index].endpointListID;
+    epList.name           = kEndpointList[index].name;
+    epList.type           = kEndpointList[index].type;
+    epList.endpoints      = kEndpointList[index].endpoints;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ActionsDelegateImpl::FindActionIdInActionList(uint16_t actionId)
+{
+    for (uint16_t i = 0; i < kActionListSize; i++)
+    {
+        if (kActionList[i].actionID == actionId)
+            return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+Status ActionsDelegateImpl::HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime,
+                                                              Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
+}
+
+Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId)
+{
+    // Not implemented
+    return Status::NotFound;
 }
