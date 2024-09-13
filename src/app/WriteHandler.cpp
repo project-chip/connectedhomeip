@@ -51,7 +51,7 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
     mDataModelProvider = apProvider;
-#endif
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
@@ -75,7 +75,7 @@ void WriteHandler::Close()
     mStateFlags.Clear(StateBits::kSuppressResponse);
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
-#endif
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     MoveToState(State::Uninitialized);
 }
 
@@ -567,7 +567,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mPreviousWriteSuccess = std::nullopt;
-#endif
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     reader.Init(std::move(aPayload));
 
@@ -576,7 +576,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     writeRequestParser.PrettyPrint();
-#endif
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
     boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
