@@ -107,6 +107,9 @@ public:
     Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    CHIP_ERROR DisconnectFromNetwork() override;
+#endif
 
     // WiFiDriver
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
@@ -133,8 +136,8 @@ public:
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
+    CHIP_ERROR BackupConfiguration();
 
-    WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;

@@ -61,10 +61,20 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
+        self._partslist_subscription = None
+        self._cadmin_subscription = None
         self._app_th_server_process = None
         self._th_server_kvs = None
 
     def teardown_class(self):
+        if self._partslist_subscription is not None:
+            self._partslist_subscription.Shutdown()
+            self._partslist_subscription = None
+
+        if self._cadmin_subscription is not None:
+            self._cadmin_subscription.Shutdown()
+            self._cadmin_subscription = None
+
         if self._app_th_server_process is not None:
             logging.warning("Stopping app with SIGTERM")
             self._app_th_server_process.send_signal(signal.SIGTERM.value)
@@ -117,9 +127,11 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
                  TestStep(10, "TH waits up to 10 seconds for subscription report from the AdministratorCommissioning attribute (from step 6) to reflect values from previous step")]
         return steps
 
+    # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
+    # be enough time for test to run
     @property
     def default_timeout(self) -> int:
-        return self.user_params.get("report_waiting_timeout_delay_sec", 10)*2 + 60
+        return 3*60
 
     @async_test_body
     async def test_TC_MCORE_FS_1_5(self):
@@ -140,7 +152,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_subscription_contents = [
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
-        parts_list_sub = await self.default_controller.ReadAttribute(
+        self._partslist_subscription = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
@@ -150,8 +162,8 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_queue = queue.Queue()
         parts_list_attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.Descriptor.Attributes.PartsList, output=parts_list_queue)
-        parts_list_sub.SetAttributeUpdateCallback(parts_list_attribute_handler)
-        parts_list_cached_attributes = parts_list_sub.GetAttributes()
+        self._partslist_subscription.SetAttributeUpdateCallback(parts_list_attribute_handler)
+        parts_list_cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = parts_list_cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
         asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
@@ -217,7 +229,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         cadmin_subscription_contents = [
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
-        cadmin_sub = await self.default_controller.ReadAttribute(
+        self._cadmin_subscription = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
@@ -228,7 +240,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         # This AttributeChangeAccumulator is really just to let us know when new subscription came in
         cadmin_attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus, output=cadmin_queue)
-        cadmin_sub.SetAttributeUpdateCallback(cadmin_attribute_handler)
+        self._cadmin_subscription.SetAttributeUpdateCallback(cadmin_attribute_handler)
         time.sleep(1)
 
         self.step(7)

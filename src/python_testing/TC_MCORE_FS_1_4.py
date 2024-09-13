@@ -47,8 +47,9 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-
 # TODO: Make this class more generic. Issue #35348
+
+
 class Subprocess(threading.Thread):
 
     def __init__(self, args: list = [], stdout_cb=None, tag="", **kw):
@@ -147,15 +148,31 @@ class FabricSyncApp:
 
 class AppServer:
 
+    def _process_admin_output(self, line):
+        if self.wait_for_text_text is not None and self.wait_for_text_text in line:
+            self.wait_for_text_event.set()
+
+    def wait_for_text(self, timeout=30):
+        if not self.wait_for_text_event.wait(timeout=timeout):
+            raise Exception(f"Timeout waiting for text: {self.wait_for_text_text}")
+        self.wait_for_text_event.clear()
+        self.wait_for_text_text = None
+
     def __init__(self, app, storage_dir, port=None, discriminator=None, passcode=None):
+        self.wait_for_text_event = threading.Event()
+        self.wait_for_text_text = None
 
         args = [app]
         args.extend(["--KVS", tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")[1]])
         args.extend(['--secured-device-port', str(port)])
         args.extend(["--discriminator", str(discriminator)])
         args.extend(["--passcode", str(passcode)])
-        self.app = Subprocess(args, tag="SERVER")
+        self.app = Subprocess(args, stdout_cb=self._process_admin_output, tag="SERVER")
+        self.wait_for_text_text = "Server initialization complete"
         self.app.start()
+
+        # Wait for the server-app to be ready.
+        self.wait_for_text()
 
     def stop(self):
         self.app.stop()
@@ -228,7 +245,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         self.th_server_port = 5544
         self.th_server_discriminator = self.th_fsa_bridge_discriminator + 1
-        self.th_server_passcode = 20202021
+        self.th_server_passcode = 20202022
 
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServer(
@@ -271,6 +288,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         self.step(1)
 
         th_server_th_node_id = 1
+
         await self.default_controller.CommissionOnNetwork(
             nodeId=th_server_th_node_id,
             setupPinCode=self.th_server_passcode,

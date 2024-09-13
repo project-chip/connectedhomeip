@@ -147,10 +147,19 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
         }
     }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
+
     // Set the wifi configuration
-    wfx_wifi_provision_t wifiConfig = {};
+    wfx_wifi_provision_t wifiConfig;
+    memset(&wifiConfig, 0, sizeof(wifiConfig));
+
+    VerifyOrReturnError(ssidLen <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(wifiConfig.ssid, ssid, ssidLen);
+    wifiConfig.ssid_length = ssidLen;
+
+    VerifyOrReturnError(keyLen < WFX_MAX_PASSKEY_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(wifiConfig.passkey, key, keyLen);
+    wifiConfig.passkey_length = keyLen;
+
     wifiConfig.security = WFX_SEC_WPA2;
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);

@@ -28,6 +28,7 @@
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDiagnosticLogsDownloader.h"
 #import "MTRError_Internal.h"
@@ -110,7 +111,7 @@ MTR_DIRECT_MEMBERS
     MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
     PersistentStorageOperationalKeystore * _keystore;
     Credentials::PersistentStorageOpCertStore * _opCertStore;
-    MTROperationalBrowser * _operationalBrowser;
+    std::unique_ptr<MTROperationalBrowser> _operationalBrowser;
 
     // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
     // from MTRDeviceControllerFactoryParams.
@@ -221,6 +222,8 @@ MTR_DIRECT_MEMBERS
 
     _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
     _serverEndpoints = [[NSMutableArray alloc] init];
+
+    _operationalBrowser = std::make_unique<MTROperationalBrowser>(self, self->_chipWorkQueue);
 
     return self;
 }
@@ -474,6 +477,7 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
     MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    BOOL startSuspended = NO;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -483,6 +487,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
         storageBehaviorConfiguration = params.storageBehaviorConfiguration;
+        startSuspended = params.startSuspended;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -545,18 +550,13 @@ MTR_DIRECT_MEMBERS
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
               concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
-                storageBehaviorConfiguration:storageBehaviorConfiguration];
+                storageBehaviorConfiguration:storageBehaviorConfiguration
+                              startSuspended:startSuspended];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
-    }
-
-    if ([_controllers count] == 0) {
-        dispatch_sync(_chipWorkQueue, ^{
-            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
-        });
     }
 
     // Add the controller to _controllers now, so if we fail partway through its
@@ -666,7 +666,7 @@ MTR_DIRECT_MEMBERS
         return existingController;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -738,7 +738,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self _startDeviceController:[MTRDeviceController alloc]
+    return [self _startDeviceController:[MTRDeviceController_Concrete alloc]
                           startupParams:startupParams
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
@@ -939,9 +939,6 @@ MTR_DIRECT_MEMBERS
         // OtaProviderDelegateBridge uses some services provided by the system
         // state without retaining it.
         if (_controllers.count == 0) {
-            delete self->_operationalBrowser;
-            self->_operationalBrowser = nullptr;
-
             if (_otaProviderDelegateBridge) {
                 _otaProviderDelegateBridge->Shutdown();
                 _otaProviderDelegateBridge.reset();
@@ -955,6 +952,10 @@ MTR_DIRECT_MEMBERS
             }
         } else if (_otaProviderDelegateBridge) {
             _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+        }
+
+        if (_diagnosticLogsDownloader != nil) {
+            [_diagnosticLogsDownloader abortDownloadsForController:controller];
         }
 
         [controller shutDownCppController];
@@ -1236,6 +1237,11 @@ MTR_DIRECT_MEMBERS
 - (Credentials::GroupDataProvider *)groupDataProvider
 {
     return &_groupDataProvider;
+}
+
+- (MTROperationalBrowser *)operationalBrowser
+{
+    return _operationalBrowser.get();
 }
 
 @end
