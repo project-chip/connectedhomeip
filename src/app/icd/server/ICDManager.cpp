@@ -36,6 +36,8 @@ enum class ICDTestEventTriggerEvent : uint64_t
     kInvalidateHalfCounterValues     = 0x0046'0000'00000003,
     kInvalidateAllCounterValues      = 0x0046'0000'00000004,
     kForceMaximumCheckInBackOffState = 0x0046'0000'00000005,
+    kDSLSForceSitMode                = 0x0046'0000'00000006,
+    kDSLSWithdrawSitMode             = 0x0046'0000'00000007,
 };
 } // namespace
 
@@ -712,6 +714,14 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
         err = mICDCheckInBackOffStrategy->ForceMaximumCheckInBackoff();
         break;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    case ICDTestEventTriggerEvent::kDSLSForceSitMode:
+        OnSITModeRequest();
+        break;
+    case ICDTestEventTriggerEvent::kDSLSWithdrawSitMode:
+        OnSITModeRequestWithdrawal();
+        break;
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;
