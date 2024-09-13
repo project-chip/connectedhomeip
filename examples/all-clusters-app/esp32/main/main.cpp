@@ -35,6 +35,7 @@
 #include "shell_extension/launch.h"
 #include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
+#include <bridged-actions-stub.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
@@ -96,6 +97,7 @@ AppCallbacks sCallbacks;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+app::Clusters::Actions::ActionsDelegateImpl sActionsDelegateImpl;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -126,9 +128,9 @@ static void InitServer(intptr_t context)
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    app::Clusters::Actions::Instance::GetInstance()->SetDefaultDelegate(&sActionsDelegateImpl);
 }
 
-// #include <laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
 #include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 
