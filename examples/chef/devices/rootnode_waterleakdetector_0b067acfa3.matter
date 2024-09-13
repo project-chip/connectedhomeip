@@ -616,23 +616,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
   revision 1; // NOTE: Default/not specifically set
@@ -1905,7 +1888,6 @@ endpoint 1 {
     ram      attribute batPercentRemaining default = 95;
     ram      attribute batTimeRemaining default = 518400;
     ram      attribute batChargeLevel default = 0;
-    ram      attribute batReplacementNeeded default = 0;
     ram      attribute batReplaceability default = 1;
     ram      attribute batPresent default = 1;
     ram      attribute batCapacity default = 350;
@@ -1916,7 +1898,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x06;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1939,5 +1921,4 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 
