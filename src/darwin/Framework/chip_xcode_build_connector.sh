@@ -61,7 +61,7 @@ read -r -a xcode_defines <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 for define in "${xcode_defines[@]}"; do
     # skip over those that GN does for us
     case "$define" in
-    CHIP_HAVE_CONFIG_H) continue ;;
+        CHIP_HAVE_CONFIG_H) continue ;;
     esac
     target_defines+=("$define")
 done
@@ -90,8 +90,8 @@ for arch in "${archs[@]}"; do
     if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
         target_arch="$arch"
         case "$arch" in
-        x86_64) target_cpu="x64" ;;
-        *) target_cpu="$arch" ;;
+            x86_64) target_cpu="x64" ;;
+            *) target_cpu="$arch" ;;
         esac
     fi
     [[ "${#archs[@]}" -gt 1 ]] && target_cflags+=(-arch "$arch")
@@ -125,8 +125,8 @@ declare -a args=(
 )
 
 case "$CONFIGURATION" in
-Debug) args+=('is_debug=true') ;;
-Release) args+=('is_debug=false') ;;
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
 esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
