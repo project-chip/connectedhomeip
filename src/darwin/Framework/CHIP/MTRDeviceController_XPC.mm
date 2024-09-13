@@ -66,7 +66,9 @@
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTRCommandPath class],
-        [MTRAttributePath class]
+        [MTRAttributePath class],
+        [MTRAttributeRequestPath class],
+        [MTREventRequestPath class]
     ]];
 
     [interface setClasses:allowedClasses
@@ -82,7 +84,8 @@
     NSXPCInterface * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
     NSMutableSet * allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTRAttributePath class]
+        [MTRAttributePath class],
+        [MTRAttributeRequestPath class]
     ]];
 
     [interface setClasses:allowedClasses
@@ -92,7 +95,8 @@
 
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
-        [MTREventPath class]
+        [MTREventPath class],
+        [MTREventRequestPath class]
     ]];
 
     [interface setClasses:allowedClasses

@@ -231,11 +231,7 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
-- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
-{
-    // TODO: Implement
-    return [NSArray array];
-}
+MTR_DEVICE_SIMPLE_REMOTE_XPC_GETTER(readAttributePaths, NSArray<MTRAttributeRequestPath *> *, nil, readAttributePathsWithReply)
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID

@@ -25,6 +25,7 @@ MTR_NEWLY_AVAILABLE
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getDeviceCachePrimedWithReply:(void (^)(BOOL primed))reply;
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getEstimatedStartTimeWithReply:(void (^)(NSDate * _Nullable estimatedStartTime))reply;
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getEstimatedSubscriptionLatencyWithReply:(void (^)(NSNumber * _Nullable estimatedSubscriptionLatency))reply;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributePathsWithReply:(void (^)(NSArray<MTRAttributeRequestPath *> * attributesPaths))reply;
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params withReply:(void (^)(NSDictionary<NSString *, id> * _Nullable))reply;
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID writeAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(id)value expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedWriteTimeout:(NSNumber * _Nullable)timeout;
