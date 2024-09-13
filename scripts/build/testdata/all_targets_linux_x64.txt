@@ -5,7 +5,7 @@ bouffalolab-{bl602dk,bl704ldk,bl706dk,bl602-night-light,bl706-night-light,bl602-
 cc32xx-{lock,air-purifier}
 ti-cc13x4_26x4-{lighting,lock,pump,pump-controller}[-mtd][-ftd]
 cyw30739-{cyw30739b2_p5_evk_01,cyw30739b2_p5_evk_02,cyw30739b2_p5_evk_03,cyw930739m2evb_01,cyw930739m2evb_02}-{light,light-switch,lock,thermostat}
-efr32-{brd2704b,brd4316a,brd4317a,brd4318a,brd4319a,brd4186a,brd4187a,brd2601b,brd4187c,brd4186c,brd2703a,brd4338a}-{window-covering,switch,unit-test,light,lock,thermostat,pump}[-rpc][-with-ota-requestor][-icd][-low-power][-shell][-no-logging][-openthread-mtd][-heap-monitoring][-no-openthread-cli][-show-qr-code][-wifi][-rs9116][-wf200][-siwx917][-ipv4][-additional-data-advertising][-use-ot-lib][-use-ot-coap-lib][-no-version][-skip-rps-generation]
+efr32-{brd2704b,brd4316a,brd4317a,brd4318a,brd4319a,brd4186a,brd4187a,brd2601b,brd4187c,brd4186c,brd2703a,brd4338a,brd2605a}-{window-covering,switch,unit-test,light,lock,thermostat,pump}[-rpc][-with-ota-requestor][-icd][-low-power][-shell][-no-logging][-openthread-mtd][-heap-monitoring][-no-openthread-cli][-show-qr-code][-wifi][-rs9116][-wf200][-siwx917][-ipv4][-additional-data-advertising][-use-ot-lib][-use-ot-coap-lib][-no-version][-skip-rps-generation]
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,energy-management,ota-provider,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only][-tracing]
 genio-lighting-app
 linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-pw-fuzztest][-coverage][-dmalloc][-clang]
@@ -13,7 +13,7 @@ linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,therm
 linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage][-trustm]
-nxp-{k32w0,k32w1,rw61x,mcxw71}-{zephyr,freertos}-{lighting,contact-sensor,all-clusters,laundry-washer,thermostat}[-factory][-low-power][-lit][-fro32k][-smu2][-dac-conversion][-rotating-id][-sw-v2][-ota][-wifi][-thread][-matter-shell]
+nxp-{k32w0,k32w1,rw61x,mcxw71}-{zephyr,freertos}-{lighting,contact-sensor,lock-app,all-clusters,laundry-washer,thermostat}[-factory][-low-power][-lit][-fro32k][-smu2][-dac-conversion][-rotating-id][-sw-v2][-ota][-wifi][-thread][-matter-shell]
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,ota-requestor,shell}[-release][-develop][-debug]
 mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
