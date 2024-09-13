@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,20 +16,71 @@
 # limitations under the License.
 #
 
+ZAP_FILE=""
+
 function _get_fullpath() {
     cd "$(dirname "$1")" >/dev/null && echo "$PWD/$(basename "$1")"
 }
 
+function _print_usage() {
+    local name="$(basename "${0}")"
+    local status="${1}"
+
+    echo "Usage: $name [ option ... ] [ <ZAP file path> ]"
+
+    if [ "$status" -ne 0 ]; then
+        echo "Try '$name -h' for more information."
+    fi
+
+    if [ "$status" -ne 1 ]; then
+        echo ""
+        echo "ZAP Tool Wrapper"
+        echo ""
+        echo " General Options:"
+        echo ""
+        echo "  -h, --help                  Display this help, then exit."
+        echo ""
+    fi
+
+    exit "$status"
+}
+
+# Main
+
 set -e
 
-[[ "$1" == "--help" ]] && {
-    echo "Usage: $0 [ZAP-file-path]" >&2
-    exit 0
-}
+# Command Line Option Parsing
+
+while [ "${#}" -gt 0 ]; do
+
+    case "${1}" in
+
+        -h | --help)
+            _print_usage 0
+            ;;
+
+        -*)
+            echo "ERROR: Unknown or invalid option: '${1}'" >&2
+            _print_usage 1
+            ;;
+
+        *)
+            if [ -z "$ZAP_FILE" ]; then
+                ZAP_FILE="${1}"
+                shift 1
+            else
+                echo "ERROR: Unexpected argument: '${1}'" >&2
+                _print_usage 1
+            fi
+            ;;
+
+    esac
+
+done
 
 SCRIPT_PATH="$(_get_fullpath "$0")"
 CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
-[[ -n "$1" ]] && ZAP_ARGS="-i \"$(_get_fullpath "$1")\"" || ZAP_ARGS=""
+[[ -n "${ZAP_FILE}" ]] && ZAP_ARGS="-i \"$(_get_fullpath "$ZAP_FILE")\"" || ZAP_ARGS=""
 
 if [[ -z "$ZAP_INSTALL_PATH" && -n "$PW_ZAP_CIPD_INSTALL_DIR" ]]; then
     ZAP_INSTALL_PATH="$PW_ZAP_CIPD_INSTALL_DIR"
