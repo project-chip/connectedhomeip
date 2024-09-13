@@ -322,7 +322,7 @@ class HostBuilder(GnBuilder):
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
-                 data_model_interface: Optional[bool] = None,
+                 data_model_interface: Optional[str] = None,
                  chip_data_model_check_die_on_failure: Optional[bool] = None,
                  ):
         super(HostBuilder, self).__init__(
