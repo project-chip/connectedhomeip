@@ -2162,12 +2162,14 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
+    ram      attribute rockSupport default = 0x00;
+    ram      attribute rockSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 33;
+    ram      attribute featureMap default = 37;
     ram      attribute clusterRevision default = 1;
 
     handle command Step;
