@@ -138,7 +138,7 @@ class NxpBuilder(GnBuilder):
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
                  enable_ota: bool = False,
-                 use_data_model_interface: Optional[str] = None,
+                 data_model_interface: Optional[str] = None,
                  ):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
