@@ -91,12 +91,10 @@ endif()
 
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
-# Usage of env is because `west` seems to use a hierarcical build system
-# and populating the cache value with cmake -D variables did not work
-if (DEFINED ENV{CHIP_DATA_MODEL_INTERFACE})
-    set(CHIP_DATA_MODEL_INTERFACE $ENV{CHIP_DATA_MODEL_INTERFACE} CACHE STRING "Data model interface option to use: enabled or disabled")
+if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
+    set(DATA_MODEL_INTERFACE "enabled")
 else()
-    set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+    set(DATA_MODEL_INTERFACE "disabled")
 endif()
 
 
@@ -110,7 +108,7 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-    DATA_MODEL_INTERFACE ${CHIP_DATA_MODEL_INTERFACE}
+    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})

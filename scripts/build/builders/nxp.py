@@ -224,6 +224,11 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             args.append('-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2')
 
+        if self.data_model_interface:
+            # NOTE: this is not supporting "check"
+            enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
+            args.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
+
         build_args = " -- " + " ".join(args) if len(args) > 0 else ""
         return build_args
 
@@ -237,9 +242,6 @@ class NxpBuilder(GnBuilder):
 
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
-
-            if self.data_model_interface:
-                cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface}'
 
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder}{build_args}'.format(
                 board_name=self.board.Name(self.os_env),

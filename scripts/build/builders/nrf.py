@@ -191,14 +191,17 @@ class NrfConnectBuilder(Builder):
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
+            if self.data_model_interface:
+                # NOTE: this is not supporting "check"
+                enabled = "y" if self.data_model_interface.lower() == "enabled" else "n"
+                flags.append(f"-DCONFIG_USE_CHIP_DATA_MODEL_INTERFACE={enabled}")
+
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
             cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
 
             if zephyr_sdk_dir:
                 cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
-            if self.data_model_interface:
-                cmd += f'\nexport CHIP_DATA_MODEL_INTERFACE={self.data_model_interface};'
 
             cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
