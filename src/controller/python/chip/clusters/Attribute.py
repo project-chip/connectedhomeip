@@ -461,7 +461,6 @@ class SubscriptionTransaction:
         '''
         return self._readTransaction._cache.attributeTLVCache
 
-
     def GetTLVAttribute(self, path: AttributePath) -> bytes:
         '''Returns a specific attribute given a AttributePath.
         '''
