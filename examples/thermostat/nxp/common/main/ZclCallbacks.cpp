@@ -27,8 +27,8 @@
 #include <app/util/af-types.h>
 
 #if CONFIG_DIAG_LOGS_DEMO
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <DiagnosticLogsProviderDelegateImpl.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #endif
 
 using namespace ::chip;

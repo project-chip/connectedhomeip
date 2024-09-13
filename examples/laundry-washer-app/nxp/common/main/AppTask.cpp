@@ -46,7 +46,6 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-
 #ifdef ENABLE_CHIP_SHELL
 const static std::map<std::string, uint8_t> map_cmd_errstate{
     { "no_error", (uint8_t) OperationalState::ErrorStateEnum::kNoError },
