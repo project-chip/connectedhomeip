@@ -28,7 +28,7 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBuilder, NxpBuildSystem, NxpOsUsed
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -551,7 +551,7 @@ def BuildNxpTarget():
     target.AppendModifier('data-model-disabled', data_model_interface="disabled").ExceptIfRe('-data-model-enabled')
     target.AppendModifier('data-model-enabled', data_model_interface="enabled").ExceptIfRe('-data-model-disabled')
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rw61x')
-    target.AppendModifier(name="frdm", board_variant="frdm").OnlyIfRe('rw61x')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).OnlyIfRe('rw61x')
 
     return target

@@ -86,6 +86,18 @@ class NxpBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
+class NxpBoardVariant(Enum):
+    RD = auto()
+    FRDM = auto()
+    
+    def BoardVariantName(self, board):
+        if board == NxpBoard.RW61X:
+            if self == NxpBoardVariant.RD:
+                return "rdrw612bga"
+            elif self == NxpBoardVariant.FRDM:
+                return "frdm"
+        else:
+            raise Exception('Unkown board variant: %r' % self)
 
 class NxpApp(Enum):
     LIGHTING = auto()
@@ -138,6 +150,7 @@ class NxpBuilder(GnBuilder):
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
                  board: NxpBoard = NxpBoard.K32W0,
+                 board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.GN,
                  low_power: bool = False,
@@ -156,8 +169,7 @@ class NxpBuilder(GnBuilder):
                  enable_ota: bool = False,
                  data_model_interface: Optional[str] = None,
                  enable_factory_data_build: bool = False,
-                 disable_pairing_autostart: bool = False,
-                 board_variant: str = None):
+                 disable_pairing_autostart: bool = False):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -285,9 +297,7 @@ class NxpBuilder(GnBuilder):
             flags.append('-DCONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=false')
 
         if self.board_variant:
-            if self.board == NxpBoard.RW61X:
-                flag_board_variant = "-DCONFIG_BOARD_VARIANT=\"%s\"" % self.board_variant
-
+            flag_board_variant = "-DCONFIG_BOARD_VARIANT=\"%s\"" % self.board_variant.BoardVariantName(self.board)
             flags.append(flag_board_variant)
 
         build_flags = " ".join(flags) if len(flags) > 0 else ""
