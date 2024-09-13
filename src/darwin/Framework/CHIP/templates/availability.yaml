@@ -9682,6 +9682,20 @@
                   - Presets
                   - MatterScheduleConfiguration
 
+- release: "Just something temporary"
+  versions:
+      # Be conservative in terms of when we are very sure it's OK to deprecate things by.
+      iOS: "18.2"
+      macOS: "15.2"
+      watchOS: "11.2"
+      tvOS: "18.2"
+  deprecated:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
+
 - release: "Future"
   versions: "future"
   introduced:
