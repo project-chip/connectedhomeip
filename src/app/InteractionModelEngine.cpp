@@ -993,7 +993,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     Protocols::InteractionModel::Status status = Status::Failure;
 
     // Ensure that DataModel::Provider has access to the exchange the message was received on.
-    ScopedExchangeContext scopedExchangeContext(*this, apExchangeContext);
+    CurrentExchangeValueScope scopedExchangeContext(*this, apExchangeContext);
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&

@@ -709,15 +709,15 @@ private:
     Messaging::ExchangeContext * mCurrentExchange = nullptr;
 
     // Changes the current exchange context of a InteractionModelEngine to a given context
-    class ScopedExchangeContext
+    class CurrentExchangeValueScope
     {
     public:
-        ScopedExchangeContext(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        CurrentExchangeValueScope(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
         {
             mEngine.mCurrentExchange = context;
         }
 
-        ~ScopedExchangeContext() { mEngine.mCurrentExchange = nullptr; }
+        ~CurrentExchangeValueScope() { mEngine.mCurrentExchange = nullptr; }
 
     private:
         InteractionModelEngine & mEngine;
