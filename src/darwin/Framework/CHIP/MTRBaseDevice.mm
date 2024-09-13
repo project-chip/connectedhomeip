@@ -2276,8 +2276,8 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %u cluster %u attribute %u>",
-            (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
-            (uint32_t) _attribute.unsignedLongValue];
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _attribute.unsignedLongValue];
 }
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2291,8 +2291,8 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 - (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
 {
     return MTREqualObjects(_endpoint, path.endpoint)
-    && MTREqualObjects(_cluster, path.cluster)
-    && MTREqualObjects(_attribute, path.attribute);
+        && MTREqualObjects(_cluster, path.cluster)
+        && MTREqualObjects(_attribute, path.attribute);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2373,13 +2373,13 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    if ( _endpoint ) {
+    if (_endpoint) {
         [coder encodeObject:_endpoint forKey:sEndpointIDKey];
     }
-    if ( _cluster ) {
+    if (_cluster) {
         [coder encodeObject:_cluster forKey:sClusterIDKey];
     }
-    if ( _attribute ) {
+    if (_attribute) {
         [coder encodeObject:_attribute forKey:sAttributeIDKey];
     }
 }
@@ -2400,8 +2400,8 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %u cluster %u event %u>",
-            (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
-            (uint32_t) _event.unsignedLongValue];
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _event.unsignedLongValue];
 }
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2415,8 +2415,8 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 - (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
 {
     return MTREqualObjects(_endpoint, path.endpoint)
-    && MTREqualObjects(_cluster, path.cluster)
-    && MTREqualObjects(_event, path.event);
+        && MTREqualObjects(_cluster, path.cluster)
+        && MTREqualObjects(_event, path.event);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2496,17 +2496,16 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    if ( _endpoint ) {
+    if (_endpoint) {
         [coder encodeObject:_endpoint forKey:sEventEndpointIDKey];
     }
-    if ( _cluster ) {
+    if (_cluster) {
         [coder encodeObject:_cluster forKey:sEventClusterIDKey];
     }
-    if ( _event ) {
+    if (_event) {
         [coder encodeObject:_event forKey:sEventAttributeIDKey];
     }
 }
-
 
 @end
 
