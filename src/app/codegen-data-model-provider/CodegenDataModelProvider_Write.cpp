@@ -333,8 +333,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
                     (request.path.mAttributeId != request.previousSuccessPath->mAttributeId));
     }
 
-    // If not writable, do unsupported write instead of unsupported-access
-
     if (checkAcl)
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
