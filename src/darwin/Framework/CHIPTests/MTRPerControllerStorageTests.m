@@ -93,7 +93,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 }
 
 - (void)controller:(MTRDeviceController *)controller
-       isSuspended:(BOOL)suspended
+    suspendedChangedTo:(BOOL)suspended
 {
     XCTAssertEqual(suspended, self.expectedSuspensionState);
     [self.expectation fulfill];

@@ -385,8 +385,8 @@ using namespace chip::Tracing::DarwinFramework;
 {
     BOOL isSuspended = [self isSuspended];
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
-            [delegate controller:self isSuspended:isSuspended];
+        if ([delegate respondsToSelector:@selector(controller:suspendedChangedTo:)]) {
+            [delegate controller:self suspendedChangedTo:isSuspended];
         }
     } logString:__PRETTY_FUNCTION__];
 }
