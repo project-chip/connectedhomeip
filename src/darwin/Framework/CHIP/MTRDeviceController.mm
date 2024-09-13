@@ -165,7 +165,7 @@ using namespace chip::Tracing::DarwinFramework;
     BOOL _shutdownPending;
     os_unfair_lock _assertionLock;
 
-    NSMutableSet<MTRDeviceControllerDelegateInfo *> * _delegates;
+    NSMutableArray<MTRDeviceControllerDelegateInfo *> * _delegates;
     id<MTRDeviceControllerDelegate> _strongDelegateForSetDelegateAPI;
 }
 
@@ -188,15 +188,11 @@ using namespace chip::Tracing::DarwinFramework;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
-    // All synchronous suspend/resume activity has to be protected by
-    // @synchronized(self), so that parts of suspend/resume can't
-    // interleave with each other. Using @synchronized here because
-    // MTRDevice may call isSuspended.
     _suspended = startSuspended;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
 
-    _delegates = [NSMutableSet set];
+    _delegates = [NSMutableArray array];
 
     return self;
 }
@@ -399,6 +395,11 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_LOG("%@ suspending", self);
 
+    if (![self isRunning]) {
+        MTR_LOG_ERROR("%@ not running; can't suspend", self);
+        return;
+    }
+
     NSArray * devicesToSuspend;
     {
         std::lock_guard lock(*self.deviceMapLock);
@@ -406,6 +407,11 @@ using namespace chip::Tracing::DarwinFramework;
         // for any given device exactly one of two things is true:
         // * It is in the snapshot we are creating
         // * It is created after we have changed our _suspended state.
+        if (_suspended) {
+            MTR_LOG("%@ already suspended", self);
+            return;
+        }
+
         _suspended = YES;
         devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
@@ -421,11 +427,23 @@ using namespace chip::Tracing::DarwinFramework;
     // * CASE sessions in general.
     // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
     [self _notifyDelegatesOfSuspendState];
+
+    [self _controllerSuspended];
+}
+
+- (void)_controllerSuspended
+{
+    // Subclass hook; nothing to do.
 }
 
 - (void)resume
 {
     MTR_LOG("%@ resuming", self);
+
+    if (![self isRunning]) {
+        MTR_LOG_ERROR("%@ not running; can't resume", self);
+        return;
+    }
 
     NSArray * devicesToResume;
     {
@@ -434,6 +452,11 @@ using namespace chip::Tracing::DarwinFramework;
         // for any given device exactly one of two things is true:
         // * It is in the snapshot we are creating
         // * It is created after we have changed our _suspended state.
+        if (!_suspended) {
+            MTR_LOG("%@ already not suspended", self);
+            return;
+        }
+
         _suspended = NO;
         devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
@@ -444,6 +467,13 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     [self _notifyDelegatesOfSuspendState];
+
+    [self _controllerResumed];
+}
+
+- (void)_controllerResumed
+{
+    // Subclass hook; nothing to do.
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
@@ -1793,7 +1823,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 #pragma mark - MTRDeviceControllerDelegate management
 
-// Note these are implemented in the base class so that XPC subclass can use it as well when it
+// Note these are implemented in the base class so that XPC subclass can use it as well
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
@@ -1814,6 +1844,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     @synchronized(self) {
+        __block BOOL delegateAlreadyAdded = NO;
+        [self _iterateDelegateInfoWithBlock:^(MTRDeviceControllerDelegateInfo * delegateInfo) {
+            if (delegateInfo.delegate == delegate) {
+                delegateAlreadyAdded = YES;
+            }
+        }];
+        if (delegateAlreadyAdded) {
+            MTR_LOG("%@ addDeviceControllerDelegate: delegate already added", self);
+            return;
+        }
+
         MTRDeviceControllerDelegateInfo * newDelegateInfo = [[MTRDeviceControllerDelegateInfo alloc] initWithDelegate:delegate queue:queue];
         [_delegates addObject:newDelegateInfo];
         MTR_LOG("%@ addDeviceControllerDelegate: added %p total %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
@@ -1836,9 +1877,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         if (delegateInfoToRemove) {
             [_delegates removeObject:delegateInfoToRemove];
-            if (_strongDelegateForSetDelegateAPI == delegate) {
-                _strongDelegateForSetDelegateAPI = nil;
-            }
             MTR_LOG("%@ removeDeviceControllerDelegate: removed %p remaining %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
         } else {
             MTR_LOG("%@ removeDeviceControllerDelegate: delegate %p not found in %lu", self, delegate, static_cast<unsigned long>(_delegates.count));
@@ -1857,7 +1895,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
 
         // Opportunistically remove defunct delegate references on every iteration
-        NSMutableSet * delegatesToRemove = nil;
+        NSMutableArray * delegatesToRemove = nil;
         for (MTRDeviceControllerDelegateInfo * delegateInfo in _delegates) {
             id<MTRDeviceControllerDelegate> strongDelegate = delegateInfo.delegate;
             if (strongDelegate) {
@@ -1866,14 +1904,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 }
             } else {
                 if (!delegatesToRemove) {
-                    delegatesToRemove = [NSMutableSet set];
+                    delegatesToRemove = [NSMutableArray array];
                 }
                 [delegatesToRemove addObject:delegateInfo];
             }
         }
 
         if (delegatesToRemove.count) {
-            [_delegates minusSet:delegatesToRemove];
+            [_delegates removeObjectsInArray:delegatesToRemove];
             MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), static_cast<unsigned long>(_delegates.count));
         }
 
