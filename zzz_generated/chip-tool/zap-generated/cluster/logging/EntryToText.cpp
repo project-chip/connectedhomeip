@@ -35,8 +35,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "OnOffSwitchConfiguration";
     case chip::app::Clusters::LevelControl::Id:
         return "LevelControl";
-    case chip::app::Clusters::BinaryInputBasic::Id:
-        return "BinaryInputBasic";
     case chip::app::Clusters::PulseWidthModulation::Id:
         return "PulseWidthModulation";
     case chip::app::Clusters::Descriptor::Id:
@@ -424,43 +422,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::LevelControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::LevelControl::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::BinaryInputBasic::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ActiveText::Id:
-            return "ActiveText";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Description::Id:
-            return "Description";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::InactiveText::Id:
-            return "InactiveText";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::Id:
-            return "OutOfService";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Polarity::Id:
-            return "Polarity";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::Id:
-            return "PresentValue";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::Reliability::Id:
-            return "Reliability";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::Id:
-            return "StatusFlags";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ApplicationType::Id:
-            return "ApplicationType";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::EventList::Id:
-            return "EventList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

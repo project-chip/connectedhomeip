@@ -230,60 +230,6 @@ static BOOL AttributeIsSpecifiedInLevelControlCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BinaryInputBasic;
-    switch (aAttributeId) {
-    case Attributes::ActiveText::Id: {
-        return YES;
-    }
-    case Attributes::Description::Id: {
-        return YES;
-    }
-    case Attributes::InactiveText::Id: {
-        return YES;
-    }
-    case Attributes::OutOfService::Id: {
-        return YES;
-    }
-    case Attributes::Polarity::Id: {
-        return YES;
-    }
-    case Attributes::PresentValue::Id: {
-        return YES;
-    }
-    case Attributes::Reliability::Id: {
-        return YES;
-    }
-    case Attributes::StatusFlags::Id: {
-        return YES;
-    }
-    case Attributes::ApplicationType::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInPulseWidthModulationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PulseWidthModulation;
@@ -6872,9 +6818,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::LevelControl::Id: {
         return AttributeIsSpecifiedInLevelControlCluster(aAttributeId);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return AttributeIsSpecifiedInBinaryInputBasicCluster(aAttributeId);
     }
     case Clusters::PulseWidthModulation::Id: {
         return AttributeIsSpecifiedInPulseWidthModulationCluster(aAttributeId);

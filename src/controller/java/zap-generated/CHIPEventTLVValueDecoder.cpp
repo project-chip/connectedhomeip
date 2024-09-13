@@ -87,16 +87,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BinaryInputBasic::Id: {
-        using namespace app::Clusters::BinaryInputBasic;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::PulseWidthModulation::Id: {
         using namespace app::Clusters::PulseWidthModulation;
         switch (aPath.mEventId)

@@ -42,9 +42,6 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeLevelControlID:
         result = @"LevelControl";
         break;
-    case MTRClusterIDTypeBinaryInputBasicID:
-        result = @"BinaryInputBasic";
-        break;
     case MTRClusterIDTypePulseWidthModulationID:
         result = @"PulseWidthModulation";
         break;
@@ -672,77 +669,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
-        }
-        break;
-
-    case MTRClusterIDTypeBinaryInputBasicID:
-
-        switch (attributeID) {
-
-            // Cluster BinaryInputBasic attributes
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID:
-            result = @"ActiveText";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID:
-            result = @"Description";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID:
-            result = @"InactiveText";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID:
-            result = @"OutOfService";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID:
-            result = @"Polarity";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID:
-            result = @"PresentValue";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID:
-            result = @"Reliability";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID:
-            result = @"StatusFlags";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID:
-            result = @"ApplicationType";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeEventListID:
-            result = @"EventList";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
-
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -9453,16 +9379,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeLevelControlID:
-
-        switch (eventID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
-            break;
-        }
-        break;
-
-    case MTRClusterIDTypeBinaryInputBasicID:
 
         switch (eventID) {
 

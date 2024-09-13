@@ -425,33 +425,6 @@
           ]
         },
         {
-          "name": "Binary Input (Basic)",
-          "code": 15,
-          "mfgCode": null,
-          "define": "BINARY_INPUT_BASIC_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "deprecated",
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Descriptor",
           "code": 29,
           "mfgCode": null,

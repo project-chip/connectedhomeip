@@ -17,7 +17,6 @@ Generally regenerate using one of:
 |          6 |       0x06 | OnOff                                                   |
 |          7 |       0x07 | OnOffSwitchConfiguration                                |
 |          8 |       0x08 | LevelControl                                            |
-|         15 |       0x0F | BinaryInputBasic                                        |
 |         28 |       0x1C | PulseWidthModulation                                    |
 |         29 |       0x1D | Descriptor                                              |
 |         30 |       0x1E | Binding                                                 |

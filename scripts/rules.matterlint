@@ -119,7 +119,6 @@ load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
 
 all endpoints {

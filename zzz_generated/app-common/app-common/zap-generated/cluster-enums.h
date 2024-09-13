@@ -588,8 +588,6 @@ enum class OptionsBitmap : uint8_t
 };
 } // namespace LevelControl
 
-namespace BinaryInputBasic {} // namespace BinaryInputBasic
-
 namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
 namespace Descriptor {

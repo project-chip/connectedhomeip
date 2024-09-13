@@ -94,18 +94,6 @@ static id _Nullable DecodeEventPayloadForLevelControlCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBinaryInputBasicCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BinaryInputBasic;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForPulseWidthModulationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PulseWidthModulation;
@@ -4853,9 +4841,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::LevelControl::Id: {
         return DecodeEventPayloadForLevelControlCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return DecodeEventPayloadForBinaryInputBasicCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::PulseWidthModulation::Id: {
         return DecodeEventPayloadForPulseWidthModulationCluster(aPath.mEventId, aReader, aError);

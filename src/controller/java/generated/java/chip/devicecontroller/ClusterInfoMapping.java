@@ -879,90 +879,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBinaryInputBasicClusterGeneratedCommandListAttributeCallback implements ChipClusters.BinaryInputBasicCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBinaryInputBasicClusterAcceptedCommandListAttributeCallback implements ChipClusters.BinaryInputBasicCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBinaryInputBasicClusterEventListAttributeCallback implements ChipClusters.BinaryInputBasicCluster.EventListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedBinaryInputBasicClusterAttributeListAttributeCallback implements ChipClusters.BinaryInputBasicCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedPulseWidthModulationClusterGeneratedCommandListAttributeCallback implements ChipClusters.PulseWidthModulationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22216,10 +22132,6 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("levelControl", levelControlClusterInfo);
 
-    ClusterInfo binaryInputBasicClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.BinaryInputBasicCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("binaryInputBasic", binaryInputBasicClusterInfo);
-
     ClusterInfo pulseWidthModulationClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.PulseWidthModulationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("pulseWidthModulation", pulseWidthModulationClusterInfo);
@@ -22709,7 +22621,6 @@ public class ClusterInfoMapping {
     destination.get("onOff").combineCommands(source.get("onOff"));
     destination.get("onOffSwitchConfiguration").combineCommands(source.get("onOffSwitchConfiguration"));
     destination.get("levelControl").combineCommands(source.get("levelControl"));
-    destination.get("binaryInputBasic").combineCommands(source.get("binaryInputBasic"));
     destination.get("pulseWidthModulation").combineCommands(source.get("pulseWidthModulation"));
     destination.get("descriptor").combineCommands(source.get("descriptor"));
     destination.get("binding").combineCommands(source.get("binding"));
@@ -23366,10 +23277,6 @@ public class ClusterInfoMapping {
     levelControlClusterInteractionInfoMap.put("moveToClosestFrequency", levelControlmoveToClosestFrequencyInteractionInfo);
 
     commandMap.put("levelControl", levelControlClusterInteractionInfoMap);
-
-    Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
-
-    commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> pulseWidthModulationClusterInteractionInfoMap = new LinkedHashMap<>();
 

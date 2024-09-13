@@ -26,7 +26,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterOnOffID MTR_DEPRECATED("Please use MTRClusterIDTypeOnOffID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000006,
     MTRClusterOnOffSwitchConfigurationID MTR_DEPRECATED("Please use MTRClusterIDTypeOnOffSwitchConfigurationID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000007,
     MTRClusterLevelControlID MTR_DEPRECATED("Please use MTRClusterIDTypeLevelControlID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000008,
-    MTRClusterBinaryInputBasicID MTR_DEPRECATED("Please use MTRClusterIDTypeBinaryInputBasicID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x0000000F,
     MTRClusterPulseWidthModulationID MTR_DEPRECATED("Please use MTRClusterIDTypePulseWidthModulationID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x0000001C,
     MTRClusterDescriptorID MTR_DEPRECATED("Please use MTRClusterIDTypeDescriptorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x0000001D,
     MTRClusterBindingID MTR_DEPRECATED("Please use MTRClusterIDTypeBindingID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x0000001E,
@@ -92,7 +91,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeOnOffID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
     MTRClusterIDTypeOnOffSwitchConfigurationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000007,
     MTRClusterIDTypeLevelControlID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
-    MTRClusterIDTypeBinaryInputBasicID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000F,
     MTRClusterIDTypePulseWidthModulationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000001C,
     MTRClusterIDTypeDescriptorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000001D,
     MTRClusterIDTypeBindingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000001E,
@@ -459,67 +457,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster BinaryInputBasic deprecated attribute names
-    MTRClusterBinaryInputBasicAttributeActiveTextID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000004,
-    MTRClusterBinaryInputBasicAttributeDescriptionID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x0000001C,
-    MTRClusterBinaryInputBasicAttributeInactiveTextID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x0000002E,
-    MTRClusterBinaryInputBasicAttributeOutOfServiceID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000051,
-    MTRClusterBinaryInputBasicAttributePolarityID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000054,
-    MTRClusterBinaryInputBasicAttributePresentValueID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000055,
-    MTRClusterBinaryInputBasicAttributeReliabilityID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000067,
-    MTRClusterBinaryInputBasicAttributeStatusFlagsID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x0000006F,
-    MTRClusterBinaryInputBasicAttributeApplicationTypeID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000100,
-    MTRClusterBinaryInputBasicAttributeGeneratedCommandListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBinaryInputBasicAttributeAcceptedCommandListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBinaryInputBasicAttributeAttributeListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBinaryInputBasicAttributeFeatureMapID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBinaryInputBasicAttributeClusterRevisionID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster BinaryInputBasic attributes
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000001C,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000002E,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000051,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000054,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000055,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000067,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000006F,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000100,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PulseWidthModulation deprecated attribute names
     MTRClusterPulseWidthModulationAttributeGeneratedCommandListID

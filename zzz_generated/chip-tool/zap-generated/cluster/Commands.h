@@ -40,7 +40,6 @@
 | OnOff                                                               | 0x0006 |
 | OnOffSwitchConfiguration                                            | 0x0007 |
 | LevelControl                                                        | 0x0008 |
-| BinaryInputBasic                                                    | 0x000F |
 | PulseWidthModulation                                                | 0x001C |
 | Descriptor                                                          | 0x001D |
 | Binding                                                             | 0x001E |
@@ -1169,31 +1168,6 @@ public:
 private:
     chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type mRequest;
 };
-
-/*----------------------------------------------------------------------------*\
-| Cluster BinaryInputBasic                                            | 0x000F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ActiveText                                                        | 0x0004 |
-| * Description                                                       | 0x001C |
-| * InactiveText                                                      | 0x002E |
-| * OutOfService                                                      | 0x0051 |
-| * Polarity                                                          | 0x0054 |
-| * PresentValue                                                      | 0x0055 |
-| * Reliability                                                       | 0x0067 |
-| * StatusFlags                                                       | 0x006F |
-| * ApplicationType                                                   | 0x0100 |
-| * GeneratedCommandList                                              | 0xFFF8 |
-| * AcceptedCommandList                                               | 0xFFF9 |
-| * EventList                                                         | 0xFFFA |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster PulseWidthModulation                                        | 0x001C |
@@ -15926,93 +15900,6 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterBinaryInputBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
-{
-    using namespace chip::app::Clusters::BinaryInputBasic;
-
-    const char * clusterName = "BinaryInputBasic";
-
-    commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "active-text", Attributes::ActiveText::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "inactive-text", Attributes::InactiveText::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "polarity", Attributes::Polarity::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "reliability", Attributes::Reliability::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "application-type", Attributes::ApplicationType::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "active-text", Attributes::ActiveText::Id, WriteCommandType::kWrite,
-                                                    credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kWrite,
-                                                    credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "inactive-text", Attributes::InactiveText::Id, WriteCommandType::kWrite,
-                                                    credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "out-of-service", 0, 1, Attributes::OutOfService::Id, WriteCommandType::kWrite,
-                                          credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "polarity", 0, UINT8_MAX, Attributes::Polarity::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "present-value", 0, 1, Attributes::PresentValue::Id, WriteCommandType::kWrite,
-                                          credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "reliability", 0, UINT8_MAX, Attributes::Reliability::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "status-flags", 0, UINT8_MAX, Attributes::StatusFlags::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "application-type", 0, UINT32_MAX, Attributes::ApplicationType::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
-            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
-            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
-            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
-            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "active-text", Attributes::ActiveText::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "inactive-text", Attributes::InactiveText::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "polarity", Attributes::Polarity::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "reliability", Attributes::Reliability::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "application-type", Attributes::ApplicationType::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
-    };
-
-    commands.RegisterCluster(clusterName, clusterCommands);
-}
 void registerClusterPulseWidthModulation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::PulseWidthModulation;
@@ -28232,7 +28119,6 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterOnOff(commands, credsIssuerConfig);
     registerClusterOnOffSwitchConfiguration(commands, credsIssuerConfig);
     registerClusterLevelControl(commands, credsIssuerConfig);
-    registerClusterBinaryInputBasic(commands, credsIssuerConfig);
     registerClusterPulseWidthModulation(commands, credsIssuerConfig);
     registerClusterDescriptor(commands, credsIssuerConfig);
     registerClusterBinding(commands, credsIssuerConfig);

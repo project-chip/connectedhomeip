@@ -261,7 +261,6 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BallastConfigurationCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BarrierControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BasicInformationCluster.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BinaryInputBasicCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BindingCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BooleanStateCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BooleanStateConfigurationCluster.kt",

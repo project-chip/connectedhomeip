@@ -61,11 +61,6 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBinaryInputBasicClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfPulseWidthModulationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -858,45 +853,6 @@ MatterLevelControlClusterServerPreAttributeChangedCallback(const chip::app::Conc
  * @param endpoint  Endpoint that is being served
  */
 void emberAfLevelControlClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
-// Binary Input (Basic) Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterBinaryInputBasicClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBinaryInputBasicClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterBinaryInputBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterBinaryInputBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfBinaryInputBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Pulse Width Modulation Cluster

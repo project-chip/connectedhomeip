@@ -68,15 +68,6 @@ static BOOL CommandNeedsTimedInvokeInLevelControlCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInBinaryInputBasicCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BinaryInputBasic;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInPulseWidthModulationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PulseWidthModulation;
@@ -1220,9 +1211,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::LevelControl::Id: {
         return CommandNeedsTimedInvokeInLevelControlCluster(commandID);
-    }
-    case Clusters::BinaryInputBasic::Id: {
-        return CommandNeedsTimedInvokeInBinaryInputBasicCluster(commandID);
     }
     case Clusters::PulseWidthModulation::Id: {
         return CommandNeedsTimedInvokeInPulseWidthModulationCluster(commandID);

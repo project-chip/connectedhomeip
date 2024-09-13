@@ -1861,54 +1861,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace LevelControl
-namespace BinaryInputBasic {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::ActiveText::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeText);
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, description);
-    case Attributes::InactiveText::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, inactiveText);
-    case Attributes::OutOfService::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, outOfService);
-    case Attributes::Polarity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, polarity);
-    case Attributes::PresentValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, presentValue);
-    case Attributes::Reliability::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reliability);
-    case Attributes::StatusFlags::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, statusFlags);
-    case Attributes::ApplicationType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, applicationType);
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, eventList);
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
-    default:
-        return CHIP_NO_ERROR;
-    }
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 
 namespace Commands {} // namespace Commands

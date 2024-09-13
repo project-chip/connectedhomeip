@@ -40,9 +40,6 @@ static constexpr ClusterId Id = 0x00000007;
 namespace LevelControl {
 static constexpr ClusterId Id = 0x00000008;
 } // namespace LevelControl
-namespace BinaryInputBasic {
-static constexpr ClusterId Id = 0x0000000F;
-} // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 static constexpr ClusterId Id = 0x0000001C;
 } // namespace PulseWidthModulation
