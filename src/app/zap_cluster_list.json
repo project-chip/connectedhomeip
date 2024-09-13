@@ -11,7 +11,6 @@
     "APPLICATION_LAUNCHER_CLUSTER": [],
     "AUDIO_OUTPUT_CLUSTER": [],
     "BALLAST_CONFIGURATION_CLUSTER": [],
-    "BARRIER_CONTROL_CLUSTER": [],
     "BASIC_INFORMATION_CLUSTER": [],
     "BINDING_CLUSTER": [],
     "BOOLEAN_STATE_CLUSTER": [],
@@ -38,7 +37,6 @@
     "DOOR_LOCK_CLUSTER": [],
     "ECOSYSTEM_INFORMATION_CLUSTER": [],
     "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
-    "ELECTRICAL_MEASUREMENT_CLUSTER": [],
     "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
     "ENERGY_EVSE_CLUSTER": [],
     "ENERGY_EVSE_MODE_CLUSTER": [],
@@ -54,7 +52,6 @@
     "GROUP_KEY_MANAGEMENT_CLUSTER": [],
     "GROUPS_CLUSTER": [],
     "HEPA_FILTER_MONITORING_CLUSTER": [],
-    "IAS_ZONE_CLUSTER": [],
     "ICD_MANAGEMENT_CLUSTER": [],
     "IDENTIFY_CLUSTER": [],
     "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
@@ -73,7 +70,6 @@
     "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
     "OCCUPANCY_SENSING_CLUSTER": [],
     "ON_OFF_CLUSTER": [],
-    "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
     "OPERATIONAL_CREDENTIALS_CLUSTER": [],
     "OPERATIONAL_STATE_CLUSTER": [],
     "OPERATIONAL_STATE_OVEN_CLUSTER": [],
@@ -137,8 +133,7 @@
     "WATER_HEATER_MANAGEMENT_CLUSTER": [],
     "WATER_HEATER_MODE_CLUSTER": [],
     "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
-    "WINDOW_COVERING_CLUSTER": [],
-    "ZLL_COMMISSIONING_CLUSTER": []
+    "WINDOW_COVERING_CLUSTER": []
   },
   "ServerDirectories": {
     "ACCESS_CONTROL_CLUSTER": [
@@ -168,9 +163,6 @@
       "audio-output-server"
     ],
     "BALLAST_CONFIGURATION_CLUSTER": [],
-    "BARRIER_CONTROL_CLUSTER": [
-      "barrier-control-server"
-    ],
     "BASIC_INFORMATION_CLUSTER": [
       "basic-information"
     ],
@@ -240,7 +232,6 @@
     "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
       "electrical-energy-measurement-server"
     ],
-    "ELECTRICAL_MEASUREMENT_CLUSTER": [],
     "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
       "electrical-power-measurement-server"
     ],
@@ -284,7 +275,6 @@
     "GROUP_KEY_MANAGEMENT_CLUSTER": [
       "group-key-mgmt-server"
     ],
-    "IAS_ZONE_CLUSTER": [],
     "ICD_MANAGEMENT_CLUSTER": [
       "icd-management-server"
     ],
@@ -340,7 +330,6 @@
     "POWER_TOPOLOGY_CLUSTER": [
       "power-topology-server"
     ],
-    "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
     "OPERATIONAL_CREDENTIALS_CLUSTER": [
       "operational-credentials-server"
     ],
@@ -491,7 +480,6 @@
     ],
     "WATER_HEATER_MODE_CLUSTER": [
       "mode-base-server"
-    ],
-    "ZLL_COMMISSIONING_CLUSTER": []
+    ]
   }
 }

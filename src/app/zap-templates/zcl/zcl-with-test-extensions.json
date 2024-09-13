@@ -22,7 +22,6 @@
     "application-launcher-cluster.xml",
     "audio-output-cluster.xml",
     "ballast-configuration-cluster.xml",
-    "barrier-control-cluster.xml",
     "basic-information-cluster.xml",
     "binding-cluster.xml",
     "boolean-state-cluster.xml",

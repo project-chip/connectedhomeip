@@ -290,33 +290,6 @@
           ]
         },
         {
-          "name": "On/off Switch Configuration",
-          "code": 7,
-          "mfgCode": null,
-          "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "deprecated",
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Level Control",
           "code": 8,
           "mfgCode": null,
@@ -3854,51 +3827,6 @@
           ]
         },
         {
-          "name": "Barrier Control",
-          "code": 259,
-          "mfgCode": null,
-          "define": "BARRIER_CONTROL_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "deprecated",
-          "commands": [
-            {
-              "name": "BarrierControlGoToPercent",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "BarrierControlStop",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
@@ -5616,33 +5544,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Electrical Measurement",
-          "code": 2820,
-          "mfgCode": null,
-          "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "deprecated",
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
