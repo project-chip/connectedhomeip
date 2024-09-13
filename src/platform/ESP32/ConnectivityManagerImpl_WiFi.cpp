@@ -56,7 +56,9 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         wifi_mode_t curWiFiMode;
-        mWiFiStationMode = (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && (curWiFiMode == WIFI_MODE_STA))
+        mWiFiStationMode =
+            (esp_wifi_get_mode(&curWiFiMode) == ESP_OK && (curWiFiMode == WIFI_MODE_APSTA || curWiFiMode == WIFI_MODE_STA))
+
             ? kWiFiStationMode_Enabled
             : kWiFiStationMode_Disabled;
     }
@@ -76,6 +78,8 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
+        ReturnErrorOnFailure(Internal::ESP32Utils::EnableStationMode());
+
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 
@@ -332,6 +336,9 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 
     // TODO Initialize the Chip Addressing and Routing Module.
 
+    // Ensure that ESP station mode is enabled.
+    ReturnErrorOnFailure(Internal::ESP32Utils::EnableStationMode());
+
     // If there is no persistent station provision...
     if (!IsWiFiStationProvisioned())
     {
@@ -366,6 +373,7 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
         }
     }
 
+    ReturnErrorOnFailure(Internal::ESP32Utils::MapError(esp_wifi_set_mode(WIFI_MODE_STA)));
     // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
 
@@ -469,6 +477,9 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Ensure that the ESP WiFi layer is started.
         ReturnOnFailure(Internal::ESP32Utils::StartWiFiLayer());
+
+        // Ensure that station mode is enabled in the ESP WiFi layer.
+        ReturnOnFailure(Internal::ESP32Utils::EnableStationMode());
     }
 
     // Determine if the ESP WiFi layer thinks the station interface is currently connected.

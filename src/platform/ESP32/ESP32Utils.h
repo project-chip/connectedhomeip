@@ -33,6 +33,7 @@ public:
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);
+    static CHIP_ERROR EnableStationMode(void);
     static int OrderScanResultsByRSSI(const void * _res1, const void * _res2);
     static const char * WiFiModeToStr(wifi_mode_t wifiMode);
     static struct netif * GetNetif(const char * ifKey);
