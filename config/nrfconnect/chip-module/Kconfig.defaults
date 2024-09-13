@@ -51,6 +51,7 @@ config INIT_STACKS
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
+    default 1536 if CHIP_ICD_LIT_SUPPORT
 
 config HEAP_MEM_POOL_SIZE
     default 80000 if CHIP_WIFI
