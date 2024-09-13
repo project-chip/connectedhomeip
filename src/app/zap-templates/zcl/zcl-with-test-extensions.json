@@ -6,7 +6,6 @@
   "xmlRoot": [
     ".",
     "./data-model/chip/",
-    "./data-model/draft/",
     "./data-model/silabs/",
     "./data-model/test"
   ],
@@ -50,7 +49,6 @@
     "ecosystem-information-cluster.xml",
     "energy-preference-cluster.xml",
     "electrical-energy-measurement-cluster.xml",
-    "electrical-measurement-cluster.xml",
     "electrical-power-measurement-cluster.xml",
     "energy-evse-cluster.xml",
     "energy-evse-mode-cluster.xml",
@@ -87,7 +85,6 @@
     "network-commissioning-cluster.xml",
     "occupancy-sensing-cluster.xml",
     "onoff-cluster.xml",
-    "onoff-switch-configuration-cluster.xml",
     "operational-credentials-cluster.xml",
     "operational-state-cluster.xml",
     "operational-state-oven-cluster.xml",
