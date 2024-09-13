@@ -1,6 +1,8 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Google LLC.
+ *    Copyright 2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,32 +20,35 @@
 
 #pragma once
 
-#include "AppConfig.h"
+#if CONFIG_APP_FREERTOS_OS
 #include "AppTaskFreeRTOS.h"
+#else
+#include "AppTaskZephyr.h"
+#endif
 
-#include <platform/CHIPDeviceLayer.h>
-
-namespace ContactSensorApp {
-
+namespace LockApp {
+#if CONFIG_APP_FREERTOS_OS
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
+#else
+class AppTask : public chip::NXP::App::AppTaskZephyr
+#endif
 {
 public:
     // AppTaskBase virtual methods
     bool CheckStateClusterHandler(void) override;
     CHIP_ERROR ProcessSetStateClusterHandler(void) override;
 
-    // AppTaskFreeRTOS virtual methods
-    void PreInitMatterStack() override;
-#if CONFIG_LOW_POWER
-    void AppMatter_DisallowDeviceToSleep() override;
-    void AppMatter_AllowDeviceToSleep() override;
-#endif
-
+    ~AppTask() override{};
+    void PostInitMatterStack(void) override;
+    void PreInitMatterStack(void) override;
+    void AppMatter_RegisterCustomCliCommands(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
-};
 
-} // namespace ContactSensorApp
+private:
+    static AppTask sAppTask;
+};
+} // namespace LockApp
 
 /**
  * Returns the application-specific implementation of the AppTaskBase object.
