@@ -41,7 +41,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-
     switch (clusterId)
     {
     case app::Clusters::Identify::Id:
@@ -50,26 +49,25 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         break;
     case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
         RefrigeratorMgr().RefAndTempCtrlAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
-        #ifdef DIC_ENABLE
-            dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
-        #endif // DIC_ENABLE
+#ifdef DIC_ENABLE
+        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
+#endif // DIC_ENABLE
         break;
     case app::Clusters::RefrigeratorAlarm::Id:
         RefrigeratorMgr().RefAlaramAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
-        #ifdef DIC_ENABLE
-            dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
-        #endif // DIC_ENABLE
+#ifdef DIC_ENABLE
+        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
+#endif // DIC_ENABLE
         break;
     case app::Clusters::TemperatureControl::Id:
         RefrigeratorMgr().TempCtrlAttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
-        #ifdef DIC_ENABLE
-            dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
-        #endif // DIC_ENABLE
+#ifdef DIC_ENABLE
+        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
+#endif // DIC_ENABLE
         break;
     default:
         break;
     }
-
 }
 
 /** @brief Refrigerator And TemperatureControlled Cabinet Mode Cluster Init

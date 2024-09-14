@@ -18,16 +18,16 @@
 
 #pragma once
 #include "AppEvent.h"
-#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/util/attribute-storage.h>
+#include <cmsis_os2.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <cmsis_os2.h>
-#include <lib/core/CHIPError.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,9 +42,9 @@ using chip::Protocols::InteractionModel::Status;
 // AppCluster Spec Table 85.
 enum SUPPORTED_MODES
 {
-    NORMAL = 0x0000,
-    ENERGY_SAVE = 0x0004,
-    RAPID_COOL = 0x4000,
+    NORMAL       = 0x0000,
+    ENERGY_SAVE  = 0x0004,
+    RAPID_COOL   = 0x4000,
     RAPID_FREEZE = 0x4001,
 };
 

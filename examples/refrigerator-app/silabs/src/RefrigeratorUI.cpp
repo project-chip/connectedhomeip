@@ -235,7 +235,7 @@ void RefrigeratorUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, 
  * @param uint32_t size Size of the font data in bytes
  */
 void RefrigeratorUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
-                            uint32_t size)
+                              uint32_t size)
 {
     uint8_t x = initial_x, y = initial_y;
     for (uint16_t i = 0; i < size; i++)

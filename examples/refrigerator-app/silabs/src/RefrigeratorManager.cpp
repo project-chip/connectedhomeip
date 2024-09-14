@@ -22,13 +22,12 @@
  *********************************************************/
 
 #include "RefrigeratorManager.h"
-#include <static-supported-temperature-levels.h>
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/logging/CHIPLogging.h>
-
+#include <static-supported-temperature-levels.h>
 
 /**********************************************************
  * Defines and Constants
@@ -38,8 +37,8 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace RefAndTempAttr = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes;
-namespace RefAlarmAttr = chip::app::Clusters::RefrigeratorAlarm::Attributes;
-namespace TempCtrlAttr = chip::app::Clusters::TemperatureControl::Attributes;
+namespace RefAlarmAttr   = chip::app::Clusters::RefrigeratorAlarm::Attributes;
+namespace TempCtrlAttr   = chip::app::Clusters::TemperatureControl::Attributes;
 
 // set Parent Endpoint and Composition Type for an Endpoint
 EndpointId kRefEndpointId           = 1;
@@ -49,18 +48,18 @@ EndpointId kFreezeCabinetEndpointId = 3;
 RefrigeratorManager RefrigeratorManager::sRefrigeratorMgr;
 
 namespace {
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-    // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
-    constexpr const uint8_t kNamespaceRefrigerator = 0x41;
-    // Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
-    constexpr const uint8_t kTagRefrigerator = 0x00;
-    // Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
-    constexpr const uint8_t kTagFreezer                                                = 0x01;
-    const Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                            .tag         = kTagRefrigerator } };
-    const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                            .tag         = kTagFreezer } };
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceRefrigerator = 0x41;
+// Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
+constexpr const uint8_t kTagRefrigerator = 0x00;
+// Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
+constexpr const uint8_t kTagFreezer                                                = 0x01;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                         .tag         = kTagRefrigerator } };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                         .tag         = kTagFreezer } };
 } // namespace
 
 CHIP_ERROR RefrigeratorManager::Init()
@@ -95,112 +94,114 @@ int8_t RefrigeratorManager::ConvertToPrintableTemp(int16_t temperature)
     return static_cast<int8_t>(temperature / 100);
 }
 
-
-void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
+void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
+                                                               uint16_t size)
 {
     switch (attributeId)
     {
-        case RefAndTempAttr::CurrentMode::Id: {
-            int16_t currentMode = static_cast<int16_t>(*value);
-            mCurrentMode = currentMode;
-        }
-        break;
+    case RefAndTempAttr::CurrentMode::Id: {
+        int16_t currentMode = static_cast<int16_t>(*value);
+        mCurrentMode        = currentMode;
+    }
+    break;
 
-        case RefAndTempAttr::StartUpMode::Id: {
-            int16_t startUpMode = static_cast<int16_t>(*value);
-            mStartUpMode = startUpMode;
-        }
-        break;
+    case RefAndTempAttr::StartUpMode::Id: {
+        int16_t startUpMode = static_cast<int16_t>(*value);
+        mStartUpMode        = startUpMode;
+    }
+    break;
 
-        case RefAndTempAttr::OnMode::Id: {
-            int16_t onMode = static_cast<int16_t>(*value);
-            mOnMode = onMode;
-        }
-        break;
+    case RefAndTempAttr::OnMode::Id: {
+        int16_t onMode = static_cast<int16_t>(*value);
+        mOnMode        = onMode;
+    }
+    break;
 
-        default: {
-            SILABS_LOG("Unhandled Refrigerator and Temprature attribute %x", attributeId);
-            return;
-        }
-        break;
+    default: {
+        SILABS_LOG("Unhandled Refrigerator and Temprature attribute %x", attributeId);
+        return;
+    }
+    break;
     }
 }
 
-void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
+void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
+                                                         uint16_t size)
 {
     switch (attributeId)
     {
-        case TempCtrlAttr::TemperatureSetpoint::Id: {
-            int16_t temperatureSetpoint = ConvertToPrintableTemp(*((int16_t *) value));
-            mTemperatureSetpoint = temperatureSetpoint;
-            TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
-        }
-        break;
+    case TempCtrlAttr::TemperatureSetpoint::Id: {
+        int16_t temperatureSetpoint = ConvertToPrintableTemp(*((int16_t *) value));
+        mTemperatureSetpoint        = temperatureSetpoint;
+        TempCtrlAttr::TemperatureSetpoint::Set(endpointId, temperatureSetpoint);
+    }
+    break;
 
-        case TempCtrlAttr::MinTemperature::Id: {
-            int16_t minTemperature = ConvertToPrintableTemp(*((int16_t *) value));
-            mMinTemperature = minTemperature;
-            TempCtrlAttr::MinTemperature::Set(endpointId, minTemperature);
-        }
-        break;
+    case TempCtrlAttr::MinTemperature::Id: {
+        int16_t minTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+        mMinTemperature        = minTemperature;
+        TempCtrlAttr::MinTemperature::Set(endpointId, minTemperature);
+    }
+    break;
 
-        case TempCtrlAttr::MaxTemperature::Id: {
-            int16_t maxTemperature = ConvertToPrintableTemp(*((int16_t *) value));
-            mMaxTemperature = maxTemperature;
-            TempCtrlAttr::MaxTemperature::Set(endpointId, maxTemperature);
-        }
-        break;
+    case TempCtrlAttr::MaxTemperature::Id: {
+        int16_t maxTemperature = ConvertToPrintableTemp(*((int16_t *) value));
+        mMaxTemperature        = maxTemperature;
+        TempCtrlAttr::MaxTemperature::Set(endpointId, maxTemperature);
+    }
+    break;
 
-        case TempCtrlAttr::SelectedTemperatureLevel::Id: {
-            int16_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
-            mSelectedTemperatureLevel = selectedTemperatureLevel;
-            TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
-        }
-        break;
+    case TempCtrlAttr::SelectedTemperatureLevel::Id: {
+        int16_t selectedTemperatureLevel = ConvertToPrintableTemp(*((int16_t *) value));
+        mSelectedTemperatureLevel        = selectedTemperatureLevel;
+        TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
+    }
+    break;
 
-        case TempCtrlAttr::Step::Id: {
-            int16_t step = ConvertToPrintableTemp(*((int16_t *) value));
-            TempCtrlAttr::MaxTemperature::Set(endpointId, step);
-        }
-        break;
+    case TempCtrlAttr::Step::Id: {
+        int16_t step = ConvertToPrintableTemp(*((int16_t *) value));
+        TempCtrlAttr::MaxTemperature::Set(endpointId, step);
+    }
+    break;
 
-        default: {
-            SILABS_LOG("Unhandled Temprature controlled attribute %x", attributeId);
-            return;
-        }
-        break;
+    default: {
+        SILABS_LOG("Unhandled Temprature controlled attribute %x", attributeId);
+        return;
+    }
+    break;
     }
 }
 
-void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size)
+void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
+                                                          uint16_t size)
 {
     switch (attributeId)
     {
-        case RefAlarmAttr::Mask::Id: {
-            auto mask = static_cast<uint32_t>(*value);
-            mState = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
-            RefAlarmAttr::Mask::Set(endpointId, mMask);
-        }
-        break;
+    case RefAlarmAttr::Mask::Id: {
+        auto mask = static_cast<uint32_t>(*value);
+        mState    = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
+        RefAlarmAttr::Mask::Set(endpointId, mMask);
+    }
+    break;
 
-        case RefAlarmAttr::State::Id: {
-            auto state = static_cast<uint32_t>(*value);
-            mState = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(state);
-            RefAlarmAttr::State::Set(endpointId, mState);
-        }
-        break;
+    case RefAlarmAttr::State::Id: {
+        auto state = static_cast<uint32_t>(*value);
+        mState     = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(state);
+        RefAlarmAttr::State::Set(endpointId, mState);
+    }
+    break;
 
-        case RefAlarmAttr::Supported::Id: {
-            auto supported = static_cast<uint32_t>(*value);
-            mSupported = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(supported);
-            RefAlarmAttr::Supported::Set(endpointId, mSupported);
-        }
-        break;
+    case RefAlarmAttr::Supported::Id: {
+        auto supported = static_cast<uint32_t>(*value);
+        mSupported     = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(supported);
+        RefAlarmAttr::Supported::Set(endpointId, mSupported);
+    }
+    break;
 
-        default: {
-            SILABS_LOG("Unhandled Refrigerator Alarm attribute %x", attributeId);
-            return;
-        }
-        break;
+    default: {
+        SILABS_LOG("Unhandled Refrigerator Alarm attribute %x", attributeId);
+        return;
+    }
+    break;
     }
 }

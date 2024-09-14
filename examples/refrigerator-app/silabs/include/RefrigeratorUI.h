@@ -28,9 +28,9 @@ class RefrigeratorUI
 public:
     enum SUPPORTED_MODES
     {
-        NORMAL = 0x0000,
-        ENERGY_SAVE = 0x0004,
-        RAPID_COOL = 0x4000,
+        NORMAL       = 0x0000,
+        ENERGY_SAVE  = 0x0004,
+        RAPID_COOL   = 0x4000,
         RAPID_FREEZE = 0x4001,
     };
 

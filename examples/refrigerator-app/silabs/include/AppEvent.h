@@ -28,7 +28,7 @@ struct AppEvent
     {
         kEventType_Button = 0,
         kEventType_Timer,
-	kEventType_Refrigerator,
+        kEventType_Refrigerator,
         kEventType_Install,
     };
 
