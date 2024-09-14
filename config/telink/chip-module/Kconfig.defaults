@@ -34,6 +34,7 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_WRN if SOC_RISCV_TELINK_TL321X
     default MATTER_LOG_LEVEL_DBG
 endchoice
 
@@ -118,7 +119,6 @@ config GPIO
 # Bluetooth Low Energy configs
 
 config BT
-    default n if SOC_SERIES_RISCV_TELINK_TLX
     default y
 
 if BT
@@ -180,7 +180,7 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     bool
     default n
 
-if SOC_SERIES_RISCV_TELINK_B9X
+if SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
 
 config B9X_BLE_CTRL_THREAD_STACK_SIZE
     default 576
@@ -199,28 +199,8 @@ choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
-endif # SOC_SERIES_RISCV_TELINK_B9X
+endif # SOC_SERIES_RISCV_TELINK_B9X || SOC_SERIES_RISCV_TELINK_TLX
 
-if SOC_SERIES_RISCV_TELINK_TLX
-
-# config TLX_BLE_CTRL_THREAD_STACK_SIZE
-#     default 576
-# 
-# config TLX_BLE_CTRL_MASTER_MAX_NUM
-#     default 0
-# 
-# config TLX_BLE_CTRL_SLAVE_MAX_NUM
-#     default 1
-# 
-# config TLX_BLE_CTRL_RF_POWER
-#     default 3 if PM 
-#     default 9
-# 
-# choice TLX_BLE_CTRL_MAC_TYPE
-#     default TLX_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
-# endchoice
-
-endif # TLX_BLE_CTRL_MASTER_MAX_NUM
 
 endif # BT
 
@@ -503,6 +483,7 @@ config OPENTHREAD_SHELL
     default n
 
 config CHIP_TASK_STACK_SIZE
+    default 6192 if SOC_RISCV_TELINK_TL321X
 	default 4864 if PM
 
 endif
