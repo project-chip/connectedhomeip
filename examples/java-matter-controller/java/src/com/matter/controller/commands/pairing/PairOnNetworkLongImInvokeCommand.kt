@@ -58,9 +58,7 @@ class PairOnNetworkLongImInvokeCommand(
       if (element != null) {
         logger.log(Level.INFO, element.toString() + element.getJsonString())
         val clusterId = element.getClusterId().getId()
-        if (
-          clusterId == CLUSTER_ID_TEST && element.getJsonString().equals("""{"0:UINT":2}""")
-        ) {
+        if (clusterId == CLUSTER_ID_TEST && element.getJsonString().equals("""{"0:UINT":2}""")) {
           logger.log(Level.INFO, "success code is $successCode")
           setSuccess()
           return

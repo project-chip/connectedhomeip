@@ -43,7 +43,8 @@ class PairOnNetworkLongImInvokeCommand(
         val arg2: UByte = 2u
         val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 0u)
 
-        // By running command testAddArguments, we are implicitly requesting CASE to be established if it's
+        // By running command testAddArguments, we are implicitly requesting CASE to be established
+        // if it's
         // not already present.
         testCluster.testAddArguments(arg1, arg2)
         logger.log(Level.INFO, "Invoke command succeeded")
