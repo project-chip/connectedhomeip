@@ -107,17 +107,17 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint) {}
 
 // /**
 //  * @brief Handles the SetTemperature command for the Temperature Control Cluster.
-//  * 
-//  * This function is called when the SetTemperature command is received from a client. 
+//  *
+//  * This function is called when the SetTemperature command is received from a client.
 //  * It is responsible for setting the temperature for the cabinet as per the command data.
-//  * 
+//  *
 //  * @param CommandHandler commandObj Pointer to the command handler object.
 //  * @param const ConcreteCommandPath commandPath The path of the command received.
-//  * @param const DecodableType & commandData 
+//  * @param const DecodableType & commandData
 //  *        The data decoded from the SetTemperature command, which includes the desired temperature.
-//  * 
+//  *
 //  * @return bool Returns true if the command was handled successfully, false otherwise.
-//  * 
+//  *
 //  * @note The actual implementation to set the temperature is yet to be added.
 //  */
 // bool emberAfTemperatureControlClusterSetTemperatureCallback(

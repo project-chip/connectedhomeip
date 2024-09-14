@@ -157,7 +157,7 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
             TempCtrlAttr::SelectedTemperatureLevel::Set(endpointId, selectedTemperatureLevel);
         }
         break;
-        
+
         case TempCtrlAttr::Step::Id: {
             int16_t step = ConvertToPrintableTemp(*((int16_t *) value));
             TempCtrlAttr::MaxTemperature::Set(endpointId, step);
