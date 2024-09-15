@@ -136,7 +136,7 @@ public:
     {
         lastRequestedLevel = targetLevel;
         ++numHandleOpenValveCalls;
-        if (simulateAsyncOpen)
+        if (simulateAsync)
         {
             currentLevel = targetLevel / 2;
         }
@@ -146,16 +146,39 @@ public:
         }
         level  = currentLevel;
         target = targetLevel;
-        if (simulateFailure || simulateValveFaultNoFailure)
+        if (simulateOpenFailure || simulateValveFaultNoFailure)
         {
             valveFault = simulatedFailureBitMask;
         }
-        if (simulateFailure)
+        if (simulateOpenFailure)
         {
             return CHIP_ERROR_INTERNAL;
         }
         return CHIP_NO_ERROR;
     }
+    virtual CHIP_ERROR HandleCloseValve(Percent & currentLevel, BitMask<ValveFaultBitmap> & valveFault) override
+    {
+        ++numHandleCloseValveCalls;
+        if (simulateAsync)
+        {
+            currentLevel = 10;
+        }
+        else
+        {
+            currentLevel = 0;
+        }
+        level = currentLevel;
+        if (simulateCloseFailure || simulateValveFaultNoFailure)
+        {
+            valveFault = simulatedFailureBitMask;
+        }
+        if (simulateCloseFailure)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
+    }
+
     Percent GetCurrentValveLevel() override
     {
         // TODO: maybe want to ramp this.
@@ -165,12 +188,13 @@ public:
 
     BitMask<ValveFaultBitmap> simulatedFailureBitMask =
         BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kBlocked) | to_underlying(ValveFaultBitmap::kGeneralFault));
-    CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
     Percent lastRequestedLevel       = 0;
-    bool simulateFailure             = false;
+    bool simulateOpenFailure         = false;
+    bool simulateCloseFailure        = false;
     bool simulateValveFaultNoFailure = false;
-    bool simulateAsyncOpen           = false;
+    bool simulateAsync               = false;
     int numHandleOpenValveCalls      = 0;
+    int numHandleCloseValveCalls     = 0;
     Percent level                    = 0;
     Percent target                   = 0;
 };
@@ -182,7 +206,7 @@ public:
     CHIP_ERROR HandleOpenValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
     {
         ++numHandleOpenValveCalls;
-        if (simulateAsyncOpen)
+        if (simulateAsync)
         {
             currentState = ValveStateEnum::kTransitioning;
         }
@@ -192,11 +216,34 @@ public:
         }
         state  = currentState;
         target = ValveStateEnum::kOpen;
-        if (simulateFailure || simulateValveFaultNoFailure)
+        if (simulateOpenFailure || simulateValveFaultNoFailure)
         {
             valveFault = simulatedFailureBitMask;
         }
-        if (simulateFailure)
+        if (simulateOpenFailure)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleCloseValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
+    {
+        ++numHandleCloseValveCalls;
+        if (simulateAsync)
+        {
+            currentState = ValveStateEnum::kTransitioning;
+        }
+        else
+        {
+            currentState = ValveStateEnum::kClosed;
+        }
+        state  = currentState;
+        target = ValveStateEnum::kClosed;
+        if (simulateCloseFailure || simulateValveFaultNoFailure)
+        {
+            valveFault = simulatedFailureBitMask;
+        }
+        if (simulateCloseFailure)
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -211,11 +258,12 @@ public:
 
     BitMask<ValveFaultBitmap> simulatedFailureBitMask =
         BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kBlocked) | to_underlying(ValveFaultBitmap::kGeneralFault));
-    CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
-    bool simulateFailure             = false;
+    bool simulateOpenFailure         = false;
+    bool simulateCloseFailure        = false;
     bool simulateValveFaultNoFailure = false;
-    bool simulateAsyncOpen           = false;
+    bool simulateAsync               = false;
     int numHandleOpenValveCalls      = 0;
+    int numHandleCloseValveCalls     = 0;
     ValveStateEnum state             = ValveStateEnum::kUnknownEnumValue;
     ValveStateEnum target            = ValveStateEnum::kUnknownEnumValue;
 };
@@ -977,8 +1025,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
                                        .supportsLevelStep        = true };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure   = false;
-    delegate.simulateAsyncOpen = false;
+    delegate.simulateOpenFailure = false;
+    delegate.simulateAsync       = false;
 
     DataModel::Nullable<uint8_t> level;
     DataModel::Nullable<ValveStateEnum> state;
@@ -1024,8 +1072,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure   = false;
-    delegate.simulateAsyncOpen = false;
+    delegate.simulateOpenFailure = false;
+    delegate.simulateAsync       = false;
 
     DataModel::Nullable<ValveStateEnum> state;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
@@ -1053,8 +1101,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelSup
                                        .supportsLevelStep        = true };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure   = false;
-    delegate.simulateAsyncOpen = true;
+    delegate.simulateOpenFailure = false;
+    delegate.simulateAsync       = true;
 
     DataModel::Nullable<uint8_t> level;
     DataModel::Nullable<ValveStateEnum> state;
@@ -1103,8 +1151,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelNot
     };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure   = false;
-    delegate.simulateAsyncOpen = true;
+    delegate.simulateOpenFailure = false;
+    delegate.simulateAsync       = true;
 
     DataModel::Nullable<ValveStateEnum> state;
 
@@ -1190,7 +1238,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
 
     BitMask<ValveFaultBitmap> valveFault;
 
-    delegate.simulateFailure = true;
+    delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
     EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
@@ -1216,7 +1264,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
 
     BitMask<ValveFaultBitmap> valveFault;
 
-    delegate.simulateFailure = true;
+    delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
     EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
@@ -1239,11 +1287,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
                                        .supportsLevelStep        = true };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure = true;
+    delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 
-    delegate.simulateFailure             = false;
+    delegate.simulateOpenFailure         = false;
     delegate.simulateValveFaultNoFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
@@ -1267,11 +1315,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     };
     EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
 
-    delegate.simulateFailure = true;
+    delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 
-    delegate.simulateFailure             = false;
+    delegate.simulateOpenFailure         = false;
     delegate.simulateValveFaultNoFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
@@ -1498,7 +1546,403 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdatesNonExac
 //=========================================================================================
 // Tests for automatically calling close from the cluster logic
 //=========================================================================================
-// ensures close is called at open duration and not before
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevel)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    DataModel::Nullable<Percent> valPercentNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+    // No valve faults, level should say 0, state should say closed, targets should be null
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::Nullable<Percent>(0));
+
+    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevel)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+    // No valve faults, level should say 0, state should say closed, targets should be null
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelAsync)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateAsync = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    DataModel::Nullable<Percent> valPercentNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+    // No valve faults, level should say 0, state should say closed, targets should be null
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_NE(valPercentNullable, DataModel::Nullable<Percent>(0));
+
+    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelAsync)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateAsync = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelOkFaultReturned)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
+    delegate.simulateValveFaultNoFailure = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    DataModel::Nullable<Percent> valPercentNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::Nullable<Percent>(0));
+
+    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelOkFaultReturned)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
+    delegate.simulateValveFaultNoFailure = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelFailure)
+{
+    TestDelegateLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
+                                       .supportsDefaultOpenLevel = true,
+                                       .supportsValveFault       = true,
+                                       .supportsLevelStep        = true };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateCloseFailure = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    DataModel::Nullable<Percent> valPercentNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+}
+
+TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelFailure)
+{
+    TestDelegateNoLevel delegate;
+    TestPersistentStorageDelegate storageDelegate;
+    EndpointId endpoint = 0;
+    MockedMatterContext context(endpoint, storageDelegate);
+    ClusterLogic logic(delegate, context);
+
+    ClusterConformance conformance = {
+        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
+    };
+    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+
+    delegate.simulateCloseFailure = true;
+
+    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    DataModel::Nullable<ValveStateEnum> valEnumNullable;
+    BitMask<ValveFaultBitmap> valBitmap;
+
+    gSystemLayerAndClock.SetMonotonic(0_ms64);
+    gSystemLayerAndClock.Clear();
+    DataModel::Nullable<ElapsedS> openDuration;
+    openDuration.SetNonNull(2u);
+    EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
+    EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::OpenDuration::Id));
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 0);
+
+    gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
+    EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
+
+    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
+
+    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
+    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+}
 
 //=========================================================================================
 // Tests for handling close commands

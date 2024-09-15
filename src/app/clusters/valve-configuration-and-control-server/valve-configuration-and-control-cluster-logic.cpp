@@ -457,13 +457,44 @@ CHIP_ERROR ClusterLogic::HandleOpenCommand(std::optional<DataModel::Nullable<Ela
 void ClusterLogic::HandleCloseInternal()
 {
     // TODO: call the delegate and add to tests
-    // TODO: Handle error returns on the delegate.
-
+    CHIP_ERROR err;
+    BitMask<ValveFaultBitmap> faults;
+    if (mConformance.HasFeature(Feature::kLevel))
+    {
+        Percent currentLevel;
+        err = mClusterDriver.HandleCloseValve(currentLevel, faults);
+        if (err == CHIP_NO_ERROR)
+        {
+            mState.SetCurrentLevel(DataModel::Nullable<Percent>(currentLevel));
+            if (currentLevel == 0)
+            {
+                mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+            }
+            else
+            {
+                mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+            }
+        }
+    }
+    else
+    {
+        ValveStateEnum state;
+        err = mClusterDriver.HandleCloseValve(state, faults);
+        if (err == CHIP_NO_ERROR)
+        {
+            mState.SetCurrentState(state);
+        }
+    }
+    // If there was an error, we know nothing about the current state
+    if (err != CHIP_NO_ERROR)
+    {
+        mState.SetCurrentLevel(DataModel::NullNullable);
+        mState.SetCurrentState(DataModel::NullNullable);
+    }
+    mState.SetValveFault(faults);
     mState.SetOpenDuration(DataModel::NullNullable);
     mState.SetRemainingDuration(DataModel::NullNullable);
-    mState.SetCurrentLevel(DataModel::Nullable<Percent>(0));
     mState.SetTargetLevel(DataModel::NullNullable);
-    mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
     mState.SetTargetState(DataModel::NullNullable);
     mState.SetAutoCloseTime(DataModel::NullNullable);
 }
