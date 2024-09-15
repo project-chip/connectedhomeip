@@ -66,7 +66,7 @@ Since this is tedious to type, the SDK provides a
 `scripts/tools/zap/run_zaptool.sh` script to automate this:
 
 ```bash
-# Ensure zap is in $PATH or set $ZAP_INSTALL_PATH or $ZAP_DEVELOPMENT_PATH
+# Ensure `zap` is in $PATH, specify the `--zap ZAP` option to `run_zaptool.sh` to specify the path to `zap`, set $ZAP_INSTALL_PATH, or set $ZAP_DEVELOPMENT_PATH
 ./scripts/tools/zap/run_zaptool.sh examples/lighting-app/lighting-common/lighting-app.zap
 ```
 
