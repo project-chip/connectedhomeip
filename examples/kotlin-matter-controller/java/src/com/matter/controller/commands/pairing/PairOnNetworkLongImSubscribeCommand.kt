@@ -9,7 +9,7 @@ import matter.controller.MatterController
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
 import matter.controller.UShortSubscriptionState
-import matter.controller.cluster.clusters.IdentifyCluster
+import matter.controller.cluster.clusters.UnitTestingCluster
 import matter.controller.model.AttributePath
 import matter.controller.model.EventPath
 
@@ -42,8 +42,8 @@ class PairOnNetworkLongImSubscribeCommand(
         // Verify Wildcard subscription
         startWildcardSubscription()
 
-        // Verify IdentifyTime attribute subscription
-        subscribeIdentifyTimeAttribute()
+        // Verify Boolean attribute subscription
+        subscribeBooleanAttribute()
       } catch (ex: Exception) {
         logger.log(Level.WARNING, "General subscribe failure occurred with error ${ex.message}")
         setFailure("subscribe failure")
@@ -107,13 +107,13 @@ class PairOnNetworkLongImSubscribeCommand(
       }
   }
 
-  private suspend fun subscribeIdentifyTimeAttribute() {
-    logger.log(Level.INFO, "Subscribe IdentifyTime attribute")
+  private suspend fun subscribeBooleanAttribute() {
+    logger.log(Level.INFO, "Subscribe Boolean attribute")
 
-    val identifyCluster = IdentifyCluster(controller = currentCommissioner(), endpointId = 0u)
+    val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 0u)
 
-    identifyCluster
-      .subscribeIdentifyTimeAttribute(minInterval = 0, maxInterval = 5)
+    testCluster
+      .subscribeBooleanAttribute(minInterval = 0, maxInterval = 5)
       .takeWhile { subscriptionState ->
         // Keep collecting as long as it's not SubscriptionEstablished
         subscriptionState !is UShortSubscriptionState.SubscriptionEstablished
@@ -121,7 +121,7 @@ class PairOnNetworkLongImSubscribeCommand(
       .collect { subscriptionState ->
         when (subscriptionState) {
           is UShortSubscriptionState.Success -> {
-            logger.log(Level.INFO, "Received IdentifyTime Update: ${subscriptionState.value}")
+            logger.log(Level.INFO, "Received Boolean Update: ${subscriptionState.value}")
           }
           is UShortSubscriptionState.Error -> {
             logger.log(
@@ -130,7 +130,7 @@ class PairOnNetworkLongImSubscribeCommand(
             )
           }
           is UShortSubscriptionState.SubscriptionEstablished -> {
-            logger.log(Level.INFO, "IdentifyTime Subscription is established")
+            logger.log(Level.INFO, "Boolean Subscription is established")
           }
           else -> {
             logger.log(Level.SEVERE, "Unexpected subscription state: $subscriptionState")
