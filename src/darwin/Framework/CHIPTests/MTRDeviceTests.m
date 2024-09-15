@@ -1451,8 +1451,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [subscriptionExpectation fulfill];
     };
 
+    NSMutableSet<NSNumber *> * endpoints = [[NSMutableSet alloc] init];
+    NSMutableSet<MTRClusterPath *> * clusters = [[NSMutableSet alloc] init];
+    NSMutableSet<NSNumber *> * rootBasicInformationAttributes = [[NSMutableSet alloc] init];
     __block unsigned attributeReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * dataItem in data) {
+            MTRAttributePath * path = dataItem[MTRAttributePathKey];
+            XCTAssertNotNil(path);
+            if (dataItem[MTRDataKey]) {
+                [endpoints addObject:path.endpoint];
+                [clusters addObject:[MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster]];
+                if (path.endpoint.unsignedLongValue == 0 && path.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID) {
+                    [rootBasicInformationAttributes addObject:path.attribute];
+                }
+            }
+        }
+
         attributeReportsReceived += data.count;
     };
 
@@ -1538,6 +1553,39 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
+
+    // Test readAttributePaths.  First, try DeviceTypeList across all endpoints.
+    __auto_type * deviceTypeListPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    __auto_type * deviceTypes = [device readAttributePaths:@[ deviceTypeListPath ]];
+    XCTAssertEqual(deviceTypes.count, endpoints.count);
+
+    // Now try ClusterRevision across all clusters.
+    __auto_type * clusterRevisionsPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)];
+    __auto_type * clusterRevisions = [device readAttributePaths:@[ clusterRevisionsPath ]];
+    XCTAssertEqual(clusterRevisions.count, clusters.count);
+
+    // Now try BasicInformation in a few different ways:
+    __auto_type * basicInformationAllAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllAttributes = [device readAttributePaths:@[ basicInformationAllAttributesPath ]];
+
+    __auto_type * basicInformationAllRootAttributesPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:nil];
+    __auto_type * basicInformationAllRootAttributes = [device readAttributePaths:@[ basicInformationAllRootAttributesPath ]];
+    // Should have gotten the same things, because Basic Information only exists
+    // on the root endpoint.
+    XCTAssertEqualObjects([NSSet setWithArray:basicInformationAllAttributes], [NSSet setWithArray:basicInformationAllRootAttributes]);
+    XCTAssertEqual(basicInformationAllAttributes.count, rootBasicInformationAttributes.count);
+
+    // Now try multiple paths.  Should just get the union of all the things for
+    // each path.
+    __auto_type * variousThings = [device readAttributePaths:@[ deviceTypeListPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:deviceTypes] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
+
+    // And similar if the paths expand to overlapping sets of existent paths
+    // (e.g. because Basic Information has a ClusterRevision).
+    variousThings = [device readAttributePaths:@[ clusterRevisionsPath, basicInformationAllRootAttributesPath ]];
+    XCTAssertEqualObjects([NSSet setWithArray:variousThings],
+        [[NSSet setWithArray:clusterRevisions] setByAddingObjectsFromSet:[NSSet setWithArray:basicInformationAllRootAttributes]]);
 
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
@@ -3117,48 +3165,49 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
+- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+{
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
+
+    NSError * encodeError;
+    NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
+
+    NSError * decodeError;
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError, @"Failed to decode %@", NSStringFromClass([obj class]));
+    XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
+
+    XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
+}
+
 - (void)test032_MTRPathClassesEncoding
 {
-    NSError * encodeError;
-    NSData * encodedData;
-    NSError * decodeError;
-    id decodedValue;
-
     // Test attribute path encode / decode
-    MTRAttributePath * originalAttributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalAttributePath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
-
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRAttributePath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTRAttributePath class]]);
-
-    MTRAttributePath * decodedAttributePath = decodedValue;
-    XCTAssertEqualObjects(originalAttributePath, decodedAttributePath);
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    [self doEncodeDecodeRoundTrip:attributePath];
 
     // Test event path encode / decode
-    MTREventPath * originalEventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalEventPath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
-
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTREventPath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTREventPath class]]);
-
-    MTREventPath * decodedEventPath = decodedValue;
-    XCTAssertEqualObjects(originalEventPath, decodedEventPath);
+    MTREventPath * eventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
+    [self doEncodeDecodeRoundTrip:eventPath];
 
     // Test command path encode / decode
-    MTRCommandPath * originalCommandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
-    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalCommandPath requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError);
+    MTRCommandPath * commandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
+    [self doEncodeDecodeRoundTrip:commandPath];
 
-    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRCommandPath class]] fromData:encodedData error:&decodeError];
-    XCTAssertNil(decodeError);
-    XCTAssertTrue([decodedValue isKindOfClass:[MTRCommandPath class]]);
+    // Test attribute request path encode/decode
+    MTRAttributeRequestPath * attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
 
-    MTRCommandPath * decodedCommandPath = decodedValue;
-    XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
+
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@(105) attributeID:@(106)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
+
+    attributeRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:@(107) clusterID:nil attributeID:@(109)];
+    [self doEncodeDecodeRoundTrip:attributeRequestPath];
 }
 
 // Helper API to test if changes in an attribute with a path specified by endpointId, clusterId and attributeId trigger
@@ -4022,6 +4071,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // For unit test no real data is needed, but timestamp is required
     };
 }
+
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4272,6 +4322,78 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual(eventsReceived3, 9);
     XCTAssertEqual(attributesReceived4, 36);
     XCTAssertEqual(eventsReceived4, 36);
+}
+
+- (void)test039_GetAllAttributesReport
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportEnd = [self expectationWithDescription:@"Report end for delegate"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    __weak __auto_type weakdelegate = delegate;
+    __block NSUInteger attributesReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived += data.count;
+    };
+    delegate.onReportEnd = ^{
+        [gotReportEnd fulfill];
+        __strong __auto_type strongDelegate = weakdelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device addDelegate:delegate queue:queue];
+
+    // Now inject attributes and check that each delegate gets the right set of attributes
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    // Construct 36 attributes with endpoints 1~4, clusters 11 ~ 33, and attributes 111~333
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int attributeID = i * 100 + j * 10 + k;
+                int value = attributeID + 10000;
+                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+            }
+        }
+    }
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    [self waitForExpectations:@[ gotReportEnd ] timeout:60];
+
+    NSArray * allAttributesReport = [device getAllAttributesReport];
+
+    XCTAssertEqual(allAttributesReport.count, attributeReport.count);
+
+    for (NSDictionary<NSString *, id> * newResponseValueDict in allAttributesReport) {
+        MTRAttributePath * newPath = newResponseValueDict[MTRAttributePathKey];
+        NSDictionary<NSString *, id> * newDataValueDict = newResponseValueDict[MTRDataKey];
+        NSNumber * newValue = newDataValueDict[MTRValueKey];
+        XCTAssertNotNil(newValue);
+
+        for (NSDictionary<NSString *, id> * originalResponseValueDict in attributeReport) {
+            MTRAttributePath * originalPath = originalResponseValueDict[MTRAttributePathKey];
+            // Find same attribute path and compare value
+            if ([newPath isEqual:originalPath]) {
+                NSDictionary<NSString *, id> * originalDataValueDict = originalResponseValueDict[MTRDataKey];
+                NSNumber * originalValue = originalDataValueDict[MTRValueKey];
+                XCTAssertNotNil(originalValue);
+                XCTAssertEqualObjects(newValue, originalValue);
+                continue;
+            }
+        }
+    }
 }
 
 @end

@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include <app/util/attribute-metadata.h>
-#include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-table.h>
 
 /**
  * Write an attribute for a request arriving from external sources.
@@ -27,6 +26,5 @@
  * This will check attribute writeability and that
  * the provided data type matches the expected data type.
  */
-chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                     chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                     EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
+                                                                     const EmberAfWriteDataInput & input);

@@ -572,6 +572,7 @@ fsync
 ftd
 fullclean
 fuzzer
+fuzzers
 fuzztest
 FW
 gbl
@@ -1532,6 +1533,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vm
 vn
 vnc
 vous

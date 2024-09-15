@@ -306,7 +306,6 @@ using namespace chip::Tracing::DarwinFramework;
         _delegates = [NSMutableSet set];
         _deviceController = controller;
         _nodeID = nodeID;
-        _accessedViaPublicAPI = NO;
         _state = MTRDeviceStateUnknown;
     }
 
@@ -322,7 +321,6 @@ using namespace chip::Tracing::DarwinFramework;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
-        _accessedViaPublicAPI = NO;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
@@ -362,19 +360,9 @@ using namespace chip::Tracing::DarwinFramework;
     MTR_LOG("MTRDevice dealloc: %p", self);
 }
 
-+ (MTRDevice *)_deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
-{
-    return [controller deviceForNodeID:nodeID];
-}
-
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    auto * device = [self _deviceWithNodeID:nodeID controller:controller];
-    if (device) {
-        std::lock_guard lock(device->_lock);
-        device->_accessedViaPublicAPI = YES;
-    }
-    return device;
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark - Time Synchronization
@@ -648,8 +636,9 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)_delegateAdded
 {
-    // Nothing to do; this is a hook for subclasses.  If that ever changes for
-    // some reason, subclasses need to start calling this hook on their super.
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
@@ -1169,7 +1158,7 @@ using namespace chip::Tracing::DarwinFramework;
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
-    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, MTR_YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
@@ -1283,6 +1272,17 @@ using namespace chip::Tracing::DarwinFramework;
 #undef MTRDeviceErrorStr
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
+{
+#define MTRDeviceErrorStr "MTRDevice readAttributePaths: must be handled by subclasses"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return [NSArray array];
+}
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -1324,6 +1324,21 @@ using namespace chip::Tracing::DarwinFramework;
     // here for now.
     // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
 
+    if (![commandFields isKindOfClass:NSDictionary.class]) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a data-value NSDictionary object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
+    MTRDeviceDataValueDictionary fieldsDataValue = commandFields;
+    if (fieldsDataValue[MTRTypeKey] != MTRStructureValueType) {
+        MTR_LOG_ERROR("%@ invokeCommandWithEndpointID passed a commandFields (%@) that is not a structure-typed data-value object",
+            self, commandFields);
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        return;
+    }
+
     [self _invokeCommandWithEndpointID:endpointID
                              clusterID:clusterID
                              commandID:commandID
@@ -1339,7 +1354,7 @@ using namespace chip::Tracing::DarwinFramework;
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
-                       commandFields:(id)commandFields
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
                expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                   timedInvokeTimeout:(NSNumber * _Nullable)timeout
@@ -1459,6 +1474,17 @@ using namespace chip::Tracing::DarwinFramework;
     }
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)getAllAttributesReport
+{
+#define MTRDeviceErrorStr "MTRDevice getAllAttributesReport must be handled by subclasses that support it"
+    MTR_LOG_ERROR(MTRDeviceErrorStr);
+#ifdef DEBUG
+    NSAssert(NO, @MTRDeviceErrorStr);
+#endif // DEBUG
+#undef MTRDeviceErrorStr
+    return nil;
+}
+
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount
 {
@@ -1557,86 +1583,6 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
-// Client Metadata Storage
-
-- (NSArray *)supportedClientDataClasses
-{
-    return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
-}
-
-- (NSArray * _Nullable)clientDataKeys
-{
-    return [self.temporaryMetaDataCache allKeys];
-}
-
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
-{
-    if (key == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
-{
-    // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
-    // TODO: Need to add a delegate method, so when this value changes we call back to the client
-
-    if (key == nil || value == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (void)removeClientDataForKey:(NSString *)key
-{
-    if (key == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-}
-
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
-{
-    if (endpointID == nil)
-        return nil;
-    // TODO: When hooked up to storage, enumerate this better
-
-    return [self.temporaryMetaDataCache allKeys];
-}
-
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
-{
-    if (key == nil || endpointID == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
-{
-    if (key == nil || value == nil || endpointID == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
-{
-    if (key == nil || endpointID == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
 #pragma mark Log Help
 
 - (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
@@ -1730,6 +1676,16 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     return result;
+}
+
+- (void)controllerSuspended
+{
+    // Nothing to do for now.
+}
+
+- (void)controllerResumed
+{
+    // Nothing to do for now.
 }
 
 @end
