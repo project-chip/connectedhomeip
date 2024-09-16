@@ -38,7 +38,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 
 /*
- * Enable temperaure level delegate of temperature control cluster
+ * Enable temperature level delegate of temperature control cluster
  */
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
