@@ -287,6 +287,7 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    CHIP_ERROR SaveTCPInfoFromRemoteSessionParams();
     static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
     static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
 

@@ -54,6 +54,7 @@
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/SessionConnectionDelegate.h>
+#include <transport/raw/PeerTCPParamsStorage.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
@@ -494,6 +495,11 @@ public:
 
     using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
 
+    Transport::TCPParamsStorageInterface * GetPeerTCPParamsStorage() { return mPeerTCPParamsStorage; }
+    void SetPeerTCPParamsStorage(Transport::TCPParamsStorageInterface * tcpParamsStorage)
+    {
+        mPeerTCPParamsStorage = tcpParamsStorage;
+    }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
@@ -566,13 +572,11 @@ private:
     // Hold the TCPConnection callback context for the receiver application in the SessionManager.
     // On receipt of a connection from a peer, the SessionManager
     Transport::AppTCPConnectionCallbackCtxt * mServerTCPConnCbCtxt = nullptr;
+    Transport::TCPParamsStorageInterface * mPeerTCPParamsStorage   = nullptr;
+    SessionConnectionDelegate * mConnDelegate                      = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     SessionMessageDelegate * mCB = nullptr;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    SessionConnectionDelegate * mConnDelegate = nullptr;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;

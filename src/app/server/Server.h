@@ -71,6 +71,9 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/PeerTCPParamsStorage.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #include <app/icd/server/ICDCheckInBackOffStrategy.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -186,6 +189,11 @@ struct ServerInitParams
     // Optional. Support for the ICD Check-In BackOff strategy. Must be initialized before being provided.
     // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Optional. Support Peer node's TCP Params when provided.
+    // Must be initialized before being provided.
+    chip::Transport::TCPParamsStorageInterface * peerTCPParamsStorage = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 /**
@@ -307,6 +315,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         }
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        ReturnErrorOnFailure(sPeerTCPParamsStorage.Init(this->persistentStorageDelegate));
+        this->peerTCPParamsStorage = &sPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
         return CHIP_NO_ERROR;
     }
 
@@ -318,6 +331,9 @@ private:
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static app::reporting::ReportSchedulerImpl sReportScheduler;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static chip::Transport::PeerTCPParamsStorage sPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
@@ -682,6 +698,9 @@ private:
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
     app::reporting::ReportScheduler * mReportScheduler;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * mPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;

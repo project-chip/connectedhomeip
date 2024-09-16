@@ -41,10 +41,19 @@ public:
     static constexpr size_t kSizeOfInteractionModelRevision = sizeof(uint16_t);
     static constexpr size_t kSizeOfSpecificationVersion     = sizeof(uint32_t);
     static constexpr size_t kSizeOfMaxPathsPerInvoke        = sizeof(uint16_t);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static constexpr size_t kSizeOfSupportedTransports = sizeof(uint16_t);
+    static constexpr size_t kSizeOfMaxTCPMessageSize   = sizeof(uint32_t);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
         kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold, kSizeOfDataModelRevision,
-        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke);
+        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        ,
+        kSizeOfSupportedTransports, kSizeOfMaxTCPMessageSize
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    );
 
     // From Section 4.12.8 "Parameters and Constants" in chapter "Secure Channel".
     enum Tag : uint32_t
@@ -56,6 +65,8 @@ public:
         kInteractionModelRevision = 5,
         kSpecificationVersion     = 6,
         kMaxPathsPerInvoke        = 7,
+        kSupportedTransports      = 8,
+        kMaxTCPMessageSize        = 9,
     };
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
@@ -91,6 +102,13 @@ public:
     uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
     void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathsPerInvoke = maxPathsPerInvoke; }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    const Optional<uint16_t> & GetSupportedTransports() const { return mSupportedTransports; }
+    void SetSupportedTransports(const uint16_t supportedTransports) { mSupportedTransports = MakeOptional(supportedTransports); }
+
+    const Optional<uint32_t> & GetMaxTCPMessageSize() const { return mMaxTCPMessageSize; }
+    void SetMaxTCPMessageSize(const uint32_t maxTCPMessageSize) { mMaxTCPMessageSize = MakeOptional(maxTCPMessageSize); }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 private:
     ReliableMessageProtocolConfig mMRPConfig;
     // For legacy reasons if we do not get DataModelRevision it means either 16 or 17. But there isn't
@@ -104,6 +122,11 @@ private:
     Optional<uint32_t> mSpecificationVersion;
     // When maxPathsPerInvoke is not provided legacy is always 1
     uint16_t mMaxPathsPerInvoke = 1;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    Optional<uint16_t> mSupportedTransports;
+    Optional<uint32_t> mMaxTCPMessageSize;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 } // namespace chip

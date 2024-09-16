@@ -33,9 +33,12 @@ static_library("raw") {
   if (chip_inet_config_enable_tcp_endpoint) {
     sources += [
       "ActiveTCPConnectionState.h",
+      "PeerTCPParamsStorage.cpp",
+      "PeerTCPParamsStorage.h",
       "TCP.cpp",
       "TCP.h",
       "TCPConfig.h",
+      "TCPParamsStorageInterface.h",
     ]
   }
 

@@ -256,6 +256,14 @@ public:
     // when new fabric is created, this list needs to be updated,
     // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
+
+    // TCP peer parameters
+    static StorageKeyName TCPPeerParams(FabricIndex fabric, NodeId nodeId)
+    {
+        return StorageKeyName::Formatted("f/%x/tcp/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32),
+                                         static_cast<uint32_t>(nodeId));
+    }
+    static StorageKeyName TCPPeerList() { return StorageKeyName::FromConst("g/tcpl"); }
 };
 
 } // namespace chip

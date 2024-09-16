@@ -45,7 +45,10 @@ chip_test_suite("tests") {
   ]
 
   if (chip_inet_config_enable_tcp_endpoint) {
-    test_sources += [ "TestTCP.cpp" ]
+    test_sources += [
+      "TestPeerTCPParamsStorage.cpp",
+      "TestTCP.cpp",
+    ]
   }
 
   sources = [ "TCPBaseTestAccess.h" ]
@@ -57,6 +60,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
   ]

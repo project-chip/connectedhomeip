@@ -41,6 +41,9 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #include <protocols/secure_channel/UnsolicitedStatusHandler.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/PeerTCPParamsStorage.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -135,6 +138,10 @@ struct DeviceControllerSystemStateParams
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
     chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate          = nullptr;
     chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * peerTCPParamsStorage = nullptr;
+    Platform::UniquePtr<chip::Transport::PeerTCPParamsStorage> ownedPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory.
@@ -182,6 +189,17 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        mOwnedPeerTCPParamsStorage = std::move(params.ownedPeerTCPParamsStorage);
+        if (mOwnedPeerTCPParamsStorage)
+        {
+            mPeerTCPParamsStorage = mOwnedPeerTCPParamsStorage.get();
+        }
+        else
+        {
+            mPeerTCPParamsStorage = params.peerTCPParamsStorage;
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
         VerifyOrDie(IsInitialized());
     };
 
@@ -273,6 +291,10 @@ private:
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                           = nullptr;
     Platform::UniquePtr<SimpleSessionResumptionStorage> mOwnedSessionResumptionStorage;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * mPeerTCPParamsStorage = nullptr;
+    Platform::UniquePtr<chip::Transport::PeerTCPParamsStorage> mOwnedPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be
