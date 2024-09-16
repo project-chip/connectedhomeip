@@ -52,18 +52,11 @@ template("chip_python_wheel_action") {
       _py_scripts = []
     }
 
-    if (defined(invoker.py_typed_packages)) {
-      _py_typed_packages = py_typed_packages
-    } else {
-      _py_typed_packages = []
-    }
-
     _py_manifest = {
       files = _py_manifest_files_rebased
       packages = py_packages
       scripts = _py_scripts
       package_reqs = py_package_reqs
-      typed_packages = _py_typed_packages
     }
 
     write_file(_py_manifest_file, _py_manifest, "json")
