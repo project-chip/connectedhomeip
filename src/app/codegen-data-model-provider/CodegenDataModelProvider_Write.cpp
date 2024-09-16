@@ -291,6 +291,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //       This should likely be fixed in spec (probably already fixed by
     //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
     //       and tests and implementation
+    //
+    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
