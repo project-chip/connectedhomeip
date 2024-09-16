@@ -47,22 +47,18 @@ import("${examples_common_plat_dir}/args.gni")
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
   # Enable test event triggers by default: Disable these in production devices
   chip_enable_energy_evse_trigger = true
   chip_enable_energy_reporting_trigger = true
   chip_enable_water_heater_management_trigger = true
   chip_enable_device_energy_management_trigger = true
-  
   # Device Energy Management feature support - only one of these can be true
   # or both can be disabled if forecasting is not supported
   chip_dem_support_power_forecast_reporting = true
   chip_dem_support_state_forecast_reporting = false
-
   # Only one of these examples should be enabled
   chip_enable_example_evse_device = true
   chip_enable_example_water_heater_device = false
-
 }
 
 if (slc_generate) {
