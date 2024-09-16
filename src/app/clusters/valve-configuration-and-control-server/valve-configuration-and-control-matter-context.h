@@ -53,7 +53,7 @@ public:
     CHIP_ERROR GetDefaultOpenLevel(uint8_t & returnVal);
 
     // MarkDirty
-    virtual void MarkDirty(AttributeId id);
+    virtual void MarkDirty(AttributeId attributeId);
 
     virtual ~MatterContext() = default;
 

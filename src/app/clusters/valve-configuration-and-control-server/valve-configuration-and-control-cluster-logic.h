@@ -129,7 +129,7 @@ public:
     // CHIP_ERROR HandleClose();
 
     // All Get functions:
-    // Return CHIP_ERROR_INVALID_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
     CHIP_ERROR GetOpenDuration(DataModel::Nullable<ElapsedS> & openDuration);

@@ -18,6 +18,8 @@
 
 #include "valve-configuration-and-control-matter-context.h"
 
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
@@ -59,9 +61,9 @@ CHIP_ERROR MatterContext::GetDefaultOpenLevel(uint8_t & returnVal)
                                                       &returnVal, size);
 }
 
-void MatterContext::MarkDirty(const AttributeId id)
+void MatterContext::MarkDirty(const AttributeId attributeId)
 {
-    // Uh...how do we do this?
+    MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
 }
 
 } // namespace ValveConfigurationAndControl

@@ -451,6 +451,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/valve-configuration-and-control-delegate.h",
           "${_app_root}/clusters/${cluster}/valve-configuration-and-control-matter-context.cpp",
           "${_app_root}/clusters/${cluster}/valve-configuration-and-control-matter-context.h",
+          "${_app_root}/clusters/${cluster}/valve-configuration-and-control-server-disco.cpp",
+          "${_app_root}/clusters/${cluster}/valve-configuration-and-control-server-disco.h",
         ]
         cflags += [ "-Wno-unused-private-field" ]
       } else {
