@@ -170,11 +170,15 @@ public:
     // Current state
     // Current level
 
-    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range or the targetLevel is supplied when LVL is not
-    // supported.
+    // Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range or the targetLevel is supplied when LVL is
+    // not supported.
     // Calls delegate HandleOpen function after validating the parameters
     CHIP_ERROR HandleOpenCommand(std::optional<DataModel::Nullable<ElapsedS>> openDuration, std::optional<Percent> targetLevel);
+
+    // Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Calls delegate HandleClose function after validating the parameters and stops any open duration timers.
+    CHIP_ERROR HandleCloseCommand();
 
 private:
     // Determines if the level value is allowed per the level step.
@@ -193,7 +197,7 @@ private:
     void HandleUpdateRemainingDurationInternal();
     // Internal function called by HandleUpdateRemainingDuration to call the close function in the delegate and
     // set all the attributes back to their closed state.
-    void HandleCloseInternal();
+    CHIP_ERROR HandleCloseInternal();
 
     bool mInitialized                              = false;
     System::Clock::Milliseconds64 mDurationStarted = System::Clock::Milliseconds64(0);

@@ -454,9 +454,15 @@ CHIP_ERROR ClusterLogic::HandleOpenCommand(std::optional<DataModel::Nullable<Ela
     return CHIP_NO_ERROR;
 }
 
-void ClusterLogic::HandleCloseInternal()
+CHIP_ERROR ClusterLogic::HandleCloseCommand()
 {
-    // TODO: call the delegate and add to tests
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
+    return HandleCloseInternal();
+}
+
+CHIP_ERROR ClusterLogic::HandleCloseInternal()
+{
     CHIP_ERROR err;
     BitMask<ValveFaultBitmap> faults;
     if (mConformance.HasFeature(Feature::kLevel))
@@ -497,6 +503,7 @@ void ClusterLogic::HandleCloseInternal()
     mState.SetTargetLevel(DataModel::NullNullable);
     mState.SetTargetState(DataModel::NullNullable);
     mState.SetAutoCloseTime(DataModel::NullNullable);
+    return err;
 }
 
 void ClusterLogic::HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context)
