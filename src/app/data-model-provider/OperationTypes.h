@@ -78,7 +78,7 @@ struct WriteAttributeRequest : OperationRequest
     ConcreteDataAttributePath path; // NOTE: this also contains LIST operation options (i.e. "data" path type)
     BitFlags<WriteFlags> writeFlags;
 
-    // The path of the previous successful write in in the same write transaction
+    // The path of the previous successful write in the same write transaction, if any.
     //
     // In particular this means that a write to this path has succeeded before (i.e. it passed required ACL checks).
     // The intent for this is to allow short-cutting ACL checks when ACL is in progress of being updated:
