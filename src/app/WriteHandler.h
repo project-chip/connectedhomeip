@@ -196,7 +196,7 @@ private:
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModel::Provider * mDataModelProvider = nullptr;
-    std::optional<ConcreteAttributePath> mPreviousWriteSuccess;
+    std::optional<ConcreteAttributePath> mLastSuccessfullyWrittenPath;
 #endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending

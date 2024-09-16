@@ -566,7 +566,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     Status status = Status::InvalidAction;
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    mPreviousWriteSuccess = std::nullopt;
+    mLastSuccessfullyWrittenPath = std::nullopt;
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     reader.Init(std::move(aPayload));
@@ -732,14 +732,14 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     request.path                = path;
     request.subjectDescriptor   = subject;
-    request.previousSuccessPath = mPreviousWriteSuccess;
+    request.previousSuccessPath = mLastSuccessfullyWrittenPath;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
     AttributeValueDecoder decoder(data, subject);
 
     DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
 
-    mPreviousWriteSuccess = status.IsSuccess() ? std::make_optional(path) : std::nullopt;
+    mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(path) : std::nullopt;
 
     return AddStatusInternal(path, StatusIB(status.GetStatusCode()));
 #else
