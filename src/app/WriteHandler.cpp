@@ -720,8 +720,8 @@ void WriteHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
 }
 
-CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subject, const ConcreteDataAttributePath & path,
-                                          TLV::TLVReader & data)
+CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
+                                          TLV::TLVReader & aData)
 {
     // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
     // the write is done via the DataModel interface
@@ -730,20 +730,20 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     DataModel::WriteAttributeRequest request;
 
-    request.path                = path;
-    request.subjectDescriptor   = subject;
+    request.path                = aPath;
+    request.subjectDescriptor   = aSubject;
     request.previousSuccessPath = mLastSuccessfullyWrittenPath;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
-    AttributeValueDecoder decoder(data, subject);
+    AttributeValueDecoder decoder(aData, aSubject);
 
     DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
 
-    mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(path) : std::nullopt;
+    mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
 
-    return AddStatusInternal(path, StatusIB(status.GetStatusCode()));
+    return AddStatusInternal(aPath, StatusIB(status.GetStatusCode()));
 #else
-    return WriteSingleClusterData(subject, path, data, this);
+    return WriteSingleClusterData(aSubject, aPath, aData, this);
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
