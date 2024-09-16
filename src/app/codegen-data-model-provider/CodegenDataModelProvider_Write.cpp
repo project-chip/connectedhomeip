@@ -330,9 +330,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // path. We apply this everywhere as a shortcut, although realistically this is only for AccessControl cluster
     if (checkAcl && request.previousSuccessPath.has_value())
     {
-        checkAcl = ((request.path.mEndpointId != request.previousSuccessPath->mEndpointId) ||
-                    (request.path.mClusterId != request.previousSuccessPath->mClusterId) ||
-                    (request.path.mAttributeId != request.previousSuccessPath->mAttributeId));
+        // NOTE: compare here relies that previousSuccessPath is a ConcreteAttributePath (i.e. NOT data,
+        //       so the list index is not considered) as well as that `mExpanded` is NOT considered
+        //       for comparison.
+        checkAcl = (request.path != request.previousSuccessPath);
     }
 
     if (checkAcl)
