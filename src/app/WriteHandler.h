@@ -71,7 +71,7 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
-     *  @param[in] apProvider              A Valid pointer to the model used to forward writes towards
+     *  @param[in] apProvider              A valid pointer to the model used to forward writes towards
      *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
      *  @retval #CHIP_ERROR_INVALID_ARGUMENT on invalid pointers
