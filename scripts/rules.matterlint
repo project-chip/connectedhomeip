@@ -156,10 +156,13 @@ endpoint 0 {
   require server cluster OperationalCredentials;
   require server cluster GeneralDiagnostics;
 
-  // Example rejection of clusters:
+  // It is disallowed to have Simple Device type cluster requirements on EP0.
   //
+  // TODO: Make sure for these commented rules that nothing breaks in CI
   // reject server cluster Scenes;
+  // reject server cluster ScenesManagement;
   // reject server cluster Groups;
+  reject server cluster Identify;
 
   // Required only if !CustomNetworkConfig.
   // require server cluster NetworkCommissioning;
