@@ -42,7 +42,7 @@ from chip.clusters.enum import MatterIntEnum
 from chip.clusters.Attribute import AttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, get_accepted_endpoints_for_test
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts, signals
 # from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from typing import Optional
@@ -114,7 +114,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TC_IDM_2_2(self):
         # Test Setup
-        await self.setup_class_helper(default_to_pase=False)
+        await self.setup_class_helper(allow_pase=False)
 
         all_clusters = [cluster for cluster in Clusters.ClusterObjects.ALL_ATTRIBUTES]
 
@@ -161,7 +161,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         try:
             asserts.assert_equal(set(returned_attributes), set(expected_descriptor_attributes.values()))
         except signals.TestFailure as e:
-            debug = True
+            debug = True # Allow subsequent tests to continue after failure -- for debugging
             if debug:
                 print(e)
                 print(vars(e))
@@ -374,6 +374,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Step 21
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
         # DUT responds with the report data action.
+        # Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE
         self.print_step(21, "Send the Read Request Message to the DUT to read any attribute to an unsupported attribute")
         found_unsupported = False
         for endpoint_id, endpoint in self.endpoints.items():
@@ -400,14 +401,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     found_unsupported = True
                     break
 
-        # Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE
-
         # Step 22
         # TH sends the Read Request Message to the DUT to read an attribute
         # Repeat the above steps 3 times
 
         # On the TH verify the received Report data message has the right attribute values for all the 3 times.
-        self.print_step(22, "Send the Read Request Message to the DUT 3 timesand check if they are correct each time")
+        self.print_step(22, "Send the Read Request Message to the DUT 3 times and check if they are correct each time")
         read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
         read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
         read_request_3 = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
