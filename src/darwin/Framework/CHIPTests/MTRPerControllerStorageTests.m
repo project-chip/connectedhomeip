@@ -1682,6 +1682,15 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNotNil(controller);
     XCTAssertTrue(controller.running);
     XCTAssertTrue(controller.suspended);
+
+    // Test that a suspended controller can't set up a commissioning session.
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(17) error:&error];
+    XCTAssertNotNil(error);
+
     [controller shutdown];
 }
 
