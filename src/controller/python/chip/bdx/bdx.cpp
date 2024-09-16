@@ -43,14 +43,14 @@ OnDataReceivedCallback gOnDataReceivedCallback           = nullptr;
 OnTransferCompletedCallback gOnTransferCompletedCallback = nullptr;
 
 // The information for a single transfer.
-struct TransferData
+struct TransferInfo
 {
     bdx::BdxTransfer * Transfer         = nullptr;
     PyObject OnTransferObtainedContext  = nullptr;
     PyObject OnDataReceivedContext      = nullptr;
     PyObject OnTransferCompletedContext = nullptr;
 
-    bool operator==(const TransferData & other) const { return Transfer == other.Transfer; }
+    bool operator==(const TransferInfo & other) const { return Transfer == other.Transfer; }
 };
 
 // The set of transfers.
@@ -58,19 +58,19 @@ class TransferMap
 {
 public:
     // Returns the transfer data associated with the given transfer.
-    TransferData * TransferDataForTransfer(bdx::BdxTransfer * transfer)
+    TransferInfo * TransferInfoForTransfer(bdx::BdxTransfer * transfer)
     {
-        std::vector<TransferData>::iterator result = std::find_if(
-            mTransfers.begin(), mTransfers.end(), [transfer](const TransferData & data) { return data.Transfer == transfer; });
+        std::vector<TransferInfo>::iterator result = std::find_if(
+            mTransfers.begin(), mTransfers.end(), [transfer](const TransferInfo & data) { return data.Transfer == transfer; });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
         return &*result;
     }
 
     // Returns the transfer data that has the given context when a transfer is obtained.
-    TransferData * TransferDataForTransferObtainedContext(PyObject transferObtainedContext)
+    TransferInfo * TransferInfoForTransferObtainedContext(PyObject transferObtainedContext)
     {
-        std::vector<TransferData>::iterator result =
-            std::find_if(mTransfers.begin(), mTransfers.end(), [transferObtainedContext](const TransferData & data) {
+        std::vector<TransferInfo>::iterator result =
+            std::find_if(mTransfers.begin(), mTransfers.end(), [transferObtainedContext](const TransferInfo & data) {
                 return data.OnTransferObtainedContext == transferObtainedContext;
             });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
@@ -78,26 +78,26 @@ public:
     }
 
     // This returns the next transfer data that has no associated BdxTransfer.
-    TransferData * NextUnassociatedTransferData()
+    TransferInfo * NextUnassociatedTransferInfo()
     {
-        std::vector<TransferData>::iterator result =
-            std::find_if(mTransfers.begin(), mTransfers.end(), [](const TransferData & data) { return data.Transfer == nullptr; });
+        std::vector<TransferInfo>::iterator result =
+            std::find_if(mTransfers.begin(), mTransfers.end(), [](const TransferInfo & data) { return data.Transfer == nullptr; });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
         return &*result;
     }
 
     // Creates a new transfer data.
-    TransferData * CreateUnassociatedTransferData() { return &mTransfers.emplace_back(); }
+    TransferInfo * CreateUnassociatedTransferInfo() { return &mTransfers.emplace_back(); }
 
-    void RemoveTransferData(TransferData * transferData)
+    void RemoveTransferInfo(TransferInfo * transferInfo)
     {
-        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(), *transferData);
+        std::vector<TransferInfo>::iterator result = std::find(mTransfers.begin(), mTransfers.end(), *transferInfo);
         VerifyOrReturn(result != mTransfers.end());
         mTransfers.erase(result);
     }
 
 private:
-    std::vector<TransferData> mTransfers;
+    std::vector<TransferInfo> mTransfers;
 };
 
 // A method to release a transfer.
@@ -114,11 +114,11 @@ public:
 
     virtual void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data)
     {
-        TransferData * transferData = mTransfers->NextUnassociatedTransferData();
-        if (gOnTransferObtainedCallback && transferData)
+        TransferInfo * transferInfo = mTransfers->NextUnassociatedTransferInfo();
+        if (gOnTransferObtainedCallback && transferInfo)
         {
-            transferData->Transfer = transfer;
-            gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, ToPyChipError(CHIP_NO_ERROR), transfer,
+            transferInfo->Transfer = transfer;
+            gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(CHIP_NO_ERROR), transfer,
                                         init_data.TransferCtlFlags, init_data.MaxBlockSize, init_data.StartOffset, init_data.Length,
                                         init_data.FileDesignator, init_data.FileDesLength, init_data.Metadata,
                                         init_data.MetadataLength);
@@ -127,30 +127,30 @@ public:
 
     virtual void DataReceived(bdx::BdxTransfer * transfer, const ByteSpan & block)
     {
-        TransferData * transferData = mTransfers->TransferDataForTransfer(transfer);
-        if (gOnDataReceivedCallback && transferData)
+        TransferInfo * transferInfo = mTransfers->TransferInfoForTransfer(transfer);
+        if (gOnDataReceivedCallback && transferInfo)
         {
-            gOnDataReceivedCallback(transferData->OnDataReceivedContext, block.data(), block.size());
+            gOnDataReceivedCallback(transferInfo->OnDataReceivedContext, block.data(), block.size());
         }
     }
 
     virtual void TransferCompleted(bdx::BdxTransfer * transfer, CHIP_ERROR result)
     {
-        TransferData * transferData = mTransfers->TransferDataForTransfer(transfer);
-        if (!transferData && result != CHIP_NO_ERROR)
+        TransferInfo * transferInfo = mTransfers->TransferInfoForTransfer(transfer);
+        if (!transferInfo && result != CHIP_NO_ERROR)
         {
             // The transfer failed during initialisation.
-            transferData = mTransfers->NextUnassociatedTransferData();
-            if (gOnTransferObtainedCallback && transferData)
+            transferInfo = mTransfers->NextUnassociatedTransferInfo();
+            if (gOnTransferObtainedCallback && transferInfo)
             {
-                gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, ToPyChipError(result), nullptr,
+                gOnTransferObtainedCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(result), nullptr,
                                             static_cast<bdx::TransferControlFlags>(0), 0, 0, 0, nullptr, 0, nullptr, 0);
             }
         }
-        else if (gOnTransferCompletedCallback && transferData)
+        else if (gOnTransferCompletedCallback && transferInfo)
         {
-            gOnTransferCompletedCallback(transferData->OnTransferCompletedContext, ToPyChipError(result));
-            mTransfers->RemoveTransferData(transferData);
+            gOnTransferCompletedCallback(transferInfo->OnTransferCompletedContext, ToPyChipError(result));
+            mTransfers->RemoveTransferInfo(transferInfo);
         }
         ReleaseTransfer(mSystemLayer, transfer);
     }
@@ -198,9 +198,9 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
 // Prepares the BDX system to expect a new transfer.
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
 {
-    TransferData * transferData = gTransfers.CreateUnassociatedTransferData();
-    VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
-    transferData->OnTransferObtainedContext = transferObtainedContext;
+    TransferInfo * transferInfo = gTransfers.CreateUnassociatedTransferInfo();
+    VerifyOrReturnValue(transferInfo != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    transferInfo->OnTransferObtainedContext = transferObtainedContext;
     gBdxTransferServer.ExpectATransfer();
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -208,10 +208,10 @@ PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
 // Stops expecting a transfer.
 PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext)
 {
-    TransferData * transferData = gTransfers.TransferDataForTransferObtainedContext(transferObtainedContext);
-    VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NOT_FOUND));
+    TransferInfo * transferInfo = gTransfers.TransferInfoForTransferObtainedContext(transferObtainedContext);
+    VerifyOrReturnValue(transferInfo != nullptr, ToPyChipError(CHIP_ERROR_NOT_FOUND));
     gBdxTransferServer.StopExpectingATransfer();
-    gTransfers.RemoveTransferData(transferData);
+    gTransfers.RemoveTransferInfo(transferInfo);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -219,9 +219,9 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
 PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
                                           PyObject transferCompletedContext)
 {
-    TransferData * transferData              = gTransfers.TransferDataForTransfer(transfer);
-    transferData->OnDataReceivedContext      = dataReceivedContext;
-    transferData->OnTransferCompletedContext = transferCompletedContext;
+    TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
+    transferInfo->OnDataReceivedContext      = dataReceivedContext;
+    transferInfo->OnTransferCompletedContext = transferCompletedContext;
     return ToPyChipError(transfer->AcceptSend());
 }
 
@@ -229,8 +229,8 @@ PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyO
 PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
                                              PyObject transferCompletedContext)
 {
-    TransferData * transferData              = gTransfers.TransferDataForTransfer(transfer);
-    transferData->OnTransferCompletedContext = transferCompletedContext;
+    TransferInfo * transferInfo              = gTransfers.TransferInfoForTransfer(transfer);
+    transferInfo->OnTransferCompletedContext = transferCompletedContext;
     chip::ByteSpan data(dataBuffer, dataLength);
     return ToPyChipError(transfer->AcceptReceive(data));
 }
