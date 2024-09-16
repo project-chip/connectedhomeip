@@ -100,11 +100,6 @@ public:
     ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
     ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
     ///     convenience to make writing Invoke calls easier.
-    ///
-    /// Expectations if invoke returns data:
-    ///   - if a command data is to be returned, the status can only be 'Success' (it cannot be cluster
-    ///     specific success). This is because responses encode either a CommandDataIB (response as a success)
-    ///     or CommandStatusIB (which can encode failures as well as cluster specific successes).
     virtual std::optional<ActionReturnStatus> Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                      CommandHandler * handler) = 0;
 
