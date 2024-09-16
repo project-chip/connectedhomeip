@@ -41,7 +41,7 @@ class PairOnNetworkLongImInvokeCommand(
       try {
         val arg1: UByte = 1u
         val arg2: UByte = 2u
-        val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 0u)
+        val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 1u)
 
         // By running command testAddArguments, we are implicitly requesting CASE to be established
         // if it's

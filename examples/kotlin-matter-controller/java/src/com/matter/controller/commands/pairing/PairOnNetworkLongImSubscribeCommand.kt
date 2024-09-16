@@ -110,7 +110,7 @@ class PairOnNetworkLongImSubscribeCommand(
   private suspend fun subscribeBooleanAttribute() {
     logger.log(Level.INFO, "Subscribe Boolean attribute")
 
-    val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 0u)
+    val testCluster = UnitTestingCluster(controller = currentCommissioner(), endpointId = 1u)
 
     testCluster
       .subscribeBooleanAttribute(minInterval = 0, maxInterval = 5)
