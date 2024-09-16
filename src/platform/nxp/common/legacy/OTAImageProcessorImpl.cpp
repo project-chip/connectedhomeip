@@ -205,6 +205,11 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     return CHIP_NO_ERROR;
 }
 
+void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
+{
+    mDelayBeforeRebootSec = rebootDelay;
+}
+
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
     ChipLogError(SoftwareUpdate, "OTA was aborted");

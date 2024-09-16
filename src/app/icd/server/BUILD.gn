@@ -93,7 +93,6 @@ source_set("manager") {
   deps = [ ":icd-server-config" ]
 
   public_deps = [
-    ":check-in-back-off",
     ":configuration-data",
     ":notifier",
     ":observer",
@@ -106,6 +105,7 @@ source_set("manager") {
 
   if (chip_enable_icd_checkin) {
     public_deps += [
+      ":check-in-back-off",
       ":monitoring-table",
       ":sender",
       "${chip_root}/src/app:app_config",
