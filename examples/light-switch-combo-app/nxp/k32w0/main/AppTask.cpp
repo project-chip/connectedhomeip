@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Google LLC.
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,11 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
+#include "binding-handler.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/ErrorStr.h>
 
-#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -33,14 +33,15 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+
+#include <DeviceInfoProviderImpl.h>
 
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
-#include "PWR_Interface.h"
 #include "app_config.h"
+#include "DefaultTestEventTriggerDelegate.h"
 
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -49,17 +50,18 @@
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
 
-constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
-constexpr uint8_t kAppEventQueueSize           = 10;
+#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_PRIORITY 2
+#define APP_EVENT_QUEUE_SIZE 10
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static QueueHandle_t sAppEventQueue;
 
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
 static LEDWidget sStatusLED;
-static LEDWidget sLockLED;
-#endif
+static LEDWidget sLightLED;
 
 static bool sIsThreadProvisioned = false;
 static bool sHaveBLEConnections  = false;
@@ -72,6 +74,8 @@ extern "C" void K32WUartProcess(void);
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
@@ -81,15 +85,37 @@ static chip::DeviceLayer::CustomFactoryDataProvider sCustomFactoryDataProvider;
 #endif
 #endif
 
+// This key is for testing/certification only and should not be used in production devices.
+// For production devices this key must be provided from factory data.
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
+static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::OnTriggerEffect,
+                              // Use invalid value for identifiers to enable TriggerEffect command
+                              // to stop Identify command for each effect
+                              Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue,
+                              Clusters::Identify::EffectVariantEnum::kDefault };
+
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
+{
+    K32W_LOG("This is a custom factory data restore mechanism.");
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    sAppEventQueue = xQueueCreate(kAppEventQueueSize, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
+        err = APP_ERROR_EVENT_QUEUE_FAILED;
         K32W_LOG("Failed to allocate app event queue");
-        assert(false);
+        assert(err == CHIP_NO_ERROR);
     }
 
     return err;
@@ -99,12 +125,15 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-// Initialize device attestation config
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-    // Initialize factory data provider
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+    sFactoryDataProvider.RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
+#endif
     ReturnErrorOnFailure(sFactoryDataProvider.Init());
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
@@ -124,16 +153,21 @@ CHIP_ERROR AppTask::Init()
     AppTask::PrintOnboardingInfo();
 
     /* HW init leds */
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
     LED_Init();
+
+    if (LightingMgr().Init() != 0)
+    {
+        K32W_LOG("LightingMgr().Init() failed");
+        assert(0);
+    }
+
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     /* start with all LEDS turnedd off */
     sStatusLED.Init(SYSTEM_STATE_LED);
 
-    sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-#endif
-    UpdateClusterState();
+    sLightLED.Init(LIGHT_STATE_LED);
+    UpdateDeviceState();
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -145,20 +179,13 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
+
     if (sFunctionTimer == NULL)
     {
+        err = APP_ERROR_CREATE_TIMER_FAILED;
         K32W_LOG("app_timer_create() failed");
         assert(err == CHIP_NO_ERROR);
     }
-
-    int status = BoltLockMgr().Init();
-    if (status != 0)
-    {
-        K32W_LOG("BoltLockMgr().Init() failed");
-        assert(status == 0);
-    }
-
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Print the current software version
     char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
@@ -168,23 +195,29 @@ CHIP_ERROR AppTask::Init()
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
+    uint32_t currentVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
-    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+    K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
-    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
+    /* Init binding - ToDo = error processing */
+    err = InitBindingHandler();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer,"InitBindingHandler() failed");
+        assert(err == CHIP_NO_ERROR);
+    }
     return err;
 }
 
 void LockOpenThreadTask(void)
 {
-    PWR_DisallowDeviceToSleep();
     chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
 }
 
 void UnlockOpenThreadTask(void)
 {
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
-    PWR_AllowDeviceToSleep();
 }
 
 void AppTask::InitServer(intptr_t arg)
@@ -197,6 +230,8 @@ void AppTask::InitServer(intptr_t arg)
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
     // Init ZCL Data Model and start server
+    static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -230,13 +265,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        TickType_t xTicksToWait = pdMS_TO_TICKS(10);
-
-#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-        xTicksToWait = portMAX_DELAY;
-#endif
-
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, xTicksToWait);
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -257,7 +286,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             PlatformMgr().UnlockChipStack();
         }
 
-        // Update the status LED if factory reset has not been initiated.
+        // Update the status LED if factory reset or identify process have not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
         //
@@ -269,8 +298,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         // rate of 100ms.
         //
         // Otherwise, blink the LED ON for a very short time.
-
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
             if (sIsThreadProvisioned)
@@ -288,14 +315,17 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
-        sLockLED.Animate();
-#endif
+        sLightLED.Animate();
+
+        HandleKeyboard();
+
     }
 }
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != SW1_BUTTON) && (pin_no != SW2_BUTTON) && (pin_no != SW3_BUTTON) && (pin_no != BLE_BUTTON)
+    		&& (pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON))
     {
         return;
     }
@@ -305,37 +335,37 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     button_event.ButtonEvent.PinNo  = pin_no;
     button_event.ButtonEvent.Action = button_action;
 
-    if (pin_no == RESET_BUTTON)
+    if (pin_no == SW1_BUTTON)
     {
-        button_event.Handler = ResetActionEventHandler;
+        button_event.Handler = SW1Handler;
     }
-    else if (pin_no == LOCK_BUTTON)
+    else if ((pin_no == SW2_BUTTON) || (pin_no == LIGHT_BUTTON))
     {
-        button_event.Handler = LockActionEventHandler;
+        button_event.Handler = SW2Handler;
+        if(button_action == LIGHT_BUTTON_PUSH)
+        {
+        	button_event.Handler = LightActionEventHandler;
+        }
     }
-    else if (pin_no == JOIN_BUTTON)
+    else if (pin_no == SW3_BUTTON)
     {
-        button_event.Handler = JoinHandler;
+        button_event.Handler = SW3Handler;
     }
-    else if (pin_no == BLE_BUTTON)
+    else if ((pin_no == BLE_BUTTON) || (pin_no == RESET_BUTTON))
     {
         button_event.Handler = BleHandler;
-
-#if !(defined OM15082)
         if (button_action == RESET_BUTTON_PUSH)
         {
             button_event.Handler = ResetActionEventHandler;
         }
-#endif
     }
+
     sAppTask.PostEvent(&button_event);
 }
 
 void AppTask::KBD_Callback(uint8_t events)
 {
     eventMask = eventMask | (uint32_t) (1 << events);
-
-    HandleKeyboard();
 }
 
 void AppTask::HandleKeyboard(void)
@@ -358,37 +388,23 @@ void AppTask::HandleKeyboard(void)
         switch (keyEvent)
         {
         case gKBD_EventPB1_c:
-            K32W_LOG("pb1 short press");
-
-#if (defined OM15082)
-            ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
+            ButtonEventHandler(SW1_BUTTON, SW1_BUTTON_PUSH);
             break;
-#else
-            if (sAppTask.mResetTimerActive)
-            {
-                ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
-            }
-            else
-            {
-                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
-            }
-            break;
-#endif
         case gKBD_EventPB2_c:
-            ButtonEventHandler(LOCK_BUTTON, LOCK_BUTTON_PUSH);
+            ButtonEventHandler(SW2_BUTTON, SW2_BUTTON_PUSH);
+            break;
+        case gKBD_EventLongPB2_c:
+            ButtonEventHandler(LIGHT_BUTTON, LIGHT_BUTTON_PUSH);
             break;
         case gKBD_EventPB3_c:
-            ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            ButtonEventHandler(SW3_BUTTON, SW3_BUTTON_PUSH);
             break;
         case gKBD_EventPB4_c:
             ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
-#if !(defined OM15082)
-        case gKBD_EventLongPB1_c:
-            K32W_LOG("pb1 long press");
-            ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+        case gKBD_EventLongPB4_c:
+            ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
             break;
-#endif
         default:
             break;
         }
@@ -404,10 +420,8 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionTimerEventHandler(void * aGenericEvent)
+void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-
     if (aEvent->Type != AppEvent::kEventType_Timer)
         return;
 
@@ -417,10 +431,8 @@ void AppTask::FunctionTimerEventHandler(void * aGenericEvent)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
-void AppTask::ResetActionEventHandler(void * aGenericEvent)
+void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 {
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-
     if (aEvent->ButtonEvent.PinNo != RESET_BUTTON && aEvent->ButtonEvent.PinNo != BLE_BUTTON)
         return;
 
@@ -429,23 +441,13 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = kFunction_NoneSelected;
 
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
-        /* restore initial state for the LED indicating Lock state */
-        if (BoltLockMgr().IsUnlocked())
-        {
-            sLockLED.Set(false);
-        }
-        else
-        {
-            sLockLED.Set(true);
-        }
-#endif
+        RestoreLightingState();
 
         K32W_LOG("Factory Reset was cancelled!");
     }
     else
     {
-        uint32_t resetTimeout = kFactoryResetTriggerTimeout;
+        uint32_t resetTimeout = FACTORY_RESET_TRIGGER_TIMEOUT;
 
         if (sAppTask.mFunction != kFunction_NoneSelected)
         {
@@ -453,61 +455,111 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
             return;
         }
 
-        K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
+        K32W_LOG("Factory Reset Triggered. Push the RESET button within %lu ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
         sStatusLED.Set(false);
-        sLockLED.Set(false);
+        sLightLED.Set(false);
 
         sStatusLED.Blink(500);
-        sLockLED.Blink(500);
-#endif
+        sLightLED.Blink(500);
 
-        sAppTask.StartTimer(kFactoryResetTriggerTimeout);
+        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+    }
+}
+void AppTask::SW1Handler(AppEvent * aEvent)
+{
+
+	if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        BindingCommandData * data = Platform::New<BindingCommandData>();
+        K32W_LOG("SW1 Button pressed");
+        if(data != NULL)
+        {
+			data->clusterId           = chip::app::Clusters::OnOff::Id;
+			data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+			data->NodeId              = 2;
+			SwitchWorkerFunction(reinterpret_cast<intptr_t>(data));
+        }
     }
 }
 
-void AppTask::LockActionEventHandler(void * aGenericEvent)
+void AppTask::SW2Handler(AppEvent * aEvent)
 {
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-    BoltLockManager::Action_t action;
+
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        BindingCommandData * data = Platform::New<BindingCommandData>();
+        K32W_LOG("SW2 Button pressed");
+        if(data != NULL)
+        {
+			data->clusterId           = chip::app::Clusters::OnOff::Id;
+			data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+			data->NodeId              = 3;
+
+			SwitchWorkerFunction(reinterpret_cast<intptr_t>(data));
+        }
+    }
+}
+
+void AppTask::SW3Handler(AppEvent * aEvent)
+{
+	if (aEvent->Type == AppEvent::kEventType_Button)
+	{
+        BindingCommandData * data = Platform::New<BindingCommandData>();
+        K32W_LOG("SW3 Button pressed");
+        if(data != NULL)
+        {
+			data->clusterId           = chip::app::Clusters::OnOff::Id;
+			data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+			data->isGroup             = true;
+
+			SwitchWorkerFunction(reinterpret_cast<intptr_t>(data));
+        }
+    }
+}
+
+void AppTask::LightActionEventHandler(AppEvent * aEvent)
+{
+    LightingManager::Action_t action;
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t actor  = 0;
     bool initiated = false;
 
     if (sAppTask.mFunction != kFunction_NoneSelected)
     {
-        K32W_LOG("Another function is scheduled. Could not initiate Lock/Unlock!");
+        K32W_LOG("Another function is scheduled. Could not initiate ON/OFF Light command!");
         return;
     }
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_TurnOn)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
+        actor  = aEvent->LightEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (BoltLockMgr().IsUnlocked())
+        actor = AppEvent::kEventType_Button;
+
+        if (LightingMgr().IsTurnedOff())
         {
-            action = BoltLockManager::LOCK_ACTION;
+            action = LightingManager::TURNON_ACTION;
         }
         else
         {
-            action = BoltLockManager::UNLOCK_ACTION;
+            action = LightingManager::TURNOFF_ACTION;
         }
     }
     else
     {
-        err    = CHIP_ERROR_INTERNAL;
-        action = BoltLockManager::INVALID_ACTION;
+        err    = APP_ERROR_UNHANDLED_EVENT;
+        action = LightingManager::INVALID_ACTION;
     }
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = BoltLockMgr().InitiateAction(actor, action);
+        initiated = LightingMgr().InitiateAction(actor, action);
 
         if (!initiated)
         {
@@ -516,51 +568,8 @@ void AppTask::LockActionEventHandler(void * aGenericEvent)
     }
 }
 
-void AppTask::ThreadStart()
+void AppTask::BleHandler(AppEvent * aEvent)
 {
-    chip::Thread::OperationalDataset dataset{};
-
-    constexpr uint8_t xpanid[]    = { 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0xca, 0xfe };
-    constexpr uint8_t masterkey[] = {
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
-    };
-    constexpr uint16_t panid   = 0xabcd;
-    constexpr uint16_t channel = 15;
-
-    dataset.SetNetworkName("OpenThread");
-    dataset.SetExtendedPanId(xpanid);
-    dataset.SetMasterKey(masterkey);
-    dataset.SetPanId(panid);
-    dataset.SetChannel(channel);
-
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
-    ThreadStackMgr().SetThreadEnabled(true);
-}
-
-void AppTask::JoinHandler(void * aGenericEvent)
-{
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-
-    if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
-        return;
-
-    if (sAppTask.mFunction != kFunction_NoneSelected)
-    {
-        K32W_LOG("Another function is scheduled. Could not initiate Thread Join!");
-        return;
-    }
-
-    /* hard-code Thread Commissioning Parameters for the moment.
-     * In a future PR, these parameters will be sent via BLE.
-     */
-    ThreadStart();
-}
-
-void AppTask::BleHandler(void * aGenericEvent)
-{
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-
     if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
         return;
 
@@ -582,7 +591,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     else
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
@@ -666,17 +674,16 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mResetTimerActive = true;
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    // start flashing the LEDs rapidly to indicate action initiation.
+    if (aAction == LightingManager::TURNON_ACTION)
     {
-        K32W_LOG("Lock Action has been initiated")
+        K32W_LOG("Turn on Action has been initiated")
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::TURNOFF_ACTION)
     {
-        K32W_LOG("Unlock Action has been initiated")
+        K32W_LOG("Turn off Action has been initiated")
     }
 
     if (aActor == AppEvent::kEventType_Button)
@@ -684,31 +691,22 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         sAppTask.mSyncClusterToButtonAction = true;
     }
 
-    sAppTask.mFunction = kFunctionLockUnlock;
-
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
-    sLockLED.Blink(50, 50);
-#endif
+    sAppTask.mFunction = kFunctionTurnOnTurnOff;
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    // Turn on the light LED if in a TURNON state OR
+    // Turn off the light LED if in a TURNOFF state.
+    if (aAction == LightingManager::TURNON_ACTION)
     {
-        K32W_LOG("Lock Action has been completed")
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
-        sLockLED.Set(true);
-#endif
+        K32W_LOG("Turn on action has been completed")
+        sLightLED.Set(true);
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::TURNOFF_ACTION)
     {
-        K32W_LOG("Unlock Action has been completed")
-#if !defined(nxp_use_low_power) || (nxp_use_low_power == 0)
-        sLockLED.Set(false);
-#endif
+        K32W_LOG("Turn off action has been completed")
+        sLightLED.Set(false);
     }
 
     if (sAppTask.mSyncClusterToButtonAction)
@@ -720,39 +718,163 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     sAppTask.mFunction = kFunction_NoneSelected;
 }
 
-void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
+void AppTask::RestoreLightingState(void)
+{
+    /* restore initial state for the LED indicating Lighting state */
+    if (LightingMgr().IsTurnedOff())
+    {
+        sLightLED.Set(false);
+    }
+    else
+    {
+        sLightLED.Set(true);
+    }
+}
+
+void AppTask::OnIdentifyStart(Identify * identify)
+{
+    if ((kFunction_NoneSelected != sAppTask.mFunction) && (kFunction_TriggerEffect != sAppTask.mFunction))
+    {
+        K32W_LOG("Another function is scheduled. Could not initiate Identify process!");
+        return;
+    }
+
+    if (kFunction_TriggerEffect == sAppTask.mFunction)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
+    }
+
+    ChipLogProgress(Zcl, "Identify process has started. Status LED should blink with a period of 0.5 seconds.");
+    sAppTask.mFunction = kFunction_Identify;
+    sLightLED.Set(false);
+    sLightLED.Blink(250);
+}
+
+void AppTask::OnIdentifyStop(Identify * identify)
+{
+    if (kFunction_Identify == sAppTask.mFunction)
+    {
+        ChipLogProgress(Zcl, "Identify process has stopped.");
+        sAppTask.mFunction = kFunction_NoneSelected;
+
+        RestoreLightingState();
+    }
+}
+
+void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState)
+{
+    // Let Identify command take over if called during TriggerEffect already running
+    if (kFunction_TriggerEffect == sAppTask.mFunction)
+    {
+        ChipLogProgress(Zcl, "TriggerEffect has stopped.");
+        sAppTask.mFunction = kFunction_NoneSelected;
+
+        // TriggerEffect finished - reset identifiers
+        // Use invalid value for identifiers to enable TriggerEffect command
+        // to stop Identify command for each effect
+        gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mEffectVariant           = Clusters::Identify::EffectVariantEnum::kDefault;
+
+        RestoreLightingState();
+    }
+}
+
+void AppTask::OnTriggerEffect(Identify * identify)
+{
+    // Allow overlapping TriggerEffect calls
+    if ((kFunction_NoneSelected != sAppTask.mFunction) && (kFunction_TriggerEffect != sAppTask.mFunction))
+    {
+        K32W_LOG("Another function is scheduled. Could not initiate Identify process!");
+        return;
+    }
+
+    sAppTask.mFunction  = kFunction_TriggerEffect;
+    uint16_t timerDelay = 0;
+
+    ChipLogProgress(Zcl, "TriggerEffect has started.");
+
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        timerDelay = 2;
+        break;
+
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        timerDelay = 15;
+        break;
+
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        timerDelay = 4;
+        break;
+
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d",
+                        to_underlying(Clusters::Identify::EffectIdentifierEnum::kBlink));
+        timerDelay = 2;
+        break;
+
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        timerDelay = 1;
+        break;
+
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
+        OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
+        break;
+
+    default:
+        ChipLogProgress(Zcl, "Invalid effect identifier.");
+    }
+
+    if (timerDelay)
+    {
+        sLightLED.Set(false);
+        sLightLED.Blink(500);
+
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timerDelay), OnTriggerEffectComplete, identify);
+    }
+}
+
+void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.Type              = AppEvent::kEventType_TurnOn;
+    event.LightEvent.Actor  = aActor;
+    event.LightEvent.Action = aAction;
+    event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 0))
+        if (__get_IPSR())
         {
-            K32W_LOG("Failed to post event to app task event queue");
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(sAppEventQueue, aEvent, 1))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
         }
     }
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
-    /* specific processing for events sent from App_PostCallbackMessage (see main.cpp) */
-    if (aEvent->Type == AppEvent::kEventType_Lp)
-    {
-        aEvent->Handler(aEvent->param);
-    }
-    else
-#endif
-
-        if (aEvent->Handler)
+    if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
@@ -766,27 +888,38 @@ void AppTask::UpdateClusterState(void)
 {
     PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
 }
+
 void AppTask::UpdateClusterStateInternal(intptr_t arg)
 {
-    using namespace chip::app::Clusters::DoorLock;
+    uint8_t newValue = !LightingMgr().IsTurnedOff();
 
-    DlLockState newValue;
-    if (BoltLockMgr().IsUnlocked())
+    // write the new on/off value
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        newValue = DlLockState::kUnlocked;
-    }
-    else
-    {
-        newValue = DlLockState::kLocked;
-    }
-
-    // write the new door lock state
-    chip::Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
-
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: updating door lock state %x", chip::to_underlying(status));
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
     }
 }
 
+void AppTask::UpdateDeviceState(void)
+{
+    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+}
+
+void AppTask::UpdateDeviceStateInternal(intptr_t arg)
+{
+    bool onoffAttrValue = 0;
+
+    /* get onoff attribute value */
+    (void) app::Clusters::OnOff::Attributes::OnOff::Get(1, &onoffAttrValue);
+
+    /* set the device state */
+    sLightLED.Set(onoffAttrValue);
+    LightingMgr().SetState(onoffAttrValue);
+}
 extern "C" void OTAIdleActivities(void) {}
+
+extern "C" bool AppHaveBLEConnections(void)
+{
+    return sHaveBLEConnections;
+}
