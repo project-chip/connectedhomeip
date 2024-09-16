@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --application evse
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.WHM.MODE_CHANGE_OK:0 PIXIT.WHM.MODE_CHANGE_FAIL:2
 # === END CI TEST ARGUMENTS ===
 
 import logging
