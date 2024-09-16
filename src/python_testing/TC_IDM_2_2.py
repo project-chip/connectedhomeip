@@ -44,16 +44,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts, signals
-# from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from typing import Optional
-
-# @dataclass(frozen=True)
-# class AttributePath:
-#     EndpointId: Optional[int] = None
-#     ClusterId: Optional[int] = None
-#     AttributeId: Optional[int] = None
-
-
 
 class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
@@ -151,22 +142,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor)])
         asserts.assert_equal({0}, read_request.keys(), "Endpoint 0 not in output")
         asserts.assert_equal({Clusters.Objects.Descriptor}, read_request[0].keys(), "Descriptor cluster not in output")
-        # returned_attributes = list(read_request[0][Clusters.Objects.Descriptor].keys())
         
         returned_attributes = [a for a in read_request[0][Clusters.Objects.Descriptor].keys() if a != Clusters.Attribute.DataVersion]
-        # if returned_attributes[0] == Clusters.Attribute.DataVersion:
-        #     # returned_descriptor_attributes = returned_attributes[1:]
         expected_descriptor_attributes = ClusterObjects.ALL_ATTRIBUTES[Clusters.Objects.Descriptor.id]
-            # Actual failure
-        try:
-            asserts.assert_equal(set(returned_attributes), set(expected_descriptor_attributes.values()))
-        except signals.TestFailure as e:
-            debug = True # Allow subsequent tests to continue after failure -- for debugging
-            if debug:
-                print(e)
-                print(vars(e))
-            else:
-                raise
+        # Actual failure
+        asserts.assert_equal(set(returned_attributes), set(expected_descriptor_attributes.values()))
 
         # Step 3
 
@@ -220,7 +200,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.AttributeList])
-        # returned_clusters = read_request[0].keys()
         for i in range(3):
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
@@ -231,7 +210,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(7, "Send Request Message to read all attributes from one cluster at all endpoints")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor])
-        # returned_clusters = read_request[0].keys()
         for i in range(3):
             asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
             asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
@@ -365,8 +343,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid cluster")
 
-                    
-
         # Step 21
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
         # DUT responds with the report data action.
@@ -413,6 +389,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # DUT sends back the attribute value with the DataVersion of the cluster.
         # TH sends a second read request to the same cluster with the DataVersionFilter Field set with the dataversion value received before.
+        # DUT should not send a report data action with the attribute value to the TH if the data version is same as that requested.
         self.print_step(
             23, "Send the Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.ServerList)])
@@ -422,15 +399,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Objects.Descriptor.Attributes.ServerList)], dataVersionFilters=data_version_filter)
         asserts.assert_equal(read_request_2, {})
         
-        # Seems to return {}?
-
-        # DUT should not send a report data action with the attribute value to the TH if the data version is same as that requested.
-
         # Step 24
         # TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # DUT sends back the attribute value with the DataVersion of the cluster.
         # TH sends a write request to the same cluster to write to any attribute.
         # TH sends a second read request to read an attribute from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
+        # DUT should send a report data action with the attribute value to the TH.
 
         self.print_step(
             24, "Send the Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set")
@@ -445,11 +419,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel)], dataVersionFilters=data_version_filter)
         data_version_2 = read_request[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-        # import pdb;pdb.set_trace()
+
         asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]), data_version_value, f"Data version does not equal {data_version_value}")
         asserts.assert_equal((data_version_1 + 1), data_version_2, "DataVersion was not incremented")
-
-        # DUT should send a report data action with the attribute value to the TH.
 
         # Step 25
 
@@ -459,7 +431,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends a second read request to read all the attributes from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
 
         # DUT should send a report data action with all the attribute values to the TH.
-        # import pdb;pdb.set_trace()
+
         self.print_step(
             25, "Send the Read Request Message to the DUT to read all attributes on a cluster with the DataVersionFilter Field not set")
     
@@ -475,7 +447,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         data_version_2 = read_request[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
         asserts.assert_equal(int(read_request[0][Clusters.Objects.BasicInformation][Clusters.Objects.BasicInformation.Attributes.NodeLabel]), data_version_value, f"Data version does not equal {data_version_value}")
         asserts.assert_equal((data_version_1 + 1), data_version_2, "DataVersion was not incremented")
-        # import pdb;pdb.set_trace()
 
         # Step 26
         # TH sends a Read Request Message to the DUT to read a particular attribute on a particular cluster with the DataVersionFilter Field not set.
@@ -507,6 +478,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Verify that the DUT sends a report data action with the attribute value from the cluster B to the TH.
         # Verify that the DUT does not send the attribute value from cluster A.
+
         self.print_step(
             27, "Send the Read Request Message to read any supported attribute/wildcard on a particular cluster say A with the DataVersionFilter Field not set")
         read_request_27_1_1 = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
@@ -536,24 +508,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.print_step(29, "Send the Read Request Message to the DUT to read a non global attribute from all clusters at that Endpoint")
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [Clusters.Objects.Descriptor.Attributes.ServerList])
         
-        # for endpoint_id, endpoint in self.endpoints.items():
-        #     if not found_non_global:
-        #         # global_attribute_ids.AttributeIdType.kStandardNonGlobal seems to be non-existent in chip-all-clusters-app
-        #         # But kTest does exist -> Clusters.Objects.UnitTesting
-        #         for cluster_type, cluster in endpoint.items():
-
-        #             if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-        #                 # if global_attribute_ids.cluster_id_type(cluster_type.id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
-        #                 found_non_global = True
-        #                 import pdb
-        #                 pdb.set_trace()
-
-        #                 non_global_attr = list(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].values())[0]
-        #                 output = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, non_global_attr)])
-        #                 asserts.assert_true(isinstance(output[0][cluster_type][non_global_attr].Reason, InteractionModelError),
-        #                                     msg="Unexpected success reading non-global attribute")
-        #                 continue
-
         # Step 30
 
         # TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints
@@ -562,25 +516,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # On the TH verify that the DUT sends an error message and not the value of the attribute.
         self.print_step(30, "Send the Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints")
         # Hardcode this for now
-        # non_global_cluster = Clusters.Objects.RelativeHumidityMeasurement
         non_global_cluster = Clusters.Objects.LaundryWasherControls
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, non_global_cluster)])
         asserts.assert_equal(read_request, {})
-        # found_non_global = False
-        # for endpoint_id, endpoint in self.endpoints.items():
-        #     if not found_non_global:
-        #         # global_attribute_ids.AttributeIdType.kStandardNonGlobal seems to be non-existent in chip-all-clusters-app
-        #         # But kTest does exist -> Clusters.Objects.UnitTesting
-        #         for cluster_type, cluster in endpoint.items():
-        #             if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-        #                 # if global_attribute_ids.cluster_id_type(cluster_type.id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal:
-        #                 found_non_global = True
-        #                 continue
 
-        #             non_global_cluster = cluster_type
-        #             read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, non_global_cluster)])
-        #             asserts.assert_equal(read_request, {})
-                    # Seems to return {}?
         # Step 31
 
         # TH should have access to only a single cluster at one Endpoint1.
