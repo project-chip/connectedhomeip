@@ -28,6 +28,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from enum import Enum
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -76,17 +77,36 @@ class TC_WHM_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_WHM_2_1(self):
 
+        asserts.assert_true('PIXIT.WHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                            "PIXIT.WHM.MODE_CHANGE_OK must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WHM.MODE_CHANGE_OK:<mode id>")
+        asserts.assert_true('PIXIT.WHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT.WHM.MODE_CHANGE_FAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WHM.MODE_CHANGE_FAIL:<mode id>")
+
+        self.endpoint = self.matter_test_config.endpoint
+        self.mode_ok = self.matter_test_config.global_test_params['PIXIT.WHM.MODE_CHANGE_OK']
+        self.mode_fail = self.matter_test_config.global_test_params['PIXIT.WHM.MODE_CHANGE_FAIL']
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid == 0:
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+            self.app_pipe = self.app_pipe + str(app_pid)
+
         # Valid modes. Only ModeManual referred to in this test
         # ModeOff    = 0
         ModeManual = 1
         # ModeTimed  = 2
 
-        self.endpoint = self.matter_test_config.endpoint
-
         attributes = Clusters.WaterHeaterMode.Attributes
 
         self.step(1)
         # Commission DUT - already done
+
+        # Ensure that the device is in the correct state
+        if self.is_ci:
+            self.write_to_app_pipe({"Name": "Reset"})
 
         self.step(2)
 
@@ -107,6 +127,12 @@ class TC_WHM_2_1(MatterBaseTest):
         modes = [m.mode for m in supported_modes]
         invalid_mode = max(modes) + 1
 
+        class CommonCodes(Enum):
+            SUCCESS = 0x00
+            UNSUPPORTED_MODE = 0x01
+            GENERIC_FAILURE = 0x02
+            INVALID_IN_MODE = 0x03
+
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
@@ -114,13 +140,51 @@ class TC_WHM_2_1(MatterBaseTest):
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
-        # Steps 5-9 are not performed as WHM.S.M.CAN_TEST_MODE_FAILURE is false
-        # TODO - see issue 34565
-        self.step(5)
-        self.step(6)
-        self.step(7)
-        self.step(8)
+        if 1 or self.check_pics("WHM.S.M.CAN_TEST_MODE_FAILURE"):
+            asserts.assert_true(self.mode_fail in modes,
+                                "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.mode_fail))
+            self.step(5)
+            if self.is_ci:
+                print("Change to WHM mode ManualMode")
+                await self.send_change_to_mode_cmd(newMode=1)
+            else:
+                self.wait_for_user_input(
+                    prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when ready." % (self.mode_fail))
+
+            self.step(6)
+            old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+
+            logging.info("CurrentMode: %s" % (old_current_mode))
+
+            self.step(7)
+
+            ret = await self.send_change_to_mode_cmd(newMode=self.mode_fail)
+            st = ret.status
+            is_mfg_code = st in range(0x80, 0xC0)
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
+            asserts.assert_true(is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.mode_fail))
+            st_text_len = len(ret.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+
+            self.step(8)
+            current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
+
+            logging.info("CurrentMode: %s" % (current_mode))
+
+            asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
+
+        else:
+            self.step(5)
+            self.step(6)
+            self.step(7)
+            self.step(8)
+
         self.step(9)
+        if self.is_ci:
+            print("Continuing...")
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when ready." % (self.mode_ok))
 
         self.step(10)
 
