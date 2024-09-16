@@ -366,7 +366,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p uuid %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier];
+    return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
 }
 
 - (BOOL)isRunning
