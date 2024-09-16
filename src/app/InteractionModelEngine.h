@@ -403,7 +403,7 @@ public:
     }
 #endif
 
-    // Temporarly NOT const because the data model provider will be auto-set
+    // Temporarily NOT const because the data model provider will be auto-set
     // to codegen on first usage. This behaviour will be changed once each
     // application must explicitly set the data model provider.
     DataModel::Provider * GetDataModelProvider();
