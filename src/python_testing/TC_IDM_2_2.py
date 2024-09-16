@@ -207,7 +207,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
         except Exception as e:
             # Seems to fail even after updating Python wheels - need to investigate, will ignore except to allow tests after this to run
-            print(e)
+            # print(e)
+            raise
 
         # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
@@ -364,12 +365,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 unsupported = [id for id in list(all_clusters - dut_clusters) if global_attribute_ids.attribute_id_type(id)
                                == global_attribute_ids.AttributeIdType.kStandardNonGlobal]
 
-                unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
-
                 if unsupported:
+                    unsupported_attribute = (ClusterObjects.ALL_ATTRIBUTES[unsupported[0]])[0]
+
                     result = await self.read_single_attribute_expect_error(endpoint=endpoint_id, cluster=ClusterObjects.ALL_CLUSTERS[unsupported[0]], attribute=unsupported_attribute, error=Status.UnsupportedCluster)
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid cluster")
+
+                    
 
         # Step 21
         # TH sends the Read Request Message to the DUT to read an unsupported attribute
