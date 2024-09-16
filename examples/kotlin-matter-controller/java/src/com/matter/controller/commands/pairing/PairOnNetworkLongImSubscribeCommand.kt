@@ -5,10 +5,10 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.runBlocking
+import matter.controller.BooleanSubscriptionState
 import matter.controller.MatterController
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
-import matter.controller.BooleanSubscriptionState
 import matter.controller.cluster.clusters.UnitTestingCluster
 import matter.controller.model.AttributePath
 import matter.controller.model.EventPath
