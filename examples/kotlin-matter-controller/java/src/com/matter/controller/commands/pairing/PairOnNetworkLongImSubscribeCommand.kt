@@ -8,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
-import matter.controller.UShortSubscriptionState
+import matter.controller.BooleanSubscriptionState
 import matter.controller.cluster.clusters.UnitTestingCluster
 import matter.controller.model.AttributePath
 import matter.controller.model.EventPath
@@ -116,20 +116,20 @@ class PairOnNetworkLongImSubscribeCommand(
       .subscribeBooleanAttribute(minInterval = 0, maxInterval = 5)
       .takeWhile { subscriptionState ->
         // Keep collecting as long as it's not SubscriptionEstablished
-        subscriptionState !is UShortSubscriptionState.SubscriptionEstablished
+        subscriptionState !is BooleanSubscriptionState.SubscriptionEstablished
       }
       .collect { subscriptionState ->
         when (subscriptionState) {
-          is UShortSubscriptionState.Success -> {
+          is BooleanSubscriptionState.Success -> {
             logger.log(Level.INFO, "Received Boolean Update: ${subscriptionState.value}")
           }
-          is UShortSubscriptionState.Error -> {
+          is BooleanSubscriptionState.Error -> {
             logger.log(
               Level.WARNING,
               "Received SubscriptionErrorNotification with terminationCause: ${subscriptionState.exception}"
             )
           }
-          is UShortSubscriptionState.SubscriptionEstablished -> {
+          is BooleanSubscriptionState.SubscriptionEstablished -> {
             logger.log(Level.INFO, "Boolean Subscription is established")
           }
           else -> {
