@@ -57,7 +57,7 @@ class EnergyCalendarClusterDayStruct(
       endArray()
       if (calendarID.isPresent) {
         val optcalendarID = calendarID.get()
-        put(ContextSpecificTag(TAG_CALENDAR_I_D), optcalendarID)
+        put(ContextSpecificTag(TAG_CALENDAR_ID), optcalendarID)
       }
       endStructure()
     }
@@ -67,7 +67,7 @@ class EnergyCalendarClusterDayStruct(
     private const val TAG_DATE = 0
     private const val TAG_DAYS_OF_WEEK = 1
     private const val TAG_TRANSITIONS = 2
-    private const val TAG_CALENDAR_I_D = 3
+    private const val TAG_CALENDAR_ID = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyCalendarClusterDayStruct {
       tlvReader.enterStructure(tlvTag)
@@ -92,8 +92,8 @@ class EnergyCalendarClusterDayStruct(
           tlvReader.exitContainer()
         }
       val calendarID =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALENDAR_I_D))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CALENDAR_I_D)))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALENDAR_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CALENDAR_ID)))
         } else {
           Optional.empty()
         }

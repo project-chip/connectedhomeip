@@ -165,6 +165,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DeviceEnergyManagement";
     case chip::app::Clusters::EnergyEvse::Id:
         return "EnergyEvse";
+    case chip::app::Clusters::EnergyCalendar::Id:
+        return "EnergyCalendar";
     case chip::app::Clusters::EnergyPreference::Id:
         return "EnergyPreference";
     case chip::app::Clusters::PowerTopology::Id:
@@ -2559,6 +2561,49 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::EnergyEvse::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::EnergyEvse::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::EnergyCalendar::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::EnergyCalendar::Attributes::CalendarID::Id:
+            return "CalendarID";
+        case chip::app::Clusters::EnergyCalendar::Attributes::Name::Id:
+            return "Name";
+        case chip::app::Clusters::EnergyCalendar::Attributes::ProviderID::Id:
+            return "ProviderID";
+        case chip::app::Clusters::EnergyCalendar::Attributes::EventID::Id:
+            return "EventID";
+        case chip::app::Clusters::EnergyCalendar::Attributes::StartDate::Id:
+            return "StartDate";
+        case chip::app::Clusters::EnergyCalendar::Attributes::CalendarPeriods::Id:
+            return "CalendarPeriods";
+        case chip::app::Clusters::EnergyCalendar::Attributes::SpecialDays::Id:
+            return "SpecialDays";
+        case chip::app::Clusters::EnergyCalendar::Attributes::CurrentDay::Id:
+            return "CurrentDay";
+        case chip::app::Clusters::EnergyCalendar::Attributes::NextDay::Id:
+            return "NextDay";
+        case chip::app::Clusters::EnergyCalendar::Attributes::CurrentTransition::Id:
+            return "CurrentTransition";
+        case chip::app::Clusters::EnergyCalendar::Attributes::CurrentPeakPeriod::Id:
+            return "CurrentPeakPeriod";
+        case chip::app::Clusters::EnergyCalendar::Attributes::NextPeakPeriod::Id:
+            return "NextPeakPeriod";
+        case chip::app::Clusters::EnergyCalendar::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::EnergyCalendar::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::EnergyCalendar::Attributes::EventList::Id:
+            return "EventList";
+        case chip::app::Clusters::EnergyCalendar::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::EnergyCalendar::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::EnergyCalendar::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

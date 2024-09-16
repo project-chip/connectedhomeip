@@ -15258,7 +15258,7 @@ namespace Attributes {
 
 namespace CalendarID {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -15277,7 +15277,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15287,10 +15287,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15303,16 +15304,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
@@ -15321,7 +15323,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
                                         MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -15332,7 +15334,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
     return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     if (value.IsNull())
     {
@@ -15346,7 +15348,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 namespace Name {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value)
 {
     if (value.IsNull())
     {
@@ -15372,7 +15374,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
 
     static_assert(12 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
@@ -15381,10 +15383,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value)
 {
 
     static_assert(12 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
@@ -15396,19 +15399,20 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     uint8_t zclString[1] = { 0xFF };
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     uint8_t zclString[1] = { 0xFF };
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
                                         MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -15419,7 +15423,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
     return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
 {
     if (value.IsNull())
     {
@@ -15433,7 +15437,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 namespace ProviderID {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -15452,7 +15456,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15462,10 +15466,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15478,16 +15483,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
@@ -15496,7 +15502,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
                                         MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -15507,7 +15513,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
     return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     if (value.IsNull())
     {
@@ -15521,7 +15527,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 namespace EventID {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -15540,7 +15546,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15550,10 +15556,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15566,16 +15573,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT32U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
@@ -15584,7 +15592,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
                                         MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -15595,7 +15603,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
     return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     if (value.IsNull())
     {
@@ -15609,7 +15617,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 namespace StartDate {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -15628,7 +15636,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15638,10 +15646,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
@@ -15654,16 +15663,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType value;
@@ -15672,7 +15682,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
     return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
                                         MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -15683,7 +15693,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
     return Set(endpoint, value.Value(), markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     if (value.IsNull())
     {
@@ -15697,7 +15707,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -15713,7 +15723,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * va
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
@@ -15723,10 +15733,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyCalendar::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyCalendar::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))

@@ -14123,12 +14123,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyCalendar::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, EnergyCalendar::Id);
         }
         case EnergyCalendar::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, EnergyCalendar::Id);
         }
         case EnergyCalendar::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
@@ -14138,7 +14138,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case EnergyCalendar::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, EnergyCalendar::Id);
         }
         case EnergyCalendar::Attributes::FeatureMap::Id: {
             uint32_t value;

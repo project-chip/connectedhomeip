@@ -82,7 +82,7 @@ limitations under the License.
     <name>Energy Calendar</name>
     <code>0x009A</code>
     <define>ENERGY_CALENDAR_CLUSTER</define>
-    <description/>
+    <description>The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption</description>
     <client init="false" tick="false">true</client>
     <features>
       <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">

@@ -109,6 +109,7 @@ __all__ = [
     "Messages",
     "DeviceEnergyManagement",
     "EnergyEvse",
+    "EnergyCalendar",
     "EnergyPreference",
     "PowerTopology",
     "EnergyEvseMode",

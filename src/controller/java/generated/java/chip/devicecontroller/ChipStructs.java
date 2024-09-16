@@ -8858,7 +8858,7 @@ public static class EnergyCalendarClusterDayStruct {
   private static final long DATE_ID = 0L;
   private static final long DAYS_OF_WEEK_ID = 1L;
   private static final long TRANSITIONS_ID = 2L;
-  private static final long CALENDAR_I_D_ID = 3L;
+  private static final long CALENDAR_ID_ID = 3L;
 
   public EnergyCalendarClusterDayStruct(
     Optional<Long> date,
@@ -8877,7 +8877,7 @@ public static class EnergyCalendarClusterDayStruct {
     values.add(new StructElement(DATE_ID, date.<BaseTLVType>map((nonOptionaldate) -> new UIntType(nonOptionaldate)).orElse(new EmptyType())));
     values.add(new StructElement(DAYS_OF_WEEK_ID, daysOfWeek.<BaseTLVType>map((nonOptionaldaysOfWeek) -> new UIntType(nonOptionaldaysOfWeek)).orElse(new EmptyType())));
     values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
-    values.add(new StructElement(CALENDAR_I_D_ID, calendarID.<BaseTLVType>map((nonOptionalcalendarID) -> new UIntType(nonOptionalcalendarID)).orElse(new EmptyType())));
+    values.add(new StructElement(CALENDAR_ID_ID, calendarID.<BaseTLVType>map((nonOptionalcalendarID) -> new UIntType(nonOptionalcalendarID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -8906,7 +8906,7 @@ public static class EnergyCalendarClusterDayStruct {
           ArrayType castingValue = element.value(ArrayType.class);
           transitions = castingValue.map((elementcastingValue) -> ChipStructs.EnergyCalendarClusterTransitionStruct.decodeTlv(elementcastingValue));
         }
-      } else if (element.contextTagNum() == CALENDAR_I_D_ID) {
+      } else if (element.contextTagNum() == CALENDAR_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           calendarID = Optional.of(castingValue.value(Long.class));

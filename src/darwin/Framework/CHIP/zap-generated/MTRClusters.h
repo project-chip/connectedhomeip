@@ -3796,7 +3796,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Energy Calendar
- *
+ *    The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterEnergyCalendar : MTRGenericCluster
