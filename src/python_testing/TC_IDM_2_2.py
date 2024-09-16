@@ -47,11 +47,11 @@ from mobly import asserts, signals
 # from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from typing import Optional
 
-@dataclass(frozen=True)
-class AttributePath:
-    EndpointId: Optional[int] = None
-    ClusterId: Optional[int] = None
-    AttributeId: Optional[int] = None
+# @dataclass(frozen=True)
+# class AttributePath:
+#     EndpointId: Optional[int] = None
+#     ClusterId: Optional[int] = None
+#     AttributeId: Optional[int] = None
 
 
 
@@ -185,11 +185,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
-        self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")
-
-        # endpoint = [0, Clusters.Objects.Descriptor.Attributes.AttributeList] # Is this a global attribute? Trial and error, but looks like it
-        # all_attributes = await self.default_controller.ReadAttribute(self.dut_node_id, [0, Clusters.Objects.Descriptor])
-        
+        self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")        
         attribute_path_1 = AttributePath(
         EndpointId = 0,
         ClusterId = None,
@@ -200,11 +196,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 self.dut_node_id,
                 [attribute_path_1]
             )
-                        
-            for i in range(3):
-
-                asserts.assert_in(Clusters.Objects.Descriptor, read_request[i].keys(), "Descriptor cluster not in output")
-                asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[i][Clusters.Objects.Descriptor], "AttributeList not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor, read_request[0].keys(), "Descriptor cluster not in output")
+            asserts.assert_in(Clusters.Objects.Descriptor.Attributes.AttributeList, read_request[0][Clusters.Objects.Descriptor], "AttributeList not in output")
         except Exception as e:
             # Seems to fail even after updating Python wheels - need to investigate, will ignore except to allow tests after this to run
             # print(e)
