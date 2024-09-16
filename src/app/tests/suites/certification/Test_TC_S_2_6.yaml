@@ -45,7 +45,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3841
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3841
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -59,7 +59,7 @@ tests:
       verification: |
           Now send the below command for commissionin DUT to TH2 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 2 36253605617 --commissioner-name beta
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
 
           Verify the commissioning completed with success on TH2(chip-tool) from DUT
 
@@ -71,7 +71,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3842
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3842
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -85,7 +85,7 @@ tests:
       verification: |
           send the below command for commissionin DUT to TH3 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 3 36545248276 --commissioner-name gamma
+          ./chip-tool pairing code 3 36545248276 --commissioner-name gamma
 
           Verify the commissioning completed with success on TH3(chip-tool) from DUT
 
