@@ -82,7 +82,7 @@ struct WriteAttributeRequest : OperationRequest
     //
     // In particular this means that a write to this path has succeeded before (i.e. it passed required ACL checks).
     // The intent for this is to allow short-cutting ACL checks when ACL is in progress of being updated:
-    //   - During write chunking, list writes are of the form "clear list" followed by "append item by item"
+    //   - During write chunking, list writes can be of the form "reset list" followed by "append item by item"
     //   - When ACL is updating, such "clear list" would result in the entire ACL being deny and the "append"
     //     would fail.
     // callers are expected to keep track of a `previousSuccessPath` whenever a write succeeds (otherwise ACL
