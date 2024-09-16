@@ -86,7 +86,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
-                               public DataModel::ActionContext,
+                               private DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -415,10 +415,10 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+private:
     /* DataModel::ActionContext implementation */
     Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
 
-private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
