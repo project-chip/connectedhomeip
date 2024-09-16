@@ -37,6 +37,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AFL
 AIDL
 algs
 alloc
@@ -340,6 +341,7 @@ datamodel
 DataModelRevision
 dataset
 datasets
+datastore
 DataVersion
 dbf
 DBG
@@ -454,6 +456,7 @@ DS
 duplicative
 DUT
 DUTS
+DUT's
 DV
 DVK
 dynload
@@ -562,12 +565,15 @@ forkpty
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FS
 fsl
 fstab
 fsync
 ftd
 fullclean
 fuzzer
+fuzzers
+fuzztest
 FW
 gbl
 gcloud
@@ -854,6 +860,7 @@ MbedNewTarget
 mbedos
 mbedTarget
 mbedTLS
+MCORE
 mcu
 MCUboot
 mcumgr
@@ -945,8 +952,6 @@ NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
 nltest
-NLUnitTest
-NLUnitTests
 nmcli
 nmtui
 noc
@@ -1005,6 +1010,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+OSS
 OTA
 OTADownloader
 otaDownloadPath
@@ -1527,6 +1533,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vm
 vn
 vnc
 vous

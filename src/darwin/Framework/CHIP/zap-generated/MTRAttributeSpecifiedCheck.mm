@@ -6060,9 +6060,6 @@ static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttri
 {
     using namespace Clusters::EcosystemInformation;
     switch (aAttributeId) {
-    case Attributes::RemovedOn::Id: {
-        return YES;
-    }
     case Attributes::DeviceDirectory::Id: {
         return YES;
     }
@@ -6685,6 +6682,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Unsupported::Id: {
+        return YES;
+    }
+    case Attributes::ReadFailureCode::Id: {
+        return YES;
+    }
+    case Attributes::FailureInt32U::Id: {
         return YES;
     }
     case Attributes::NullableBoolean::Id: {

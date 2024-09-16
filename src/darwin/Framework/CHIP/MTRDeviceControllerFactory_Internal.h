@@ -30,6 +30,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceControllerFactory.h"
+#import "MTROperationalBrowser.h"
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -108,6 +109,7 @@ MTR_DIRECT_MEMBERS
 
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupDataProvider;
+@property (readonly, assign) MTROperationalBrowser * operationalBrowser;
 
 @end
 

@@ -132,6 +132,7 @@ Here is the interpretation of the **optional** parameters:
 --unique_id             -> Unique id used for rotating device id generation
 --product_finish        -> Visible finish of the product
 --product_primary_color -> Representative color of the visible parts of the product
+--hw_params             -> Use application factory data from Hardware Parameters component
 ```
 
 ## 3. Write provisioning data
@@ -144,14 +145,11 @@ DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_d
 ```
 
 For **K32W1** platform, the binary needs to be written in the internal flash at
-location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
+location given by **0xFE080**, using `JLink`:
 
 ```
-loadfile factory_data.bin 0xf4000
+loadfile factory_data.bin 0xFE080
 ```
-
-where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the
-corresponding .map file (can be different if using a custom linker script).
 
 For **RW61X** platform, the binary needs to be written in the internal flash at
 location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
@@ -208,7 +206,7 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 Supported platforms:
 
--   K32W1 - `src/plaftorm/nxp/k32w/k32w1/FactoryDataProviderImpl.h`
+-   K32W1 - `src/plaftorm/nxp/k32w1/FactoryDataProviderImpl.h`
 
 For platforms that have a secure subsystem (`SSS`), the DAC private key can be
 converted to an encrypted blob. This blob will overwrite the DAC private key in
@@ -218,6 +216,12 @@ data provider instance.
 The application will check at initialization whether the DAC private key has
 been converted or not and convert it if needed. However, the conversion process
 should be done at manufacturing time for security reasons.
+
+Reference factory data generation command:
+
+```shell
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x1037" --pid "0xA221" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "2023-01-01" --hw_version 1 --hw_version_str "1.0" --cert_declaration ./Chip-Test-CD-1037-A221.der --dac_cert ./Chip-DAC-NXP-1037-A221-Cert.der --dac_key ./Chip-DAC-NXP-1037-A221-Key.der --pai_cert ./Chip-PAI-NXP-1037-A221-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --hw_params --out ./factory_data.bin
+```
 
 There is no need for an extra binary.
 
@@ -247,24 +251,58 @@ adding the following gn argument `chip_use_plain_dac_key=true`.
 
 Supported platforms:
 
--   RW61X - `src/plaftorm/nxp/rt/rw61x/FactoryDataProviderImpl.h`
+-   RW61X
 
-For platforms that have a secure subsystem (`SE50`), the DAC private key can be
-converted to an encrypted blob. This blob will overwrite the DAC private key in
-factory data and will be imported in the `SE50` before to sign, by the factory
-data provider instance.
+there are three implementations for factory data protection
 
-The conversion process shall happen at manufacturing time and should be run one
-time only:
+-   whole factory data protection with AES encryption ( chip_with_factory_data=1
+    chip_enable_secure_whole_factory_data=true )
+    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`\
+    `src/platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.cpp`
 
--   Write factory data binary.
--   Build the application with
-    `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
--   Write the application to the board and let it run.
+-   only dac private key protection ( chip_with_factory_data=1
+    chip_enable_secure_dac_private_key_storage=true )  
+    `examples/platform/nxp/rt/rw61x/factory_data/source/AppFactoryDataExample.cpp`
+    \
+    `src/platform/nxp/rt/rw61x/FactoryDataProviderImpl.cpp`
 
-After the conversion process:
+-   whole factory data protection with hard-coded AES key (
+    chip_with_factory_data=1 )
+    `examples/platform/nxp/common/factory_data/source/AppFactoryDataDefaultImpl.cpp`
+    \
+    `src/platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.cpp`
 
--   Make sure the application is built with `chip_with_factory_data=1`, but
-    without `chip_convert_dac_private_key` arg, since conversion already
-    happened.
--   Write the application to the board.
+for the first one, the whole factory data is encrypted by an AES-256 key, the
+AES key can be passed through serial link when in factory production mode, and
+will be provisioned into Edge Lock, and the returned AES Key blob (wrapped key)
+can be stored in the end of factory data region in TLV format. for the
+decryption process, the blob is retrieved and provisioned into Edge Lock and the
+whole factory data can be decrypted using the returned key index in Edge Lock.
+Compared with only dac private key protection solution, this solution can avoid
+tampering with the original factory data.
+
+the factory data should be encrypted by an AES-256 key using "--aes256_key"
+option in "generate.py" script file.
+
+it will check whether there is AES key blob in factory data region when in each
+initialization, if not, the default AES key is converted and the result is
+stored into flash, it run only once.
+
+for the second one, it only protect the dac private key inside the factory data,
+the dac private key is retrieved and provisioned into Edge Lock, the returned
+key blob replace the previous dac private key, and also update the overall size
+and hash, and re-write the factory data. when device is doing matter
+commissioning, the blob is retrieved and provisioned into Edge Lock and the
+signing can be done using the returned key index in Edge Lock.
+
+the factory data should be plain text for the first programming. it will check
+whether there is dac private key blob (base on the size of blob, should be 48)
+in factory data when in each initialization, if not, the dac private key is
+converted and the result is stored into flash, it run only once.
+
+for the third one, it is a little similar to the first one, the whole factory
+data is encrypted by an AES key, but there are two differences:
+
+-   the AES key is hard-coded and not provisioned into Edge Lock
+-   the factory data should be encrypted by AES-128 key using "--aes128_key"
+    option in "generate.py" script file.

@@ -74,6 +74,11 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
         {
             resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
         }
+        else if (CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) == err)
+        {
+            // TODO: Confirm if we need to add UnsupportedAttribute status as a return for Scene Commands
+            resp.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
+        }
         else
         {
             resp.status = to_underlying(StatusIB(err).mStatus);

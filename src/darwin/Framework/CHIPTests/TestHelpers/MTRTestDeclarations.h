@@ -18,6 +18,9 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
+// For MTRDeviceDataValueDictionary:
+#import "MTRDevice_Internal.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
@@ -55,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
+- (NSUInteger)unitTestDelegateCount;
 @end
 
 @interface MTRBaseDevice (TestDebug)

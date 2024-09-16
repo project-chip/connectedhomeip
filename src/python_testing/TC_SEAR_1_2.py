@@ -29,7 +29,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -80,7 +79,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         asserts.assert_less_equal(len(supported_areas), 255,
                                   "SupportedAreas should have max 255 entries")
         areaid_list = []
-        areadesc_s = set()
+        areainfo_s = set()
         for a in supported_areas:
             asserts.assert_true(a.areaID not in areaid_list, "SupportedAreas must have unique AreaID values!")
 
@@ -91,27 +90,27 @@ class TC_SEAR_1_2(MatterBaseTest):
                                       f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
                 asserts.assert_true(a.mapID in self.mapid_list,
                                     f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
-                k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s,
-                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"mapID:{a.mapID} areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s,
+                                    f"SupportedAreas must have unique MapID({a.mapID}) + AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
             else:
                 # empty SupportedMaps
                 asserts.assert_is(a.mapID, NullValue,
                                   f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
-                k = f"areaDesc:{a.areaDesc}"
-                asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
-                areadesc_s.add(k)
+                k = f"areaInfo:{a.areaInfo}"
+                asserts.assert_true(k not in areainfo_s, f"SupportedAreas must have unique AreaInfo({a.areaInfo}) values!")
+                areainfo_s.add(k)
 
-            if a.areaDesc.locationInfo is NullValue and a.areaDesc.landmarkInfo is NullValue:
+            if a.areaInfo.locationInfo is NullValue and a.areaInfo.landmarkInfo is NullValue:
                 asserts.assert_true(
                     f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkInfo")
-            if a.areaDesc.landmarkInfo is not NullValue:
-                asserts.assert_true(a.areaDesc.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaDesc.landmarkInfo.landmarkTag})")
-                asserts.assert_true(a.areaDesc.landmarkInfo.positionTag is NullValue or a
-                                    .areaDesc.landmarkInfo.positionTag in range(0, self.MAX_RELPOS_ID),
-                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.areaDesc.landmarkInfo.positionTag})")
+            if a.areaInfo.landmarkInfo is not NullValue:
+                asserts.assert_true(a.areaInfo.landmarkInfo.landmarkTag <= self.MAX_LANDMARK_ID,
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.areaInfo.landmarkInfo.landmarkTag})")
+                asserts.assert_true(a.areaInfo.landmarkInfo.relativePositionTag is NullValue or a
+                                    .areaInfo.landmarkInfo.relativePositionTag in range(0, self.MAX_RELPOS_ID),
+                                    f"SupportedAreas entry with AreaID({a.areaID}) has invalid RelativePositionTag({a.areaInfo.landmarkInfo.relativePositionTag})")
         # save so other methods can use this if needed
         self.areaid_list = areaid_list
 
@@ -140,10 +139,10 @@ class TC_SEAR_1_2(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
         logging.info(f"CurrentArea {current_area}")
 
-        asserts.assert_true((len(self.selareaid_list) == 0 and current_area is NullValue)
-                            or
-                            current_area in self.selareaid_list,
-                            f"CurrentArea {current_area} is invalid. SelectedAreas is {self.selareaid_list}.")
+        if current_area is not NullValue:
+            asserts.assert_true(current_area in self.areaid_list,
+                                f"CurrentArea {current_area} is not in SupportedAreas: {self.areaid_list}.")
+
         # save so other methods can use this if needed
         self.current_area = current_area
 
@@ -158,7 +157,8 @@ class TC_SEAR_1_2(MatterBaseTest):
         if self.current_area is NullValue:
             asserts.assert_true(estimated_end_time is NullValue,
                                 "EstimatedEndTime should be null if CurrentArea is null.")
-        else:
+
+        if estimated_end_time is not NullValue:
             # allow for some clock skew
             asserts.assert_true(estimated_end_time >= read_time - 3*60,
                                 f"EstimatedEndTime({estimated_end_time}) should be greater than the time when it was read({read_time})")
@@ -180,23 +180,15 @@ class TC_SEAR_1_2(MatterBaseTest):
                 progareaid_list.append(p.areaID)
                 asserts.assert_true(p.areaID in self.areaid_list,
                                     f"Progress entry has invalid AreaID value ({p.areaID})")
-                asserts.assert_true(p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kOperating,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
-                                                 Clusters.ServiceArea.OperationalStatusEnum.kCompleted),
+                asserts.assert_true(p.status in (Clusters.ServiceArea.Enums.OperationalStatusEnum.kPending,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kOperating,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kSkipped,
+                                                 Clusters.ServiceArea.Enums.OperationalStatusEnum.kCompleted),
                                     f"Progress entry has invalid Status value ({p.status})")
-                if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped, Clusters.ServiceArea.OperationalStatusEnum.kCompleted):
+                if p.status not in (Clusters.ServiceArea.Enums.OperationalStatusEnum.kSkipped, Clusters.ServiceArea.Enums.OperationalStatusEnum.kCompleted):
                     asserts.assert_true(p.totalOperationalTime is NullValue,
                                         f"Progress entry should have a null TotalOperationalTime value (Status is {p.status})")
                 # TODO how to check that InitialTimeEstimate is either null or uint32?
-
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Allow some time for the command to take effect.
-        # This removes the test flakyness which is very annoying for everyone in CI.
-        sleep(0.001)
 
     def TC_SEAR_1_2(self) -> list[str]:
         return ["SEAR.S"]
@@ -216,7 +208,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         if self.check_pics("SEAR.S.F02"):
             await self.read_and_validate_supported_maps(step=2)
@@ -246,7 +238,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveMap", "MapId": 3}')
+                self.write_to_app_pipe({"Name": "RemoveMap", "MapId": 3})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -281,7 +273,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"}')
+                self.write_to_app_pipe({"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -316,7 +308,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "RemoveArea", "AreaId": 10050}')
+                self.write_to_app_pipe({"Name": "RemoveArea", "AreaId": 10050})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -350,7 +342,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"}')
+                self.write_to_app_pipe({"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

@@ -7,14 +7,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_ADMIN_CHOICES=(
     "./fabric-admin"
     "out/debug/standalone/fabric-admin"
-    "out/linux-x64-fabric-admin/fabric-admin"
-    "out/darwin-arm64-fabric-admin/fabric-admin"
+    "out/linux-x64-fabric-admin-rpc/fabric-admin"
+    "out/darwin-arm64-fabric-admin-rpc/fabric-admin"
 )
 DEFAULT_BRIDGE_CHOICES=(
     "./fabric-bridge-app"
     "out/debug/standalone/fabric-bridge-app"
-    "out/linux-x64-fabric-bridge-app/fabric-bridge-app"
-    "out/darwin-arm64-fabric-bridge-app/fabric-bridge-app"
+    "out/linux-x64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/linux-x64-fabric-bridge-rpc-no-ble/fabric-bridge-app"
+    "out/darwin-arm64-fabric-bridge-rpc/fabric-bridge-app"
+    "out/darwin-arm64-fabric-bridge-rpc-no-ble/fabric-bridge-app"
 )
 FABRIC_ADMIN_LOG="/tmp/fabric_admin.log"
 FABRIC_BRIDGE_APP_LOG="/tmp/fabric_bridge_app.log"

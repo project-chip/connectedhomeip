@@ -98,7 +98,8 @@ class TC_CNET_1_4(MatterBaseTest):
 
         self.step(6)
         concurrent_connection = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning,
-                                                                               attribute=Clusters.GeneralCommissioning.Attributes.SupportsConcurrentConnection)
+                                                                               attribute=Clusters.GeneralCommissioning.Attributes.SupportsConcurrentConnection,
+                                                                               endpoint=kRootEndpointId)
         asserts.assert_true(concurrent_connection, "The device does not support concurrent connection commissioning")
 
 

@@ -33,6 +33,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
+set(CHIP_DATA_MODEL_INTERFACE "disabled" CACHE STRING "Data model interface option to use: enabled or disabled")
+
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
@@ -64,6 +66,12 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
+if ("${CHIP_DATA_MODEL_INTERFACE}" STREQUAL "enabled")
+    chip_gn_arg_append("chip_use_data_model_interface" "\"enabled\"")
+else()
+    chip_gn_arg_append("chip_use_data_model_interface" "\"disabled\"")
+endif()
+
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
 # It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
@@ -87,25 +95,25 @@ if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
 endif()
 
 # Config the chip log level by IDF menuconfig
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
     chip_gn_arg_bool  ("chip_error_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_error_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
     chip_gn_arg_bool  ("chip_progress_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_progress_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
     chip_gn_arg_bool  ("chip_detail_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_detail_logging" "false")
 endif()
 
-if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_CHIP_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
     chip_gn_arg_bool  ("chip_automation_logging" "true")
 else()
     chip_gn_arg_bool  ("chip_automation_logging" "false")

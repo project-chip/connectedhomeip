@@ -24,7 +24,7 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -33,7 +33,7 @@ import time
 import chip.clusters as Clusters
 import test_plan_support
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, per_endpoint_test)
+                                    has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 
 
@@ -43,11 +43,11 @@ class TC_LVL_2_3(MatterBaseTest):
         THRead = "TH reads"
         THcommand = "TH sends the command"
         return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
-                TestStep(2, f"{THRead} FeatureMap attribute and the AttributeList value"),
+                TestStep(2, f"{THRead} FeatureMap attribute and the AttributeList value", test_plan_support.verify_success()),
                 TestStep(
                     "3a", f"If the MaxLevel attribute is in the AttributeList, {THRead} MaxLevel attribute and store value as maxLevel, otherwise set maxLevel to 254", test_plan_support.verify_success()),
                 TestStep(
-                    "3b", f"If the MinLevel attribute is in the AttributeList, {THRead} MinLevel attribute and store value as minLevel, otherwise set minLevel to 1", test_plan_support.verify_success()),
+                    "3b", f"If the MinLevel attribute is in the AttributeList, {THRead} MinLevel attribute and store value as minLevel, otherwise set minLevel to 0 if LT is not supported or 1 if LT is supported", test_plan_support.verify_success()),
                 TestStep(4, f"{THcommand} MoveWithOnOff with MoveMode field set to Down and rate set to 254 and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(5, f"{THRead} CurrentLevel attribute and store value as startCurrentLevel",
@@ -57,8 +57,8 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(7, f"{THcommand} MoveToLevelWithOnOff with Level field set to maxLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(8, "TH stores the reported values of CurrentLevel in all incoming reports for CurrentLevel attribute, that contains data in reportedCurrentLevelValuesList, over a period of 30 seconds."),
-                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 10 entries for CurrentLevel",
-                         "reportedCurrentLevelValuesList has 10 or less entries in the list"),
+                TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 12 entries for CurrentLevel",
+                         "reportedCurrentLevelValuesList has 12 or fewer entries in the list"),
                 TestStep(10, "If reportedCurrentLevelValuesList only contain a single entry, TH verifies the value of the entry is equal to maxLevel",
                          "The entry in reportedCurrentLevelValuesList is equal to maxLevel"),
                 TestStep(11, "If reportedCurrentLevelValuesList contains two or more entries, TH verifies the value of the first entry is larger than startCurrentLevel",
@@ -77,14 +77,14 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(20, "TH verifies reportedRemainingTimeValuesList contains three entries",
                          "reportedRemainingTimeValuesList has 3 entries in the list"),
                 TestStep(21, "TH verifies the first entry in reportedRemainingTimeValuesList is approximately 100 (10s)",
-                         "The first entry in reportedRemainingTimeValuesList is approximately equal to 100"),
+                         "The first entry in reportedRemainingTimeValuesList is in the range 95 - 100"),
                 TestStep(22, "TH verifies the second entry in reportedRemainingTimeValuesList is approximately 150",
-                         "The second entry in reportedRemainingTimeValuesList is approximately equal to 150"),
+                         "The second entry in reportedRemainingTimeValuesList is in the range 145 - 150"),
                 TestStep(23, "TH verifies the third entry in reportedRemainingTimeValuesList is 0",
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
 
-    @per_endpoint_test(has_cluster(Clusters.LevelControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
     async def test_TC_LVL_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -96,8 +96,6 @@ class TC_LVL_2_3(MatterBaseTest):
         attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
 
         self.step("3a")
-        attributes = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.AttributeList)
-
         if lvl.Attributes.MaxLevel.attribute_id in attributes:
             max_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MaxLevel)
         else:
@@ -107,7 +105,10 @@ class TC_LVL_2_3(MatterBaseTest):
         if lvl.Attributes.MinLevel.attribute_id in attributes:
             min_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.MinLevel)
         else:
-            min_level = 1
+            if (lvl.Bitmaps.Feature.kLighting & feature_map) == 0:
+                min_level = 0
+            else:
+                min_level = 1
 
         self.step(4)
         cmd = Clusters.LevelControl.Commands.MoveToLevelWithOnOff(level=min_level, transitionTime=0)
@@ -133,7 +134,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(9)
         count = sub_handler.attribute_report_counts[lvl.Attributes.CurrentLevel]
-        asserts.assert_less_equal(count, 10, "Received more than 10 reports for CurrentLevel")
+        asserts.assert_less_equal(count, 12, "Received more than 12 reports for CurrentLevel")
         asserts.assert_greater(count, 0, "Did not receive any reports for CurrentLevel")
 
         self.step(10)
@@ -189,9 +190,11 @@ class TC_LVL_2_3(MatterBaseTest):
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
         logging.info(f'Reamining time reports: {remaining_time}')
+        asserts.assert_less_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
         asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 
         self.step(22)
+        asserts.assert_less_equal(remaining_time[1].value, 150, "Unexpected second RemainingTime report")
         asserts.assert_almost_equal(remaining_time[1].value, 150, delta=10, msg="Unexpected second RemainingTime report")
 
         self.step(23)

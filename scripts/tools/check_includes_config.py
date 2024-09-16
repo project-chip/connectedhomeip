@@ -180,9 +180,11 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
     'src/lib/support/jsontlv/TextFormat.h': {'string'},
+    'src/lib/support/TemporaryFileStream.h': {'ostream', 'streambuf', 'string'},
     'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
     'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
+    'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
 }

@@ -24,6 +24,8 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include "OTAConfig.h"
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
 #define APP_ACTION_BUTTON 1
@@ -184,12 +186,15 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
         if (status != SL_STATUS_OK)
         {
-            ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
+            ChipLogError(AppServer, "Failed to enable the TA Deep Sleep");
         }
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (BaseApplication::GetProvisionStatus())
     {
+        // After the device is provisioned and the commissioning passed
+        // resetting the isCommissioningStarted to false
+        isComissioningStarted = false;
 #ifdef DISPLAY_ENABLED
 #ifdef QR_CODE_ENABLED
         SilabsLCD::Screen_e screen;
@@ -229,7 +234,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppEventQueue = osMessageQueueNew(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), &appEventQueueAttr);
     if (sAppEventQueue == NULL)
     {
-        SILABS_LOG("Failed to allocate app event queue");
+        ChipLogError(AppServer, "Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
@@ -237,7 +242,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppTaskHandle = osThreadNew(taskFunction, &sAppEventQueue, &appTaskAttr);
     if (sAppTaskHandle == nullptr)
     {
-        SILABS_LOG("Failed to create app task");
+        ChipLogError(AppServer, "Failed to create app task");
         appError(APP_ERROR_CREATE_TASK_FAILED);
     }
     return CHIP_NO_ERROR;
@@ -251,12 +256,12 @@ CHIP_ERROR BaseApplication::Init()
     /*
      * Wait for the WiFi to be initialized
      */
-    SILABS_LOG("APP: Wait WiFi Init");
+    ChipLogProgress(AppServer, "APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
         vTaskDelay(pdMS_TO_TICKS(10));
     }
-    SILABS_LOG("APP: Done WiFi Init");
+    ChipLogProgress(AppServer, "APP: Done WiFi Init");
     /* We will init server when we get IP */
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -273,7 +278,7 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sFunctionTimer == NULL)
     {
-        SILABS_LOG("funct timer create failed");
+        ChipLogError(AppServer, "funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -285,12 +290,12 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sLightTimer == NULL)
     {
-        SILABS_LOG("Light Timer create failed");
+        ChipLogError(AppServer, "Light Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    ChipLogProgress(AppServer, "Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    ChipLogProgress(AppServer, "Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -540,12 +545,12 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 if (err != CHIP_NO_ERROR)
                 {
-                    SILABS_LOG("Failed to open the Basic Commissioning Window");
+                    ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
                 }
             }
             else
             {
-                SILABS_LOG("Network is already provisioned, Ble advertisement not enabled");
+                ChipLogProgress(AppServer, "Network is already provisioned, Ble advertisement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
@@ -568,7 +573,7 @@ void BaseApplication::CancelFunctionTimer()
 {
     if (osTimerStop(sFunctionTimer) == osError)
     {
-        SILABS_LOG("app timer stop() failed");
+        ChipLogError(AppServer, "app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -578,7 +583,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     // Starts or restarts the function timer
     if (osTimerStart(sFunctionTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
-        SILABS_LOG("app timer start() failed");
+        ChipLogError(AppServer, "app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -586,7 +591,8 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
 void BaseApplication::StartFactoryResetSequence()
 {
     // Initiate the factory reset sequence
-    SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+    ChipLogProgress(AppServer, "Factory Reset Triggered. Release button within %ums to cancel.",
+                    FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
     // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
     // cancel, if required.
@@ -615,7 +621,7 @@ void BaseApplication::CancelFactoryResetSequence()
     if (sIsFactoryResetTriggered)
     {
         sIsFactoryResetTriggered = false;
-        SILABS_LOG("Factory Reset has been Canceled");
+        ChipLogProgress(AppServer, "Factory Reset has been cancelled");
     }
 }
 
@@ -623,7 +629,7 @@ void BaseApplication::StartStatusLEDTimer()
 {
     if (osTimerStart(sLightTimer, kLightTimerPeriod) != osOK)
     {
-        SILABS_LOG("Light Time start failed");
+        ChipLogError(AppServer, "Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -636,7 +642,7 @@ void BaseApplication::StopStatusLEDTimer()
 
     if (osTimerStop(sLightTimer) == osError)
     {
-        SILABS_LOG("Light Time start failed");
+        ChipLogError(AppServer, "Light Time start failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -767,12 +773,12 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
     {
         if (osMessageQueuePut(sAppEventQueue, aEvent, osPriorityNormal, 0) != osOK)
         {
-            SILABS_LOG("Failed to post event to app task event queue");
+            ChipLogError(AppServer, "Failed to post event to app task event queue");
         }
     }
     else
     {
-        SILABS_LOG("App Event Queue is uninitialized");
+        ChipLogError(AppServer, "App Event Queue is uninitialized");
     }
 }
 
@@ -784,7 +790,7 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        SILABS_LOG("Event received with no handler. Dropping event.");
+        ChipLogProgress(AppServer, "Event received with no handler. Dropping event.");
     }
 }
 
@@ -796,6 +802,10 @@ void BaseApplication::ScheduleFactoryReset()
         {
             Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
+#if SL_WIFI
+        // Removing the matter services on factory reset
+        chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
+#endif
         PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
                                                   // basic information cluster it seems. And triggers and Event flush, which is not
                                                   // relevant when there are no fabrics left
@@ -820,38 +830,94 @@ void BaseApplication::DoProvisioningReset()
         CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
         if (err != CHIP_NO_ERROR)
         {
-            SILABS_LOG("Failed to open the Basic Commissioning Window");
+            ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
         }
     });
 }
+
+#if SILABS_OTA_ENABLED
+void BaseApplication::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    OTAConfig::Init();
+}
+#endif
 
 void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
     switch (event->Type)
     {
-    case DeviceEventType::kServiceProvisioningChange:
+    case DeviceEventType::kServiceProvisioningChange: {
         // Note: This is only called on Attach, we need to add a method to detect Thread Network Detach
         BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-        break;
-    case DeviceEventType::kInternetConnectivityChange:
+    }
+    break;
+
+    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kInternetConnectivityChange: {
 #ifdef DIC_ENABLE
-        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == kConnectivity_Established);
-        if (DIC_OK != dic_init(dic::control::subscribeCB))
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            SILABS_LOG("Failed to initialize DIC module\n");
+            if (DIC_OK != dic_init(dic::control::subscribeCB))
+            {
+                ChipLogError(AppServer, "dic_init failed");
+            }
         }
 #endif // DIC_ENABLE
-        break;
-    case DeviceEventType::kWiFiConnectivityChange:
 #ifdef DISPLAY_ENABLED
         SilabsLCD::Screen_e screen;
         AppTask::GetLCD().GetScreen(screen);
         // Update the LCD screen with SSID and connected state
-        VerifyOrReturn(screen == SilabsLCD::Screen_e::StatusScreen);
-        BaseApplication::UpdateLCDStatusScreen(false);
-        AppTask::GetLCD().SetScreen(screen);
+        if (screen == SilabsLCD::Screen_e::StatusScreen)
+        {
+            BaseApplication::UpdateLCDStatusScreen(false);
+            AppTask::GetLCD().SetScreen(screen);
+        }
 #endif // DISPLAY_ENABLED
-        break;
+        if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
+            (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
+        {
+#if SL_WIFI
+            chip::app::DnssdServer::Instance().StartServer();
+#endif // SL_WIFI
+
+#if SILABS_OTA_ENABLED
+            ChipLogProgress(AppServer, "Scheduling OTA Requestor initialization");
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+#endif // SILABS_OTA_ENABLED
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI)
+            // on power cycle, let the device go to sleep after connection is established
+            if (BaseApplication::sAppDelegate.isCommissioningInProgress() == false)
+            {
+#if SLI_SI917
+                sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
+#else
+                sl_status_t err = wfx_power_save();
+#endif /* SLI_SI917 */
+                if (err != SL_STATUS_OK)
+                {
+                    ChipLogError(AppServer, "wfx_power_save failed: 0x%lx", err);
+                }
+            }
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI */
+        }
+    }
+    break;
+
+    case DeviceEventType::kCommissioningComplete: {
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI)
+#if SLI_SI917
+        sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
+#else
+        sl_status_t err = wfx_power_save();
+#endif /* SLI_SI917 */
+        if (err != SL_STATUS_OK)
+        {
+            ChipLogError(AppServer, "wfx_power_save failed: 0x%lx", err);
+        }
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER && RS911X_WIFI */
+    }
+    break;
     default:
         break;
     }
@@ -881,7 +947,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
     else
     {
-        SILABS_LOG("Getting QR code failed!");
+        ChipLogError(AppServer, "Getting QR code failed!");
     }
 }
 

@@ -59,6 +59,7 @@ def main(search_directory, env_file):
         "TC_CNET_4_4.py",
         "TC_CCTRL_2_1.py",
         "TC_CCTRL_2_2.py",
+        "TC_CCTRL_2_3.py",
         "TC_DGGEN_3_2.py",
         "TC_EEVSE_Utils.py",
         "TC_ECOINFO_2_1.py",
@@ -74,21 +75,20 @@ def main(search_directory, env_file):
         "TC_MCORE_FS_1_1.py",
         "TC_MCORE_FS_1_2.py",
         "TC_MCORE_FS_1_3.py",
+        "TC_MCORE_FS_1_4.py",
+        "TC_MCORE_FS_1_5.py",
         "TC_OCC_3_1.py",
         "TC_OCC_3_2.py",
         "TC_BRBINFO_4_1.py",
-        "TC_SEAR_1_2.py",
-        "TC_SEAR_1_3.py",
-        "TC_SEAR_1_4.py",
-        "TC_SEAR_1_5.py",
-        "TC_SEAR_1_6.py",
         "TestCommissioningTimeSync.py",
         "TestConformanceSupport.py",
         "TestChoiceConformanceSupport.py",
         "TC_DEMTestBase.py",
         "choice_conformance_support.py",
+        "TestConformanceTest.py",  # Unit test of the conformance test (TC_DeviceConformance) - does not run against an app.
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
+        "TestConformanceTest.py",
         "TestMatterTestingSupport.py",
         "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",
@@ -124,7 +124,7 @@ def main(search_directory, env_file):
     # Run each script with the base command
     for script in python_files:
         full_command = f"{base_command} --load-from-env {env_file} --script {script}"
-        print(f"Running command: {full_command}")
+        print(f"Running command: {full_command}", flush=True)  # Flush print to stdout immediately
         subprocess.run(full_command, shell=True, check=True)
 
 
