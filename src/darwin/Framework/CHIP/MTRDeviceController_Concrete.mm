@@ -962,7 +962,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                        error:(NSError * __autoreleasing *)error
 {
     if (self.suspended) {
-        MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with paramaters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+        MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
         // TODO: Can we do a better error here?
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
