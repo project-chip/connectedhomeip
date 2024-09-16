@@ -140,7 +140,7 @@ class TC_WHM_2_1(MatterBaseTest):
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
-        if 1 or self.check_pics("WHM.S.M.CAN_TEST_MODE_FAILURE"):
+        if self.check_pics("WHM.S.M.CAN_TEST_MODE_FAILURE"):
             asserts.assert_true(self.mode_fail in modes,
                                 "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.mode_fail))
             self.step(5)
