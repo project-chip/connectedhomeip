@@ -76,6 +76,30 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
 @end
 
+@interface MTRPerControllerStorageTestsSuspensionDelegate : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic, assign) BOOL expectedSuspensionState;
+@end
+
+@implementation MTRPerControllerStorageTestsSuspensionDelegate
+- (id)initWithExpectation:(XCTestExpectation *)expectation expectedSuspensionState:(BOOL)expectedSuspensionState
+{
+    self = [super init];
+    if (self) {
+        _expectation = expectation;
+        _expectedSuspensionState = expectedSuspensionState;
+    }
+    return self;
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    suspendedChangedTo:(BOOL)suspended
+{
+    XCTAssertEqual(suspended, self.expectedSuspensionState);
+    [self.expectation fulfill];
+}
+@end
+
 @interface MTRPerControllerStorageTestsCertificateIssuer : NSObject <MTROperationalCertificateIssuer>
 - (instancetype)initWithRootCertificate:(MTRCertificateDERBytes)rootCertificate
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
@@ -1713,6 +1737,17 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [becameUnreachableExpectation fulfill];
     };
 
+    XCTestExpectation * suspendedExpectation = [self expectationWithDescription:@"Controller has been suspended"];
+    __auto_type * suspensionDelegate = [[MTRPerControllerStorageTestsSuspensionDelegate alloc] initWithExpectation:suspendedExpectation expectedSuspensionState:YES];
+    [controller addDeviceControllerDelegate:suspensionDelegate queue:queue];
+
+    XCTestExpectation * browseStoppedExpectation = [self expectationWithDescription:@"Operational browse has stopped"];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"stopping persistent operational browse"]) {
+            [browseStoppedExpectation fulfill];
+        }
+    });
+
     [controller suspend];
     XCTAssertTrue(controller.suspended);
 
@@ -1723,7 +1758,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [toggle2Expectation fulfill];
     }];
 
-    [self waitForExpectations:@[ becameUnreachableExpectation, toggle2Expectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ becameUnreachableExpectation, toggle2Expectation, suspendedExpectation, browseStoppedExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * newSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up again"];
     XCTestExpectation * newReachableExpectation = [self expectationWithDescription:@"Device became reachable again"];
@@ -1735,10 +1770,23 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [newSubscriptionExpectation fulfill];
     };
 
+    XCTestExpectation * resumedExpectation = [self expectationWithDescription:@"Controller has been resumed"];
+    suspensionDelegate.expectation = resumedExpectation;
+    suspensionDelegate.expectedSuspensionState = NO;
+
+    XCTestExpectation * browseRestartedExpectation = [self expectationWithDescription:@"Operational browse has re-started"];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"trying to start persistent operational browse"]) {
+            [browseRestartedExpectation fulfill];
+        }
+    });
+
     [controller resume];
     XCTAssertFalse(controller.suspended);
 
-    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation ] timeout:kSubscriptionTimeoutInSeconds];
+    [self waitForExpectations:@[ newSubscriptionExpectation, newReachableExpectation, resumedExpectation, browseRestartedExpectation ] timeout:kSubscriptionTimeoutInSeconds];
+
+    MTRSetLogCallback(MTRLogTypeProgress, nil);
 
     // Test that sending a command works again.  Clear the delegate's onReportEnd
     // first, so reports from the command don't trigger it.

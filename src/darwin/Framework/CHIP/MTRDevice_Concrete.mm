@@ -2963,6 +2963,79 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
+{
+    // Determine the set of what the spec calls "existent paths" that correspond
+    // to the request paths.  Building the whole set in-memory is OK, because
+    // we're going to need all those paths for our return value anyway.
+    NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
+    {
+        std::lock_guard lock(_lock);
+        for (MTRAttributeRequestPath * path in attributePaths) {
+            [self _addExistentPathsFor:path to:existentPaths];
+        }
+    }
+
+    NSMutableArray<NSDictionary<NSString *, id> *> * result = [NSMutableArray arrayWithCapacity:existentPaths.count];
+    for (MTRAttributePath * path in existentPaths) {
+        auto * value = [self readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
+        if (!value) {
+            continue;
+        }
+        [result addObject:@{
+            MTRAttributePathKey : path,
+            MTRDataKey : value,
+        }];
+    }
+
+    return result;
+}
+
+- (void)_addExistentPathsFor:(MTRAttributeRequestPath *)path to:(NSMutableSet<MTRAttributePath *> *)set
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (path.endpoint != nil) {
+        [self _addExistentPathsForEndpoint:path.endpoint path:path to:set];
+        return;
+    }
+
+    NSArray<NSNumber *> * endpointList = [self _endpointList];
+    for (NSNumber * endpoint in endpointList) {
+        [self _addExistentPathsForEndpoint:endpoint path:path to:set];
+    }
+}
+
+- (void)_addExistentPathsForEndpoint:(NSNumber *)endpoint path:(MTRAttributeRequestPath *)path to:(NSMutableSet<MTRAttributePath *> *)set
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (path.cluster != nil) {
+        [self _addExistentPathsForEndpoint:endpoint cluster:path.cluster attribute:path.attribute to:set];
+        return;
+    }
+
+    auto * clusterList = [self _serverListForEndpointID:endpoint];
+    for (NSNumber * cluster in clusterList) {
+        [self _addExistentPathsForEndpoint:endpoint cluster:cluster attribute:path.attribute to:set];
+    }
+}
+
+- (void)_addExistentPathsForEndpoint:(NSNumber *)endpoint cluster:(NSNumber *)cluster attribute:(NSNumber * _Nullable)attribute to:(NSMutableSet<MTRAttributePath *> *)set
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (attribute != nil) {
+        [set addObject:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:cluster attributeID:attribute]];
+        return;
+    }
+
+    auto * attributeList = [self _attributeListForEndpointID:endpoint clusterID:cluster];
+    for (NSNumber * existentAttribute in attributeList) {
+        [set addObject:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:cluster attributeID:existentAttribute]];
+    }
+}
+
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                            commandID:(NSNumber *)commandID
@@ -3968,17 +4041,53 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     os_unfair_lock_assert_owner(&_lock);
 
-    auto * partsListPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
-                                                               clusterID:@(MTRClusterIDTypeDescriptorID)
-                                                             attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
-    auto * partsList = [self _cachedAttributeValueForPath:partsListPath];
-    NSMutableArray<NSNumber *> * endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
-    if (!endpointsOnDevice) {
-        endpointsOnDevice = [[NSMutableArray<NSNumber *> alloc] init];
-    }
-    // Add Root node!
-    [endpointsOnDevice addObject:@(0)];
+    auto * partsList = [self _cachedListOfNumbersValueForEndpointID:@(kRootEndpointId)
+                                                          clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                        attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+    NSMutableArray<NSNumber *> * endpointsOnDevice = [partsList mutableCopy];
+    // Add Root Node endpoint.
+    [endpointsOnDevice addObject:@(kRootEndpointId)];
     return endpointsOnDevice;
+}
+
+/**
+ * Returns the cached value of the relevant attribute as a list of numbers.
+ * Returns an empty list if the value does not exist or can't be converted to a
+ * list of numbers.
+ */
+- (NSArray<NSNumber *> *)_cachedListOfNumbersValueForEndpointID:(NSNumber *)endpointID
+                                                      clusterID:(NSNumber *)clusterID
+                                                    attributeID:(NSNumber *)attributeID
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * path = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                      clusterID:clusterID
+                                                    attributeID:attributeID];
+    auto * value = [self _cachedAttributeValueForPath:path];
+    NSArray<NSNumber *> * arrayValue = [self arrayOfNumbersFromAttributeValue:value];
+    if (arrayValue) {
+        return arrayValue;
+    }
+    return [NSArray array];
+}
+
+- (NSArray<NSNumber *> *)_serverListForEndpointID:(NSNumber *)endpointID
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    return [self _cachedListOfNumbersValueForEndpointID:endpointID
+                                              clusterID:@(MTRClusterIDTypeDescriptorID)
+                                            attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)];
+}
+
+- (NSArray<NSNumber *> *)_attributeListForEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    return [self _cachedListOfNumbersValueForEndpointID:endpointID
+                                              clusterID:clusterID
+                                            attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
 }
 
 - (NSNumber * _Nullable)_networkFeatures

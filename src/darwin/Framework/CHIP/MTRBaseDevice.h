@@ -166,7 +166,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  */
 NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRAttributeRequestPath : NSObject <NSCopying>
+@interface MTRAttributeRequestPath : NSObject <NSCopying, NSSecureCoding>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable)
@@ -185,7 +185,7 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  */
 NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTREventRequestPath : NSObject <NSCopying>
+@interface MTREventRequestPath : NSObject <NSCopying, NSSecureCoding>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * event MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
