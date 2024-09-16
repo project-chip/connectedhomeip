@@ -93,7 +93,7 @@ public:
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
     /// Return value expectations:
-    ///   - if a response has been placed into a `handler` then std::nullopt MUST be returned. In particular
+    ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
     ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
     ///        > CHIP_NO_ERROR means handler had no status set and we caller to AddStatus(success)
     ///        > std::nullopt means that handler had an appropriate data/status set on it already
