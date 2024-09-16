@@ -9937,6 +9937,11 @@
               - ColorCapabilities
               - ColorLoopUpdateFlags
   removed:
+      clusters:
+          - BarrierControl
+          - BinaryInputBasic
+          - ElectricalMeasurement
+          - OnOffSwitchConfiguration
       enum values:
           ColorControl:
               # Don't expose the new value names on the old enum names
