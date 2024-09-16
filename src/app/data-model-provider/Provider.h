@@ -95,7 +95,7 @@ public:
     /// Return value expectations:
     ///   - if a response has been placed into `handler` then std::nullopt MUST be returned. In particular
     ///     note that CHIP_NO_ERROR is NOT the same as std::nullopt:
-    ///        > CHIP_NO_ERROR means handler had no status set and we caller to AddStatus(success)
+    ///        > CHIP_NO_ERROR means handler had no status set and we expect the caller to AddStatus(success)
     ///        > std::nullopt means that handler had an appropriate data/status set on it already
     ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
     ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
