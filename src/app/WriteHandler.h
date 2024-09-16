@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "ConcreteAttributePath.h"
+#include <app/ConcreteAttributePath.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
