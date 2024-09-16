@@ -188,10 +188,6 @@ using namespace chip::Tracing::DarwinFramework;
     _shutdownPending = NO;
     _assertionLock = OS_UNFAIR_LOCK_INIT;
 
-    // All synchronous suspend/resume activity has to be protected by
-    // @synchronized(self), so that parts of suspend/resume can't
-    // interleave with each other. Using @synchronized here because
-    // MTRDevice may call isSuspended.
     _suspended = startSuspended;
 
     _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
@@ -389,8 +385,8 @@ using namespace chip::Tracing::DarwinFramework;
 {
     BOOL isSuspended = [self isSuspended];
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(controller:isSuspended:)]) {
-            [delegate controller:self isSuspended:isSuspended];
+        if ([delegate respondsToSelector:@selector(controller:suspendedChangedTo:)]) {
+            [delegate controller:self suspendedChangedTo:isSuspended];
         }
     } logString:__PRETTY_FUNCTION__];
 }
@@ -399,6 +395,11 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_LOG("%@ suspending", self);
 
+    if (![self isRunning]) {
+        MTR_LOG_ERROR("%@ not running; can't suspend", self);
+        return;
+    }
+
     NSArray * devicesToSuspend;
     {
         std::lock_guard lock(*self.deviceMapLock);
@@ -406,6 +407,11 @@ using namespace chip::Tracing::DarwinFramework;
         // for any given device exactly one of two things is true:
         // * It is in the snapshot we are creating
         // * It is created after we have changed our _suspended state.
+        if (_suspended) {
+            MTR_LOG("%@ already suspended", self);
+            return;
+        }
+
         _suspended = YES;
         devicesToSuspend = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
@@ -421,11 +427,23 @@ using namespace chip::Tracing::DarwinFramework;
     // * CASE sessions in general.
     // * Possibly try to see whether we can change our fabric entry to not advertise and restart advertising.
     [self _notifyDelegatesOfSuspendState];
+
+    [self _controllerSuspended];
+}
+
+- (void)_controllerSuspended
+{
+    // Subclass hook; nothing to do.
 }
 
 - (void)resume
 {
     MTR_LOG("%@ resuming", self);
+
+    if (![self isRunning]) {
+        MTR_LOG_ERROR("%@ not running; can't resume", self);
+        return;
+    }
 
     NSArray * devicesToResume;
     {
@@ -434,6 +452,11 @@ using namespace chip::Tracing::DarwinFramework;
         // for any given device exactly one of two things is true:
         // * It is in the snapshot we are creating
         // * It is created after we have changed our _suspended state.
+        if (!_suspended) {
+            MTR_LOG("%@ already not suspended", self);
+            return;
+        }
+
         _suspended = NO;
         devicesToResume = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
     }
@@ -444,6 +467,13 @@ using namespace chip::Tracing::DarwinFramework;
     }
 
     [self _notifyDelegatesOfSuspendState];
+
+    [self _controllerResumed];
+}
+
+- (void)_controllerResumed
+{
+    // Subclass hook; nothing to do.
 }
 
 - (BOOL)matchesPendingShutdownControllerWithOperationalCertificate:(nullable MTRCertificateDERBytes)operationalCertificate andRootCertificate:(nullable MTRCertificateDERBytes)rootCertificate
