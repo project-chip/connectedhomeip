@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <app/data-model-provider/Provider.h>
