@@ -453,6 +453,7 @@ dpkg
 dropdown
 dryrun
 DS
+DSLS
 duplicative
 DUT
 DUTS

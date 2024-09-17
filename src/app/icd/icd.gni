@@ -30,6 +30,9 @@ declare_args() {
 
   # Set to true to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
   icd_enforce_sit_slow_poll_limit = false
+
+  # Set to true if device supports dynamic switching from SIT to LIT operating modes (DSLS)
+  chip_enable_icd_dsls = false
 }
 
 # Set the defaults for CIP and UAT features to be consistent with the LIT value.

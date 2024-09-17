@@ -241,6 +241,12 @@ public:
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    void OnSITModeRequest() override;
+    void OnSITModeRequestWithdrawal() override;
+#endif
+
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
 
@@ -355,6 +361,10 @@ private:
     bool mTransitionToIdleCalled       = false;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+    bool mSITModeRequested = false;
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     uint8_t mCheckInRequestCount = 0;
