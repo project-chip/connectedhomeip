@@ -57,21 +57,21 @@ class TC_CADMIN_1_24(MatterBaseTest):
             self, setupPinCode: int, thnum: int, th: str, fail: bool):
 
         logging.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
-        if fail == True:
+        if fail:
             ctx = asserts.assert_raises(ChipStackError)
             self.print_step(0, ctx)
             with ctx:
                 await th.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
+                    nodeId=self.dut_node_id, setupPinCode=setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
                 errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
-                errcode.is_success, errcode, (cycle+1)))
+            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(
+                errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == 0x0000000B,
                                 'Unexpected error code returned from CommissioningComplete')
 
-        elif fail == False:
+        elif not fail:
             await th.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
@@ -105,7 +105,7 @@ class TC_CADMIN_1_24(MatterBaseTest):
         self.discriminator = random.randint(0, 4095)
 
         self.step(2)
-        params = await self.th1.OpenCommissioningWindow(
+        await self.th1.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=180, iteration=10000, discriminator=self.discriminator, option=1)
 
         self.step(3)
@@ -117,11 +117,11 @@ class TC_CADMIN_1_24(MatterBaseTest):
         self.step(4)
         window_status = await self.get_window_status()
         if window_status != 0:
-            asserts.fail(f"Commissioning window is expected to be closed, but was found to be open")
+            asserts.fail("Commissioning window is expected to be closed, but was found to be open")
 
         self.step(5)
         try:
-            params = await self.th1.OpenCommissioningWindow(
+            await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=179, iteration=10000, discriminator=self.discriminator, option=1)
 
         except ChipStackError as e:
@@ -133,7 +133,7 @@ class TC_CADMIN_1_24(MatterBaseTest):
         self.step(6)
         window_status2 = await self.get_window_status()
         if window_status2 != 0:
-            asserts.fail(f"Commissioning window is expected to be closed, but was found to be open")
+            asserts.fail("Commissioning window is expected to be closed, but was found to be open")
 
 
 if __name__ == "__main__":
