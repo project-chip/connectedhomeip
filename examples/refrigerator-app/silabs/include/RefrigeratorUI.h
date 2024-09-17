@@ -42,7 +42,6 @@ private:
     static void DrawHeader(GLIB_Context_t * glibContext);
     static void DrawFooter(GLIB_Context_t * glibContext, bool autoMode = true);
     static void DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bool isCelsius = true);
-    static void DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
-                         uint32_t size);
+    static void DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data, uint32_t size);
     static void DrawSetPoint(GLIB_Context_t * glibContext, int8_t setPoint, bool secondLine);
 };
