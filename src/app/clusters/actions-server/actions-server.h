@@ -22,11 +22,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::Protocols::InteractionModel;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -126,7 +121,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When an InstantActionWithTransition command is recieved, an action (state change) on the involved endpoints shall trigger,
@@ -137,7 +132,7 @@ public:
      * @param transitionTime The time for transition from the current state to the new state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime, Optional<uint32_t> invokeId);
 
     /**
      * When a StartAction command is recieved, the commencement of an action on the involved endpoints shall trigger. Afterwards,
@@ -146,7 +141,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When a StartActionWithDuration command is recieved, the commencement of an action on the involved endpoints shall trigger,
@@ -157,7 +152,7 @@ public:
      * @param duration The time for which an action shall be in start state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
 
     /**
      * When a StopAction command is recieved, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
@@ -166,7 +161,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When a PauseAction command is recieved, the ongoing action on the involved endpoints shall pause and SHALL change the
@@ -175,7 +170,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When a PauseActionWithDuration command is recieved, pauses an ongoing action, and SHALL change the action’s state to Paused.
@@ -186,7 +181,7 @@ public:
      * @param duration The time for which an action shall be in pause state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
 
     /**
      * When a ResumeAction command is recieved, the previously paused action shall resume and SHALL change the action’s state to
@@ -195,7 +190,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When an EnableAction command is recieved, it enables a certain action or automation. Afterwards, the action’s state SHALL be
@@ -204,7 +199,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When an EnableActionWithDuration command is recieved, it enables a certain action or automation, and SHALL change the
@@ -215,7 +210,7 @@ public:
      * @param duration The time for which an action shall be in active state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
 
     /**
      * When a DisableAction command is recieved, it disables a certain action or automation, and SHALL change the action’s state to
@@ -224,7 +219,7 @@ public:
      * @param actionId The id of an action on which an action shall takes place.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId);
 
     /**
      * When a DisableActionWithDuration command is recieved, it disables a certain action or automation, and SHALL change the
@@ -235,7 +230,7 @@ public:
      * @param duration The time for which an action shall be in disable state.
      * @return Returns a Success if an action took place successfully otherwise, suitable error.
      */
-    virtual Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+    virtual Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
 };
 
 } // namespace Actions
