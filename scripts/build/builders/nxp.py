@@ -240,11 +240,9 @@ class NxpBuilder(GnBuilder):
             if 'ZEPHYR_NXP_BASE' not in os.environ:
                 raise Exception("ZEPHYR_NXP_BASE need to be set")
 
-            if 'ZEPHYR_TOOLCHAIN_VARIANT' in os.environ:
-                del os.environ['ZEPHYR_TOOLCHAIN_VARIANT']
-
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
+            cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
 
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder}{build_args}'.format(
                 board_name=self.board.Name(self.os_env),
