@@ -59,9 +59,7 @@ CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);
     InitCommonParts();
-#if (!CONFIG_PWM)
-    LedManager::getInstance().linkLed(LedManager::EAppLed_App0, 1);
-#endif
+
     Protocols::InteractionModel::Status status;
 
     app::DataModel::Nullable<uint8_t> brightness;
@@ -251,3 +249,10 @@ void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
     }
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+void AppTask::LinkLeds(LedManager & ledManager)
+{
+#if (!CONFIG_PWM)
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
+#endif // !CONFIG_PWM
+}
