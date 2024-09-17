@@ -115,7 +115,6 @@ const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-
 void BLEManagerImpl::ProcessEvent(BleEvent_t inEvent)
 {
     switch (inEvent.eventType)
