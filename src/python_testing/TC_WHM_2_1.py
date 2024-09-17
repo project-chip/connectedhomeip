@@ -175,10 +175,10 @@ class TC_WHM_2_1(MatterBaseTest):
             asserts.assert_true(current_mode == old_current_mode, "CurrentMode changed after failed ChangeToMode command!")
 
         else:
-            self.step(5)
-            self.step(6)
-            self.step(7)
-            self.step(8)
+            self.skip_step(5)
+            self.skip_step(6)
+            self.skip_step(7)
+            self.skip_step(8)
 
         self.step(9)
         if self.is_ci:
