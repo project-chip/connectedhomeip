@@ -20,14 +20,14 @@ from tasks import Subprocess
 class TestSubprocess(unittest.TestCase):
 
     def test_expected_output(self):
-        p = Subprocess("python3", "--help")
-        p.start(expected_output="Other environment variables", timeout=1)
+        p = Subprocess("python3", "-c", "print('Hello, World!')")
+        p.start(expected_output="Hello, World!", timeout=1)
         p.terminate()
 
     def test_expected_output_timeout(self):
-        p = Subprocess("python3", "--help")
+        p = Subprocess("python3", "--version")
         with self.assertRaises(TimeoutError):
-            p.start(expected_output="Non-existing output 1234", timeout=1)
+            p.start(expected_output="Python 1.0.0", timeout=1)
         p.terminate()
 
 
