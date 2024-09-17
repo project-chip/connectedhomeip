@@ -29,7 +29,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #include <cctype>
 
