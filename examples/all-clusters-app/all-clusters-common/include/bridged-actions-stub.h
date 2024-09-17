@@ -25,12 +25,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Actions;
-using namespace chip::app::Clusters::Actions::Attributes;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -91,18 +85,18 @@ private:
     CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, EndpointListStructType & epList) override;
     CHIP_ERROR FindActionIdInActionList(uint16_t actionId) override;
 
-    Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime, Optional<uint32_t> invokeId) override;
-    Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
-    Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
-    Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
-    Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
-    Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId) override;
+    Protocols::InteractionModel::Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId) override;
 };
 } // namespace Actions
 } // namespace Clusters
