@@ -117,7 +117,7 @@ void RefrigeratorManager::RefAndTempCtrlAttributeChangeHandler(EndpointId endpoi
     break;
 
     default: {
-        ChipLogDetail(AppServer, "Unhandled Refrigerator and Temprature attribute %d", attributeId);
+        ChipLogDetail(AppServer, "Unhandled Refrigerator and Temprature attribute %ld", attributeId);
         return;
     }
     break;
@@ -163,7 +163,7 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
         break;
 
         default: {
-            ChipLogDetail(AppServer, "Unhandled Temprature controlled attribute %d", attributeId);
+            ChipLogDetail(AppServer, "Unhandled Temprature controlled attribute %ld", attributeId);
             return;
         }
         break;
@@ -197,7 +197,7 @@ void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId,
     break;
 
     default: {
-        ChipLogDetail(AppServer, "Unhandled Refrigerator Alarm attribute %x", attributeId);
+        ChipLogDetail(AppServer, "Unhandled Refrigerator Alarm attribute %ld", attributeId);
         return;
     }
     break;
