@@ -84,21 +84,157 @@ class Delegate
 public:
     virtual ~Delegate() = default;
 
+    /**
+     * Get the action at the Nth index from list of actions.
+     * @param index The index of the action to be returned. It is assumed that actions are indexable from 0 and with no gaps.
+     * @param action A reference to the action struct which copies existing and initialised buffer at index.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the action was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available actions.
+     */
     virtual CHIP_ERROR ReadActionAtIndex(uint16_t index, Structs::ActionStruct::Type & action);
+
+    /**
+     * Get the EndpointList at the Nth index from list of endpointList.
+     * @param index The index of the endpointList to be returned. It is assumed that actions are indexable from 0 and with no gaps.
+     * @param epList A reference to the endpointList struct which copies existing and initialised buffer at index.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available endpointList.
+     */
     virtual CHIP_ERROR ReadEndpointListAtIndex(uint16_t index, Structs::EndpointListStruct::Type & epList);
+
+    /**
+     * Find the action with matching actionId in the list of action.
+     * @param actionId The action to be find in the list of action.
+     * @return Returns a CHIP_NO_ERROR if matching action is found.
+     * CHIP_ERROR_NOT_FOUND if the matching action does not found in the list of action.
+     */
     virtual CHIP_ERROR FindActionIdInActionList(uint16_t actionId);
 
+    /**
+     * On reciept of each and every command,
+     * if the InvokeID data field is provided by the client when invoking a command, the server SHALL generate a StateChanged event
+     * when the action changes to a new state or an ActionFailed event when execution of the action fails.
+     *
+     * @return If the command refers to an action which currently is not in a state where the command applies, a response SHALL be
+     * generated with the StatusCode INVALID_COMMAND.
+     */
+
+    /**
+     * When an InstantAction command is recieved, an action (state change) on the involved endpoints shall trigger,
+     * in a "fire and forget" manner. Afterwards, the action’s state SHALL be Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleInstantAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When an InstantActionWithTransition command is recieved, an action (state change) on the involved endpoints shall trigger,
+     * with a specified time to transition from the current state to the new state. During the transition, the action’s state SHALL
+     * be Active. Afterwards, the action’s state SHALL be Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @param transitionTime The time for transition from the current state to the new state.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleInstantActionWithTransition(uint16_t actionId, uint16_t transitionTime, Optional<uint32_t> invokeId);
+
+    /**
+     * When a StartAction command is recieved, the commencement of an action on the involved endpoints shall trigger. Afterwards,
+     * the action’s state SHALL be Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleStartAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When a StartActionWithDuration command is recieved, the commencement of an action on the involved endpoints shall trigger,
+     * and SHALL change the action’s state to Active. After the specified Duration, the action will stop, and the action’s state
+     * SHALL change to Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @param duration The time for which an action shall be in start state.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleStartActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+
+    /**
+     * When a StopAction command is recieved, the ongoing action on the involved endpoints shall stop. Afterwards, the action’s
+     * state SHALL be Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleStopAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When a PauseAction command is recieved, the ongoing action on the involved endpoints shall pause and SHALL change the
+     * action’s state to Paused.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandlePauseAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When a PauseActionWithDuration command is recieved, pauses an ongoing action, and SHALL change the action’s state to Paused.
+     * After the specified Duration, the ongoing action will be automatically resumed. which SHALL change the action’s state to
+     * Active.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @param duration The time for which an action shall be in pause state.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandlePauseActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+
+    /**
+     * When a ResumeAction command is recieved, the previously paused action shall resume and SHALL change the action’s state to
+     * Active.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleResumeAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When an EnableAction command is recieved, it enables a certain action or automation. Afterwards, the action’s state SHALL be
+     * Active.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleEnableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When an EnableActionWithDuration command is recieved, it enables a certain action or automation, and SHALL change the
+     * action’s state to be Active. After the specified Duration, the action or automation will stop, and the action’s state SHALL
+     * change to Disabled.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @param duration The time for which an action shall be in active state.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleEnableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
+
+    /**
+     * When a DisableAction command is recieved, it disables a certain action or automation, and SHALL change the action’s state to
+     * Inactive.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleDisableAction(uint16_t actionId, Optional<uint32_t> invokeId);
+
+    /**
+     * When a DisableActionWithDuration command is recieved, it disables a certain action or automation, and SHALL change the
+     * action’s state to Disabled. After the specified Duration, the action or automation will re-start, and the action’s state
+     * SHALL change to either Inactive or Active, depending on the actions.
+     *
+     * @param actionId The id of an action on which an action shall takes place.
+     * @param duration The time for which an action shall be in disable state.
+     * @return Returns a Success if an action took place successfully otherwise, suitable error.
+     */
     virtual Status HandleDisableActionWithDuration(uint16_t actionId, uint32_t duration, Optional<uint32_t> invokeId);
 };
 
