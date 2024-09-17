@@ -20,7 +20,7 @@
 
 #include "OtaPrivate.h"
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 
 /* Posted Operations Size Info */
 #define NB_PENDING_TRANSACTIONS 12

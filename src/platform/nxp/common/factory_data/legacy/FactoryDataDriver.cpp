@@ -17,8 +17,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -19,7 +19,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #if !CHIP_USE_PLAIN_DAC_KEY
 #include "sss_crypto.h"

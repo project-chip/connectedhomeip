@@ -16,25 +16,25 @@
  *    limitations under the License.
  */
 
-#include <platform/nxp/common/legacy/OTAImageProcessorImpl.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/nxp/mcxw71_k32w1/OTAFirmwareProcessor.h>
+#include <platform/nxp/common/ota/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-#include <platform/nxp/common/legacy/OTAFactoryDataProcessor.h>
-#include <platform/nxp/mcxw71_k32w1/FactoryDataProviderImpl.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
+#include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 #include "OtaSupport.h"
 
-#ifndef CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST
-#define CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST 0
+#ifndef CONFIG_CHIP_MAX_ENTRIES_TEST
+#define CONFIG_CHIP_MAX_ENTRIES_TEST 0
 #endif
 
-#ifndef CONFIG_CHIP_K32W1_OTA_ABORT_HOOK
-#define CONFIG_CHIP_K32W1_OTA_ABORT_HOOK 0
+#ifndef CONFIG_CHIP_OTA_ABORT_HOOK
+#define CONFIG_CHIP_OTA_ABORT_HOOK 0
 #endif
 
 #define APPLICATION_PROCESSOR_TAG 1
@@ -61,7 +61,7 @@ CHIP_ERROR ProcessDescriptor(void * descriptor)
 
 extern "C" WEAK CHIP_ERROR OtaHookInit()
 {
-#if CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST
+#if CONFIG_CHIP_MAX_ENTRIES_TEST
     static chip::OTAFirmwareProcessor processors[8];
 #endif
 
@@ -77,13 +77,13 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(FACTORY_DATA_PROCESSOR_TAG, &sFactoryDataProcessor));
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
-#if CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST
+#if CONFIG_CHIP_MAX_ENTRIES_TEST
     for (auto i = 0; i < 8; i++)
     {
         processors[i].RegisterDescriptorCallback(ProcessDescriptor);
         ReturnErrorOnFailure(imageProcessor.RegisterProcessor(i + 4, &processors[i]));
     }
-#endif // CONFIG_CHIP_K32W1_MAX_ENTRIES_TEST
+#endif // CONFIG_CHIP_MAX_ENTRIES_TEST
 
     return CHIP_NO_ERROR;
 }
@@ -106,10 +106,10 @@ extern "C" WEAK void OtaHookAbort()
      Disclaimer: This is not default behavior and it was not checked against
      Matter specification compliance. You should use this at your own discretion.
 
-     Use CONFIG_CHIP_K32W1_OTA_ABORT_HOOK to enable/disable this feature (disabled by default).
+     Use CONFIG_CHIP_OTA_ABORT_HOOK to enable/disable this feature (disabled by default).
      This hook is called inside OTAImageProcessorImpl::HandleAbort to schedule a retry (when enabled).
     */
-#if CONFIG_CHIP_K32W1_OTA_ABORT_HOOK
+#if CONFIG_CHIP_OTA_ABORT_HOOK
     auto & imageProcessor   = chip::OTAImageProcessorImpl::GetDefaultInstance();
     auto & providerLocation = imageProcessor.GetBackupProvider();
 

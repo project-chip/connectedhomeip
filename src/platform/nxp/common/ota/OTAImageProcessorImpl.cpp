@@ -23,7 +23,7 @@
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/nxp/common/legacy/OTAImageProcessorImpl.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;

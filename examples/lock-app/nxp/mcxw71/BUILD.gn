@@ -37,6 +37,8 @@ assert(target_os == "freertos")
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 common_example_dir = "${chip_root}/examples/platform/nxp/common"
+support_common_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/common"
 
 mcxw71_k32w1_sdk("sdk") {
   defines = []
@@ -51,6 +53,9 @@ mcxw71_k32w1_sdk("sdk") {
 
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+
+  # Indicate the default path to GATT database
+  include_dirs += [ "${support_common_platform_dir}/ble" ]
 
   include_dirs += [
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
@@ -67,6 +72,7 @@ mcxw71_k32w1_sdk("sdk") {
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
     "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${support_common_platform_dir}/ble/ble_function_mux.c",
   ]
 
   if (is_debug) {
@@ -102,7 +108,7 @@ mcxw71_k32w1_executable("lock_app") {
     "CONFIG_NETWORK_LAYER_BLE=1",
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_OPERATIONAL_KEYSTORE=1",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/legacy/FactoryDataProvider.h\"",
+    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
     "CONFIG_APP_FREERTOS_OS=1",
   ]
 
@@ -144,6 +150,7 @@ mcxw71_k32w1_executable("lock_app") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
+    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
   ]
 
@@ -152,7 +159,8 @@ mcxw71_k32w1_executable("lock_app") {
   }
 
   if (chip_with_factory_data == 1) {
-    include_dirs += [ "${chip_root}/src/platform/nxp/common/legacy" ]
+    include_dirs +=
+        [ "${chip_root}/src/platform/nxp/common/factory_data/legacy" ]
     deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
@@ -170,7 +178,7 @@ mcxw71_k32w1_executable("lock_app") {
 
   if (chip_enable_ota_requestor) {
     defines += [
-      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/legacy/OTAImageProcessorImpl.h\"",
+      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"",
 
       # The status LED and the external flash CS pin are wired together. The OTA image writing may fail if used together.
       "LED_MANAGER_ENABLE_STATUS_LED=0",
@@ -198,7 +206,6 @@ mcxw71_k32w1_executable("lock_app") {
   sources += [
     "${example_platform_dir}/button/ButtonManager.cpp",
     "${example_platform_dir}/clusters/Identify.cpp",
-    "${example_platform_dir}/operational_keystore/OperationalKeystore.cpp",
   ]
 
   if (chip_enable_ota_requestor) {

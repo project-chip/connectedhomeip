@@ -20,8 +20,8 @@
 #include <lib/support/BufferReader.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/common/legacy/OTAImageProcessorImpl.h>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #if OTA_ENCRYPTION_ENABLE
 #include "OtaUtils.h"
 #include "rom_aes.h"

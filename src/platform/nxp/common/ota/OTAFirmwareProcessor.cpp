@@ -17,8 +17,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/common/legacy/OTAImageProcessorImpl.h>
-#include <platform/nxp/mcxw71_k32w1/OTAFirmwareProcessor.h>
+#include <platform/nxp/common/ota/OTAFirmwareProcessor.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 
 #include "OtaSupport.h"
 
