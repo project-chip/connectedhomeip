@@ -62,6 +62,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
         ChipLogProgress(NotSpecified, "Successfully paired bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mBridgeNodeId));
 
+        DeviceMgr().UpdateLastUsedNodeId(mBridgeNodeId);
         DeviceMgr().SubscribeRemoteFabricBridge();
 
         if (DeviceMgr().IsLocalBridgeReady())
@@ -180,6 +181,7 @@ void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, C
     if (err == CHIP_NO_ERROR)
     {
         DeviceMgr().SetLocalBridgeNodeId(mLocalBridgeNodeId);
+        DeviceMgr().UpdateLastUsedNodeId(mLocalBridgeNodeId);
         ChipLogProgress(NotSpecified, "Successfully paired local bridge device: NodeId: " ChipLogFormatX64,
                         ChipLogValueX64(mLocalBridgeNodeId));
     }
