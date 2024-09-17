@@ -222,7 +222,7 @@ void BLEManagerImpl::sl_ble_init()
     //  Exchange of GATT info with BLE stack
     rsi_ble_add_matter_service();
     rsi_ble_set_random_address_with_value(randomAddrBLE);
-    
+
     sInstance.sBleEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
     VerifyOrDie(sInstance.sBleEventQueue != nullptr);
 
