@@ -53,17 +53,17 @@ class TC_DRLK_2_5(MatterBaseTest):
             TestStep("3", "TH sends GetWeekDaySchedule Command to DUT.",
                      "Verify that the DUT sends GetWeekDayScheduleResponse command with expected values."),
             TestStep("4", "TH sends SetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
+                     "Verify that the DUT responds with INVALID_COMMAND."),
             TestStep("5", "TH sends SetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
+                     "Verify that the DUT responds with INVALID_COMMAND."),
             TestStep("6", "TH sends SetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
+                     "Verify that the DUT responds with INVALID_COMMAND."),
             TestStep("7", "TH sends SetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
+                     "Verify that the DUT responds with INVALID_COMMAND."),
             TestStep("8", "TH sends GetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
+                     "Verify that the DUT responds with with INVALID_COMMAND."),
             TestStep("9", "TH sends GetWeekDaySchedule Command to DUT.",
-                     "Verify that the DUT responds with SetCredentialResponse command with Status NOT_FOUND."),
+                     "Verify that the DUT responds with GetWeekDayScheduleResponse command with Status NOT_FOUND."),
             TestStep("10a", "TH sends ClearWeekDaySchedule Command to DUT.", "Verify that the DUT sends SUCCESS response."),
             TestStep("10b", "TH sends ClearWeekDaySchedule Command to DUT.", "Verify that the DUT sends INVALID_COMMAND response."),
             TestStep("10c", "TH sends ClearWeekDaySchedule Command to DUT.", "Verify that the DUT sends INVALID_COMMAND response."),
@@ -192,6 +192,8 @@ class TC_DRLK_2_5(MatterBaseTest):
                                                                                                cluster=drlkcluster,
                                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfWeekDaySchedulesSupportedPerUser)
             logging.info("NumberOfWeekDaySchedulesSupportedPerUser %s" % (number_week_day_schedules_supported_per_user))
+            asserts.assert_in(number_week_day_schedules_supported_per_user, range(
+                0, 255), "NumberOfWeekDaySchedulesSupportedPerUser value is out of range")
         self.step("2a")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:
@@ -267,8 +269,8 @@ class TC_DRLK_2_5(MatterBaseTest):
                 Status.InvalidCommand)
         self.step("5")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
-            week_day_index = 0  # invalid value
-            day_mask_map_index = 2  # valid value
+            week_day_index = 1  # Valid value
+            day_mask_map_index = 0  # invalid value
             await self.set_week_days_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -281,7 +283,7 @@ class TC_DRLK_2_5(MatterBaseTest):
         self.step("6")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             week_day_index = 1  # valid value
-            day_mask_map_index = 0  # invalid value
+            day_mask_map_index = 128  # invalid value
             await self.set_week_days_schedule_cmd(
                 week_day_index,
                 user_index,
@@ -332,7 +334,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                 start_Minute,
                 end_Hour,
                 end_Minute,
-                Status.InvalidCommand)
+                Status.NotFound)
         self.step("10a")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0d.Rsp")):
             week_day_index = 1
