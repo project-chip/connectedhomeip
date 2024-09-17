@@ -35,6 +35,7 @@ from chip.native import PyChipError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CADMIN_1_19(MatterBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
@@ -88,15 +89,21 @@ class TC_CADMIN_1_19(MatterBaseTest):
             TestStep(3, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
             TestStep(4, "TH_CR1 reads the SupportedFabrics attribute from the Node Operational Credentials cluster. Save max_fabrics"),
             TestStep(5, "Repeat the following steps (5a and 5b) max_fabrics - initial_number_of_fabrics times"),
-            TestStep("5a", "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
-            TestStep("5b", "TH creates a controller on a new fabric and commissions DUT_CE using that controller", "Commissioning is successful"),
-            TestStep(6, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.", "Verify this is equal to max_fabrics"),
-            TestStep(7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
-            TestStep(8, "TH creates a controller on a new fabric and commissions DUT_CE using that controller", "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
+            TestStep(
+                "5a", "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+            TestStep("5b", "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
+                     "Commissioning is successful"),
+            TestStep(6, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
+                     "Verify this is equal to max_fabrics"),
+            TestStep(
+                7, "TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration", "{resDutSuccess}"),
+            TestStep(8, "TH creates a controller on a new fabric and commissions DUT_CE using that controller",
+                     "Verify DUT_CE responds with NOCResponse with a StatusCode field value of TableFull(5)"),
             TestStep(9, "Repeat the following steps (9a and 9b) for each controller (TH_CRn) created by this test"),
             TestStep("9a", "The controller reads the CurrentFabricIndex from the Node Operational Credentials cluster. Save as fabric_index."),
             TestStep("9b", "TH_CR1 sends the RemoveFabric command to DUT_CE", "{resDutSuccess}"),
-            TestStep(10, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.", "Verify this is equal to initial_number_of_fabrics."),            
+            TestStep(10, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
+                     "Verify this is equal to initial_number_of_fabrics."),
         ]
 
     def pics_TC_CADMIN_1_19(self) -> list[str]:
@@ -122,7 +129,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(3)
         fabrics = await self.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
-        
+
         self.step(4)
         OC_cluster = Clusters.OperationalCredentials
         max_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
@@ -143,29 +150,31 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
             self.step("5b")
             fids_ca_dir['thca' + str(fid)] = self.certificate_authority_manager.NewCertificateAuthority()
-            fids_fa_dir['thfa' + str(fid)] = fids_ca_dir['thca' + str(fid)].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid) 
+            fids_fa_dir['thfa' + str(fid)] = fids_ca_dir['thca' + str(fid)].NewFabricAdmin(vendorId=0xFFF1, fabricId=fid)
             fids['th' + str(fid)] = fids_fa_dir['thfa' + str(fid)].NewController(nodeId=fid, useTestCommissioner=True)
             await self.CommissionAttempt(setupPinCode, thnum=fid, th=fids['th' + str(fid)], fail=False)
 
         self.step(6)
-        #TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
+        # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
         if current_fabrics != max_fabrics:
             asserts.fail(f"Expected number of fabrics not correct, instead was {str(current_fabrics)}")
-        
+
         self.step(7)
         params = await self.OpenCommissioningWindow()
         setupPinCode = params.setupPinCode
 
         self.step(8)
-        #TH creates a controller on a new fabric and commissions DUT_CE using that controller
+        # TH creates a controller on a new fabric and commissions DUT_CE using that controller
         fids_ca_dir['thca' + str(current_fabrics + 1)] = self.certificate_authority_manager.NewCertificateAuthority()
-        fids_fa_dir['thfa' + str(current_fabrics + 1)] = fids_ca_dir['thca' + str(current_fabrics + 1)].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1) 
+        fids_fa_dir['thfa' + str(current_fabrics + 1)] = fids_ca_dir['thca' + str(current_fabrics + 1)
+                                                                     ].NewFabricAdmin(vendorId=0xFFF1, fabricId=current_fabrics + 1)
         try:
-            fids['th' + str(current_fabrics + 1)] = fids_fa_dir['thfa' + str(current_fabrics + 1)].NewController(nodeId=current_fabrics + 1, useTestCommissioner=True)
+            fids['th' + str(current_fabrics + 1)] = fids_fa_dir['thfa' + str(current_fabrics + 1)
+                                                                ].NewController(nodeId=current_fabrics + 1, useTestCommissioner=True)
             await self.CommissionAttempt(setupPinCode, thnum=fid, th=fids['th' + str(current_fabrics + 1)], fail=True)
             asserts.fail("Expected exception not thrown")
-        
+
         except ChipStackError as e:
             # When attempting to create a new controller we are expected to get the following response:
             # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
@@ -186,10 +195,11 @@ class TC_CADMIN_1_19(MatterBaseTest):
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(10)
-        #TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
+        # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         if current_fabrics != initial_number_of_fabrics:
             asserts.fail(f"Found more than expected fabrics: {str(current_fabrics)}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
