@@ -58,7 +58,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
         logging.info(f"-----------------Commissioning with TH_CR{str(thnum)}-------------------------")
         if fail:
             ctx = asserts.assert_raises(ChipStackError)
-            self.print_step(0, ctx)
             with ctx:
                 await th.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setupPinCode,
@@ -132,8 +131,6 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.step(4)
         OC_cluster = Clusters.OperationalCredentials
         max_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.SupportedFabrics)
-
-        self.print_step(0, (max_fabrics - initial_number_of_fabrics))
 
         self.step(5)
         fids_ca_dir = {}
