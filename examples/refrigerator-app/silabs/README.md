@@ -243,7 +243,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking slowly_ ; No implementation is present. this feature will be available in a future update.
         -   _Blinking quickly_ ; No implementation is present. this feature will be available in a future update.
 
-    **Push Button 0** Increase either tilt or lift, and factory reset
+    **Push Button 0**  Function button and factory reset
 
         -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
