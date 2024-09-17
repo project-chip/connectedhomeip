@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import enum
 import fnmatch
 import glob
 import logging
@@ -8,18 +9,15 @@ import shlex
 import stat
 import subprocess
 import sys
-import tabulate
 import textwrap
 import time
+from dataclasses import dataclass
+from typing import List
 
+import alive_progress
 import click
 import coloredlogs
-
-from typing import List
-from dataclasses import dataclass
-
-import enum
-import alive_progress
+import tabulate
 
 
 class BinaryRunner(enum.Enum):
