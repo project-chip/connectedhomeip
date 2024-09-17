@@ -29,13 +29,11 @@
 extern std::unique_ptr<chip::app::Clusters::PowerTopology::PowerTopologyDelegate> gPTDelegate;
 extern std::unique_ptr<chip::app::Clusters::PowerTopology::PowerTopologyInstance> gPTInstance;
 
-
 extern std::unique_ptr<chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate> gEPMDelegate;
 extern std::unique_ptr<chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance> gEPMInstance;
 
 // Electrical Energy Measurement cluster uses ember to initialise
 extern std::unique_ptr<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
-
 
 CHIP_ERROR PowerTopologyInit();
 CHIP_ERROR PowerTopologyShutdown();

@@ -34,8 +34,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
-static constexpr int POWER_TOPOLOGY_ENDPOINT=1;
-static constexpr int ENERGY_METER_ENDPOINT=1;
+static constexpr int POWER_TOPOLOGY_ENDPOINT = 1;
+static constexpr int ENERGY_METER_ENDPOINT   = 1;
 
 using namespace chip;
 using namespace chip::app;

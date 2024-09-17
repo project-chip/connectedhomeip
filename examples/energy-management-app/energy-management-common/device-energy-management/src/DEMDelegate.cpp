@@ -17,8 +17,8 @@
  */
 
 #include <DeviceEnergyManagementManager.h>
-#include <device-energy-management-modes.h>
 #include <EnergyManagementAppCmdLineOptions.h>
+#include <device-energy-management-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

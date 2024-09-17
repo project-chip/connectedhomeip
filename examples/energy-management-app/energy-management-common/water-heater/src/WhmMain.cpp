@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include <DEMDelegate.h>
+#include <EnergyReportingMain.h>
 #include <WhmInstance.h>
 #include <WhmManufacturer.h>
-#include <EnergyReportingMain.h>
-#include <DEMDelegate.h>
 #include <device-energy-management-modes.h>
 #include <water-heater-mode.h>
 
@@ -141,8 +141,8 @@ CHIP_ERROR WhmManufacturerInit()
     }
 
     /* Now create WhmManufacturer */
-    gWhmManufacturer = std::make_unique<WhmManufacturer>(gWhmInstance.get(), gEPMInstance.get(),
-                                                         gPTInstance.get(), gDEMInstance.get());
+    gWhmManufacturer =
+        std::make_unique<WhmManufacturer>(gWhmInstance.get(), gEPMInstance.get(), gPTInstance.get(), gDEMInstance.get());
     if (!gWhmManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WhmManufacturer");
@@ -196,7 +196,7 @@ CHIP_ERROR WhmApplicationInit()
     }
 
     err = PowerTopologyInit();
-    if( err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         DeviceEnergyManagementShutdown();
         WhmShutdown();

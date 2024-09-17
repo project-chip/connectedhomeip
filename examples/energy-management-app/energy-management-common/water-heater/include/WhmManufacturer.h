@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <DeviceEnergyManagementManager.h>
 #include <DEMManufacturerDelegate.h>
+#include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <PowerTopologyDelegate.h>
 
@@ -42,13 +42,12 @@ class WhmManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
 public:
     WhmManufacturer(WaterHeaterManagementInstance * whmInstance,
                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                    PowerTopology::PowerTopologyInstance * aPTInstance,
-                    DeviceEnergyManagementManager * aDEMInstance)
+                    PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
     {
         mWhmInstance = whmInstance;
-        mEPMInstance  = aEPMInstance;
-        mPTInstance   = aPTInstance;
-        mDEMInstance  = aDEMInstance;
+        mEPMInstance = aEPMInstance;
+        mPTInstance  = aPTInstance;
+        mDEMInstance = aDEMInstance;
     }
 
     WaterHeaterManagementInstance * GetWhmInstance() { return mWhmInstance; }
@@ -63,7 +62,7 @@ public:
         return nullptr;
     }
 
-        ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * GetEPMDelegate()
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * GetEPMDelegate()
     {
         if (mEPMInstance)
         {
@@ -180,9 +179,8 @@ public:
      */
     void BoostCommandFinished();
 
-
-    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, Power_mW aActivePower_mW,
-                                Voltage_mV aVoltage_mV, Amperage_mA aActiveCurrent_mA);
+    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, Power_mW aActivePower_mW, Voltage_mV aVoltage_mV,
+                                Amperage_mA aActiveCurrent_mA);
 
     /* Implement the DEMManufacturerDelegate interface */
 

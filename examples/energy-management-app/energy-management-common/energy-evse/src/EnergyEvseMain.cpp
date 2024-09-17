@@ -18,15 +18,15 @@
 
 #include "EnergyManagementAppCmdLineOptions.h"
 
+#include <DEMDelegate.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
+#include <EnergyReportingMain.h>
 #include <PowerTopologyDelegate.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
-#include <EnergyReportingMain.h>
-#include <DEMDelegate.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -56,13 +56,10 @@ static std::unique_ptr<EnergyEvseManager> gEvseInstance;
 
 static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
-
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
     return gEvseManufacturer.get();
 }
-
-
 
 /*
  *  @brief  Creates a Delegate and Instance for EVSE cluster
