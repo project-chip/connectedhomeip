@@ -266,7 +266,8 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
-        TargetPart('pump', app=Efr32App.PUMP)
+        TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
