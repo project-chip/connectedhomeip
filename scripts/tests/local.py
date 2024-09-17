@@ -5,6 +5,7 @@ import fnmatch
 import glob
 import logging
 import os
+import platform
 import shlex
 import stat
 import subprocess
@@ -26,7 +27,7 @@ def _get_native_machine_target():
     """
     Returns the build prefix for applications, such as 'linux-x64'.
     """
-    current_system_info = uname()
+    current_system_info = platform.uname()
     arch = current_system_info.machine
     if arch == 'x86_64':
         arch = 'x64'
